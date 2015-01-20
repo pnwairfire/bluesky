@@ -6,7 +6,13 @@ BlueSky Framework rearchitected as a pipeable collection of standalone modules.
 
 ### Install Dependencies
 
+Run the following to install dependencies:
+
     pip install -r requirements.txt
+
+Run the following for installing development dependencies (like running tests):
+
+    pip install -r dev-requirements.txt
 
 ### Setup Environment
 
@@ -15,11 +21,16 @@ to the search path. Some of the scripts bin do this automatically.
 
 ## Running tests
 
-Use nose:
+Use pytest:
 
-    nosetests
-    nosetests test/bluesky/path/to/some_tests.py
-    nosetests -v -w ./test/bluesky/
+    py.test
+    py.test test/bluesky/path/to/some_tests.py
+
+You can also use the ```--collect-only``` option to see a list of all tests.
+
+    py.test --collect-only
+
+See [pytest](http://pytest.org/latest/getting-started.html#getstarted) for more information about
 
 ## Installation
 
