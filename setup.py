@@ -16,6 +16,7 @@ setup(
         'bluesky'
     ],
     scripts=[
+        'bin/bsp'
     ],
     url='git@bitbucket.org:fera/airfire-pyairfire.git',
     description='General toolbox of pythong utilities for AirFire team.',

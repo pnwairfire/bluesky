@@ -1,0 +1,96 @@
+#!/usr/bin/env python
+
+"""bsp: Runs
+
+Example calls:
+ > ./bin/bsp.py
+"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2014, AirFire, PNW, USFS"
+
+import json
+import importlib
+import logging
+import pkgutil
+import sys
+
+from pyairfire import scripting
+
+try:
+    import bluesky
+except:
+    import os
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
+    sys.path.insert(0, root_dir)
+    import bluesky
+
+# Note: though some argue that all required parameters should be specified as
+# positional arguments, I prefer using 'options' flags, even though this
+# meands that there are required 'options', which is oxymoronic.
+
+REQUIRED_OPTIONS = [
+    {
+        'short': '-m',
+        'long': '--module',
+        'dest': 'modules',
+        'help': 'status logger query API endpoint (required)',
+        'action': 'append'
+    }
+]
+
+OPTIONAL_OPTIONS = [
+    {
+        'short': '-l',
+        'long': '--list-modules',
+        'dest': 'list_modules',
+        'help': 'lists modules available to use in pipeline; order matters',
+        'action': "store_true",
+        'default': []
+    }
+]
+
+# Note: pkgutil.walk_packages recursively walks nested packages, while
+# pkgutil.iter_modules iterates through only modules and packages that
+# are one deep
+# TODO:
+modules = [
+    importlib.import_module(p[1]) for p in pkgutil.iter_modules(bluesky.__path__, bluesky.__name__ + '.') if p[2]
+]
+
+def exit_with_msg(msg, extra_output=None):
+    print "* Error: %s\n" % (msg)
+    if extra_output:
+        extra_output()
+    sys.exit(1)
+
+def validate_options(options):
+    # TODO: validate options values as necessary
+    pass
+
+def main():
+    parser, options, args = scripting.options.parse_options(REQUIRED_OPTIONS + OPTIONAL_OPTIONS)
+
+    # TODO: figure out way to include available modules in help message, and then
+    # remove '--list-modules' option
+    if options.list_modules:
+        scripting.utils.exit_with_msg(
+            "...List modules here...",
+            extra_preceeding_output=lambda: parser.print_help(),
+            exit_code=0, prefix="")
+
+    scripting.options.check_required_options(options, REQUIRED_OPTIONS, parser)
+    validate_options(options, parser)
+    scripting.options.configure_logging_from_options(options, parser)
+    scripting.options.output_options(parser)
+
+    try:
+        # TODO: run...
+        pass
+
+    except Exception, e:
+        raise
+        exit_with_msg(e.message)
+
+if __name__ == "__main__":
+    main()
