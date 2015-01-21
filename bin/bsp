@@ -18,25 +18,25 @@ import sys
 from pyairfire import scripting
 
 try:
-    import bluesky
+    from bluesky import modules
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    import bluesky
+    from bluesky import modules
 
 # Note: though some argue that all required parameters should be specified as
 # positional arguments, I prefer using 'options' flags, even though this
 # meands that there are required 'options', which is oxymoronic.
 
 REQUIRED_OPTIONS = [
-    {
-        'short': '-m',
-        'long': '--module',
-        'dest': 'modules',
-        'help': 'status logger query API endpoint (required)',
-        'action': 'append'
-    }
+    # {
+    #     'short': '-m',
+    #     'long': '--module',
+    #     'dest': 'modules',
+    #     'help': 'status logger query API endpoint (required)',
+    #     'action': 'append'
+    # }
 ]
 
 OPTIONAL_OPTIONS = [
@@ -47,15 +47,24 @@ OPTIONAL_OPTIONS = [
         'help': 'lists modules available to use in pipeline; order matters',
         'action': "store_true",
         'default': []
+    },
+    {
+        'short': '-c',
+        'long': '--config-file',
+        'dest': 'config_file',
+        'help': 'config file comtaining overrides for default config values',
+        'action': "store",
+        'default': []
     }
+
 ]
 
 # Note: pkgutil.walk_packages recursively walks nested packages, while
 # pkgutil.iter_modules iterates through only modules and packages that
 # are one deep
 # TODO:
-modules = [
-    importlib.import_module(p[1]) for p in pkgutil.iter_modules(bluesky.__path__, bluesky.__name__ + '.') if p[2]
+AVAILABLE_MODULES = [
+    p[1].split('.')[-1] for p in pkgutil.iter_modules(modules.__path__, modules.__name__ + '.') if p[2]
 ]
 
 def exit_with_msg(msg, extra_output=None):
@@ -68,25 +77,50 @@ def validate_options(options):
     # TODO: validate options values as necessary
     pass
 
-def main():
-    parser, options, args = scripting.options.parse_options(REQUIRED_OPTIONS + OPTIONAL_OPTIONS)
+def input_fires():
+    fires = [] # TODO: input fires
+    return fires
 
-    # TODO: figure out way to include available modules in help message, and then
-    # remove '--list-modules' option
+def output_fires(fires):
+    # TODO: output fires
+    pass
+
+
+def main():
+    parser, options, args = scripting.options.parse_options(
+        REQUIRED_OPTIONS + OPTIONAL_OPTIONS, usage="usage: %prog [options] <module> [<module> ...]")
+
+    # TODO: figure out way to include available modules in help message,
+    # and then remove '--list-modules' option
     if options.list_modules:
         scripting.utils.exit_with_msg(
-            "...List modules here...",
+            "Available Modules:\n\n\t%s" % ('\n\t'.join(AVAILABLE_MODULES)),
             extra_preceeding_output=lambda: parser.print_help(),
             exit_code=0, prefix="")
 
+    if len(args) == 0:
+        scripting.utils.exit_with_msg("Specify one or more BlueSky modules", extra_output=lambda: parser.print_help())
+
     scripting.options.check_required_options(options, REQUIRED_OPTIONS, parser)
-    validate_options(options, parser)
+    validate_options(options)
     scripting.options.configure_logging_from_options(options, parser)
     scripting.options.output_options(parser)
 
     try:
-        # TODO: run...
-        pass
+        modules = [
+            importlib.import_module('bluesky.modules.%s' % (m)) for m in args
+        ]
+    except ImportError, e:
+        scripting.utils.exit_with_msg(e.message,
+            extra_output=lambda: parser.print_help())
+
+    try:
+        fires = input_fires()
+
+        for module in modules:
+            module.run(fires) # modifies fires in place
+
+        output_fires(fires)
 
     except Exception, e:
         raise
