@@ -57,4 +57,57 @@ If you get an error like    ```AttributeError: 'NoneType' object has no attribut
 
 ## Usage:
 
-TODO....
+### Getting Help
+
+Use the ```-h``` flag for help:
+
+    $ ./bin/bsp -h
+    Usage: bsp [options] <module> [<module> ...]
+
+    Options:
+      -h, --help            show this help message and exit
+      -l, --list-modules    lists modules available to use in pipeline; order
+                            matters
+      -c CONFIG_FILE, --config-file=CONFIG_FILE
+                            config file comtaining overrides for default config
+                            values
+      -i INPUT_FILE, --input-file=INPUT_FILE
+                            input file comtaining JSON formatted fire data
+      -o OUTPUT_FILE, --output-file=OUTPUT_FILE
+                            output file comtaining JSON formatted fire data
+      --log-level=LOG_LEVEL
+                            python log level (DEBUG,INFO,WARNING,ERROR,CRITICAL)
+      --log-file=LOG_FILE   log file
+      --log-message-format=LOG_MESSAGE_FORMAT
+                            log message format
+
+Use the ```-l``` flag to see available BlueSky modules:
+
+    $ ./bin/bsp -l
+
+    Available Modules:
+
+            fuelbeds
+            fuelloading
+
+### Input / Output
+
+The ```bsp``` executable inputs fire json data, and exports a modified version
+of that fire json data.  You can input from stdin (via piping or redirecting)
+or from file.  Likewise, you can output to stdout or to file.
+
+Example of reading from and writing to file:
+
+    $ ./bsp -i /path/to/input/fires/json/file.json -o /path/to/output/modified/fires/json/file.json fuelbeds fuelloading
+
+Example of piping in and redirecting output to file
+
+    $ cat /path/to/input/fires/json/file.json | ./bsp > /path/to/output/modified/fires/json/file.json fuelbeds fuelloading
+
+Example of redirecting input from and output to file:
+
+    $ ./bin/bsp fuelbeds fuelloading < /path/to/input/fires/json/file.json > /path/to/output/modified/fires/json/file.json
+
+Example of redirecting input from file and outputing to stdout
+
+    $ ./bin/bsp fuelbeds fuelloading < /path/to/input/fires/json/file.json

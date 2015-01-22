@@ -100,8 +100,8 @@ def main():
     # and then remove '--list-modules' option
     if options.list_modules:
         scripting.utils.exit_with_msg(
-            "Available Modules:\n\n\t%s" % ('\n\t'.join(AVAILABLE_MODULES)),
-            extra_preceeding_output=lambda: parser.print_help(),
+            "Available Modules:\n\t%s" % ('\n\t'.join(AVAILABLE_MODULES)),
+            #extra_preceeding_output=lambda: parser.print_help(),
             exit_code=0, prefix="")
 
     if len(args) == 0:
