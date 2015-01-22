@@ -18,12 +18,12 @@ import sys
 from pyairfire import scripting
 
 try:
-    from bluesky import modules
+    from bluesky import modules, models
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from bluesky import modules
+    from bluesky import modules, models
 
 # Note: though some argue that all required parameters should be specified as
 # positional arguments, I prefer using 'options' flags, even though this
@@ -54,9 +54,24 @@ OPTIONAL_OPTIONS = [
         'dest': 'config_file',
         'help': 'config file comtaining overrides for default config values',
         'action': "store",
-        'default': []
+        'default': None
+    },
+    {
+        'short': '-i',
+        'long': '--input-file',
+        'dest': 'input_file',
+        'help': 'input file comtaining JSON formatted fire data',
+        'action': "store",
+        'default': None
+    },
+    {
+        'short': '-o',
+        'long': '--output-file',
+        'dest': 'output_file',
+        'help': 'output file comtaining JSON formatted fire data',
+        'action': "store",
+        'default': None
     }
-
 ]
 
 # Note: pkgutil.walk_packages recursively walks nested packages, while
@@ -76,15 +91,6 @@ def exit_with_msg(msg, extra_output=None):
 def validate_options(options):
     # TODO: validate options values as necessary
     pass
-
-def input_fires():
-    fires = [] # TODO: input fires
-    return fires
-
-def output_fires(fires):
-    # TODO: output fires
-    pass
-
 
 def main():
     parser, options, args = scripting.options.parse_options(
@@ -115,12 +121,12 @@ def main():
             extra_output=lambda: parser.print_help())
 
     try:
-        fires = input_fires()
+        fires = models.fires.Fire.loads(options)
 
         for module in modules:
             module.run(fires) # modifies fires in place
 
-        output_fires(fires)
+        models.fires.Fire.dumps(fires, options.output_file)
 
     except Exception, e:
         raise
