@@ -38,7 +38,7 @@ OPTIONAL_OPTIONS = [
         'dest': 'list_modules',
         'help': 'lists modules available to use in pipeline; order matters',
         'action': "store_true",
-        'default': []
+        'default': False
     },
     {
         'short': '-c',
