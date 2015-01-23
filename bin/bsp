@@ -27,17 +27,9 @@ except:
 
 # Note: though some argue that all required parameters should be specified as
 # positional arguments, I prefer using 'options' flags, even though this
-# meands that there are required 'options', which is oxymoronic.
+# means that there are required 'options', which is oxymoronic.
 
-REQUIRED_OPTIONS = [
-    # {
-    #     'short': '-m',
-    #     'long': '--module',
-    #     'dest': 'modules',
-    #     'help': 'status logger query API endpoint (required)',
-    #     'action': 'append'
-    # }
-]
+REQUIRED_OPTIONS = []
 
 OPTIONAL_OPTIONS = [
     {
