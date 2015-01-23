@@ -74,27 +74,23 @@ AVAILABLE_MODULES = [
     p[1].split('.')[-1] for p in pkgutil.iter_modules(modules.__path__, modules.__name__ + '.') if p[2]
 ]
 
-def exit_with_msg(msg, extra_output=None):
-    print "* Error: %s\n" % (msg)
-    if extra_output:
-        extra_output()
-    sys.exit(1)
-
 def validate_options(options):
     # TODO: validate options values as necessary
     pass
 
 def main():
-    parser, options, args = scripting.options.parse_options(
-        REQUIRED_OPTIONS + OPTIONAL_OPTIONS, usage="usage: %prog [options] <module> [<module> ...]")
-
     # TODO: figure out way to include available modules in help message,
     # and then remove '--list-modules' option
-    if options.list_modules:
-        scripting.utils.exit_with_msg(
-            "Available Modules:\n\t%s" % ('\n\t'.join(AVAILABLE_MODULES)),
-            #extra_preceeding_output=lambda: parser.print_help(),
-            exit_code=0, prefix="")
+    def pre_validation(parser, options):
+        if options.list_modules:
+            scripting.utils.exit_with_msg(
+                "Available Modules:\n\t%s" % ('\n\t'.join(AVAILABLE_MODULES)),
+                #extra_preceeding_output=lambda: parser.print_help(),
+                exit_code=0, prefix="")
+
+    parser, options, args = scripting.options.parse_options(REQUIRED_OPTIONS,
+        OPTIONAL_OPTIONS, usage="usage: %prog [options] <module> [<module> ...]",
+        pre_validation=pre_validation)
 
     if len(args) == 0:
         scripting.utils.exit_with_msg("Specify one or more BlueSky modules", extra_output=lambda: parser.print_help())
@@ -102,7 +98,7 @@ def main():
     scripting.options.check_required_options(options, REQUIRED_OPTIONS, parser)
     validate_options(options)
     scripting.options.configure_logging_from_options(options, parser)
-    scripting.options.output_options(parser)
+    scripting.options.output_options(options)
 
     try:
         modules = [
@@ -121,8 +117,7 @@ def main():
         models.fires.Fire.dumps(fires, options.output_file)
 
     except Exception, e:
-        raise
-        exit_with_msg(e.message)
+        scripting.utils.exit_with_msg(e.message)
 
 if __name__ == "__main__":
     main()

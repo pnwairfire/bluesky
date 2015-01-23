@@ -1,1 +1,1 @@
-git+https://bitbucket.org/fera/airfire-pyairfire.git@v0.5.2
+git+https://bitbucket.org/fera/airfire-pyairfire.git@v0.5.4
