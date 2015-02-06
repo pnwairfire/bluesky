@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-"""bsp: Runs...
+"""bsp: Runs BlueSky
 
 Example calls:
- > ./bin/bsp.py
+ > ./bin/bsp.py -i fires-before.json -o fires-after.json
+ > cat fires-before.json | ./bin/bsp.py > fires-after.json
+ > ./bin/bsp.py < fires-before.json > fires-after.json
 """
 
 __author__      = "Joel Dubowy"
