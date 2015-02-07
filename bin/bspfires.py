@@ -9,7 +9,7 @@ Example calls:
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-from bluesky.models.fires import Fire, FireDataFormat
+from bluesky.models.fires import Fire, FireDataFormats
 
 REQUIRED_OPTIONS = [
     # TODO: put output (and input) formats in here?
@@ -49,7 +49,6 @@ OPTIONAL_OPTIONS = [
         'default': []
     }
 ]
-
 
 
 def main():

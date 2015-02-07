@@ -4,11 +4,12 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import csv
 import json
 import sys
 
 __all__ = [
-    'FireDataFormat',
+    'FireDataFormats',
     'FireDataFormatNotSupported',
     'Fire'
 ]
@@ -17,80 +18,77 @@ __all__ = [
 class FireDataFormatNotSupported(ValueError):
     pass
 
-class FireDataFormat(object):
+class FireDataFormats(object):
     _formats = {
         'json': 1,
         'csv': 2
     }
+    _r_formats = dict([(v,k) for k,v in _formats.items()])
+
+    # To handle missing classes methods and attributes
+    class __metaclass__(type):
+        def __getattr__(cls, attr):
+            if attr == 'formats':
+                return cls._formats.keys()
+            if cls._formats.has_key(attr.lower()):
+                return cls._formats[attr.lower()]
+            raise FireDataFormatNotSupported(
+                "%s is not a valid fire data format" % (attr))
 
     @classmethod
-    def __getattr__(cls, name):
-        if cls._formats.has_key(name.lower()):
-            return cls._formats[name.lower()]
-        raise FireDataFormatNotSupported(
-            "%s is not a valid fire data format" % (name))
+    def get_format_str(cls, format_id):
+        return cls._r_formats.get(format_id)
 
+class Fire(dict):
 
-class Fire(object):
-    def __init__(self, **kwargs):
-        self.id = kwargs.get("id")
-        self.lat = kwargs.get("lat")
-        self.lng = kwargs.get("lng")
-        self.area = kwargs.get("area")
-        # TODO: add other fields
+    def __init__(self, *args, **kwargs):
+        super(Fire, self).__init__(*args, **kwargs)
 
-    def to_dict(self):
-        # TODO: dump via inspecting self rather than explicitly
-        # specifying keys/values
-        return {
-            "id": self.id,
-            "lat": self.lat,
-            "lng": self.lng,
-            "area": self.area
-            # TODO: add other fields
-        }
+    def __getattr__(self, attr):
+        if attr in self.keys():
+            return self[attr]
+        raise KeyError
 
     @classmethod
-    def from_json(cls, json_data):
-        """Returns of Fire objects loaded from json
+    def from_json(cls, stream):
+        """Returns array of Fire objects loaded from json
 
         Always returns an array, even if json input represents a single fire
         object
 
         Args:
-         - json_data (str) -- json formated fire data
+         - stream -- file object or other iterable object
 
         TODO:
          - support already parsed JSON (i.e. dict or array)
         """
-        data = json.loads(json_data)
+        data = json.loads(''.join([d for d in stream]))
         if hasattr(data, 'keys'):
-            return [Fire(**data)]
+            return [cls(data)]
         elif hasattr(data, 'append'):
-            return [Fire(**d) for d in data]
+            return [cls(d) for d in data]
         else:
             raise ValueError("Invalid fire json data")
 
-    def from_csv(cls, csv_data):
-        # TDOO: implement
-        raise NotImplementedError
+    def from_csv(cls, stream):
+        fires = []
+        headers = None
+        for row in csv.reader(stream):
+            if headers:
+                headers = dict([(i, row[i]) for i in xrange(len(row))])
+            else:
+                fires.append(cls(dict([(headers[i], row[i]) for i in xrange(len(row))])))
+        return fires
 
     ## IO
 
     @classmethod
-    def read(cls, options, do_strip_newlines):
+    def open(cls, options): #, do_strip_newlines):
         lines = []
         if options.input_file:
-            with open(options.input_file) as f:
-                lines = f.readlines()
-                data_str = "".join()
+            return open(options.input_file)
         else:
-            lines = [l for l in sys.stdin]
-
-        if do_strip_newlines:
-            lines = [l.strip() for l in lines]
-
-        return "".join(lines)
+            return sys.stdin
 
     @classmethod
     def write(cls, options, data):
@@ -101,20 +99,17 @@ class Fire(object):
             sys.stdout.write(data)
 
     @classmethod
-    def loads(cls, options, format=FireDataFormat.JSON):
-        if format == FireDataFormat.JSON:
-            fires = cls.from_json(read(options, True))
-        elif format == FireDataFormat.CSV:
-            fires = cls.from_csv(read(options, False))
-        else:
+    def loads(cls, options, format=FireDataFormats.JSON):
+        loader = getattr(cls, "from_%s" % (FireDataFormats.get_format_str(format)), None)
+        if not loader:
             raise FireDataFormatNotSupported
-        return fires
+        return loader(open(options))
 
     @classmethod
-    def dumps(cls, fires_array, output_file=None, format=FireDataFormat.JSON):
-        if format == FireDataFormat.JSON:
+    def dumps(cls, fires_array, output_file=None, format=FireDataFormats.JSON):
+        if format == FireDataFormats.JSON:
             data = json.dumps([f.to_dict() for f in fires_array])
-        elif format == FireDataFormat.CSV:
+        elif format == FireDataFormats.CSV:
             # TDOO: implement
             raise NotImplementedError
         else:
