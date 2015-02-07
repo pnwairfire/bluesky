@@ -1,3 +1,5 @@
+import io
+
 from py.test import raises
 
 try:
@@ -37,27 +39,37 @@ class TestFire:
         with raises(KeyError) as e:
             f.rifsijsflj
 
-class TestFiresImporter
+class TestFiresImporter:
 
     def test_from_json(self):
+        fires_importer = fires.FiresImporter()
         with raises(ValueError):
-            fires.Fire._from_json('')
+            fires_importer._from_json(io.StringIO(u''))
         with raises(ValueError):
-            fires.Fire._from_json('""')
+            fires_importer._from_json(io.StringIO(u'""'))
         with raises(ValueError):
-            fires.Fire._from_json('"sdf"')
+            fires_importer._from_json(io.StringIO(u'"sdf"'))
         with raises(ValueError):
-            fires.Fire._from_json('null')
+            fires_importer._from_json(io.StringIO(u'null'))
 
-        assert [] == fires.Fire._from_json(['[]'])
+        expected = []
+        assert expected == fires_importer._from_json(io.StringIO(u'[]'))
+        expected.append({'foo':'a', 'bar':123})
+        assert expected == fires_importer._from_json(io.StringIO(u'{"foo":a,"bar":123}'))
+        assert expected == fires_importer._from_json(io.StringIO(u'[{"foo":a,"bar":123}]'))
+        expected.append({'foo':'b', 'bar':2})
+        assert expected == fires_importer._from_json(io.StringIO(u'[{"foo":a,"bar":123},{"foo":"b","bar":2}]'))
+
+
 
         # TODO: test case of single fire object
         # TODO: test case of non-empty array of fire objects
 
     def test_from_csv(self):
+        fires_importer = fires.FiresImporter()
         expected = []
-        assert expected == fires.Fire._from_csv([['foo, bar']])
+        assert expected == fires_importer._from_csv(io.StringIO(u'foo,bar'))
         expected.append({'foo':'a', 'bar':123})
-        assert expected == fires.Fire._from_csv([['foo, bar'],['a',123]])
+        assert expected == fires_importer._from_csv(io.StringIO(u'foo,bar\na,123'))
         expected.append({'foo':'b', 'bar':2})
-        assert expected == fires.Fire._from_csv([['foo, bar'],['a',123], ['b', 2]])
+        assert expected == fires_importer._from_csv(io.StringIO(u'foo,bar\na,123\nb,2'))

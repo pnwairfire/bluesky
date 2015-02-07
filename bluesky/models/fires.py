@@ -88,19 +88,14 @@ class FiresImporter(object):
 
     ## IO
 
-    def _open_stream(self): #, do_strip_newlines):
-        lines = []
-        if self._input_file:
-            return open(self._input_file)
+    def _stream(self, file_name, flag): #, do_strip_newlines):
+        if file_name:
+            return open(file_name, flag)
         else:
-            return sys.stdin
-
-    def _write_stream(self, data):
-        if self._output_file:
-            with open(self._output_file, "w") as f:
-                f.write(data)
-        else:
-            sys.stdout.write(data)
+            if flag == 'r':
+                return sys.stdin
+            else:
+                return sys.stdout
 
     ## 'Public' Methods
 
@@ -112,7 +107,7 @@ class FiresImporter(object):
         loader = getattr(self, "_from_%s" % (FireDataFormats.get_format_str(format)), None)
         if not loader:
             raise FireDataFormatNotSupported
-        self._fires = loader(self._open_stream())
+        self._fires = loader(self._stream(self._input_file, 'r'))
         return self._fires
 
     def dumps(self, format=FireDataFormats.JSON):
@@ -128,4 +123,4 @@ class FiresImporter(object):
         else:
             raise FireDataFormatNotSupported
 
-        self._write_stream(data)
+        self._stream(self._output_file, 'w').write(data)
