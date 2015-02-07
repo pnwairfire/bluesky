@@ -111,12 +111,14 @@ def main():
             extra_output=lambda: parser.print_help())
 
     try:
-        fires = models.fires.Fire.loads(options)
+        fires_importer = models.fires.FiresImporter(
+            options.input_file, options.output_file)
+        fires = fires_importer.loads()
 
         for module in modules:
             module.run(fires) # modifies fires in place
 
-        models.fires.Fire.dumps(fires, options.output_file)
+        fires_importer.dumps()
 
     except Exception, e:
         scripting.utils.exit_with_msg(e.message)

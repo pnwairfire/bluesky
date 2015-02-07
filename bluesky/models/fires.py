@@ -49,8 +49,14 @@ class Fire(dict):
             return self[attr]
         raise KeyError
 
-    @classmethod
-    def from_json(cls, stream):
+class FiresImporter(object):
+
+    def __init__(self, input_file=None, output_file=None):
+        self._input_file = input_file
+        self._output_file = output_file
+        self._fires = None
+
+    def _from_json(self, stream):
         """Returns array of Fire objects loaded from json
 
         Always returns an array, even if json input represents a single fire
@@ -64,55 +70,62 @@ class Fire(dict):
         """
         data = json.loads(''.join([d for d in stream]))
         if hasattr(data, 'keys'):
-            return [cls(data)]
+            return [Fire(data)]
         elif hasattr(data, 'append'):
-            return [cls(d) for d in data]
+            return [Fire(d) for d in data]
         else:
             raise ValueError("Invalid fire json data")
 
-    def from_csv(cls, stream):
+    def _from_csv(self, stream):
         fires = []
         headers = None
         for row in csv.reader(stream):
-            if headers:
+            if not headers:
                 headers = dict([(i, row[i]) for i in xrange(len(row))])
             else:
-                fires.append(cls(dict([(headers[i], row[i]) for i in xrange(len(row))])))
+                fires.append(Fire(dict([(headers[i], row[i]) for i in xrange(len(row))])))
         return fires
 
     ## IO
 
-    @classmethod
-    def open(cls, options): #, do_strip_newlines):
+    def _open_stream(self): #, do_strip_newlines):
         lines = []
-        if options.input_file:
-            return open(options.input_file)
+        if self._input_file:
+            return open(self._input_file)
         else:
             return sys.stdin
 
-    @classmethod
-    def write(cls, options, data):
-        if output_file:
-            with open(output_file, "w") as f:
+    def _write_stream(self, data):
+        if self._output_file:
+            with open(self._output_file, "w") as f:
                 f.write(data)
         else:
             sys.stdout.write(data)
 
-    @classmethod
-    def loads(cls, options, format=FireDataFormats.JSON):
-        loader = getattr(cls, "from_%s" % (FireDataFormats.get_format_str(format)), None)
+    ## 'Public' Methods
+
+    @property
+    def fires(self):
+        return self._fires
+
+    def loads(self, format=FireDataFormats.JSON):
+        loader = getattr(self, "_from_%s" % (FireDataFormats.get_format_str(format)), None)
         if not loader:
             raise FireDataFormatNotSupported
-        return loader(open(options))
+        self._fires = loader(self._open_stream())
+        return self._fires
 
-    @classmethod
-    def dumps(cls, fires_array, output_file=None, format=FireDataFormats.JSON):
+    def dumps(self, format=FireDataFormats.JSON):
+        if self._fires is None:
+            raise RuntimeError("Fires not yet loaded")
+
         if format == FireDataFormats.JSON:
-            data = json.dumps([f.to_dict() for f in fires_array])
+            data = json.dumps(self._fires)
         elif format == FireDataFormats.CSV:
+            # TODO: need to k
             # TDOO: implement
             raise NotImplementedError
         else:
             raise FireDataFormatNotSupported
 
-        cls.write(options, data)
+        self._write_stream(data)

@@ -24,27 +24,40 @@ class TestFireDataFormats:
         with raises(fires.FireDataFormatNotSupported) as e:
             fires.FireDataFormats.sdf
 
-class TestFires:
+class TestFire:
+
+    def test_accessing_attributes(self):
+        f = fires.Fire({'a': 123, 'b': 'sdf'})
+        assert 123 == f['a']
+        assert 123 == f.a
+        assert 'sdf' == f['b']
+        assert 'sdf' == f.b
+        with raises(KeyError) as e:
+            f['sdfdsf']
+        with raises(KeyError) as e:
+            f.rifsijsflj
+
+class TestFiresImporter
 
     def test_from_json(self):
         with raises(ValueError):
-            fires.Fire.from_json('')
+            fires.Fire._from_json('')
         with raises(ValueError):
-            fires.Fire.from_json('""')
+            fires.Fire._from_json('""')
         with raises(ValueError):
-            fires.Fire.from_json('"sdf"')
+            fires.Fire._from_json('"sdf"')
         with raises(ValueError):
-            fires.Fire.from_json('null')
+            fires.Fire._from_json('null')
 
-        assert [] == fires.Fire.from_json(['[]'])
+        assert [] == fires.Fire._from_json(['[]'])
 
         # TODO: test case of single fire object
         # TODO: test case of non-empty array of fire objects
 
     def test_from_csv(self):
         expected = []
-        assert expected == fires.Fire.from_json(['foo, bar'])
+        assert expected == fires.Fire._from_csv([['foo, bar']])
         expected.append({'foo':'a', 'bar':123})
-        assert expected == fires.Fire.from_json(['foo, bar'],['a',123])
+        assert expected == fires.Fire._from_csv([['foo, bar'],['a',123]])
         expected.append({'foo':'b', 'bar':2})
-        assert expected == fires.Fire.from_json(['foo, bar'],['a',123], ['b', 2])
+        assert expected == fires.Fire._from_csv([['foo, bar'],['a',123], ['b', 2]])

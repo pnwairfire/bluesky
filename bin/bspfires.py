@@ -63,12 +63,14 @@ def main():
         # update Fire.loads to deduce it from the data
         format = None
 
-        fires = Fire.loads(options, format)
+        fires_importer = models.fires.FiresImporter(
+            options.input_file, options.output_file)
+        fires = Fire.loads(format)
 
         # TODO: apply filter
 
         output_format = getattr(FireDataFormat, options.output_format)
-        models.fires.Fire.dumps(fires, options.output_file, output_format)
+        fires_importer.dumps(output_format)
 
     except Exception, e:
         scripting.utils.exit_with_msg(e.message)
