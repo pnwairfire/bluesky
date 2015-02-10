@@ -79,6 +79,7 @@ OPTIONAL_OPTIONS = [
     {
         'long': '--input-format',
         'dest': 'input_format',
+        'type': "string",
         'help': 'format of input fire data; valid formats: %s; default: json' % (
             ', '.join(models.fires.FireDataFormats.formats)),
         'action': "callback",
@@ -88,6 +89,7 @@ OPTIONAL_OPTIONS = [
     {
         'long': '--output-format',
         'dest': 'output_format',
+        'type': "string",
         'help': 'format to output fire data; valid formats: %s; default: json' % (
             ', '.join(models.fires.FireDataFormats.formats)),
         'action': "callback",
@@ -144,10 +146,9 @@ def main():
             extra_output=lambda: parser.print_help())
 
     try:
-        input_format = models.fires.FireDataFormats[options.output_format]
         fires_importer = models.fires.FiresImporter(
             options.input_file, options.output_file)
-        fires = fires_importer.loads(input_format)
+        fires = fires_importer.loads(options.input_format)
 
 
         for module in modules:
@@ -155,8 +156,7 @@ def main():
 
         # TODO: apply filter
 
-        output_format = models.fires.FireDataFormats[options.output_format]
-        fires_importer.dumps(output_format)
+        fires_importer.dumps(options.output_format)
 
     except Exception, e:
         scripting.utils.exit_with_msg(e.message)
