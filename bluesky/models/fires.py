@@ -146,8 +146,11 @@ class FiresImporter(object):
         if format == FireDataFormats.JSON:
             data = json.dumps(self._fires)
         elif format == FireDataFormats.CSV:
-            # TODO: need to k
             # TDOO: implement
+            # TODO: if self._headers is defined, then use it to order the first
+            # N columns of the fire data.  (After that will come the data augmented
+            # by the BlueSky modules run on the data.  For those columns, maybe just
+            # organize them in alphabetical order)
             raise NotImplementedError("Outputing CSV formated fire data not yet implemented")
         else:
             raise FireDataFormatNotSupported("Unsupported output format: %s" % (format))
