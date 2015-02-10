@@ -27,6 +27,16 @@ except:
     sys.path.insert(0, root_dir)
     from bluesky import modules, models
 
+def parse_format(option, opt, value, parser):
+    """
+    """
+    value = value.strip()
+    try:
+        setattr(parser.values, option.dest, models.fires.FireDataFormats[value])
+    except models.fires.FireDataFormatNotSupported:
+        msg = "Invalid fire data format: %s" % (value)
+        raise OptionValueError(msg)
+
 # Note: though some argue that all required parameters should be specified as
 # positional arguments, I prefer using 'options' flags, even though this
 # means that there are required 'options', which is oxymoronic.
@@ -65,6 +75,32 @@ OPTIONAL_OPTIONS = [
         'help': 'output file comtaining JSON formatted fire data',
         'action': "store",
         'default': None
+    },
+    {
+        'long': '--input-format',
+        'dest': 'input_format',
+        'help': 'format of input fire data; valid formats: %s; default: json' % (
+            ', '.join(models.fires.FireDataFormats.formats)),
+        'action': "callback",
+        'callback': parse_format,
+        'default': models.fires.FireDataFormats.json
+    },
+    {
+        'long': '--output-format',
+        'dest': 'output_format',
+        'help': 'format to output fire data; valid formats: %s; default: json' % (
+            ', '.join(models.fires.FireDataFormats.formats)),
+        'action': "callback",
+        'callback': parse_format,
+        'default': models.fires.FireDataFormats.json
+    },
+    {
+        'short': '-w',
+        'long': '--country-code-whitelist',
+        'dest': 'country_code_whitelist',
+        'help': 'input file comtaining JSON formatted fire data',
+        'action': "append",
+        'default': []
     }
 ]
 
@@ -91,11 +127,8 @@ def main():
                 exit_code=0, prefix="")
 
     parser, options, args = scripting.options.parse_options(REQUIRED_OPTIONS,
-        OPTIONAL_OPTIONS, usage="usage: %prog [options] <module> [<module> ...]",
+        OPTIONAL_OPTIONS, usage="usage: %prog [options] [<module> ...]",
         pre_validation=pre_validation)
-
-    if len(args) == 0:
-        scripting.utils.exit_with_msg("Specify one or more BlueSky modules", extra_output=lambda: parser.print_help())
 
     scripting.options.check_required_options(options, REQUIRED_OPTIONS, parser)
     validate_options(options)
@@ -111,14 +144,19 @@ def main():
             extra_output=lambda: parser.print_help())
 
     try:
+        input_format = models.fires.FireDataFormats[options.output_format]
         fires_importer = models.fires.FiresImporter(
             options.input_file, options.output_file)
-        fires = fires_importer.loads()
+        fires = fires_importer.loads(input_format)
+
 
         for module in modules:
             module.run(fires) # modifies fires in place
 
-        fires_importer.dumps()
+        # TODO: apply filter
+
+        output_format = models.fires.FireDataFormats[options.output_format]
+        fires_importer.dumps(output_format)
 
     except Exception, e:
         scripting.utils.exit_with_msg(e.message)

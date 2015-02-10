@@ -63,7 +63,7 @@ class Fire(dict):
     def __getattr__(self, attr):
         if attr in self.keys():
             return self[attr]
-        raise KeyError
+        raise KeyError(attr)
 
 class FiresImporter(object):
 
@@ -94,13 +94,13 @@ class FiresImporter(object):
 
     def _from_csv(self, stream):
         fires = []
-        headers = None
+        self._headers = None
         for row in csv.reader(stream):
-            if not headers:
-                #headers_ = dict([(i, row[i].strip(' ')) for i in xrange(len(row))])
-                headers = [e.strip(' ') for e in row]
+            if not self._headers:
+                #self._headers = dict([(i, row[i].strip(' ')) for i in xrange(len(row))])
+                self._headers = [e.strip(' ') for e in row]
             else:
-                fires.append(Fire(dict([(headers[i], row[i].strip(' ')) for i in xrange(len(row))])))
+                fires.append(Fire(dict([(self._headers[i], row[i].strip(' ')) for i in xrange(len(row))])))
                 # TODO: better way to automatically parse numerical values
                 for k in fires[-1].keys():
                     try:
@@ -135,7 +135,7 @@ class FiresImporter(object):
     def loads(self, format=FireDataFormats.JSON):
         loader = getattr(self, "_from_%s" % (FireDataFormats[format]), None)
         if not loader:
-            raise FireDataFormatNotSupported
+            raise FireDataFormatNotSupported("Unsupported format: %s" % (format))
         self._fires = loader(self._stream(self._input_file, 'r'))
         return self._fires
 
@@ -148,8 +148,8 @@ class FiresImporter(object):
         elif format == FireDataFormats.CSV:
             # TODO: need to k
             # TDOO: implement
-            raise NotImplementedError
+            raise NotImplementedError("Outputing CSV formated fire data not yet implemented")
         else:
-            raise FireDataFormatNotSupported
+            raise FireDataFormatNotSupported("Unsupported output format: %s" % (format))
 
         self._stream(self._output_file, 'w').write(data)
