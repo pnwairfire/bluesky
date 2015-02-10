@@ -57,7 +57,16 @@ If you get an error like    ```AttributeError: 'NoneType' object has no attribut
 
 ## Usage:
 
-### Getting Help
+### bsp
+
+bsp is the main BlueSky executable.  It can be used for any combination of
+the following:
+
+ - to translate CSV-formatted fire data to JSON, and vice versa
+ - to filter a set of fires by country code
+ - run BlueSky fires
+
+#### Getting Help
 
 Use the ```-h``` flag for help:
 
@@ -68,18 +77,7 @@ Use the ```-h``` flag for help:
       -h, --help            show this help message and exit
       -l, --list-modules    lists modules available to use in pipeline; order
                             matters
-      -c CONFIG_FILE, --config-file=CONFIG_FILE
-                            config file comtaining overrides for default config
-                            values
-      -i INPUT_FILE, --input-file=INPUT_FILE
-                            input file comtaining JSON formatted fire data
-      -o OUTPUT_FILE, --output-file=OUTPUT_FILE
-                            output file comtaining JSON formatted fire data
-      --log-level=LOG_LEVEL
-                            python log level (DEBUG,INFO,WARNING,ERROR,CRITICAL)
-      --log-file=LOG_FILE   log file
-      --log-message-format=LOG_MESSAGE_FORMAT
-                            log message format
+      ...
 
 Use the ```-l``` flag to see available BlueSky modules:
 
@@ -89,8 +87,9 @@ Use the ```-l``` flag to see available BlueSky modules:
 
             fuelbeds
             fuelloading
+            ...
 
-### Input / Output
+#### Input / Output
 
 The ```bsp``` executable inputs fire json data, and exports a modified version
 of that fire json data.  You can input from stdin (via piping or redirecting)
@@ -111,3 +110,12 @@ Example of redirecting input from and output to file:
 Example of redirecting input from file and outputing to stdout
 
     $ ./bin/bsp fuelbeds fuelloading < /path/to/input/fires/json/file.json
+
+```bsp``` supports inputting and outputing both json and csv formatted fire data.
+(The default expected format is JSON.) The following example reads in CSV fire
+data from file, filters out all but USA filures, and outputs JSON formated data
+to stdout
+
+    $ ./bin/bsp -i /path/to/input/fires/csv/file.csv --input-format=CSV
+
+...More examples...
