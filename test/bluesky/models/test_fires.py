@@ -53,7 +53,7 @@ class TestFire:
 
 class TestFiresImporter:
 
-    def test_from_json(self):
+    def test_from_json_invalid_data(self):
         fires_importer = fires.FiresImporter()
         with raises(ValueError):
             fires_importer._from_json(io.StringIO(u''))
@@ -64,32 +64,69 @@ class TestFiresImporter:
         with raises(ValueError):
             fires_importer._from_json(io.StringIO(u'null'))
 
-        expected = []
-        assert expected == fires_importer._from_json(io.StringIO(u'[]'))
-        expected.append({'foo':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"})
-        # handle either single fire object or array of one or more fire objects
-        assert expected == fires_importer._from_json(io.StringIO(
-            u'{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"}'))
-        assert expected == fires_importer._from_json(io.StringIO(
-            u'[{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"}]'))
-        expected.append({'foo':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
-        assert expected == fires_importer._from_json(io.StringIO(
-            u'[{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"},'
-              '{"foo":"b","bar":2, "baz": 1.1, "bee":"24.34"}]'))
-
-    def test_from_csv(self):
+    def test_from_json_no_fires(self):
         fires_importer = fires.FiresImporter()
         expected = []
-        assert expected == fires_importer._from_csv(io.StringIO(u'foo,bar, baz, bee '))
-        expected.append({'foo':'a', 'bar':123, 'baz': 23.23, 'bee': 23.23 })
-        assert expected == fires_importer._from_csv(io.StringIO(
+        fires_importer._from_json(io.StringIO(u'[]'))
+        assert expected == fires_importer.fires
+
+    def test_from_json_one_fire_single_object(self):
+        fires_importer = fires.FiresImporter()
+        expected = [
+            {'foo':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}
+        ]
+        fires_importer._from_json(io.StringIO(
+            u'{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"}'))
+        assert expected == fires_importer.fires
+
+    def test_from_json_one_fire_array(self):
+        fires_importer = fires.FiresImporter()
+        expected = [
+            {'foo':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}
+        ]
+        fires_importer._from_json(io.StringIO(
+            u'[{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"}]'))
+        assert expected == fires_importer.fires
+
+    def test_from_json_multiple_fires(self):
+        fires_importer = fires.FiresImporter()
+        expected = [
+            {'foo':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"},
+            {'foo':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'}
+        ]
+        fires_importer._from_json(io.StringIO(
+            u'[{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"},'
+              '{"foo":"b","bar":2, "baz": 1.1, "bee":"24.34"}]'))
+        assert expected == fires_importer.fires
+
+    def test_from_csv_no_fires(self):
+        fires_importer = fires.FiresImporter()
+        fires_importer._from_csv(io.StringIO(u'foo,bar, baz, bee '))
+        expected = []
+        assert expected == fires_importer.fires
+
+    def test_from_csv_one_fire(self):
+        fires_importer = fires.FiresImporter()
+        expected = [{'foo':'a', 'bar':123, 'baz': 23.23, 'bee': 23.23 }]
+        fires_importer._from_csv(io.StringIO(
             u'foo,bar, baz, bee \n a, 123, 23.23,"23.23"'))
-        expected.append({'foo':'b', 'bar':2, 'baz':1.2, "bee": 12.23})
-        assert expected == fires_importer._from_csv(io.StringIO(
+        assert expected == fires_importer.fires
+
+    def test_from_csv_multiple_fires(self):
+        fires_importer = fires.FiresImporter()
+        expected = [
+            {'foo':'a', 'bar':123, 'baz': 23.23, 'bee': 23.23 },
+            {'foo':'b', 'bar':2, 'baz':1.2, "bee": 12.23}
+        ]
+        fires_importer._from_csv(io.StringIO(
             u'foo,bar, baz, bee \n a, 123, 23.23,"23.23"\nb,2, 1.2,"12.23"'))
+        assert expected == fires_importer.fires
 
     def test_to_json(self):
         pass
 
     def test_to_csv(self):
         pass
+
+    def test_full_cycle(self):
+        fires_importer = fires.FiresImporter()

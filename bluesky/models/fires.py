@@ -75,6 +75,7 @@ class FiresImporter(object):
         self._input_file = input_file
         self._output_file = output_file
         self._fires = None
+        self._headers = None
 
     ## Importing
 
@@ -90,36 +91,40 @@ class FiresImporter(object):
         TODO:
          - support already parsed JSON (i.e. dict or array)
         """
+        self._fires = self._fires or []
         data = json.loads(''.join([d for d in stream]))
         if hasattr(data, 'keys'):
-            return [Fire(data)]
+            self._fires = [Fire(data)]
         elif hasattr(data, 'append'):
-            return [Fire(d) for d in data]
+            self._fires = [Fire(d) for d in data]
         else:
             raise ValueError("Invalid fire json data")
 
     def _from_csv(self, stream):
-        fires = []
-        self._headers = []
+        self._fires = self._fires or []
+        self._headers = self._headers or []
+        headers = []
         for row in csv.reader(stream):
-            if not self._headers:
-                #self._headers = dict([(i, row[i].strip(' ')) for i in xrange(len(row))])
-                self._headers = [e.strip(' ') for e in row]
+            if not headers:
+                # record headers for this csv data
+                #headers = dict([(i, row[i].strip(' ')) for i in xrange(len(row))])
+                headers = [e.strip(' ') for e in row]
+                # add any new headers to those recorded from previously loaded data
+                self._headers.extend(set(headers) - set(self._headers))
             else:
-                fires.append(Fire(dict([(self._headers[i], row[i].strip(' ')) for i in xrange(len(row))])))
+                self._fires.append(Fire(dict([(headers[i], row[i].strip(' ')) for i in xrange(len(row))])))
                 # TODO: better way to automatically parse numerical values
-                for k in fires[-1].keys():
+                for k in self._fires[-1].keys():
                     try:
                         # try to parse int
-                        fires[-1][k] = int(fires[-1][k])
+                        self._fires[-1][k] = int(self._fires[-1][k])
                     except ValueError:
                         try:
                             # try to parse float
-                            fires[-1][k] = float(fires[-1][k])
+                            self._fires[-1][k] = float(self._fires[-1][k])
                         except:
                             # leave it as a string
                             pass
-        return fires
 
     ## Exporting
 
@@ -135,18 +140,20 @@ class FiresImporter(object):
 
         # Note: assumes each fire has the same set of keys
         # TODO: assert that this is true, and fail if it isn't?
-        headers = getattr(self, '_headers', [])
+        headers = self._headers or []
         if self._fires: # i.e. defined and has at least one fire
             headers.extend(set(self._fires[0].keys()) - set(headers))
 
         csvfile = csv.writer(stream)
         csvfile.writerow(headers)
         for f in self._fires:
-            a = [f[h] for h in headers]
+            a = [f.get(h,'') for h in headers]
             csvfile.writerow(a)
 
     ## IO
 
+    # TODO: implement this as a context-managing class, with __enter__ and
+    # __exit__ methods
     def _stream(self, file_name, flag): #, do_strip_newlines):
         if file_name:
             return open(file_name, flag)
@@ -166,8 +173,7 @@ class FiresImporter(object):
         loader = getattr(self, "_from_%s" % (FireDataFormats[format]), None)
         if not loader:
             raise FireDataFormatNotSupported("Unsupported format: %s" % (format))
-        self._fires = loader(self._stream(self._input_file, 'r'))
-        return self._fires
+        loader(self._stream(self._input_file, 'r'))
 
     def filter(self, attr, **kwargs):
         whitelist = kwargs.get('whitelist')
