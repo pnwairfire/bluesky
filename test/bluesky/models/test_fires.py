@@ -15,10 +15,22 @@ class TestFireDataFormats:
     def test_formats(self):
         assert set(['json', 'csv']) == set(fires.FireDataFormats.formats)
 
-    def test_get_format_str(self):
-        assert 'json' == fires.FireDataFormats.get_format_str(1)
-        assert 'csv' == fires.FireDataFormats.get_format_str(2)
-        assert None == fires.FireDataFormats.get_format_str(3)
+    def test_format_ids(self):
+        assert set([1,2]) == set(fires.FireDataFormats.format_ids)
+
+    def test_get_item(self):
+        # id to format key
+        assert 'json' == fires.FireDataFormats[1]
+        assert 'csv' == fires.FireDataFormats[2]
+        with raises(fires.FireDataFormatNotSupported) as e:
+            fires.FireDataFormats[3]
+        # format key to id
+        assert 1 == fires.FireDataFormats['JSON']
+        assert 1 == fires.FireDataFormats['json']
+        assert 2 == fires.FireDataFormats['CSV']
+        assert 2 == fires.FireDataFormats['csv']
+        with raises(fires.FireDataFormatNotSupported) as e:
+            fires.FireDataFormats['sdf']
 
     def test_format_attrs(self):
         assert 1 == fires.FireDataFormats.json
@@ -54,22 +66,24 @@ class TestFiresImporter:
 
         expected = []
         assert expected == fires_importer._from_json(io.StringIO(u'[]'))
-        expected.append({'foo':'a', 'bar':123})
-        assert expected == fires_importer._from_json(io.StringIO(u'{"foo":a,"bar":123}'))
-        assert expected == fires_importer._from_json(io.StringIO(u'[{"foo":a,"bar":123}]'))
-        expected.append({'foo':'b', 'bar':2})
-        assert expected == fires_importer._from_json(io.StringIO(u'[{"foo":a,"bar":123},{"foo":"b","bar":2}]'))
-
-
-
-        # TODO: test case of single fire object
-        # TODO: test case of non-empty array of fire objects
+        expected.append({'foo':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"})
+        # handle either single fire object or array of one or more fire objects
+        assert expected == fires_importer._from_json(io.StringIO(
+            u'{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"}'))
+        assert expected == fires_importer._from_json(io.StringIO(
+            u'[{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"}]'))
+        expected.append({'foo':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
+        assert expected == fires_importer._from_json(io.StringIO(
+            u'[{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"},'
+              '{"foo":"b","bar":2, "baz": 1.1, "bee":"24.34"}]'))
 
     def test_from_csv(self):
         fires_importer = fires.FiresImporter()
         expected = []
-        assert expected == fires_importer._from_csv(io.StringIO(u'foo,bar'))
-        expected.append({'foo':'a', 'bar':123})
-        assert expected == fires_importer._from_csv(io.StringIO(u'foo,bar\na,123'))
-        expected.append({'foo':'b', 'bar':2})
-        assert expected == fires_importer._from_csv(io.StringIO(u'foo,bar\na,123\nb,2'))
+        assert expected == fires_importer._from_csv(io.StringIO(u'foo,bar, baz, bee '))
+        expected.append({'foo':'a', 'bar':123, 'baz': 23.23, 'bee': 23.23 })
+        assert expected == fires_importer._from_csv(io.StringIO(
+            u'foo,bar, baz, bee \n a, 123, 23.23,"23.23"'))
+        expected.append({'foo':'b', 'bar':2, 'baz':1.2, "bee": 12.23})
+        assert expected == fires_importer._from_csv(io.StringIO(
+            u'foo,bar, baz, bee \n a, 123, 23.23,"23.23"\nb,2, 1.2,"12.23"'))

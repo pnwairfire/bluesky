@@ -28,16 +28,32 @@ class FireDataFormats(object):
     # To handle missing classes methods and attributes
     class __metaclass__(type):
         def __getattr__(cls, attr):
+            if hasattr(attr, 'lower'):
+                attr = attr.lower()
+
             if attr == 'formats':
                 return cls._formats.keys()
-            if cls._formats.has_key(attr.lower()):
-                return cls._formats[attr.lower()]
+            if attr == 'format_ids':
+                return cls._r_formats.keys()
+
+            if cls._formats.has_key(attr):
+                return cls._formats[attr]
+            if cls._r_formats.has_key(attr):
+                return cls._r_formats[attr]
+
             raise FireDataFormatNotSupported(
                 "%s is not a valid fire data format" % (attr))
+        __getitem__ = __getattr__
 
-    @classmethod
-    def get_format_str(cls, format_id):
-        return cls._r_formats.get(format_id)
+    # @property
+    # @classmethod
+    # def formats(cls):
+    #     return cls._formats.keys()
+
+    # @property
+    # @classmethod
+    # def format_ids(cls):
+    #     return cls._r_formats.keys()
 
 class Fire(dict):
 
@@ -81,9 +97,22 @@ class FiresImporter(object):
         headers = None
         for row in csv.reader(stream):
             if not headers:
-                headers = dict([(i, row[i]) for i in xrange(len(row))])
+                #headers_ = dict([(i, row[i].strip(' ')) for i in xrange(len(row))])
+                headers = [e.strip(' ') for e in row]
             else:
-                fires.append(Fire(dict([(headers[i], row[i]) for i in xrange(len(row))])))
+                fires.append(Fire(dict([(headers[i], row[i].strip(' ')) for i in xrange(len(row))])))
+                # TODO: better way to automatically parse numerical values
+                for k in fires[-1].keys():
+                    try:
+                        # try to parse int
+                        fires[-1][k] = int(fires[-1][k])
+                    except ValueError:
+                        try:
+                            # try to parse float
+                            fires[-1][k] = float(fires[-1][k])
+                        except:
+                            # leave it as a string
+                            pass
         return fires
 
     ## IO
@@ -104,7 +133,7 @@ class FiresImporter(object):
         return self._fires
 
     def loads(self, format=FireDataFormats.JSON):
-        loader = getattr(self, "_from_%s" % (FireDataFormats.get_format_str(format)), None)
+        loader = getattr(self, "_from_%s" % (FireDataFormats[format]), None)
         if not loader:
             raise FireDataFormatNotSupported
         self._fires = loader(self._stream(self._input_file, 'r'))
