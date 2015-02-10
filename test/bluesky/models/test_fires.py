@@ -87,3 +87,9 @@ class TestFiresImporter:
         expected.append({'foo':'b', 'bar':2, 'baz':1.2, "bee": 12.23})
         assert expected == fires_importer._from_csv(io.StringIO(
             u'foo,bar, baz, bee \n a, 123, 23.23,"23.23"\nb,2, 1.2,"12.23"'))
+
+    def test_to_json(self):
+        pass
+
+    def test_to_csv(self):
+        pass

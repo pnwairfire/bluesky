@@ -148,13 +148,13 @@ def main():
     try:
         fires_importer = models.fires.FiresImporter(
             options.input_file, options.output_file)
-        fires = fires_importer.loads(options.input_format)
+        fires_importer.loads(options.input_format)
 
+        if options.country_code_whitelist:
+            fires_importer.filter('country', option.country_code_whitelist)
 
         for module in modules:
-            module.run(fires) # modifies fires in place
-
-        # TODO: apply filter
+            module.run(fires_importer.fires) # modifies fires in place
 
         fires_importer.dumps(options.output_format)
 

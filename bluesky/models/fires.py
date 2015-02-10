@@ -11,11 +11,15 @@ import sys
 __all__ = [
     'FireDataFormats',
     'FireDataFormatNotSupported',
-    'Fire'
+    'Fire',
+    'InvalidFilterError',
+    'FiresImporter'
 ]
 
-
 class FireDataFormatNotSupported(ValueError):
+    pass
+
+class InvalidFilterError(ValueError):
     pass
 
 class FireDataFormats(object):
@@ -72,6 +76,8 @@ class FiresImporter(object):
         self._output_file = output_file
         self._fires = None
 
+    ## Importing
+
     def _from_json(self, stream):
         """Returns array of Fire objects loaded from json
 
@@ -94,7 +100,7 @@ class FiresImporter(object):
 
     def _from_csv(self, stream):
         fires = []
-        self._headers = None
+        self._headers = []
         for row in csv.reader(stream):
             if not self._headers:
                 #self._headers = dict([(i, row[i].strip(' ')) for i in xrange(len(row))])
@@ -114,6 +120,30 @@ class FiresImporter(object):
                             # leave it as a string
                             pass
         return fires
+
+    ## Exporting
+
+    def _to_json(self, stream):
+        stream.write(json.dumps(self._fires))
+
+    def _to_csv(self, stream):
+        # TDOO: implement
+        # TODO: if self._headers is defined, then use it to order the first
+        # N columns of the fire data.  (After that will come the data augmented
+        # by the BlueSky modules run on the data.  For those columns, maybe just
+        # organize them in alphabetical order)
+
+        # Note: assumes each fire has the same set of keys
+        # TODO: assert that this is true, and fail if it isn't?
+        headers = getattr(self, '_headers', [])
+        if self._fires: # i.e. defined and has at least one fire
+            headers.extend(set(self._fires[0].keys()) - set(headers))
+
+        csvfile = csv.writer(stream)
+        csvfile.writerow(headers)
+        for f in self._fires:
+            a = [f[h] for h in headers]
+            csvfile.writerow(a)
 
     ## IO
 
@@ -139,20 +169,20 @@ class FiresImporter(object):
         self._fires = loader(self._stream(self._input_file, 'r'))
         return self._fires
 
+    def filter(self, attr, **kwargs):
+        whitelist = kwargs.get('whitelist')
+        blacklist = kwargs.get('blacklist')
+        if (not whitelist and not blacklist) or (whitelist and blacklist):
+            raise InvalidFilterError("Specify whitelist or blacklist - not both")
+
+        _filter = (lambda e: e in whitelist) if whitelist else (lambda e: e not in blacklist)
+        self._fires = [f for f in self._fires if _filter(getattr(f, attr))]
+
     def dumps(self, format=FireDataFormats.JSON):
         if self._fires is None:
             raise RuntimeError("Fires not yet loaded")
 
-        if format == FireDataFormats.JSON:
-            data = json.dumps(self._fires)
-        elif format == FireDataFormats.CSV:
-            # TDOO: implement
-            # TODO: if self._headers is defined, then use it to order the first
-            # N columns of the fire data.  (After that will come the data augmented
-            # by the BlueSky modules run on the data.  For those columns, maybe just
-            # organize them in alphabetical order)
-            raise NotImplementedError("Outputing CSV formated fire data not yet implemented")
-        else:
+        dumper = getattr(self, "_to_%s" % (FireDataFormats[format]), None)
+        if not dumper:
             raise FireDataFormatNotSupported("Unsupported output format: %s" % (format))
-
-        self._stream(self._output_file, 'w').write(data)
+        dumper(self._stream(self._output_file, 'w'))
