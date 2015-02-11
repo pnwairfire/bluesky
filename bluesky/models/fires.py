@@ -110,7 +110,11 @@ class FiresImporter(object):
                 #headers = dict([(i, row[i].strip(' ')) for i in xrange(len(row))])
                 headers = [e.strip(' ') for e in row]
                 # add any new headers to those recorded from previously loaded data
-                self._headers.extend(set(headers) - set(self._headers))
+                # Note: not using set opartions, such as the following:
+                #  > self._headers.extend(set(headers) - set(self._headers))
+                # because they don't preserve order
+                self._headers.extend([h for h in headers if h not in self._headers])
+                print headers
             else:
                 self._fires.append(Fire(dict([(headers[i], row[i].strip(' ')) for i in xrange(len(row))])))
                 # TODO: better way to automatically parse numerical values
