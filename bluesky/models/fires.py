@@ -75,7 +75,7 @@ class FiresImporter(object):
         self._input_file = input_file
         self._output_file = output_file
         self._fires = None
-        self._headers = None
+        self._headers = []
 
     ## Importing
 
@@ -92,17 +92,28 @@ class FiresImporter(object):
          - support already parsed JSON (i.e. dict or array)
         """
         self._fires = self._fires or []
+        new_headers = []
+
         data = json.loads(''.join([d for d in stream]))
         if hasattr(data, 'keys'):
-            self._fires = [Fire(data)]
+            self._fires.append(Fire(data))
+            # we'll be adding any new headers to those recorded from previously loaded data
+            # Note: not using set opartions, as explainedin comment in _from_csv
+            new_headers = [h for h in data.keys() if h not in self._headers]
         elif hasattr(data, 'append'):
-            self._fires = [Fire(d) for d in data]
+            self._fires.extend([Fire(d) for d in data])
+            if len(data) > 0:
+                # See note above about new headers
+                # Note: this assumes each fire has the same set of keys
+                # TODO: assert that this is true, and fail if it isn't, or just
+                # go throuh all fires and pick out new headers from each?
+                new_headers = [h for h in data[0].keys() if h not in self._headers]
         else:
             raise ValueError("Invalid fire json data")
+        self._headers.extend(sorted(new_headers))
 
     def _from_csv(self, stream):
         self._fires = self._fires or []
-        self._headers = self._headers or []
         headers = []
         for row in csv.reader(stream):
             if not headers:
@@ -114,7 +125,6 @@ class FiresImporter(object):
                 #  > self._headers.extend(set(headers) - set(self._headers))
                 # because they don't preserve order
                 self._headers.extend([h for h in headers if h not in self._headers])
-                print headers
             else:
                 self._fires.append(Fire(dict([(headers[i], row[i].strip(' ')) for i in xrange(len(row))])))
                 # TODO: better way to automatically parse numerical values
@@ -142,16 +152,10 @@ class FiresImporter(object):
         # by the BlueSky modules run on the data.  For those columns, maybe just
         # organize them in alphabetical order)
 
-        # Note: assumes each fire has the same set of keys
-        # TODO: assert that this is true, and fail if it isn't?
-        headers = self._headers or []
-        if self._fires: # i.e. defined and has at least one fire
-            headers.extend(set(self._fires[0].keys()) - set(headers))
-
         csvfile = csv.writer(stream, lineterminator='\n')
-        csvfile.writerow(headers)
+        csvfile.writerow(self._headers)
         for f in self._fires:
-            a = [f.get(h,'') for h in headers]
+            a = [f.get(h,'') for h in self._headers]
             csvfile.writerow(a)
 
     ## IO

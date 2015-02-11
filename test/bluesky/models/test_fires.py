@@ -142,23 +142,25 @@ class TestFiresImporter:
                      'b%d,%d,baz%d' % (
                         self._calls, self._calls, self._calls, self._calls,
                         self._calls, self._calls, self._calls, self._calls)
-                     )
+                )
             else:
                 self._output = getattr(self, 'output', StringIO.StringIO())
                 return self._output
         monkeypatch.setattr(fires.FiresImporter, '_stream', _stream)
-        #monkeypatch.setattr(fires_importer, '_stream', _stream)
-        #monkeypatch.setattr(sys.stdout, 'write', _write)        fires_importer.
+
         fires_importer.loads(format=fires.FireDataFormats.csv)
         expected = [
-            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},{'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'}
+            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},
+            {'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'}
         ]
         assert expected == fires_importer.fires
 
         fires_importer.loads(format=fires.FireDataFormats.csv)
         expected = [
-            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},{'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'},
-            {'foo2':2, 'bar2':'a2', 'baz':'baz2'},{'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'}
+            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},
+            {'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'},
+            {'foo2':2, 'bar2':'a2', 'baz':'baz2'},
+            {'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'}
         ]
         assert expected == fires_importer.fires
 
@@ -169,7 +171,36 @@ class TestFiresImporter:
         fires_importer._output = StringIO.StringIO()
         fires_importer.dumps()
         expected = [
-            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},{'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'},
-            {'foo2':2, 'bar2':'a2', 'baz':'baz2'},{'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'}
+            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},
+            {'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'},
+            {'foo2':2, 'bar2':'a2', 'baz':'baz2'},
+            {'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'}
         ]
         assert expected == json.loads(fires_importer._output.getvalue())
+
+        def _new_json_stream(self, file_name, flag):
+            if flag == 'r':
+                return StringIO.StringIO(
+                    u'{"fooj":"j","barj":"jj","baz":99}'
+                 )
+            else:
+                self._output = getattr(self, 'output', StringIO.StringIO())
+                return self._output
+        monkeypatch.setattr(fires.FiresImporter, '_stream', _new_json_stream)
+
+        fires_importer.loads(format=fires.FireDataFormats.json)
+        expected = [
+            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},
+            {'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'},
+            {'foo2':2, 'bar2':'a2', 'baz':'baz2'},
+            {'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'},
+            {"fooj": "j", "barj": "jj", "baz": 99}
+        ]
+        assert expected == fires_importer.fires
+
+        expected = "foo1,bar1,baz,foo2,bar2,barj,fooj\n1,a1,baz1,,,,\nb1,1,baz1,,,,\n,,baz2,2,a2,,\n,,baz2,b2,2,,\n,,99,,,jj,j\n"
+        fires_importer._output = StringIO.StringIO()
+        fires_importer.dumps(format=fires.FireDataFormats.csv)
+        print expected
+        print fires_importer._output.getvalue()
+        assert expected == fires_importer._output.getvalue()
