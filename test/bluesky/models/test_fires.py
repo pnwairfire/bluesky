@@ -1,4 +1,7 @@
 import io
+import json
+import sys
+import StringIO
 
 from py.test import raises
 
@@ -6,7 +9,7 @@ try:
     from bluesky.models import fires
 except:
     import os
-    import sys
+
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../../../'))
     sys.path.insert(0, root_dir)
     from bluesky.models import fires
@@ -128,5 +131,45 @@ class TestFiresImporter:
     def test_to_csv(self):
         pass
 
-    def test_full_cycle(self):
+    def test_full_cycle(self, monkeypatch):
         fires_importer = fires.FiresImporter()
+        def _stream(self, file_name, flag):
+            if flag == 'r':
+                self._calls = getattr(self, '_calls', 0) + 1
+                return StringIO.StringIO(
+                    u'foo%d,bar%d,baz \n'
+                     ' %d, a%d,baz%d\n'
+                     'b%d,%d,baz%d' % (
+                        self._calls, self._calls, self._calls, self._calls,
+                        self._calls, self._calls, self._calls, self._calls)
+                     )
+            else:
+                self._output = getattr(self, 'output', StringIO.StringIO())
+                return self._output
+        monkeypatch.setattr(fires.FiresImporter, '_stream', _stream)
+        #monkeypatch.setattr(fires_importer, '_stream', _stream)
+        #monkeypatch.setattr(sys.stdout, 'write', _write)        fires_importer.
+        fires_importer.loads(format=fires.FireDataFormats.csv)
+        expected = [
+            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},{'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'}
+        ]
+        assert expected == fires_importer.fires
+
+        fires_importer.loads(format=fires.FireDataFormats.csv)
+        expected = [
+            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},{'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'},
+            {'foo2':2, 'bar2':'a2', 'baz':'baz2'},{'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'}
+        ]
+        assert expected == fires_importer.fires
+
+        expected = "foo1,bar1,baz,foo2,bar2\n1,a1,baz1,,\nb1,1,baz1,,\n,,baz2,2,a2\n,,baz2,b2,2\n"
+        fires_importer.dumps(format=fires.FireDataFormats.csv)
+        assert expected == fires_importer._output.getvalue()
+
+        fires_importer._output = StringIO.StringIO()
+        fires_importer.dumps()
+        expected = [
+            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},{'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'},
+            {'foo2':2, 'bar2':'a2', 'baz':'baz2'},{'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'}
+        ]
+        assert expected == json.loads(fires_importer._output.getvalue())
