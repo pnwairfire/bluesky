@@ -76,7 +76,7 @@ class TestFiresImporter:
     def test_from_json_one_fire_single_object(self):
         fires_importer = fires.FiresImporter()
         expected = [
-            {'foo':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}
+            fires.Fire({'foo':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"})
         ]
         fires_importer._from_json(io.StringIO(
             u'{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"}'))
@@ -85,7 +85,7 @@ class TestFiresImporter:
     def test_from_json_one_fire_array(self):
         fires_importer = fires.FiresImporter()
         expected = [
-            {'foo':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}
+            fires.Fire({'foo':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"})
         ]
         fires_importer._from_json(io.StringIO(
             u'[{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"}]'))
@@ -94,8 +94,8 @@ class TestFiresImporter:
     def test_from_json_multiple_fires(self):
         fires_importer = fires.FiresImporter()
         expected = [
-            {'foo':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"},
-            {'foo':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'}
+            fires.Fire({'foo':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
+            fires.Fire({'foo':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
         ]
         fires_importer._from_json(io.StringIO(
             u'[{"foo":"a","bar":123,"baz":12.32,"bee":"12.12"},'
@@ -118,8 +118,8 @@ class TestFiresImporter:
     def test_from_csv_multiple_fires(self):
         fires_importer = fires.FiresImporter()
         expected = [
-            {'foo':'a', 'bar':123, 'baz': 23.23, 'bee': 23.23 },
-            {'foo':'b', 'bar':2, 'baz':1.2, "bee": 12.23}
+            fires.Fire({'foo':'a', 'bar':123, 'baz': 23.23, 'bee': 23.23 }),
+            fires.Fire({'foo':'b', 'bar':2, 'baz':1.2, "bee": 12.23})
         ]
         fires_importer._from_csv(io.StringIO(
             u'foo,bar, baz, bee \n a, 123, 23.23,"23.23"\nb,2, 1.2,"12.23"'))
@@ -150,17 +150,17 @@ class TestFiresImporter:
 
         fires_importer.loads(format=fires.FireDataFormats.csv)
         expected = [
-            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},
-            {'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'}
+            fires.Fire({'foo1':1, 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'})
         ]
         assert expected == fires_importer.fires
 
         fires_importer.loads(format=fires.FireDataFormats.csv)
         expected = [
-            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},
-            {'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'},
-            {'foo2':2, 'bar2':'a2', 'baz':'baz2'},
-            {'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'}
+            fires.Fire({'foo1':1, 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'}),
+            fires.Fire({'foo2':2, 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'})
         ]
         assert expected == fires_importer.fires
 
@@ -190,17 +190,80 @@ class TestFiresImporter:
 
         fires_importer.loads(format=fires.FireDataFormats.json)
         expected = [
-            {'foo1':1, 'bar1':'a1', 'baz':'baz1'},
-            {'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'},
-            {'foo2':2, 'bar2':'a2', 'baz':'baz2'},
-            {'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'},
-            {"fooj": "j", "barj": "jj", "baz": 99}
+            fires.Fire({'foo1':1, 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'}),
+            fires.Fire({'foo2':2, 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'}),
+            fires.Fire({"fooj": "j", "barj": "jj", "baz": 99})
         ]
         assert expected == fires_importer.fires
 
         expected = "foo1,bar1,baz,foo2,bar2,barj,fooj\n1,a1,baz1,,,,\nb1,1,baz1,,,,\n,,baz2,2,a2,,\n,,baz2,b2,2,,\n,,99,,,jj,j\n"
         fires_importer._output = StringIO.StringIO()
         fires_importer.dumps(format=fires.FireDataFormats.csv)
-        print expected
-        print fires_importer._output.getvalue()
         assert expected == fires_importer._output.getvalue()
+
+    def test_filter(self):
+        fires_importer = fires.FiresImporter()
+        fires_importer._fires = [
+            fires.Fire({'dfd':'a1', 'baz':'baz1'}),
+            fires.Fire({'bar':'a1', 'baz':'baz1'}),
+            fires.Fire({'country': "ZZ", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'country': '', 'bar1': 1 , 'baz':'baz1'}),
+            fires.Fire({'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
+            fires.Fire({'country': 'Unknown', 'bar2': 2 , 'baz':'baz2'}),
+            fires.Fire({"country": "USA", "barj": "jj", "baz": 99}),
+            fires.Fire({"country": "BZ", "barj": "jj", "baz": 99})
+        ]
+
+        fires_importer.filter('country', blacklist=["ZZ"])
+        expected = [
+            fires.Fire({'dfd':'a1', 'baz':'baz1'}),
+            fires.Fire({'bar':'a1', 'baz':'baz1'}),
+            fires.Fire({'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'country': '', 'bar1': 1 , 'baz':'baz1'}),
+            fires.Fire({'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
+            fires.Fire({'country': 'Unknown', 'bar2': 2 , 'baz':'baz2'}),
+            fires.Fire({"country": "USA", "barj": "jj", "baz": 99}),
+            fires.Fire({"country": "BZ", "barj": "jj", "baz": 99})
+        ]
+        assert expected == fires_importer.fires
+
+        fires_importer.filter('country', whitelist=["USA", "CA", "UK", "BZ"])
+        expected = [
+            fires.Fire({'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
+            fires.Fire({"country": "USA", "barj": "jj", "baz": 99}),
+            fires.Fire({"country": "BZ", "barj": "jj", "baz": 99})
+        ]
+        assert expected == fires_importer.fires
+
+        fires_importer.filter('country', blacklist=["USA"])
+        expected = [
+            fires.Fire({'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
+            fires.Fire({"country": "BZ", "barj": "jj", "baz": 99})
+        ]
+        assert expected == fires_importer.fires
+
+        fires_importer.filter('country', whitelist=["USA", "CA", "UK"])
+        expected = [
+            fires.Fire({'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'})
+        ]
+        assert expected == fires_importer.fires
+
+        fires_importer.filter('country', blacklist=["USA", "CA"])
+        expected = [
+            fires.Fire({'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+        ]
+        assert expected == fires_importer.fires

@@ -189,8 +189,12 @@ class FiresImporter(object):
         if (not whitelist and not blacklist) or (whitelist and blacklist):
             raise InvalidFilterError("Specify whitelist or blacklist - not both")
 
-        _filter = (lambda e: e in whitelist) if whitelist else (lambda e: e not in blacklist)
-        self._fires = [f for f in self._fires if _filter(getattr(f, attr))]
+        def _filter(fire, attr):
+            if whitelist:
+                return hasattr(fire, attr) and getattr(fire, attr) in whitelist
+            else:
+                return not hasattr(fire, attr) or getattr(fire, attr) not in blacklist
+        self._fires = [f for f in self._fires if _filter(f, attr)]
 
     def dumps(self, format=FireDataFormats.JSON):
         if self._fires is None:
