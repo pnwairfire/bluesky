@@ -8,8 +8,8 @@ with open('requirements.txt') as f:
     REQUIREMENTS = f.read().splitlines()
 
 setup(
-    name='pyairfire',
-    version='4.0.0',
+    name='BlueSky Pipeline',
+    version='0.0.1',
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
     packages=[
@@ -18,7 +18,7 @@ setup(
     scripts=[
         'bin/bsp'
     ],
-    url='git@bitbucket.org:fera/airfire-pyairfire.git',
-    description='General toolbox of pythong utilities for AirFire team.',
+    url='git@bitbucket.org:fera/airfire-bluesky-pipeline.git',
+    description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
     install_requires=REQUIREMENTS,
 )
