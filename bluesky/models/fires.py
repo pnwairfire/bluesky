@@ -148,7 +148,7 @@ class FiresImporter(object):
         if self._fires: # i.e. defined and has at least one fire
             headers.extend(set(self._fires[0].keys()) - set(headers))
 
-        csvfile = csv.writer(stream)
+        csvfile = csv.writer(stream, lineterminator='\n')
         csvfile.writerow(headers)
         for f in self._fires:
             a = [f.get(h,'') for h in headers]
