@@ -103,10 +103,20 @@ class FiresImporter(object):
     def __init__(self, input_file=None, output_file=None):
         self._input_file = input_file
         self._output_file = output_file
-        self._fires = None
+        self._fires = {}
+        self._fire_ids = [] # to record order fires were added
         self._headers = []
 
     ## Importing
+
+    def _add_fire(self, fire):
+        self._fires = self._fires or {}
+        if not self._fires.has_key(fire.id):
+            self._fires[fire.id] = (fire)
+            self._fire_ids.append(fire.id)
+        else:
+            # TODO: merge into existing (updateing start/end/size/etc appropriately)
+            pass
 
     def _from_json(self, stream):
         """Returns array of Fire objects loaded from json
@@ -120,12 +130,11 @@ class FiresImporter(object):
         TODO:
          - support already parsed JSON (i.e. dict or array)
         """
-        self._fires = self._fires or []
         new_headers = []
 
         data = json.loads(''.join([d for d in stream]))
         if hasattr(data, 'keys'):
-            self._fires.append(Fire(data))
+            self._add_fire(Fire(data))
             # we'll be adding any new headers to those recorded from previously loaded data
             # Note: not using set opartions, as explainedin comment in _from_csv
             new_headers = [h for h in data.keys() if h not in self._headers]
@@ -138,13 +147,12 @@ class FiresImporter(object):
                 # just look at first fire's keys
                 for fire in new_fires:
                     new_headers.extend([h for h in fire.keys() if h not in self._headers])
-                self._fires.extend(new_fires)
+                    self._add_fire(fire)
         else:
             raise ValueError("Invalid fire json data")
         self._headers.extend(sorted(new_headers))
 
     def _from_csv(self, stream):
-        self._fires = self._fires or []
         headers = []
         for row in csv.reader(stream):
             if not headers:
@@ -157,24 +165,28 @@ class FiresImporter(object):
                 # because they don't preserve order
                 self._headers.extend([h for h in headers if h not in self._headers])
             else:
-                self._fires.append(Fire(dict([(headers[i], row[i].strip(' ')) for i in xrange(len(row))])))
-                # TODO: better way to automatically parse numerical values
-                for k in self._fires[-1].keys():
-                    try:
-                        # try to parse int
-                        self._fires[-1][k] = int(self._fires[-1][k])
-                    except ValueError:
-                        try:
-                            # try to parse float
-                            self._fires[-1][k] = float(self._fires[-1][k])
-                        except:
-                            # leave it as a string
-                            pass
+                fire = Fire(dict([(headers[i], row[i].strip(' ')) for i in xrange(len(row))]))
+                self._cast_numeric_values(fire)
+                self._add_fire(fire)
+
+    def _cast_numeric_values(self, fire):
+        # TODO: better way to automatically parse numerical values
+        for k in fire.keys():
+            try:
+                # try to parse int
+                fire[k] = int(fire[k])
+            except ValueError:
+                try:
+                    # try to parse float
+                    fire[k] = float(fire[k])
+                except:
+                    # leave it as a string
+                    pass
 
     ## Exporting
 
     def _to_json(self, stream):
-        stream.write(json.dumps(self._fires))
+        stream.write(json.dumps(self.fires))
 
     def _to_csv(self, stream):
         # TDOO: implement
@@ -185,7 +197,7 @@ class FiresImporter(object):
 
         csvfile = csv.writer(stream, lineterminator='\n')
         csvfile.writerow(self._headers)
-        for f in self._fires:
+        for f in self.fires:
             a = [f.get(h,'') for h in self._headers]
             csvfile.writerow(a)
 
@@ -206,7 +218,15 @@ class FiresImporter(object):
 
     @property
     def fires(self):
-        return self._fires
+        return [self._fires[i] for i in self._fire_ids]
+
+    @fires.setter
+    def fires(self, fires_list):
+        self._fires = {}
+        self._fire_ids = []
+        for fire in fires_list:
+            self._add_fire(fire)
+
 
     def loads(self, format=FireDataFormats.JSON):
         loader = getattr(self, "_from_%s" % (FireDataFormats[format]), None)
@@ -225,11 +245,10 @@ class FiresImporter(object):
                 return hasattr(fire, attr) and getattr(fire, attr) in whitelist
             else:
                 return not hasattr(fire, attr) or getattr(fire, attr) not in blacklist
-        self._fires = [f for f in self._fires if _filter(f, attr)]
+        self.fires = [f for f in self.fires if _filter(f, attr)]
 
     def dumps(self, format=FireDataFormats.JSON):
-        if self._fires is None:
-            raise RuntimeError("Fires not yet loaded")
+        # If not fires have yet been loaded, just return empty array
 
         dumper = getattr(self, "_to_%s" % (FireDataFormats[format]), None)
         if not dumper:

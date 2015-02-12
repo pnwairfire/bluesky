@@ -192,6 +192,8 @@ class TestFiresImporter:
                 return self._output
         monkeypatch.setattr(fires.FiresImporter, '_stream', _stream)
 
+        assert [] == fires_importer.fires
+
         fires_importer.loads(format=fires.FireDataFormats.csv)
         expected = [
             fires.Fire({'id': 'A-1', 'name':'Aname1', 'foo1':1, 'bar1':'a1', 'baz':'baz1'}),
@@ -252,7 +254,7 @@ class TestFiresImporter:
 
     def test_filter(self):
         fires_importer = fires.FiresImporter()
-        fires_importer._fires = [
+        fires_importer.fires = [
             fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '3', 'name': 'n3', 'country': "ZZ", 'bar1':'a1', 'baz':'baz1'}),
