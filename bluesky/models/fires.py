@@ -98,6 +98,12 @@ class Fire(dict):
             return self[attr]
         raise KeyError(attr)
 
+    def __setattr__(self, attr, val):
+        if attr != 'auto_initialized_attrs':
+            self[attr] = val
+        else:
+            super(Fire, self).__setattr__(attr, val)
+
 class FiresImporter(object):
 
     def __init__(self, input_file=None, output_file=None):
