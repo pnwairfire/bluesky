@@ -7,6 +7,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import csv
 import json
 import sys
+import uuid
 
 __all__ = [
     'FireDataFormats',
@@ -61,8 +62,36 @@ class FireDataFormats(object):
 
 class Fire(dict):
 
+    SYNONYMS = {
+        "date_time": "start"
+        # TODO: fill in other synonyms
+    }
+
     def __init__(self, *args, **kwargs):
         super(Fire, self).__init__(*args, **kwargs)
+
+        # keep track of attrs generated during initialization
+        self.auto_initialized_attrs = []
+
+        for k,v in self.SYNONYMS.items():
+            if self.has_key(k) and not self.has_key(v):
+                # TDOO: should we pop 'k':
+                #  >  self[v] = self.pop(k)
+                self[v] = self[k]
+                self.auto_initialized_attrs.append(v)
+
+        # if id isn't specified, create it using other fields
+        if not self.get('id'):
+            self['id'] = '-'.join([str(e) for e in [
+                str(uuid.uuid1())[:8],
+                self.get('start'),
+                self.get('end')
+            ] if e]).replace(' ', '')
+            self.auto_initialized_attrs.append('id')
+
+        if not self.get('name'):
+            self['name'] = 'Unknown-%s' % (self['id'])
+            self.auto_initialized_attrs.append('name')
 
     def __getattr__(self, attr):
         if attr in self.keys():
