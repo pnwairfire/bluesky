@@ -130,13 +130,15 @@ class FiresImporter(object):
             # Note: not using set opartions, as explainedin comment in _from_csv
             new_headers = [h for h in data.keys() if h not in self._headers]
         elif hasattr(data, 'append'):
-            self._fires.extend([Fire(d) for d in data])
             if len(data) > 0:
-                # See note above about new headers
-                # Note: this assumes each fire has the same set of keys
-                # TODO: assert that this is true, and fail if it isn't, or just
-                # go throuh all fires and pick out new headers from each?
-                new_headers = [h for h in data[0].keys() if h not in self._headers]
+                new_fires = [Fire(d) for d in data]
+                # See note above about new headers; In case fires have different set
+                # of keys, go through and add any new headers from each fire's keys.
+                # TODO: if this significantly hurts performance, maybe we should
+                # just look at first fire's keys
+                for fire in new_fires:
+                    new_headers.extend([h for h in fire.keys() if h not in self._headers])
+                self._fires.extend(new_fires)
         else:
             raise ValueError("Invalid fire json data")
         self._headers.extend(sorted(new_headers))
