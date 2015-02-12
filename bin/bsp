@@ -16,6 +16,7 @@ import importlib
 import logging
 import pkgutil
 import sys
+import traceback
 
 from pyairfire import scripting
 
@@ -154,11 +155,15 @@ def main():
             fires_importer.filter('country', option.country_code_whitelist)
 
         for module in modules:
+            # TDOO: catch any exception raised by a module and dumps
+            # whatever is the current state of fires (or state of fires prior
+            # to calling hte module) ?
             module.run(fires_importer.fires) # modifies fires in place
 
         fires_importer.dumps(options.output_format)
 
     except Exception, e:
+        print traceback.format_exc()
         scripting.utils.exit_with_msg(e.message)
 
 if __name__ == "__main__":
