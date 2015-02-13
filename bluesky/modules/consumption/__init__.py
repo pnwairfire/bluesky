@@ -19,16 +19,16 @@ SETTINGS = {
         ('slope', None),
         ('windspeed', None),
         ('fm_type', None),
-        ('fuel_moisture_10hr_pct', None),
+        ('fuel_moisture_10hr_pct', 50), # default from consume package
         ('length_of_ignition', None),
         ('days_since_rain', None),
         ('fm_type', None),
     ],
     'all': [
-        ('fuel_moisture_1000hr_pct', None),
-        ('canopy_consumption_pct', None),
-        ('fuel_moisture_duff_pct', None),
-        ('shrub_blackened_pct', None),
+        ('fuel_moisture_1000hr_pct', 50), # default from consume package
+        ('canopy_consumption_pct', 0),
+        ('fuel_moisture_duff_pct', 50), # default from consume package
+        ('shrub_blackened_pct', 50),
         ('output_units', None),
         ('pile_blackened_pct', 0)
     ]
