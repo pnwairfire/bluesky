@@ -104,6 +104,13 @@ class Fire(dict):
         else:
             super(Fire, self).__setattr__(attr, val)
 
+class FireEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, 'tolist'):
+            return obj.tolist()
+
+        return json.JSONEncoder.default(self, obj)
+
 class FiresImporter(object):
 
     def __init__(self, input_file=None, output_file=None):
@@ -192,7 +199,7 @@ class FiresImporter(object):
     ## Exporting
 
     def _to_json(self, stream):
-        stream.write(json.dumps(self.fires))
+        stream.write(json.dumps(self.fires, cls=FireEncoder))
 
     def _to_csv(self, stream):
         # TDOO: implement
