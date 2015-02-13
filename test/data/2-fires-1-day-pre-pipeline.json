@@ -9,7 +9,7 @@
         "start": "20150120T000000Z",
         "end": "",
         "county": "",
-        "country": "Baha",
+        "country": "BS",
         "slope": 10.0,
         "max_humid": 80.0,
         "elevation": 0.0,
@@ -20,6 +20,7 @@
     {
         "id": "fkjsdflkjsdflkjsdlkfj",
         "name": "Natural Fire in WA",
+        "shape": "This needs to be filled in with real shape data",
         "latitude": 47.123,
         "longitude": -120.379,
         "area": 200,
