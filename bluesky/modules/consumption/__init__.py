@@ -11,6 +11,29 @@ __all__ = [
     'run'
 ]
 
+# TODO: These burn-type pecific settings sets might not be correct
+# TODO: Check with Susan P, Susan O, Kjell, etc. to make sure defaults are correct
+SETTINGS = {
+    'natural': [],
+    'activity': [
+        ('slope', None),
+        ('windspeed', None),
+        ('fm_type', None),
+        ('fuel_moisture_10hr_pct', None),
+        ('length_of_ignition', None),
+        ('days_since_rain', None),
+        ('fm_type', None),
+    ],
+    'all': [
+        ('fuel_moisture_1000hr_pct', None),
+        ('canopy_consumption_pct', None),
+        ('fuel_moisture_duff_pct', None),
+        ('shrub_blackened_pct', None),
+        ('output_units', None),
+        ('pile_blackened_pct', 0)
+    ]
+}
+
 def run(fires):
     logging.debug("Running consumption module (NOOP)")
 
@@ -23,20 +46,31 @@ def run(fires):
     # a single fire?
     for fire in fires:
         burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
+        valid_settings = SETTINGS[burn_type] + SETTINGS['all']
+
+        # TODO: can I run consume on all fuelbeds at once and get per-fuelbed
+        # results?  If it is simply a matter of parsing separated values from
+        # the results, make sure that running all at once produces any performance
+        # gain; if it doesn't, then it might not be worth the trouble
         for fb in fire.fuelbeds:
             fc = consume.FuelConsumption() #msg_level=msg_level)
             fc.burn_type = burn_type
-            fc.fuelbed_fccs_ids = fb['fccs_id']
+            fc.fuelbed_fccs_ids = [fb['fccs_id']]
+
+            # Note: for the rest, use lists if we end up running fc on
+            # all fuelbeds at once
             fc.fuelbed_area_acres = fb['percentage'] * fire.area
+            fc.fuelbed_ecoregion = [fire.ecoregion]
 
-            # TODO: the following are dummy values; set appropriately
-            fc.fuelbed_ecoregion = ['western']
-            fc.fuel_moisture_1000hr_pct = 50
-            fc.fuel_moisture_duff_pct = 50
-            fc.pile_blackened_pct = 34
-            fc.canopy_consumption_pct = 25
-            fc.shrub_blackened_pct = 25
-            fc.output_units = 'kg_ha'
+            for k, default in valid_settings:
+                if fire.has_key(k):
+                    setattr(fc, k, fire[k])
+                elif default is not None:
+                    setattr(fc, k, default)
 
-            import pdb;pdb.set_trace()
-            fb['consumption'] = fc.results()['consumption']
+            if fc.results():
+                fb['consumption'] = fc.results()['consumption']
+            else:
+                logging.error("Failed to calculate consumption for fire %s / %s fuelbed %s" % (
+                    fire.id, fire.name, fb['fccs_id']
+                ))
