@@ -19,20 +19,24 @@ def run(fires):
     msg_level = 2  # 1 => fewest messages; 3 => most messages
 
     # TODO: can I safely instantiate one FuelConsumption object and
-    # use it across all fires?
+    # use it across all fires, or at lesat accross all fuelbeds within
+    # a single fire?
     for fire in fires:
         burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
-        fc = consume.FuelConsumption() #msg_level=msg_level)
-        fc._settings.burn_type = burn_type
-        fc.fuelbed_fccs_ids = [fb['fccs_id'] for fb in fire.fuelbeds]
-        fc.fuelbed_area_acres = [fb['percentage'] * fire.area for fb in fire.fuelbeds]
-        # >>> fc.fuelbed_ecoregion = 'western'
-        # >>> fc.fuel_moisture_1000hr_pct = [50, 40]
-        #fc.fuel_moisture_duff_pct = [50, 40]
-        # >>> fc.canopy_consumption_pct = 25
-        # >>> fc.shrub_blackened_pct = 25
-        # >>> fc.output_units = 'kg_ha'
-        # >>> fc.display_inputs()
+        for fb in fire.fuelbeds:
+            fc = consume.FuelConsumption() #msg_level=msg_level)
+            fc.burn_type = burn_type
+            fc.fuelbed_fccs_ids = fb['fccs_id']
+            fc.fuelbed_area_acres = fb['percentage'] * fire.area
 
-        #fc.results()
-        # fuelbed_list = consumer.fuelbed_fccs_ids
+            # TODO: the following are dummy values; set appropriately
+            fc.fuelbed_ecoregion = ['western']
+            fc.fuel_moisture_1000hr_pct = 50
+            fc.fuel_moisture_duff_pct = 50
+            fc.pile_blackened_pct = 34
+            fc.canopy_consumption_pct = 25
+            fc.shrub_blackened_pct = 25
+            fc.output_units = 'kg_ha'
+
+            import pdb;pdb.set_trace()
+            fb['consumption'] = fc.results()['consumption']
