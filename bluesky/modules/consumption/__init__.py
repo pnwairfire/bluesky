@@ -18,16 +18,15 @@ SETTINGS = {
     'activity': [
         ('slope', None),
         ('windspeed', None),
-        ('fm_type', None),
+        ('days_since_rain', None),
         ('fuel_moisture_10hr_pct', 50), # default from consume package
         ('length_of_ignition', None),
-        ('days_since_rain', None),
         ('fm_type', None),
     ],
     'all': [
         ('fuel_moisture_1000hr_pct', 50), # default from consume package
-        ('canopy_consumption_pct', 0),
         ('fuel_moisture_duff_pct', 50), # default from consume package
+        ('canopy_consumption_pct', 0),
         ('shrub_blackened_pct', 50),
         ('output_units', None),
         ('pile_blackened_pct', 0)
@@ -57,8 +56,8 @@ def run(fires):
             fc.burn_type = burn_type
             fc.fuelbed_fccs_ids = [fb['fccs_id']]
 
-            # Note: for the rest, use lists if we end up running fc on
-            # all fuelbeds at once
+            # Note: if we end up running fc on all fuelbeds at once, use lists
+            # for the rest
             fc.fuelbed_area_acres = fb['pct'] * fire.area
             fc.fuelbed_ecoregion = [fire.ecoregion]
 
