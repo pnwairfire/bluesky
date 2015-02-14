@@ -276,6 +276,33 @@ class TestFiresImporterLoadingAndDumping:
 
 class TestFiresImporterLowerLevelMethods:
 
+    def test_nested_fire_to_csv(self):
+        pass
+
+    def test_flattened_fires(self):
+        pass
+
+    def test_flatten(self):
+        d = {
+            'a': 1,
+            'c': {
+                'a': 2,
+                'b': {
+                    'x': 5,
+                    'y' : 10}
+                },
+            'd': [1, 2, 3]
+        }
+        new_d = {
+            'a': 1,
+            'c_a': 2,
+            'c_b_x': 5,
+            'd': [1, 2, 3],
+            'c_b_y': 10
+        }
+        assert new_d == fires.FiresImporter()._flatten(d)
+        assert new_d == fires.FiresImporter()._flatten(new_d)  # NOOP
+
     def test_filter(self):
         fires_importer = fires.FiresImporter()
         fires_importer.fires = [

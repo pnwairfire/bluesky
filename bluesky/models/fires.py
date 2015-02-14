@@ -185,17 +185,42 @@ class FiresImporter(object):
         stream.write(json.dumps(self.fires, cls=FireEncoder))
 
     def _to_csv(self, stream):
-        # TDOO: implement
-        # TODO: if self._headers is defined, then use it to order the first
-        # N columns of the fire data.  (After that will come the data augmented
-        # by the BlueSky modules run on the data.  For those columns, maybe just
-        # organize them in alphabetical order)
+        flattened_fires = self._flattened_fires()
+
+        # TODO: is there a more efficient way to get a unique set of the fires' keys ???
+        headers = set()
+        for f in flattened_fires:
+            for k in f.keys():
+                headers.add(k)
+        headers = list(headers)
 
         csvfile = csv.writer(stream, lineterminator='\n')
-        csvfile.writerow(self._headers)
-        for f in self.fires:
-            a = [f.get(h,'') for h in self._headers]
+        csvfile.writerow(headers)
+        for f in flattened_fires:
+            a = [f.get(h, '') for h in headers]
             csvfile.writerow(a)
+
+    def _flattened_fires(self):
+        ffs = []
+        for fire in self.fires:
+            ffs.append(self._flatten(fire))
+        return ffs
+
+    def _flatten(self, d, parent_key=None, sep='_'):
+        """Flattens a nested dict
+
+        TODO: move _flatten to general purpose module (maybe in pyairfire)
+        TODO: handle key colissions (or let user deal with it by specifying
+          a separator that guarantees no colissions)
+        """
+        new_d = {}
+        for k, v in d.items():
+            new_key = sep.join([e for e in [parent_key, k] if e])
+            if hasattr(v, 'has_key'):
+                new_d.update(self._flatten(v, new_key, sep=sep))
+            else:
+                new_d[new_key] = v
+        return new_d
 
     ## IO
 
