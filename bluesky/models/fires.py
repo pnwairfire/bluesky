@@ -118,7 +118,6 @@ class FiresImporter(object):
         self._output_file = output_file
         self._fires = {}
         self._fire_ids = [] # to record order fires were added
-        self._headers = []
 
     ## Importing
 
@@ -143,27 +142,16 @@ class FiresImporter(object):
         TODO:
          - support already parsed JSON (i.e. dict or array)
         """
-        new_headers = []
-
         data = json.loads(''.join([d for d in stream]))
         if hasattr(data, 'keys'):
             self._add_fire(Fire(data))
-            # we'll be adding any new headers to those recorded from previously loaded data
-            # Note: not using set opartions, as explainedin comment in _from_csv
-            new_headers = [h for h in data.keys() if h not in self._headers]
         elif hasattr(data, 'append'):
             if len(data) > 0:
                 new_fires = [Fire(d) for d in data]
-                # See note above about new headers; In case fires have different set
-                # of keys, go through and add any new headers from each fire's keys.
-                # TODO: if this significantly hurts performance, maybe we should
-                # just look at first fire's keys
                 for fire in new_fires:
-                    new_headers.extend([h for h in fire.keys() if h not in self._headers])
                     self._add_fire(fire)
         else:
             raise ValueError("Invalid fire json data")
-        self._headers.extend(sorted(new_headers))
 
     def _from_csv(self, stream):
         headers = []
@@ -172,11 +160,6 @@ class FiresImporter(object):
                 # record headers for this csv data
                 #headers = dict([(i, row[i].strip(' ')) for i in xrange(len(row))])
                 headers = [e.strip(' ') for e in row]
-                # add any new headers to those recorded from previously loaded data
-                # Note: not using set opartions, such as the following:
-                #  > self._headers.extend(set(headers) - set(self._headers))
-                # because they don't preserve order
-                self._headers.extend([h for h in headers if h not in self._headers])
             else:
                 fire = Fire(dict([(headers[i], row[i].strip(' ')) for i in xrange(len(row))]))
                 self._cast_numeric_values(fire)
