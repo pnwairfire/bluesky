@@ -15,6 +15,10 @@ except:
     sys.path.insert(0, root_dir)
     from bluesky.models import fires
 
+##
+## Tests for FireDataFormats
+##
+
 class TestFireDataFormats:
     def test_formats(self):
         assert set(['json', 'csv']) == set(fires.FireDataFormats.formats)
@@ -41,6 +45,10 @@ class TestFireDataFormats:
         assert 1 == fires.FireDataFormats.JSON
         with raises(fires.FireDataFormatNotSupported) as e:
             fires.FireDataFormats.sdf
+
+##
+## Tests for Fire
+##
 
 class TestFire:
 
@@ -98,7 +106,13 @@ class TestFire:
         with raises(KeyError) as e:
             f.rifsijsflj
 
+##
+## Tests for FiresImporter
+##
+
 class TestFiresImporter:
+
+    ## From JSON
 
     def test_from_json_invalid_data(self):
         fires_importer = fires.FiresImporter()
@@ -146,6 +160,8 @@ class TestFiresImporter:
               '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}]'))
         assert expected == fires_importer.fires
 
+    ## From CSV
+
     def test_from_csv_no_fires(self):
         fires_importer = fires.FiresImporter()
         fires_importer._from_csv(io.StringIO(u'id,bar, baz, bee '))
@@ -169,11 +185,17 @@ class TestFiresImporter:
             u'id,bar, baz, bee \n a, 123, 23.23,"23.23"\nb,2, 1.2,"12.23"'))
         assert expected == fires_importer.fires
 
+    ## To JSON
+
     def test_to_json(self):
         pass
 
+    ## To CSV
+
     def test_to_csv(self):
         pass
+
+class TestFiresImporterLoadingAndDumping:
 
     def test_full_cycle(self, monkeypatch):
         fires_importer = fires.FiresImporter()
@@ -251,6 +273,8 @@ class TestFiresImporter:
         fires_importer._output = StringIO.StringIO()
         fires_importer.dumps(format=fires.FireDataFormats.csv)
         assert expected == fires_importer._output.getvalue()
+
+class TestFiresImporterLowerLevelMethods:
 
     def test_filter(self):
         fires_importer = fires.FiresImporter()
