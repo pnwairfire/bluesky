@@ -232,11 +232,46 @@ class TestFiresImporterLoadingAndDumping:
         ]
         assert expected == fires_importer.fires
 
-        expected = "id,name,foo1,bar1,baz,foo2,bar2\n1,a1,baz1,,\nb1,1,baz1,,\n,,baz2,2,a2\n,,baz2,b2,2\n"
-        expected = ("id,name,foo1,bar1,baz,foo2,bar2\nA-1,Aname1,1,a1,baz1,,\n"
-            "B-1,Bname1,b1,1,baz1,,\nA-2,Aname2,,,baz2,2,a2\nB-2,Bname2,,,baz2,b2,2\n")
+        # Note that CSV output doesn't preserve input column order
+        expected_lines = [
+            set([
+                ("id","A-1"),
+                ("name","Aname1"),
+                ("foo1", "1"),
+                ("bar1", "a1"),
+                ("baz", "baz1"),
+                ("foo2",""),
+                ("bar2", "")]),
+            set([
+                ("id","B-1"),
+                ("name","Bname1"),
+                ("foo1", "b1"),
+                ("bar1", "1"),
+                ("baz", "baz1"),
+                ("foo2",""),
+                ("bar2", "")]),
+            set([
+                ("id","A-2"),
+                ("name","Aname2"),
+                ("foo1", ""),
+                ("bar1", ""),
+                ("baz", "baz2"),
+                ("foo2","2"),
+                ("bar2", "a2")]),
+            set([
+                ("id","B-2"),
+                ("name","Bname2"),
+                ("foo1", ""),
+                ("bar1", ""),
+                ("baz", "baz2"),
+                ("foo2","b2"),
+                ("bar2", "2")])
+        ]
         fires_importer.dumps(format=fires.FireDataFormats.csv)
-        assert expected == fires_importer._output.getvalue()
+        dumped_lines = fires_importer._output.getvalue().strip('\n').split('\n')
+        headers = dumped_lines[0].split(',')
+        dumped_lines = [set(zip(headers, dl.split(','))) for dl in dumped_lines[1:]]
+        assert expected_lines == dumped_lines
 
         fires_importer._output = StringIO.StringIO()
         fires_importer.dumps()
@@ -268,11 +303,65 @@ class TestFiresImporterLoadingAndDumping:
         ]
         assert expected == fires_importer.fires
 
-        expected = ("id,name,foo1,bar1,baz,foo2,bar2,barj,fooj\nA-1,Aname1,1,a1,baz1,,,,\n"
-            "B-1,Bname1,b1,1,baz1,,,,\nA-2,Aname2,,,baz2,2,a2,,\nB-2,Bname2,,,baz2,b2,2,,\ndfdf,sdfs,,,99,,,jj,j\n")
+        # Again, Note that CSV output doesn't preserve input column order
+        expected_lines = [
+            set([
+                ("id", "A-1"),
+                ("name", "Aname1"),
+                ("foo1", "1"),
+                ("bar1", "a1"),
+                ("baz", "baz1"),
+                ("foo2", ""),
+                ("bar2", ""),
+                ("barj", ""),
+                ("fooj", "")]),
+            set([
+                ("id", "B-1"),
+                ("name", "Bname1"),
+                ("foo1", "b1"),
+                ("bar1", "1"),
+                ("baz", "baz1"),
+                ("foo2", ""),
+                ("bar2", ""),
+                ("barj", ""),
+                ("fooj", "")]),
+            set([
+                ("id", "A-2"),
+                ("name", "Aname2"),
+                ("foo1", ""),
+                ("bar1", ""),
+                ("baz", "baz2"),
+                ("foo2", "2"),
+                ("bar2", "a2"),
+                ("barj", ""),
+                ("fooj", "")]),
+            set([
+                ("id", "B-2"),
+                ("name", "Bname2"),
+                ("foo1", ""),
+                ("bar1", ""),
+                ("baz", "baz2"),
+                ("foo2", "b2"),
+                ("bar2", "2"),
+                ("barj" ,""),
+                ("fooj", "")]),
+            set([
+                ("id", "dfdf"),
+                ("name", "sdfs"),
+                ("foo1", ""),
+                ("bar1", ""),
+                ("baz", "99"),
+                ("foo2", ""),
+                ("bar2", ""),
+                ("barj" ,"jj"),
+                ("fooj", "j")])
+        ]
         fires_importer._output = StringIO.StringIO()
         fires_importer.dumps(format=fires.FireDataFormats.csv)
-        assert expected == fires_importer._output.getvalue()
+        dumped_lines = fires_importer._output.getvalue().strip('\n').split('\n')
+        headers = dumped_lines[0].split(',')
+        dumped_lines = [set(zip(headers, dl.split(','))) for dl in dumped_lines[1:]]
+        assert expected_lines == dumped_lines
 
 class TestFiresImporterLowerLevelMethods:
 
