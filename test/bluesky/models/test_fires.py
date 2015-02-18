@@ -197,6 +197,8 @@ class TestFiresImporter:
 
 class TestFiresImporterLoadingAndDumping:
 
+    # TODO: monkeypatch fires.FiresImporter._stream in setup to avoid redundancy
+
     def test_full_cycle(self, monkeypatch):
         fires_importer = fires.FiresImporter()
         def _stream(self, file_name, flag):
@@ -241,7 +243,8 @@ class TestFiresImporterLoadingAndDumping:
                 ("bar1", "a1"),
                 ("baz", "baz1"),
                 ("foo2",""),
-                ("bar2", "")]),
+                ("bar2", "")
+            ]),
             set([
                 ("id","B-1"),
                 ("name","Bname1"),
@@ -249,7 +252,8 @@ class TestFiresImporterLoadingAndDumping:
                 ("bar1", "1"),
                 ("baz", "baz1"),
                 ("foo2",""),
-                ("bar2", "")]),
+                ("bar2", "")
+            ]),
             set([
                 ("id","A-2"),
                 ("name","Aname2"),
@@ -257,7 +261,8 @@ class TestFiresImporterLoadingAndDumping:
                 ("bar1", ""),
                 ("baz", "baz2"),
                 ("foo2","2"),
-                ("bar2", "a2")]),
+                ("bar2", "a2")
+            ]),
             set([
                 ("id","B-2"),
                 ("name","Bname2"),
@@ -265,7 +270,8 @@ class TestFiresImporterLoadingAndDumping:
                 ("bar1", ""),
                 ("baz", "baz2"),
                 ("foo2","b2"),
-                ("bar2", "2")])
+                ("bar2", "2")
+            ])
         ]
         fires_importer.dumps(format=fires.FireDataFormats.csv)
         dumped_lines = fires_importer._output.getvalue().strip('\n').split('\n')
@@ -314,7 +320,8 @@ class TestFiresImporterLoadingAndDumping:
                 ("foo2", ""),
                 ("bar2", ""),
                 ("barj", ""),
-                ("fooj", "")]),
+                ("fooj", "")
+            ]),
             set([
                 ("id", "B-1"),
                 ("name", "Bname1"),
@@ -324,7 +331,8 @@ class TestFiresImporterLoadingAndDumping:
                 ("foo2", ""),
                 ("bar2", ""),
                 ("barj", ""),
-                ("fooj", "")]),
+                ("fooj", "")
+            ]),
             set([
                 ("id", "A-2"),
                 ("name", "Aname2"),
@@ -334,7 +342,8 @@ class TestFiresImporterLoadingAndDumping:
                 ("foo2", "2"),
                 ("bar2", "a2"),
                 ("barj", ""),
-                ("fooj", "")]),
+                ("fooj", "")
+            ]),
             set([
                 ("id", "B-2"),
                 ("name", "Bname2"),
@@ -344,7 +353,8 @@ class TestFiresImporterLoadingAndDumping:
                 ("foo2", "b2"),
                 ("bar2", "2"),
                 ("barj" ,""),
-                ("fooj", "")]),
+                ("fooj", "")
+            ]),
             set([
                 ("id", "dfdf"),
                 ("name", "sdfs"),
@@ -354,7 +364,8 @@ class TestFiresImporterLoadingAndDumping:
                 ("foo2", ""),
                 ("bar2", ""),
                 ("barj" ,"jj"),
-                ("fooj", "j")])
+                ("fooj", "j")
+            ])
         ]
         fires_importer._output = StringIO.StringIO()
         fires_importer.dumps(format=fires.FireDataFormats.csv)
@@ -362,6 +373,49 @@ class TestFiresImporterLoadingAndDumping:
         headers = dumped_lines[0].split(',')
         dumped_lines = [set(zip(headers, dl.split(','))) for dl in dumped_lines[1:]]
         assert expected_lines == dumped_lines
+
+    def test_dumping_nested_fire_to_csv(self, monkeypatch):
+        fires_importer = fires.FiresImporter()
+        def _stream(self, file_name, flag):
+            if flag == 'r':
+                return StringIO.StringIO(
+                    u'[{"id": "A-1", "name":"Aname1", "foo1":1, "bar1":"a1", "baz":"baz1"}]'
+                )
+            else:
+                self._output = getattr(self, 'output', StringIO.StringIO())
+                return self._output
+        monkeypatch.setattr(fires.FiresImporter, '_stream', _stream)
+
+        fires_importer.fires = [
+            fires.Fire({
+                "start": "20140202T121223",
+                "id": "sdfsdfsdfsdf",
+                "name": "sfkjhsdkjfhsd",
+                "blah": {
+                    "foo": 1,
+                    "bar": "abc",
+                    "bas": {
+                        "a": "b"
+                    }
+                }
+            })
+        ]
+        expected_lines = [
+            set([
+                ("id", "sdfsdfsdfsdf"),
+                ("name", "sfkjhsdkjfhsd"),
+                ("start", "20140202T121223"),
+                ("blah_foo", "1"),
+                ("blah_bar", "abc"),
+                ("blah_bas_a", "b")
+            ])
+        ]
+        fires_importer.dumps(format=fires.FireDataFormats.csv)
+        dumped_lines = fires_importer._output.getvalue().strip('\n').split('\n')
+        headers = dumped_lines[0].split(',')
+        dumped_lines = [set(zip(headers, dl.split(','))) for dl in dumped_lines[1:]]
+        assert expected_lines == dumped_lines
+
 
 class TestFiresImporterLowerLevelMethods:
 
