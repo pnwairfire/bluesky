@@ -34,7 +34,7 @@ SETTINGS = {
 }
 
 def run(fires):
-    logging.debug("Running consumption module (NOOP)")
+    logging.debug("Running consumption module")
 
     # TODO: update bsp to have generic way of specifying module-specific
     # options, and get msg_level and burn_type from options
