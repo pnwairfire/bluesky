@@ -18,4 +18,5 @@ def run(fires):
     calculator = EmissionsCalculator(Fccs2Ef())
     for fire in fires:
         for fb in fire.fuelbeds:
-            fb['emissions'] = calculator.calculate(fb["fccs_id"], fb["consumption"])
+            is_rx = fire.get('type') == "rx"
+            fb['emissions'] = calculator.calculate(fb["fccs_id"], fb["consumption"], is_rx)
