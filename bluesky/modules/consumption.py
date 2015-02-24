@@ -91,7 +91,4 @@ def convert_arrays_to_scalar(consumption_results):
             for k in sc_dict.keys():
                 logging.debug(" consumption['%s']['%s']['%s'] = %s" % (
                     category, sub_category, k, sc_dict[k]))
-                if hasattr(sc_dict[k], 'pop'):
-                    sc_dict[k] = sc_dict[k][0]
-                if hasattr(sc_dict[k], 'isdigit'):
-                    sc_dict[k] = float(sc_dict[k])
+                sc_dict[k] = sc_dict[k][0]
