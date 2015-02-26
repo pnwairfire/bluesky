@@ -19,4 +19,4 @@ def run(fires):
     for fire in fires:
         for fb in fire.fuelbeds:
             is_rx = fire.get('type') == "rx"
-            fb['emissions'] = calculator.calculate(fb["fccs_id"], fb["consumption"], is_rx)
+            fb['emissions'] = calculator.calculate([fb["fccs_id"]], fb["consumption"], is_rx)
