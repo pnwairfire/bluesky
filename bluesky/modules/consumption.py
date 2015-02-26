@@ -72,23 +72,8 @@ def run(fires):
 
             if fc.results():
                 fb['consumption'] = fc.results()['consumption']
-                convert_arrays_to_scalar(fb['consumption'])
+                fb['consumption'].pop('debug', None)
             else:
                 logging.error("Failed to calculate consumption for fire %s / %s fuelbed %s" % (
                     fire.id, fire.name, fb['fccs_id']
                 ))
-
-def convert_arrays_to_scalar(consumption_results):
-    """Converts array of consumption values into scalar.
-
-    Each array of consumption values will be size one, since we're only
-    passing one fuelbed into consume.
-    """
-    # First get rid of
-    consumption_results.pop('debug',None)
-    for category, c_dict in consumption_results.items():
-        for sub_category, sc_dict in c_dict.items():
-            for k in sc_dict.keys():
-                logging.debug(" consumption['%s']['%s']['%s'] = %s" % (
-                    category, sub_category, k, sc_dict[k]))
-                sc_dict[k] = sc_dict[k][0]
