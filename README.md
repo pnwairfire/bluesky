@@ -107,7 +107,7 @@ Example of reading from and writing to file:
 
 Example of piping in and redirecting output to file
 
-    $ cat /path/to/input/fires/json/file.json | ./bsp > /path/to/output/modified/fires/json/file.json fuelbeds
+    $ cat /path/to/input/fires/json/file.json | ./bsp fuelbeds > /path/to/output/modified/fires/json/file.json
 
 Example of redirecting input from and outputing to file:
 
@@ -117,12 +117,51 @@ Example of redirecting input from file and outputing to stdout
 
     $ ./bin/bsp fuelbeds fuelloading < /path/to/input/fires/json/file.json
 
+#### Data Formats
+
 ```bsp``` supports inputting and outputing both json and csv formatted fire data.
 (The default expected format is JSON.) The following example reads in CSV fire
-data from file, filters out all but USA filures, and outputs JSON formated data
-to stdout
+data from file, filters out all but USA filures, runs the fires through the
+fuelbeds and consumption modules, and outputs JSON formated data to stdout:
 
     $ ./bin/bsp -i /path/to/input/fires/csv/file.csv --input-format=CSV -w USA fuelbeds consumption
+
+Note, however, that when writing out csv formatted data, all nested json
+objects are flattened.  For example:
+
+    [{
+        "slope": 20.0,
+        "fuelbeds": [{
+            "fccs_id": 35,
+            "pct": 100
+        }],
+        "max_humid": 70.0,
+        "end": "20150120T000000Z",
+        "name": "Natural Fire in WA lacking consumption inputs",
+        "area": 200,
+        "event_id": "SF11E826544",
+        "country": "USA",
+        "longitude": -120.379,
+        "elevation": 2320.0,
+        "start": "20150120T000000Z",
+        "state": "KS",
+        "latitude": 47.123,
+        "timezone": -7.0,
+        "ecoregion": "southern",
+        "id": "fkjsdflkjsflkjsdlkfj"
+    }]
+
+would be output to the following csv:
+
+    slope,max_humid,end,name,area,event_id,country,longitude,elevation,start,state,latitude,timezone,ecoregion,fuelbeds_0_pct,id,fuelbeds_0_fccs_id
+    20.0,70.0,20150120T000000Z,Natural Fire in WA lacking consumption inputs,200,SF11E826544,USA,-120.379,2320.0,20150120T000000Z,KS,47.123,-7.0,southern,100,fkjsdflkjsflkjsdlkfj,35
+
+Any initial nesting information is lost, so that if the csv data is then input
+back into ```bsp```, the loaded data is flat as well.  Any modules expecting
+nested data will not work.  For example, in the following example, cunsumption
+will fail:
+
+    cat /path/to/input/fires/csv/file.json | ./bin/bsp fuelbeds --output-format=csv | ./bin/bsp --input-format=csv consumption
 
 #### Piping
 
