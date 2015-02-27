@@ -214,12 +214,18 @@ class FiresImporter(object):
           a separator that guarantees no colissions)
         """
         new_d = {}
-        for k, v in d.items():
-            new_key = sep.join([e for e in [parent_key, k] if e])
-            if hasattr(v, 'has_key'):
+        if hasattr(d, 'has_key'):
+            for k, v in d.items():
+                new_key = sep.join([e for e in [parent_key, k] if e])
                 new_d.update(self._flatten(v, new_key, sep=sep))
-            else:
-                new_d[new_key] = v
+        elif hasattr(d, '__iter__'):
+            # note that dict has '__iter__' as well, but dicts are caught by
+            # the 'if' block above
+            for i in xrange(len(d)):
+                new_key = sep.join([e for e in [parent_key, str(i)] if e])
+                new_d.update(self._flatten(d[i], new_key, sep=sep))
+        else:
+            new_d[parent_key] = d
         return new_d
 
     ## IO

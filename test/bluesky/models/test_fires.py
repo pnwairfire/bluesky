@@ -434,14 +434,30 @@ class TestFiresImporterLowerLevelMethods:
                     'x': 5,
                     'y' : 10}
                 },
-            'd': [1, 2, 3]
+            'd': [1, 2, 3],
+            'e': [
+                {
+                    'a': 1,
+                    'b': 2
+                },
+                {
+                    'a': 6,
+                    'b': 4
+                }
+            ]
         }
         new_d = {
             'a': 1,
             'c_a': 2,
             'c_b_x': 5,
-            'd': [1, 2, 3],
-            'c_b_y': 10
+            'd_0': 1,
+            'd_1': 2,
+            'd_2': 3,
+            'c_b_y': 10,
+            'e_0_a': 1,
+            'e_0_b': 2,
+            'e_1_a': 6,
+            'e_1_b': 4
         }
         assert new_d == fires.FiresImporter()._flatten(d)
         assert new_d == fires.FiresImporter()._flatten(new_d)  # NOOP
