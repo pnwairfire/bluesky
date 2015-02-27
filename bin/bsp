@@ -107,12 +107,12 @@ OPTIONAL_OPTIONS = [
     }
 ]
 
-# Note: pkgutil.walk_packages recursively walks nested packages, while
-# pkgutil.iter_modules iterates through only modules and packages that
-# are one deep
-# TODO:
+# Note: pkgutil.walk_packages recursively walks modules and packages, while
+# pkgutil.iter_modules iterates through only modules and packages that are
+# one deep
 AVAILABLE_MODULES = [
-    p[1].split('.')[-1] for p in pkgutil.iter_modules(modules.__path__, modules.__name__ + '.') if p[2]
+    #p[1].split('.')[-1] for p in pkgutil.iter_modules(modules.__path__, modules.__name__ + '.') #if p[2]
+    p[1] for p in pkgutil.iter_modules(modules.__path__)
 ]
 
 def validate_options(options):
