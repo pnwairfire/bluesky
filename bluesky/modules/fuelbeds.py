@@ -50,7 +50,7 @@ class Estimator(object):
         for i in xrange(num_fires):
             p = random.randint(0, remaining_pct-(num_fires-i)) if i != num_fires else remaining_pct
             self.fire.fuelbeds.append({
-                'fccs_id': random.randint(1, 68),  # note: this could results in dupes
+                'fccs_id': random.randint(1, 29),  # note: this could results in dupes
                 'pct': p
             })
             remaining_pct -= self.fire.fuelbeds[-1]['pct']
@@ -62,7 +62,7 @@ class Estimator(object):
         fire_id = self.fire.get('id', "FAKEID") # every fire should have an id
         random.seed(ord(fire_id[0]))
         self.fire.fuelbeds = [{
-            'fccs_id': ord(fire_id[0]) % 68 + 1,
+            'fccs_id': ord(fire_id[0]) % 29 + 1,
             'pct': 100
         }]
 
