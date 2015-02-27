@@ -10,14 +10,17 @@ Run the following to install dependencies:
 
     pip install -r requirements.txt
 
-Run the following for installing development dependencies (like running tests):
+Run the following for installing development dependencies (such as for running
+tests):
 
     pip install -r dev-requirements.txt
 
 ### Setup Environment
 
-To import pyairfire in development, you'll have to add the repo root directory
-to the search path. Some of the scripts bin do this automatically.
+This project contains a single package, ```bluesky```. To import bluesky
+package in development, you'll have to add the repo root directory to the
+search path. The ```./bin/bsp``` script does this automatically, if
+necessary.
 
 ## Running tests
 
@@ -30,12 +33,12 @@ You can also use the ```--collect-only``` option to see a list of all tests.
 
     py.test --collect-only
 
-See [pytest](http://pytest.org/latest/getting-started.html#getstarted) for more information about
+See [pytest](http://pytest.org/latest/getting-started.html#getstarted) for more information about using pytest.
 
 ## Installation
 
 The repo is currently private. So, you need to be on the FERA bitbucket team
-to install from the repo.
+to install from the bitbucket repo.
 
 ### Installing With pip
 
@@ -43,15 +46,18 @@ First, install pip:
 
     sudo apt-get install python-pip
 
-Then, to install, for example, v4.0.0, use the following:
+Then, to install, for example, v0.1.0, use the following:
 
-    sudo pip install git+ssh://git@bitbucket.org/fera/airfire-bluesky-pipeline@v4.0.0
+    sudo pip install git+ssh://git@bitbucket.org/fera/airfire-bluesky-pipeline@v0.1.0
 
-Or add it to your project's requirements.txt:
+Or, if using the bluesky package in another project, add it to your project's
+requirements.txt:
 
-    git+ssh://git@bitbucket.org/fera/airfire-bluesky-pipeline@v4.0.0
+    git+ssh://git@bitbucket.org/fera/airfire-bluesky-pipeline@v0.1.0
 
-If you get an error like    ```AttributeError: 'NoneType' object has no attribute 'skip_requirements_regex```, it means you need in upgrade pip.  One way to do so is with the following:
+If you get an error like    ```AttributeError: 'NoneType' object has no
+attribute 'skip_requirements_regex```, it means that you need in upgrade pip.
+One way to do so is with the following:
 
     pip install --upgrade pip
 
@@ -64,14 +70,14 @@ the following:
 
  - to translate CSV-formatted fire data to JSON, and vice versa
  - to filter a set of fires by country code
- - run BlueSky modules (consumption, emissions, etc.) on fires
+ - **to run BlueSky modules (consumption, emissions, etc.) on fire data**
 
 #### Getting Help
 
 Use the ```-h``` flag for help:
 
     $ ./bin/bsp -h
-    Usage: bsp [options] <module> [<module> ...]
+    Usage: bsp [options] [<module> ...]
 
     Options:
       -h, --help            show this help message and exit
@@ -84,10 +90,9 @@ Use the ```-l``` flag to see available BlueSky modules:
     $ ./bin/bsp -l
 
     Available Modules:
-
-            fuelbeds
             consumption
             emissions
+            fuelbeds
             ...
 
 #### Input / Output
