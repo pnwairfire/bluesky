@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='BlueSky Pipeline',
-    version='0.0.1',
+    version='0.1.0',
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
     packages=[
