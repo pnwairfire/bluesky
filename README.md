@@ -170,16 +170,15 @@ data will be regenerated, so that the following will work
 
 #### Piping
 
-As fire data flow through modules within ```bsp```, the modules add to the
-data without modified what's already defined.  Modules further downstream
-generally work with data produced by upstream modules, which meands that
+As fire data flow through the modules within ```bsp```, the modules add to the
+data without modifying what's already defined.  Modules further downstream
+generally work with data produced by upstream modules, which means that
 order of module execution does matter.
 
-You can run fires through a serious of modules, capture the output, and
+You can run fires through a series of modules, capture the output, and
 then run the output back into ```bsp``` as long as you start with a module
-that doesn't depend on the data having been processed by another module
-that hasn't yet been run.  For example, assume you start with the following
-fire data:
+that doesn't depend on data updates made by any module not yet run.  For
+example, assume that you start with the following fire data:
 
     [
         {
@@ -213,13 +212,13 @@ fire data:
         }
     ]
 
-Assume this data is in a file called fires.json, and you run it through the
-fuelbeds module, with the following:
+Assume that this data is in a file called fires.json, and that you run
+it through the fuelbeds module, with the following:
 
     ./bin/bsp -i fires.json fuelbeds
 
 You would get the folloing output (which is the input json with the addition
-of 'fuelbeds' array):
+of the 'fuelbeds' array):
 
     [{
         "slope": 10.0,
@@ -340,8 +339,8 @@ the fuelbeds module in the second pass throgh ```bsp```, like so:
     ./bin/bsp -i fires.json fuelbeds | ./bin/bsp fuelbeds consumption
 
 The second pass through the fuelbeds module would reinitialize the fuelbeds
-array array created by the first pass through the module. After running
-through consumption, you get the same output as above.  Though this re-running
+array created by the first pass through the module. After running through
+consumption, you would get the same output as above.  Though this re-running
 of the fuelbeds module is pointless in this example, there may be situations
 where you'd like to re-run your data through a module without starting from
 the beginning of the pipeline.
