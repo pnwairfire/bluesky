@@ -161,7 +161,12 @@ back into ```bsp```, the loaded data is flat as well.  Any modules expecting
 nested data will not work.  For example, in the following example, cunsumption
 will fail:
 
-    cat /path/to/input/fires/csv/file.json | ./bin/bsp fuelbeds --output-format=csv | ./bin/bsp --input-format=csv consumption
+    echo '[{"slope": 20.0, "max_humid": 70.0, "end": "20150120T000000Z", "name": "Natural Fire in WA lacking consumption inputs", "area": 200, "event_id": "SF11E826544", "country": "USA", "longitude": -120.379, "elevation": 2320.0, "start": "20150120T000000Z", "state": "KS", "latitude": 47.123, "timezone": -7.0, "ecoregion": "southern", "id": "fkjsdflkjsflkjsdlkfj"}]' | ./bin/bsp fuelbeds --output-format=csv | ./bin/bsp --input-format=csv consumption
+
+If you rerun the fires back through fuelbeds, however, the nested fuelbeds
+data will be regenerated, so that the following will work
+
+    echo '[{"slope": 20.0, "max_humid": 70.0, "end": "20150120T000000Z", "name": "Natural Fire in WA lacking consumption inputs", "area": 200, "event_id": "SF11E826544", "country": "USA", "longitude": -120.379, "elevation": 2320.0, "start": "20150120T000000Z", "state": "KS", "latitude": 47.123, "timezone": -7.0, "ecoregion": "southern", "id": "fkjsdflkjsflkjsdlkfj"}]' | ./bin/bsp fuelbeds --output-format=csv | ./bin/bsp --input-format=csv fuelbeds consumption
 
 #### Piping
 
