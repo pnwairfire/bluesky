@@ -1,4 +1,4 @@
 git+https://bitbucket.org/fera/airfire-pyairfire.git@v0.6.7
 hg+https://bitbucket.org/fera/apps-consume4@v4.1.0
-git+https://bitbucket.org/fera/airfire-fccs2ef.git@v0.2.0
-git+https://bitbucket.org/fera/airfire-emissions-calculator.git@v0.1.0
+git+https://github.com/pnwairfire/fccs2ef@v0.3.1
+git+https://github.com/pnwairfire/emitcalc@v0.1.2
