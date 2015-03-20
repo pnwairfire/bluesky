@@ -6,7 +6,12 @@ BlueSky Framework rearchitected as a pipeable collection of standalone modules.
 
 ### Install Dependencies
 
-Run the following to install dependencies:
+If using the fuelbeds module, you'll need to manually install some dependencies
+needed by the fccsmap package, which fuelbeds uses. See the
+[fccsmap github page](https://github.com/pnwairfire/fccsmap)
+for instructions.
+
+Run the following to install python dependencies:
 
     pip install -r requirements.txt
 
@@ -514,4 +519,59 @@ would contain this output, agumented with emissions data:
         "fuel_moisture_1000hr_pct": 50,
         "latitude": 25.041,
         "type": "Rx"
+    }]
+
+#### Input Fire Data
+
+One thing to note about the fire data is that the location can be specified by
+a single lat/lng pair with area (assumed to be acres) or by perimeter polygon
+data. The following is an example of the former:
+
+    [{
+        "id": "fkjsdflkjsflkjsdlkfj"
+        "name": "Natural Fire in WA lacking consumption inputs",
+        "event_id": "SF11E826544",
+        "state": "KS",
+        "country": "USA",
+        "latitude": 47.123,
+        "longitude": -120.379,
+        "area": 200,
+        "elevation": 2320.0,
+        "start": "20150120T000000Z",
+        "end": "20150120T000000Z",
+        "max_humid": 70.0,
+        "slope": 20.0,
+        "timezone": -7.0,
+        "ecoregion": "southern",
+    }]
+
+while the following is an example of the latter:
+
+    [{
+        "id": "fkjsdflkjsflkjsdlkfj"
+        "name": "Natural Fire in WA lacking consumption inputs",
+        "event_id": "SF11E826544",
+        "state": "KS",
+        "country": "USA",
+        "perimeter": {
+            "type": "MultiPolygon",
+            "coordinates": [
+                [
+                    [
+                        [-121.4522115, 47.4316976],
+                        [-121.3990506, 47.4316976],
+                        [-121.3990506, 47.4099293],
+                        [-121.4522115, 47.4099293],
+                        [-121.4522115, 47.4316976]
+                    ]
+                ]
+            ]
+        },
+        "elevation": 2320.0,
+        "start": "20150120T000000Z",
+        "end": "20150120T000000Z",
+        "max_humid": 70.0,
+        "slope": 20.0,
+        "timezone": -7.0,
+        "ecoregion": "southern",
     }]
