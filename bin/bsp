@@ -49,7 +49,7 @@ OPTIONAL_OPTIONS = [
         'short': '-l',
         'long': '--list-modules',
         'dest': 'list_modules',
-        'help': 'lists modules available to use in pipeline; order matters',
+        'help': 'lists available modules; order matters',
         'action': "store_true",
         'default': False
     },

@@ -83,8 +83,7 @@ Use the ```-h``` flag for help:
 
     Options:
       -h, --help            show this help message and exit
-      -l, --list-modules    lists modules available to use in pipeline; order
-                            matters
+      -l, --list-modules    lists available modules; order matters
       ...
 
 Use the ```-l``` flag to see available BlueSky modules:
