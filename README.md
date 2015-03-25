@@ -48,14 +48,14 @@ First, install pip:
 
     sudo apt-get install python-pip
 
-Then, to install, for example, v0.1.0, use the following:
+Then, to install, for example, v0.1.2, use the following:
 
-    sudo pip install git+ssh://git@github.org/pnwairfire/bluesky@v0.1.0
+    sudo pip install git+ssh://git@github.org/pnwairfire/bluesky@v0.1.2
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
-    git+ssh://git@github.org/pnwairfire/bluesky@v0.1.0
+    git+ssh://git@github.org/pnwairfire/bluesky@v0.1.2
 
 If you get an error like    ```AttributeError: 'NoneType' object has no
 attribute 'skip_requirements_regex```, it means that you need in upgrade pip.
