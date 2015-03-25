@@ -1,3 +1,6 @@
 .DS_Store
 *.pyc
 tmp/
+build/
+dist/
+BlueSky_Pipeline.egg-info/
