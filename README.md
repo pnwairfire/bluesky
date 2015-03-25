@@ -42,9 +42,6 @@ See [pytest](http://pytest.org/latest/getting-started.html#getstarted) for more 
 
 ## Installation
 
-The repo is currently private. So, you need to be on the FERA bitbucket team
-to install from the bitbucket repo.
-
 ### Installing With pip
 
 First, install pip:
@@ -53,12 +50,12 @@ First, install pip:
 
 Then, to install, for example, v0.1.0, use the following:
 
-    sudo pip install git+ssh://git@bitbucket.org/fera/airfire-bluesky-pipeline@v0.1.0
+    sudo pip install git+ssh://git@github.org/pnwairfire/bluesky@v0.1.0
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
-    git+ssh://git@bitbucket.org/fera/airfire-bluesky-pipeline@v0.1.0
+    git+ssh://git@github.org/pnwairfire/bluesky@v0.1.0
 
 If you get an error like    ```AttributeError: 'NoneType' object has no
 attribute 'skip_requirements_regex```, it means that you need in upgrade pip.
