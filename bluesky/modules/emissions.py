@@ -7,7 +7,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import logging
 
 from emitcalc.calculator import EmissionsCalculator
-from fccs2ef.lookup import Fccs2Ef
+from eflookup.fccs2ef.lookup import Fccs2Ef
 
 __all__ = [
     'run'
