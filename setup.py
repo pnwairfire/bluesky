@@ -1,5 +1,5 @@
 import re
-from distutils.core import setup
+from setuptools import setup, find_packages
 
 from bluesky import __version__
 
@@ -36,9 +36,7 @@ setup(
     version=__version__,
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
-    packages=[
-        'bluesky'
-    ],
+    packages=find_packages(),
     scripts=[
         'bin/bsp'
     ],
