@@ -1,5 +1,5 @@
-git+https://github.com/pnwairfire/pyairfire.git@v0.6.12
+git+https://github.com/pnwairfire/pyairfire@v0.6.14
 hg+https://bitbucket.org/fera/apps-consume4@v4.1.0
-git+https://github.com/pnwairfire/fccs2ef@v0.3.1
-git+https://github.com/pnwairfire/emitcalc@v0.1.8
-git+https://github.com/pnwairfire/fccsmap@v0.1.2
+git+https://github.com/pnwairfire/fccs2ef@v0.3.8
+git+https://github.com/pnwairfire/emitcalc@v0.1.11
+git+https://github.com/pnwairfire/fccsmap@v0.1.5
