@@ -48,7 +48,7 @@ requirements = parse_requirements(dependency_links, 'requirements.txt')
 test_requirements = parse_requirements(dependency_links, 'requirements-test.txt')
 
 setup(
-    name='BlueSky Pipeline',
+    name='bluesky',
     version=__version__,
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
@@ -56,7 +56,7 @@ setup(
     scripts=[
         'bin/bsp'
     ],
-    url='git@bitbucket.org:fera/airfire-bluesky-pipeline.git',
+    url='https://github.com/pnwairfire/bluesky',
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
     install_requires=requirements,
     dependency_links=dependency_links,
