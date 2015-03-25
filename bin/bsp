@@ -163,8 +163,10 @@ def main():
         fires_importer.dumps(options.output_format)
 
     except Exception, e:
-        print traceback.format_exc()
-        scripting.utils.exit_with_msg(e.message)
+        if logging.getLogger().getEffectiveLevel() <= logging.DEBUG:
+            scripting.utils.exit_with_msg(traceback.format_exc(), prefix="")
+        else:
+            scripting.utils.exit_with_msg(e.message)
 
 if __name__ == "__main__":
     main()
