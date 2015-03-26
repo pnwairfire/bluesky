@@ -15,8 +15,10 @@ __all__ = [
 
 def run(fires):
     logging.debug("Running emissions module (NOOP)")
-    calculator = EmissionsCalculator(Fccs2Ef())
+    fccs2ef = Fccs2Ef()
+    calculator = EmissionsCalculator()
     for fire in fires:
         for fb in fire.fuelbeds:
             is_rx = fire.get('type') == "rx"
-            fb['emissions'] = calculator.calculate([fb["fccs_id"]], fb["consumption"], is_rx)
+            fb['emissions'] = calculator.calculate([fccs2ef[fb["fccs_id"]]],
+                fb["consumption"], is_rx)
