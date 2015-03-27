@@ -102,6 +102,13 @@ OPTIONAL_OPTIONS = [
         'help': 'input file comtaining JSON formatted fire data',
         'action': "append",
         'default': []
+    },
+    {
+        'short': "-D",
+        'long': '--config-option',
+        'dest': 'config_options',
+        'help': "Config option override, formatted like 'Section.Option=value'",
+        'action': scripting.args.SetConfigOptionAction
     }
 ]
 
@@ -163,7 +170,8 @@ def main():
             # TDOO: catch any exception raised by a module and dumps
             # whatever is the current state of fires (or state of fires prior
             # to calling hte module) ?
-            module.run(fires_importer.fires) # modifies fires in place
+            # 'run' modifies fires in place
+            module.run(fires_importer.fires, options.config_options)
 
         fires_importer.dumps(options.output_format)
 

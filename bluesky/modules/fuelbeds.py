@@ -15,7 +15,14 @@ __all__ = [
 
 FCCS_VERSION = '2' # TODO: make this configurable
 
-def run(fires):
+def run(fires, config=None):
+    """Runs emissions module
+
+    Args:
+     - fires -- array of fire objects
+    Kwargs:
+     - config -- optional configparser object
+    """
     logging.info("Running fuelbeds module")
     for fire in fires:
         # TODO: instead of instantiating a new FccsLookUp and Estimator for

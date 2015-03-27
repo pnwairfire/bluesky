@@ -33,9 +33,14 @@ SETTINGS = {
     ]
 }
 
-def run(fires):
+def run(fires, options=None):
     """Runs the fire data through consumption calculations, using the consume
     package for the underlying computations.
+
+    Args:
+     - fires -- array of fire objects
+    Kwargs:
+     - config -- optional configparser object
     """
     logging.debug("Running consumption module")
 
