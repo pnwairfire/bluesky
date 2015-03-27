@@ -17,6 +17,7 @@ import logging
 import pkgutil
 import sys
 import traceback
+import argparse
 
 from pyairfire import scripting
 
@@ -28,15 +29,15 @@ except:
     sys.path.insert(0, root_dir)
     from bluesky import modules, models
 
-def parse_format(option, opt, value, parser):
-    """
-    """
-    value = value.strip()
-    try:
-        setattr(parser.values, option.dest, models.fires.FireDataFormats[value])
-    except models.fires.FireDataFormatNotSupported:
-        msg = "Invalid fire data format: %s" % (value)
-        raise OptionValueError(msg)
+class ParseFormatAction(argparse.Action):
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        value = values.strip()
+        try:
+            setattr(namespace, self.dest, models.fires.FireDataFormats[value])
+        except models.fires.FireDataFormatNotSupported:
+            msg = "Invalid fire data format: %s" % (values)
+            raise argparse.ArgumentError(msg)
 
 # Note: though some argue that all required parameters should be specified as
 # positional arguments, I prefer using 'options' flags, even though this
@@ -80,21 +81,18 @@ OPTIONAL_OPTIONS = [
     {
         'long': '--input-format',
         'dest': 'input_format',
-        'type': "string",
         'help': 'format of input fire data; valid formats: %s; default: json' % (
             ', '.join(models.fires.FireDataFormats.formats)),
-        'action': "callback",
-        'callback': parse_format,
+        'action': ParseFormatAction,
         'default': models.fires.FireDataFormats.json
     },
     {
         'long': '--output-format',
         'dest': 'output_format',
-        'type': "string",
+        'type': str,
         'help': 'format to output fire data; valid formats: %s; default: json' % (
             ', '.join(models.fires.FireDataFormats.formats)),
-        'action': "callback",
-        'callback': parse_format,
+        'action': ParseFormatAction,
         'default': models.fires.FireDataFormats.json
     },
     {
@@ -104,6 +102,13 @@ OPTIONAL_OPTIONS = [
         'help': 'input file comtaining JSON formatted fire data',
         'action': "append",
         'default': []
+    }
+]
+
+POSITIONAL_ARGS = [
+    {
+        'long': 'modules',
+        'nargs': '*'
     }
 ]
 
@@ -129,18 +134,18 @@ def main():
                 #extra_preceeding_output=lambda: parser.print_help(),
                 exit_code=0, prefix="")
 
-    parser, options, args = scripting.options.parse_options(REQUIRED_OPTIONS,
-        OPTIONAL_OPTIONS, usage="usage: %prog [options] [<module> ...]",
+    parser, options = scripting.args.parse_args(REQUIRED_OPTIONS,
+        OPTIONAL_OPTIONS, positional_args=POSITIONAL_ARGS,
+        usage="usage: %(prog)s [options] [<module> ...]",
         pre_validation=pre_validation)
 
-    scripting.options.check_required_options(options, REQUIRED_OPTIONS, parser)
     validate_options(options)
-    scripting.options.configure_logging_from_options(options, parser)
-    scripting.options.output_options(options)
+
+    scripting.utils.log_config(options.config_options)
 
     try:
         modules = [
-            importlib.import_module('bluesky.modules.%s' % (m)) for m in args
+            importlib.import_module('bluesky.modules.%s' % (m)) for m in options.modules
         ]
     except ImportError, e:
         scripting.utils.exit_with_msg(e.message,
