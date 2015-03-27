@@ -39,13 +39,9 @@ class ParseFormatAction(argparse.Action):
             msg = "Invalid fire data format: %s" % (values)
             raise argparse.ArgumentError(msg)
 
-# Note: though some argue that all required parameters should be specified as
-# positional arguments, I prefer using 'options' flags, even though this
-# means that there are required 'options', which is oxymoronic.
+REQUIRED_ARGS = []
 
-REQUIRED_OPTIONS = []
-
-OPTIONAL_OPTIONS = [
+OPTIONAL_ARGS = [
     {
         'short': '-l',
         'long': '--list-modules',
@@ -114,7 +110,7 @@ OPTIONAL_OPTIONS = [
 
 POSITIONAL_ARGS = [
     {
-        'long': 'modules',
+        'long': 'module',
         'nargs': '*'
     }
 ]
@@ -127,32 +123,31 @@ AVAILABLE_MODULES = [
     p[1] for p in pkgutil.iter_modules(modules.__path__)
 ]
 
-def validate_options(options):
-    # TODO: validate options values as necessary
+def validate_args(args):
+    # TODO: validate args values as necessary
     pass
 
 def main():
     # TODO: figure out way to include available modules in help message,
     # and then remove '--list-modules' option
-    def pre_validation(parser, options):
-        if options.list_modules:
+    def pre_validation(parser, args):
+        if args.list_modules:
             scripting.utils.exit_with_msg(
                 "Available Modules:\n\t%s" % ('\n\t'.join(AVAILABLE_MODULES)),
                 #extra_preceeding_output=lambda: parser.print_help(),
                 exit_code=0, prefix="")
 
-    parser, options = scripting.args.parse_args(REQUIRED_OPTIONS,
-        OPTIONAL_OPTIONS, positional_args=POSITIONAL_ARGS,
-        usage="usage: %(prog)s [options] [<module> ...]",
+    parser, args = scripting.args.parse_args(REQUIRED_ARGS,
+        OPTIONAL_ARGS, positional_args=POSITIONAL_ARGS,
         pre_validation=pre_validation)
 
-    validate_options(options)
+    validate_args(args)
 
-    scripting.utils.log_config(options.config_options)
+    scripting.utils.log_config(args.config_options)
 
     try:
         modules = [
-            importlib.import_module('bluesky.modules.%s' % (m)) for m in options.modules
+            importlib.import_module('bluesky.modules.%s' % (m)) for m in args.module
         ]
     except ImportError, e:
         scripting.utils.exit_with_msg(e.message,
@@ -160,10 +155,10 @@ def main():
 
     try:
         fires_importer = models.fires.FiresImporter(
-            options.input_file, options.output_file)
-        fires_importer.loads(options.input_format)
+            args.input_file, args.output_file)
+        fires_importer.loads(args.input_format)
 
-        if options.country_code_whitelist:
+        if args.country_code_whitelist:
             fires_importer.filter('country', option.country_code_whitelist)
 
         for module in modules:
@@ -171,9 +166,9 @@ def main():
             # whatever is the current state of fires (or state of fires prior
             # to calling hte module) ?
             # 'run' modifies fires in place
-            module.run(fires_importer.fires, options.config_options)
+            module.run(fires_importer.fires, args.config_options)
 
-        fires_importer.dumps(options.output_format)
+        fires_importer.dumps(args.output_format)
 
     except Exception, e:
         if logging.getLogger().getEffectiveLevel() <= logging.DEBUG:
