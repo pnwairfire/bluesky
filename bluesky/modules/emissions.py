@@ -8,6 +8,7 @@ import logging
 
 from emitcalc.calculator import EmissionsCalculator
 from eflookup.fccs2ef.lookup import Fccs2Ef
+from eflookup.fepsef.lookup import FepsEFLookup
 
 __all__ = [
     'run'
@@ -28,7 +29,14 @@ def run(fires, config=None):
 
 def _run_feps(self):
     logging.debug("Running emissions module FEPS EFs")
-    raise NotImplementedError
+
+    # The same lookup object is used for both Rx and WF
+    feps_ef_lookup = FepsEFLookup()
+
+    for fire in fires:
+        for fb in fire.fuelbeds:
+            fb['emissions'] = calculator.calculate([feps_ef_lookup],
+                fb["consumption"], is_rx)
 
 def _run_urbanski(fires):
     logging.debug("Running emissions module with Urbanski EFs")
