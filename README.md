@@ -67,10 +67,9 @@ One way to do so is with the following:
 
 ### bsp
 
-bsp is the main BlueSky executable.  It can be used for any combination of
+bsp is the main BlueSky executable.  It can be used for either or both of
 the following:
 
- - to translate CSV-formatted fire data to JSON, and vice versa
  - to filter a set of fires by country code
  - **to run BlueSky modules (consumption, emissions, etc.) on fire data**
 
@@ -118,56 +117,9 @@ Example of redirecting input from file and outputing to stdout
 
     $ ./bin/bsp fuelbeds fuelloading < /path/to/input/fires/json/file.json
 
-#### Data Formats
+#### Data Format
 
-```bsp``` supports inputting and outputing both json and csv formatted fire data.
-(The default expected format is JSON.) The following example reads in CSV fire
-data from file, filters out all but USA filures, runs the fires through the
-fuelbeds and consumption modules, and outputs JSON formated data to stdout:
-
-    $ ./bin/bsp -i /path/to/input/fires/csv/file.csv --input-format=CSV -w USA fuelbeds consumption
-
-Note, however, that when writing out csv formatted data, all nested json
-objects are flattened.  For example:
-
-    [{
-        "slope": 20.0,
-        "fuelbeds": [{
-            "fccs_id": 35,
-            "pct": 100
-        }],
-        "max_humid": 70.0,
-        "end": "20150120T000000Z",
-        "name": "Natural Fire in WA lacking consumption inputs",
-        "area": 200,
-        "event_id": "SF11E826544",
-        "country": "USA",
-        "longitude": -120.379,
-        "elevation": 2320.0,
-        "start": "20150120T000000Z",
-        "state": "KS",
-        "latitude": 47.123,
-        "timezone": -7.0,
-        "ecoregion": "southern",
-        "id": "fkjsdflkjsflkjsdlkfj"
-    }]
-
-would be output to the following csv:
-
-    slope,max_humid,end,name,area,event_id,country,longitude,elevation,start,state,latitude,timezone,ecoregion,fuelbeds_0_pct,id,fuelbeds_0_fccs_id
-    20.0,70.0,20150120T000000Z,Natural Fire in WA lacking consumption inputs,200,SF11E826544,USA,-120.379,2320.0,20150120T000000Z,KS,47.123,-7.0,southern,100,fkjsdflkjsflkjsdlkfj,35
-
-Any initial nesting information is lost, so that if the csv data is then input
-back into ```bsp```, the loaded data is flat as well.  Any modules expecting
-nested data will not work.  For example, in the following example, cunsumption
-will fail:
-
-    echo '[{"slope": 20.0, "max_humid": 70.0, "end": "20150120T000000Z", "name": "Natural Fire in WA lacking consumption inputs", "area": 200, "event_id": "SF11E826544", "country": "USA", "longitude": -120.379, "elevation": 2320.0, "start": "20150120T000000Z", "state": "KS", "latitude": 47.123, "timezone": -7.0, "ecoregion": "southern", "id": "fkjsdflkjsflkjsdlkfj"}]' | ./bin/bsp fuelbeds --output-format=csv | ./bin/bsp --input-format=csv consumption
-
-If you rerun the fires back through fuelbeds, however, the nested fuelbeds
-data will be regenerated, so that the following will work
-
-    echo '[{"slope": 20.0, "max_humid": 70.0, "end": "20150120T000000Z", "name": "Natural Fire in WA lacking consumption inputs", "area": 200, "event_id": "SF11E826544", "country": "USA", "longitude": -120.379, "elevation": 2320.0, "start": "20150120T000000Z", "state": "KS", "latitude": 47.123, "timezone": -7.0, "ecoregion": "southern", "id": "fkjsdflkjsflkjsdlkfj"}]' | ./bin/bsp fuelbeds --output-format=csv | ./bin/bsp --input-format=csv fuelbeds consumption
+```bsp``` supports inputting and outputing only json formatted fire data.
 
 #### Piping
 
