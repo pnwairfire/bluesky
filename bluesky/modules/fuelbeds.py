@@ -102,6 +102,9 @@ class Estimator(object):
           85% -> 85% * 100 / (100 - 7) = 91.4%
           8% -> 7% * 100 / (100 - 7) = 8.6%
         """
+        if not fire.fuelbeds:
+            return
+
         # TDOO: make sure percentages add up to 100%
         fire.fuelbeds.sort(key=lambda fb: fb['pct'])
         fire.fuelbeds.reverse()
