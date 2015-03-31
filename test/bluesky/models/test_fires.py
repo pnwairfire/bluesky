@@ -16,37 +16,6 @@ except:
     from bluesky.models import fires
 
 ##
-## Tests for FireDataFormats
-##
-
-class TestFireDataFormats:
-    def test_formats(self):
-        assert set(['json', 'csv']) == set(fires.FireDataFormats.formats)
-
-    def test_format_ids(self):
-        assert set([1,2]) == set(fires.FireDataFormats.format_ids)
-
-    def test_get_item(self):
-        # id to format key
-        assert 'json' == fires.FireDataFormats[1]
-        assert 'csv' == fires.FireDataFormats[2]
-        with raises(fires.FireDataFormatNotSupported) as e:
-            fires.FireDataFormats[3]
-        # format key to id
-        assert 1 == fires.FireDataFormats['JSON']
-        assert 1 == fires.FireDataFormats['json']
-        assert 2 == fires.FireDataFormats['CSV']
-        assert 2 == fires.FireDataFormats['csv']
-        with raises(fires.FireDataFormatNotSupported) as e:
-            fires.FireDataFormats['sdf']
-
-    def test_format_attrs(self):
-        assert 1 == fires.FireDataFormats.json
-        assert 1 == fires.FireDataFormats.JSON
-        with raises(fires.FireDataFormatNotSupported) as e:
-            fires.FireDataFormats.sdf
-
-##
 ## Tests for Fire
 ##
 
@@ -160,40 +129,6 @@ class TestFiresImporter:
               '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}]'))
         assert expected == fires_importer.fires
 
-    ## From CSV
-
-    def test_from_csv_no_fires(self):
-        fires_importer = fires.FiresImporter()
-        fires_importer._from_csv(io.StringIO(u'id,bar, baz, bee '))
-        expected = []
-        assert expected == fires_importer.fires
-
-    def test_from_csv_one_fire(self):
-        fires_importer = fires.FiresImporter()
-        expected = [{'id':'a','name':"asd",'bar':123, 'baz': 23.23, 'bee': 23.23 }]
-        fires_importer._from_csv(io.StringIO(
-            u'id,name,bar, baz, bee \n a,asd, 123, 23.23,"23.23"'))
-        assert expected == fires_importer.fires
-
-    def test_from_csv_multiple_fires(self):
-        fires_importer = fires.FiresImporter()
-        expected = [
-            fires.Fire({'id':'a', 'bar':123, 'baz': 23.23, 'bee': 23.23 }),
-            fires.Fire({'id':'b', 'bar':2, 'baz':1.2, "bee": 12.23})
-        ]
-        fires_importer._from_csv(io.StringIO(
-            u'id,bar, baz, bee \n a, 123, 23.23,"23.23"\nb,2, 1.2,"12.23"'))
-        assert expected == fires_importer.fires
-
-    ## To JSON
-
-    def test_to_json(self):
-        pass
-
-    ## To CSV
-
-    def test_to_csv(self):
-        pass
 
 class TestFiresImporterLoadingAndDumping:
 
@@ -201,266 +136,31 @@ class TestFiresImporterLoadingAndDumping:
 
     def test_full_cycle(self, monkeypatch):
         fires_importer = fires.FiresImporter()
-        def _stream(self, file_name, flag):
-            if flag == 'r':
-                self._calls = getattr(self, '_calls', 0) + 1
-                return StringIO.StringIO(
-                    u'id,name,foo%d,bar%d,baz \n'
-                     'A-%d,Aname%d, %d, a%d,baz%d\n'
-                     'B-%d,Bname%d, b%d,%d,baz%d' % (
-                        self._calls, self._calls, self._calls, self._calls, self._calls, self._calls,
-                        self._calls, self._calls, self._calls, self._calls, self._calls, self._calls)
-                )
-            else:
-                self._output = getattr(self, 'output', StringIO.StringIO())
-                return self._output
-        monkeypatch.setattr(fires.FiresImporter, '_stream', _stream)
-
         assert [] == fires_importer.fires
 
-        fires_importer.loads(format=fires.FireDataFormats.csv)
-        expected = [
-            fires.Fire({'id': 'A-1', 'name':'Aname1', 'foo1':1, 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': 'B-1', 'name':'Bname1', 'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'})
+        fire_json = (
+            u'[{"id":"dfdf","name":"sdfs","fooj":"j","barj":"jj","baz":99},'
+            + u'{"id":"3j34","name":"sdfi3234l","fo":"j","ba":"jj","ba":199}]')
+        fire_objects = [
+            {"id":"dfdf","name":"sdfs","fooj":"j","barj":"jj","baz":99},
+            {"id":"3j34","name":"sdfi3234l","fo":"j","ba":"jj","ba":199}
         ]
-        assert expected == fires_importer.fires
 
-        fires_importer.loads(format=fires.FireDataFormats.csv)
-        expected = [
-            fires.Fire({'id': 'A-1', 'name':'Aname1', 'foo1':1, 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': 'B-1', 'name':'Bname1', 'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'}),
-            fires.Fire({'id': 'A-2', 'name' :'Aname2', 'foo2':2, 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': 'B-2', 'name' :'Bname2', 'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'})
-        ]
-        assert expected == fires_importer.fires
-
-        # Note that CSV output doesn't preserve input column order
-        expected_lines = [
-            set([
-                ("id","A-1"),
-                ("name","Aname1"),
-                ("foo1", "1"),
-                ("bar1", "a1"),
-                ("baz", "baz1"),
-                ("foo2",""),
-                ("bar2", "")
-            ]),
-            set([
-                ("id","B-1"),
-                ("name","Bname1"),
-                ("foo1", "b1"),
-                ("bar1", "1"),
-                ("baz", "baz1"),
-                ("foo2",""),
-                ("bar2", "")
-            ]),
-            set([
-                ("id","A-2"),
-                ("name","Aname2"),
-                ("foo1", ""),
-                ("bar1", ""),
-                ("baz", "baz2"),
-                ("foo2","2"),
-                ("bar2", "a2")
-            ]),
-            set([
-                ("id","B-2"),
-                ("name","Bname2"),
-                ("foo1", ""),
-                ("bar1", ""),
-                ("baz", "baz2"),
-                ("foo2","b2"),
-                ("bar2", "2")
-            ])
-        ]
-        fires_importer.dumps(format=fires.FireDataFormats.csv)
-        dumped_lines = fires_importer._output.getvalue().strip('\n').split('\n')
-        headers = dumped_lines[0].split(',')
-        dumped_lines = [set(zip(headers, dl.split(','))) for dl in dumped_lines[1:]]
-        assert expected_lines == dumped_lines
-
-        fires_importer._output = StringIO.StringIO()
-        fires_importer.dumps()
-        expected = [
-            {'id': 'A-1', 'name':'Aname1', 'foo1':1, 'bar1':'a1', 'baz':'baz1'},
-            {'id': 'B-1', 'name':'Bname1', 'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'},
-            {'id': 'A-2', 'name' :'Aname2', 'foo2':2, 'bar2':'a2', 'baz':'baz2'},
-            {'id': 'B-2', 'name' :'Bname2', 'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'}
-        ]
-        assert expected == json.loads(fires_importer._output.getvalue())
-
-        def _new_json_stream(self, file_name, flag):
-            if flag == 'r':
-                return StringIO.StringIO(
-                    u'{"id":"dfdf","name":"sdfs","fooj":"j","barj":"jj","baz":99}'
-                 )
-            else:
-                self._output = getattr(self, 'output', StringIO.StringIO())
-                return self._output
-        monkeypatch.setattr(fires.FiresImporter, '_stream', _new_json_stream)
-
-        fires_importer.loads(format=fires.FireDataFormats.json)
-        expected = [
-            fires.Fire({'id': 'A-1', 'name':'Aname1', 'foo1':1, 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': 'B-1', 'name':'Bname1', 'foo1': 'b1', 'bar1': 1 , 'baz':'baz1'}),
-            fires.Fire({'id': 'A-2', 'name' :'Aname2', 'foo2':2, 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': 'B-2', 'name' :'Bname2', 'foo2': 'b2', 'bar2': 2 , 'baz':'baz2'}),
-            fires.Fire({'id': 'dfdf', 'name': 'sdfs', "fooj": "j", "barj": "jj", "baz": 99})
-        ]
-        assert expected == fires_importer.fires
-
-        # Again, Note that CSV output doesn't preserve input column order
-        expected_lines = [
-            set([
-                ("id", "A-1"),
-                ("name", "Aname1"),
-                ("foo1", "1"),
-                ("bar1", "a1"),
-                ("baz", "baz1"),
-                ("foo2", ""),
-                ("bar2", ""),
-                ("barj", ""),
-                ("fooj", "")
-            ]),
-            set([
-                ("id", "B-1"),
-                ("name", "Bname1"),
-                ("foo1", "b1"),
-                ("bar1", "1"),
-                ("baz", "baz1"),
-                ("foo2", ""),
-                ("bar2", ""),
-                ("barj", ""),
-                ("fooj", "")
-            ]),
-            set([
-                ("id", "A-2"),
-                ("name", "Aname2"),
-                ("foo1", ""),
-                ("bar1", ""),
-                ("baz", "baz2"),
-                ("foo2", "2"),
-                ("bar2", "a2"),
-                ("barj", ""),
-                ("fooj", "")
-            ]),
-            set([
-                ("id", "B-2"),
-                ("name", "Bname2"),
-                ("foo1", ""),
-                ("bar1", ""),
-                ("baz", "baz2"),
-                ("foo2", "b2"),
-                ("bar2", "2"),
-                ("barj" ,""),
-                ("fooj", "")
-            ]),
-            set([
-                ("id", "dfdf"),
-                ("name", "sdfs"),
-                ("foo1", ""),
-                ("bar1", ""),
-                ("baz", "99"),
-                ("foo2", ""),
-                ("bar2", ""),
-                ("barj" ,"jj"),
-                ("fooj", "j")
-            ])
-        ]
-        fires_importer._output = StringIO.StringIO()
-        fires_importer.dumps(format=fires.FireDataFormats.csv)
-        dumped_lines = fires_importer._output.getvalue().strip('\n').split('\n')
-        headers = dumped_lines[0].split(',')
-        dumped_lines = [set(zip(headers, dl.split(','))) for dl in dumped_lines[1:]]
-        assert expected_lines == dumped_lines
-
-    def test_dumping_nested_fire_to_csv(self, monkeypatch):
-        fires_importer = fires.FiresImporter()
         def _stream(self, file_name, flag):
             if flag == 'r':
-                return StringIO.StringIO(
-                    u'[{"id": "A-1", "name":"Aname1", "foo1":1, "bar1":"a1", "baz":"baz1"}]'
-                )
+                return StringIO.StringIO(fire_json)
             else:
                 self._output = getattr(self, 'output', StringIO.StringIO())
                 return self._output
         monkeypatch.setattr(fires.FiresImporter, '_stream', _stream)
 
-        fires_importer.fires = [
-            fires.Fire({
-                "start": "20140202T121223",
-                "id": "sdfsdfsdfsdf",
-                "name": "sfkjhsdkjfhsd",
-                "blah": {
-                    "foo": 1,
-                    "bar": "abc",
-                    "bas": {
-                        "a": "b"
-                    }
-                }
-            })
-        ]
-        expected_lines = [
-            set([
-                ("id", "sdfsdfsdfsdf"),
-                ("name", "sfkjhsdkjfhsd"),
-                ("start", "20140202T121223"),
-                ("blah_foo", "1"),
-                ("blah_bar", "abc"),
-                ("blah_bas_a", "b")
-            ])
-        ]
-        fires_importer.dumps(format=fires.FireDataFormats.csv)
-        dumped_lines = fires_importer._output.getvalue().strip('\n').split('\n')
-        headers = dumped_lines[0].split(',')
-        dumped_lines = [set(zip(headers, dl.split(','))) for dl in dumped_lines[1:]]
-        assert expected_lines == dumped_lines
-
+        fires_importer.loads()
+        assert fire_objects == fires_importer.fires
+        fires_importer._output = StringIO.StringIO()
+        fires_importer.dumps()
+        assert fire_objects == json.loads(fires_importer._output.getvalue())
 
 class TestFiresImporterLowerLevelMethods:
-
-    def test_nested_fire_to_csv(self):
-        pass
-
-    def test_flattened_fires(self):
-        pass
-
-    def test_flatten(self):
-        d = {
-            'a': 1,
-            'c': {
-                'a': 2,
-                'b': {
-                    'x': 5,
-                    'y' : 10}
-                },
-            'd': [1, 2, 3],
-            'e': [
-                {
-                    'a': 1,
-                    'b': 2
-                },
-                {
-                    'a': 6,
-                    'b': 4
-                }
-            ]
-        }
-        new_d = {
-            'a': 1,
-            'c_a': 2,
-            'c_b_x': 5,
-            'd_0': 1,
-            'd_1': 2,
-            'd_2': 3,
-            'c_b_y': 10,
-            'e_0_a': 1,
-            'e_0_b': 2,
-            'e_1_a': 6,
-            'e_1_b': 4
-        }
-        assert new_d == fires.FiresImporter()._flatten(d)
-        assert new_d == fires.FiresImporter()._flatten(new_d)  # NOOP
 
     def test_filter(self):
         fires_importer = fires.FiresImporter()

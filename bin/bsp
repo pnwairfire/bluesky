@@ -29,16 +29,6 @@ except:
     sys.path.insert(0, root_dir)
     from bluesky import modules, models
 
-class ParseFormatAction(argparse.Action):
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        value = values.strip()
-        try:
-            setattr(namespace, self.dest, models.fires.FireDataFormats[value])
-        except models.fires.FireDataFormatNotSupported:
-            msg = "Invalid fire data format: %s" % (values)
-            raise argparse.ArgumentError(msg)
-
 REQUIRED_ARGS = []
 
 OPTIONAL_ARGS = [
@@ -73,23 +63,6 @@ OPTIONAL_ARGS = [
         'help': 'output file comtaining JSON formatted fire data',
         'action': "store",
         'default': None
-    },
-    {
-        'long': '--input-format',
-        'dest': 'input_format',
-        'help': 'format of input fire data; valid formats: %s; default: json' % (
-            ', '.join(models.fires.FireDataFormats.formats)),
-        'action': ParseFormatAction,
-        'default': models.fires.FireDataFormats.json
-    },
-    {
-        'long': '--output-format',
-        'dest': 'output_format',
-        'type': str,
-        'help': 'format to output fire data; valid formats: %s; default: json' % (
-            ', '.join(models.fires.FireDataFormats.formats)),
-        'action': ParseFormatAction,
-        'default': models.fires.FireDataFormats.json
     },
     {
         'short': '-w',
@@ -146,7 +119,7 @@ def load_fires(args):
     try:
         fires_importer = models.fires.FiresImporter(
             args.input_file, args.output_file)
-        fires_importer.loads(args.input_format)
+        fires_importer.loads()
     except:
         logging.debug(traceback.format_exc())
         exit_with_traceback(e)
@@ -171,7 +144,7 @@ def run_modules(args, modules, fires_importer):
 
 def dump_fires(args, fires_importer):
     try:
-        fires_importer.dumps(args.output_format)
+        fires_importer.dumps()
     except Exception, e:
         logging.debug(traceback.format_exc())
         exit_with_traceback(e)

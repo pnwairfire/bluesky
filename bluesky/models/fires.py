@@ -10,55 +10,13 @@ import sys
 import uuid
 
 __all__ = [
-    'FireDataFormats',
-    'FireDataFormatNotSupported',
     'Fire',
     'InvalidFilterError',
     'FiresImporter'
 ]
 
-class FireDataFormatNotSupported(ValueError):
-    pass
-
 class InvalidFilterError(ValueError):
     pass
-
-class FireDataFormats(object):
-    _formats = {
-        'json': 1,
-        'csv': 2
-    }
-    _r_formats = dict([(v,k) for k,v in _formats.items()])
-
-    # To handle missing classes methods and attributes
-    class __metaclass__(type):
-        def __getattr__(cls, attr):
-            if hasattr(attr, 'lower'):
-                attr = attr.lower()
-
-            if attr == 'formats':
-                return cls._formats.keys()
-            if attr == 'format_ids':
-                return cls._r_formats.keys()
-
-            if cls._formats.has_key(attr):
-                return cls._formats[attr]
-            if cls._r_formats.has_key(attr):
-                return cls._r_formats[attr]
-
-            raise FireDataFormatNotSupported(
-                "%s is not a valid fire data format" % (attr))
-        __getitem__ = __getattr__
-
-    # @property
-    # @classmethod
-    # def formats(cls):
-    #     return cls._formats.keys()
-
-    # @property
-    # @classmethod
-    # def format_ids(cls):
-    #     return cls._r_formats.keys()
 
 class Fire(dict):
 
@@ -153,80 +111,10 @@ class FiresImporter(object):
         else:
             raise ValueError("Invalid fire json data")
 
-    def _from_csv(self, stream):
-        headers = []
-        for row in csv.reader(stream):
-            if not headers:
-                # record headers for this csv data
-                #headers = dict([(i, row[i].strip(' ')) for i in xrange(len(row))])
-                headers = [e.strip(' ') for e in row]
-            else:
-                fire = Fire(dict([(headers[i], row[i].strip(' ')) for i in xrange(len(row))]))
-                self._cast_numeric_values(fire)
-                self._add_fire(fire)
-
-    def _cast_numeric_values(self, fire):
-        # TODO: better way to automatically parse numerical values
-        for k in fire.keys():
-            try:
-                # try to parse int
-                fire[k] = int(fire[k])
-            except ValueError:
-                try:
-                    # try to parse float
-                    fire[k] = float(fire[k])
-                except:
-                    # leave it as a string
-                    pass
-
     ## Exporting
 
     def _to_json(self, stream):
         stream.write(json.dumps(self.fires, cls=FireEncoder))
-
-    def _to_csv(self, stream):
-        flattened_fires = self._flattened_fires()
-
-        # TODO: is there a more efficient way to get a unique set of the fires' keys ???
-        headers = set()
-        for f in flattened_fires:
-            for k in f.keys():
-                headers.add(k)
-        headers = list(headers)
-
-        csvfile = csv.writer(stream, lineterminator='\n')
-        csvfile.writerow(headers)
-        for f in flattened_fires:
-            a = [f.get(h, '') for h in headers]
-            csvfile.writerow(a)
-
-    def _flattened_fires(self):
-        ffs = []
-        for fire in self.fires:
-            ffs.append(self._flatten(fire))
-        return ffs
-
-    def _flatten(self, d, parent_key=None, sep='_'):
-        """Flattens a nested dict
-
-        TODO: move _flatten to general purpose module (maybe in pyairfire)
-        TODO: handle key colissions (or let user deal with it by specifying
-          a separator that guarantees no colissions)
-        """
-        new_d = {}
-        if hasattr(d, 'has_key'):
-            for k, v in d.items():
-                new_key = sep.join([e for e in [parent_key, k] if e])
-                new_d.update(self._flatten(v, new_key, sep=sep))
-        elif hasattr(d, '__iter__'):
-            # note that dict has '__iter__' as well, but dicts are caught by
-            # the 'if' block above
-            for i in xrange(len(d)):
-                new_key = sep.join([e for e in [parent_key, str(i)] if e])
-                new_d.update(self._flatten(d[i], new_key, sep=sep))
-        else:
-            new_d[parent_key] = d
-        return new_d
 
     ## IO
 
@@ -254,12 +142,8 @@ class FiresImporter(object):
         for fire in fires_list:
             self._add_fire(fire)
 
-
-    def loads(self, format=FireDataFormats.JSON):
-        loader = getattr(self, "_from_%s" % (FireDataFormats[format]), None)
-        if not loader:
-            raise FireDataFormatNotSupported("Unsupported format: %s" % (format))
-        loader(self._stream(self._input_file, 'r'))
+    def loads(self):
+        self._from_json(self._stream(self._input_file, 'r'))
 
     def filter(self, attr, **kwargs):
         whitelist = kwargs.get('whitelist')
@@ -274,10 +158,7 @@ class FiresImporter(object):
                 return not hasattr(fire, attr) or getattr(fire, attr) not in blacklist
         self.fires = [f for f in self.fires if _filter(f, attr)]
 
-    def dumps(self, format=FireDataFormats.JSON):
+    def dumps(self):
         # If not fires have yet been loaded, just return empty array
 
-        dumper = getattr(self, "_to_%s" % (FireDataFormats[format]), None)
-        if not dumper:
-            raise FireDataFormatNotSupported("Unsupported output format: %s" % (format))
-        dumper(self._stream(self._output_file, 'w'))
+        self._to_json(self._stream(self._output_file, 'w'))
