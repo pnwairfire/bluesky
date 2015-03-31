@@ -127,6 +127,10 @@ def validate_args(args):
     # TODO: validate args values as necessary
     pass
 
+def exit_with_traceback(e):
+    logging.debug(traceback.format_exc())
+    scripting.utils.exit_with_msg(e)
+
 def main():
     # TODO: figure out way to include available modules in help message,
     # and then remove '--list-modules' option
@@ -150,8 +154,7 @@ def main():
             importlib.import_module('bluesky.modules.%s' % (m)) for m in args.module
         ]
     except ImportError, e:
-        scripting.utils.exit_with_msg(e.message,
-            extra_output=lambda: parser.print_help())
+        exit_with_traceback(e)
 
     try:
         fires_importer = models.fires.FiresImporter(
@@ -171,10 +174,7 @@ def main():
         fires_importer.dumps(args.output_format)
 
     except Exception, e:
-        if logging.getLogger().getEffectiveLevel() <= logging.DEBUG:
-            scripting.utils.exit_with_msg(traceback.format_exc(), prefix="")
-        else:
-            scripting.utils.exit_with_msg(e.message)
+        exit_with_traceback(e)
 
 if __name__ == "__main__":
     main()
