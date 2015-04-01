@@ -72,6 +72,7 @@ class FireEncoder(json.JSONEncoder):
 class FiresImporter(object):
 
     def __init__(self, input_file=None, output_file=None):
+        self._meta = {}
         self._input_file = input_file
         self._output_file = output_file
         self._fires = {}
@@ -87,34 +88,6 @@ class FiresImporter(object):
         else:
             # TODO: merge into existing (updateing start/end/size/etc appropriately)
             pass
-
-    def _from_json(self, stream):
-        """Returns array of Fire objects loaded from json
-
-        Always returns an array, even if json input represents a single fire
-        object
-
-        Args:
-         - stream -- file object or other iterable object
-
-        TODO:
-         - support already parsed JSON (i.e. dict or array)
-        """
-        data = json.loads(''.join([d for d in stream]))
-        if hasattr(data, 'keys'):
-            self._add_fire(Fire(data))
-        elif hasattr(data, 'append'):
-            if len(data) > 0:
-                new_fires = [Fire(d) for d in data]
-                for fire in new_fires:
-                    self._add_fire(fire)
-        else:
-            raise ValueError("Invalid fire json data")
-
-    ## Exporting
-
-    def _to_json(self, stream):
-        stream.write(json.dumps(self.fires, cls=FireEncoder))
 
     ## IO
 
@@ -135,6 +108,32 @@ class FiresImporter(object):
     def fires(self):
         return [self._fires[i] for i in self._fire_ids]
 
+    @property
+    def meta(self):
+        return self._meta
+
+    # @property(self):
+    # def meta(self):
+    #     return self._meta
+
+    def __getattr__(self, attr):
+        """Provides get access to meta data
+
+        Note: __getattr__ is called when the 'attr' isn't defined on self
+        """
+        return self._meta.get(attr)
+
+    def __setattr__(self, attr, val):
+        """Provides set access to meta data
+
+        Note: __setattr__ is always called, whether or not 'attr' is defined
+        on self.  So, we have to make sure this is meta data, and call super's
+        __setattr__ if not.
+        """
+        if not attr.startswith('_') and not hasattr(FiresImporter, attr):
+            self._meta[attr] = val
+        super(FiresImporter, self).__setattr__(attr, val)
+
     @fires.setter
     def fires(self, fires_list):
         self._fires = {}
@@ -143,7 +142,21 @@ class FiresImporter(object):
             self._add_fire(fire)
 
     def loads(self):
-        self._from_json(self._stream(self._input_file, 'r'))
+        """Loads json-formatted fire data, creating list of Fire objects and
+        storing other fields in self.meta.
+
+        TODO:
+         - support already parsed JSON (i.e. dict or array)
+        """
+        stream = self._stream(self._input_file, 'r')
+        data = json.loads(''.join([d for d in stream]))
+        if not hasattr(data, 'keys'):
+            raise ValueError("Invalid fire data")
+        for d in data.pop('fires', []):
+            new_fires = [Fire(d) for d in data]
+            for fire in new_fires:
+                self._add_fire(fire)
+        self._meta = data
 
     def filter(self, attr, **kwargs):
         whitelist = kwargs.get('whitelist')
@@ -159,6 +172,6 @@ class FiresImporter(object):
         self.fires = [f for f in self.fires if _filter(f, attr)]
 
     def dumps(self):
-        # If not fires have yet been loaded, just return empty array
-
-        self._to_json(self._stream(self._output_file, 'w'))
+        stream = self._stream(self._output_file, 'w')
+        fire_json = json.dumps(dict(self._meta, fires=self.fires), cls=FireEncoder)
+        stream.write(fire_json)
