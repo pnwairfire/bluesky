@@ -1,24 +1,26 @@
-[
-    {
-        "id": "fkjsdflkjsflkjsdlkfj",
-        "event_id": "SF11E826544",
-        "name": "Natural Fire in WA lacking consumption inputs",
-        "perimeter": {
-            "type": "MultiPolygon",
-            "coordinates": [
-                [
+{
+    "fires": [
+        {
+            "id": "fkjsdflkjsflkjsdlkfj",
+            "event_id": "SF11E826544",
+            "name": "Natural Fire in WA lacking consumption inputs",
+            "perimeter": {
+                "type": "MultiPolygon",
+                "coordinates": [
                     [
-                        [-121.4522115, 47.4316976],
-                        [-121.3990506, 47.4316976],
-                        [-121.3990506, 47.4099293],
-                        [-121.4522115, 47.4099293],
-                        [-121.4522115, 47.4316976]
+                        [
+                            [-121.4522115, 47.4316976],
+                            [-121.3990506, 47.4316976],
+                            [-121.3990506, 47.4099293],
+                            [-121.4522115, 47.4099293],
+                            [-121.4522115, 47.4316976]
+                        ]
                     ]
                 ]
-            ]
-        },
-        "start": "20150120T000000Z",
-        "end": "20150120T000000Z",
-        "ecoregion": "southern"
-    }
-]
+            },
+            "start": "20150120T000000Z",
+            "end": "20150120T000000Z",
+            "ecoregion": "southern"
+        }
+    ]
+}
