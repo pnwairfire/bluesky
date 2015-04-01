@@ -152,10 +152,9 @@ class FiresManager(object):
         data = json.loads(''.join([d for d in stream]))
         if not hasattr(data, 'keys'):
             raise ValueError("Invalid fire data")
-        for d in data.pop('fires', []):
-            new_fires = [Fire(d) for d in data]
-            for fire in new_fires:
-                self._add_fire(fire)
+        new_fires = [Fire(d) for d in data.pop('fires', [])]
+        for fire in new_fires:
+            self._add_fire(fire)
         self._meta = data
 
     def filter(self, attr, **kwargs):

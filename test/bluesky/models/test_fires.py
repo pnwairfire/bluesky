@@ -119,13 +119,13 @@ class TestFiresManager:
 
     ## Loading
 
-    def _stream(self, data=''):
+    def _stream(test_self, data=''):
         def _stream(self, file_name, flag):
             if flag == 'r':
                 return StringIO.StringIO(data)
             else:
-                self._output = getattr(self, 'output', StringIO.StringIO())
-                return self._output
+                test_self._output = StringIO.StringIO()
+                return test_self._output
         return _stream
 
     def test_load_invalid_data(self, monkeypatch):
@@ -149,6 +149,10 @@ class TestFiresManager:
 
     def test_load_no_fires_no_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{}'))
+        fires_manager.loads()
+        assert [] == fires_manager.fires
+        assert {} == fires_manager.meta
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{"fires":[]}'))
         fires_manager.loads()
         assert [] == fires_manager.fires
@@ -202,23 +206,25 @@ class TestFiresManager:
     def test_dump_multiple_fires_with_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream())
-        fires = [
+        fire_objects = [
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
             fires.Fire({'id':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
         ]
         fires_manager._fires = {
-            '1': fires[0],
-            '2': fires[1]
+            '1': fire_objects[0],
+            '2': fire_objects[1]
         }
         fires_manager._fire_ids = ['1','2']
         fires_manager._meta = {"foo": {"bar": "baz"}}
 
         fires_manager.dumps()
-        expected = ('{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},' +
-            '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}], "foo": {"bar": "baz"}}')
-        assert expected == fires_manager._output.getvalue()
+        expected = {
+            "fires": fire_objects,
+            "foo": {"bar": "baz"}
+        }
+        assert expected == json.loads(self._output.getvalue())
 
-    # ## Filtering
+    ## Filtering
 
     def test_filter(self):
         fires_manager = fires.FiresManager()
