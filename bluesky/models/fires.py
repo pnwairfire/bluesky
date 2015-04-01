@@ -12,7 +12,7 @@ import uuid
 __all__ = [
     'Fire',
     'InvalidFilterError',
-    'FiresImporter'
+    'FiresManager'
 ]
 
 class InvalidFilterError(ValueError):
@@ -69,7 +69,7 @@ class FireEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
-class FiresImporter(object):
+class FiresManager(object):
 
     def __init__(self, input_file=None, output_file=None):
         self._meta = {}
@@ -130,9 +130,9 @@ class FiresImporter(object):
         on self.  So, we have to make sure this is meta data, and call super's
         __setattr__ if not.
         """
-        if not attr.startswith('_') and not hasattr(FiresImporter, attr):
+        if not attr.startswith('_') and not hasattr(FiresManager, attr):
             self._meta[attr] = val
-        super(FiresImporter, self).__setattr__(attr, val)
+        super(FiresManager, self).__setattr__(attr, val)
 
     @fires.setter
     def fires(self, fires_list):

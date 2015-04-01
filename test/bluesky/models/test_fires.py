@@ -75,47 +75,47 @@ class TestFire:
             f.rifsijsflj
 
 ##
-## Tests for FiresImporter
+## Tests for FiresManager
 ##
 
-class TestFiresImporter:
+class TestFiresManager:
 
     ## Get/Set Fires and Meta
 
     def test_getting_fires_and_meta(self):
-        fires_importer = fires.FiresImporter()
+        fires_manager = fires.FiresManager()
         fire_objects = [
             fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'})
         ]
-        fires_importer._fires = {
+        fires_manager._fires = {
             '1': fire_objects[0],
             '2': fire_objects[1]
         }
-        fires_importer._fire_ids = ['1','2']
-        fires_importer._meta = {'a':1, 'b':{'c':2}}
+        fires_manager._fire_ids = ['1','2']
+        fires_manager._meta = {'a':1, 'b':{'c':2}}
 
-        assert fire_objects == fires_importer.fires
-        assert 1 == fires_importer.a
-        assert {'c':2} == fires_importer.b
-        assert 2 == fires_importer.b['c']
-        assert None == fires_importer.d
+        assert fire_objects == fires_manager.fires
+        assert 1 == fires_manager.a
+        assert {'c':2} == fires_manager.b
+        assert 2 == fires_manager.b['c']
+        assert None == fires_manager.d
 
     def test_setting_fires_and_meta(self):
-        fires_importer = fires.FiresImporter()
+        fires_manager = fires.FiresManager()
         fire_objects = [
             fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'})
         ]
-        fires_importer.fires = fire_objects
-        fires_importer.a = 1
-        fires_importer.b = {'c': 2}
+        fires_manager.fires = fire_objects
+        fires_manager.a = 1
+        fires_manager.b = {'c': 2}
         # you can also set meta data directly
-        fires_importer.meta['d'] = 123
+        fires_manager.meta['d'] = 123
 
-        assert ['1','2'] == fires_importer._fire_ids
-        assert {'1': fire_objects[0],'2': fire_objects[1]} == fires_importer._fires
-        assert {'a':1, 'b':{'c':2}, 'd': 123} == fires_importer._meta == fires_importer.meta
+        assert ['1','2'] == fires_manager._fire_ids
+        assert {'1': fire_objects[0],'2': fire_objects[1]} == fires_manager._fires
+        assert {'a':1, 'b':{'c':2}, 'd': 123} == fires_manager._meta == fires_manager.meta
 
     ## Loading
 
@@ -129,66 +129,66 @@ class TestFiresImporter:
         return _stream
 
     def test_load_invalid_data(self, monkeypatch):
-        fires_importer = fires.FiresImporter()
+        fires_manager = fires.FiresManager()
 
-        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream(''))
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(''))
         with raises(ValueError):
-            fires_importer.loads()
+            fires_manager.loads()
 
-        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream('""'))
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('""'))
         with raises(ValueError):
-            fires_importer.loads()
+            fires_manager.loads()
 
-        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream('"sdf"'))
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('"sdf"'))
         with raises(ValueError):
-            fires_importer.loads()
+            fires_manager.loads()
 
-        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream('null'))
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('null'))
         with raises(ValueError):
-            fires_importer.loads()
+            fires_manager.loads()
 
     def test_load_no_fires_no_meta(self, monkeypatch):
-        fires_importer = fires.FiresImporter()
-        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream('{"fires":[]}'))
-        fires_importer.loads()
-        assert [] == fires_importer.fires
-        assert {} == fires_importer.meta
+        fires_manager = fires.FiresManager()
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{"fires":[]}'))
+        fires_manager.loads()
+        assert [] == fires_manager.fires
+        assert {} == fires_manager.meta
 
     def test_load_no_fires_with_meta(self, monkeypatch):
-        fires_importer = fires.FiresImporter()
-        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream(
+        fires_manager = fires.FiresManager()
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
             '{"fires":[], "foo": {"bar": "baz"}}'))
-        fires_importer.loads()
-        assert [] == fires_importer.fires
-        assert {"foo": {"bar": "baz"}} == fires_importer.meta
+        fires_manager.loads()
+        assert [] == fires_manager.fires
+        assert {"foo": {"bar": "baz"}} == fires_manager.meta
 
     def test_load_one_fire_with_meta(self, monkeypatch):
-        fires_importer = fires.FiresImporter()
-        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream(
+        fires_manager = fires.FiresManager()
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
             '{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"}],'
             '"foo": {"bar": "baz"}}'))
-        fires_importer.loads()
+        fires_manager.loads()
         expected = [
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"})
         ]
-        assert expected == fires_importer.fires
-        assert {"foo": {"bar": "baz"}} == fires_importer.meta
+        assert expected == fires_manager.fires
+        assert {"foo": {"bar": "baz"}} == fires_manager.meta
 
     def test_load_multiple_fires_with_meta(self, monkeypatch):
-        fires_importer = fires.FiresImporter()
-        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream(
+        fires_manager = fires.FiresManager()
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
             '{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
             '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}],'
             '"foo": {"bar": "baz"}}'))
-        fires_importer.loads()
+        fires_manager.loads()
         expected = [
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
             fires.Fire({'id':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
         ]
-        assert expected == fires_importer.fires
-        assert {"foo": {"bar": "baz"}} == fires_importer.meta
+        assert expected == fires_manager.fires
+        assert {"foo": {"bar": "baz"}} == fires_manager.meta
 
-    # ## Dumping
+    ## Dumping
 
     def test_dump_no_fire_no_meta(self, monkeypatch):
         pass
@@ -200,29 +200,29 @@ class TestFiresImporter:
         pass
 
     def test_dump_multiple_fires_with_meta(self, monkeypatch):
-        fires_importer = fires.FiresImporter()
-        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream())
+        fires_manager = fires.FiresManager()
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream())
         fires = [
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
             fires.Fire({'id':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
         ]
-        fires_importer._fires = {
+        fires_manager._fires = {
             '1': fires[0],
             '2': fires[1]
         }
-        fires_importer._fire_ids = ['1','2']
-        fires_importer._meta = {"foo": {"bar": "baz"}}
+        fires_manager._fire_ids = ['1','2']
+        fires_manager._meta = {"foo": {"bar": "baz"}}
 
-        fires_importer.dumps()
+        fires_manager.dumps()
         expected = ('{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},' +
             '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}], "foo": {"bar": "baz"}}')
-        assert expected == fires_importer._output.getvalue()
+        assert expected == fires_manager._output.getvalue()
 
     # ## Filtering
 
     def test_filter(self):
-        fires_importer = fires.FiresImporter()
-        fires_importer.fires = [
+        fires_manager = fires.FiresManager()
+        fires_manager.fires = [
             fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '3', 'name': 'n3', 'country': "ZZ", 'bar1':'a1', 'baz':'baz1'}),
@@ -236,7 +236,7 @@ class TestFiresImporter:
             fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
         ]
 
-        fires_importer.filter('country', blacklist=["ZZ"])
+        fires_manager.filter('country', blacklist=["ZZ"])
         expected = [
             fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
@@ -249,9 +249,9 @@ class TestFiresImporter:
             fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
             fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
         ]
-        assert expected == fires_importer.fires
+        assert expected == fires_manager.fires
 
-        fires_importer.filter('country', whitelist=["USA", "CA", "UK", "BZ"])
+        fires_manager.filter('country', whitelist=["USA", "CA", "UK", "BZ"])
         expected = [
             fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '5', 'name': 'n5', 'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
@@ -260,28 +260,27 @@ class TestFiresImporter:
             fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
             fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
         ]
-        assert expected == fires_importer.fires
+        assert expected == fires_manager.fires
 
-        fires_importer.filter('country', blacklist=["USA"])
+        fires_manager.filter('country', blacklist=["USA"])
         expected = [
             fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
             fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
             fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
         ]
-        assert expected == fires_importer.fires
+        assert expected == fires_manager.fires
 
-        fires_importer.filter('country', whitelist=["USA", "CA", "UK"])
+        fires_manager.filter('country', whitelist=["USA", "CA", "UK"])
         expected = [
             fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
             fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'})
         ]
-        assert expected == fires_importer.fires
+        assert expected == fires_manager.fires
 
-        fires_importer.filter('country', blacklist=["USA", "CA"])
+        fires_manager.filter('country', blacklist=["USA", "CA"])
         expected = [
             fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
         ]
-        assert expected == fires_importer.fires
-
+        assert expected == fires_manager.fires

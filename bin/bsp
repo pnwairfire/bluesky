@@ -117,34 +117,34 @@ def import_modules(args):
 
 def load_fires(args):
     try:
-        fires_importer = models.fires.FiresImporter(
+        fires_manager = models.fires.FiresManager(
             args.input_file, args.output_file)
-        fires_importer.loads()
+        fires_manager.loads()
     except:
         logging.debug(traceback.format_exc())
         exit_with_traceback(e)
-    return fires_importer
+    return fires_manager
 
-def run_modules(args, modules, fires_importer):
+def run_modules(args, modules, fires_manager):
     try:
         if args.country_code_whitelist:
-            fires_importer.filter('country', args.country_code_whitelist)
+            fires_manager.filter('country', args.country_code_whitelist)
 
         for module in modules:
             # TDOO: catch any exception raised by a module and dumps
             # whatever is the current state of fires (or state of fires prior
             # to calling hte module) ?
             # 'run' modifies fires in place
-            module.run(fires_importer.fires, args.config_options)
+            module.run(fires_manager.fires, args.config_options)
     except Exception, e:
         # when there's an error running modules, don't bail; we'll dump fire
         # data as is
         logging.debug(traceback.format_exc())
         logging.error(e)
 
-def dump_fires(args, fires_importer):
+def dump_fires(args, fires_manager):
     try:
-        fires_importer.dumps()
+        fires_manager.dumps()
     except Exception, e:
         logging.debug(traceback.format_exc())
         exit_with_traceback(e)
@@ -166,9 +166,9 @@ def main():
     scripting.utils.log_config(args.config_options)
 
     modules =import_modules(args)
-    fires_importer = load_fires(args)
-    run_modules(args, modules, fires_importer)
-    dump_fires(args, fires_importer)
+    fires_manager = load_fires(args)
+    run_modules(args, modules, fires_manager)
+    dump_fires(args, fires_manager)
 
 if __name__ == "__main__":
     main()
