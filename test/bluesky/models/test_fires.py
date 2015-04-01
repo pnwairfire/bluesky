@@ -1,4 +1,3 @@
-import io
 import json
 import sys
 import StringIO
@@ -81,86 +80,145 @@ class TestFire:
 
 class TestFiresImporter:
 
-    ## From JSON
+    ## Get/Set Fires and Meta
 
-    def test_from_json_invalid_data(self):
+    def test_getting_fires_and_meta(self):
         fires_importer = fires.FiresImporter()
-        with raises(ValueError):
-            fires_importer._from_json(io.StringIO(u''))
-        with raises(ValueError):
-            fires_importer._from_json(io.StringIO(u'""'))
-        with raises(ValueError):
-            fires_importer._from_json(io.StringIO(u'"sdf"'))
-        with raises(ValueError):
-            fires_importer._from_json(io.StringIO(u'null'))
+        fire_objects = [
+            fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'})
+        ]
+        fires_importer._fires = {
+            '1': fire_objects[0],
+            '2': fire_objects[1]
+        }
+        fires_importer._fire_ids = ['1','2']
+        fires_importer._meta = {'a':1, 'b':{'c':2}}
 
-    def test_from_json_no_fires(self):
-        fires_importer = fires.FiresImporter()
-        expected = []
-        fires_importer._from_json(io.StringIO(u'[]'))
-        assert expected == fires_importer.fires
+        assert fire_objects == fires_importer.fires
+        assert 1 == fires_importer.a
+        assert {'c':2} == fires_importer.b
+        assert 2 == fires_importer.b['c']
+        assert None == fires_importer.d
 
-    def test_from_json_one_fire_single_object(self):
+    def test_setting_fires_and_meta(self):
         fires_importer = fires.FiresImporter()
+        fire_objects = [
+            fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'})
+        ]
+        fires_importer.fires = fire_objects
+        fires_importer.a = 1
+        fires_importer.b = {'c': 2}
+        # you can also set meta data directly
+        fires_importer.meta['d'] = 123
+
+        assert ['1','2'] == fires_importer._fire_ids
+        assert {'1': fire_objects[0],'2': fire_objects[1]} == fires_importer._fires
+        assert {'a':1, 'b':{'c':2}, 'd': 123} == fires_importer._meta == fires_importer.meta
+
+    ## Loading
+
+    def _stream(self, data=''):
+        def _stream(self, file_name, flag):
+            if flag == 'r':
+                return StringIO.StringIO(data)
+            else:
+                self._output = getattr(self, 'output', StringIO.StringIO())
+                return self._output
+        return _stream
+
+    def test_load_invalid_data(self, monkeypatch):
+        fires_importer = fires.FiresImporter()
+
+        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream(''))
+        with raises(ValueError):
+            fires_importer.loads()
+
+        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream('""'))
+        with raises(ValueError):
+            fires_importer.loads()
+
+        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream('"sdf"'))
+        with raises(ValueError):
+            fires_importer.loads()
+
+        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream('null'))
+        with raises(ValueError):
+            fires_importer.loads()
+
+    def test_load_no_fires_no_meta(self, monkeypatch):
+        fires_importer = fires.FiresImporter()
+        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream('{"fires":[]}'))
+        fires_importer.loads()
+        assert [] == fires_importer.fires
+        assert {} == fires_importer.meta
+
+    def test_load_no_fires_with_meta(self, monkeypatch):
+        fires_importer = fires.FiresImporter()
+        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream(
+            '{"fires":[], "foo": {"bar": "baz"}}'))
+        fires_importer.loads()
+        assert [] == fires_importer.fires
+        assert {"foo": {"bar": "baz"}} == fires_importer.meta
+
+    def test_load_one_fire_with_meta(self, monkeypatch):
+        fires_importer = fires.FiresImporter()
+        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream(
+            '{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"}],'
+            '"foo": {"bar": "baz"}}'))
+        fires_importer.loads()
         expected = [
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"})
         ]
-        fires_importer._from_json(io.StringIO(
-            u'{"id":"a","bar":123,"baz":12.32,"bee":"12.12"}'))
         assert expected == fires_importer.fires
+        assert {"foo": {"bar": "baz"}} == fires_importer.meta
 
-    def test_from_json_one_fire_array(self):
+    def test_load_multiple_fires_with_meta(self, monkeypatch):
         fires_importer = fires.FiresImporter()
-        expected = [
-            fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"})
-        ]
-        fires_importer._from_json(io.StringIO(
-            u'[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"}]'))
-        assert expected == fires_importer.fires
-
-    def test_from_json_multiple_fires(self):
-        fires_importer = fires.FiresImporter()
+        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream(
+            '{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
+            '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}],'
+            '"foo": {"bar": "baz"}}'))
+        fires_importer.loads()
         expected = [
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
             fires.Fire({'id':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
         ]
-        fires_importer._from_json(io.StringIO(
-            u'[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
-              '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}]'))
         assert expected == fires_importer.fires
+        assert {"foo": {"bar": "baz"}} == fires_importer.meta
 
+    # ## Dumping
 
-class TestFiresImporterLoadingAndDumping:
+    def test_dump_no_fire_no_meta(self, monkeypatch):
+        pass
 
-    # TODO: monkeypatch fires.FiresImporter._stream in setup to avoid redundancy
+    def test_dump_no_fires_with_meta(self, monkeypatch):
+        pass
 
-    def test_full_cycle(self, monkeypatch):
+    def test_dump_one_fire_with_meta(self, monkeypatch):
+        pass
+
+    def test_dump_multiple_fires_with_meta(self, monkeypatch):
         fires_importer = fires.FiresImporter()
-        assert [] == fires_importer.fires
-
-        fire_json = (
-            u'[{"id":"dfdf","name":"sdfs","fooj":"j","barj":"jj","baz":99},'
-            + u'{"id":"3j34","name":"sdfi3234l","fo":"j","ba":"jj","ba":199}]')
-        fire_objects = [
-            {"id":"dfdf","name":"sdfs","fooj":"j","barj":"jj","baz":99},
-            {"id":"3j34","name":"sdfi3234l","fo":"j","ba":"jj","ba":199}
+        monkeypatch.setattr(fires.FiresImporter, '_stream', self._stream())
+        fires = [
+            fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
+            fires.Fire({'id':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
         ]
+        fires_importer._fires = {
+            '1': fires[0],
+            '2': fires[1]
+        }
+        fires_importer._fire_ids = ['1','2']
+        fires_importer._meta = {"foo": {"bar": "baz"}}
 
-        def _stream(self, file_name, flag):
-            if flag == 'r':
-                return StringIO.StringIO(fire_json)
-            else:
-                self._output = getattr(self, 'output', StringIO.StringIO())
-                return self._output
-        monkeypatch.setattr(fires.FiresImporter, '_stream', _stream)
-
-        fires_importer.loads()
-        assert fire_objects == fires_importer.fires
-        fires_importer._output = StringIO.StringIO()
         fires_importer.dumps()
-        assert fire_objects == json.loads(fires_importer._output.getvalue())
+        expected = ('{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},' +
+            '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}], "foo": {"bar": "baz"}}')
+        assert expected == fires_importer._output.getvalue()
 
-class TestFiresImporterLowerLevelMethods:
+    # ## Filtering
 
     def test_filter(self):
         fires_importer = fires.FiresImporter()
@@ -226,3 +284,4 @@ class TestFiresImporterLowerLevelMethods:
             fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
         ]
         assert expected == fires_importer.fires
+
