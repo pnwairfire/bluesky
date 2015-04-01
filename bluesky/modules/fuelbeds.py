@@ -28,7 +28,7 @@ def run(fires, config=None):
         # TODO: instead of instantiating a new FccsLookUp and Estimator for
         # each fire, create AK and non-AK lookup and estimator objects that
         # are reused, and set reference to correct one here
-        lookup = FccsLookUp(is_alaska=fire.get('state')=='AK',
+        lookup = FccsLookUp(is_alaska=fire.location.get('state')=='AK',
             fccs_version=FCCS_VERSION)
         Estimator(lookup).estimate(fire)
 
@@ -48,8 +48,8 @@ class Estimator(object):
         """Estimates fuelbed composition based on lat/lng or perimeter vector
         data.
 
-        If fire['perimeter'] is defined, it will look something like the
-        following:
+        If fire.location['perimeter'] is defined, it will look something like
+        the following:
 
             {
                 "type": "MultiPolygon",
@@ -67,17 +67,17 @@ class Estimator(object):
             }
         """
         fuelbed_info = {}
-        if fire.get('shape_file'):
+        if fire.location.get('shape_file'):
             raise NotImplementedError("Importing of shape data from file not implemented")
-        if fire.get('perimeter'):
-            fuelbed_info = self.lookup.look_up(fire['perimeter'])
+        if fire.location.get('perimeter'):
+            fuelbed_info = self.lookup.look_up(fire.location['perimeter'])
             # fuelbed_info['area'] is in m^2
-            # TDOO: only use fuelbed_info['area'] is in m^2 if fire.area
+            # TDOO: only use fuelbed_info['area'] is in m^2 if fire.location.area
             # isn't already defined?
-            fire.area = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
-        elif fire.get('latitude') and fire.get('longitude'):
-            fuelbed_info = self.lookup.look_up_by_lat_lng(fire['latitude'],
-                fire['longitude'])
+            fire.location.area = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
+        elif fire.location.get('latitude') and fire.location.get('longitude'):
+            fuelbed_info = self.lookup.look_up_by_lat_lng(
+                fire.location['latitude'], fire.location['longitude'])
         else:
             raise RuntimeError("Insufficient data for looking up fuelbed information")
 

@@ -2,31 +2,35 @@
     "fires": [
         {
             "id": "fkjsdflkjsflkjsdlkfj",
+            "event_id": "SF11E826544",
             "name": "Natural Fire in WA lacking consumption inputs",
-            "perimeter": {
-                "type": "MultiPolygon",
-                "coordinates": [
-                    [
+            "location": {
+                "perimeter": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
                         [
-                            [-121.4522115, 47.4316976],
-                            [-121.3990506, 47.4316976],
-                            [-121.3990506, 47.4099293],
-                            [-121.4522115, 47.4099293],
-                            [-121.4522115, 47.4316976]
+                            [
+                                [-121.4522115, 47.4316976],
+                                [-121.3990506, 47.4316976],
+                                [-121.3990506, 47.4099293],
+                                [-121.4522115, 47.4099293],
+                                [-121.4522115, 47.4316976]
+                            ]
                         ]
                     ]
-                ]
+                },
+                "ecoregion": "southern",
+                "state": "KS",
+                "country": "USA",
+                "slope": 20.0,
+                "elevation": 2320.0,
+                "max_humid": 70.0
             },
-            "start": "20150120T000000Z",
-            "ecoregion": "southern",
-            "end": "20150120T000000Z",
-            "country": "USA",
-            "slope": 20.0,
-            "max_humid": 70.0,
-            "elevation": 2320.0,
-            "timezone": -7.0,
-            "event_id": "SF11E826544",
-            "state": "KS"
+            "time": {
+                "start": "20150120T000000Z",
+                "end": "20150120T000000Z",
+                "timezone": -7.0
+            }
         }
     ]
 }
