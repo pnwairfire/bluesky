@@ -28,7 +28,7 @@ def run(fires, config=None):
         # TODO: instead of instantiating a new FccsLookUp and Estimator for
         # each fire, create AK and non-AK lookup and estimator objects that
         # are reused, and set reference to correct one here
-        lookup = FccsLookUp(is_alaska=fire.location.get('state')=='AK',
+        lookup = FccsLookUp(is_alaska=fire['location'].get('state')=='AK',
             fccs_version=FCCS_VERSION)
         Estimator(lookup).estimate(fire)
 
@@ -48,7 +48,7 @@ class Estimator(object):
         """Estimates fuelbed composition based on lat/lng or perimeter vector
         data.
 
-        If fire.location['perimeter'] is defined, it will look something like
+        If fire['location']['perimeter'] is defined, it will look something like
         the following:
 
             {
@@ -67,25 +67,26 @@ class Estimator(object):
             }
         """
         fuelbed_info = {}
-        if fire.location.get('shape_file'):
+        if fire['location'].get('shape_file'):
             raise NotImplementedError("Importing of shape data from file not implemented")
-        if fire.location.get('perimeter'):
-            fuelbed_info = self.lookup.look_up(fire.location['perimeter'])
+        if fire['location'].get('perimeter'):
+            fuelbed_info = self.lookup.look_up(fire['location']['perimeter'])
             # fuelbed_info['area'] is in m^2
-            # TDOO: only use fuelbed_info['area'] is in m^2 if fire.location.area
+            # TDOO: only use fuelbed_info['area'] is in m^2 if fire['location']['area']
             # isn't already defined?
-            fire.location.area = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
-        elif fire.location.get('latitude') and fire.location.get('longitude'):
+            if fuelbed_info:
+                fire['location']['area'] = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
+        elif fire['location'].get('latitude') and fire['location'].get('longitude'):
             fuelbed_info = self.lookup.look_up_by_lat_lng(
-                fire.location['latitude'], fire.location['longitude'])
+                fire['location']['latitude'], fire['location']['longitude'])
         else:
-            raise RuntimeError("Insufficient data for looking up fuelbed information")
+            raise ValueError("Insufficient data for looking up fuelbed information")
 
         if not fuelbed_info:
             # TODO: option to ignore failures ?
             raise RuntimeError("Failed to lookup fuelbed information")
 
-        fire.fuelbeds = [{'fccs_id':f, 'pct':d['percent']}
+        fire['fuelbeds'] = [{'fccs_id':f, 'pct':d['percent']}
             for f,d in fuelbed_info['fuelbeds'].items()]
 
         self._truncate(fire)
@@ -102,17 +103,17 @@ class Estimator(object):
           85% -> 85% * 100 / (100 - 7) = 91.4%
           8% -> 7% * 100 / (100 - 7) = 8.6%
         """
-        if not fire.fuelbeds:
+        if not fire['fuelbeds']:
             return
 
         # TDOO: make sure percentages add up to 100%
-        fire.fuelbeds.sort(key=lambda fb: fb['pct'])
-        fire.fuelbeds.reverse()
+        fire['fuelbeds'].sort(key=lambda fb: fb['pct'])
+        fire['fuelbeds'].reverse()
         total_popped_pct = 0
-        while total_popped_pct + fire.fuelbeds[-1]['pct'] < self.TRUNCATION_PERCENTAGE_THRESHOLD:
-            total_popped_pct += fire.fuelbeds.pop()['pct']
+        while total_popped_pct + fire['fuelbeds'][-1]['pct'] < self.TRUNCATION_PERCENTAGE_THRESHOLD:
+            total_popped_pct += fire['fuelbeds'].pop()['pct']
 
     def _adjust_percentages(self, fire):
-        total_pct = sum([fb['pct'] for fb in fire.fuelbeds])
-        for fb in fire.fuelbeds:
+        total_pct = sum([fb['pct'] for fb in fire['fuelbeds']])
+        for fb in fire['fuelbeds']:
             fb['pct'] *= 100.0 / total_pct
