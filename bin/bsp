@@ -101,8 +101,8 @@ def validate_args(args):
     pass
 
 def exit_with_traceback(e):
-    logging.debug(traceback.format_exc())
     scripting.utils.exit_with_msg(e)
+    logging.debug(traceback.format_exc())
 
 def import_modules(args):
     try:
@@ -135,10 +135,15 @@ def run_modules(args, modules, fires_manager):
             # 'run' modifies fires in place
             module.run(fires_manager.fires, args.config_options)
     except Exception, e:
-        # when there's an error running modules, don't bail; we'll dump fire
-        # data as is
-        logging.debug(traceback.format_exc())
+        # when there's an error running modules, don't bail; fire data will be
+        # dumped as is
         logging.error(e)
+        tb = traceback.format_exc()
+        logging.debug(tb)
+        fires_manager.error = {
+            "message": str(e),
+            "traceback": str(tb)
+        }
 
 def dump_fires(args, fires_manager):
     try:
