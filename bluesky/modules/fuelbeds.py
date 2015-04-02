@@ -38,6 +38,8 @@ def run(fires, config=None):
 
 # According to https://en.wikipedia.org/wiki/Acre, an acre is 4046.8564224 m^2
 ACRES_PER_SQUARE_METER = 1 / 4046.8564224  # == 0.0002471053814671653
+# Allow summed fuel percentages to be between 99.5% and 100.5%
+TOTAL_PCT_THRESHOLD = 0.5
 
 class Estimator(object):
 
@@ -88,6 +90,9 @@ class Estimator(object):
         if not fuelbed_info:
             # TODO: option to ignore failures ?
             raise RuntimeError("Failed to lookup fuelbed information")
+        elif TOTAL_PCT_THRESHOLD < abs(100.0 - sum(
+                [d['percent'] for d in fuelbed_info['fuelbeds'].values()])):
+            raise RuntimeError("Fuelbed percentages don't add up to 100%")
 
         fire['fuelbeds'] = [{'fccs_id':f, 'pct':d['percent']}
             for f,d in fuelbed_info['fuelbeds'].items()]
