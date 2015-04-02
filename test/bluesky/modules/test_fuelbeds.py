@@ -1,3 +1,4 @@
+import copy
 import mock
 
 from py.test import raises
@@ -11,7 +12,7 @@ PERIMETER = {
             [
                 [-84.8194, 30.5222],
                 [-84.8197, 30.5209],
-                ...
+                # ...add more coordinates...
                 [-84.8193, 30.5235],
                 [-84.8194, 30.5222]
             ]
@@ -64,24 +65,26 @@ FUELBED_INFO_60_30['fuelbeds']['47']['percent'] = 30
 FUELBED_INFO_60_40_10 = copy.deepcopy(FUELBED_INFO_60_40)
 FUELBED_INFO_60_40_10['fuelbeds']['50'] = {"grid_cells": 1, "percent": 10.0}
 
-##
-## Tests for Estimator.estimate
-##
 
 ##
 ## Tests for Estimator.estimate
 ##
 
-class TestEstimatorInsufficientDataForLookup:
+class TestEstimatorInsufficientDataForLookup(object):
 
     def setup(self):
         lookup = mock.Mock()
         self.estimator = fuelbeds.Estimator(lookup)
 
-    def test_no_perimeter_or_lat_or_lng(self):
-        pass
+    def test_no_location(self):
+        with raises(ValueError) as e:
+            self.estimator.estimate({})
 
-class BaseTestEstimatorEstimate:
+    def test_no_perimeter_or_lat_or_lng(self):
+        with raises(ValueError) as e:
+            self.estimator.estimate({"location":{}})
+
+class BaseTestEstimatorEstimate(object):
     """Base class for testing Estimator.estimate
     """
 
@@ -93,21 +96,25 @@ class BaseTestEstimatorEstimate:
 
     def test_none_lookup_info(self):
         self.estimator.lookup.look_up = lambda p: None
+        self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: None
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.fire)
 
     def test_empty_lookup_info(self):
         self.estimator.lookup.look_up = lambda p: {}
+        self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: {}
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.fire)
 
     def test_lookup_info_percentages_less_than_100(self):
         self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_30
+        self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: FUELBED_INFO_60_30
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.fire)
 
     def test_lookup_info_percentages_greater_than_100(self):
         self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_40_10
+        self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: FUELBED_INFO_60_40_10
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.fire)
 
@@ -115,6 +122,7 @@ class BaseTestEstimatorEstimate:
 
     def test_no_truncation(self):
         self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_40
+        self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: FUELBED_INFO_60_40
         expected_fuelbeds = [
             {'fccs_id': '46', 'pct': 60},
             {'fccs_id': '47', 'pct': 40}
@@ -122,7 +130,7 @@ class BaseTestEstimatorEstimate:
         # Having 'perimeter' key will trigger call to self.estimator.lookup.look_up;
         # The value of PERIMETER is not actually used here
         self.estimator.estimate(self.fire)
-        assert expected == self.fire.get('fuelbeds')
+        assert expected_fuelbeds == self.fire.get('fuelbeds')
 
     def test_with_truncation(self):
         # TODO: implement
@@ -130,21 +138,20 @@ class BaseTestEstimatorEstimate:
 
 class TestEstimatorGetFromPerimeter(BaseTestEstimatorEstimate):
     def setup(self):
-        self.fire = {"perimeter": PERIMETER}
+        self.fire = {"location": {"perimeter": PERIMETER}}
         super(TestEstimatorGetFromPerimeter, self).setup()
-
 
 class TestEstimatorGetFromLatLng(BaseTestEstimatorEstimate):
 
     def setup(self):
-        self.fire = {"latitude": 46.0, 'longitude': -120.34}
+        self.fire = {"location": {"latitude": 46.0, 'longitude': -120.34}}
         super(TestEstimatorGetFromLatLng, self).setup()
 
 ##
 ## Tests for Estimator._truncate
 ##
 
-class TestEstimatorTruncation:
+class TestEstimatorTruncation(object):
 
     def setup(self):
         lookup = mock.Mock()
@@ -155,68 +162,68 @@ class TestEstimatorTruncation:
 
 
     def test_truncate_empty_set(self):
-        self.estimator.fire.fuelbeds = []
-        self.estimator._truncate()
-        assert [] == self.estimator.fire.fuelbeds
+        fire = dict(fuelbeds=[])
+        self.estimator._truncate(fire)
+        assert [] == fire['fuelbeds']
 
     def test_truncate_one_fuelbed(self):
-        self.estimator.fire.fuelbeds = [{'fccs_id': 1, 'pct': 100}]
-        self.estimator._truncate()
-        assert [{'fccs_id': 1, 'pct': 100}] == self.estimator.fire.fuelbeds
+        fire = dict(fuelbeds=[{'fccs_id': 1, 'pct': 100}])
+        self.estimator._truncate(fire)
+        assert [{'fccs_id': 1, 'pct': 100}] == fire['fuelbeds']
 
         # a single fuelbed's percentage should never be below 100%,
         # let alone the truncation percemtage threshold, but code
         # should handle it
         pct = 99 - fuelbeds.Estimator.TRUNCATION_PERCENTAGE_THRESHOLD
-        self.estimator.fire.fuelbeds = [{'fccs_id': 1, 'pct': pct}]
-        self.estimator._truncate()
-        assert [{'fccs_id': 1, 'pct': pct}] == self.estimator.fire.fuelbeds
+        fire = dict(fuelbeds=[{'fccs_id': 1, 'pct': pct}])
+        self.estimator._truncate(fire)
+        assert [{'fccs_id': 1, 'pct': pct}] == fire['fuelbeds']
 
     def test_truncate_multiple_fbs_no_truncation(self):
-        self.estimator.fire.fuelbeds = [
+        fire = dict(fuelbeds=[
             {'fccs_id': 1, 'pct': 50},
             {'fccs_id': 2, 'pct': 20},
             {'fccs_id': 3, 'pct': 30}
-        ]
-        self.estimator._truncate()
+        ])
+        self.estimator._truncate(fire)
         expected = [
             {'fccs_id': 1, 'pct': 50},
             {'fccs_id': 3, 'pct': 30},
             {'fccs_id': 2, 'pct': 20}
         ]
-        assert expected == self.estimator.fire.fuelbeds
+        assert expected == fire['fuelbeds']
 
     def test_truncate_multiple_fbs_truncated(self):
-        self.estimator.fire.fuelbeds = [
+        fire = dict(fuelbeds=[
             {'fccs_id': 3, 'pct': 20},
             {'fccs_id': 1, 'pct': 75},
             {'fccs_id': 2, 'pct': 5}
-        ]
-        self.estimator._truncate()
+        ])
+        self.estimator._truncate(fire)
         expected = [
             {'fccs_id': 1, 'pct': 75},
             {'fccs_id': 3, 'pct': 20}
         ]
-        assert expected == self.estimator.fire.fuelbeds
-        self.estimator.fire.fuelbeds = [
+        assert expected == fire['fuelbeds']
+        fire = dict(fuelbeds=[
             {'fccs_id': 5, 'pct': 16},
             {'fccs_id': 45, 'pct': 3},
             {'fccs_id': 1, 'pct': 75},
             {'fccs_id': 223, 'pct': 5},
             {'fccs_id': 3, 'pct': 1}
-        ]
-        self.estimator._truncate()
+        ])
+        self.estimator._truncate(fire)
         expected = [
             {'fccs_id': 1, 'pct': 75},
             {'fccs_id': 5, 'pct': 16}
         ]
-        assert expected == self.estimator.fire.fuelbeds
+        assert expected == fire['fuelbeds']
 
-##
-## Tests for Estimator._adjust_percentages
-##
+# ##
+# ## Tests for Estimator._adjust_percentages
+# ##
 
-class TestEstimatorPercentageAdjustment:
+class TestEstimatorPercentageAdjustment(object):
 
     def setup(self):
         lookup = mock.Mock()
