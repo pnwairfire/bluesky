@@ -101,8 +101,9 @@ def validate_args(args):
     pass
 
 def exit_with_traceback(e):
-    scripting.utils.exit_with_msg(e)
+    logging.error(e)
     logging.debug(traceback.format_exc())
+    scripting.utils.exit_with_msg(e)
 
 def import_modules(args):
     try:
