@@ -66,6 +66,9 @@ class Estimator(object):
                 ]
             }
         """
+        if not fire.get('location'):
+            raise ValueError("Insufficient data for looking up fuelbed information")
+
         fuelbed_info = {}
         if fire['location'].get('shape_file'):
             raise NotImplementedError("Importing of shape data from file not implemented")
