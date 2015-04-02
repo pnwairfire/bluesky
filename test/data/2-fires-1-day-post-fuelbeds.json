@@ -1,0 +1,68 @@
+{
+    "fires": [
+        {
+            "id": "SF11C14225236095807750",
+            "event_id": "SF11E826544",
+            "name": "Some Rx Fire in the Bahamas",
+            "type": "Rx",
+            "location":{
+                "slope": 10.0,
+                "max_humid": 80.0,
+                "elevation": 0.0,
+                "country": "BS",
+                "longitude": -77.379,
+                "state": "KS",
+                "latitude": 25.041,
+                "area": 99.9999997516,
+                "county": ""
+            },
+            "time":{
+                "end": "",
+                "start": "20150120T000000Z",
+                "timezone": -5.0
+            },
+            "fuelbeds": [
+                {
+                    "fccs_id": 84,
+                    "percentage": 100
+                }
+            ]
+        },
+        {
+            "id": "fkjsdflkjsdflkjsdlkfj",
+            "event_id": "SF11E826544",
+            "name": "Natural Fire in WA",
+            "location":{
+                "county": "",
+                "shape": "This needs to be filled in with real shape data",
+                "area": 200,
+                "country": "USA",
+                "longitude": -120.379,
+                "start": "20150120T000000Z",
+                "latitude": 47.123
+            },
+            "time":{
+                "timezone": -7.0,
+                "end": "20150120T000000Z",
+                "state": "KS"
+            },
+            "slope": 20.0,
+            "max_humid": 70.0,
+            "elevation": 2320.0,
+            "fuelbeds": [
+                {
+                    "fccs_id": 16,
+                    "percentage": 60
+                },
+                {
+                    "fccs_id": 60,
+                    "percentage": 27
+                },
+                {
+                    "fccs_id": 61,
+                    "percentage": 4
+                }
+            ]
+        }
+    ]
+}
