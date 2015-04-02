@@ -110,7 +110,7 @@ def import_modules(args):
         modules = [
             importlib.import_module('bluesky.modules.%s' % (m)) for m in args.module
         ]
-    except Execption, e: #ImportError, e:
+    except Exception, e: #ImportError, e:
         exit_with_traceback(e)
 
     return modules
