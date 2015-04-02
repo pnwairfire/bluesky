@@ -1,9 +1,9 @@
 {
     "fires": [
         {
-            "id": "fkjsdflkjsflkjsdlkfj",
+            "id": "SF11C14225236095807750",
             "event_id": "SF11E826544",
-            "name": "Natural Fire in WA lacking consumption inputs",
+            "name": "Natural Fire near Snoqualmie Pass, WA",
             "location": {
                 "perimeter": {
                     "type": "MultiPolygon",
