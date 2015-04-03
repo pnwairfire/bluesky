@@ -330,11 +330,21 @@ would contain this output, agumented with emissions data:
         }]
     }
 
-#### Ingestions
+##### Pretty-Printing JSON Output
+
+To get indented and formated output like the above examples, try
+[json.tool](https://docs.python.org/2.7/library/json.html).  It'll work only
+if you let the results get output to STDOUT.  For example:
+
+    bsp -i fires.json fuelbeds | python -m json.tool
+
+#### Ingestion
 
 TODO: ...fill this in once it's implemented...
 
-#### Input Fire Data
+#### Notes About Input Fire Data
+
+##### Perimeter vs. Lat + Lng + Area
 
 One thing to note about the fire data is that the location can be specified by
 a single lat/lng pair with area (assumed to be acres) or by perimeter polygon
