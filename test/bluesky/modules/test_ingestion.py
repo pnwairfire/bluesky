@@ -43,7 +43,7 @@ class TestIngester(object):
             'input': copy.deepcopy(f),
             'location': copy.deepcopy(f['location'])
         }
-        ingestion.FireIngester(f)
+        self.ingester.ingest(f)
         assert expected == f
 
     def test_fire_with_maximum_optional_fields(self):
@@ -75,11 +75,14 @@ class TestIngester(object):
             }
         }
         expected = {
+            "id": "SF11C14225236095807750",
+            "event_id": "SF11E826544",
+            "name": "Natural Fire near Snoqualmie Pass, WA",
             'input': copy.deepcopy(f),
             'location': copy.deepcopy(f['location']),
             'time': copy.deepcopy(f['time'])
         }
-        ingestion.FireIngester(f)
+        self.ingester.ingest(f)
         assert expected == f
 
     def test_flat_fire(self):
@@ -108,6 +111,9 @@ class TestIngester(object):
         }
         expected = {
             'input': copy.deepcopy(f),
+            "id": "SF11C14225236095807750",
+            "event_id": "SF11E826544",
+            "name": "Natural Fire near Snoqualmie Pass, WA",
             'location': {
                 "perimeter": {
                     "type": "MultiPolygon",
@@ -123,6 +129,7 @@ class TestIngester(object):
                         ]
                     ]
                 },
+                "ecoregion": "southern",
             },
             'time': {
                 "start": "20150120T000000Z",
@@ -130,7 +137,7 @@ class TestIngester(object):
                 "timezone": -0.7
             }
         }
-        ingestion.FireIngester(f)
+        self.ingester.ingest(f)
         assert expected == f
 
     def test_flat_and_nested_fire(self):
@@ -163,6 +170,9 @@ class TestIngester(object):
         }
         expected = {
             'input': copy.deepcopy(f),
+            "id": "SF11C14225236095807750",
+            "event_id": "SF11E826544",
+            "name": "Natural Fire near Snoqualmie Pass, WA",
             'location': {
                 "perimeter": {
                     "type": "MultiPolygon",
@@ -178,6 +188,7 @@ class TestIngester(object):
                         ]
                     ]
                 },
+                "ecoregion": "southern"
             },
             'time': {
                 "start": "20150120T000000Z",
@@ -185,7 +196,7 @@ class TestIngester(object):
                 "timezone": -0.7
             }
         }
-        ingestion.FireIngester(f)
+        self.ingester.ingest(f)
         assert expected == f
 
 
@@ -221,10 +232,14 @@ class TestIngester(object):
         }
         expected = {
             'input': copy.deepcopy(f),
+            "id": "SF11C14225236095807750",
+            "event_id": "SF11E826544",
+            "name": "Natural Fire near Snoqualmie Pass, WA",
             'location': copy.deepcopy(f['location']),
             'time': copy.deepcopy(f['time'])
         }
-        ingestion.FireIngester(f)
+        expected['location'].pop('foo')
+        self.ingester.ingest(f)
         assert expected == f
 
     def test_fire_with_perimeter_and_lat_lng(self):
@@ -255,6 +270,6 @@ class TestIngester(object):
                 'perimeter': copy.deepcopy(f['location']['perimeter'])
             }
         }
-        ingestion.FireIngester(f)
+        self.ingester.ingest(f)
         assert expected == f
 
