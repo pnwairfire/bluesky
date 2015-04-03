@@ -20,15 +20,17 @@ def run(fires, options=None):
      - config -- optional configparser object
     """
     logging.debug("Running ingestion module")
-    fire_ingester = FireIngester()
+    fire_ingester = FireIngester(options)
     for fire in fires:
         ingester.ingest(fire)
 
 class FireIngester(object):
+    """Inputs, transforms, and validates fire data, recording original copy
+    under 'input' key.
+    """
 
-    ##
-    ## Public Interface
-    ##
+    def __init__(self, options):
+        self._options = options
 
     SCALAR_FIELDS = {
         "id", "name", "event_id"
@@ -37,27 +39,40 @@ class FireIngester(object):
         "location", "time"
     }
 
+    ##
+    ## Public Interface
+    ##
+
     def ingest(self, fire):
         if not fire:
             raise ValueError("Fire contains no data")
         if fire.has_key('input'):
             raise RuntimeError("Fire data was already ingested")
 
+        # move original data under 'input key'
         fire['input'] = { k, fire.pop(k) for k in fire.keys() }
+
+        # copy back down any recognized top level, 'scalar' fields
         for f in self.SCALAR_FIELDS:
-            fire['input'][k] = fire[k]
+            if fire['input'].has_key(k):
+                fire[k] = fire['input'][k]
+
+        # Call separate ingest methods for each nested object
         for f in self.NESTED_FIELDS:
             key_ingestr = getattr(self, '_ingest_%s' % (k), None)
             key_ingester(fire)
 
-        # TODO: allow other arbitrary fields?
-
+        self._ingest_custom_fields(fire)
         self._fill_in_fields(fire)
-        self._post_process(fire)
+        self._validate(fire)
 
     ##
     ## General Helper methods
     ##
+
+    def _ingest_custom_fields(self, fire):
+        # TODO: copy over custom fields specified in options
+        pass
 
     def _fill_in_fields(self, fire):
         # TODO: set defaults for any fields that aren't defined
@@ -65,8 +80,9 @@ class FireIngester(object):
         # should be set from other fields (like name, id, etc.)
         pass
 
-    def _post_process(self, fire):
-        # TODO: make sure required fields are all defined
+    def _validate(self, fire):
+        # TODO: make sure required fields are all defined, and validate
+        # values not validated by nested field specific _ingest_* methods
         pass
 
     def _get_field(self, fire, key, section=None):
@@ -83,6 +99,19 @@ class FireIngester(object):
         if v is None:
             v = fire['input'].get(key)
         return v
+
+    def _get_fields(self, fire, section, optional_fields):
+        """Returns dict of specified fields, defined either in top level or
+        nested within specified section
+
+        Excludes any fields that are undefined or empty.
+        """
+        fields = {}
+        for k in optional_fields:
+            v = self._get_field(fire, k, section)
+            if v:
+                fields[k] = v
+        return fields
 
     ##
     ## Field-Specific Ingest Methods
@@ -113,10 +142,14 @@ class FireIngester(object):
         else:
             raise ValueError("Fire object must define perimeter or lat+lng+area")
 
-        fire['location'].update({
-            k:v for k, copy.deepcopy(v) in fire['input']['location'].items()
-                if k in self.OPTIONAL_LOCATION_FIELDS
-        })
+        fire['location'].update(self._get_fields(fire, section, 'location'specified fields, defined either in top level or))
+
+    OPTIONAL_TIME_FIELDS = [
+        "start", "end", "timezone"
+    ]
 
     def _ingest_time(self, fire):
-        pass
+        time_fields = self._get_fields(fire, section, 'time')
+        # Only add 'time' key if there are any defined fiespecified fields, defined either in top level or
+        if time_fields:
+            fire['time'] = time_fields
