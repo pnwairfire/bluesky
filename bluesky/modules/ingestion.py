@@ -22,7 +22,7 @@ def run(fires, options=None):
     logging.debug("Running ingestion module")
     fire_ingester = FireIngester(options)
     for fire in fires:
-        ingester.ingest(fire)
+        fire_ingester.ingest(fire)
 
 class FireIngester(object):
     """Inputs, transforms, and validates fire data, recording original copy
