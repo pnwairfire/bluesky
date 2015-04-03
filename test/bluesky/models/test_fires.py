@@ -5,14 +5,7 @@ import uuid
 
 from py.test import raises
 
-try:
-    from bluesky.models import fires
-except:
-    import os
-
-    root_dir = os.path.abspath(os.path.join(sys.path[0], '../../../'))
-    sys.path.insert(0, root_dir)
-    from bluesky.models import fires
+from bluesky.models import fires
 
 ##
 ## Tests for Fire
