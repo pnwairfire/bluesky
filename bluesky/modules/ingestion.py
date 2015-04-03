@@ -29,7 +29,7 @@ class FireIngester(object):
     under 'input' key.
     """
 
-    def __init__(self, options):
+    def __init__(self, options=None):
         self._options = options
 
     SCALAR_FIELDS = {
@@ -50,7 +50,7 @@ class FireIngester(object):
             raise RuntimeError("Fire data was already ingested")
 
         # move original data under 'input key'
-        fire['input'] = { k, fire.pop(k) for k in fire.keys() }
+        fire['input'] = { k: fire.pop(k) for k in fire.keys() }
 
         # copy back down any recognized top level, 'scalar' fields
         for f in self.SCALAR_FIELDS:
@@ -142,7 +142,7 @@ class FireIngester(object):
         else:
             raise ValueError("Fire object must define perimeter or lat+lng+area")
 
-        fire['location'].update(self._get_fields(fire, section, 'location'specified fields, defined either in top level or))
+        fire['location'].update(self._get_fields(fire, section, 'location'))
 
     OPTIONAL_TIME_FIELDS = [
         "start", "end", "timezone"
