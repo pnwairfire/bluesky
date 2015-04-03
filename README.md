@@ -50,7 +50,7 @@ First, install pip:
 
 Then, to install, for example, v0.1.5, use the following:
 
-    sudo pip install git+ssh://git@github.org/pnwairfire/bluesky@v0.1.5
+    pip install git+https://github.com/pnwairfire/bluesky@v0.1.5
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
