@@ -53,13 +53,13 @@ class FireIngester(object):
         fire['input'] = { k: fire.pop(k) for k in fire.keys() }
 
         # copy back down any recognized top level, 'scalar' fields
-        for f in self.SCALAR_FIELDS:
+        for k in self.SCALAR_FIELDS:
             if fire['input'].has_key(k):
                 fire[k] = fire['input'][k]
 
         # Call separate ingest methods for each nested object
-        for f in self.NESTED_FIELDS:
-            key_ingestr = getattr(self, '_ingest_%s' % (k), None)
+        for k in self.NESTED_FIELDS:
+            key_ingester = getattr(self, '_ingest_%s' % (k), None)
             key_ingester(fire)
 
         self._ingest_custom_fields(fire)
@@ -142,14 +142,15 @@ class FireIngester(object):
         else:
             raise ValueError("Fire object must define perimeter or lat+lng+area")
 
-        fire['location'].update(self._get_fields(fire, section, 'location'))
+        fire['location'].update(self._get_fields(fire, 'location',
+            self.OPTIONAL_LOCATION_FIELDS))
 
     OPTIONAL_TIME_FIELDS = [
         "start", "end", "timezone"
     ]
 
     def _ingest_time(self, fire):
-        time_fields = self._get_fields(fire, section, 'time')
+        time_fields = self._get_fields(fire, 'time', self.OPTIONAL_TIME_FIELDS)
         # Only add 'time' key if there are any defined fiespecified fields, defined either in top level or
         if time_fields:
             fire['time'] = time_fields
