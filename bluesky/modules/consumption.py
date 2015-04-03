@@ -65,7 +65,7 @@ def run(fires, options=None):
 
             # Note: if we end up running fc on all fuelbeds at once, use lists
             # for the rest
-            fc.fuelbed_area_acres = fb['pct'] * fire.location['area']
+            fc.fuelbed_area_acres = [fb['pct'] * fire.location['area']]
             fc.fuelbed_ecoregion = [fire.location['ecoregion']]
 
             for k, default in valid_settings:
