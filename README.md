@@ -333,14 +333,190 @@ would contain this output, agumented with emissions data:
 ##### Pretty-Printing JSON Output
 
 To get indented and formated output like the above examples, try
-[json.tool](https://docs.python.org/2.7/library/json.html).  It'll work only
-if you let the results get output to STDOUT.  For example:
+[json.tool](https://docs.python.org/2.7/library/json.html).  It will
+work only if you let the results go to STDOUT.  For example:
 
     bsp -i fires.json fuelbeds | python -m json.tool
 
 #### Ingestion
 
-TODO: ...fill this in once it's implemented...
+The ingestion module does various things.  For each fire, it does the following:
+
+**1. Nests the entire fire obect under key 'input.**
+
+For example,
+
+    {
+        "fires": [
+            {
+                "location": {
+                    "latitude": 47.4316976,
+                    "longitude": -121.3990506,
+                    "area": 200
+                }
+            }
+        ]
+    }
+
+would become:
+
+    {
+        "fires": [
+            {
+                "input": {
+                    "location": {
+                        "latitude": 47.4316976,
+                        "longitude": -121.3990506,
+                        "area": 200
+                    }
+                }
+            }
+        ]
+    }
+
+In so doing, it keeps a record of the initial data, which will remain untouched.
+
+**2. Copies recognized fields back up to the top level**
+
+For example,
+
+    {
+        "fires": [
+            {
+                "input": {
+                    "location": {
+                        "latitude": 47.4316976,
+                        "longitude": -121.3990506,
+                        "area": 200,
+                        "foo": "bar"
+                    }
+                }
+            }
+        ]
+    }
+
+would become,
+
+    {
+        "fires": [
+            {
+                "input": {
+                    "location": {
+                        "latitude": 47.4316976,
+                        "longitude": -121.3990506,
+                        "area": 200,
+                        "foo": "bar"  /*  <-- This is ignored */
+                    }
+                }
+                "location": {
+                    "latitude": 47.4316976,
+                    "longitude": -121.3990506,
+                    "area": 200,
+                }
+            }
+        ]
+    }
+
+In this step, it looks for nested fields both in the correctly nested
+locations as well as in the root fire object.  For example:
+
+    TODO: ...add example here...
+
+**3. Copies custom fields up to the top level**
+
+...FILL IN AND GIVE EXAMPLE(S)....
+
+**4. Sets defualts**
+
+As of v0.1.6, there are no hardcoded defaults, but defualts can be configured.
+
+...FILL IN AND GIVE EXAMPLE(S)....
+
+**5. Sets derived fields**
+
+This entails setting undefined fields (such as 'name') from other fields'
+values.
+
+...GIVE EXAMPLE(S)....
+
+**6. Validates the fire data**
+
+...FILL IN AND GIVE EXAMPLES....
+
+##### Ingestion example
+
+As an example, starting with the following input data (which we'll assume is
+in fires.json):
+
+    {
+        "fires": [
+            {
+                "id": "SF11C14225236095807750",
+                "event_id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "location": {
+                    "latitude": 47.4316976,
+                    "longitude": -121.3990506,
+                    "area": 200,
+                    "foo": "bar"
+                },
+                "ecoregion": "southern",
+                "time": {
+                    "start": "20150120T000000Z",
+                    "end": "20150120T000000Z"
+                },
+                "bar": 123
+            }
+        ]
+    }
+
+if you pass this data through ingestion:
+
+    bsp -i fires.json ingestion
+
+you'll end up with this:
+
+    {
+        "fires": [
+            {
+                "event_id": "SF11E826544",
+                "id": "SF11C14225236095807750",
+                "input": {
+                    "event_id": "SF11E826544",
+                    "id": "SF11C14225236095807750",
+                    "location": {
+                        "area": 200,
+                        "ecoregion": "southern",
+                        "latitude": 47.4316976,
+                        "longitude": -121.3990506,
+                        "foo": "bar"
+                    },
+                    "ecoregion": "southern",
+                    "name": "Natural Fire near Snoqualmie Pass, WA",
+                    "time": {
+                        "end": "20150120T000000Z",
+                        "start": "20150120T000000Z"
+                    }
+                    "bar": 123
+                },
+                "location": {
+                    "area": 200,
+                    "ecoregion": "southern",
+                    "latitude": 47.4316976,
+                    "longitude": -121.3990506,
+                    "ecoregion": "southern"
+                },
+                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "time": {
+                    "end": "20150120T000000Z",
+                    "start": "20150120T000000Z"
+                }
+            }
+        ]
+    }
+
+Note that "foo" and "bar" were ignored (though left under 'input'), and
+"ecoregion" got moved under "location".
 
 #### Notes About Input Fire Data
 
