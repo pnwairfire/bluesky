@@ -1,0 +1,19 @@
+{
+    "fires": [
+        {
+            "id": "SF11C14225236095807750",
+            "event_id": "SF11E826544",
+            "name": "Natural Fire near Snoqualmie Pass, WA",
+            "location": {
+                "latitude": 47.4316976,
+                "longitude": -121.3990506,
+                "area": 200,
+                "ecoregion": "southern"
+            },
+            "time": {
+                "start": "20150120T000000Z",
+                "end": "20150120T000000Z"
+            }
+        }
+    ]
+}
