@@ -159,8 +159,8 @@ class FireIngester(object):
         # TODO: look for fields either in 'location' key or at top level
         perimeter = self._get_field(fire, 'perimeter', 'location')
         lat = self._get_field(fire, 'latitude', 'location')
-        lng = self._get_field(fire, 'latitude', 'longitude')
-        area = self._get_field(fire, 'latitude', 'area')
+        lng = self._get_field(fire, 'longitude', 'location')
+        area = self._get_field(fire, 'area', 'location')
         if perimeter:
             fire['location'] = {
                 'perimeter': perimeter
