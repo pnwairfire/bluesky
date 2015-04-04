@@ -63,7 +63,8 @@ class FireIngester(object):
             key_ingester(fire)
 
         self._ingest_custom_fields(fire)
-        self._fill_in_fields(fire)
+        self._set_defaults(fire)
+        self._set_derived_fields(fire)
         self._validate(fire)
 
     ##
@@ -74,11 +75,42 @@ class FireIngester(object):
         # TODO: copy over custom fields specified in options
         pass
 
-    def _fill_in_fields(self, fire):
-        # TODO: set defaults for any fields that aren't defined
-        # TODO: set any fields that aren't defined and can and
-        # should be set from other fields (like name, id, etc.)
+    def _set_defaults(self, fire):
+        # TODO: set defaults for any fields that aren't defined; make the
+        # defaults configurable, and maybe hard code any
         pass
+
+    def _set_derived_fields(self, fire):
+        # TODO: set any other fields (besides 'name') that aren't defined and
+        # can and should be set from other fields (like name, id, etc.)
+            self._set_derived_name(fire)
+
+    def _set_derived_name(self, fire):
+        if fire.get('name'):
+            return
+
+        perimeter = fire['location'].get('perimeter')
+        if perimeter:
+            coords = perimeter.get('coordinates',[])
+            if 0 < len(:
+                lng = coords[0][0]
+                lat = coords[0][1]
+            # TODO: support other perimeter geo data type/formats
+        elif fire['location'].get('latitude'): # implies lng is defined too
+            lat = fire['location']['latitude']
+            lng = fire['location']['longitude']
+
+        fire_id = fire.get("id")
+        fire_name = "Fire %s" % (fire_id) if fire_id else "Unnamed fire"
+
+        event_id = fire.get('event_id')
+        if event_id:
+            fire_name += " from event %s" % (event_id)
+
+        if lat and lng:
+            fire_name += " near %.5f, %.5f" % (lat, lng)
+
+        fire['name'] = fire_name
 
     def _validate(self, fire):
         # TODO: make sure required fields are all defined, and validate

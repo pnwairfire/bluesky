@@ -9,6 +9,43 @@ class TestIngester(object):
     def setup(self):
         self.ingester = ingestion.FireIngester()
 
+    ##
+    ## Tests for _fill_in_name
+    ##
+
+    def test_fill_in_name(self):
+        # These cases whould never happen in practice, since 'location' will
+        # always be defined, but it simplifies testing these various cases
+        f = {"name": "Ssdfsdf"}
+        self.ingester._fill_in_name(f)
+        assert "Ssdfsdf" == f["name"]
+
+        f = {"location": {}}
+        self.ingester._fill_in_name(f)
+        assert "Unnamed fire" == f['name']
+
+        f = {"location": {}, "id": "123"}
+        self.ingester._fill_in_name(f)
+        assert "Fire 123" == f['name']
+
+        f = {"location": {}, "event_id": "345"}
+        self.ingester._fill_in_name(f)
+        assert "Unnamed fire from event 345" == f['name']
+
+        f = {"location": {}, "id": "123", "event_id": "345"}
+        self.ingester._fill_in_name(f)
+        assert "Fire 123 from event 345" == f['name']
+
+        # More realistic cases
+        # TODO: more tests cases
+        # f = {...}
+        # self.ingester._fill_in_name(f)
+        # assert "..." == f['name']
+
+    ##
+    ## Tests For ingest
+    ##
+
     def test_fire_missing_required_fields(self):
         with raises(ValueError) as e:
             self.ingester.ingest({})
@@ -42,6 +79,7 @@ class TestIngester(object):
         expected = {
             'input': copy.deepcopy(f),
             'location': copy.deepcopy(f['location'])
+            "name": "Unnamed fire near 47.43169, -121.45221"
         }
         self.ingester.ingest(f)
         assert expected == f
