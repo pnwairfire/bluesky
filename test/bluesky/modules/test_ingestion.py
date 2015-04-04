@@ -282,6 +282,9 @@ class TestIngester(object):
 
     def test_fire_with_perimeter_and_lat_lng(self):
         f = {
+            "id": "SF11C14225236095807750",
+            "event_id": "SF11E826544",
+            "name": "Natural Fire near Snoqualmie Pass, WA",
             "location": {
                 "perimeter": {
                     "type": "MultiPolygon",
@@ -304,10 +307,12 @@ class TestIngester(object):
         }
         expected = {
             'input': copy.deepcopy(f),
+            "id": "SF11C14225236095807750",
+            "event_id": "SF11E826544",
+            "name": "Natural Fire near Snoqualmie Pass, WA",
             'location': {
                 'perimeter': copy.deepcopy(f['location']['perimeter'])
             }
         }
         self.ingester.ingest(f)
         assert expected == f
-
