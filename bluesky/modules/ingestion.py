@@ -83,7 +83,7 @@ class FireIngester(object):
     def _set_derived_fields(self, fire):
         # TODO: set any other fields (besides 'name') that aren't defined and
         # can and should be set from other fields (like name, id, etc.)
-            self._set_derived_name(fire)
+        self._set_derived_name(fire)
 
     def _set_derived_name(self, fire):
         if fire.get('name'):
