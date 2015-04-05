@@ -407,7 +407,7 @@ would become,
                         "area": 200,
                         "foo": "bar"  /*  <-- This is ignored */
                     }
-                }
+                },
                 "location": {
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
@@ -420,33 +420,81 @@ would become,
 In this step, it looks for nested fields both in the correctly nested
 locations as well as in the root fire object.  For example:
 
-    TODO: ...add example here...
+    {
+        "fires": [
+            {
+                "input": {
+                    "location": {
+                        "latitude": 47.4316976,
+                        "longitude": -121.3990506
+                    },
+                    "area": 200
+                }
+            }
+        ]
+    }
+
+would become,
+
+    {
+        "fires": [
+            {
+                "input": {
+                    "location": {
+                        "latitude": 47.4316976,
+                        "longitude": -121.3990506
+                    },
+                    "area": 200
+                },
+                "location": {
+                    "latitude": 47.4316976,
+                    "longitude": -121.3990506,
+                    "area": 200,
+                }
+            }
+        ]
+    }
 
 **3. Copies custom fields up to the top level**
 
-...FILL IN AND GIVE EXAMPLE(S)....
+User-identified fields that should also be copied from the input data up to
+the top level can be configured.
 
-**4. Sets defualts**
+*(Not yet implemented)*
 
-As of v0.1.6, there are no hardcoded defaults, but defualts can be configured.
+**4. Sets defaults**
 
-...FILL IN AND GIVE EXAMPLE(S)....
+There are no hardcoded defaults, but defualts can be configured.
+
+*(Not yet implemented)*
 
 **5. Sets derived fields**
 
 This entails setting undefined fields (such as 'name') from other fields'
-values.
+values. For example, given the following location information
 
-...GIVE EXAMPLE(S)....
+    {
+        ...
+        "location": {
+            "latitude": 47.4316976,
+            "longitude": -121.4522115
+        }
+        ...
+    }
+
+The name (if not set already) would be set to
+
+    "Unnamed fire near 47.43170, -121.45221"
 
 **6. Validates the fire data**
 
-...FILL IN AND GIVE EXAMPLES....
+For example, if there is not location information, or if the nested location
+is insufficient, a ```ValueError``` is raised.
 
 ##### Ingestion example
 
-As an example, starting with the following input data (which we'll assume is
-in fires.json):
+As a full example, starting with the following input data (which we'll
+assume is in fires.json):
 
     {
         "fires": [
