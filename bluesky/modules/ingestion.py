@@ -89,16 +89,22 @@ class FireIngester(object):
         if fire.get('name'):
             return
 
-        perimeter = fire['location'].get('perimeter')
-        if perimeter:
-            coords = perimeter.get('coordinates',[])
-            if 0 < len(:
-                lng = coords[0][0]
-                lat = coords[0][1]
-            # TODO: support other perimeter geo data type/formats
-        elif fire['location'].get('latitude'): # implies lng is defined too
-            lat = fire['location']['latitude']
-            lng = fire['location']['longitude']
+        lat = lng = None
+        location = fire.get('location')
+        if location:
+            perimeter = location.get('perimeter')
+            if perimeter:
+                if perimeter.get('type') == 'MultiPolygon':
+                    coords = perimeter.get('coordinates',[])
+                    if (0 < len(coords) and 0 < len(coords[0]) and
+                            0 < len(coords[0][0]) and 0 < len(coords[0][0][0])):
+                        lng = coords[0][0][0][0]
+                        lat = coords[0][0][0][1]
+                    # else, invalid data; just exlude lat/lng from name
+                # TODO: support other perimeter geo data type/formats
+            elif location.get('latitude'): # implies lng is defined too
+                lat = location['latitude']
+                lng = location['longitude']
 
         fire_id = fire.get("id")
         fire_name = "Fire %s" % (fire_id) if fire_id else "Unnamed fire"
