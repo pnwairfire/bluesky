@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+
+"""bsp-csv2json: Converts csv formatted fire data to json.
+
+Example calls:
+ > bsp-csv2json -i fires.cvs -o fires.json
+ > cat fires.csv | bsp-csv2json > fires.json
+ > bsp-csv2json < fires.csv > fires.json
+"""
+
+from pyairfire import scripting
+
+try:
+    from bluesky import io
+except:
+    import os, sys
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
+    sys.path.insert(0, root_dir)
+    from bluesky import io
+
+REQUIRED_ARGS = []
+
+OPTIONAL_ARGS = [
+    {
+        'short': '-i',
+        'long': '--input-file',
+        'dest': 'input_file',
+        'help': 'input file comtaining JSON formatted fire data',
+        'action': "store",
+        'default': None
+    },
+    {
+        'short': '-o',
+        'long': '--output-file',
+        'dest': 'output_file',
+        'help': 'output file comtaining JSON formatted fire data',
+        'action': "store",
+        'default': None
+    },
+    {
+        'short': '-m',
+        'long': '--merge-fires',
+        'dest': 'merge_fires',
+        'help': 'merge fire entries with the same id',
+        'action': "store_true",
+        'default': False
+    }
+]
+
+def main():
+    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS)
+    io.CSV2JSON(args.input_file, args.output_file,
+        'id' if args.merge_fires else None, 'fires').convert()
+
+if __name__ == "__main__":
+    main()

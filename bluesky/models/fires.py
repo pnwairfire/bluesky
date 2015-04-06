@@ -91,8 +91,8 @@ class FiresManager(object):
 
     ## IO
 
-    # TODO: implement this as a context-managing class, with __enter__ and
-    # __exit__ methods
+    # TODO: Remove this method and use bluesky.io.Stream in code below instead
+    # (would have a fair amoubnt of unit test updates)
     def _stream(self, file_name, flag): #, do_strip_newlines):
         if file_name:
             return open(file_name, flag)
