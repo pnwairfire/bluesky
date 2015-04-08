@@ -86,12 +86,13 @@ class Estimator(object):
         else:
             raise ValueError("Insufficient data for looking up fuelbed information")
 
-        if not fuelbed_info:
+        if not fuelbed_info or not fuelbed_info.get('fuelbeds'):
             # TODO: option to ignore failures ?
             raise RuntimeError("Failed to lookup fuelbed information")
         elif TOTAL_PCT_THRESHOLD < abs(100.0 - sum(
                 [d['percent'] for d in fuelbed_info['fuelbeds'].values()])):
-            raise RuntimeError("Fuelbed percentages don't add up to 100%")
+            raise RuntimeError("Fuelbed percentages don't add up to 100% - {fuelbeds}".format(
+                fuelbeds=fuelbed_info['fuelbeds']))
 
         fire['fuelbeds'] = [{'fccs_id':f, 'pct':d['percent']}
             for f,d in fuelbed_info['fuelbeds'].items()]
