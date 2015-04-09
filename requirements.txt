@@ -6,4 +6,4 @@ git+https://github.com/pnwairfire/pyairfire@v0.6.15
 git+https://github.com/pnwairfire/eflookup@v0.6.1
 git+https://github.com/pnwairfire/emitcalc@v0.3.0
 git+https://github.com/pnwairfire/fccsmap@v0.1.5
-hg+https://bitbucket.org/fera/apps-consume4@v4.1.1
+hg+https://bitbucket.org/fera/apps-consume4@v4.1.2
