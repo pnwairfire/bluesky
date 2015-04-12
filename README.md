@@ -4,6 +4,16 @@ BlueSky Framework rearchitected as a pipeable collection of standalone modules.
 
 ## Development
 
+### Clone Repo
+
+Via ssh:
+
+    git clone git@github.com:pnwairfire/bluesky.git
+
+or http:
+
+    git clone https://github.com/pnwairfire/bluesky.git
+
 ### Install Dependencies
 
 If using the fuelbeds module, you'll need to manually install some dependencies
@@ -44,18 +54,19 @@ See [pytest](http://pytest.org/latest/getting-started.html#getstarted) for more 
 
 ### Installing With pip
 
-First, install pip:
+First, install pip (with sudo if necessary):
 
-    sudo apt-get install python-pip
+    apt-get install python-pip
 
-Then, to install, for example, v0.2.1, use the following:
+Then, to install, for example, v0.2.2, use the following (with sudo if necessary):
 
-    pip install git+https://github.com/pnwairfire/bluesky@v0.2.1
+    pip install --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==0.2.2
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
-    git+ssh://git@github.org/pnwairfire/bluesky@v0.2.1
+    -i http://pypi.smoke.airfire.org/simple/-i http://pypi.smoke.airfire.org/simple/
+    bluesky==0.2.2
 
 If you get an error like    ```AttributeError: 'NoneType' object has no
 attribute 'skip_requirements_regex```, it means that you need in upgrade pip.
