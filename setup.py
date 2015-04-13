@@ -27,14 +27,14 @@ setup(
         "eflookup>=0.6.2",
         "emitcalc>=0.3.1",
         "fccsmap>=0.1.6",
-        "apps-consume4"
+        "apps-consume4>=4.1.2"
     ],
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/pyairfire/",
         "https://pypi.smoke.airfire.org/simple/eflookup/",
         "https://pypi.smoke.airfire.org/simple/emitcalc/",
         "https://pypi.smoke.airfire.org/simple/fccsmap/",
-        "https://bitbucket.org/fera/apps-consume4/get/v4.1.2.zip#egg=apps-consume4"
+        "https://pypi.smoke.airfire.org/simple/apps-consume4/"
     ],
     tests_require=test_requirements
 )
