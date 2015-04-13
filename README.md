@@ -74,6 +74,19 @@ One way to do so is with the following:
 
     pip install --upgrade pip
 
+#### gdal installation issue
+
+If, when running the fuelbeds module, you encounter the following error:
+
+    ImportError: No module named _gdal_array
+
+You can fix it by uninstalling and then reinstalling gdal with the following:
+
+    pip uninstall -y gdal && pip install gdal
+
+For some reason, when gdal is installed for fccsmap from within the bluesky
+installation, _gdal_array.so is missing.
+
 ## Usage:
 
 ### bsp
