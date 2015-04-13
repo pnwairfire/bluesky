@@ -25,7 +25,7 @@ setup(
         "gdal==1.11.2",
         "pyairfire>=0.7.0",
         "eflookup>=0.6.2",
-        "emitcalc>=0.3.1",
+        "emitcalc>=0.3.2",
         "fccsmap>=0.1.6",
         "apps-consume4>=4.1.2"
     ],
