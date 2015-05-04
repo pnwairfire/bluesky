@@ -1,4 +1,3 @@
-import re
 from setuptools import setup, find_packages
 
 from bluesky import __version__
