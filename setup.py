@@ -22,7 +22,7 @@ setup(
         # fccsmap's dependencies.  For some reason, if not specified here, the
         # osgeo installtion ends up missing osgeo/_gdal_array.so
         "gdal==1.11.2",
-        "pyairfire>=0.7.0",
+        "pyairfire>=0.8.3",
         "eflookup>=0.6.2",
         "emitcalc>=0.3.2",
         "fccsmap>=0.1.6",

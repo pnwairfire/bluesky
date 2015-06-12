@@ -33,14 +33,6 @@ REQUIRED_ARGS = []
 
 OPTIONAL_ARGS = [
     {
-        'short': '-l',
-        'long': '--list-modules',
-        'dest': 'list_modules',
-        'help': 'lists available modules; order matters',
-        'action': "store_true",
-        'default': False
-    },
-    {
         'short': '-c',
         'long': '--config-file',
         'dest': 'config_file',
@@ -95,6 +87,11 @@ AVAILABLE_MODULES = [
     #p[1].split('.')[-1] for p in pkgutil.iter_modules(modules.__path__, modules.__name__ + '.') #if p[2]
     p[1] for p in pkgutil.iter_modules(modules.__path__)
 ]
+# Note: the trailing space seems to be the only way to add an extra trailing line
+AVAILABLE_MODULES_STR = """\
+Available Modules:
+    {}
+ """.format('\n    '.join(AVAILABLE_MODULES))
 
 def validate_args(args):
     # TODO: validate args values as necessary
@@ -153,18 +150,8 @@ def dump_fires(args, fires_manager):
         exit_with_traceback(e)
 
 def main():
-    # TODO: figure out way to include available modules in help message,
-    # and then remove '--list-modules' option
-    def pre_validation(parser, args):
-        if args.list_modules:
-            scripting.utils.exit_with_msg(
-                "Available Modules:\n\t%s" % ('\n\t'.join(AVAILABLE_MODULES)),
-                #extra_preceeding_output=lambda: parser.print_help(),
-                exit_code=0, prefix="")
-
-    parser, args = scripting.args.parse_args(REQUIRED_ARGS,
-        OPTIONAL_ARGS, positional_args=POSITIONAL_ARGS,
-        pre_validation=pre_validation)
+    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+        positional_args=POSITIONAL_ARGS, epilog=AVAILABLE_MODULES_STR)
     validate_args(args)
     scripting.utils.log_config(args.config_options)
 
