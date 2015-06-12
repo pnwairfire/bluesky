@@ -3,9 +3,9 @@
 """bsp: Runs BlueSky
 
 Example calls:
- > ./bin/bsp.py -i fires-before.json -o fires-after.json
- > cat fires-before.json | ./bin/bsp.py > fires-after.json
- > ./bin/bsp.py < fires-before.json > fires-after.json
+ > bsp -i fires-before.json -o fires-after.json
+ > cat fires-before.json | bsp > fires-after.json
+ > bsp < fires-before.json > fires-after.json
 """
 
 __author__      = "Joel Dubowy"
