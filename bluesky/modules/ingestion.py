@@ -10,7 +10,7 @@ __all__ = [
     'run'
 ]
 
-def run(fires, options=None):
+def run(fires, config=None):
     """Runs the fire data through consumption calculations, using the consume
     package for the underlying computations.
 
@@ -20,7 +20,7 @@ def run(fires, options=None):
      - config -- optional configparser object
     """
     logging.debug("Running ingestion module")
-    fire_ingester = FireIngester(options)
+    fire_ingester = FireIngester(config)
     for fire in fires:
         fire_ingester.ingest(fire)
 
@@ -29,8 +29,8 @@ class FireIngester(object):
     under 'input' key.
     """
 
-    def __init__(self, options=None):
-        self._options = options
+    def __init__(self, config=None):
+        self._config = config
 
     SCALAR_FIELDS = {
         "id", "name", "event_id"
@@ -72,7 +72,7 @@ class FireIngester(object):
     ##
 
     def _ingest_custom_fields(self, fire):
-        # TODO: copy over custom fields specified in options
+        # TODO: copy over custom fields specified in config
         pass
 
     def _set_defaults(self, fire):
