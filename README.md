@@ -23,12 +23,46 @@ for instructions.
 
 Run the following to install python dependencies:
 
-    pip install -r requirements.txt
+    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
 
-Run the following for installing development dependencies (such as for running
-tests):
+Run the following to install packages required for development and testing:
 
-    pip install -r dev-requirements.txt
+    pip install -r requirements-test.txt
+    pip install -r requirements-dev.txt
+
+#### Notes
+
+##### pip issues
+
+If you get an error like    ```AttributeError: 'NoneType' object has no
+attribute 'skip_requirements_regex```, it means you need in upgrade
+pip. One way to do so is with the following:
+
+    pip install --upgrade pip
+
+##### gdal issues
+
+If, when you use fccsmap, you get the following error:
+
+    *** Error: No module named _gdal_array
+
+it's because your osgeo package (/path/to/site-packages/osgeo/) is
+missing _gdal_array.so.  This happens when gdal is built on a
+machine that lacks numpy.  The ```--no-binary :all:``` in the pip
+install command, above, is meant to fix this issue.  If it doesn't work,
+try uninstalling the gdal package and then re-installing it individually
+with the ```--no-binary``` option to pip:
+
+    pip uninstall -y GDAL
+    pip install --no-binary :all: gdal==1.11.2
+
+If this doesn't work, uninstall gdal, and then install it manually:
+
+    pip uninstall -y GDAL
+    wget https://pypi.python.org/packages/source/G/GDAL/GDAL-1.11.2.tar.gz
+    tar xzf GDAL-1.11.2.tar.gz
+    cd GDAL-1.11.2
+    python setup.py install
 
 ### Setup Environment
 
@@ -60,32 +94,16 @@ First, install pip (with sudo if necessary):
 
 Then, to install, for example, v0.2.2, use the following (with sudo if necessary):
 
-    pip install --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==0.2.2
+    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==0.2.2
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
-    -i http://pypi.smoke.airfire.org/simple/-i http://pypi.smoke.airfire.org/simple/
+    -i http://pypi.smoke.airfire.org/simple/
     bluesky==0.2.2
 
-If you get an error like    ```AttributeError: 'NoneType' object has no
-attribute 'skip_requirements_regex```, it means that you need in upgrade pip.
-One way to do so is with the following:
-
-    pip install --upgrade pip
-
-#### gdal installation issue
-
-If, when running the fuelbeds module, you encounter the following error:
-
-    ImportError: No module named _gdal_array
-
-You can fix it by uninstalling and then reinstalling gdal with the following:
-
-    pip uninstall -y gdal && pip install gdal
-
-For some reason, when gdal is installed for fccsmap from within the bluesky
-installation, _gdal_array.so is missing.
+See the Development > Install Dependencies > Notes section, above, for
+notes on resolving pip and gdal issues.
 
 ## Usage:
 

@@ -18,10 +18,6 @@ setup(
     url='https://github.com/pnwairfire/bluesky',
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
     install_requires=[
-        # Note: gdal needs to be specified here, even though it's specified in
-        # fccsmap's dependencies.  For some reason, if not specified here, the
-        # osgeo installtion ends up missing osgeo/_gdal_array.so
-        "gdal==1.11.2",
         "pyairfire>=0.8.3",
         "eflookup>=0.6.2",
         "emitcalc>=0.3.2",
