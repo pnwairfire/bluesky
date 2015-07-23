@@ -33,6 +33,7 @@ if [ ! -d "/home/vagrant/.pyenv" ]; then
     git clone https://github.com/yyuu/pyenv.git /home/vagrant/.pyenv
     git clone https://github.com/yyuu/pyenv-virtualenv.git /home/vagrant/.pyenv/plugins/pyenv-virtualenv
     git clone https://github.com/yyuu/pyenv-pip-rehash.git /home/vagrant/.pyenv/plugins/pyenv-pip-rehash
+    mkdir -p /home/vagrant/.pyenv/shims /home/vagrant/.pyenv/versions
     chown -R vagrant:vagrant /home/vagrant/.pyenv/
 fi
 cd ~
@@ -40,12 +41,11 @@ cd ~
 touch /home/vagrant/.bashrc
 
 if ! hash pyenv 2>/dev/null; then
-    echo >> /home/vagrant/.bashrcc
+    echo >> /home/vagrant/.bashrc
     echo export PYENV_ROOT=/home/vagrant/.pyenv >> /home/vagrant/.bashrc
     echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> /home/vagrant/.bashrc
     echo 'eval "$(pyenv init -)"' >> /home/vagrant/.bashrc
     echo 'eval "$(pyenv virtualenv-init -)"' >> /home/vagrant/.bashrc
-    mkdir -p /home/vagrant/.pyenv/shims /home/vagrant/.pyenv/versions
 fi
 
 source /home/vagrant/.bashrc
