@@ -696,9 +696,10 @@ while the following is an example of the latter:
 
 ## Vagrant
 
-If you'd like to use vagrant to sping up virtual machines for running BlueSky
-Pipeline, look in the vagrant/ directory, which contains Vagrantfiles and
-provisioning scripts.
+If you'd like to use vagrant to spin up virtual machines for running BlueSky
+Pipeline, look in the
+[vagrant/](https://github.com/pnwairfire/bluesky/tree/master/vagrant)
+directory, which contains Vagrantfiles and provisioning scripts.
 
 ### Get Vagrant + Virtualization Software
 
@@ -715,7 +716,8 @@ Note that the one Vagrantfile currently in the repo is configured to use virtual
 ### Basic usage
 
 First, if you haven't already, clone this repo and cd into one of the
-VM-specific subdirectories under vagrant/:
+VM-specific subdirectories under
+[vagrant/](https://github.com/pnwairfire/bluesky/tree/master/vagrant):
 
     git clone https://github.com/pnwairfire/bluesky.git
     cd airfire-bluesky-framework/vagrant/<one-of-the-VMs>/
@@ -723,7 +725,28 @@ VM-specific subdirectories under vagrant/:
 To spin it up and ssh into the vm, use the following:
 
     vagrant up
+    vagrant provision
     vagrant ssh
+
+#### Provisioning
+
+Note that ```vagrant up``` should provision, but it for some reason doesn't
+always do so.  Also note that ```vagrant provision``` may give the following error
+
+    SSH authentication failed! This is typically caused by the public/private
+    keypair for the SSH user not being properly set on the guest VM. Please
+    verify that the guest VM is setup with the proper public key, and that
+    the private key path for Vagrant is setup properly as well.
+
+If it does, add your key to the vagrant user's authorized_keys file
+and then try provisioning again
+
+    vagrant ssh
+    echo your_public_key >> .ssh/authorized_keys
+    exit
+    vagrant provision
+
+#### ssh / scp
 
 You can also ssh/scp to the vm. The host and port depend on what's
 in the Vagrantfile and what the provider (VirtualBox, VMWare, etc) overrides.
@@ -732,12 +755,18 @@ the following in the output:
 
     default: SSH address: 127.0.0.1:2222
 
-The following examples assume host 127.0.0.1 and port 2222
-
-    scp -r -P 2222 /path/to/bluesky/trunk/some/file vagrant@127.0.0.1:~/bluesky-trunk/some/file
-    ssh vagrant@127.0.0.1 -p 2222
-
 The default password for the 'vagrant' user is 'vagrant'.
 
+#### Running bsp on vagrant vm
+
 Once ssh'd into the machine, clone the bluesky repo or pip install it, as
-described above.
+described above.  For example, using pip, and assuming host 127.0.0.1 and port 2222
+
+    vagrant ssh
+    pyenv install 2.7.8
+    pyenv virtualenv 2.7.8 bluesky-2.7.8
+    pyenv global bluesky-2.7.8
+    pip install ipython
+    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky
+    echo '{"fires": [{"slope": 10.0, "max_humid": 80.0, "co": "", "veg": "", "consumption_flaming": "", "max_temp": 30.0, "scc": 2810015000, "county": "", "fuel_1hr": "", "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "timezone": -5.0, "owner": "", "min_temp": 13.0, "sunrise_hour": 7, "sunset_hour": 18, "rot": "", "id": "SF11C14225236095807750", "fuel_100hr": "", "fuel_10khr": "", "shrub": "", "min_wind_aloft": 6.0, "area": 99.9999997516, "event_id": "SF11E826544", "moisture_live": 130.0, "voc": "", "consumption_smoldering": "", "sf_stream_name": "realtime", "fuel_1khr": "", "min_humid": 40.0, "state": "Unknown", "rain_days": 8, "latitude": 25.041, "min_wind": 6.0, "type": "RX", "moisture_10hr": 12.0, "pm25": "", "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "elevation": 0.0, "co2": "", "consumption_residual": "", "moisture_1khr": 22.0, "heat": "", "min_temp_hour": 4, "fips": -9999, "nh3": "", "max_temp_hour": 14, "max_wind_aloft": 6.0, "canopy": "", "duff": "", "date_time": "201501200000Z", "fuel_10hr": "", "moisture_duff": 150.0, "fuel_gt10khr": "", "pm10": "", "country": "Unknown", "litter": "", "longitude": -77.379, "moisture_1hr": 10.0, "so2": "", "ch4": "", "fccs_number": "", "consumption_duff": "", "nox": "", "moisture_100hr": 12.0, "grass": "", "snow_month": 5, "sf_server": "playground.dri.edu", "max_wind": 6.0}]}' > fires.json
+    bsp -i fires.json ingestion fuelbeds
