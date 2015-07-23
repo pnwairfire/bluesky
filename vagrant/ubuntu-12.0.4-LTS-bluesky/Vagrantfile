@@ -1,0 +1,61 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+# The provisioning script is embedded in the Vagrantfile to simplify
+# sharing of the Vagrantfile with those lacking access to our repos
+$provisioning_script = <<SCRIPT
+#!/usr/bin/env bash
+
+sudo apt-get update
+sudo apt-get upgrade
+
+sudo apt-get install -y g++ gcc make dkms emacs
+sudo apt-get install -y git git-svn
+sudo apt-get install -y tmux
+
+sudo apt-get install libnetcdf-dev
+sudo apt-get install proj
+sudo apt-get install python-gdal
+sudo apt-get install libgdal1-1.7.0
+#sudo apt-get install -y libgdal-dev
+
+sudo apt-get install -y python
+sudo apt-get install python-pip
+pip install --upgrade pip
+
+# install pyenv / virtualenv
+git clone https://github.com/yyuu/pyenv.git /usr/local/lib/.pyenv
+git clone https://github.com/yyuu/pyenv-virtualenv.git /usr/local/lib/.pyenv/plugins/pyenv-virtualenv
+git clone https://github.com/yyuu/pyenv-pip-rehash.git /usr/local/lib/.pyenv/plugins/pyenv-pip-rehash
+touch /home/vagrant/.bashrc
+echo export PYENV_ROOT=/usr/local/lib/.pyenv >> /home/vagrant/.bashrc
+echo eval "$(pyenv init -)" >> /home/vagrant/.bashrc
+source /home/vagrant/.bashrc
+pyenv virtualenv 2.7.8 bluesky-2.7.8
+
+sudo pip install ipython
+SCRIPT
+
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = "hashicorp/precise64"
+  config.vm.provision :shell, inline: $provisioning_script
+  config.vm.boot_timeout = 600
+
+  config.ssh.forward_agent = true
+  config.ssh.private_key_path = "~/.ssh/id_rsa"
+  # config.vm.network "forwarded_port", host: 5080, guest: 5000
+
+  config.vm.provider "virtualbox" do |vb|
+    #vb.gui = true  # <-- set to true to not boot in headless mode (i.e. to have a gui)
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
+  end
+
+  # machine for development work
+  config.vm.define "bsp" do
+    config.vm.network "private_network", ip: "192.168.33.11"
+  end
+end

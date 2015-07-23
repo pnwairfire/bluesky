@@ -16,6 +16,10 @@ or http:
 
 ### Install Dependencies
 
+First, install pip (with sudo if necessary):
+
+    apt-get install python-pip
+
 If using the fuelbeds module, you'll need to manually install some dependencies
 needed by the fccsmap package, which fuelbeds uses. See the
 [fccsmap github page](https://github.com/pnwairfire/fccsmap)
@@ -689,3 +693,51 @@ while the following is an example of the latter:
             }
         ]
     }
+
+## Vagrant
+
+If you'd like to use vagrant to sping up virtual machines for running BlueSky
+Pipeline, look in the vagrant/ directory, which contains Vagrantfiles and
+provisioning scripts.
+
+### Get Vagrant + Virtualization Software
+
+[Vagrant](http://www.vagrantup.com/downloads.html)
+
+Virtualization software options:
+
+ - [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+ - [VMWare](https://my.vmware.com/web/vmware/info/slug/desktop_end_user_computing/vmware_fusion/6_0)
+ - [Other options](https://www.google.com/?gws_rd=ssl#q=Virtualization+software)
+
+Note that the one Vagrantfile currently in the repo is configured to use virtualbox.
+
+### Basic usage
+
+First, if you haven't already, clone this repo and cd into one of the
+VM-specific subdirectories under vagrant/:
+
+    git clone https://github.com/pnwairfire/bluesky.git
+    cd airfire-bluesky-framework/vagrant/<one-of-the-VMs>/
+
+To spin it up and ssh into the vm, use the following:
+
+    vagrant up
+    vagrant ssh
+
+You can also ssh/scp to the vm. The host and port depend on what's
+in the Vagrantfile and what the provider (VirtualBox, VMWare, etc) overrides.
+You'll see the ssh address when you execute 'vagrant up'.  It will look like
+the following in the output:
+
+    default: SSH address: 127.0.0.1:2222
+
+The following examples assume host 127.0.0.1 and port 2222
+
+    scp -r -P 2222 /path/to/bluesky/trunk/some/file vagrant@127.0.0.1:~/bluesky-trunk/some/file
+    ssh vagrant@127.0.0.1 -p 2222
+
+The default password for the 'vagrant' user is 'vagrant'.
+
+Once ssh'd into the machine, clone the bluesky repo or pip install it, as
+described above.
