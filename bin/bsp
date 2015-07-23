@@ -22,12 +22,12 @@ import argparse
 from pyairfire import scripting
 
 try:
-    from bluesky import modules, models
+    from bluesky import modules, models, __version__
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from bluesky import modules, models
+    from bluesky import modules, models, __version__
 
 REQUIRED_ARGS = []
 
@@ -70,6 +70,14 @@ OPTIONAL_ARGS = [
         'dest': 'config_options',
         'help': "Config option override, formatted like 'Section.Option=value'",
         'action': scripting.args.SetConfigOptionAction
+    },
+    {
+        #'short': "-v",
+        'long': '--version',
+        'dest': 'version',
+        'action': 'store_true',
+        'help': "Output bluesky version and exit.",
+        'default': False
     }
 ]
 
@@ -149,9 +157,16 @@ def dump_fires(args, fires_manager):
     except Exception, e:
         exit_with_traceback(e)
 
+def output_version(parser, args):
+    if args.version:
+        sys.stdout.write("bsp (bluesky) version {}\n".format(__version__))
+        sys.exit(0)
+
 def main():
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
-        positional_args=POSITIONAL_ARGS, epilog=AVAILABLE_MODULES_STR)
+        positional_args=POSITIONAL_ARGS, epilog=AVAILABLE_MODULES_STR,
+        pre_validation=output_version)
+
     validate_args(args)
     scripting.utils.log_config(args.config_options)
 
