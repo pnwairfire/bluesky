@@ -17,26 +17,23 @@ sudo apt-get install -y git git-svn
 sudo apt-get install -y curl
 sudo apt-get install -y tmux
 
+sudo apt-get install libxml2-dev libxslt1-dev
 sudo apt-get install -y libnetcdf-dev
 sudo apt-get install -y proj
 sudo apt-get install -y python-gdal
 sudo apt-get install -y libgdal1-1.7.0
-sudo apt-get install -y libgdal-dev
+#sudo apt-get install -y libgdal-dev
 
 sudo apt-get install -y python
 sudo apt-get install -y python-pip
 sudo pip install --upgrade pip
 
 # install pyenv / virtualenv
-if [ -d "/home/vagrant/.pyenv" ]; then
-    cd /home/vagrant/.pyenv && git pull
-    cd /home/vagrant/.pyenv/plugins/pyenv-virtualenv && git pull
-    cd /home/vagrant/.pyenv/plugins/pyenv-pip-rehash && git pull
+if [ ! -d "/home/vagrant/.pyenv" ]; then
+    git clone https://github.com/yyuu/pyenv.git /home/vagrant/.pyenv
+    git clone https://github.com/yyuu/pyenv-virtualenv.git /home/vagrant/.pyenv/plugins/pyenv-virtualenv
+    git clone https://github.com/yyuu/pyenv-pip-rehash.git /home/vagrant/.pyenv/plugins/pyenv-pip-rehash
     chown -R vagrant:vagrant /home/vagrant/.pyenv/
-# else
-#     git clone https://github.com/yyuu/pyenv.git /home/vagrant/.pyenv
-#     git clone https://github.com/yyuu/pyenv-virtualenv.git /home/vagrant/.pyenv/plugins/pyenv-virtualenv
-#     git clone https://github.com/yyuu/pyenv-pip-rehash.git /home/vagrant/.pyenv/plugins/pyenv-pip-rehash
 fi
 cd ~
 
@@ -77,7 +74,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   # machine for development work
-  config.vm.define "bsp" do
+  config.vm.define "bsp-precise-64-12.04-LTS" do
     config.vm.network "private_network", ip: "192.168.33.11"
   end
 end

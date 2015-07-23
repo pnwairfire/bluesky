@@ -768,5 +768,34 @@ described above.  For example, using pip, and assuming host 127.0.0.1 and port 2
     pyenv global bluesky-2.7.8
     pip install ipython
     pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky
-    echo '{"fires": [{"slope": 10.0, "max_humid": 80.0, "co": "", "veg": "", "consumption_flaming": "", "max_temp": 30.0, "scc": 2810015000, "county": "", "fuel_1hr": "", "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "timezone": -5.0, "owner": "", "min_temp": 13.0, "sunrise_hour": 7, "sunset_hour": 18, "rot": "", "id": "SF11C14225236095807750", "fuel_100hr": "", "fuel_10khr": "", "shrub": "", "min_wind_aloft": 6.0, "area": 99.9999997516, "event_id": "SF11E826544", "moisture_live": 130.0, "voc": "", "consumption_smoldering": "", "sf_stream_name": "realtime", "fuel_1khr": "", "min_humid": 40.0, "state": "Unknown", "rain_days": 8, "latitude": 25.041, "min_wind": 6.0, "type": "RX", "moisture_10hr": 12.0, "pm25": "", "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "elevation": 0.0, "co2": "", "consumption_residual": "", "moisture_1khr": 22.0, "heat": "", "min_temp_hour": 4, "fips": -9999, "nh3": "", "max_temp_hour": 14, "max_wind_aloft": 6.0, "canopy": "", "duff": "", "date_time": "201501200000Z", "fuel_10hr": "", "moisture_duff": 150.0, "fuel_gt10khr": "", "pm10": "", "country": "Unknown", "litter": "", "longitude": -77.379, "moisture_1hr": 10.0, "so2": "", "ch4": "", "fccs_number": "", "consumption_duff": "", "nox": "", "moisture_100hr": 12.0, "grass": "", "snow_month": 5, "sf_server": "playground.dri.edu", "max_wind": 6.0}]}' > fires.json
+    echo '{
+        "fires": [
+            {
+                "id": "SF11C14225236095807750",
+                "event_id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "location": {
+                    "perimeter": {
+                        "type": "MultiPolygon",
+                        "coordinates": [
+                            [
+                                [
+                                    [-121.4522115, 47.4316976],
+                                    [-121.3990506, 47.4316976],
+                                    [-121.3990506, 47.4099293],
+                                    [-121.4522115, 47.4099293],
+                                    [-121.4522115, 47.4316976]
+                                ]
+                            ]
+                        ]
+                    },
+                    "ecoregion": "southern"
+                },
+                "time": {
+                    "start": "20150120T000000Z",
+                    "end": "20150120T000000Z"
+                }
+            }
+        ]
+    }' > fires.json
     bsp -i fires.json ingestion fuelbeds
