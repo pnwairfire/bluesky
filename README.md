@@ -2,6 +2,17 @@
 
 BlueSky Framework rearchitected as a pipeable collection of standalone modules.
 
+## Non-python Dependencies
+
+For the fuelbeds module, you'll need to manually install some
+dependencies needed by the fccsmap package, which fuelbeds uses.
+See the [fccsmap github page](https://github.com/pnwairfire/fccsmap)
+for instructions.
+
+Additionally, on ubuntu, you'll need to install libxml
+
+    sudo apt-get install libxml2-dev libxslt1-dev
+
 ## Development
 
 ### Clone Repo
@@ -20,10 +31,6 @@ First, install pip (with sudo if necessary):
 
     apt-get install python-pip
 
-If using the fuelbeds module, you'll need to manually install some dependencies
-needed by the fccsmap package, which fuelbeds uses. See the
-[fccsmap github page](https://github.com/pnwairfire/fccsmap)
-for instructions.
 
 Run the following to install python dependencies:
 
@@ -762,12 +769,15 @@ The default password for the 'vagrant' user is 'vagrant'.
 Once ssh'd into the machine, clone the bluesky repo or pip install it, as
 described above.  For example, using pip, and assuming host 127.0.0.1 and port 2222
 
+# TODO: add notes about installing gdal manually
+
     vagrant ssh
     pyenv install 2.7.8
     pyenv virtualenv 2.7.8 bluesky-2.7.8
     pyenv global bluesky-2.7.8
     pip install ipython
-    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky
+
+    sudo pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky
     echo '{
         "fires": [
             {
