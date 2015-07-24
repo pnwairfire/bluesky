@@ -26,9 +26,6 @@ cd gdal-1.11.2
 make
 sudo make install
 sudo ldconfig
-
-sudo apt-get install -y python-gdal
-
 cd ..
 
 # # install pyenv / virtualenv
@@ -57,6 +54,8 @@ cd ..
 # pyenv virtualenv 2.7.8 bluesky-2.7.8
 # pyenv global bluesky-2.7.8
 # pip install ipython
+
+sudo apt-get install -y python-gdal
 
 sudo apt-get install libxml2-dev libxslt1-dev
 sudo pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky
