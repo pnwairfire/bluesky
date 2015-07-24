@@ -40,9 +40,7 @@ cd ..
 #     chown -R vagrant:vagrant /home/vagrant/.pyenv/
 # fi
 # cd ~
-
 # touch /home/vagrant/.bashrc
-
 # if ! hash pyenv 2>/dev/null; then
 #     echo >> /home/vagrant/.bashrc
 #     echo export PYENV_ROOT=/home/vagrant/.pyenv >> /home/vagrant/.bashrc

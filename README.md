@@ -737,8 +737,9 @@ To spin it up and ssh into the vm, use the following:
 
 #### Provisioning
 
-Note that ```vagrant up``` should provision, but it for some reason doesn't
-always do so.  Also note that ```vagrant provision``` may give the following error
+Note that ```vagrant up``` should provision, but it for some reason
+doesn't always do so.  Also note that ```vagrant provision``` may
+give the following error
 
     SSH authentication failed! This is typically caused by the public/private
     keypair for the SSH user not being properly set on the guest VM. Please
@@ -746,38 +747,38 @@ always do so.  Also note that ```vagrant provision``` may give the following err
     the private key path for Vagrant is setup properly as well.
 
 If it does, add your key to the vagrant user's authorized_keys file
-and then try provisioning again
+and then try provisioning again. Note that the default password for
+the 'vagrant' user is 'vagrant'. You'll need since your key isn't
+yet in authorized_keys.
 
     vagrant ssh
     echo your_public_key >> .ssh/authorized_keys
     exit
     vagrant provision
 
+If the provisioning fails to install bsp with an error related
+to lxml, ssh into the box, manually reinstall the xml libs, and
+try installing bsp:
+
+    vagrant ssh
+    sudo apt-get  install libxml2-dev libxslt1-dev
+    sudo pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky
+
 #### ssh / scp
 
-You can also ssh/scp to the vm. The host and port depend on what's
-in the Vagrantfile and what the provider (VirtualBox, VMWare, etc) overrides.
-You'll see the ssh address when you execute 'vagrant up'.  It will look like
-the following in the output:
+Besides using ```vagrant ssh```, You can ssh/scp directly to the vm.
+The host and port depend on what's in the Vagrantfile and what the
+provider (VirtualBox, VMWare, etc) overrides.
+You'll see the ssh address when you execute 'vagrant up'.  It will
+look like the following in the output:
 
     default: SSH address: 127.0.0.1:2222
 
-The default password for the 'vagrant' user is 'vagrant'.
-
 #### Running bsp on vagrant vm
 
-Once ssh'd into the machine, clone the bluesky repo or pip install it, as
-described above.  For example, using pip, and assuming host 127.0.0.1 and port 2222
-
-# TODO: add notes about installing gdal manually
+Now you're ready to run bsp:
 
     vagrant ssh
-    pyenv install 2.7.8
-    pyenv virtualenv 2.7.8 bluesky-2.7.8
-    pyenv global bluesky-2.7.8
-    pip install ipython
-
-    sudo pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky
     echo '{
         "fires": [
             {
