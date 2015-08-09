@@ -19,6 +19,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "bsp-precise-64-12.04-LTS" do
-    config.vm.network "private_network", ip: "192.168.33.11"
+    config.vm.network "private_network", ip: "192.168.33.12"
   end
 end
