@@ -18,7 +18,7 @@ can be dropped when you pipe the fire to later steps.)
 This example requires very little data, since it's starting off with fuelbeds,
 one of the earlier modules in the pipeline.
 
-    $ curl 'http://localhost:6050/api/bluesky/runs/schedule/' -H 'Content-Type: application/json' -d '
+    $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["fuelbeds", "consumption", "emissions"],
         "fires": [
@@ -49,7 +49,7 @@ one of the earlier modules in the pipeline.
 
 Another exmaple, with location data specified as lat + lng + size
 
-    $ curl 'http://localhost:6050/api/bluesky/runs/schedule/' -H 'Content-Type: application/json' -d '
+    $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["fuelbeds", "consumption", "emissions"],
         "fires": [
@@ -72,7 +72,7 @@ This example assumes you've already run up through emissions.  The consumption d
 that would have nested along side the emissions data has been stripped out, since
 it's not needed.
 
-    $ curl 'http://localhost:6050/api/bluesky/runs/schedule/' -H 'Content-Type: application/json' -d '
+    $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["timeprofile", "plumerise", "hysplit"],
         "fires": [
@@ -123,7 +123,7 @@ Other fields:
 
 #### Example - running ```ingestion```, ```fuelbeds```, ```consumption```, ```emissions```, ```timeprofile```, ```plumerise```, and ```hysplit```:
 
-    $ curl 'http://localhost:6050/api/bluesky/runs/schedule/' -H 'Content-Type: application/json' -d '
+    $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["timeprofile", "plumerise", "hysplit"],
         "fires": [
