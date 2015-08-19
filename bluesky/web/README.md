@@ -13,7 +13,39 @@ Generally, the further you are along the pipeline of modules, the more data you
 need.  (This is not entiredly true, since some data required by earlier modules
 can be dropped when you pipe the fire data into later modules.)
 
-#### Example - running ```fuelbeds```, ```consumption```, and ```emissions```:
+#### Required Fields
+##### fuelbeds
+ - ...
+##### consumption
+ - ...
+##### emissions
+ - ...
+##### timeprofile
+ - ...
+##### plumerise
+ - ...
+##### dispersion
+ - ...
+
+#### Optional Fields
+##### fuelbeds
+ - ...
+##### consumption
+ - 'fires' > 'location' > 'ecoregion'
+ - 'fires' > 'type' -- 'rx', 'natural'
+ - ...
+##### emissions
+ - ...
+##### timeprofile
+ - ...
+##### plumerise
+ - ...
+##### dispersion
+ - ...
+
+#### Examples
+
+##### Running ```fuelbeds```, ```consumption```, and ```emissions```:
 
 This example requires very little data, since it's starting off with ```fuelbeds```,
 one of the earlier modules in the pipeline.
@@ -66,7 +98,7 @@ Another exmaple, with fire location data specified as lat + lng + size
         ]
     }'
 
-#### Example - running  ```timeprofile```, ```plumerise```, and ```hysplit```:
+##### Running  ```timeprofile```, ```plumerise```, and ```dispersion```:
 
 This example assumes you've already run up through emissions.  The consumption data
 that would have nested along side the emissions data has been stripped out, since
@@ -74,7 +106,7 @@ it's not needed.
 
     $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
-        "modules": ["timeprofile", "plumerise", "hysplit"],
+        "modules": ["timeprofile", "plumerise", "dispersion"],
         "fires": [
             {
                 "id": "SF11C14225236095807750",
@@ -98,10 +130,14 @@ it's not needed.
                                         ]
                                     },
                                     'residual': {
-                                        'PM2.5': [4.621500211796271e-01]
+                                        'PM2.5': [
+                                            4.621500211796271e-01
+                                        ]
                                     },
                                     'smoldering': {
-                                        'PM2.5': [6.424985839975172e-06]
+                                        'PM2.5': [
+                                            6.424985839975172e-06
+                                        ]
                                     }
                                 }
                             }
@@ -123,21 +159,20 @@ is of the form:
 
     'emissions' > 'category' > 'subcategory' > 'phase' > 'species'
 
-The fact that the emissions data is in an array is because the consumptions
+where the 'category' and 'subcategory' keys correspond to fuel types, but could
+be anything.
+
+The fact that the emissions data is in an array is because the consumption
 module (more specifically, the underlying 'consume' module) outputs arrays.
-The length of the array equals the number of fuelbeds passed into consume.
+The length of each array equals the number of fuelbeds passed into consume.
 Since consume is called on each fuelbed separately, the arrays of consumption
-and emissions data are all length 1.
+and emissions data will all be of length 1.
 
-Other fields:
-
- - Met Domain
-
-#### Example - running ```ingestion```, ```fuelbeds```, ```consumption```, ```emissions```, ```timeprofile```, ```plumerise```, and ```hysplit```:
+##### Running ```ingestion```, ```fuelbeds```, ```consumption```, ```emissions```, ```timeprofile```, ```plumerise```, and ```dispersion```:
 
     $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
-        "modules": ["timeprofile", "plumerise", "hysplit"],
+        "modules": ["timeprofile", "plumerise", "dispersion"],
         "fires": [
             {
                 "id": "SF11C14225236095807750",
