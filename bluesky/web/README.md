@@ -5,17 +5,17 @@
 ### POST /api/v1/run/
 
 This API requires posted JSON with two top level keys - 'modules' and 'fires'.
-The 'fires' key lists the one or more fires to process.
-The 'modules' key is the order specific list of modules to run on the fires.
+The 'fires' key lists the one or more fires to process. The 'modules' key is
+the order specific list of modules through which the fires should be run.
 
-What data is needed for each fire depends on what modules you're going to run.
-Generally, the further you are along hte pipeline of modules, the more data you
-need.  (This is not entiredly true, since some data required by earlier steps
-can be dropped when you pipe the fire to later steps.)
+What data is needed for each fire depends on what modules are to be run.
+Generally, the further you are along the pipeline of modules, the more data you
+need.  (This is not entiredly true, since some data required by earlier modules
+can be dropped when you pipe the fire data into later modules.)
 
 #### Example - running ```fuelbeds```, ```consumption```, and ```emissions```:
 
-This example requires very little data, since it's starting off with fuelbeds,
+This example requires very little data, since it's starting off with ```fuelbeds```,
 one of the earlier modules in the pipeline.
 
     $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
@@ -47,7 +47,7 @@ one of the earlier modules in the pipeline.
         ]
     }'
 
-Another exmaple, with location data specified as lat + lng + size
+Another exmaple, with fire location data specified as lat + lng + size
 
     $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
@@ -93,15 +93,15 @@ it's not needed.
                             'ground fuels': {
                                 'basal accumulations': {
                                     'flaming': {
-                                        'CO': [3.3815120047017005e-05,
-                                            0.012923999999999995
+                                        'PM2.5': [
+                                            3.3815120047017005e-05
                                         ]
                                     },
                                     'residual': {
                                         'PM2.5': [4.621500211796271e-01]
                                     },
                                     'smoldering': {
-                                        'NH3': [6.424985839975172e-06]
+                                        'PM2.5': [6.424985839975172e-06]
                                     }
                                 }
                             }
@@ -116,6 +116,18 @@ it's not needed.
             }
         ]
     }'
+
+The nested keys in the emissions data are arbitrary.  The timeprofile
+module simply expects a hierarchy of keys.  Generally speaking, the hiearchy
+is of the form:
+
+    'emissions' > 'category' > 'subcategory' > 'phase' > 'species'
+
+The fact that the emissions data is in an array is because the consumptions
+module (more specifically, the underlying 'consume' module) outputs arrays.
+The length of the array equals the number of fuelbeds passed into consume.
+Since consume is called on each fuelbed separately, the arrays of consumption
+and emissions data are all length 1.
 
 Other fields:
 
