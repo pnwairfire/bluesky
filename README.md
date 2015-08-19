@@ -701,6 +701,10 @@ while the following is an example of the latter:
         ]
     }
 
+### Web APIs
+
+See [BlueSky Web](bluesky/web/README.md)
+
 ## Vagrant
 
 If you'd like to use vagrant to spin up virtual machines for running BlueSky
