@@ -14,32 +14,44 @@ need.  (This is not entiredly true, since some data required by earlier modules
 can be dropped when you pipe the fire data into later modules.)
 
 #### Required Fields
+
 ##### fuelbeds
  - ...
+
 ##### consumption
  - ...
+
 ##### emissions
  - ...
+
 ##### timeprofile
  - ...
+
 ##### plumerise
  - ...
+
 ##### dispersion
  - ...
 
 #### Optional Fields
+
 ##### fuelbeds
  - ...
+
 ##### consumption
  - 'fires' > 'location' > 'ecoregion'
  - 'fires' > 'type' -- 'rx', 'natural'
  - ...
+
 ##### emissions
  - ...
+
 ##### timeprofile
  - ...
+
 ##### plumerise
  - ...
+
 ##### dispersion
  - ...
 
