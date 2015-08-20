@@ -2,6 +2,83 @@
 
 ## APIs
 
+### GET /api/v1/domains/
+
+This API returns domains with ARL data
+
+#### Request
+
+ - url: http://hostname/api/v1/domains/
+ - method: GET
+
+#### Response
+
+    {
+        "<domain_id>": {
+            "dates": [
+                <date>,
+                ...
+            ],
+            "boundary": {
+                "center_latitude": <lat>,
+                "center_longitude": <lng>,
+                "width_longitude": <degrees>,
+                "height_latitude": <degrees>
+            },
+            <other_domain_data?>: <data>,
+            ...
+        },
+        ...
+    }
+
+#### Example
+
+    $ curl 'http://hostname/api/v1/domains/'
+
+    {
+        "PNW-4km: {
+            "dates": [
+                "20150612", "20150613"
+            ],
+            "boundary": {
+                "center_latitude": 45.0,
+                "center_longitude": -118.3,
+                "width_longitude": 20.0,
+                "height_latitude": 10.0
+            }
+        }
+    }
+
+### GET /api/v1/domains/<domain_id>/dates/
+
+This API returns the dates for which a has ARL data
+
+#### Request
+
+ - url: http://hostname/api/v1/domains/<domain_id>/dates
+ - method: GET
+
+#### Response
+
+    {
+        "dates": [
+           <date>,
+           ...
+        ]
+    }
+
+
+#### Example
+
+    $ curl 'http://hostname/api/v1/domains/PNW-4km/dates
+
+    {
+        "dates": [
+            "20150612", "20150613"
+        ]
+    }
+
+
 ### POST /api/v1/run/
 
 This API requires posted JSON with three top level keys -
@@ -10,7 +87,26 @@ The 'fires' key lists the one or more fires to process. The 'modules' key is
 the order specific list of modules through which the fires should be run.
 The 'config' key specifies configuration data and other control parameters.
 
-#### Fire Fields
+
+#### Request
+
+ - url: http://hostname/api/v1/domains/<domain_id>/dates
+ - method: POST
+ - post data:
+
+    {
+        "modules": <array_of_modules>,
+        "fires": <fire_data>,
+        "config": <configuration>
+    }
+
+#### Response
+
+    {
+        run_id: <guid>
+    }
+
+#### 'fires' Fields
 
 The top level 'fires' object has data added to it as it moves through
 the pipeline of modules.  Each module has its own set of required and optional
@@ -93,7 +189,7 @@ modules.)
 ###### Optional
  - ...
 
-#### Config Fields
+#### 'config' Fields
 
 The 'config' object has sub-objects specific to the modules to be run, as
 well as top level fields that apply to multiple modules. As with
@@ -418,3 +514,76 @@ Example:
             }
         }
     }'
+
+
+### GET /api/v1/run/<guid>/status
+
+This API returns the status of a specific run
+
+#### Request
+
+ - url: http://hostname/api/v1/run/<guid>/status
+ - method: GET
+
+#### Response
+
+    {
+        "complete": <boolean>,
+        "percent": <double>, /* (if available) */
+        "failed": <boolean>,
+        "message": <string>
+    }
+
+#### Example:
+
+    $ curl 'http://hostname/api/v1/run/abc123/status'
+
+    {
+        "complete": false,
+        "percent": 62.3, /* (if available) */
+        "failed": false,
+        "message": "Started HYSPLIT"
+    }
+
+### GET /api/v1/run/<guid>/output
+
+This API returns the output location for a specific run
+
+#### Request
+
+ - url: http://hostname/api/v1/run/<guid>/output
+ - method: GET
+
+#### Response
+
+
+#### Example:
+
+    $ curl 'http://hostname/api/v1/run/abc123/output'
+
+    {
+       "output": {
+           "directory": <absolute_path>,
+           "images": {
+               "hourly": [
+                   <filename|relative_path>,
+                   ...
+               ],
+               "daily": {
+                   "average": [
+                       <filename|relative_path>,
+                       ...
+                   ],
+                   "maximum": [
+                       <filename|relative_path>,
+                       ...
+                   ],
+               }
+           },
+           "netCDF": <filename|relative_path>,
+           "kmz": <filename|relative_path>,
+           "fireLocations": <filename|relative_path>, (needed?)
+           "fireEvents": <filename|relative_path>, (needed?)
+           "fireEmissions": <filename|relative_path> (needed?)
+       }
+    }
