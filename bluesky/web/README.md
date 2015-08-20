@@ -110,7 +110,7 @@ Another exmaple, with fire location data specified as lat + lng + size
         ]
     }'
 
-##### Running  ```timeprofile```, ```plumerise```, and ```dispersion```:
+##### Running  ```localmet```, ```timeprofile```, ```plumerise```, ```dispersion```, ```visualization```, ```export```:
 
 This example assumes you've already run up through emissions.  The consumption data
 that would have nested along side the emissions data has been stripped out, since
@@ -118,7 +118,7 @@ it's not needed.
 
     $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
-        "modules": ["timeprofile", "plumerise", "dispersion"],
+        "modules": ["localmet", "timeprofile", "plumerise", "dispersion", "visualization", "export"],
         "fires": [
             {
                 "id": "SF11C14225236095807750",
@@ -180,7 +180,7 @@ The length of each array equals the number of fuelbeds passed into consume.
 Since consume is called on each fuelbed separately, the arrays of consumption
 and emissions data will all be of length 1.
 
-##### Running ```ingestion```, ```fuelbeds```, ```consumption```, ```emissions```, ```timeprofile```, ```plumerise```, and ```dispersion```:
+##### Running ```ingestion```, ```fuelbeds```, ```consumption```, ```emissions```, ```localmet```, ```timeprofile```, ```plumerise```, ```dispersion```, ```visualization```, ```export```:
 
     $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
@@ -202,3 +202,11 @@ and emissions data will all be of length 1.
             }
         ]
     }
+
+## API Aliase
+
+### POST /api/v1/playground/
+
+This is just an alias for ```/api/v1/run/```, and running ```localmet```,
+```timeprofile```, ```plumerise```, ```dispersion```, ```visualization```,
+```export```.  (You don't have to specify the 'modules' key)
