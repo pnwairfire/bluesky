@@ -10,16 +10,15 @@ The 'fires' key lists the one or more fires to process. The 'modules' key is
 the order specific list of modules through which the fires should be run.
 The 'request' key specifies configuration data and other control parameters.
 
-What data is needed for each fire depends on what modules are to be run.
-Generally, the further you are along the pipeline of modules, the more data you
-need.  (This is not entiredly true, since some data required by earlier modules
-can be dropped when you pipe the fire data into later modules.)
-
 #### Fire Fields
 
 The top level 'fires' object has data added to it as it moves through
-the pipeline of modules.  Each module has its own set of required
-and optional fields that it uses
+the pipeline of modules.  Each module has its own set of required and optional
+fields that it uses, so the set of data needed for each fire depends
+on the modules to be run. Generally, the further you are along the pipeline
+of modules, the more data you need.  (Note, however, that some data required
+by earlier modules can be dropped when you pipe the fire data into later
+modules.)
 
 ##### fuelbeds
 
