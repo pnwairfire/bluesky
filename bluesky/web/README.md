@@ -15,9 +15,11 @@ Generally, the further you are along the pipeline of modules, the more data you
 need.  (This is not entiredly true, since some data required by earlier modules
 can be dropped when you pipe the fire data into later modules.)
 
-#### Request Fields
+#### Fire Fields
 
-The top level request object has sub-keys for the modules to be run.
+The top level 'fires' object has data added to it as it moves through
+the pipeline of modules.  Each module has its own set of required
+and optional fields that it uses
 
 ##### fuelbeds
 
@@ -35,6 +37,86 @@ The top level request object has sub-keys for the modules to be run.
 ###### Optional:
  - 'fires' > 'location' > 'ecoregion'
  - 'fires' > 'type' -- 'rx', 'natural'
+ - ...
+
+##### emissions
+
+###### Required
+ - ...
+
+###### Optional:
+ - ...
+
+##### localmet
+
+###### Required
+ - ...
+
+###### Optional:
+ - ...
+
+##### timeprofile
+
+###### Required
+ - ...
+
+###### Optional:
+ - ...
+
+##### plumerise
+
+###### Required
+ - ...
+
+###### Optional:
+ - ...
+
+##### dispersion
+
+###### Required
+ - module -- hysplit",
+ - start -- 20150121T000000Z",
+ - end -- 20150123T000000Z",
+ - met_domain -- PNW-4km"
+
+###### Optional:
+ - ...
+
+##### visualization
+
+###### Required
+ - ...
+
+###### Optional:
+ - ...
+
+##### export
+
+###### Required
+ - ...
+
+###### Optional:
+ - ...
+
+#### Request Fields
+
+The top level 'request' object has sub-keys for the modules to be run. As with
+the fire data, each module has its own set of required and optional fields.
+
+##### fuelbeds
+
+###### Required
+ - ...
+
+###### Optional:
+ - ...
+
+##### consumption
+
+###### Required
+ - ...
+
+###### Optional:
  - ...
 
 ##### emissions
