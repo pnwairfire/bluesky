@@ -20,64 +20,81 @@ can be dropped when you pipe the fire data into later modules.)
 The top level request object has sub-keys for the modules to be run.
 
 ##### fuelbeds
+
 ###### Required
  - ...
+
 ###### Optional:
  - ...
 
 ##### consumption
+
 ###### Required
  - ...
+
 ###### Optional:
  - 'fires' > 'location' > 'ecoregion'
  - 'fires' > 'type' -- 'rx', 'natural'
  - ...
 
 ##### emissions
+
 ###### Required
  - ...
+
 ###### Optional:
  - ...
 
 ##### localmet
+
 ###### Required
  - ...
+
 ###### Optional:
  - ...
 
 ##### timeprofile
+
 ###### Required
  - ...
+
 ###### Optional:
  - ...
 
 ##### plumerise
+
 ###### Required
  - ...
+
 ###### Optional:
  - ...
 
 ##### dispersion
+
 ###### Required
  - module -- hysplit",
  - start -- 20150121T000000Z",
  - end -- 20150123T000000Z",
  - met_domain -- PNW-4km"
+
 ###### Optional:
  - ...
 
 ##### visualization
+
 ###### Required
  - ...
+
 ###### Optional:
  - ...
 
 ##### export
+
 ###### Required
  - ...
+
 ###### Optional:
  - ...
-
 
 #### Examples
 
