@@ -162,7 +162,30 @@ it's not needed.
                     "end": "20150121T000000Z"
                 }
             }
-        ]
+        ],
+        "request": {
+            "localmet": {
+                /* ... */
+            },
+            "timeprofile": {
+                "module": "standard" /* or "feps_rx_timing" or "custom" */
+            },
+            "plumerise": {
+                "module": "sev"
+            },
+            "dispersion": {
+                "module": "hysplit",
+                "start": "20150121T000000Z",
+                "end": "20150123T000000Z",
+                "met_domain": "PNW-4km"
+            },
+            "visualization": {
+                /* ... */
+            },
+            "export"" {
+                "module": "playground" /* or "bs_daily" */
+            }
+        }
     }'
 
 The nested keys in the emissions data are arbitrary.  The timeprofile
@@ -205,8 +228,16 @@ and emissions data will all be of length 1.
 
 ## API Aliase
 
-### POST /api/v1/playground/
+### POST /api/v1/playground/1/
+
+This is just an alias for ```/api/v1/run/```, and running ```ingestion```,
+```fuelbeds```, ```consumption```, ```emissions``` - i.e. you don't have
+to specify the 'modules' key.  Also
+
+### POST /api/v1/playground/2/
 
 This is just an alias for ```/api/v1/run/```, and running ```localmet```,
 ```timeprofile```, ```plumerise```, ```dispersion```, ```visualization```,
-```export```.  (You don't have to specify the 'modules' key)
+```export```.  As with /1/, you don't have to specify either the 'modules'
+key or the export type.
+
