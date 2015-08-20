@@ -5,19 +5,19 @@
 ### POST /api/v1/run/
 
 This API requires posted JSON with three top level keys -
-'modules', 'fires', and 'request'.
+'modules', 'fires', and 'config'.
 The 'fires' key lists the one or more fires to process. The 'modules' key is
 the order specific list of modules through which the fires should be run.
-The 'request' key specifies configuration data and other control parameters.
+The 'config' key specifies configuration data and other control parameters.
 
 #### Fire Fields
 
 The top level 'fires' object has data added to it as it moves through
 the pipeline of modules.  Each module has its own set of required and optional
-fields that it uses, so the set of data needed for each fire depends
+fields that it uses, so that the set of data needed for each fire depends
 on the modules to be run. Generally, the further you are along the pipeline
 of modules, the more data you need.  (Note, however, that some data required
-by earlier modules can be dropped when you pipe the fire data into later
+by earlier modules can be dropped when you pipe the fire data into downstream
 modules.)
 
 ##### fuelbeds
@@ -25,7 +25,7 @@ modules.)
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### consumption
@@ -33,17 +33,16 @@ modules.)
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - 'fires' > 'location' > 'ecoregion'
- - 'fires' > 'type' -- 'rx', 'natural'
- - ...
+ - 'fires' > 'type' -- fire type (ex. 'rx' or 'natural')
 
 ##### emissions
 
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### localmet
@@ -51,7 +50,7 @@ modules.)
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### timeprofile
@@ -59,7 +58,7 @@ modules.)
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### plumerise
@@ -67,18 +66,15 @@ modules.)
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### dispersion
 
 ###### Required
- - module -- hysplit",
- - start -- 20150121T000000Z",
- - end -- 20150123T000000Z",
- - met_domain -- PNW-4km"
+ - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### visualization
@@ -86,7 +82,7 @@ modules.)
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### export
@@ -94,20 +90,22 @@ modules.)
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
-#### Request Fields
+#### Config Fields
 
-The top level 'request' object has sub-keys for the modules to be run. As with
+The 'config' object has sub-objects specific to the modules to be run, as
+well as top level fields that apply to multiple modules. As with
 the fire data, each module has its own set of required and optional fields.
+
 
 ##### fuelbeds
 
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### consumption
@@ -115,7 +113,7 @@ the fire data, each module has its own set of required and optional fields.
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### emissions
@@ -123,7 +121,7 @@ the fire data, each module has its own set of required and optional fields.
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### localmet
@@ -131,15 +129,16 @@ the fire data, each module has its own set of required and optional fields.
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### timeprofile
 
 ###### Required
- - ...
+ - 'config' > 'start' -- modeling start time (ex. "20150121T000000Z")
+ - 'config' > 'end' -- modeling end time (ex. "20150123T000000Z")
 
-###### Optional:
+###### Optional
  - ...
 
 ##### plumerise
@@ -147,26 +146,25 @@ the fire data, each module has its own set of required and optional fields.
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### dispersion
 
 ###### Required
- - module -- hysplit",
- - start -- 20150121T000000Z",
- - end -- 20150123T000000Z",
- - met_domain -- PNW-4km"
+ - 'config' > 'start' -- modeling start time (ex. "20150121T000000Z")
+ - 'config' > 'end' -- modeling end time (ex. "20150123T000000Z")
+ - 'config' > 'met_domain' -- met domain (ex. "PNW-4km")
 
-###### Optional:
- - ...
+###### Optional
+ - 'config' > 'dispersion' > 'module' -- dispersion module; defaults to "hysplit"
 
 ##### visualization
 
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 ##### export
@@ -174,7 +172,7 @@ the fire data, each module has its own set of required and optional fields.
 ###### Required
  - ...
 
-###### Optional:
+###### Optional
  - ...
 
 #### Examples
@@ -285,7 +283,7 @@ it's not needed.
                 }
             }
         ],
-        "request": {
+        "config": {
             "localmet": {
                 /* ... */
             },
@@ -411,27 +409,12 @@ Example:
                 }
             }
         ],
-        "request": {
-            "localmet": {
-                /* ... */
-            },
+        "config": {
+            "start": "20150121T000000Z",
+            "end": "20150123T000000Z",
+            "met_domain": "PNW-4km",
             "timeprofile": {
-                "module": "standard" /* or "feps_rx_timing" or "custom" */
-            },
-            "plumerise": {
-                "module": "sev"
-            },
-            "dispersion": {
-                "module": "hysplit",
-                "start": "20150121T000000Z",
-                "end": "20150123T000000Z",
-                "met_domain": "PNW-4km"
-            },
-            "visualization": {
-                /* ... */
-            },
-            "export"" {
-                "module": "playground" /* or "bs_daily" */
+                "module": "custom"
             }
         }
     }'
