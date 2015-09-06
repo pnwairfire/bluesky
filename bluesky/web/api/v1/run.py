@@ -3,22 +3,15 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-from bsslib.web.lib.auth import b_auth
+import tornado.ioloop
 
-class BlueSkyRunScheduledJobs(Resource):
+#from bluesky.web.lib.auth import b_auth
+from bluesky import modules, models
 
-    def get(self):
-        return ScheduledRuns(REDIS_URL=config.REDIS_URL,
-            SKIP_FORM_VALIDATION=config.SKIP_FORM_VALIDATION).get()
+class Run(tornado.web.RequestHandler):
 
     def post(self):
-        wrapper = ScheduledRuns(REDIS_URL=config.REDIS_URL,
-            SKIP_FORM_VALIDATION=config.SKIP_FORM_VALIDATION)
-        wrapper.create(**request.get_json(force=True))
-        return '', 200 # TODO: how to return truly empty response body
-
-    def delete(self):
-        wrapper = ScheduledRuns(REDIS_URL=config.REDIS_URL,
-            SKIP_FORM_VALIDATION=config.SKIP_FORM_VALIDATION)
-        wrapper.cancel(**request.form.to_dict())
-        return '', 200 # TODO: how to return truly empty response body
+        # module = GET MODILE FROM REQUEST
+        # r = CALL BSP
+        # self.write(r)
+        self.write('hello')

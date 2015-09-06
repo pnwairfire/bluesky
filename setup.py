@@ -22,7 +22,8 @@ setup(
         "eflookup>=0.6.2",
         "emitcalc>=0.3.2",
         "fccsmap>=0.1.6",
-        "apps-consume4>=4.1.2"
+        "apps-consume4>=4.1.2",
+        "tornado==4.2.1"
     ],
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/pyairfire/",

@@ -3,15 +3,14 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-from flask import Flask
-from flask_restful import Resource, Api
+import tornado.ioloop
+import tornado.web
 
-app = Flask(__name__)
-api = Api(app)
-
-from .api.run import Run
-api.add_resource(run, '/run')
-api.add_resource(run, '/run/')
+from .api.v1.run import Run
+application = tornado.web.Application([
+    (r"/api/v1/run/", Run),
+])
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    application.listen(8888)
+    tornado.ioloop.IOLoop.current().start()
