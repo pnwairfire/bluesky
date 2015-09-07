@@ -170,7 +170,7 @@ def main():
     validate_args(args)
     scripting.utils.log_config(args.config_options)
 
-    modules =import_modules(args)
+    modules = import_modules(args)
     fires_manager = load_fires(args)
     run_modules(args, modules, fires_manager)
     dump_fires(args, fires_manager)
