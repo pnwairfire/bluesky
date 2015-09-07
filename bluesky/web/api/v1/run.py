@@ -3,6 +3,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import importlib
 import io
 import json
 import tornado.web
@@ -34,4 +35,9 @@ class Run(tornado.web.RequestHandler):
             config = data.get('config') or {}
             for module in modules:
                 module.run(fires, config)
-            self.write({"fires":fires})
+
+            # If you pass a dict into self.write, it will dump it to json and set
+            # content-type to json;  we need to specify a json encoder, though, so
+            # we'll manaually set the header adn dump the json
+            self.set_header('Content-Type', 'application/json') #; charset=UTF-8')
+            self.write(json.dumps({"fires":fires}, cls=models.fires.FireEncoder))

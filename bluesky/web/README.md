@@ -398,7 +398,7 @@ it's not needed.
             "visualization": {
                 /* ... */
             },
-            "export"" {
+            "export": {
                 "module": "playground" /* or "bs_daily" */
             }
         }
