@@ -814,3 +814,39 @@ Now you're ready to run bsp:
         ]
     }' > fires.json
     bsp -i fires.json ingestion fuelbeds
+
+## Bluesky web API
+
+One component of the bluesky package is a tornado web service, wrapping bsp,
+that can be started by simply running ```bsp-web```.
+
+### Usage
+
+For API usage, see it's separate [README.md](./bluesky/web/README.md).
+
+### Fabric
+
+For the convenience of those wishing to run the web service on a remove server,
+the bluesky git repo contains a fabfile defining tasks for setting up,
+deploying to, and restarting the service on a remote server.
+
+To see what tasks are available, clone the repo, cd into repo, and run
+
+    git clone https://github.com/pnwairfire/bluesky.git
+    cd bluesky
+    BLUESKYWEB_SERVERS=username@hostname fab -l
+
+(The 'BLUESKYWEB_SERVERS=username@hostname' is needed because it's used to set
+the role definitions, which are be done at the module scope.)
+
+To see documentation for a specific task, use the '-d' option. E.g.:
+
+    BLUESKYWEB_SERVERS=username@hostname fab -d deploy
+
+
+An example with two remote servers
+
+    BLUESKYWEB_SERVERS=username-a@hostname-a,username-b@hostname-b fab setup
+    BLUESKYWEB_SERVERS=username-a@hostname-a,username-b@hostname-b fab deploy
+
+Note that the deploy task takes care of restarting.

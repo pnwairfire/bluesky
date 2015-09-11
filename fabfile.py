@@ -1,7 +1,7 @@
 # fab tasks for deplying and restarting bsp nodejs server, proxied via apache
 #
 # Example:
-#  > BLUESKY_WEB_SERVERS=foo@bar.com fab deploy
+#  > BLUESKYWEB_SERVERS=username@hostname.com fab deploy
 #
 # Using Apache to proxy:
 #  If you'd like to let apache proxy requests to the bluesky web server,
@@ -46,10 +46,10 @@ def error(msg):
 ## Role definitions and env vars
 ##
 
-if os.environ.get('BLUESKY_WEB_SERVERS'):
-    error('Specify BLUESKY_WEB_SERVERS; ex. BLUESKY_WEB_SERVERS=foo@bar.com,bar@baz.com')
+if not os.environ.get('BLUESKYWEB_SERVERS'):
+    error('Specify BLUESKYWEB_SERVERS; ex. BLUESKYWEB_SERVERS=username@hostname.com,bar@baz.com')
 env.roledefs.update({
-    'web': os.environ.get('BLUESKY_WEB_SERVERS').split(',')
+    'web': os.environ.get('BLUESKYWEB_SERVERS').split(',')
 })
 
 PYTHON_VERSION = os.environ.get('PYTHON_VERSION') or "2.7.3"
@@ -124,16 +124,20 @@ class prepare_code:
 @task
 @roles('web')
 def setup():
-    """Sets up server to run bluesky
+    """Sets up server to run bluesky web
 
     Required:
-     - BLUESKY_WEB_SERVERS
+     - BLUESKYWEB_SERVERS
+
+    Optional:
+     - BLUESKYWEB_USER (default: www-data)
+     - BLUESKY_VERSION (default: HEAD)
 
     Examples:
-        > AIRTOOLS_ENV=vm fab -A setup
+        > BLUESKYWEB_SERVERS=username@hostname fab setup
     """
     blueskyweb_user = env_var_or_prompt_for_input('BLUESKYWEB_USER',
-        'User to run blueskyweb', BLUESKYWEB_USER)
+        'User to run blueskyweb', DEFAULT_BLUESKYWEB_USER)
 
     #sudo('which node || sudo apt-get install -y nodejs')
     install_python_tools()
@@ -149,20 +153,23 @@ def setup():
 @task
 @roles('web')
 def deploy():
-    """Deploys websky code to web server
+    """Deploys bluesky code to server and starts web service
 
     Required:
-     - BLUESKY_WEB_SERVERS
+     - BLUESKYWEB_SERVERS
+
+    Optional:
+     - BLUESKYWEB_USER (default: www-data)
 
     Examples:
-        > AIRTOOLS_ENV=vm fab -A deploy
+        > BLUESKYWEB_SERVERS=username@hostname fab deploy
     """
     with prepare_code() as repo_path_name:
         with cd(repo_path_name):
             print("Installing bluesky package...")
             sudo('PYENV_VERSION={} python setup.py install'.format(VIRTUALENV_NAME))
             blueskyweb_user = env_var_or_prompt_for_input('BLUESKYWEB_USER',
-                'User to run blueskyweb', BLUESKYWEB_USER)
+                'User to run blueskyweb', DEFAULT_BLUESKYWEB_USER)
             print('Preparing upstart script and moving to /etc/init/ ...')
             upstart_script = './init/blueskyweb.conf'
             contrib.files.sed(upstart_script, '__BLUESKYWEBUSER__'. blueskyweb_user)
@@ -176,13 +183,12 @@ def deploy():
 @task
 @roles('web')
 def restart():
-    """Restarts airtools nodejs server
+    """Restarts bluesky web service
 
     Required:
-     - AIRTOOLS_ENV
-     - FABRIC_USER (only reqired if WEBSKY_ENV is 'production' or 'staging')
+     - BLUESKYWEB_SERVERS
 
     Examples:
-        > AIRTOOLS_ENV=vm fab -A restart
+        > BLUESKYWEB_SERVERS=username@hostname fab deploy
     """
     sudo('service blueskyweb restart')
