@@ -13,7 +13,8 @@ setup(
     author_email='jdubowy@gmail.com',
     packages=find_packages(),
     scripts=[
-        'bin/bsp'
+        'bin/bsp',
+        'bin/bsp-web'
     ],
     url='https://github.com/pnwairfire/bluesky',
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
