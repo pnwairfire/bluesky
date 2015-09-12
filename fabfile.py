@@ -22,6 +22,7 @@
 
 import datetime
 import os
+import subprocess
 import sys
 from fabric import contrib
 from fabric.api import *
@@ -54,8 +55,10 @@ env.roledefs.update({
 
 PYTHON_VERSION = os.environ.get('PYTHON_VERSION') or "2.7.3"
 VIRTUALENV_NAME = "bluesky-web-{}".format(PYTHON_VERSION)
-REPO_GIT_URL = "git@github.com:pnwairfire/bluesky.git"
+REPO_GIT_URL = "https://github.com/pnwairfire/bluesky.git"
 DEFAULT_BLUESKYWEB_USER = 'www-data'
+DEFAULT_HOME_DIR = '/var/www/'
+DEFAULT_DOT_FILE = '.profile'
 
 ##
 ## Helper methods
@@ -68,7 +71,12 @@ def env_var_or_prompt_for_input(env_var_name, msg, default):
     else:
         return os.environ.get(env_var_name)
 
-def install_python_tools():
+# Copied from http://stackoverflow.com/questions/377017/test-if-executable-exists-in-python
+def cmd_exists(cmd):
+    return subprocess.call("type " + cmd, shell=True,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE) == 0
+
+def install_python_tools(blueskyweb_user, home_dir, dot_file):
     sudo('which git || apt-get install git-core')
     if not cmd_exists('pyenv'):
         print("Installing pyenv...")
@@ -77,7 +85,8 @@ def install_python_tools():
     print("Installing pyenv environment {}...".format(VIRTUALENV_NAME))
     install_pyenv_environment(PYTHON_VERSION, VIRTUALENV_NAME)
     for role in env['effective_roles']:
-        add_pyenv_to_dot_file(**config.DOT_FILES[role])
+        add_pyenv_to_dot_file(user=blueskyweb_user, home_dir=home_dir,
+            dot_file=dot_file)
 
 class prepare_code:
     """Context manager that clones repo on enter and deletes it on exit.
@@ -104,18 +113,18 @@ class prepare_code:
         repo_dir_name = 'pnwairfire-bluesky-{}'.format(bluesky_version)
 
         with lcd('/tmp/'):
-            local('git clone %s %s' % (REPO_GIT_URL, repo_dir_name))
+            run('git clone %s %s' % (REPO_GIT_URL, repo_dir_name))
 
         self.repo_path_name = '/tmp/{}'.format(repo_dir_name)
-        with lcd(repo_path_name):
-            local('git checkout %s' % (bluesky_version))
-            local('rm .python-version')
+        with lcd(self.repo_path_name):
+            run('git checkout %s' % (bluesky_version))
+            run('rm .python-version')
         return self.repo_path_name
 
     def clean_up(self):
         """Removes local repo *if it wasn't already existing*
         """
-        local('rm -rf %s*' % (self.repo_path_name))
+        run('rm -rf %s*' % (self.repo_path_name))
 
 ##
 ## Tasks
@@ -131,16 +140,20 @@ def setup():
 
     Optional:
      - BLUESKYWEB_USER (default: www-data)
-     - BLUESKY_VERSION (default: HEAD)
+     - PYTHON_VERSION (default: 2.7.3)
 
     Examples:
         > BLUESKYWEB_SERVERS=username@hostname fab setup
     """
     blueskyweb_user = env_var_or_prompt_for_input('BLUESKYWEB_USER',
         'User to run blueskyweb', DEFAULT_BLUESKYWEB_USER)
+    home_dir = env_var_or_prompt_for_input('HOME_DIR',
+        "blueskyweb user's home dir", DEFAULT_HOME_DIR)
+    dot_file = env_var_or_prompt_for_input('DOT_FILE',
+        "bluesky web user's dot file", DEFAULT_DOT_FILE)
 
     #sudo('which node || sudo apt-get install -y nodejs')
-    install_python_tools()
+    install_python_tools(blueskyweb_user, home_dir, dot_file)
 
     # print('Uploading apache upstart script...')
     # put('./init/', TMP_DIR)
@@ -160,6 +173,7 @@ def deploy():
 
     Optional:
      - BLUESKYWEB_USER (default: www-data)
+     - BLUESKY_VERSION (default: HEAD)
 
     Examples:
         > BLUESKYWEB_SERVERS=username@hostname fab deploy
