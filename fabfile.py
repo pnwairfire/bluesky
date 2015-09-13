@@ -191,8 +191,8 @@ def provision():
         run('wget http://download.osgeo.org/gdal/1.11.2/gdal-1.11.2.tar.gz')
         run('tar xvfz gdal-1.11.2.tar.gz')
         with cd('/tmp/gdal-1.11.2'):
-            run('./configure --with-python --prefix=/usr')
-            run('make')
+            sudo('./configure --with-python --prefix=/usr')
+            sudo('make')
             sudo('make install')
             sudo('ldconfig')
     execute_in_virtualenv('apt-get install -y python-gdal')
@@ -218,7 +218,11 @@ def deploy():
             print("Installing bluesky package...")
             execute_in_virtualenv('pip install --trusted-host '
                 'pypi.smoke.airfire.org -r requirements.txt')
-            execute_in_virtualenv('python setup.py install')
+            execute_in_virtualenv('python setup.py install '
+                # '--gdal-config=/usr/bin/gdal-config '
+                # '--include-dirs=/usr/include/ '
+                # '--library-dirs=/usr/lib/'
+                )
 
         blueskyweb_user = env_var_or_prompt_for_input('BLUESKYWEB_USER',
             'User to run blueskyweb', DEFAULT_BLUESKYWEB_USER)
