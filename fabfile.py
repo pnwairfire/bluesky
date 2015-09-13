@@ -115,7 +115,7 @@ class prepare_code:
 
     def get_code(self):
         bluesky_version = env_var_or_prompt_for_input('BLUESKY_VERSION',
-            'Git tag or commit to deploy', 'HEAD')
+            'Git tag, branch, or commit to deploy', 'HEAD')
         repo_dir_name = 'pnwairfire-bluesky-{}'.format(bluesky_version)
 
         with cd('/tmp/'):
@@ -204,15 +204,16 @@ def deploy():
             execute_in_virtualenv('pip install --trusted-host '
                 'pypi.smoke.airfire.org -r requirements.txt')
             execute_in_virtualenv('python setup.py install')
-            blueskyweb_user = env_var_or_prompt_for_input('BLUESKYWEB_USER',
-                'User to run blueskyweb', DEFAULT_BLUESKYWEB_USER)
-            print('Preparing upstart script and moving to /etc/init/ ...')
-            upstart_script = './init/blueskyweb.conf'
-            contrib.files.sed(upstart_script, '__BLUESKYWEBUSER__'. blueskyweb_user)
-            contrib.files.sed(upstart_script, '__VIRTUALENV__', VIRTUALENV_NAME)
-            sudo('mv {}/init/blueskyweb.conf /etc/init'.format(TMP_DIR))
-            sudo('chown root:root /etc/init/blueskyweb.conf')
-            sudo('chmod 644 /etc/init/blueskyweb.conf')
+
+        blueskyweb_user = env_var_or_prompt_for_input('BLUESKYWEB_USER',
+            'User to run blueskyweb', DEFAULT_BLUESKYWEB_USER)
+        print('Preparing upstart script and moving to /etc/init/ ...')
+        upstart_script = '{}/init/blueskyweb.conf'.format(repo_path_name)
+        contrib.files.sed(upstart_script, '__BLUESKYWEBUSER__', blueskyweb_user)
+        contrib.files.sed(upstart_script, '__VIRTUALENV__', VIRTUALENV_NAME)
+        sudo('mv {} /etc/init'.format(upstart_script))
+        sudo('chown root:root /etc/init/blueskyweb.conf')
+        sudo('chmod 644 /etc/init/blueskyweb.conf')
 
     execute(restart)
 
