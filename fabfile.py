@@ -112,11 +112,13 @@ class prepare_code:
             'Git tag or commit to deploy', 'HEAD')
         repo_dir_name = 'pnwairfire-bluesky-{}'.format(bluesky_version)
 
-        with lcd('/tmp/'):
+        with cd('/tmp/'):
+            if contrib.files.exists(repo_dir_name):
+                sudo('rm -rf %s*' % (repo_dir_name))
             run('git clone %s %s' % (REPO_GIT_URL, repo_dir_name))
 
         self.repo_path_name = '/tmp/{}'.format(repo_dir_name)
-        with lcd(self.repo_path_name):
+        with cd(self.repo_path_name):
             run('git checkout %s' % (bluesky_version))
             run('rm .python-version')
         return self.repo_path_name
@@ -124,7 +126,7 @@ class prepare_code:
     def clean_up(self):
         """Removes local repo *if it wasn't already existing*
         """
-        run('rm -rf %s*' % (self.repo_path_name))
+        sudo('rm -rf %s*' % (self.repo_path_name))
 
 ##
 ## Tasks
