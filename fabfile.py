@@ -163,6 +163,26 @@ def setup():
     #sudo('which node || sudo apt-get install -y nodejs')
     install_python_tools(blueskyweb_user, home_dir, dot_file)
 
+    print('Creating remote root directory...')
+    #sudo('mkdir -p /var/www/blueskyweb')
+    sudo('mkdir -p /var/www/blueskyweb/logs/')
+    sudo('chown -R {user}:{user} /var/www/blueskyweb'.format(user=blueskyweb_user))
+
+@task
+@roles('web')
+def provision():
+    """Provisions bluesky web server with dependencies not installed with pip
+
+    Required:
+     - BLUESKYWEB_SERVERS
+
+    Optional:
+     - BLUESKYWEB_USER (default: www-data)
+     - PYTHON_VERSION (default: 2.7.3)
+
+    Examples:
+        > BLUESKYWEB_SERVERS=username@hostname fab provision
+    """
     print('installing dependencies...')
     sudo('apt-get install -y libnetcdf-dev')
     sudo('apt-get install -y proj')
@@ -177,11 +197,6 @@ def setup():
             sudo('ldconfig')
     execute_in_virtualenv('apt-get install -y python-gdal')
     sudo('apt-get install libxml2-dev libxslt1-dev')
-
-    print('Creating remote root directory...')
-    #sudo('mkdir -p /var/www/blueskyweb')
-    sudo('mkdir -p /var/www/blueskyweb/logs/')
-    sudo('chown -R www-data:www-data /var/www/blueskyweb')
 
 @task
 @roles('web')
