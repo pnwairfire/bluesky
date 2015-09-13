@@ -88,6 +88,12 @@ def install_python_tools(blueskyweb_user, home_dir, dot_file):
         add_pyenv_to_dot_file(user=blueskyweb_user, home_dir=home_dir,
             dot_file=dot_file)
 
+def execute_in_virtualenv(cmd):
+    """execute_in_virtualenv is for running setup/deploy/takedown type
+    tasks within a vritualenv.
+    """
+    sudo("PYENV_VERSION={} {}".format(VIRTUALENV_NAME, cmd))
+
 class prepare_code:
     """Context manager that clones repo on enter and deletes it on exit.
     """
@@ -157,8 +163,20 @@ def setup():
     #sudo('which node || sudo apt-get install -y nodejs')
     install_python_tools(blueskyweb_user, home_dir, dot_file)
 
-    # print('Uploading apache upstart script...')
-    # put('./init/', TMP_DIR)
+    print('installing dependencies...')
+    sudo('apt-get install -y libnetcdf-dev')
+    sudo('apt-get install -y proj')
+    execute_in_virtualenv('pip install numpy==1.8.0')
+    with cd('/tmp/'):
+        run('wget http://download.osgeo.org/gdal/1.11.2/gdal-1.11.2.tar.gz')
+        run('tar xvfz gdal-1.11.2.tar.gz')
+        with cd('/tmp/gdal-1.11.2'):
+            run('./configure --with-python --prefix=/usr')
+            run('make')
+            sudo('make install')
+            sudo('ldconfig')
+    execute_in_virtualenv('apt-get install -y python-gdal')
+    sudo('apt-get install libxml2-dev libxslt1-dev')
 
     print('Creating remote root directory...')
     #sudo('mkdir -p /var/www/blueskyweb')
@@ -183,7 +201,9 @@ def deploy():
     with prepare_code() as repo_path_name:
         with cd(repo_path_name):
             print("Installing bluesky package...")
-            sudo('PYENV_VERSION={} python setup.py install'.format(VIRTUALENV_NAME))
+            execute_in_virtualenv('pip install --trusted-host '
+                'pypi.smoke.airfire.org -r requirements.txt')
+            execute_in_virtualenv('python setup.py install')
             blueskyweb_user = env_var_or_prompt_for_input('BLUESKYWEB_USER',
                 'User to run blueskyweb', DEFAULT_BLUESKYWEB_USER)
             print('Preparing upstart script and moving to /etc/init/ ...')
