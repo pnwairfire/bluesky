@@ -64,7 +64,6 @@ class FireIngester(object):
 
         self._ingest_custom_fields(fire)
         self._set_defaults(fire)
-        self._set_derived_fields(fire)
         self._validate(fire)
 
     ##
@@ -79,44 +78,6 @@ class FireIngester(object):
         # TODO: set defaults for any fields that aren't defined; make the
         # defaults configurable, and maybe hard code any
         pass
-
-    def _set_derived_fields(self, fire):
-        # TODO: set any other fields (besides 'name') that aren't defined and
-        # can and should be set from other fields (like name, id, etc.)
-        self._set_derived_name(fire)
-
-    def _set_derived_name(self, fire):
-        if fire.get('name'):
-            return
-
-        lat = lng = None
-        location = fire.get('location')
-        if location:
-            perimeter = location.get('perimeter')
-            if perimeter:
-                if perimeter.get('type') == 'MultiPolygon':
-                    coords = perimeter.get('coordinates',[])
-                    if (0 < len(coords) and 0 < len(coords[0]) and
-                            0 < len(coords[0][0]) and 0 < len(coords[0][0][0])):
-                        lng = coords[0][0][0][0]
-                        lat = coords[0][0][0][1]
-                    # else, invalid data; just exlude lat/lng from name
-                # TODO: support other perimeter geo data type/formats
-            elif location.get('latitude'): # implies lng is defined too
-                lat = location['latitude']
-                lng = location['longitude']
-
-        fire_id = fire.get("id")
-        fire_name = "Fire %s" % (fire_id) if fire_id else "Unnamed fire"
-
-        event_id = fire.get('event_id')
-        if event_id:
-            fire_name += " from event %s" % (event_id)
-
-        if lat and lng:
-            fire_name += " near %.5f, %.5f" % (lat, lng)
-
-        fire['name'] = fire_name
 
     def _validate(self, fire):
         # TODO: make sure required fields are all defined, and validate
