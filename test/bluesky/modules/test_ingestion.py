@@ -53,8 +53,10 @@ class TestIngester(object):
     def test_fire_with_maximum_optional_fields(self):
         f = {
             "id": "SF11C14225236095807750",
-            "event_id": "SF11E826544",
-            "name": "Natural Fire near Snoqualmie Pass, WA",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             "location": {
                 "perimeter": {
                     "type": "MultiPolygon",
@@ -80,8 +82,10 @@ class TestIngester(object):
         }
         expected = {
             "id": "SF11C14225236095807750",
-            "event_id": "SF11E826544",
-            "name": "Natural Fire near Snoqualmie Pass, WA",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             'input': copy.deepcopy(f),
             'location': copy.deepcopy(f['location']),
             'time': copy.deepcopy(f['time'])
@@ -92,8 +96,10 @@ class TestIngester(object):
     def test_flat_fire(self):
         f = {
             "id": "SF11C14225236095807750",
-            "event_id": "SF11E826544",
-            "name": "Natural Fire near Snoqualmie Pass, WA",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             "perimeter": {
                 "type": "MultiPolygon",
                 "coordinates": [
@@ -116,8 +122,10 @@ class TestIngester(object):
         expected = {
             'input': copy.deepcopy(f),
             "id": "SF11C14225236095807750",
-            "event_id": "SF11E826544",
-            "name": "Natural Fire near Snoqualmie Pass, WA",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             'location': {
                 "perimeter": {
                     "type": "MultiPolygon",
@@ -147,8 +155,10 @@ class TestIngester(object):
     def test_flat_and_nested_fire(self):
         f = {
             "id": "SF11C14225236095807750",
-            "event_id": "SF11E826544",
-            "name": "Natural Fire near Snoqualmie Pass, WA",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             "location": {
                 "perimeter": {
                     "type": "MultiPolygon",
@@ -175,8 +185,10 @@ class TestIngester(object):
         expected = {
             'input': copy.deepcopy(f),
             "id": "SF11C14225236095807750",
-            "event_id": "SF11E826544",
-            "name": "Natural Fire near Snoqualmie Pass, WA",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             'location': {
                 "perimeter": {
                     "type": "MultiPolygon",
@@ -207,8 +219,10 @@ class TestIngester(object):
     def test_fire_with_ignored_fields(self):
         f = {
             "id": "SF11C14225236095807750",
-            "event_id": "SF11E826544",
-            "name": "Natural Fire near Snoqualmie Pass, WA",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             "location": {
                 "perimeter": {
                     "type": "MultiPolygon",
@@ -237,8 +251,10 @@ class TestIngester(object):
         expected = {
             'input': copy.deepcopy(f),
             "id": "SF11C14225236095807750",
-            "event_id": "SF11E826544",
-            "name": "Natural Fire near Snoqualmie Pass, WA",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             'location': copy.deepcopy(f['location']),
             'time': copy.deepcopy(f['time'])
         }
@@ -249,8 +265,10 @@ class TestIngester(object):
     def test_fire_with_perimeter_and_lat_lng(self):
         f = {
             "id": "SF11C14225236095807750",
-            "event_id": "SF11E826544",
-            "name": "Natural Fire near Snoqualmie Pass, WA",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             "location": {
                 "perimeter": {
                     "type": "MultiPolygon",
@@ -274,8 +292,10 @@ class TestIngester(object):
         expected = {
             'input': copy.deepcopy(f),
             "id": "SF11C14225236095807750",
-            "event_id": "SF11E826544",
-            "name": "Natural Fire near Snoqualmie Pass, WA",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             'location': {
                 'perimeter': copy.deepcopy(f['location']['perimeter'])
             }

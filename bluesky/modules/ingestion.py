@@ -33,10 +33,10 @@ class FireIngester(object):
         self._config = config
 
     SCALAR_FIELDS = {
-        "id", "name", "event_id"
+        "id",
     }
     NESTED_FIELDS = {
-        "location", "time"
+        "location", "time", "event_of"
     }
 
     ##
@@ -143,6 +143,16 @@ class FireIngester(object):
 
         fire['location'].update(self._get_fields(fire, 'location',
             self.OPTIONAL_LOCATION_FIELDS))
+
+
+    OPTIONAL_EVENT_OF_FIELDS = [
+        "name", "id"
+    ]
+
+    def _ingest_event_of(self, fire):
+        event_of_dict = self._get_fields(fire, 'event_of', ["name", "id"])
+        if event_of_dict:
+            fire['event_of'] = event_of_dict
 
     OPTIONAL_TIME_FIELDS = [
         "start", "end", "timezone"
