@@ -146,7 +146,7 @@ class TestFiresManager:
         fires_manager.loads()
         assert [] == fires_manager.fires
         assert {} == fires_manager.meta
-        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{"fires":[]}'))
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{"fire_locations":[]}'))
         fires_manager.loads()
         assert [] == fires_manager.fires
         assert {} == fires_manager.meta
@@ -154,7 +154,7 @@ class TestFiresManager:
     def test_load_no_fires_with_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
-            '{"fires":[], "foo": {"bar": "baz"}}'))
+            '{"fire_locations":[], "foo": {"bar": "baz"}}'))
         fires_manager.loads()
         assert [] == fires_manager.fires
         assert {"foo": {"bar": "baz"}} == fires_manager.meta
@@ -162,7 +162,7 @@ class TestFiresManager:
     def test_load_one_fire_with_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
-            '{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"}],'
+            '{"fire_locations":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"}],'
             '"foo": {"bar": "baz"}}'))
         fires_manager.loads()
         expected = [
@@ -174,7 +174,7 @@ class TestFiresManager:
     def test_load_multiple_fires_with_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
-            '{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
+            '{"fire_locations":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
             '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}],'
             '"foo": {"bar": "baz"}}'))
         fires_manager.loads()
@@ -212,7 +212,7 @@ class TestFiresManager:
 
         fires_manager.dumps()
         expected = {
-            "fires": fire_objects,
+            "fire_locations": fire_objects,
             "foo": {"bar": "baz"}
         }
         assert expected == json.loads(self._output.getvalue())

@@ -186,7 +186,7 @@ running ```bsp-csv2json``` like so:
 
 would produce the following (written to stdout):
 
-    {"fires": [{"slope": 10.0, "max_humid": 80.0, "co": "", "veg": "", "consumption_flaming": "", "max_temp": 30.0, "scc": 2810015000, "county": "", "fuel_1hr": "", "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "timezone": -5.0, "owner": "", "min_temp": 13.0, "sunrise_hour": 7, "sunset_hour": 18, "rot": "", "id": "SF11C14225236095807750", "fuel_100hr": "", "fuel_10khr": "", "shrub": "", "min_wind_aloft": 6.0, "area": 99.9999997516, "event_id": "SF11E826544", "moisture_live": 130.0, "voc": "", "consumption_smoldering": "", "sf_stream_name": "realtime", "fuel_1khr": "", "min_humid": 40.0, "state": "Unknown", "rain_days": 8, "latitude": 25.041, "min_wind": 6.0, "type": "RX", "moisture_10hr": 12.0, "pm25": "", "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "elevation": 0.0, "co2": "", "consumption_residual": "", "moisture_1khr": 22.0, "heat": "", "min_temp_hour": 4, "fips": -9999, "nh3": "", "max_temp_hour": 14, "max_wind_aloft": 6.0, "canopy": "", "duff": "", "date_time": "201501200000Z", "fuel_10hr": "", "moisture_duff": 150.0, "fuel_gt10khr": "", "pm10": "", "country": "Unknown", "litter": "", "longitude": -77.379, "moisture_1hr": 10.0, "so2": "", "ch4": "", "fccs_number": "", "consumption_duff": "", "nox": "", "moisture_100hr": 12.0, "grass": "", "snow_month": 5, "sf_server": "playground.dri.edu", "max_wind": 6.0}]}
+    {"fire_locations": [{"slope": 10.0, "max_humid": 80.0, "co": "", "veg": "", "consumption_flaming": "", "max_temp": 30.0, "scc": 2810015000, "county": "", "fuel_1hr": "", "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "timezone": -5.0, "owner": "", "min_temp": 13.0, "sunrise_hour": 7, "sunset_hour": 18, "rot": "", "id": "SF11C14225236095807750", "fuel_100hr": "", "fuel_10khr": "", "shrub": "", "min_wind_aloft": 6.0, "area": 99.9999997516, "event_id": "SF11E826544", "moisture_live": 130.0, "voc": "", "consumption_smoldering": "", "sf_stream_name": "realtime", "fuel_1khr": "", "min_humid": 40.0, "state": "Unknown", "rain_days": 8, "latitude": 25.041, "min_wind": 6.0, "type": "RX", "moisture_10hr": 12.0, "pm25": "", "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "elevation": 0.0, "co2": "", "consumption_residual": "", "moisture_1khr": 22.0, "heat": "", "min_temp_hour": 4, "fips": -9999, "nh3": "", "max_temp_hour": 14, "max_wind_aloft": 6.0, "canopy": "", "duff": "", "date_time": "201501200000Z", "fuel_10hr": "", "moisture_duff": 150.0, "fuel_gt10khr": "", "pm10": "", "country": "Unknown", "litter": "", "longitude": -77.379, "moisture_1hr": 10.0, "so2": "", "ch4": "", "fccs_number": "", "consumption_duff": "", "nox": "", "moisture_100hr": 12.0, "grass": "", "snow_month": 5, "sf_server": "playground.dri.edu", "max_wind": 6.0}]}
 
 You can pipe the output of ```bsp-csv2json``` directly into ```bsp```, as long
 as you use the ingestions module, described below:
@@ -209,7 +209,7 @@ that doesn't depend on data updates made by any module not yet run.  For
 example, assume that you start with the following fire data:
 
     {
-        "fires": [
+        "fire_locations": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
@@ -248,7 +248,7 @@ You would get the folloing output (which is the input json with the addition
 of the 'fuelbeds' array in the fire object):
 
     {
-        "fires": [{
+        "fire_locations": [{
             "name": "Natural Fire near Snoqualmie Pass, WA",
             "event_id": "SF11E826544",
             "fuelbeds": [{
@@ -292,7 +292,7 @@ module, like so:
 yielding the following augmented output:
 
     {
-        "fires": [{
+        "fire_locations": [{
             "name": "Natural Fire near Snoqualmie Pass, WA",
             "event_id": "SF11E826544",
             "fuelbeds": [{
@@ -421,7 +421,7 @@ The ingestion module does various things.  For each fire, it does the following:
 For example,
 
     {
-        "fires": [
+        "fire_locations": [
             {
                 "location": {
                     "latitude": 47.4316976,
@@ -435,7 +435,7 @@ For example,
 would become:
 
     {
-        "fires": [
+        "fire_locations": [
             {
                 "input": {
                     "location": {
@@ -455,7 +455,7 @@ In so doing, it keeps a record of the initial data, which will remain untouched.
 For example,
 
     {
-        "fires": [
+        "fire_locations": [
             {
                 "input": {
                     "location": {
@@ -472,7 +472,7 @@ For example,
 would become,
 
     {
-        "fires": [
+        "fire_locations": [
             {
                 "input": {
                     "location": {
@@ -495,7 +495,7 @@ In this step, it looks for nested fields both in the correctly nested
 locations as well as in the root fire object.  For example:
 
     {
-        "fires": [
+        "fire_locations": [
             {
                 "input": {
                     "location": {
@@ -511,7 +511,7 @@ locations as well as in the root fire object.  For example:
 would become,
 
     {
-        "fires": [
+        "fire_locations": [
             {
                 "input": {
                     "location": {
@@ -571,7 +571,7 @@ As a full example, starting with the following input data (which we'll
 assume is in fires.json):
 
     {
-        "fires": [
+        "fire_locations": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
@@ -599,7 +599,7 @@ if you pass this data through ingestion:
 you'll end up with this:
 
     {
-        "fires": [
+        "fire_locations": [
             {
                 "event_id": "SF11E826544",
                 "id": "SF11C14225236095807750",
@@ -649,7 +649,7 @@ a single lat/lng pair with area (assumed to be acres) or by perimeter polygon
 data. The following is an example of the former:
 
     {
-        "fires": [
+        "fire_locations": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
@@ -671,7 +671,7 @@ data. The following is an example of the former:
 while the following is an example of the latter:
 
     {
-        "fires": [
+        "fire_locations": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
@@ -784,7 +784,7 @@ Now you're ready to run bsp:
 
     vagrant ssh
     echo '{
-        "fires": [
+        "fire_locations": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",

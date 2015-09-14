@@ -24,8 +24,8 @@ class Run(tornado.web.RequestHandler):
         data = json.loads(self.request.body)
         if "modules" not in data:
             self.set_status(400, "Bad request: 'modules' not specified")
-        elif "fires" not in data:
-            self.set_status(400, "Bad request: 'fires' not specified")
+        elif "fire_locations" not in data:
+            self.set_status(400, "Bad request: 'fire_locations' not specified")
         else:
             # TODO: share code that's in ./bin/bsp, first moving it somewhere in bluesky package
             fires = [models.fires.Fire(f) for f in data['fires']]
@@ -40,4 +40,4 @@ class Run(tornado.web.RequestHandler):
             # content-type to json;  we need to specify a json encoder, though, so
             # we'll manaually set the header adn dump the json
             self.set_header('Content-Type', 'application/json') #; charset=UTF-8')
-            self.write(json.dumps({"fires":fires}, cls=models.fires.FireEncoder))
+            self.write(json.dumps({"fire_locations":fires}, cls=models.fires.FireEncoder))
