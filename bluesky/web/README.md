@@ -82,8 +82,8 @@ This API returns the dates for which a has ARL data
 ### POST /api/v1/run/
 
 This API requires posted JSON with three top level keys -
-'modules', 'fire_locations', and 'config'.
-The 'fire_locations' key lists the one or more fires to process. The 'modules' key is
+'modules', 'fire_information', and 'config'.
+The 'fire_information' key lists the one or more fires to process. The 'modules' key is
 the order specific list of modules through which the fires should be run.
 The 'config' key specifies configuration data and other control parameters.
 
@@ -96,7 +96,7 @@ The 'config' key specifies configuration data and other control parameters.
 
     {
         "modules": <array_of_modules>,
-        "fire_locations": <fire_data>,
+        "fire_information": <fire_data>,
         "config": <configuration>
     }
 
@@ -106,9 +106,9 @@ The 'config' key specifies configuration data and other control parameters.
         run_id: <guid>
     }
 
-#### 'fire_locations' Fields
+#### 'fire_information' Fields
 
-The top level 'fire_locations' object has data added to it as it moves through
+The top level 'fire_information' object has data added to it as it moves through
 the pipeline of modules.  Each module has its own set of required and optional
 fields that it uses, so that the set of data needed for each fire depends
 on the modules to be run. Generally, the further you are along the pipeline
@@ -130,8 +130,8 @@ modules.)
  - ...
 
 ###### Optional
- - 'fire_locations' > 'location' > 'ecoregion'
- - 'fire_locations' > 'type' -- fire type (ex. 'rx' or 'natural')
+ - 'fire_information' > 'location' > 'ecoregion'
+ - 'fire_information' > 'type' -- fire type (ex. 'rx' or 'natural')
 
 ##### emissions
 
@@ -281,7 +281,7 @@ one of the earlier modules in the pipeline.
     $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["fuelbeds", "consumption", "emissions"],
-        "fire_locations": [
+        "fire_information": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
@@ -312,7 +312,7 @@ Another exmaple, with fire location data specified as lat + lng + size
     $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["fuelbeds", "consumption", "emissions"],
-        "fire_locations": [
+        "fire_information": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
@@ -335,7 +335,7 @@ it's not needed.
     $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["localmet", "timeprofile", "plumerise", "dispersion", "visualization", "export"],
-        "fire_locations": [
+        "fire_information": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
@@ -424,7 +424,7 @@ and emissions data will all be of length 1.
     $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["timeprofile", "plumerise", "dispersion"],
-        "fire_locations": [
+        "fire_information": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",
@@ -461,7 +461,7 @@ Example:
 
     $ curl 'http://hostname/api/v1/playground/2/' -H 'Content-Type: application/json' -d '
     {
-        "fire_locations": [
+        "fire_information": [
             {
                 "id": "SF11C14225236095807750",
                 "event_id": "SF11E826544",

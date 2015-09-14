@@ -212,8 +212,10 @@ example, assume that you start with the following fire data:
         "fire_locations": [
             {
                 "id": "SF11C14225236095807750",
-                "event_id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                },
                 "location": {
                     "perimeter": {
                         "type": "MultiPolygon",
@@ -356,9 +358,12 @@ runs the output back through consumption and on through emissions:
 would contain this output, agumented with emissions data:
 
     {
-        "fires": [{
-            "name": "Natural Fire near Snoqualmie Pass, WA",
-            "event_id": "SF11E826544",
+        "fire_locations": [{
+            "id": "SF11C14225236095807750"
+            "event_of" :{
+                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "id": "SF11E826544"
+            },
             "fuelbeds": [{
                 "fccs_id": "49",
                 "pct": 50.0,
@@ -574,8 +579,10 @@ assume is in fires.json):
         "fire_locations": [
             {
                 "id": "SF11C14225236095807750",
-                "event_id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                },
                 "location": {
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
@@ -652,8 +659,10 @@ data. The following is an example of the former:
         "fire_locations": [
             {
                 "id": "SF11C14225236095807750",
-                "event_id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                },
                 "location": {
                     "latitude": 47.123,
                     "longitude": -120.379,
@@ -674,8 +683,10 @@ while the following is an example of the latter:
         "fire_locations": [
             {
                 "id": "SF11C14225236095807750",
-                "event_id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                },
                 "location": {
                     "perimeter": {
                         "type": "MultiPolygon",
@@ -787,8 +798,10 @@ Now you're ready to run bsp:
         "fire_locations": [
             {
                 "id": "SF11C14225236095807750",
-                "event_id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                },
                 "location": {
                     "perimeter": {
                         "type": "MultiPolygon",

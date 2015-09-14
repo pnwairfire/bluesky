@@ -8,7 +8,7 @@ do not represent the current behavior.
 Assume you have the following input data:
 
     {
-        "fire_locations": [
+        "fire_information": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of" :{
@@ -57,7 +57,7 @@ would give you:
 
 
     {
-        "fire_locations": [
+        "fire_information": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of" :{
@@ -146,7 +146,7 @@ Piping that through fuelbeds
 would give you:
 
     {
-        "fire_locations": [
+        "fire_information": [
                 "id": "SF11C14225236095807750",
                 "event_of" :{
                     "name": "Natural Fire near Snoqualmie Pass, WA",
@@ -269,7 +269,7 @@ Piping that through consumption
 would give you:
 
     {
-        "fire_locations": [
+        "fire_information": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of" :{
@@ -466,7 +466,7 @@ would give you:
 
 
     {
-        "fire_locations": [
+        "fire_information": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of" :{

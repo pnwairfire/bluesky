@@ -50,7 +50,7 @@ OPTIONAL_ARGS = [
 def main():
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS)
     io.CSV2JSON(args.input_file, args.output_file,
-        'id' if args.merge_fires else None, 'fire_locations').convert()
+        'id' if args.merge_fires else None, 'fire_information').convert()
 
 if __name__ == "__main__":
     main()

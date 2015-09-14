@@ -151,7 +151,7 @@ class FiresManager(object):
         data = json.loads(''.join([d for d in stream]))
         if not hasattr(data, 'keys'):
             raise ValueError("Invalid fire data")
-        new_fires = [Fire(d) for d in data.pop('fire_locations', [])]
+        new_fires = [Fire(d) for d in data.pop('fire_information', [])]
         for fire in new_fires:
             self._add_fire(fire)
         self._meta = data
@@ -171,5 +171,5 @@ class FiresManager(object):
 
     def dumps(self):
         stream = self._stream(self._output_file, 'w')
-        fire_json = json.dumps(dict(self._meta, fires=self.fires), cls=FireEncoder)
+        fire_json = json.dumps(dict(self._meta, fire_information=self.fires), cls=FireEncoder)
         stream.write(fire_json)
