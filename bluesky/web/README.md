@@ -301,7 +301,8 @@ one of the earlier modules in the pipeline.
                             ]
                         ]
                     },
-                    "ecoregion": "southern"
+                    "ecoregion": "southern",
+                    "timezone": "-09:00"
                 }
             }
         ]
@@ -320,7 +321,8 @@ Another exmaple, with fire location data specified as lat + lng + size
                 "location": {
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
-                    "area": 200
+                    "area": 200,
+                    "timezone": "-09:00"
                 }
             }
         ]
@@ -343,7 +345,8 @@ it's not needed.
                 "location": {
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
-                    "area": 200
+                    "area": 200,
+                    "timezone": "-09:00"
                 },
                 "fuelbeds": [
                     {
@@ -435,7 +438,8 @@ and emissions data will all be of length 1.
                 "location": {
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
-                    "area": 200
+                    "area": 200,
+                    "timezone": "-09:00"
                 }
                 "growth": [
                     {
@@ -475,7 +479,8 @@ Example:
                 "location": {
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
-                    "area": 200
+                    "area": 200,
+                    "timezone": "-09:00"
                 },
                 "fuelbeds": [
                     {
