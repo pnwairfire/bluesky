@@ -22,12 +22,12 @@ import argparse
 from pyairfire import scripting
 
 try:
-    from bluesky import modules, models, __version__
+    from bluesky import modules, models, process, __version__
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from bluesky import modules, models, __version__
+    from bluesky import modules, models, process, __version__
 
 REQUIRED_ARGS = []
 
@@ -110,70 +110,38 @@ def exit_with_traceback(e):
     logging.debug(traceback.format_exc())
     scripting.utils.exit_with_msg(e)
 
-def import_modules(args):
-    try:
-        modules = [
-            importlib.import_module('bluesky.modules.%s' % (m)) for m in args.module
-        ]
-    except Exception, e: #ImportError, e:
-        exit_with_traceback(e)
-
-    return modules
-
-def load_fires(args):
-    try:
-        fires_manager = models.fires.FiresManager(
-            input_file=args.input_file, output_file=args.output_file)
-        fires_manager.loads()
-    except Exception, e:
-        exit_with_traceback(e)
-    return fires_manager
-
-def run_modules(args, modules, fires_manager):
-    try:
-        if args.country_code_whitelist:
-            fires_manager.filter('country', args.country_code_whitelist)
-
-        for module in modules:
-            # TDOO: catch any exception raised by a module and dumps
-            # whatever is the current state of fires (or state of fires prior
-            # to calling hte module) ?
-            # 'run' modifies fires in place
-            module.run(fires_manager.fires, args.config_options)
-    except Exception, e:
-        # when there's an error running modules, don't bail; fire data will be
-        # dumped as is
-        logging.error(e)
-        tb = traceback.format_exc()
-        logging.debug(tb)
-        fires_manager.error = {
-            "message": str(e),
-            "traceback": str(tb)
-        }
-
-def dump_fires(args, fires_manager):
-    try:
-        fires_manager.dumps()
-    except Exception, e:
-        exit_with_traceback(e)
-
 def output_version(parser, args):
     if args.version:
         sys.stdout.write("bsp (bluesky) version {}\n".format(__version__))
         sys.exit(0)
 
+def load_fires(args):
+    # Note: Calling code handles exception
+    fires_manager = models.fires.FiresManager(
+        input_file=args.input_file, output_file=args.output_file)
+    fires_manager.loads()
+
+    if args.country_code_whitelist:
+        fires_manager.filter('country', args.country_code_whitelist)
+    return fires_manager
+
 def main():
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         positional_args=POSITIONAL_ARGS, epilog=AVAILABLE_MODULES_STR,
         pre_validation=output_version)
-
     validate_args(args)
     scripting.utils.log_config(args.config_options)
 
-    modules = import_modules(args)
-    fires_manager = load_fires(args)
-    run_modules(args, modules, fires_manager)
-    dump_fires(args, fires_manager)
+    try:
+        fires_manager = load_fires(args)
+        process.run_modules(args.module, fires_manager, args.config)
+        fires_manager.dumps()
+    except process.BlueSkyModuleError, e:
+        # The error was added to fires_manager's meta data, and will be
+        # included in the output data
+        pass
+    except Exception, e:
+        exit_with_traceback(e)
 
 if __name__ == "__main__":
     main()

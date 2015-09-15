@@ -3,13 +3,13 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-import importlib
 import io
 import json
+import logging
 import tornado.web
 
 #from bluesky.web.lib.auth import b_auth
-from bluesky import modules, models
+from bluesky import modules, models, process
 
 class Run(tornado.web.RequestHandler):
     # def _bad_request(self, msg):
@@ -27,14 +27,25 @@ class Run(tornado.web.RequestHandler):
         elif "fire_information" not in data:
             self.set_status(400, "Bad request: 'fire_information' not specified")
         else:
-            # TODO: share code that's in ./bin/bsp, first moving it somewhere in bluesky package
-            fires = [models.fires.Fire(f) for f in data['fires']]
-            modules = [
-                importlib.import_module('bluesky.modules.%s' % (m)) for m in data['modules']
-            ]
+            fires = [models.fires.Fire(f) for f in data['fire_information']]
+            fires_manager = models.fires.FiresManager(fires=fires)
             config = data.get('config') or {}
-            for module in modules:
-                module.run(fires, config)
+
+            # TODO: somehow commincate back from process.run_modules if exception
+            # was caught while running modules set status appropriately?  (or should
+            # module error not result in http error status, since error is recorded
+            # in fires_manager.error
+            try:
+                process.run_modules(data['modules'], fires_manager, config)
+            except process.BlueSkyModuleError, e:
+                # The error was added to fires_manager's meta data, and will
+                # be included in the output data
+                pass
+            except process.BlueSkyImportError, e:
+                self.set_status(400, "Bad request: {}".format(e.message))
+            except Exception, e:
+                logging.error('Exception: {}'.format(e))
+                self.set_status(500)
 
             # If you pass a dict into self.write, it will dump it to json and set
             # content-type to json;  we need to specify a json encoder, though, so
