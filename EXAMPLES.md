@@ -30,7 +30,8 @@ Assume you have the following input data:
                             ]
                         ]
                     },
-                    "ecoregion": "southern"
+                    "ecoregion": "southern",
+                    "timezone": "-09:00"
                 }
                 "growth": [
                     {
@@ -79,7 +80,8 @@ would give you:
                             ]
                         ],
                         "type": "MultiPolygon"
-                    }
+                    },
+                    "timezone": "-09:00"
                 },
                 "growth": [
                     {
@@ -119,6 +121,7 @@ would give you:
                             ]
                         },
                         "ecoregion": "southern",
+                        "timezone": "-09:00"
                     },
                     "growth": [
                         {
@@ -167,7 +170,8 @@ would give you:
                             ]
                         ],
                         "type": "MultiPolygon"
-                    }
+                    },
+                    "timezone": "-09:00"
                 },
                 "growth": [
                     {
@@ -241,6 +245,7 @@ would give you:
                             ]
                         },
                         "ecoregion": "southern",
+                        "timezone": "-09:00"
                     },
                     "growth": [
                         {
@@ -291,7 +296,8 @@ would give you:
                             ]
                         ],
                         "type": "MultiPolygon"
-                    }
+                    },
+                    "timezone": "-09:00"
                 },
                 "growth": [
                     {
@@ -435,6 +441,7 @@ would give you:
                             ]
                         },
                         "ecoregion": "southern",
+                        "timezone": "-09:00"
                     },
                     "growth": [
                         {
@@ -488,7 +495,8 @@ would give you:
                             ]
                         ],
                         "type": "MultiPolygon"
-                    }
+                    },
+                    "timezone": "-09:00"
                 },
                 "growth": [
                     {
@@ -692,6 +700,7 @@ would give you:
                             ]
                         },
                         "ecoregion": "southern",
+                        "timezone": "-09:00"
                     },
                     "growth": [
                         {

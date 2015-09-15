@@ -17,8 +17,40 @@ class TestIngester(object):
         with raises(ValueError) as e:
             self.ingester.ingest({})
 
+        # location must have perimeter or lat+lng+area
         with raises(ValueError) as e:
             self.ingester.ingest({"location": {}})
+
+    def test_fire_with_invalid_growth(self):
+        # If growth is specified, each object in the array must have
+        # 'start', 'end', and 'pct' defined
+        with raises(ValueError) as e:
+            self.ingester.ingest(
+                {
+                    "location": {
+                        "perimeter": {
+                            "type": "MultiPolygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ]
+                                ]
+                            ]
+                        },
+                        "ecoregion": "southern"
+                    },
+                    "growth": [
+                        {
+                            "sdf": 1
+                        }
+                    ]
+                }
+            )
 
     def test_fire_was_aready_ingested(self):
         with raises(RuntimeError) as e:
@@ -74,11 +106,11 @@ class TestIngester(object):
                 },
                 "ecoregion": "southern"
             },
-            "time": {
+            "growth": [{
                 "start": "20150120T000000Z",
                 "end": "20150120T000000Z",
-                "timezone": -0.7
-            }
+                "pct": 100.0
+            }]
         }
         expected = {
             "id": "SF11C14225236095807750",
@@ -88,7 +120,7 @@ class TestIngester(object):
             },
             'input': copy.deepcopy(f),
             'location': copy.deepcopy(f['location']),
-            'time': copy.deepcopy(f['time'])
+            'growth': copy.deepcopy(f['growth'])
         }
         self.ingester.ingest(f)
         assert expected == f
@@ -173,13 +205,17 @@ class TestIngester(object):
                             ]
                         ]
                     ]
-                }
+                },
+                "timezone": -0.7
             },
             "ecoregion": "southern",
-            "time":{
-                "start": "20150120T000000Z",
-                "end": "20150120T000000Z"
-            },
+            "growth": [
+                {
+                    "start": "20150120T000000Z",
+                    "end": "20150120T000000Z",
+                    "pct": 100.0
+                }
+            ],
             "timezone": -0.7
         }
         expected = {
@@ -204,12 +240,12 @@ class TestIngester(object):
                         ]
                     ]
                 },
-                "ecoregion": "southern"
+                "ecoregion": "southern",
+                "timezone": -0.7
             },
             'time': {
                 "start": "20150120T000000Z",
-                "end": "20150120T000000Z",
-                "timezone": -0.7
+                "end": "20150120T000000Z"
             }
         }
         self.ingester.ingest(f)
@@ -241,11 +277,13 @@ class TestIngester(object):
                 "ecoregion": "southern",
                 "foo": "bar"
             },
-            "time": {
-                "start": "20150120T000000Z",
-                "end": "20150120T000000Z",
-                "timezone": -0.7
-            },
+            "growth": [
+                {
+                    "start": "20150120T000000Z",
+                    "end": "20150120T000000Z",
+                    "pct": 100.0
+                }
+            ],
             "bar": "baz"
         }
         expected = {

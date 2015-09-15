@@ -373,10 +373,13 @@ it's not needed.
                         }
                     }
                 ],
-                "time": {
-                    "start": "20150120T000000Z",
-                    "end": "20150121T000000Z"
-                }
+                "growth": [
+                    {
+                        "start": "20150120",
+                        "end": "20150121",
+                        "pct": 100.0
+                    }
+                ]
             }
         ],
         "config": {
@@ -434,10 +437,13 @@ and emissions data will all be of length 1.
                     "longitude": -121.3990506,
                     "area": 200
                 }
-                "time": {
-                    "start": "20150120T000000Z",
-                    "end": "20150121T000000Z"
-                }
+                "growth": [
+                    {
+                        "start": "20150120",
+                        "end": "20150121",
+                        "pct": 100.0
+                    }
+                ]
             }
         ]
     }
@@ -499,10 +505,13 @@ Example:
                         }
                     }
                 ],
-                "time": {
-                    "start": "20150120T000000Z",
-                    "end": "20150121T000000Z"
-                }
+                "growth": [
+                    {
+                        "start": "20150120",
+                        "end": "20150121",
+                        "pct": 100.0
+                    }
+                ]
             }
         ],
         "config": {

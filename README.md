@@ -231,12 +231,16 @@ example, assume that you start with the following fire data:
                             ]
                         ]
                     },
-                    "ecoregion": "southern"
+                    "ecoregion": "southern",
+                    "timezone": "-09:00"
                 },
-                "time": {
-                    "start": "20150120T000000Z",
-                    "end": "20150120T000000Z"
-                }
+                "growth": [
+                    {
+                        "pct": 100,
+                        "start": "20150120",
+                        "end": "20150120"
+                    }
+                ]
             }
         ]
     }
@@ -276,12 +280,16 @@ of the 'fuelbeds' array in the fire object):
                     ]
                 },
                 "ecoregion": "southern",
+                "timezone": "-09:00",
                 "area": 2398.94477979842
             },
-            "time": {
-                "start": "20150120T000000Z",
-                "end": "20150120T000000Z"
-            },
+            "growth": [
+                {
+                    "pct": 100,
+                    "start": "20150120",
+                    "end": "20150120"
+                }
+            ],
             "id": "SF11C14225236095807750"
         }]
     }
@@ -326,12 +334,16 @@ yielding the following augmented output:
                     ]
                 },
                 "ecoregion": "southern",
+                "timezone": "-09:00",
                 "area": 2398.94477979842
             },
-            "time": {
-                "start": "20150120T000000Z",
-                "end": "20150120T000000Z"
-            },
+            "growth": [
+                {
+                    "pct": 100,
+                    "start": "20150120",
+                    "end": "20150120"
+                }
+            ],
             "id": "SF11C14225236095807750"
         }]
     }
@@ -364,6 +376,38 @@ would contain this output, agumented with emissions data:
                 "name": "Natural Fire near Snoqualmie Pass, WA",
                 "id": "SF11E826544"
             },
+            "location": {
+                "perimeter": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                        [
+                            [
+                                [-121.4522115, 47.4316976],
+                                [-121.3990506, 47.4316976],
+                                [-121.3990506, 47.4099293],
+                                [-121.4522115, 47.4099293],
+                                [-121.4522115, 47.4316976]
+                            ]
+                        ]
+                    ]
+                },
+                "ecoregion": "southern",
+                "area": 2398.94477979842,
+                /* TODO: Is this an appropriate timezone format for GeoJSON */
+                "timezone": "-09:00"
+            },
+            "growth": [
+                {
+                    "pct": 60,
+                    "start": "20150120",
+                    "end": "20150121"
+                },
+                {
+                    "pct": 40,
+                    "start": "20150121",
+                    "end": "20150122"
+                },
+            ],
             "fuelbeds": [{
                 "fccs_id": "49",
                 "pct": 50.0,
@@ -431,7 +475,8 @@ For example,
                 "location": {
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
-                    "area": 200
+                    "area": 200,
+                    "timezone": "-09:00"
                 }
             }
         ]
@@ -446,7 +491,8 @@ would become:
                     "location": {
                         "latitude": 47.4316976,
                         "longitude": -121.3990506,
-                        "area": 200
+                        "area": 200,
+                        "timezone": "-09:00"
                     }
                 }
             }
@@ -467,6 +513,7 @@ For example,
                         "latitude": 47.4316976,
                         "longitude": -121.3990506,
                         "area": 200,
+                        "timezone": "-09:00",
                         "foo": "bar"
                     }
                 }
@@ -484,6 +531,7 @@ would become,
                         "latitude": 47.4316976,
                         "longitude": -121.3990506,
                         "area": 200,
+                        "timezone": "-09:00",
                         "foo": "bar"  /*  <-- This is ignored */
                     }
                 },
@@ -491,6 +539,7 @@ would become,
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
                     "area": 200,
+                    "timezone": "-09:00"
                 }
             }
         ]
@@ -507,7 +556,8 @@ locations as well as in the root fire object.  For example:
                         "latitude": 47.4316976,
                         "longitude": -121.3990506
                     },
-                    "area": 200
+                    "area": 200,
+                    "timezone": "-09:00"
                 }
             }
         ]
@@ -587,13 +637,17 @@ assume is in fires.json):
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
                     "area": 200,
+                    "timezone": "-09:00",
                     "foo": "bar"
                 },
                 "ecoregion": "southern",
-                "time": {
-                    "start": "20150120T000000Z",
-                    "end": "20150120T000000Z"
-                },
+                "growth": [
+                    {
+                        "pct": 100.0,
+                        "start": "20150120",
+                        "end": "20150120"
+                    }
+                ],
                 "bar": 123
             }
         ]
@@ -618,14 +672,18 @@ you'll end up with this:
                         "ecoregion": "southern",
                         "latitude": 47.4316976,
                         "longitude": -121.3990506,
+                        "timezone": "-09:00",
                         "foo": "bar"
                     },
                     "ecoregion": "southern",
                     "name": "Natural Fire near Snoqualmie Pass, WA",
-                    "time": {
-                        "end": "20150120T000000Z",
-                        "start": "20150120T000000Z"
-                    }
+                    "growth": [
+                        {
+                            "end": "20150120",
+                            "start": "20150120T000000Z",
+                            "pct": 100.0
+                        }
+                    ],
                     "bar": 123
                 },
                 "location": {
@@ -633,13 +691,17 @@ you'll end up with this:
                     "ecoregion": "southern",
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
-                    "ecoregion": "southern"
+                    "ecoregion": "southern",
+                    "timezone": "-09:00"
                 },
                 "name": "Natural Fire near Snoqualmie Pass, WA",
-                "time": {
-                    "end": "20150120T000000Z",
-                    "start": "20150120T000000Z"
-                }
+                "growth": [
+                    {
+                        "end": "20150120",
+                        "start": "20150120T000000Z",
+                        "pct": 100.0
+                    }
+                ]
             }
         ]
     }
@@ -669,10 +731,13 @@ data. The following is an example of the former:
                     "area": 200,
                     "ecoregion": "southern"
                 },
-                "time": {
-                    "start": "20150120T000000Z",
-                    "end": "20150120T000000Z"
-                }
+                "growth": [
+                    {
+                        "pct": 100,
+                        "start": "20150120",
+                        "end": "20150120"
+                    }
+                ]
             }
         ]
     }
@@ -704,10 +769,13 @@ while the following is an example of the latter:
                     },
                     "ecoregion": "southern"
                 },
-                "time": {
-                    "start": "20150120T000000Z",
-                    "end": "20150120T000000Z"
-                }
+                "growth": [
+                    {
+                        "pct": 100,
+                        "start": "20150120",
+                        "end": "20150120"
+                    }
+                ]
             }
         ]
     }
@@ -819,10 +887,13 @@ Now you're ready to run bsp:
                     },
                     "ecoregion": "southern"
                 },
-                "time": {
-                    "start": "20150120T000000Z",
-                    "end": "20150120T000000Z"
-                }
+                "growth": [
+                    {
+                        "pct": 100,
+                        "start": "20150120",
+                        "end": "20150120"
+                    }
+                ]
             }
         ]
     }' > fires.json

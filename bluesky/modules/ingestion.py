@@ -36,7 +36,7 @@ class FireIngester(object):
         "id",
     }
     NESTED_FIELDS = {
-        "location", "time", "event_of"
+        "location", "growth", "event_of"
     }
 
     ##
@@ -118,6 +118,8 @@ class FireIngester(object):
 
     OPTIONAL_LOCATION_FIELDS = [
         "ecoregion",
+        # TODO: should timezone be required, or only by modules using met data?
+        "timezone"
         # TODO: fill in others
     ]
 
@@ -154,12 +156,17 @@ class FireIngester(object):
         if event_of_dict:
             fire['event_of'] = event_of_dict
 
-    OPTIONAL_TIME_FIELDS = [
-        "start", "end", "timezone"
-    ]
+
+    GROWTH_FIELDS = ['start','end', 'pct']
 
     def _ingest_time(self, fire):
-        time_fields = self._get_fields(fire, 'time', self.OPTIONAL_TIME_FIELDS)
-        # Only add 'time' key if there are any defined fiespecified fields, defined either in top level or
-        if time_fields:
-            fire['time'] = time_fields
+        growth = []
+        for g in fire['input'].get('growth', []):
+            growth.append({})
+            for f in GROWTH_FIELDS:
+                if not g.get(f):
+                    raise ValueError("Missing groth field: '{}'".format(f))
+                growth[-1][f] = g[f]
+        if growth:
+            # TODO: make sure percentages add up to 100.0, with allowable error
+            fire['growth'] = growth
