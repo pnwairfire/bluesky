@@ -32,25 +32,25 @@ SETTINGS = {
     ]
 }
 
-def run(fires, options=None):
+def run(fires_manager, config=None):
     """Runs the fire data through consumption calculations, using the consume
     package for the underlying computations.
 
     Args:
-     - fires -- array of fire objects
+     - fires_manager -- bluesky.models.fires.FiresManager object
     Kwargs:
      - config -- optional configparser object
     """
     logging.debug("Running consumption module")
 
     # TODO: update bsp to have generic way of specifying module-specific
-    # options, and get msg_level and burn_type from options
+    # config, and get msg_level and burn_type from config
     msg_level = 2  # 1 => fewest messages; 3 => most messages
 
     # TODO: can I safely instantiate one FuelConsumption object and
     # use it across all fires, or at lesat accross all fuelbeds within
     # a single fire?
-    for fire in fires:
+    for fire in fires_manager.fires:
         burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
         valid_settings = SETTINGS[burn_type] + SETTINGS['all']
 

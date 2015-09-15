@@ -14,16 +14,16 @@ __all__ = [
 
 FCCS_VERSION = '2' # TODO: make this configurable
 
-def run(fires, config=None):
+def run(fires_manager, config=None):
     """Runs emissions module
 
     Args:
-     - fires -- array of fire objects
+     - fires_manager -- bluesky.models.fires.FiresManager object
     Kwargs:
      - config -- optional configparser object
     """
     logging.info("Running fuelbeds module")
-    for fire in fires:
+    for fire in fires_manager.fires:
         # TODO: instead of instantiating a new FccsLookUp and Estimator for
         # each fire, create AK and non-AK lookup and estimator objects that
         # are reused, and set reference to correct one here

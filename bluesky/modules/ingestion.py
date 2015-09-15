@@ -10,18 +10,18 @@ __all__ = [
     'run'
 ]
 
-def run(fires, config=None):
+def run(fires_manager, config=None):
     """Runs the fire data through consumption calculations, using the consume
     package for the underlying computations.
 
     Args:
-     - fires -- array of fire objects
+     - fires_manager -- bluesky.models.fires.FiresManager object
     Kwargs:
      - config -- optional configparser object
     """
     logging.debug("Running ingestion module")
     fire_ingester = FireIngester(config)
-    for fire in fires:
+    for fire in fires_manager.fires:
         fire_ingester.ingest(fire)
 
 class FireIngester(object):
