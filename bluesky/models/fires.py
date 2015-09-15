@@ -70,12 +70,11 @@ class FireEncoder(json.JSONEncoder):
 
 class FiresManager(object):
 
-    def __init__(self, input_file=None, output_file=None):
+    def __init__(self, fires=[], input_file=None, output_file=None):
         self._meta = {}
         self._input_file = input_file
         self._output_file = output_file
-        self._fires = {}
-        self._fire_ids = [] # to record order fires were added
+        self.fires = fires
 
     ## Importing
 

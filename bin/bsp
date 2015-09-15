@@ -123,7 +123,7 @@ def import_modules(args):
 def load_fires(args):
     try:
         fires_manager = models.fires.FiresManager(
-            args.input_file, args.output_file)
+            input_file=args.input_file, output_file=args.output_file)
         fires_manager.loads()
     except Exception, e:
         exit_with_traceback(e)
