@@ -15,13 +15,16 @@
                 "latitude": 25.041,
                 "county": "",
                 "ecoregion": "southern",
-                "area": 200
+                "area": 200,
+                "timezone": "-07:00"
             },
-            "time":{
-                "end": "",
-                "start": "20150120T000000Z",
-                "timezone": -5.0
-            },
+            "growth": [
+                {
+                    "start": "20150120",
+                    "end": "20150120",
+                    "pct": 100.0
+                }
+            ],
             "fuelbeds": [
                 {
                     "fccs_id": 84,

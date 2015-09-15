@@ -19,12 +19,16 @@
                         ]
                     ]
                 },
-                "ecoregion": "southern"
+                "ecoregion": "southern",
+                "timezone": "-07:00"
             },
-            "time": {
-                "start": "20150120T000000Z",
-                "end": "20150120T000000Z"
-            }
+            "growth": [
+                {
+                    "start": "20150120",
+                    "end": "20150120",
+                    "pct": 100.0
+                }
+            ]
         }
     ]
 }

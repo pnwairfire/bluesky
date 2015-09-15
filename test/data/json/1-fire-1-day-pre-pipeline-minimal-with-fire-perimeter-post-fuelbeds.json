@@ -25,13 +25,16 @@
                 "slope": 20.0,
                 "elevation": 2320.0,
                 "max_humid": 70.0,
-                "area": 200
+                "area": 200,
+                "timezone": "-07:00"
             },
-            "time": {
-                "start": "20150120T000000Z",
-                "end": "20150120T000000Z",
-                "timezone": -7.0
-            },
+            "growth": [
+                {
+                    "start": "20150120",
+                    "end": "20150120",
+                    "pct": 100.0
+                }
+            ],
             "fuelbeds": [
                 {
                     "fccs_id": 16,

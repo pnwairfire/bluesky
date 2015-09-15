@@ -85,7 +85,7 @@ class TestIngester(object):
     def test_fire_with_maximum_optional_fields(self):
         f = {
             "id": "SF11C14225236095807750",
-            "event_of":{
+            "event_of": {
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
@@ -107,8 +107,8 @@ class TestIngester(object):
                 "ecoregion": "southern"
             },
             "growth": [{
-                "start": "20150120T000000Z",
-                "end": "20150120T000000Z",
+                "start": "20150120",
+                "end": "20150120",
                 "pct": 100.0
             }]
         }
@@ -147,9 +147,9 @@ class TestIngester(object):
                 ]
             },
             "ecoregion": "southern",
-            "start": "20150120T000000Z",
-            "end": "20150120T000000Z",
-            "timezone": -0.7
+            "start": "20150120",
+            "end": "20150120",
+            "timezone": "-07:00"
         }
         expected = {
             'input': copy.deepcopy(f),
@@ -174,12 +174,15 @@ class TestIngester(object):
                     ]
                 },
                 "ecoregion": "southern",
+                "timezone": "-07:00"
             },
-            'time': {
-                "start": "20150120T000000Z",
-                "end": "20150120T000000Z",
-                "timezone": -0.7
-            }
+            'growth': [
+                {
+                    "pct": 100.0,
+                    "start": "20150120",
+                    "end": "20150120"
+                }
+            ]
         }
         self.ingester.ingest(f)
         assert expected == f
@@ -205,18 +208,17 @@ class TestIngester(object):
                             ]
                         ]
                     ]
-                },
-                "timezone": -0.7
+                }
             },
             "ecoregion": "southern",
             "growth": [
                 {
-                    "start": "20150120T000000Z",
-                    "end": "20150120T000000Z",
+                    "start": "20150120",
+                    "end": "20150120",
                     "pct": 100.0
                 }
             ],
-            "timezone": -0.7
+            "timezone": "-07:00"
         }
         expected = {
             'input': copy.deepcopy(f),
@@ -241,12 +243,15 @@ class TestIngester(object):
                     ]
                 },
                 "ecoregion": "southern",
-                "timezone": -0.7
+                "timezone": "-07:00"
             },
-            'time': {
-                "start": "20150120T000000Z",
-                "end": "20150120T000000Z"
-            }
+            "growth": [
+                {
+                    "start": "20150120",
+                    "end": "20150120",
+                    "pct": 100.0
+                }
+            ]
         }
         self.ingester.ingest(f)
         assert expected == f
@@ -279,8 +284,8 @@ class TestIngester(object):
             },
             "growth": [
                 {
-                    "start": "20150120T000000Z",
-                    "end": "20150120T000000Z",
+                    "start": "20150120",
+                    "end": "20150120",
                     "pct": 100.0
                 }
             ],
@@ -294,7 +299,7 @@ class TestIngester(object):
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
             'location': copy.deepcopy(f['location']),
-            'time': copy.deepcopy(f['time'])
+            'groth': copy.deepcopy(f['growth'])
         }
         expected['location'].pop('foo')
         self.ingester.ingest(f)

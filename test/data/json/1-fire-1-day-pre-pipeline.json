@@ -25,13 +25,16 @@
                 "fm_type": "ADJ-Th",
                 "days_since_rain": 4,
                 "length_of_ignition": 23,
-                "output_units": "tons"
+                "output_units": "tons",
+                "timezone": "-07:00"
             },
-            "time": {
-                "start": "20150120T000000Z",
-                "timezone": -5.0,
-                "end": ""
-            }
+            "growth": [
+                {
+                    "start": "20150120",
+                    "end": "20150120",
+                    "pct": 100.0
+                }
+            ]
         }
     ]
 }

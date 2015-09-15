@@ -159,11 +159,11 @@ class FireIngester(object):
 
     GROWTH_FIELDS = ['start','end', 'pct']
 
-    def _ingest_time(self, fire):
+    def _ingest_growth(self, fire):
         growth = []
         for g in fire['input'].get('growth', []):
             growth.append({})
-            for f in GROWTH_FIELDS:
+            for f in self.GROWTH_FIELDS:
                 if not g.get(f):
                     raise ValueError("Missing groth field: '{}'".format(f))
                 growth[-1][f] = g[f]

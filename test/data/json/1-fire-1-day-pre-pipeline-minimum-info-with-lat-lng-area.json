@@ -8,12 +8,16 @@
                 "latitude": 47.4316976,
                 "longitude": -121.3990506,
                 "area": 200,
-                "ecoregion": "southern"
+                "ecoregion": "southern",
+                "timezone": "-07:00"
             },
-            "time": {
-                "start": "20150120T000000Z",
-                "end": "20150120T000000Z"
-            }
+            "growth": [
+                {
+                    "start": "20150120",
+                    "end": "20150120",
+                    "pct": 100.0
+                }
+            ]
         }
     ]
 }
