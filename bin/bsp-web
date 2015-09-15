@@ -6,22 +6,13 @@ __copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 import tornado.ioloop
 
 try:
-    from bluesky.web.app import application, get_logger, config
+    from bluesky.web.app import main
 except:
     import os
     import sys
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from bluesky.web.app import application#, get_logger, config
+    from bluesky.web.app import main
 
 if __name__ == "__main__":
-    # get_logger().info(' * Debug mode: %s' % config.DEBUG)
-    # get_logger().info(' * Authentication: %s' % (config.AUTH_ENABLED))
-    # get_logger().info(' * Redis URL: %s' % (config.REDIS_URL))
-    application.listen(
-        8888 # TODO: look for PORT defined in env or config module?
-        # host=config.HOST,
-        # debug=config.DEBUG,
-        # port=
-    )
-    tornado.ioloop.IOLoop.current().start()
+    main()
