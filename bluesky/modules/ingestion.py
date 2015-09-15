@@ -160,13 +160,22 @@ class FireIngester(object):
     GROWTH_FIELDS = ['start','end', 'pct']
 
     def _ingest_growth(self, fire):
+        # Note: can't use _get_field[s] as is because 'growth' is an array,
+        # not a nested object
         growth = []
-        for g in fire['input'].get('growth', []):
-            growth.append({})
-            for f in self.GROWTH_FIELDS:
-                if not g.get(f):
-                    raise ValueError("Missing groth field: '{}'".format(f))
-                growth[-1][f] = g[f]
+        if not fire['input'].get('growth'):
+            # no growth array - look for 'start'/'end' in top level
+            start = fire['input'].get('start')
+            end = fire['input'].get('end')
+            if start and end:
+                growth.append({'start': start, 'end': end, 'pct': 100.0})
+        else:
+            for g in fire['input']['growth']:
+                growth.append({})
+                for f in self.GROWTH_FIELDS:
+                    if not g.get(f):
+                        raise ValueError("Missing groth field: '{}'".format(f))
+                    growth[-1][f] = g[f]
         if growth:
             # TODO: make sure percentages add up to 100.0, with allowable error
             fire['growth'] = growth

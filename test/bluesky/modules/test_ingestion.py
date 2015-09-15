@@ -299,7 +299,7 @@ class TestIngester(object):
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
             'location': copy.deepcopy(f['location']),
-            'groth': copy.deepcopy(f['growth'])
+            'growth': copy.deepcopy(f['growth'])
         }
         expected['location'].pop('foo')
         self.ingester.ingest(f)
