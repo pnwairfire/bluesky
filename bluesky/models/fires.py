@@ -70,10 +70,8 @@ class FireEncoder(json.JSONEncoder):
 
 class FiresManager(object):
 
-    def __init__(self, fires=[], input_file=None, output_file=None):
+    def __init__(self, fires=[]):
         self._meta = {}
-        self._input_file = input_file
-        self._output_file = output_file
         self.fires = fires
 
     ## Importing
@@ -139,21 +137,28 @@ class FiresManager(object):
         for fire in fires_list:
             self._add_fire(fire)
 
-    def loads(self):
-        """Loads json-formatted fire data, creating list of Fire objects and
-        storing other fields in self.meta.
+    ## Loading data
 
-        TODO:
-         - support already parsed JSON (i.e. dict or array)
-        """
-        stream = self._stream(self._input_file, 'r')
-        data = json.loads(''.join([d for d in stream]))
-        if not hasattr(data, 'keys'):
+    def load(self, input_dict):
+        if not hasattr(input_dict, 'keys'):
             raise ValueError("Invalid fire data")
-        new_fires = [Fire(d) for d in data.pop('fire_information', [])]
+        new_fires = [Fire(d) for d in input_dict.pop('fire_information', [])]
         for fire in new_fires:
             self._add_fire(fire)
-        self._meta = data
+        self._meta = input_dict
+
+    def loads(self, input_stream=None, input_file=None):
+        """Loads json-formatted fire data, creating list of Fire objects and
+        storing other fields in self.meta.
+        """
+        if input_stream and input_file:
+            raise RuntimeError("Don't specify both input_stream and input_file")
+        if not input_stream:
+            input_stream = self._stream(input_file, 'r')
+        data = json.loads(''.join([d for d in input_stream]))
+        return self.load(data)
+
+    ## Filtering data
 
     def filter(self, attr, **kwargs):
         whitelist = kwargs.get('whitelist')
@@ -168,7 +173,15 @@ class FiresManager(object):
                 return not hasattr(fire, attr) or getattr(fire, attr) not in blacklist
         self.fires = [f for f in self.fires if _filter(f, attr)]
 
-    def dumps(self):
-        stream = self._stream(self._output_file, 'w')
-        fire_json = json.dumps(dict(self._meta, fire_information=self.fires), cls=FireEncoder)
-        stream.write(fire_json)
+    ## Dumping data
+
+    def dump(self):
+        return dict(self._meta, fire_information=self.fires)
+
+    def dumps(self, output_stream=None, output_file=None):
+        if output_stream and output_file:
+            raise RuntimeError("Don't specify both output_stream and output_file")
+        if not output_stream:
+            output_stream = self._stream(output_file, 'w')
+        fire_json = json.dumps(self.dump(), cls=FireEncoder)
+        output_stream.write(fire_json)

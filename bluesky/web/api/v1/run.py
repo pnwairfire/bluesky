@@ -30,28 +30,32 @@ class Run(tornado.web.RequestHandler):
         elif "fire_information" not in data:
             self.set_status(400, "Bad request: 'fire_information' not specified")
         else:
-            fires = [models.fires.Fire(f) for f in data['fire_information']]
-            fires_manager = models.fires.FiresManager(fires=fires)
-            config = config_from_dict(data.get('config') or {})
-
-            # TODO: somehow commincate back from process.run_modules if exception
-            # was caught while running modules set status appropriately?  (or should
-            # module error not result in http error status, since error is recorded
-            # in fires_manager.error
             try:
-                process.run_modules(data['modules'], fires_manager, config)
-            except BlueSkyModuleError, e:
-                # The error was added to fires_manager's meta data, and will
-                # be included in the output data
-                pass
-            except BlueSkyImportError, e:
-                self.set_status(400, "Bad request: {}".format(e.message))
-            except Exception, e:
-                logging.error('Exception: {}'.format(e))
-                self.set_status(500)
+                modules = data.pop('modules')
+                fires_manager = models.fires.FiresManager()
+                fires_manager.load(data)
+                config = config_from_dict(data.get('config') or {})
 
-            # If you pass a dict into self.write, it will dump it to json and set
-            # content-type to json;  we need to specify a json encoder, though, so
-            # we'll manaually set the header adn dump the json
-            self.set_header('Content-Type', 'application/json') #; charset=UTF-8')
-            self.write(json.dumps({"fire_information":fires}, cls=models.fires.FireEncoder))
+                try:
+                    process.run_modules(modules, fires_manager, config)
+                except BlueSkyModuleError, e:
+                    # Exception was caught while running modules and added to
+                    # fires_manager's meta data, and so will be included in
+                    # the output data
+                    # TODO: should module error not be reflected in http error status?
+                    pass
+                except BlueSkyImportError, e:
+                    self.set_status(400, "Bad request: {}".format(e.message))
+                except Exception, e:
+                    logging.error('Exception: {}'.format(e))
+                    self.set_status(500)
+
+                # If you pass a dict into self.write, it will dump it to json and set
+                # content-type to json;  we need to specify a json encoder, though, so
+                # we'll manaually set the header adn dump the json
+                self.set_header('Content-Type', 'application/json') #; charset=UTF-8')
+                fires_manager.dumps(output_stream=self)
+            except:
+                # IF exceptions aren't caught, the traceback is returned as
+                # the response body
+                self.set_status(500)

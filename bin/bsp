@@ -117,9 +117,8 @@ def output_version(parser, args):
 
 def load_fires(args):
     # Note: Calling code handles exception
-    fires_manager = models.fires.FiresManager(
-        input_file=args.input_file, output_file=args.output_file)
-    fires_manager.loads()
+    fires_manager = models.fires.FiresManager()
+    fires_manager.loads(input_file=args.input_file)
 
     if args.country_code_whitelist:
         fires_manager.filter('country', args.country_code_whitelist)
@@ -142,7 +141,7 @@ def main():
     except Exception, e:
         exit_with_traceback(e)
 
-    fires_manager.dumps()
+    fires_manager.dumps(output_file=args.output_file)
 
 if __name__ == "__main__":
     main()
