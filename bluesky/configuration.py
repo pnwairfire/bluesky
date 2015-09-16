@@ -9,7 +9,6 @@ __all__ = [
     'get_config_value'
 ]
 
-
 def config_from_dict(config_dict):
     """Converts a dict of configuration data into a configparser object
 

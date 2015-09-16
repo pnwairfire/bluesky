@@ -10,6 +10,7 @@ from eflookup.fccs2ef.lookup import Fccs2Ef
 from eflookup.fepsef import FepsEFLookup
 
 from bluesky.configuration import get_config_value
+from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
     'run'
@@ -23,10 +24,14 @@ def run(fires_manager, config=None):
     Kwargs:
      - config -- optional configparser object
     """
-    if get_config_value(config, 'emissions', 'efs', 'feps').lower() == 'urbanski':
+    efs = get_config_value(config, 'emissions', 'efs', 'feps').lower()
+    if efs == 'urbanski':
         _run_urbanski(fires_manager)
-    else:
+    elif efs == 'feps':
         _run_feps(fires_manager)
+    else:
+        raise BlueSkyConfigurationError(
+            "Invalid emissions factors set: '{}'".format(efs))
 
 def _run_feps(fires_manager):
     logging.debug("Running emissions module FEPS EFs")
