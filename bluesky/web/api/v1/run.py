@@ -11,6 +11,7 @@ import tornado.web
 #from bluesky.web.lib.auth import b_auth
 from bluesky import modules, models, process
 from bluesky.configuration import config_from_dict
+from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
 
 
 class Run(tornado.web.RequestHandler):
@@ -39,11 +40,11 @@ class Run(tornado.web.RequestHandler):
             # in fires_manager.error
             try:
                 process.run_modules(data['modules'], fires_manager, config)
-            except process.BlueSkyModuleError, e:
+            except BlueSkyModuleError, e:
                 # The error was added to fires_manager's meta data, and will
                 # be included in the output data
                 pass
-            except process.BlueSkyImportError, e:
+            except BlueSkyImportError, e:
                 self.set_status(400, "Bad request: {}".format(e.message))
             except Exception, e:
                 logging.error('Exception: {}'.format(e))

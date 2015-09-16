@@ -6,24 +6,15 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-__all__ = [
-    "BlueSkyImportError",
-    "BlueSkyModuleError",
-    "run_modules"
-]
 import importlib
 import logging
 import traceback
 
-##
-## Exception classes to let calling code handle errors differently
-##
+from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
 
-class BlueSkyImportError(ImportError):
-    pass
-
-class BlueSkyModuleError(Exception):
-    pass
+__all__ = [
+    "run_modules"
+]
 
 ##
 ## Public functions
