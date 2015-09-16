@@ -16,7 +16,9 @@ except:
     sys.path.insert(0, root_dir)
     from bluesky.web.app import main
 
-EXAMPLES_STR = """
+# TODO: somehow auto-generate list of 'Configuration Options' in epilog string
+# or use a centrally defined set of recognized options
+EPILOG_STR = """
 Examples:
 
     Help:
@@ -35,12 +37,9 @@ Configuration Options:
   - logging.file -- default none
 """
 
-
-POSITIONAL_ARGS = []
-
 if __name__ == "__main__":
     parser = scripting.args.ArgumentParser()
-    parser.epilog = EXAMPLES_STR
+    pPILOGpilog = EXAMPLES_STR
     parser.formatter_class = scripting.args.RawTextHelpFormatter
     parser.add_argument('-c', '--config', dest='config',
         help="config settings (ex. '-c server.PORT=8888')",
