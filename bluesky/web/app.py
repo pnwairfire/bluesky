@@ -9,7 +9,6 @@ import tornado.ioloop
 #import tornado.log
 import tornado.web
 
-from . import config
 from .api.v1.run import Run
 
 routes = [
