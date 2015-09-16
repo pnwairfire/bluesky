@@ -3,17 +3,22 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-import ConfigParser
 import logging
 import tornado.ioloop
 #import tornado.log
 import tornado.web
 
-from .api.v1.run import Run
 from bluesky.configuration import get_config_value
+# TODO: use path args for version and api module. ex:
+#  routes = [
+#    ('/api/<api_version:[^/]+>/<api_module:[^/]+>/'), Dispatcher
+#  ]
+# and have dispatcher try to dynamically import and run the
+# appropriate hander, returning 404 if not implemented
+from .api.v1.run import Run as RunV1
 
 routes = [
-    (r"/api/v1/run/", Run),
+    (r"/api/v1/run/", RunV1),
 ]
 
 LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
