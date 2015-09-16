@@ -135,13 +135,14 @@ def main():
     try:
         fires_manager = load_fires(args)
         process.run_modules(args.module, fires_manager, args.config_options)
-        fires_manager.dumps()
     except exceptions.BlueSkyModuleError, e:
         # The error was added to fires_manager's meta data, and will be
         # included in the output data
         pass
     except Exception, e:
         exit_with_traceback(e)
+
+    fires_manager.dumps()
 
 if __name__ == "__main__":
     main()
