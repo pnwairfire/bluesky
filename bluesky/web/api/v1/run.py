@@ -10,6 +10,8 @@ import tornado.web
 
 #from bluesky.web.lib.auth import b_auth
 from bluesky import modules, models, process
+from bluesky.configuration import config_from_dict
+
 
 class Run(tornado.web.RequestHandler):
     # def _bad_request(self, msg):
@@ -29,7 +31,7 @@ class Run(tornado.web.RequestHandler):
         else:
             fires = [models.fires.Fire(f) for f in data['fire_information']]
             fires_manager = models.fires.FiresManager(fires=fires)
-            config = data.get('config') or {}
+            config = config_from_dict(data.get('config') or {})
 
             # TODO: somehow commincate back from process.run_modules if exception
             # was caught while running modules set status appropriately?  (or should

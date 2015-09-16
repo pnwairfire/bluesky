@@ -9,6 +9,8 @@ from emitcalc.calculator import EmissionsCalculator
 from eflookup.fccs2ef.lookup import Fccs2Ef
 from eflookup.fepsef import FepsEFLookup
 
+from bluesky.configuration import get_config_value
+
 __all__ = [
     'run'
 ]
@@ -21,7 +23,7 @@ def run(fires_manager, config=None):
     Kwargs:
      - config -- optional configparser object
     """
-    if config and config.get('emissions', 'efs').lower() == 'urbanski':
+    if get_config_value(config, 'emissions', 'efs', 'feps').lower() == 'urbanski':
         _run_urbanski(fires_manager)
     else:
         _run_feps(fires_manager)

@@ -10,16 +10,11 @@ import tornado.ioloop
 import tornado.web
 
 from .api.v1.run import Run
+from bluesky.configuration import get_config_value
 
 routes = [
     (r"/api/v1/run/", Run),
 ]
-
-def get_config_value(config, section, key, default=None):
-    try:
-        return config.get(section, key)
-    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-        return default
 
 LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
 def configure_logging(config):
