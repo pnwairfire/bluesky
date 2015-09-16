@@ -48,7 +48,7 @@ def run_modules(module_names, fires_manager, config):
             # whatever is the current state of fires (or state of fires prior
             # to calling hte module) ?
             # 'run' modifies fires in place
-            module.run(fires_manager.fires, config)
+            module.run(fires_manager, config)
     except Exception, e:
         # when there's an error running modules, don't bail; raise
         # BlueSkyModuleError so that the calling code can decide what to do
