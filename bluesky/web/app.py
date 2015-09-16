@@ -22,12 +22,16 @@ def get_config_value(config, section, key, default=None):
     except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
         return default
 
+LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
 def configure_logging(config):
     log_level = getattr(logging, get_config_value(config, 'logging', 'level', 'WARNING'))
-    logging.basicConfig(level=log_level)
+    logging.basicConfig(level=log_level, format=LOG_FORMAT)
+
     log_file = get_config_value(config, 'logging', 'file')
     if log_file:
-        logging.getLogger().addHandler(logging.FileHandler(log_file))
+        fh = logging.FileHandler(log_file)
+        fh.setFormatter(logging.Formatter(LOG_FORMAT))
+        logging.getLogger().addHandler(fh)
 
 def main(config, debug=False):
     """Main method for starting bluesky tornado web service
