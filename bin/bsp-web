@@ -5,6 +5,8 @@ __copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 
 import tornado.ioloop
 
+from pyairfire import scripting
+
 try:
     from bluesky.web.app import main
 except:
@@ -14,5 +16,33 @@ except:
     sys.path.insert(0, root_dir)
     from bluesky.web.app import main
 
+EXAMPLES_STR = """
+Examples:
+
+    Help:
+        > bsp-web -h
+
+    Basic usage, no options:
+        > bsp-web
+
+    Run in debug mode, with automatic code reloading (helpful in development):
+        > bsp-web -c server.DEBUG=true
+"""
+
+
+POSITIONAL_ARGS = []
+
 if __name__ == "__main__":
-    main()
+    parser = scripting.args.ArgumentParser()
+    parser.epilog = EXAMPLES_STR
+    parser.formatter_class = scripting.args.RawTextHelpFormatter
+    parser.add_argument('-c', '--config', dest='config',
+        help="config settings (ex. '-c server.PORT=8888')",
+        default=scripting.args.ConfigParser.ConfigParser(),
+        action=scripting.args.SetConfigOptionAction)
+    parser.add_argument("-d", "--debug", dest="debug",
+        help="run the server in debug mode (with auto-reloading of code, etc.)",
+        default=False, action="store_true")
+    args = parser.parse_args()
+
+    main(args.config, debug=args.debug)

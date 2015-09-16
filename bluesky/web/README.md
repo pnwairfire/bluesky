@@ -1,5 +1,11 @@
 # BlueSky Web
 
+## Running
+
+Use the help (-h) option to see usage and available config options:
+
+    bsp-web -h
+
 ## APIs
 
 ### GET /api/v1/domains/
