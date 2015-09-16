@@ -39,7 +39,7 @@ Configuration Options:
 
 if __name__ == "__main__":
     parser = scripting.args.ArgumentParser()
-    pPILOGpilog = EXAMPLES_STR
+    parser.epilog = EPILOG_STR
     parser.formatter_class = scripting.args.RawTextHelpFormatter
     parser.add_argument('-c', '--config', dest='config',
         help="config settings (ex. '-c server.PORT=8888')",
