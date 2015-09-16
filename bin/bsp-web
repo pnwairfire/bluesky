@@ -25,8 +25,14 @@ Examples:
     Basic usage, no options:
         > bsp-web
 
-    Run in debug mode, with automatic code reloading (helpful in development):
-        > bsp-web -c server.DEBUG=true
+    Run in debug mode, with automatic code reloading (helpful in development),
+    with log level set to DEBUG:
+        > ./bin/bsp-web -c logging.level=DEBUG -d
+
+Configuration Options:
+  - server.port -- default 8888
+  - logging.level -- default 'WARNING'
+  - logging.file -- default none
 """
 
 

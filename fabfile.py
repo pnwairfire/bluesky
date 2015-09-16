@@ -6,18 +6,18 @@
 # Using Apache to proxy:
 #  If you'd like to let apache proxy requests to the bluesky web server,
 #  and if you're using virtualhosts, You can use something like the following
-#  file: /etc/apache2/sites-available/blueskyweb.bar.com
+#  file: /etc/apache2/sites-available/blueskyweb
 #    <VirtualHost *:80>
 #            ServerAdmin webmaster@localhost
-#            ServerName blueskyweb.bar.com
-#            ServerAlias www.blueskyweb.bar.com
+#            ServerName blueskyweb
+#            ServerAlias www.blueskyweb
 #
 #            ProxyPass / http://127.0.0.1:8888/
 #            ProxyPassReverse / http://127.0.0.1:8888/
 #
-#            ErrorLog /var/www/blueskyweb.bar.com/logs/error.log
+#            ErrorLog /var/www/blueskyweb/logs/error.log
 #            LogLevel warn
-#            CustomLog /var/www/blueskyweb.bar.com/logs/access.log combined
+#            CustomLog /var/www/blueskyweb/logs/access.log combined
 #    </VirtualHost>
 #
 #  If not using virtual hosts, you can put something like the following

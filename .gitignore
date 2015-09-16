@@ -4,3 +4,4 @@ tmp/
 build/
 dist/
 bluesky.egg-info/
+logs/
