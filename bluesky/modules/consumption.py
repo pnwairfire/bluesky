@@ -60,6 +60,9 @@ def run(fires_manager, config=None):
     # use it across all fires, or at lesat accross all fuelbeds within
     # a single fire?
     for fire in fires_manager.fires:
+        if 'fuelbeds' not in fire:
+            raise ValueError("Missing fuelbed data for computing consumption")
+
         burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
         valid_settings = SETTINGS[burn_type] + SETTINGS['all']
 
