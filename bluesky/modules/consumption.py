@@ -93,3 +93,23 @@ def run(fires_manager, config=None):
                 logging.error("Failed to calculate consumption for fire %s / %s fuelbed %s" % (
                     fire.id, fire.name, fb['fccs_id']
                 ))
+    fires_manager.summarize(consumption=summarize(fires_manager.fires))
+
+def summarize(fires):
+    # TODO: skip 'total' keys and compute totals here?
+    if not fires:
+        return {}
+
+    summary = {}
+    for fire in fires:
+        for fb in fire.fuelbeds:
+            for i in fb['consumption']:
+                summary[i] = summary.get(i, {})
+                for j in fb['consumption'][i]:
+                    summary[i][j] = summary[i].get(j, {})
+                    for k in fb['consumption'][i][j]:
+                        num_values = len(fb['consumption'][i][j][k])
+                        summary[i][j][k] = summary[i][j].get(k) or [0] * num_values
+                        for l in range(num_values):
+                            summary[i][j][k][l] += fb['consumption'][i][j][k][l]
+    return summary
