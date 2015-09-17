@@ -10,6 +10,8 @@ __all__ = [
     'run'
 ]
 
+__version__ = "0.1.0"
+
 def run(fires_manager, config=None):
     """Runs the fire data through consumption calculations, using the consume
     package for the underlying computations.
@@ -20,9 +22,15 @@ def run(fires_manager, config=None):
      - config -- optional configparser object
     """
     logging.debug("Running ingestion module")
+    # TODO: check fires_manager.processing for evidence of
+    #  ingestion already being run, and raise exception if so ?
+    #    raise RuntimeError("Fire data was already ingested")
+    #  (or maybe it's ok to run multiple times)
+    parsed_input = []
     fire_ingester = FireIngester(config)
     for fire in fires_manager.fires:
-        fire_ingester.ingest(fire)
+        parsed_input.append(fire_ingester.ingest(fire))
+    fires_manager.processing(__name__, __version__, parsed_input=parsed_input)
 
 class FireIngester(object):
     """Inputs, transforms, and validates fire data, recording original copy
@@ -43,19 +51,19 @@ class FireIngester(object):
     ## Public Interface
     ##
 
+    # TODO: refact
+
     def ingest(self, fire):
         if not fire:
             raise ValueError("Fire contains no data")
-        if fire.has_key('input'):
-            raise RuntimeError("Fire data was already ingested")
 
         # move original data under 'input key'
-        fire['input'] = { k: fire.pop(k) for k in fire.keys() }
+        self._parsed_input = { k: fire.pop(k) for k in fire.keys() }
 
         # copy back down any recognized top level, 'scalar' fields
         for k in self.SCALAR_FIELDS:
-            if fire['input'].has_key(k):
-                fire[k] = fire['input'][k]
+            if self._parsed_input.has_key(k):
+                fire[k] = self._parsed_input[k]
 
         # Call separate ingest methods for each nested object
         for k in self.NESTED_FIELDS:
@@ -65,6 +73,7 @@ class FireIngester(object):
         self._ingest_custom_fields(fire)
         self._set_defaults(fire)
         self._validate(fire)
+        return self._parsed_input
 
     ##
     ## General Helper methods
@@ -94,9 +103,9 @@ class FireIngester(object):
         """
         v = None
         if section:
-            v = fire['input'].get(section, {}).get(key)
+            v = self._parsed_input.get(section, {}).get(key)
         if v is None:
-            v = fire['input'].get(key)
+            v = self._parsed_input.get(key)
         return v
 
     def _get_fields(self, fire, section, optional_fields):
@@ -163,14 +172,14 @@ class FireIngester(object):
         # Note: can't use _get_field[s] as is because 'growth' is an array,
         # not a nested object
         growth = []
-        if not fire['input'].get('growth'):
+        if not self._parsed_input.get('growth'):
             # no growth array - look for 'start'/'end' in top level
-            start = fire['input'].get('start')
-            end = fire['input'].get('end')
+            start = self._parsed_input.get('start')
+            end = self._parsed_input.get('end')
             if start and end:
                 growth.append({'start': start, 'end': end, 'pct': 100.0})
         else:
-            for g in fire['input']['growth']:
+            for g in self._parsed_input['growth']:
                 growth.append({})
                 for f in self.GROWTH_FIELDS:
                     if not g.get(f):

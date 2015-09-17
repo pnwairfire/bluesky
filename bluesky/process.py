@@ -31,7 +31,6 @@ def run_modules(module_names, fires_manager, config):
             raise BlueSkyImportError("Invalid module '{}'".format(m))
 
     fires_manager.summary = fires_manager.summary or {}
-    fires_manager.processing = fires_manager.processing or []
 
     try:
         for module in modules:

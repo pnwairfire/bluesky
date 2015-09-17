@@ -137,6 +137,15 @@ class FiresManager(object):
         for fire in fires_list:
             self._add_fire(fire)
 
+    def add_too_processing(self, module_name, version, **data):
+        self.processing = self.processing or []
+        v = {
+            'module': module_name,
+            'version': version,
+        }
+        if data:
+            v.update(data)
+
     ## Loading data
 
     def load(self, input_dict):
