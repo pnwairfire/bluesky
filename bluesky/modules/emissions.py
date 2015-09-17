@@ -43,6 +43,8 @@ def _run_feps(fires_manager):
     # The same lookup object is used for both Rx and WF
     calculator = EmissionsCalculator(FepsEFLookup())
     for fire in fires_manager.fires:
+        if 'fuelbeds' not in fire:
+            raise ValueError("Missing fuelbed data required for computing emissions")
         for fb in fire.fuelbeds:
             if 'consumption' not in fb:
                 raise ValueError("Missing consumption data required for computing emissions")
@@ -56,6 +58,8 @@ def _run_urbanski(fires_manager):
     fccs2ef_rx = Fccs2Ef(is_rx=True)
 
     for fire in fires_manager.fires:
+        if 'fuelbeds' not in fire:
+            raise ValueError("Missing fuelbed data required for computing emissions")
         fccs2ef = fccs2ef_rx if fire.get('type') == "rx" else fccs2ef_wf
         for fb in fire.fuelbeds:
             if 'consumption' not in fb:
