@@ -48,9 +48,9 @@ class Fire(dict):
             ] if e]).replace(' ', '')
             self.auto_initialized_attrs.append('id')
 
-        if not self.get('name'):
-            self['name'] = 'Unknown-%s' % (self['id'])
-            self.auto_initialized_attrs.append('name')
+        # if not self.get('name'):
+        #     self['name'] = 'Unknown-%s' % (self['id'])
+        #     self.auto_initialized_attrs.append('name')
 
     def __getattr__(self, attr):
         if attr in self.keys():
