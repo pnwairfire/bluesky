@@ -44,6 +44,8 @@ def _run_feps(fires_manager):
     calculator = EmissionsCalculator(FepsEFLookup())
     for fire in fires_manager.fires:
         for fb in fire.fuelbeds:
+            if 'consumption' not in fb:
+                raise ValueError("Missing consumption data required for computing emissions")
             fb['emissions'] = calculator.calculate(fb["consumption"])
 
 def _run_urbanski(fires_manager):
@@ -56,5 +58,7 @@ def _run_urbanski(fires_manager):
     for fire in fires_manager.fires:
         fccs2ef = fccs2ef_rx if fire.get('type') == "rx" else fccs2ef_wf
         for fb in fire.fuelbeds:
+            if 'consumption' not in fb:
+                raise ValueError("Missing consumption data required for computing emissions")
             calculator = EmissionsCalculator([fccs2ef[fb["fccs_id"]]])
             fb['emissions'] = calculator.calculate(fb["consumption"])

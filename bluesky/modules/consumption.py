@@ -61,7 +61,7 @@ def run(fires_manager, config=None):
     # a single fire?
     for fire in fires_manager.fires:
         if 'fuelbeds' not in fire:
-            raise ValueError("Missing fuelbed data for computing consumption")
+            raise ValueError("Missing fuelbed data required for computing consumption")
 
         burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
         valid_settings = SETTINGS[burn_type] + SETTINGS['all']
