@@ -1,3 +1,8 @@
+"""Unit tests for bluesky.modules.fuelbeds"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+
 import copy
 import mock
 

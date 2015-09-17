@@ -1,3 +1,8 @@
+"""Unit tests for bluesky.io"""
+
+__author__      = "Joel Dubowy"
+__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+
 import json
 import sys
 import StringIO
