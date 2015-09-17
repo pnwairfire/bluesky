@@ -30,8 +30,6 @@ def run_modules(module_names, fires_manager, config):
         except ImportError, e:
             raise BlueSkyImportError("Invalid module '{}'".format(m))
 
-    fires_manager.summary = fires_manager.summary or {}
-
     try:
         for module in modules:
             # TDOO: catch any exception raised by a module and dumps
