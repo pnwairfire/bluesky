@@ -250,49 +250,92 @@ it through the fuelbeds module, with the following:
 
     bsp -i fires.json fuelbeds
 
-You would get the folloing output (which is the input json with the addition
-of the 'fuelbeds' array in the fire object):
+You would get the following output (which is the input json with the addition
+of the 'fuelbeds' array in the fire object, plus 'processing' and 'summary'
+fields):
 
     {
-        "fire_information": [{
-            "name": "Natural Fire near Snoqualmie Pass, WA",
-            "event_id": "SF11E826544",
-            "fuelbeds": [{
-                "fccs_id": "49",
-                "pct": 50.0
-            }, {
-                "fccs_id": "46",
-                "pct": 50.0
-            }],
-            "location": {
-                "perimeter": {
-                    "type": "MultiPolygon",
-                    "coordinates": [
-                        [
-                            [
-                                [-121.4522115, 47.4316976],
-                                [-121.3990506, 47.4316976],
-                                [-121.3990506, 47.4099293],
-                                [-121.4522115, 47.4099293],
-                                [-121.4522115, 47.4316976]
-                            ]
-                        ]
-                    ]
+        "fire_information": [
+            {
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "ecoregion": "southern",
-                "timezone": "-09:00",
-                "area": 2398.94477979842
-            },
-            "growth": [
-                {
-                    "pct": 100,
-                    "start": "20150120",
-                    "end": "20150120"
+                "fuelbeds": [
+                    {
+                        "fccs_id": "49",
+                        "pct": 50.0
+                    },
+                    {
+                        "fccs_id": "46",
+                        "pct": 50.0
+                    }
+                ],
+                "growth": [
+                    {
+                        "end": "20150120",
+                        "pct": 100,
+                        "start": "20150120"
+                    }
+                ],
+                "id": "SF11C14225236095807750",
+                "location": {
+                    "area": 2398.94477979842,
+                    "ecoregion": "southern",
+                    "perimeter": {
+                        "coordinates": [
+                            [
+                                [
+                                    [
+                                        -121.4522115,
+                                        47.4316976
+                                    ],
+                                    [
+                                        -121.3990506,
+                                        47.4316976
+                                    ],
+                                    [
+                                        -121.3990506,
+                                        47.4099293
+                                    ],
+                                    [
+                                        -121.4522115,
+                                        47.4099293
+                                    ],
+                                    [
+                                        -121.4522115,
+                                        47.4316976
+                                    ]
+                                ]
+                            ]
+                        ],
+                        "type": "MultiPolygon"
+                    },
+                    "timezone": "-09:00"
                 }
-            ],
-            "id": "SF11C14225236095807750"
-        }]
+            }
+        ],
+        "processing": [
+            {
+                "fccsmap_version": "0.1.7",
+                "module": "bluesky.modules.fuelbeds",
+                "version": "0.1.0"
+            }
+        ],
+        "summary": {
+            "fuelbeds": [
+                {
+                    "fccs_id": "46",
+                    "pct": 50.0
+                },
+                {
+                    "fccs_id": "49",
+                    "pct": 50.0
+                }
+            ]
+        }
     }
+
 
 This output could be piped back into ```bsp``` and run through the consumption
 module, like so:
