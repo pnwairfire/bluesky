@@ -99,7 +99,8 @@ would give you:
         ],
         "processing": [
             {
-                "module": "INGESTION 0.17,
+                "module": "bluesky.modules.ingestion",
+                "version": "0.17.0",
                 "parsed_input":
                     "id": "SF11C14225236095807750",
                     "event_of": {
@@ -185,24 +186,24 @@ would give you:
                         "end": "20150122"
                     },
                 ],
-            }
-        ],
-        "fuelbeds": [
-            {
-                "fccs_id": "49",
-                "pct": 50.0
-                "fuel_loadings": {
-                    "canopy": 1232,
-                    /* ... */
-                },
-            },
-            {
-                "fccs_id": "46",
-                "pct": 50.0
-                "fuel_loadings": {
-                    "canopy": 143,
-                    /* ... */
-                },
+                "fuelbeds": [
+                    {
+                        "fccs_id": "49",
+                        "pct": 50.0
+                        "fuel_loadings": {
+                            "canopy": 1232,
+                            /* ... */
+                        },
+                    },
+                    {
+                        "fccs_id": "46",
+                        "pct": 50.0
+                        "fuel_loadings": {
+                            "canopy": 143,
+                            /* ... */
+                        },
+                    }
+                ],
             }
         ],
         "summary": {
@@ -223,7 +224,8 @@ would give you:
         },
         "processing": [
             {
-                "module": "INGESTION 0.17,
+                "module": "bluesky.modules.ingestion",
+                "version": "0.17.0",
                 "parsed_input":
                     "event_of": {
                         "id": "SF11E826544",
@@ -261,7 +263,11 @@ would give you:
                     ],
                 }
             },
-            "looked up fuelbeds"
+            {
+                "module": "bluesky.modules.fuelbeds",
+                "version": "0.2.1",
+                "fccsmap_version": "0.2.1"
+            },
         ]
     }
 
@@ -311,70 +317,70 @@ would give you:
                         "end": "20150122"
                     },
                 ],
-            }
-        ],
-        "fuelbeds": [
-            {
-                "fccs_id": "49",
-                "pct": 50.0
-                "fuel_loadings": {
-                    "canopy": 143,
-                    /* ... */
-                },
-                "consumption": {
-                    "canopy": {
-                        "ladder fuels": {
-                            "flaming": [0.0],
-                            "residual": [0.0],
-                            "smoldering": [0.0],
-                            "total": [0.0]
+                "fuelbeds": [
+                    {
+                        "fccs_id": "49",
+                        "pct": 50.0
+                        "fuel_loadings": {
+                            "canopy": 143,
+                            /* ... */
                         },
-                        /* ... */
-                        "understory": {
-                            "flaming": [0.0],
-                            "residual": [0.0],
-                            "smoldering": [0.0],
-                            "total": [0.0]
-                        }
-                        /* ... */
+                        "consumption": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                },
+                                /* ... */
+                                "understory": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                }
+                                /* ... */
+                            }
+                            /* ... */
+                         }
+                     },
+                    {
+                        "fccs_id": "46",
+                        "pct": 50.0
+                        "fuel_loadings": {
+                            "canopy": 143,
+                            /* ... */
+                        },
+                        "consumption": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                },
+                                /* ... */
+                                "understory": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                }
+                            },
+                            "ground fuels": {
+                                "basal accumulations": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                },
+                                /* ... */
+                            }
+                            /* ... */
+                         }
                     }
-                    /* ... */
-                 }
-             },
-            {
-                "fccs_id": "46",
-                "pct": 50.0
-                "fuel_loadings": {
-                    "canopy": 143,
-                    /* ... */
-                },
-                "consumption": {
-                    "canopy": {
-                        "ladder fuels": {
-                            "flaming": [0.0],
-                            "residual": [0.0],
-                            "smoldering": [0.0],
-                            "total": [0.0]
-                        },
-                        /* ... */
-                        "understory": {
-                            "flaming": [0.0],
-                            "residual": [0.0],
-                            "smoldering": [0.0],
-                            "total": [0.0]
-                        }
-                    },
-                    "ground fuels": {
-                        "basal accumulations": {
-                            "flaming": [0.0],
-                            "residual": [0.0],
-                            "smoldering": [0.0],
-                            "total": [0.0]
-                        },
-                        /* ... */
-                    }
-                    /* ... */
-                 }
+                ],
             }
         ],
         "summary": {
@@ -419,7 +425,8 @@ would give you:
         },
         "processing": [
             {
-                "module": "INGESTION 0.17,
+                "module": "bluesky.modules.ingestion",
+                "version": "0.17.0",
                 "parsed_input":
                     "event_of": {
                         "id": "SF11E826544",
@@ -457,8 +464,16 @@ would give you:
                     ],
                 }
             },
-            "fuelbeds",
-            "CONSUMPTION: consume"
+            {
+                "module": "bluesky.modules.fuelbeds",
+                "version": "0.2.1",
+                "fccsmap_version": "0.2.1"
+            },
+            {
+                "module": "bluesky.modules.consumption",
+                "version": "0.1.2",
+                "consume_version": "0.4.3"
+            }
         ]
     }
 
@@ -510,110 +525,110 @@ would give you:
                         "end": "20150122"
                     },
                 ],
-            }
-        ],
-        "fuelbeds": [
-            {
-                "fccs_id": "49",
-                "pct": 50.0
-                "fuel_loadings": {
-                    "canopy": 143,
-                    /* ... */
-                },
-                "consumption": {
-                    "canopy": {
-                        "ladder fuels": {
-                            "flaming": [0.0],
-                            "residual": [0.0],
-                            "smoldering": [0.0],
-                            "total": [0.0]
+                "fuelbeds": [
+                    {
+                        "fccs_id": "49",
+                        "pct": 50.0
+                        "fuel_loadings": {
+                            "canopy": 143,
+                            /* ... */
                         },
-                        /* ... */
-                        "understory": {
-                            "flaming": [0.0],
-                            "residual": [0.0],
-                            "smoldering": [0.0],
-                            "total": [0.0]
-                        }
-                        /* ... */
-                    }
-                    /* ... */
-                },
-                "emissions": {
-                    "canopy": {
-                        "ladder fuels": {
-                            "flaming": {
-                                "CH4": [0.0],
+                        "consumption": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                },
                                 /* ... */
-                            },
-                            "residual": {
-                                "CH4": [0.0],
-                                /* ... */
-                            },
-                            "smoldering": {
-                                "CH4": [0.0],
+                                "understory": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                }
                                 /* ... */
                             }
+                            /* ... */
                         },
-                        /* ... */
-                    }
-                    /* ... */
-                }
-             },
-            {
-                "fccs_id": "46",
-                "pct": 50.0
-                "fuel_loadings": {
-                    "canopy": 143,
-                    /* ... */
-                },
-                "consumption": {
-                    "canopy": {
-                        "ladder fuels": {
-                            "flaming": [0.0],
-                            "residual": [0.0],
-                            "smoldering": [0.0],
-                            "total": [0.0]
-                        },
-                        /* ... */
-                        "understory": {
-                            "flaming": [0.0],
-                            "residual": [0.0],
-                            "smoldering": [0.0],
-                            "total": [0.0]
-                        }
-                    },
-                    "ground fuels": {
-                        "basal accumulations": {
-                            "flaming": [0.0],
-                            "residual": [0.0],
-                            "smoldering": [0.0],
-                            "total": [0.0]
-                        },
-                        /* ... */
-                    }
-                    /* ... */
-                }
-                "emissions": {
-                    "canopy": {
-                        "ladder fuels": {
-                            "flaming": {
-                                "CH4": [0.0],
-                                /* ... */
-                            },
-                            "residual": {
-                                "CH4": [0.0],
-                                /* ... */
-                            },
-                            "smoldering": {
-                                "CH4": [0.0],
+                        "emissions": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": {
+                                        "CH4": [0.0],
+                                        /* ... */
+                                    },
+                                    "residual": {
+                                        "CH4": [0.0],
+                                        /* ... */
+                                    },
+                                    "smoldering": {
+                                        "CH4": [0.0],
+                                        /* ... */
+                                    }
+                                },
                                 /* ... */
                             }
+                            /* ... */
+                        }
+                     },
+                    {
+                        "fccs_id": "46",
+                        "pct": 50.0
+                        "fuel_loadings": {
+                            "canopy": 143,
+                            /* ... */
                         },
-                        /* ... */
+                        "consumption": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                },
+                                /* ... */
+                                "understory": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                }
+                            },
+                            "ground fuels": {
+                                "basal accumulations": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                },
+                                /* ... */
+                            }
+                            /* ... */
+                        }
+                        "emissions": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": {
+                                        "CH4": [0.0],
+                                        /* ... */
+                                    },
+                                    "residual": {
+                                        "CH4": [0.0],
+                                        /* ... */
+                                    },
+                                    "smoldering": {
+                                        "CH4": [0.0],
+                                        /* ... */
+                                    }
+                                },
+                                /* ... */
+                            }
+                            /* ... */
+                        }
                     }
-                    /* ... */
-                }
+                ],
             }
         ],
         "summary": {
@@ -678,7 +693,8 @@ would give you:
         },
         "processing": [
             {
-                "module": "INGESTION 0.17,
+                "module": "bluesky.modules.ingestion",
+                "version": "0.17.0",
                 "parsed_input":
                     "event_of": {
                         "id": "SF11E826544",
@@ -716,9 +732,22 @@ would give you:
                     ],
                 }
             },
-            "fuelbeds",
-            "CONSUMPTION: consume",
-            "emissions"
+            {
+                "module": "bluesky.modules.fuelbeds",
+                "version": "0.2.1",
+                "fccsmap_version": "0.2.1"
+            },
+            {
+                "module": "bluesky.modules.consumption",
+                "version": "0.1.2",
+                "consume_version": "0.4.3"
+            },
+            {
+                "module": "bluesky.modules.emissions",
+                "version": "0.1.0",
+                "emitcalc_version": "0.5.2",
+                "ef_set": "feps"
+            }
         ]
     }
 
