@@ -8,6 +8,8 @@ import json
 import sys
 import uuid
 
+from bluesky import datautils
+
 __all__ = [
     'Fire',
     'InvalidFilterError',
@@ -148,6 +150,10 @@ class FiresManager(object):
         if data:
             v.update(data)
         self._processing.append(v)
+
+    def summarize(self, **data):
+        self.summary = self.summary or {}
+        self.summary = datautils.deepmerge(self.summary, data)
 
     ## Loading data
 
