@@ -6,11 +6,14 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import logging
 import random
 
+import fccsmap
 from fccsmap.lookup import FccsLookUp
 
 __all__ = [
     'run'
 ]
+
+__version__ = "0.1.0"
 
 FCCS_VERSION = '2' # TODO: make this configurable
 
@@ -23,6 +26,8 @@ def run(fires_manager, config=None):
      - config -- optional configparser object
     """
     logging.info("Running fuelbeds module")
+    fires_manager.processing(__name__, __version__,
+        fccsmap_version=fccsmap.__version__)
     for fire in fires_manager.fires:
         # TODO: instead of instantiating a new FccsLookUp and Estimator for
         # each fire, create AK and non-AK lookup and estimator objects that

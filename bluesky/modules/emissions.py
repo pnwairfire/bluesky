@@ -5,6 +5,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import logging
 
+import emitcalc
 from emitcalc.calculator import EmissionsCalculator
 from eflookup.fccs2ef.lookup import Fccs2Ef
 from eflookup.fepsef import FepsEFLookup
@@ -15,6 +16,7 @@ from bluesky.exceptions import BlueSkyConfigurationError
 __all__ = [
     'run'
 ]
+__version__ = "0.1.0"
 
 def run(fires_manager, config=None):
     """Runs emissions module
@@ -25,6 +27,8 @@ def run(fires_manager, config=None):
      - config -- optional configparser object
     """
     efs = get_config_value(config, 'emissions', 'efs', 'feps').lower()
+    fires_manager.processing(__name__, __version__,
+        emitcalc_version=emitcalc.__version__, ef_set=efs)
     if efs == 'urbanski':
         _run_urbanski(fires_manager)
     elif efs == 'feps':

@@ -10,6 +10,8 @@ __all__ = [
     'run'
 ]
 
+__version__ = "0.1.0"
+
 # TODO: These burn-type pecific settings sets might not be correct
 # TODO: Check with Susan P, Susan O, Kjell, etc. to make sure defaults are correct
 SETTINGS = {
@@ -42,6 +44,13 @@ def run(fires_manager, config=None):
      - config -- optional configparser object
     """
     logging.debug("Running consumption module")
+    # TODO: don't hard code consume_version; either update consume to define
+    # it's version in consume.__version__, or execute pip:
+    #   $ pip freeze |grep consume
+    #  or
+    #   $ pip show apps-consume4|grep "^Version:"
+    fires_manager.processing(__name__, __version__,
+        consume_version="4.1.2")
 
     # TODO: update bsp to have generic way of specifying module-specific
     # config, and get msg_level and burn_type from config
