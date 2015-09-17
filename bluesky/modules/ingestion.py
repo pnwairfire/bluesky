@@ -13,24 +13,29 @@ __all__ = [
 __version__ = "0.1.0"
 
 def run(fires_manager, config=None):
-    """Runs the fire data through consumption calculations, using the consume
-    package for the underlying computations.
+    """Ingests the fire data, recording a copy of the raw input and restructuring
+    the data as necessary
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     Kwargs:
      - config -- optional configparser object
+
+    Note: Ingestion typically should only be run once, but the code does *not*
+    enforce this.
     """
     logging.debug("Running ingestion module")
-    # TODO: check fires_manager.processing for evidence of
-    #  ingestion already being run, and raise exception if so ?
-    #    raise RuntimeError("Fire data was already ingested")
-    #  (or maybe it's ok to run multiple times)
-    parsed_input = []
-    fire_ingester = FireIngester(config)
-    for fire in fires_manager.fires:
-        parsed_input.append(fire_ingester.ingest(fire))
-    fires_manager.processing(__name__, __version__, parsed_input=parsed_input)
+    try:
+        parsed_input = []
+        fire_ingester = FireIngester(config)
+        for fire in fires_manager.fires:
+            parsed_input.append(fire_ingester.ingest(fire))
+        fires_manager.processing(__name__, __version__, parsed_input=parsed_input)
+    except:
+        # just record what module was run; the error will be inserted
+        # into output data by calling code
+        fires_manager.processing(__name__, __version__)
+        raise
 
 class FireIngester(object):
     """Inputs, transforms, and validates fire data, recording original copy
