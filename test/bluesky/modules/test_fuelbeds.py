@@ -8,6 +8,7 @@ import mock
 
 from py.test import raises
 
+from bluesky.models.fires import Fire
 from bluesky.modules import fuelbeds
 
 PERIMETER = {
@@ -69,6 +70,53 @@ FUELBED_INFO_60_30['fuelbeds']['47']['percent'] = 30
 # total % > 100
 FUELBED_INFO_60_40_10 = copy.deepcopy(FUELBED_INFO_60_40)
 FUELBED_INFO_60_40_10['fuelbeds']['50'] = {"grid_cells": 1, "percent": 10.0}
+
+
+##
+## Tests for summarize
+##
+
+class TestSummarize(object):
+
+    def test_no_fires(self):
+        assert fuelbeds.summarize([]) == []
+
+    def test_one_fire(self):
+        fires = [
+            Fire({
+                "location":{"area": 10},
+                "fuelbeds":[
+                    {"fccs_id": "1", "pct": 40},
+                    {"fccs_id": "2", "pct": 60}
+                ]
+            })
+        ]
+        summary = fuelbeds.summarize(fires)
+        assert summary == fires[0]['fuelbeds']
+    def test_two_fires(self):
+        fires = [
+            Fire({
+                "location":{"area": 10},
+                "fuelbeds":[
+                    {"fccs_id": "1", "pct": 30},
+                    {"fccs_id": "2", "pct": 70}
+                ]
+            }),
+            Fire({
+                "location":{"area": 5},
+                "fuelbeds":[
+                    {"fccs_id": "2", "pct": 10},
+                    {"fccs_id": "3", "pct": 90}
+                ]
+            })
+        ]
+        expected_summary = [
+            {"fccs_id": "1", "pct": 20},
+            {"fccs_id": "2", "pct": 50},
+            {"fccs_id": "3", "pct": 30}
+        ]
+        summary = fuelbeds.summarize(fires)
+        assert summary == expected_summary
 
 
 ##

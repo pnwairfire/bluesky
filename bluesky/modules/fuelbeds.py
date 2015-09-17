@@ -5,6 +5,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import logging
 import random
+from collections import defaultdict
 
 import fccsmap
 from fccsmap.lookup import FccsLookUp
@@ -35,7 +36,20 @@ def run(fires_manager, config=None):
         lookup = FccsLookUp(is_alaska=fire['location'].get('state')=='AK',
             fccs_version=FCCS_VERSION)
         Estimator(lookup).estimate(fire)
+    fires_manager.summarize(fuelbeds=summarize(fires_manager.fires))
 
+def summarize(fires):
+    if not fires:
+        return []
+
+    area_by_fccs_id = defaultdict(lambda: 0)
+    for fire in fires:
+        for fb in fire.fuelbeds:
+            area_by_fccs_id[fb['fccs_id']] += (fb['pct'] / 100.0) * fire['location']['area']
+    total_area = reduce(lambda a, b: a + b, [fire['location']['area'] for fire in fires])
+    summary = [{"fccs_id": fccs_id, "pct": (area / total_area) * 100.0}
+        for fccs_id, area in area_by_fccs_id.items()]
+    return sorted(summary, key=lambda a: a["fccs_id"])
 
 # TODO: change 'get_*' functions to 'set_*' and chnge fire in place
 # rather than return values ???
