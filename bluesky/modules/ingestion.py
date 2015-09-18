@@ -21,8 +21,12 @@ def run(fires_manager, config=None):
     Kwargs:
      - config -- optional configparser object
 
+    Note: The input being recorded may not be purely 'raw', since any fire
+      lacking an id will have one auto-generated during Fire object
+      instantiation.  Otherwise, what's recorded is the user's input.
+
     Note: Ingestion typically should only be run once, but the code does *not*
-    enforce this.
+      enforce this.
     """
     logging.debug("Running ingestion module")
     try:
@@ -45,8 +49,22 @@ class FireIngester(object):
     def __init__(self, config=None):
         self._config = config
 
+    # TODO: support synonyms (?)
+    #  ex:
+    #    SYNONYMS = {
+    #        "date_time": "start"
+    #        # TODO: fill in other synonyms
+    #    }
+    #  with logic like:
+    #    for k,v in self.SYNONYMS.items():
+    #        if fire.has_key(k) and not fire.has_key(v):
+    #            # TDOO: should we pop 'k':
+    #            #  >  self[v] = self.pop(k)
+    #            fire[v] = fire[k]
+    # and do so recursively to get nested objects under fire object
+
     SCALAR_FIELDS = {
-        "id",
+        "id"
     }
     NESTED_FIELDS = {
         "location", "growth", "event_of"

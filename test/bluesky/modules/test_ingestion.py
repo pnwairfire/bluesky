@@ -18,6 +18,14 @@ class TestIngester(object):
     ## Tests For ingest
     ##
 
+    # TODO: if ingestion is updated to fill in synonyms, add test like
+    # the following, which was
+    # def test_fills_in_synonyms(self):
+    #     f = fires.Fire({"date_time": "20140202T121223", "b": "sdf"})
+    #     self.ingester.inget(f)
+    #     assert ...
+
+
     def test_fire_missing_required_fields(self):
         with raises(ValueError) as e:
             self.ingester.ingest({})

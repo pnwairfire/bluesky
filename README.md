@@ -574,166 +574,87 @@ work only if you let the results go to STDOUT.  For example:
 
 #### Ingestion
 
-The ingestion module does various things.  For each fire, it does the following:
+For each fire, the ingestion module does the following:
 
-**1. Nests the entire fire obect under key 'input.**
+ 1. Moves the raw fire object to the 'parsed_input' array under the ingestion module's processing record -- In so doing, it keeps a record of the initial data, which will remain untouched.
+ 2. Copies recognized fields back into a fire object under the 'fire_information' array -- In this step, it looks for nested fields both in the correctly nested
+locations as well as in the root fire object.
+ 3. Validates the fire data -- For example, if there is no location information, or if the nested location is insufficient, a ```ValueError``` is raised.
 
-For example,
+Some proposed but not yet implemented tasks:
 
-    {
-        "fire_information": [
-            {
-                "location": {
-                    "latitude": 47.4316976,
-                    "longitude": -121.3990506,
-                    "area": 200,
-                    "timezone": "-09:00"
-                }
-            }
-        ]
-    }
-
-would become:
-
-    {
-        "fire_information": [
-            {
-                "input": {
-                    "location": {
-                        "latitude": 47.4316976,
-                        "longitude": -121.3990506,
-                        "area": 200,
-                        "timezone": "-09:00"
-                    }
-                }
-            }
-        ]
-    }
-
-In so doing, it keeps a record of the initial data, which will remain untouched.
-
-**2. Copies recognized fields back up to the top level**
-
-For example,
-
-    {
-        "fire_information": [
-            {
-                "input": {
-                    "location": {
-                        "latitude": 47.4316976,
-                        "longitude": -121.3990506,
-                        "area": 200,
-                        "timezone": "-09:00",
-                        "foo": "bar"
-                    }
-                }
-            }
-        ]
-    }
-
-would become,
-
-    {
-        "fire_information": [
-            {
-                "input": {
-                    "location": {
-                        "latitude": 47.4316976,
-                        "longitude": -121.3990506,
-                        "area": 200,
-                        "timezone": "-09:00",
-                        "foo": "bar"  /*  <-- This is ignored */
-                    }
-                },
-                "location": {
-                    "latitude": 47.4316976,
-                    "longitude": -121.3990506,
-                    "area": 200,
-                    "timezone": "-09:00"
-                }
-            }
-        ]
-    }
-
-In this step, it looks for nested fields both in the correctly nested
-locations as well as in the root fire object.  For example:
-
-    {
-        "fire_information": [
-            {
-                "input": {
-                    "location": {
-                        "latitude": 47.4316976,
-                        "longitude": -121.3990506
-                    },
-                    "area": 200,
-                    "timezone": "-09:00"
-                }
-            }
-        ]
-    }
-
-would become,
-
-    {
-        "fire_information": [
-            {
-                "input": {
-                    "location": {
-                        "latitude": 47.4316976,
-                        "longitude": -121.3990506
-                    },
-                    "area": 200
-                },
-                "location": {
-                    "latitude": 47.4316976,
-                    "longitude": -121.3990506,
-                    "area": 200,
-                }
-            }
-        ]
-    }
-
-**3. Copies custom fields up to the top level**
-
-User-identified fields that should also be copied from the input data up to
-the top level can be configured.
-
-*(Not yet implemented)*
-
-**4. Sets defaults**
-
-There are no hardcoded defaults, but defualts can be configured.
-
-*(Not yet implemented)*
-
-**5. Sets derived fields**
-
-This entails setting undefined fields (such as 'name') from other fields'
-values. For example, given the following location information
-
-    {
-        ...
-        "location": {
-            "latitude": 47.4316976,
-            "longitude": -121.4522115
-        }
-        ...
-    }
-
-The name (if not set already) would be set to
-
-    "Unnamed fire near 47.43170, -121.45221"
-
-**6. Validates the fire data**
-
-For example, if there is not location information, or if the nested location
-is insufficient, a ```ValueError``` is raised.
+ 1. Copy custom fields up to the top level -- i.e. user-identified fields that should also be copied from the input data up to the top level can be configured.
+ 2. Set defaults -- There are no hardcoded defaults, but defaults could be configured
+ 3. Sets derived fields -- There's no current need for this, but an example would be to derive
 
 ##### Ingestion example
 
-As a full example, starting with the following input data (which we'll
+###### Example 1
+
+Assume you start with the following data:
+
+    {
+        "fire_information": [
+            {
+                    "location": {
+                        "latitude": 47.4316976,
+                        "longitude": -121.3990506
+                    },
+                    "area": 200,
+                    "timezone": "-09:00",
+                    "name": "event name",
+                    "event_id": "jfkhfdskj"
+            }
+        ]
+    }
+
+It would become:
+
+    {
+        "fire_information": [
+            {
+                "event_of": {
+                    "id": "jfkhfdskj",
+                    "name": "event name"
+                },
+                "id": "7e10cd4a",
+                "location": {
+                    "area": 200,
+                    "latitude": 47.4316976,
+                    "longitude": -121.3990506,
+                    "timezone": "-09:00"
+                }
+            }
+        ],
+        "processing": [
+            {
+                "module": "bluesky.modules.ingestion",
+                "parsed_input": [
+                    {
+                        "area": 200,
+                        "event_id": "jfkhfdskj",
+                        "id": "7e10cd4a",
+                        "location": {
+                            "latitude": 47.4316976,
+                            "longitude": -121.3990506
+                        },
+                        "name": "event name",
+                        "timezone": "-09:00"
+                    }
+                ],
+                "version": "0.1.0"
+            }
+        ]
+    }
+
+Notice:
+ - The 'raw' input under processing isn't purely raw, as the fire has been assigned an id ("4b94a511").  This is the one auto-generated field that you will find under 'processing' > 'parsed_input'.  If the fire object already contains an id, it will be used, in which case the raw fire input is in fact exactly what the user input.
+ - The 'area' and 'timezone' keys are initially defined at the top level, but, after ingestion, are under the 'location' object.  Similarly, 'name' gets moved under 'event_of' (since names apply to fire events, not to fire locations).
+ - The 'event_id' key gets moved under 'event_of' and is renamed 'id'.
+
+###### Example 2
+
+As a fuller example, starting with the following input data (which we'll
 assume is in fires.json):
 
     {
@@ -773,52 +694,63 @@ you'll end up with this:
     {
         "fire_information": [
             {
-                "event_id": "SF11E826544",
-                "id": "SF11C14225236095807750",
-                "input": {
-                    "event_id": "SF11E826544",
-                    "id": "SF11C14225236095807750",
-                    "location": {
-                        "area": 200,
-                        "ecoregion": "southern",
-                        "latitude": 47.4316976,
-                        "longitude": -121.3990506,
-                        "timezone": "-09:00",
-                        "foo": "bar"
-                    },
-                    "ecoregion": "southern",
-                    "name": "Natural Fire near Snoqualmie Pass, WA",
-                    "growth": [
-                        {
-                            "end": "20150120",
-                            "start": "20150120T000000Z",
-                            "pct": 100.0
-                        }
-                    ],
-                    "bar": 123
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
+                "growth": [
+                    {
+                        "end": "20150120",
+                        "pct": 100.0,
+                        "start": "20150120"
+                    }
+                ],
+                "id": "SF11C14225236095807750",
                 "location": {
                     "area": 200,
                     "ecoregion": "southern",
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
-                    "ecoregion": "southern",
                     "timezone": "-09:00"
-                },
-                "name": "Natural Fire near Snoqualmie Pass, WA",
-                "growth": [
+                }
+            }
+        ],
+        "processing": [
+            {
+                "module": "bluesky.modules.ingestion",
+                "parsed_input": [
                     {
-                        "end": "20150120",
-                        "start": "20150120T000000Z",
-                        "pct": 100.0
+                        "bar": 123,
+                        "ecoregion": "southern",
+                        "event_of": {
+                            "id": "SF11E826544",
+                            "name": "Natural Fire near Snoqualmie Pass, WA"
+                        },
+                        "growth": [
+                            {
+                                "end": "20150120",
+                                "pct": 100.0,
+                                "start": "20150120"
+                            }
+                        ],
+                        "id": "SF11C14225236095807750",
+                        "location": {
+                            "area": 200,
+                            "foo": "bar",
+                            "latitude": 47.4316976,
+                            "longitude": -121.3990506,
+                            "timezone": "-09:00"
+                        }
                     }
-                ]
+                ],
+                "version": "0.1.0"
             }
         ]
     }
 
-Note that "foo" and "bar" were ignored (though left under 'input'), and
-"ecoregion" got moved under "location".
+Notice:
+ - "foo" and "bar" were ignored (though left in the recorded raw input)
+ - "ecoregion" got moved under "location"
 
 #### Notes About Input Fire Data
 
