@@ -51,7 +51,7 @@ def run(fires_manager, config=None):
     #   $ pip freeze |grep consume
     #  or
     #   $ pip show apps-consume4|grep "^Version:"
-    fires_manager.processing(__name__, __version__,
+    fires_manager.processed(__name__, __version__,
         consume_version="4.1.2")
 
     # TODO: update bsp to have generic way of specifying module-specific

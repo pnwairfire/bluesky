@@ -28,7 +28,7 @@ def run(fires_manager, config=None):
      - config -- optional configparser object
     """
     efs = get_config_value(config, 'emissions', 'efs', 'feps').lower()
-    fires_manager.processing(__name__, __version__,
+    fires_manager.processed(__name__, __version__,
         emitcalc_version=emitcalc.__version__, ef_set=efs)
     if efs == 'urbanski':
         _run_urbanski(fires_manager)

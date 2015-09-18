@@ -27,7 +27,7 @@ def run(fires_manager, config=None):
      - config -- optional configparser object
     """
     logging.info("Running fuelbeds module")
-    fires_manager.processing(__name__, __version__,
+    fires_manager.processed(__name__, __version__,
         fccsmap_version=fccsmap.__version__)
     for fire in fires_manager.fires:
         # TODO: instead of instantiating a new FccsLookUp and Estimator for

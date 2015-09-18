@@ -139,17 +139,17 @@ class FiresManager(object):
         for fire in fires_list:
             self._add_fire(fire)
 
-    def processing(self, module_name, version, **data):
+    def processed(self, module_name, version, **data):
         # TODO: determine module from call stack rather than require name
         # to be passed in.  Also get version from module's __version__
-        self._processing = self._processing or []
+        self.processing = self.processing or []
         v = {
             'module': module_name,
             'version': version,
         }
         if data:
             v.update(data)
-        self._processing.append(v)
+        self.processing.append(v)
 
     def summarize(self, **data):
         self.summary = self.summary or {}
@@ -194,7 +194,7 @@ class FiresManager(object):
     ## Dumping data
 
     def dump(self):
-        return dict(self._meta, fire_information=self.fires, processing=self._processing)
+        return dict(self._meta, fire_information=self.fires)
 
     def dumps(self, output_stream=None, output_file=None):
         if output_stream and output_file:
