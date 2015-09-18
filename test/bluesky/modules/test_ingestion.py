@@ -65,10 +65,6 @@ class TestIngester(object):
                 }
             )
 
-    def test_fire_was_aready_ingested(self):
-        with raises(RuntimeError) as e:
-            self.ingester.ingest({'input':{}})
-
     def test_fire_with_minimum_fields(self):
         f = {
             "location": {
@@ -89,11 +85,12 @@ class TestIngester(object):
             }
         }
         expected = {
-            'input': copy.deepcopy(f),
             'location': copy.deepcopy(f['location'])
         }
-        self.ingester.ingest(f)
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
         assert expected == f
+        assert expected_parsed_input == parsed_input
 
     def test_fire_with_maximum_optional_fields(self):
         f = {
@@ -131,12 +128,13 @@ class TestIngester(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            'input': copy.deepcopy(f),
             'location': copy.deepcopy(f['location']),
             'growth': copy.deepcopy(f['growth'])
         }
-        self.ingester.ingest(f)
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
         assert expected == f
+        assert expected_parsed_input == parsed_input
 
     def test_flat_fire(self):
         f = {
@@ -165,7 +163,6 @@ class TestIngester(object):
             "timezone": "-07:00"
         }
         expected = {
-            'input': copy.deepcopy(f),
             "id": "SF11C14225236095807750",
             "event_of":{
                 "id": "SF11E826544",
@@ -197,8 +194,10 @@ class TestIngester(object):
                 }
             ]
         }
-        self.ingester.ingest(f)
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
         assert expected == f
+        assert expected_parsed_input == parsed_input
 
     def test_flat_and_nested_fire(self):
         f = {
@@ -234,7 +233,6 @@ class TestIngester(object):
             "timezone": "-07:00"
         }
         expected = {
-            'input': copy.deepcopy(f),
             "id": "SF11C14225236095807750",
             "event_of":{
                 "id": "SF11E826544",
@@ -266,9 +264,10 @@ class TestIngester(object):
                 }
             ]
         }
-        self.ingester.ingest(f)
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
         assert expected == f
-
+        assert expected_parsed_input == parsed_input
 
     def test_fire_with_ignored_fields(self):
         f = {
@@ -305,7 +304,6 @@ class TestIngester(object):
             "bar": "baz"
         }
         expected = {
-            'input': copy.deepcopy(f),
             "id": "SF11C14225236095807750",
             "event_of":{
                 "id": "SF11E826544",
@@ -315,8 +313,10 @@ class TestIngester(object):
             'growth': copy.deepcopy(f['growth'])
         }
         expected['location'].pop('foo')
-        self.ingester.ingest(f)
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
         assert expected == f
+        assert expected_parsed_input == parsed_input
 
     def test_fire_with_perimeter_and_lat_lng(self):
         f = {
@@ -346,7 +346,6 @@ class TestIngester(object):
             }
         }
         expected = {
-            'input': copy.deepcopy(f),
             "id": "SF11C14225236095807750",
             "event_of":{
                 "id": "SF11E826544",
@@ -356,5 +355,7 @@ class TestIngester(object):
                 'perimeter': copy.deepcopy(f['location']['perimeter'])
             }
         }
-        self.ingester.ingest(f)
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
         assert expected == f
+        assert expected_parsed_input == parsed_input
