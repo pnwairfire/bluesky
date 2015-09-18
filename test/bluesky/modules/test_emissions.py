@@ -50,7 +50,8 @@ class TestSummarize(object):
                                     "total": {"CO": [3.0]}
                                 },
                                 "midstory": {
-                                    "flaming": {"CO": [4.0]}
+                                    "flaming": {"CO": [4.0]},
+                                    "residual": {"CO2": [4.0]}
                                 }
                             },
                             "foo": {
@@ -81,7 +82,8 @@ class TestSummarize(object):
                                     "total": {"CO": [3.0]}
                                 },
                                 "midstory": {
-                                    "flaming": {"CO": [4.0]}
+                                    "flaming": {"CO": [4.0]},
+                                    "residual": {"CO2": [4.0]}
                                 }
                             },
                             "foo": {
@@ -123,7 +125,8 @@ class TestSummarize(object):
                     "total": {"CO": [17.0]}
                 },
                 "midstory": {
-                    "flaming": {"CO": [4.0]}
+                    "flaming": {"CO": [4.0]},
+                    "residual": {"CO2": [4.0]}
                 },
                 "blah": {
                     "flaming": {"CO": [15.0]}
@@ -159,7 +162,8 @@ class TestSummarize(object):
                                     "total": {"CO": [3.0]}
                                 },
                                 "midstory": {
-                                    "flaming": {"CO": [4.0]}
+                                    "flaming": {"CO": [4.0]},
+                                    "residual": {"CO2": [4.0]}
                                 }
                             },
                             "foo": {
@@ -225,7 +229,8 @@ class TestSummarize(object):
                     "total": {"CO": [17.0]}
                 },
                 "midstory": {
-                    "flaming": {"CO": [4.0]}
+                    "flaming": {"CO": [4.0]},
+                    "residual": {"CO2": [4.0]}
                 },
                 "blah": {
                     "flaming": {"CO": [15.0]}
