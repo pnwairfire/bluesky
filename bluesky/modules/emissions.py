@@ -36,6 +36,28 @@ def run(fires_manager, config=None):
     else:
         raise BlueSkyConfigurationError(
             "Invalid emissions factors set: '{}'".format(efs))
+    fires_manager.summarize(emissions=summarize(fires_manager.fires))
+
+def summarize(fires):
+    # TODO: skip 'total' keys and compute totals here?
+    if not fires:
+        return {}
+
+    summary = {}
+    for fire in fires:
+        for fb in fire.fuelbeds:
+            for i in fb['emissions']:
+                summary[i] = summary.get(i, {})
+                for j in fb['emissions'][i]:
+                    summary[i][j] = summary[i].get(j, {})
+                    for k in fb['emissions'][i][j]:
+                        summary[i][j][k] = summary[i][j].get(k, {})
+                        for l in fb['emissions'][i][j][k]:
+                            num_values = len(fb['emissions'][i][j][k][l])
+                            summary[i][j][k][l] = summary[i][j][k].get(l) or [0] * num_values
+                            for m in range(num_values):
+                                summary[i][j][k][l][m] += fb['emissions'][i][j][k][l][m]
+    return summary
 
 def _run_feps(fires_manager):
     logging.debug("Running emissions module FEPS EFs")
