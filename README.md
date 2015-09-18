@@ -382,16 +382,11 @@ yielding the following augmented output:
                         "coordinates": [
                             [
                                 [
-                                    [-121.4522115,47.4316976
-                                    ],
-                                    [-121.3990506,47.4316976
-                                    ],
-                                    [-121.3990506,47.4099293
-                                    ],
-                                    [-121.4522115,47.4099293
-                                    ],
-                                    [-121.4522115,47.4316976
-                                    ]
+                                    [-121.4522115,47.4316976],
+                                    [-121.3990506,47.4316976],
+                                    [-121.3990506,47.4099293],
+                                    [-121.4522115,47.4099293],
+                                    [-121.4522115,47.4316976]
                                 ]
                             ]
                         ],
@@ -415,7 +410,7 @@ yielding the following augmented output:
         ],
         "summary": {
             "consumption": {
-                /* ...summary consumption... */
+                /* ...summary consumption data... */
             },
             "fuelbeds": [
                 {
@@ -429,6 +424,7 @@ yielding the following augmented output:
             ]
         }
     }
+
 
 Though there would be no reason to do so in this situation, you could re-run
 the fuelbeds module in the second pass throgh ```bsp```, like so:
@@ -451,7 +447,122 @@ runs the output back through consumption and on through emissions:
 ```fires-c.json``` would contain the output listed above.  ```fires-e.json```
 would contain this output, agumented with emissions data:
 
-    ...TODO: fill in output...
+    {
+        "fire_information": [
+            {
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                },
+                "fuelbeds": [
+                    {
+                        "consumption": {
+                            /* ...consumption output... */
+                        },
+                        "emissions": {
+                            /* ...emissions output... */
+                        },
+                        "fccs_id": "49",
+                        "pct": 50.0
+                    },
+                    {
+                        "consumption": {
+                            /* ...consumption output... */
+                        },
+                        "emissions": {
+                            /* ...emissions output... */
+                        },
+                        "fccs_id": "46",
+                        "pct": 50.0
+                    }
+                ],
+                "growth": [
+                    {
+                        "end": "20150120",
+                        "pct": 100,
+                        "start": "20150120"
+                    }
+                ],
+                "id": "SF11C14225236095807750",
+                "location": {
+                    "area": 2398.94477979842,
+                    "ecoregion": "southern",
+                    "perimeter": {
+                        "coordinates": [
+                            [
+                                [
+                                    [
+                                        -121.4522115,
+                                        47.4316976
+                                    ],
+                                    [
+                                        -121.3990506,
+                                        47.4316976
+                                    ],
+                                    [
+                                        -121.3990506,
+                                        47.4099293
+                                    ],
+                                    [
+                                        -121.4522115,
+                                        47.4099293
+                                    ],
+                                    [
+                                        -121.4522115,
+                                        47.4316976
+                                    ]
+                                ]
+                            ]
+                        ],
+                        "type": "MultiPolygon"
+                    },
+                    "timezone": "-09:00"
+                }
+            }
+        ],
+        "processing": [
+            {
+                "fccsmap_version": "0.1.7",
+                "module": "bluesky.modules.fuelbeds",
+                "version": "0.1.0"
+            },
+            {
+                "consume_version": "4.1.2",
+                "module": "bluesky.modules.consumption",
+                "version": "0.1.0"
+            },
+            {
+                "consume_version": "4.1.2",
+                "module": "bluesky.modules.consumption",
+                "version": "0.1.0"
+            },
+            {
+                "ef_set": "feps",
+                "emitcalc_version": "0.3.2",
+                "module": "bluesky.modules.emissions",
+                "version": "0.1.0"
+            }
+        ],
+        "summary": {
+            "consumption": {
+                /* ...summary consumption data... */
+            },
+            "emissions": {
+                /* ...summary emissions data... */
+            },
+            "fuelbeds": [
+                {
+                    "fccs_id": "46",
+                    "pct": 50.0
+                },
+                {
+                    "fccs_id": "49",
+                    "pct": 50.0
+                }
+            ]
+        }
+    }
+
 
 ##### Pretty-Printing JSON Output
 
