@@ -45,22 +45,6 @@ class TestFire:
         assert "sdkjfh2rkjhsdf" == f["id"]
         assert "id" not in f.auto_initialized_attrs
 
-    def test_fills_in_name(self, monkeypatch):
-        monkeypatch.setattr(uuid, "uuid1", lambda: "abcd1234")
-        # If name is missing, sets name to 'Unknown-' + id
-        f = fires.Fire({"id": "SDFSDFSDF", "b": "sdf"})
-        assert "Unknown-SDFSDFSDF" == f["name"]
-        assert "name" in f.auto_initialized_attrs
-        # If name is defined, leave it as is
-        f = fires.Fire({"id": "SDFSDFSDF", "b": "sdf", "name": "sfkjhsdkjfhsd"})
-        assert "sfkjhsdkjfhsd" == f["name"]
-        assert "name" not in f.auto_initialized_attrs
-
-    def test_fills_in_synonyms(self):
-        f = fires.Fire({"date_time": "20140202T121223", "b": "sdf", "name": "sfkjhsdkjfhsd"})
-        assert "20140202T121223" == f["date_time"] == f["start"]
-        assert "start" in f.auto_initialized_attrs
-
     def test_accessing_attributes(self):
         f = fires.Fire({'a': 123, 'b': 'sdf'})
         assert 123 == f['a']

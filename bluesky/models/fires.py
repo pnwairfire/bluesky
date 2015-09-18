@@ -21,36 +21,12 @@ class InvalidFilterError(ValueError):
 
 class Fire(dict):
 
-    SYNONYMS = {
-        "date_time": "start"
-        # TODO: fill in other synonyms
-    }
-
     def __init__(self, *args, **kwargs):
         super(Fire, self).__init__(*args, **kwargs)
 
-        # keep track of attrs generated during initialization
-        self.auto_initialized_attrs = []
-
-        for k,v in self.SYNONYMS.items():
-            if self.has_key(k) and not self.has_key(v):
-                # TDOO: should we pop 'k':
-                #  >  self[v] = self.pop(k)
-                self[v] = self[k]
-                self.auto_initialized_attrs.append(v)
-
-        # if id isn't specified, create it using other fields
+        # if id isn't specified, set to new guid
         if not self.get('id'):
-            self['id'] = '-'.join([str(e) for e in [
-                str(uuid.uuid1())[:8],
-                self.get('start'),
-                self.get('end')
-            ] if e]).replace(' ', '')
-            self.auto_initialized_attrs.append('id')
-
-        # if not self.get('name'):
-        #     self['name'] = 'Unknown-%s' % (self['id'])
-        #     self.auto_initialized_attrs.append('name')
+            self['id'] = str(uuid.uuid1())[:8]
 
     def __getattr__(self, attr):
         if attr in self.keys():
@@ -58,10 +34,7 @@ class Fire(dict):
         raise KeyError(attr)
 
     def __setattr__(self, attr, val):
-        if attr != 'auto_initialized_attrs':
-            self[attr] = val
-        else:
-            super(Fire, self).__setattr__(attr, val)
+        self[attr] = val
 
 class FireEncoder(json.JSONEncoder):
     def default(self, obj):
