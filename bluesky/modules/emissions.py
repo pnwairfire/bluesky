@@ -37,7 +37,7 @@ def run(fires_manager, config=None):
     else:
         raise BlueSkyConfigurationError(
             "Invalid emissions factors set: '{}'".format(efs))
-    fires_manager.summarize(emissions=datautils.summarize(fires_manager.fires))
+    fires_manager.summarize(emissions=datautils.summarize(fires_manager.fires, 'emissions'))
 
 def _run_feps(fires_manager):
     logging.debug("Running emissions module FEPS EFs")
