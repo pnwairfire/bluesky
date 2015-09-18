@@ -23,27 +23,22 @@ class TestFire:
         # if start, end, and id are all missing, sets id to guid
         f = fires.Fire({"a": 123, "b": "sdf"})
         assert "abcd1234" == f["id"]
-        assert "id" in f.auto_initialized_attrs
         # if start and/or end are specified but id is missing, sets id to guid
         # combined with start and/or end
         f = fires.Fire({"a": 123, "b": "sdf", "start": "20120202 10:20:32"})
-        assert "abcd1234-2012020210:20:32" == f["id"]
-        assert "id" in f.auto_initialized_attrs
+        assert "abcd1234" == f["id"]
         f = fires.Fire({"a": 123, "b": "sdf", "end": "20120922 10:20:32"})
-        assert "abcd1234-2012092210:20:32" == f["id"]
-        assert "id" in f.auto_initialized_attrs
+        assert "abcd1234" == f["id"]
         f = fires.Fire({
             "a": 123, "b": "sdf",
             "start": "20120202 10:20:32", "end": "20120922T10:20:32"})
-        assert "abcd1234-2012020210:20:32-20120922T10:20:32" == f["id"]
-        assert "id" in f.auto_initialized_attrs
+        assert "abcd1234" == f["id"]
         # if id exists, use it
         f = fires.Fire({
             "a": 123, "b": "sdf",
             "start": "20120202 10:20:32", "end": "20120922T10:20:32",
             "id": "sdkjfh2rkjhsdf"})
         assert "sdkjfh2rkjhsdf" == f["id"]
-        assert "id" not in f.auto_initialized_attrs
 
     def test_accessing_attributes(self):
         f = fires.Fire({'a': 123, 'b': 'sdf'})
