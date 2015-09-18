@@ -190,18 +190,10 @@ would give you:
                     {
                         "fccs_id": "49",
                         "pct": 50.0
-                        "fuel_loadings": {
-                            "canopy": 1232,
-                            /* ... */
-                        },
                     },
                     {
                         "fccs_id": "46",
                         "pct": 50.0
-                        "fuel_loadings": {
-                            "canopy": 143,
-                            /* ... */
-                        },
                     }
                 ],
             }
