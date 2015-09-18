@@ -166,10 +166,17 @@ class FireIngester(object):
     ]
 
     def _ingest_event_of(self, fire):
-        event_of_dict = self._get_fields(fire, 'event_of', ["name", "id"])
+        event_of_fields = [
+            # 'name' can be defined at the top level as well as under 'event_of'
+            ("name", self._get_field("name", 'event_of')),
+            # event id, if defined, can be defined as 'event_id' at the top
+            # level or as 'id' be under 'event_of'
+            ("id", self._parsed_input.get('event_of', {}).get('id') or
+                self._parsed_input.get('event_id'))
+        ]
+        event_of_dict = { k:v for k, v in event_of_fields if v}
         if event_of_dict:
             fire['event_of'] = event_of_dict
-
 
     GROWTH_FIELDS = ['start','end', 'pct']
 
