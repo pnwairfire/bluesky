@@ -98,7 +98,7 @@ class FireIngester(object):
         # values not validated by nested field specific _ingest_* methods
         pass
 
-    def _get_field(self, fire, key, section=None):
+    def _get_field(self, key, section=None):
         """Looks up field's value in fire object.
 
         Looks in 'input' > section > key, if section is defined. If not, or if
@@ -113,7 +113,7 @@ class FireIngester(object):
             v = self._parsed_input.get(key)
         return v
 
-    def _get_fields(self, fire, section, optional_fields):
+    def _get_fields(self, section, optional_fields):
         """Returns dict of specified fields, defined either in top level or
         nested within specified section
 
@@ -121,7 +121,7 @@ class FireIngester(object):
         """
         fields = {}
         for k in optional_fields:
-            v = self._get_field(fire, k, section)
+            v = self._get_field(k, section)
             if v:
                 fields[k] = v
         return fields
@@ -140,10 +140,10 @@ class FireIngester(object):
     def _ingest_location(self, fire):
         # TODO: validate fields
         # TODO: look for fields either in 'location' key or at top level
-        perimeter = self._get_field(fire, 'perimeter', 'location')
-        lat = self._get_field(fire, 'latitude', 'location')
-        lng = self._get_field(fire, 'longitude', 'location')
-        area = self._get_field(fire, 'area', 'location')
+        perimeter = self._get_field('perimeter', 'location')
+        lat = self._get_field('latitude', 'location')
+        lng = self._get_field('longitude', 'location')
+        area = self._get_field('area', 'location')
         if perimeter:
             fire['location'] = {
                 'perimeter': perimeter
@@ -157,7 +157,7 @@ class FireIngester(object):
         else:
             raise ValueError("Fire object must define perimeter or lat+lng+area")
 
-        fire['location'].update(self._get_fields(fire, 'location',
+        fire['location'].update(self._get_fields('location',
             self.OPTIONAL_LOCATION_FIELDS))
 
 
