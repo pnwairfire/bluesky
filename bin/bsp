@@ -22,12 +22,12 @@ import argparse
 from pyairfire import scripting
 
 try:
-    from bluesky import exceptions, modules, models, process, __version__
+    from bluesky import exceptions, configuration, modules, models, process, __version__
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from bluesky import exceptions, modules, models, process, __version__
+    from bluesky import exceptions, configuration, modules, models, process, __version__
 
 REQUIRED_ARGS = []
 
@@ -64,13 +64,13 @@ OPTIONAL_ARGS = [
         'action': "append",
         'default': []
     },
-    {
-        'short': "-D",
-        'long': '--config-option',
-        'dest': 'config_options',
-        'help': "Config option override, formatted like 'Section.Option=value'",
-        'action': scripting.args.SetConfigOptionAction
-    },
+    # {
+    #     'short': "-D",
+    #     'long': '--config-option',
+    #     'dest': 'config_options',
+    #     'help': "Config option override, formatted like 'Section.Option=value'",
+    #     'action': scripting.args.SetConfigOptionAction
+    # },
     {
         #'short': "-v",
         'long': '--version',
@@ -129,11 +129,16 @@ def main():
         positional_args=POSITIONAL_ARGS, epilog=AVAILABLE_MODULES_STR,
         pre_validation=output_version)
     validate_args(args)
-    scripting.utils.log_config(args.config_options)
+    #scripting.utils.log_config(args.config_options)
 
     try:
         fires_manager = load_fires(args)
-        process.run_modules(args.module, fires_manager, args.config_options)
+        config = configuration.config_from_dict(fires_manager.config or {})
+        # TODO: uncomment/enable '-D'/'--contig-option' and merge the config
+        # values specified in args.config_options into config. It may be easier
+        # to refactor that option to produce nested dict rather than a
+        # ConfigParser object.  Make sure output json contains merged config
+        process.run_modules(args.module, fires_manager, config)
     except exceptions.BlueSkyModuleError, e:
         # The error was added to fires_manager's meta data, and will be
         # included in the output data
