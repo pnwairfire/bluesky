@@ -41,8 +41,22 @@ SETTINGS = {
 }
 
 
+def _get_fuel_loadings(fccs_id, fccsdb_obj=None):
+    # TODO: make sure this method works both when default fuel loadings
+    # are used and when custom ones are used
+
+    if not fccsdb_obj:
+        fccsdb_obj = consume.fccs_db.FCCSDB()
+
+    # iterate through the rows in the fccsdb_obj.loadings_data_
+    # pandas.DataFrame until you find row with fuel loadings for fccs_id
+    for i in range(len(fccsdb_obj.loadings_data_)):
+        row = fccsdb_obj.loadings_data_.irow(i)
+        if row[0] == str(fccs_id):
+            return dict(row)
+
 # TODO: come up with more elegant way to return mock file object with
-# emptystring name
+# empty string name
 class MockFuelLoadingsFile(object):
     name = ""
 
@@ -129,9 +143,7 @@ def run(fires_manager, config=None):
             fuel_loadings_csv_filename = _generate_fuel_loadings_csv(config, fb['fccs_id'])
             fc = consume.FuelConsumption(fccs_file=fuel_loadings_csv_filename.name) #msg_level=msg_level)
 
-            # TODO: Add fuelbed's fuel loadings to fc['fuel_loadings']
-            #  (look at fc.FCCS to see if I have easy access to fuel loadings data)
-            #  fb['fuel_loadings'] = fc.FCCS.loadings_data_
+            fb['fuel_loadings'] = _get_fuel_loadings(fb['fccs_id'], fc.FCCS)
 
             fc.burn_type = burn_type
             fc.fuelbed_fccs_ids = [fb['fccs_id']]
