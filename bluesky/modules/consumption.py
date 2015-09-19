@@ -11,6 +11,7 @@ import consume
 
 from bluesky import datautils
 from bluesky.configuration import get_config_value
+from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
     'run'
@@ -96,10 +97,20 @@ def _generate_fuel_loadings_csv(config, fccs_id):
     # default non-loadings columns to empty string
     for k in NON_LOADINGS_FIELDS:
         fuel_loadings[k] = fuel_loadings.get(k, "")
-    # default loadings columns to 0.0
-    fuel_loadings = defaultdict(lambda: 0.0, fuel_loadings)
 
-    f.write(FCCS_LOADINGS_CSV_ROW_TEMPLATE.format(fuel_loadings))
+    # TODO: look for 'based_on_fccs_id' in fuel_loadings dict, pop it if it's
+    # defined, and use that fccs id's default values to fill in missing loadings
+    # values (using consume.fccs_Db.FCCSDB, via _get_fuel_loadings(fccs_id))
+    # Keep the try/except in case based_on_fccs_id isn't defined and defaults
+    # aren't filled in.
+    try:
+        row = FCCS_LOADINGS_CSV_ROW_TEMPLATE.format(**fuel_loadings)
+    except KeyError, e:
+        raise BlueSkyConfigurationError(
+            "Missing fuel loadings field: '{}'".format(e.message))
+
+    f.write(row)
+    f.flush()
 
     # return temp file object, not just it's name, since file is
     # deleted once obejct goes out of scope
