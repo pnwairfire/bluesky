@@ -69,15 +69,17 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
 FCCS_LOADINGS_CSV_ROW_TEMPLATE = """{fuelbed_number},{filename},{cover_type},{ecoregion},{overstory_loading},{midstory_loading},{understory_loading},{snags_c1_foliage_loading},{snags_c1wo_foliage_loading},{snags_c1_wood_loading},{snags_c2_loading},{snags_c3_loading},{shrubs_primary_loading},{shrubs_secondary_loading},{shrubs_primary_perc_live},{shrubs_secondary_perc_live},{nw_primary_loading},{nw_secondary_loading},{nw_primary_perc_live},{nw_secondary_perc_live},{w_sound_0_quarter_loading},{w_sound_quarter_1_loading},{w_sound_1_3_loading},{w_sound_3_9_loading},{w_sound_9_20_loading},{w_sound_gt20_loading},{w_rotten_3_9_loading},{w_rotten_9_20_loading},{w_rotten_gt20_loading},{w_stump_sound_loading},{w_stump_rotten_loading},{w_stump_lightered_loading},{litter_depth},{litter_loading},{lichen_depth},{lichen_loading},{moss_depth},{moss_loading},{basal_accum_loading},{squirrel_midden_loading},{ladderfuels_loading},{duff_lower_depth},{duff_lower_loading},{duff_upper_depth},{duff_upper_loading},{pile_clean_loading},{pile_dirty_loading},{pile_vdirty_loading},{total_available_fuel_loading},{efg_natural},{efg_activity}
 """
 def _generate_fuel_loadings_csv(config, fccs_id):
+    fccs_id = str(fccs_id)  # shouldn't be necessary, but just in case...
+
     all_fuel_loadings = get_config_value(config, 'consumption', 'fuel_loadings')
-    if not all_fuel_loadings or not all_fuel_loadings.get('fccs_id'):
+    if not all_fuel_loadings or not all_fuel_loadings.get(fccs_id):
         # To indicate that consume's built-in fuel loadings should be used,
         # consume.FuelConsumption must be instantiated with fccs_file=""
         return MockFuelLoadingsFile
 
     # TODO: copy all_fuel_loadings['fccs_id'] dict so that we don't modify
     # original, below (?)
-    fuel_loadings = all_fuel_loadings['fccs_id']
+    fuel_loadings = all_fuel_loadings[fccs_id]
 
     # TODO: keep track of files already created in order to not create
     # redundant files?  (would need to restructure code to do so, such as
@@ -102,6 +104,7 @@ def _generate_fuel_loadings_csv(config, fccs_id):
     # return temp file object, not just it's name, since file is
     # deleted once obejct goes out of scope
     return f
+
 
 def run(fires_manager, config=None):
     """Runs the fire data through consumption calculations, using the consume
