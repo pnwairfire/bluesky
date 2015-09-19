@@ -312,10 +312,11 @@ would give you:
                 "fuelbeds": [
                     {
                         "fccs_id": "49",
-                        "pct": 50.0
+                        "pct": 50.0,
                         "fuel_loadings": {
-                            "canopy": 143,
-                            /* ... */
+                            "Total_available_fuel_loading": 18.153765,
+                            "bas_loading": 0.0,
+                            /* ...fuel loadings... */
                         },
                         "consumption": {
                             "canopy": {
@@ -339,10 +340,11 @@ would give you:
                      },
                     {
                         "fccs_id": "46",
-                        "pct": 50.0
+                        "pct": 50.0,
                         "fuel_loadings": {
-                            "canopy": 143,
-                            /* ... */
+                            "Total_available_fuel_loading": 18.153765,
+                            "bas_loading": 0.0,
+                            /* ...fuel loadings... */
                         },
                         "consumption": {
                             "canopy": {
@@ -522,8 +524,9 @@ would give you:
                         "fccs_id": "49",
                         "pct": 50.0
                         "fuel_loadings": {
-                            "canopy": 143,
-                            /* ... */
+                            "Total_available_fuel_loading": 18.153765,
+                            "bas_loading": 0.0,
+                            /* ...fuel loadings... */
                         },
                         "consumption": {
                             "canopy": {
@@ -569,8 +572,9 @@ would give you:
                         "fccs_id": "46",
                         "pct": 50.0
                         "fuel_loadings": {
-                            "canopy": 143,
-                            /* ... */
+                            "Total_available_fuel_loading": 18.153765,
+                            "bas_loading": 0.0,
+                            /* ...fuel loadings... */
                         },
                         "consumption": {
                             "canopy": {

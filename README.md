@@ -357,14 +357,20 @@ yielding the following augmented output:
                             /* ...consumption output... */
                         },
                         "fccs_id": "49",
-                        "pct": 50.0
+                        "pct": 50.0,
+                        "fuel_loadings": {
+                            /* ...fuel loadings... */
+                        }
                     },
                     {
                         "consumption": {
                             /* ...consumption output... */
                         },
                         "fccs_id": "46",
-                        "pct": 50.0
+                        "pct": 50.0,
+                        "fuel_loadings": {
+                            /* ...fuel loadings... */
+                        }
                     }
                 ],
                 "growth": [
@@ -463,7 +469,10 @@ would contain this output, agumented with emissions data:
                             /* ...emissions output... */
                         },
                         "fccs_id": "49",
-                        "pct": 50.0
+                        "pct": 50.0,
+                        "fuel_loadings": {
+                            /* ...fuel loadings... */
+                        }
                     },
                     {
                         "consumption": {
@@ -473,7 +482,10 @@ would contain this output, agumented with emissions data:
                             /* ...emissions output... */
                         },
                         "fccs_id": "46",
-                        "pct": 50.0
+                        "pct": 50.0,
+                        "fuel_loadings": {
+                            /* ...fuel loadings... */
+                        }
                     }
                 ],
                 "growth": [
