@@ -127,7 +127,7 @@ def run(fires_manager, config=None):
         # gain; if it doesn't, then it might not be worth the trouble
         for fb in fire.fuelbeds:
             fuel_loadings_csv_filename = _generate_fuel_loadings_csv(config, fb['fccs_id'])
-            fc = consume.FuelConsumption(fccs_file=fuel_loadings_csv_filename) #msg_level=msg_level)
+            fc = consume.FuelConsumption(fccs_file=fuel_loadings_csv_filename.name) #msg_level=msg_level)
 
             # TODO: Add fuelbed's fuel loadings to fc['fuel_loadings']
             #  (look at fc.FCCS to see if I have easy access to fuel loadings data)
