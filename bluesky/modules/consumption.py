@@ -41,84 +41,66 @@ SETTINGS = {
     ]
 }
 
-FUEL_LOADINGS_KEY_MAPPINGS = {
-    "bas_loading": "basal_accum_loading",
-    "cover_type": "cover_type",
-    "duff_lower_depth": "duff_lower_depth",
-    "duff_lower_loading": "duff_lower_loading",
-    "duff_upper_depth": "duff_upper_depth",
-    "duff_upper_loading": "duff_upper_loading",
-    "ecoregion": "ecoregion",
-    "efg_activity": "efg_activity",
-    "efg_natural": "efg_natural",
-    "filename": "filename",
-    "ladder": "ladderfuels_loading",
-    "lch_depth": "lichen_depth",
-    "lichen_loading": "lichen_loading",
-    "lit_depth": "litter_depth",
-    "litter_loading": "litter_loading",
-    "midstory": "midstory_loading",
-    "moss_depth": "moss_depth",
-    "moss_loading": "moss_loading",
-    "nw_prim": "nw_primary_loading",
-    "nw_prim_pctlv": "nw_primary_perc_live",
-    "nw_seco": "nw_secondary_loading",
-    "nw_seco_pctlv": "nw_secondary_perc_live",
-    "overstory": "overstory_loading",
-    "pile_clean_loading": "pile_clean_loading",
-    "pile_dirty_loading": "pile_dirty_loading",
-    "pile_vdirty_loading": "pile_vdirty_loading",
-    "shrub_prim": "shrubs_primary_loading",
-    "shrub_prim_pctlv": "shrubs_primary_perc_live",
-    "shrub_seco": "shrubs_secondary_loading",
-    "shrub_seco_pctlv": "shrubs_secondary_perc_live",
-    "snag1f": "snags_c1_foliage_loading",
-    "snag1w": "snags_c1_wood_loading",
-    "snag1nf": "snags_c1wo_foliage_loading",
-    "snag2": "snags_c2_loading",
-    "snag3": "snags_c3_loading",
-    "sqm_loading": "squirrel_midden_loading",
-    "Total_available_fuel_loading": "total_available_fuel_loading",
-    "understory": "understory_loading",
-    "oneK_hr_rotten": "w_rotten_3_9_loading",
-    "tenK_hr_rotten": "w_rotten_9_20_loading",
-    "tnkp_hr_rotten": "w_rotten_gt20_loading",
-    "one_hr_sound": "w_sound_0_quarter_loading",
-    "hun_hr_sound": "w_sound_1_3_loading",
-    "oneK_hr_sound": "w_sound_3_9_loading",
-    "tenK_hr_sound": "w_sound_9_20_loading",
-    "tnkp_hr_sound": "w_sound_gt20_loading",
-    "ten_hr_sound": "w_sound_quarter_1_loading",
-    "stump_lightered": "w_stump_lightered_loading",
-    "stump_rotten": "w_stump_rotten_loading",
-    "stump_sound": "w_stump_sound_loading"
-}
-
-def _get_fuel_loadings(fccs_id, fccsdb_obj=None):
-    # TODO: make sure this method works both when default fuel loadings
-    # are used and when custom ones are used
-
-    if not fccsdb_obj:
-        fccsdb_obj = consume.fccs_db.FCCSDB()
-
-    # iterate through the rows in the fccsdb_obj.loadings_data_
-    # pandas.DataFrame until you find row with fuel loadings for fccs_id
-    for i in range(len(fccsdb_obj.loadings_data_)):
-        row = fccsdb_obj.loadings_data_.irow(i)
-        if row[0] == str(fccs_id):
-            d = dict(row)
-            for k in d:
-                if FUEL_LOADINGS_KEY_MAPPINGS.has_key(k):
-                    d[FUEL_LOADINGS_KEY_MAPPINGS[k]] = d.pop(k)
-            d.pop('fccs_id', None)
-            return d
 
 # TODO: come up with more elegant way to return mock file object with
 # empty string name
 class MockFuelLoadingsFile(object):
     name = ""
 
-class FuelLoadingsCsvGenerator(object):
+class FuelLoadingsManager(object):
+
+    FUEL_LOADINGS_KEY_MAPPINGS = {
+        "bas_loading": "basal_accum_loading",
+        "cover_type": "cover_type",
+        "duff_lower_depth": "duff_lower_depth",
+        "duff_lower_loading": "duff_lower_loading",
+        "duff_upper_depth": "duff_upper_depth",
+        "duff_upper_loading": "duff_upper_loading",
+        "ecoregion": "ecoregion",
+        "efg_activity": "efg_activity",
+        "efg_natural": "efg_natural",
+        "filename": "filename",
+        "ladder": "ladderfuels_loading",
+        "lch_depth": "lichen_depth",
+        "lichen_loading": "lichen_loading",
+        "lit_depth": "litter_depth",
+        "litter_loading": "litter_loading",
+        "midstory": "midstory_loading",
+        "moss_depth": "moss_depth",
+        "moss_loading": "moss_loading",
+        "nw_prim": "nw_primary_loading",
+        "nw_prim_pctlv": "nw_primary_perc_live",
+        "nw_seco": "nw_secondary_loading",
+        "nw_seco_pctlv": "nw_secondary_perc_live",
+        "overstory": "overstory_loading",
+        "pile_clean_loading": "pile_clean_loading",
+        "pile_dirty_loading": "pile_dirty_loading",
+        "pile_vdirty_loading": "pile_vdirty_loading",
+        "shrub_prim": "shrubs_primary_loading",
+        "shrub_prim_pctlv": "shrubs_primary_perc_live",
+        "shrub_seco": "shrubs_secondary_loading",
+        "shrub_seco_pctlv": "shrubs_secondary_perc_live",
+        "snag1f": "snags_c1_foliage_loading",
+        "snag1w": "snags_c1_wood_loading",
+        "snag1nf": "snags_c1wo_foliage_loading",
+        "snag2": "snags_c2_loading",
+        "snag3": "snags_c3_loading",
+        "sqm_loading": "squirrel_midden_loading",
+        "Total_available_fuel_loading": "total_available_fuel_loading",
+        "understory": "understory_loading",
+        "oneK_hr_rotten": "w_rotten_3_9_loading",
+        "tenK_hr_rotten": "w_rotten_9_20_loading",
+        "tnkp_hr_rotten": "w_rotten_gt20_loading",
+        "one_hr_sound": "w_sound_0_quarter_loading",
+        "hun_hr_sound": "w_sound_1_3_loading",
+        "oneK_hr_sound": "w_sound_3_9_loading",
+        "tenK_hr_sound": "w_sound_9_20_loading",
+        "tnkp_hr_sound": "w_sound_gt20_loading",
+        "ten_hr_sound": "w_sound_quarter_1_loading",
+        "stump_lightered": "w_stump_lightered_loading",
+        "stump_rotten": "w_stump_rotten_loading",
+        "stump_sound": "w_stump_sound_loading"
+    }
 
     NON_LOADINGS_FIELDS = [
         'filename','cover_type','ecoregion','efg_natural','efg_activity'
@@ -136,9 +118,46 @@ class FuelLoadingsCsvGenerator(object):
         self._defaults_fuel_loadings = {}
         self._custom = {}
 
+    ##
+    ## Public Interface
+    ##
+
+    def get_fuel_loadings(self, fccs_id, fccsdb_obj=None):
+        # TODO: make sure this method works both when default fuel loadings
+        # are used and when custom ones are used
+
+        if not fccsdb_obj:
+            fccsdb_obj = consume.fccs_db.FCCSDB()
+
+        # iterate through the rows in the fccsdb_obj.loadings_data_
+        # pandas.DataFrame until you find row with fuel loadings for fccs_id
+        for i in range(len(fccsdb_obj.loadings_data_)):
+            row = fccsdb_obj.loadings_data_.irow(i)
+            if row[0] == str(fccs_id):
+                d = dict(row)
+                for k in d:
+                    if self.FUEL_LOADINGS_KEY_MAPPINGS.has_key(k):
+                        d[self.FUEL_LOADINGS_KEY_MAPPINGS[k]] = d.pop(k)
+                d.pop('fccs_id', None)
+                return d
+
+    def generate_custom_csv(self, fccs_id):
+        fccs_id = str(fccs_id)  # shouldn't be necessary, but just in case...
+
+        if not self._all_fuel_loadings or not self._all_fuel_loadings.get(fccs_id):
+            # To indicate that consume's built-in fuel loadings should be used,
+            # consume.FuelConsumption must be instantiated with fccs_file=""
+            return MockFuelLoadingsFile
+
+        return self._generate(fccs_id)
+
+    ##
+    ## Helper Methods
+    ##
+
     def _defaults(self, fccs_id):
         if fccs_id not in self._defaults_fuel_loadings:
-            self._defaults_fuel_loadings[fccs_id] = _get_fuel_loadings(fccs_id)
+            self._defaults_fuel_loadings[fccs_id] = self.get_fuel_loadings(fccs_id)
         return self._defaults_fuel_loadings[fccs_id]
 
     def _fill_in_defaults(self, fuel_loadings):
@@ -166,7 +185,6 @@ class FuelLoadingsCsvGenerator(object):
 
             self._fill_in_defaults(fuel_loadings)
 
-
             # Keep the try/except in case based_on_fccs_id isn't defined and defaults
             # aren't filled in.
             try:
@@ -182,17 +200,7 @@ class FuelLoadingsCsvGenerator(object):
             # deleted once obejct goes out of scope
             self._custom[fccs_id] = f
 
-        return self._custom[fccs_id]
-
-    def generate(self, fccs_id):
-        fccs_id = str(fccs_id)  # shouldn't be necessary, but just in case...
-
-        if not self._all_fuel_loadings or not self._all_fuel_loadings.get(fccs_id):
-            # To indicate that consume's built-in fuel loadings should be used,
-            # consume.FuelConsumption must be instantiated with fccs_file=""
-            return MockFuelLoadingsFile
-
-        return self._generate(fccs_id)
+        return self._custom[fccs_id].name
 
 def run(fires_manager, config=None):
     """Runs the fire data through consumption calculations, using the consume
@@ -216,7 +224,7 @@ def run(fires_manager, config=None):
     # config, and get msg_level and burn_type from config
     msg_level = 2  # 1 => fewest messages; 3 => most messages
 
-    fuel_loadings_csv_generator = FuelLoadingsCsvGenerator(config)
+    fuel_loadings_manager = FuelLoadingsManager(config)
 
     # TODO: can I safely instantiate one FuelConsumption object and
     # use it across all fires, or at lesat accross all fuelbeds within
@@ -233,12 +241,12 @@ def run(fires_manager, config=None):
         # the results, make sure that running all at once produces any performance
         # gain; if it doesn't, then it might not be worth the trouble
         for fb in fire.fuelbeds:
-            fuel_loadings_csv_file = fuel_loadings_csv_generator.generate(
+            fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
                 fb['fccs_id'])
             fc = consume.FuelConsumption(
-                fccs_file=fuel_loadings_csv_file.name) #msg_level=msg_level)
+                fccs_file=fuel_loadings_csv_filename) #msg_level=msg_level)
 
-            fb['fuel_loadings'] = _get_fuel_loadings(fb['fccs_id'], fc.FCCS)
+            fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
 
             fc.burn_type = burn_type
             fc.fuelbed_fccs_ids = [fb['fccs_id']]
