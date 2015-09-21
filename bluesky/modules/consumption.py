@@ -111,7 +111,7 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
     def __init__(self, config):
         self._all_fuel_loadings = get_config_value(config, 'consumption',
             'fuel_loadings')
-        self._defaults_fuel_loadings = {}
+        self._default_fuel_loadings = {}
         self._custom = {}
 
     ##
@@ -152,9 +152,9 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
     ##
 
     def _defaults(self, fccs_id):
-        if fccs_id not in self._defaults_fuel_loadings:
-            self._defaults_fuel_loadings[fccs_id] = self.get_fuel_loadings(fccs_id)
-        return self._defaults_fuel_loadings[fccs_id]
+        if fccs_id not in self._default_fuel_loadings:
+            self._default_fuel_loadings[fccs_id] = self.get_fuel_loadings(fccs_id)
+        return self._default_fuel_loadings[fccs_id]
 
     def _fill_in_defaults(self, fuel_loadings):
         based_on_fccs_id = fuel_loadings.pop('based_on_fccs_id', None)
