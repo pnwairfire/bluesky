@@ -58,6 +58,24 @@ if not os.environ.get('BLUESKYWEB_SERVERS'):
 env.roledefs.update({
     'web': os.environ.get('BLUESKYWEB_SERVERS').split(',')
 })
+# TODO: only require BLUESKYWEB_SERVERS if task is being execute (i.e. don't
+# require if just listing tasks with fab -l).  Maybe somehow accomplish this
+# with a decorator.  Tried the following, called between @task and @roles,
+# but it didn't work - env.host was not defined when the task code was executed,
+# even though env.roledefs was.
+#   def set_roles(func):
+#       def d(*args, **kwargs):
+#           if not os.environ.get('BLUESKYWEB_SERVERS'):
+#               error('Specify BLUESKYWEB_SERVERS; ex. BLUESKYWEB_SERVERS=username@hostname.com,bar@baz.com')
+#           env.roledefs.update({
+#               'web': os.environ.get('BLUESKYWEB_SERVERS').split(',')
+#           })
+#           return func(*args, **kwargs)
+#       d.__name__ = func.__name__
+#       d.__doc__ = func.__doc__
+#       d.__module__ = func.__module__
+#       d.func_name = func.func_name
+#       return d
 
 PYTHON_VERSION = os.environ.get('PYTHON_VERSION') or "2.7.3"
 VIRTUALENV_NAME = "bluesky-web-{}".format(PYTHON_VERSION)
