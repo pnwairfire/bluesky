@@ -159,6 +159,10 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
     def _fill_in_defaults(self, fuel_loadings):
         based_on_fccs_id = fuel_loadings.pop('based_on_fccs_id', None)
         if based_on_fccs_id:
+            based_on_fccs_id = str(based_on_fccs_id)
+            if based_on_fccs_id == fuel_loadings['fuelbed_number']:
+                raise ValueError("Custom fuel bed can't have same id as the "
+                    "one on which it's based.")
             defaults = self._defaults(based_on_fccs_id)
             for k in based_on_fccs_id:
                 if k not in fuel_loadings:
