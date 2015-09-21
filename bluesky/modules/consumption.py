@@ -115,6 +115,7 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
                 config, 'consumption', 'fuel_loadings')
 
         self._default_fuel_loadings = {}
+        self._default_fccsdb_obj = None # lazy instantiate
         self._custom = {}
 
     ##
@@ -126,19 +127,15 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
         # are used and when custom ones are used
 
         if not fccsdb_obj:
-            fccsdb_obj = consume.fccs_db.FCCSDB()
+            if fccs_id not in self._default_fuel_loadings:
+                # instantiate default fccsdb obj if not yet done
+                if not self._default_fccsdb_obj:
+                    self._default_fccsdb_obj = consume.fccs_db.FCCSDB()
+                self._default_fuel_loadings[fccs_id] = self._get_fuel_loadings_from_fccsdb_obj(
+                    fccs_id, self._default_fccsdb_obj)
+            return self._default_fuel_loadings[fccs_id]
 
-        # iterate through the rows in the fccsdb_obj.loadings_data_
-        # pandas.DataFrame until you find row with fuel loadings for fccs_id
-        for i in range(len(fccsdb_obj.loadings_data_)):
-            row = fccsdb_obj.loadings_data_.irow(i)
-            if row[0] == str(fccs_id):
-                d = dict(row)
-                for k in d:
-                    if self.FUEL_LOADINGS_KEY_MAPPINGS.has_key(k):
-                        d[self.FUEL_LOADINGS_KEY_MAPPINGS[k]] = d.pop(k)
-                d.pop('fccs_id', None)
-                return d
+        return self._get_fuel_loadings_from_fccsdb_obj(fccs_id, fccsdb_obj)
 
     def generate_custom_csv(self, fccs_id):
         fccs_id = str(fccs_id)  # shouldn't be necessary, but just in case...
@@ -154,10 +151,20 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
     ## Helper Methods
     ##
 
-    def _defaults(self, fccs_id):
-        if fccs_id not in self._default_fuel_loadings:
-            self._default_fuel_loadings[fccs_id] = self.get_fuel_loadings(fccs_id)
-        return self._default_fuel_loadings[fccs_id]
+
+    def _get_fuel_loadings_from_fccsdb_obj(self, fccs_id, fccsdb_obj):
+        # iterate through the rows in the fccsdb_obj.loadings_data_
+        # pandas.DataFrame until you find row with fuel loadings for fccs_id
+        for i in range(len(fccsdb_obj.loadings_data_)):
+            row = fccsdb_obj.loadings_data_.irow(i)
+            if row[0] == str(fccs_id):
+                d = dict(row)
+                for k in d:
+                    if self.FUEL_LOADINGS_KEY_MAPPINGS.has_key(k):
+                        d[self.FUEL_LOADINGS_KEY_MAPPINGS[k]] = d.pop(k)
+                d.pop('fccs_id', None)
+                return d
+
 
     def _fill_in_defaults(self, fuel_loadings):
         based_on_fccs_id = fuel_loadings.pop('based_on_fccs_id', None)
@@ -166,7 +173,9 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
             if based_on_fccs_id == fuel_loadings['fuelbed_number']:
                 raise ValueError("Custom fuel bed can't have same id as the "
                     "one on which it's based.")
-            defaults = self._defaults(based_on_fccs_id)
+            # calling self.get_fuel_loadings without passing fccsdb obj
+            # returns defaults
+            defaults = self.get_fuel_loadings(based_on_fccs_id)
             for k in based_on_fccs_id:
                 if k not in fuel_loadings:
                     fuel_loadings[k] = defaults[k]
