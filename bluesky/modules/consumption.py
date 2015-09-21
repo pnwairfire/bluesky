@@ -3,6 +3,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import copy
 import logging
 import tempfile
 from collections import defaultdict
@@ -182,9 +183,7 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
 
     def _generate(self, fccs_id):
         if fccs_id not in self._custom:
-            # TODO: copy all_fuel_loadings['fccs_id'] dict so that we don't
-            # modify original, below (?)
-            fuel_loadings = self._all_fuel_loadings[fccs_id]
+            fuel_loadings = copy.copy(self._all_fuel_loadings[fccs_id])
 
             f = tempfile.NamedTemporaryFile()
 
