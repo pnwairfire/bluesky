@@ -41,12 +41,6 @@ SETTINGS = {
     ]
 }
 
-
-# TODO: come up with more elegant way to return mock file object with
-# empty string name
-class MockFuelLoadingsFile(object):
-    name = ""
-
 class FuelLoadingsManager(object):
 
     FUEL_LOADINGS_KEY_MAPPINGS = {
@@ -147,7 +141,7 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
         if not self._all_fuel_loadings or not self._all_fuel_loadings.get(fccs_id):
             # To indicate that consume's built-in fuel loadings should be used,
             # consume.FuelConsumption must be instantiated with fccs_file=""
-            return MockFuelLoadingsFile
+            return ""
 
         return self._generate(fccs_id)
 
