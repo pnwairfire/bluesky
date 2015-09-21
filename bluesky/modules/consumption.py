@@ -41,6 +41,58 @@ SETTINGS = {
     ]
 }
 
+FUEL_LOADINGS_KEY_MAPPINGS = {
+    "bas_loading": "basal_accum_loading",
+    "cover_type": "cover_type",
+    "duff_lower_depth": "duff_lower_depth",
+    "duff_lower_loading": "duff_lower_loading",
+    "duff_upper_depth": "duff_upper_depth",
+    "duff_upper_loading": "duff_upper_loading",
+    "ecoregion": "ecoregion",
+    "efg_activity": "efg_activity",
+    "efg_natural": "efg_natural",
+    "filename": "filename",
+    "ladder": "ladderfuels_loading",
+    "lch_depth": "lichen_depth",
+    "lichen_loading": "lichen_loading",
+    "lit_depth": "litter_depth",
+    "litter_loading": "litter_loading",
+    "midstory": "midstory_loading",
+    "moss_depth": "moss_depth",
+    "moss_loading": "moss_loading",
+    "nw_prim": "nw_primary_loading",
+    "nw_prim_pctlv": "nw_primary_perc_live",
+    "nw_seco": "nw_secondary_loading",
+    "nw_seco_pctlv": "nw_secondary_perc_live",
+    "overstory": "overstory_loading",
+    "pile_clean_loading": "pile_clean_loading",
+    "pile_dirty_loading": "pile_dirty_loading",
+    "pile_vdirty_loading": "pile_vdirty_loading",
+    "shrub_prim": "shrubs_primary_loading",
+    "shrub_prim_pctlv": "shrubs_primary_perc_live",
+    "shrub_seco": "shrubs_secondary_loading",
+    "shrub_seco_pctlv": "shrubs_secondary_perc_live",
+    "snag1f": "snags_c1_foliage_loading",
+    "snag1w": "snags_c1_wood_loading",
+    "snag1nf": "snags_c1wo_foliage_loading",
+    "snag2": "snags_c2_loading",
+    "snag3": "snags_c3_loading",
+    "sqm_loading": "squirrel_midden_loading",
+    "Total_available_fuel_loading": "total_available_fuel_loading",
+    "understory": "understory_loading",
+    "oneK_hr_rotten": "w_rotten_3_9_loading",
+    "tenK_hr_rotten": "w_rotten_9_20_loading",
+    "tnkp_hr_rotten": "w_rotten_gt20_loading",
+    "one_hr_sound": "w_sound_0_quarter_loading",
+    "hun_hr_sound": "w_sound_1_3_loading",
+    "oneK_hr_sound": "w_sound_3_9_loading",
+    "tenK_hr_sound": "w_sound_9_20_loading",
+    "tnkp_hr_sound": "w_sound_gt20_loading",
+    "ten_hr_sound": "w_sound_quarter_1_loading",
+    "stump_lightered": "w_stump_lightered_loading",
+    "stump_rotten": "w_stump_rotten_loading",
+    "stump_sound": "w_stump_sound_loading"
+}
 
 def _get_fuel_loadings(fccs_id, fccsdb_obj=None):
     # TODO: make sure this method works both when default fuel loadings
@@ -54,7 +106,12 @@ def _get_fuel_loadings(fccs_id, fccsdb_obj=None):
     for i in range(len(fccsdb_obj.loadings_data_)):
         row = fccsdb_obj.loadings_data_.irow(i)
         if row[0] == str(fccs_id):
-            return dict(row)
+            d = dict(row)
+            for k in d:
+                if FUEL_LOADINGS_KEY_MAPPINGS.has_key(k):
+                    d[FUEL_LOADINGS_KEY_MAPPINGS[k]] = d.pop(k)
+            d.pop('fccs_id', None)
+            return d
 
 # TODO: come up with more elegant way to return mock file object with
 # empty string name
