@@ -19,7 +19,7 @@ except:
 # TODO: somehow auto-generate list of 'Configuration Options' in epilog string
 # or use a centrally defined set of recognized options
 EPILOG_STR = """
-Examples:
+## Examples
 
     Help:
         > bsp-web -h
@@ -31,10 +31,18 @@ Examples:
     with log level set to DEBUG:
         > ./bin/bsp-web -c logging.level=DEBUG -d
 
-Configuration Options:
+## Configuration Options
+
+The following server config settings are supported:
+
   - server.port -- default 8888
   - logging.level -- default 'WARNING'
   - logging.file -- default none
+
+Note: The configuration settings specied with bsp-web's '-c'/'--config'
+option are for the web server, not for the bluesky modules to be run.
+To configure the underlying modules, specify configuration settings under
+the request body's 'config' key.
 """
 
 if __name__ == "__main__":
@@ -42,7 +50,7 @@ if __name__ == "__main__":
     parser.epilog = EPILOG_STR
     parser.formatter_class = scripting.args.RawTextHelpFormatter
     parser.add_argument('-c', '--config', dest='config',
-        help="config settings (ex. '-c server.PORT=8888')",
+        help="config settings for the server (ex. '-c server.PORT=8888'), not for bluesky modules",
         default=scripting.args.ConfigParser.ConfigParser(),
         action=scripting.args.SetConfigOptionAction)
     parser.add_argument("-d", "--debug", dest="debug",
