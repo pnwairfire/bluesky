@@ -322,12 +322,63 @@ Another exmaple, with fire location data specified as lat + lng + size
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
-                "event_id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                },
                 "location": {
                     "latitude": 47.4316976,
                     "longitude": -121.3990506,
                     "area": 200,
+                    "timezone": "-09:00",
+                    "ecoregion": "southern"
+                }
+            }
+        ]
+    }'
+
+##### Running ```consumption```, and ```emissions```:
+
+This example starts with fire data that already had fuelbed information and
+passes it through consumption and emissions.  Note that is passes in some
+custom fuel loadings information.
+
+    $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
+    {
+        "modules": ["consumption", "emissions"],
+        "config": {
+            "consumption": {
+                "fuel_loadings": {
+                    "10046": {
+                        "based_on_fccs_id": "46",
+                        "w_sound_9_20_loading": 0.42,
+                        "w_sound_gt20_loading": 0.43,
+                        "w_sound_quarter_1_loading": 0.44,
+                        "w_stump_lightered_loading": 0.45,
+                        "w_stump_rotten_loading": 0.46,
+                        "w_stump_sound_loading": 0.47
+                    }
+                }
+            }
+        },
+        "fire_information": [
+            {
+                "id": "SF11C14225236095807750",
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                },
+                "fuelbeds": [
+                    {
+                        "fccs_id": "10046",
+                        "pct": 100.0
+                    }
+                ],
+                "location": {
+                    "area": 200,
+                    "ecoregion": "southern",
+                    "latitude": 47.4316976,
+                    "longitude": -121.3990506,
                     "timezone": "-09:00"
                 }
             }
