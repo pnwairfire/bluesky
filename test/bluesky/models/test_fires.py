@@ -267,3 +267,5 @@ class TestFiresManager:
             fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
         ]
         assert expected == fires_manager.fires
+
+    # TODO: test instantiating with fires, dump, adding more with loads, dump, etc.
