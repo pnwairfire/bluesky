@@ -118,61 +118,67 @@ def _get_fuel_loadings(fccs_id, fccsdb_obj=None):
 class MockFuelLoadingsFile(object):
     name = ""
 
-NON_LOADINGS_FIELDS = [
-    'filename','cover_type','ecoregion','efg_natural','efg_activity'
-]
-FCCS_LOADINGS_CSV_HEADER = """GeneratorName=FCCS 3.0,GeneratorVersion=3.0.0,DateCreated=11/14/2014
-fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,understory_loading,snags_c1_foliage_loading,snags_c1wo_foliage_loading,snags_c1_wood_loading,snags_c2_loading,snags_c3_loading,shrubs_primary_loading,shrubs_secondary_loading,shrubs_primary_perc_live,shrubs_secondary_perc_live,nw_primary_loading,nw_secondary_loading,nw_primary_perc_live,nw_secondary_perc_live,w_sound_0_quarter_loading,w_sound_quarter_1_loading,w_sound_1_3_loading,w_sound_3_9_loading,w_sound_9_20_loading,w_sound_gt20_loading,w_rotten_3_9_loading,w_rotten_9_20_loading,w_rotten_gt20_loading,w_stump_sound_loading,w_stump_rotten_loading,w_stump_lightered_loading,litter_depth,litter_loading,lichen_depth,lichen_loading,moss_depth,moss_loading,basal_accum_loading,squirrel_midden_loading,ladderfuels_loading,duff_lower_depth,duff_lower_loading,duff_upper_depth,duff_upper_loading,pile_clean_loading,pile_dirty_loading,pile_vdirty_loading,Total_available_fuel_loading,efg_natural,efg_activity
-"""
-FCCS_LOADINGS_CSV_ROW_TEMPLATE = """{fuelbed_number},{filename},{cover_type},{ecoregion},{overstory_loading},{midstory_loading},{understory_loading},{snags_c1_foliage_loading},{snags_c1wo_foliage_loading},{snags_c1_wood_loading},{snags_c2_loading},{snags_c3_loading},{shrubs_primary_loading},{shrubs_secondary_loading},{shrubs_primary_perc_live},{shrubs_secondary_perc_live},{nw_primary_loading},{nw_secondary_loading},{nw_primary_perc_live},{nw_secondary_perc_live},{w_sound_0_quarter_loading},{w_sound_quarter_1_loading},{w_sound_1_3_loading},{w_sound_3_9_loading},{w_sound_9_20_loading},{w_sound_gt20_loading},{w_rotten_3_9_loading},{w_rotten_9_20_loading},{w_rotten_gt20_loading},{w_stump_sound_loading},{w_stump_rotten_loading},{w_stump_lightered_loading},{litter_depth},{litter_loading},{lichen_depth},{lichen_loading},{moss_depth},{moss_loading},{basal_accum_loading},{squirrel_midden_loading},{ladderfuels_loading},{duff_lower_depth},{duff_lower_loading},{duff_upper_depth},{duff_upper_loading},{pile_clean_loading},{pile_dirty_loading},{pile_vdirty_loading},{total_available_fuel_loading},{efg_natural},{efg_activity}
-"""
-def _generate_fuel_loadings_csv(config, fccs_id):
-    fccs_id = str(fccs_id)  # shouldn't be necessary, but just in case...
+class FuelLoadingsCsvGenerator(object):
 
-    all_fuel_loadings = get_config_value(config, 'consumption', 'fuel_loadings')
-    if not all_fuel_loadings or not all_fuel_loadings.get(fccs_id):
-        # To indicate that consume's built-in fuel loadings should be used,
-        # consume.FuelConsumption must be instantiated with fccs_file=""
-        return MockFuelLoadingsFile
+    NON_LOADINGS_FIELDS = [
+        'filename','cover_type','ecoregion','efg_natural','efg_activity'
+    ]
 
-    # TODO: copy all_fuel_loadings['fccs_id'] dict so that we don't modify
-    # original, below (?)
-    fuel_loadings = all_fuel_loadings[fccs_id]
+    FCCS_LOADINGS_CSV_HEADER = """GeneratorName=FCCS 3.0,GeneratorVersion=3.0.0,DateCreated=11/14/2014
+    fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,understory_loading,snags_c1_foliage_loading,snags_c1wo_foliage_loading,snags_c1_wood_loading,snags_c2_loading,snags_c3_loading,shrubs_primary_loading,shrubs_secondary_loading,shrubs_primary_perc_live,shrubs_secondary_perc_live,nw_primary_loading,nw_secondary_loading,nw_primary_perc_live,nw_secondary_perc_live,w_sound_0_quarter_loading,w_sound_quarter_1_loading,w_sound_1_3_loading,w_sound_3_9_loading,w_sound_9_20_loading,w_sound_gt20_loading,w_rotten_3_9_loading,w_rotten_9_20_loading,w_rotten_gt20_loading,w_stump_sound_loading,w_stump_rotten_loading,w_stump_lightered_loading,litter_depth,litter_loading,lichen_depth,lichen_loading,moss_depth,moss_loading,basal_accum_loading,squirrel_midden_loading,ladderfuels_loading,duff_lower_depth,duff_lower_loading,duff_upper_depth,duff_upper_loading,pile_clean_loading,pile_dirty_loading,pile_vdirty_loading,Total_available_fuel_loading,efg_natural,efg_activity
+    """
+    FCCS_LOADINGS_CSV_ROW_TEMPLATE = """{fuelbed_number},{filename},{cover_type},{ecoregion},{overstory_loading},{midstory_loading},{understory_loading},{snags_c1_foliage_loading},{snags_c1wo_foliage_loading},{snags_c1_wood_loading},{snags_c2_loading},{snags_c3_loading},{shrubs_primary_loading},{shrubs_secondary_loading},{shrubs_primary_perc_live},{shrubs_secondary_perc_live},{nw_primary_loading},{nw_secondary_loading},{nw_primary_perc_live},{nw_secondary_perc_live},{w_sound_0_quarter_loading},{w_sound_quarter_1_loading},{w_sound_1_3_loading},{w_sound_3_9_loading},{w_sound_9_20_loading},{w_sound_gt20_loading},{w_rotten_3_9_loading},{w_rotten_9_20_loading},{w_rotten_gt20_loading},{w_stump_sound_loading},{w_stump_rotten_loading},{w_stump_lightered_loading},{litter_depth},{litter_loading},{lichen_depth},{lichen_loading},{moss_depth},{moss_loading},{basal_accum_loading},{squirrel_midden_loading},{ladderfuels_loading},{duff_lower_depth},{duff_lower_loading},{duff_upper_depth},{duff_upper_loading},{pile_clean_loading},{pile_dirty_loading},{pile_vdirty_loading},{total_available_fuel_loading},{efg_natural},{efg_activity}
+    """
 
-    # TODO: keep track of files already created in order to not create
-    # redundant files?  (would need to restructure code to do so, such as
-    # by creating a dict mapping fccs_id to tempfile object at the beginning
-    # of 'run' and passing it into this function, which would grab existin
-    # file or create and add new. this would prevent files form being
-    # deleted until run completes.)
+    def __init__(self, config):
+        self._all_fuel_loadings = get_config_value(config, 'consumption',
+            'fuel_loadings')
+        self._custom = {}
 
-    f = tempfile.NamedTemporaryFile()
+    def _generate(self, fccs_id):
+        if fccs_id not in self._custom:
+            # TODO: copy all_fuel_loadings['fccs_id'] dict so that we don't
+            # modify original, below (?)
+            fuel_loadings = self._all_fuel_loadings[fccs_id]
 
-    f.write(FCCS_LOADINGS_CSV_HEADER)
-    # set fuelbed_id
-    fuel_loadings['fuelbed_number'] = fccs_id
-    # default non-loadings columns to empty string
-    for k in NON_LOADINGS_FIELDS:
-        fuel_loadings[k] = fuel_loadings.get(k, "")
+            f = tempfile.NamedTemporaryFile()
 
-    # TODO: look for 'based_on_fccs_id' in fuel_loadings dict, pop it if it's
-    # defined, and use that fccs id's default values to fill in missing loadings
-    # values (using consume.fccs_Db.FCCSDB, via _get_fuel_loadings(fccs_id))
-    # Keep the try/except in case based_on_fccs_id isn't defined and defaults
-    # aren't filled in.
-    try:
-        row = FCCS_LOADINGS_CSV_ROW_TEMPLATE.format(**fuel_loadings)
-    except KeyError, e:
-        raise BlueSkyConfigurationError(
-            "Missing fuel loadings field: '{}'".format(e.message))
+            f.write(self.FCCS_LOADINGS_CSV_HEADER)
+            # set fuelbed_id
+            fuel_loadings['fuelbed_number'] = fccs_id
+            # default non-loadings columns to empty string
+            for k in self.NON_LOADINGS_FIELDS:
+                fuel_loadings[k] = fuel_loadings.get(k, "")
 
-    f.write(row)
-    f.flush()
+            # TODO: look for 'based_on_fccs_id' in fuel_loadings dict, pop it if it's
+            # defined, and use that fccs id's default values to fill in missing loadings
+            # values (using consume.fccs_Db.FCCSDB, via _get_fuel_loadings(fccs_id))
+            # Keep the try/except in case based_on_fccs_id isn't defined and defaults
+            # aren't filled in.
+            try:
+                row = self.FCCS_LOADINGS_CSV_ROW_TEMPLATE.format(**fuel_loadings)
+            except KeyError, e:
+                raise BlueSkyConfigurationError(
+                    "Missing fuel loadings field: '{}'".format(e.message))
 
-    # return temp file object, not just it's name, since file is
-    # deleted once obejct goes out of scope
-    return f
+            f.write(row)
+            f.flush()
 
+            # return temp file object, not just it's name, since file is
+            # deleted once obejct goes out of scope
+            self._custom[fccs_id] = f
+
+        return self._custom[fccs_id]
+
+    def generate(self, fccs_id):
+        fccs_id = str(fccs_id)  # shouldn't be necessary, but just in case...
+
+        if not self._all_fuel_loadings or not self._all_fuel_loadings.get(fccs_id):
+            # To indicate that consume's built-in fuel loadings should be used,
+            # consume.FuelConsumption must be instantiated with fccs_file=""
+            return MockFuelLoadingsFile
+
+        return self._generate(fccs_id)
 
 def run(fires_manager, config=None):
     """Runs the fire data through consumption calculations, using the consume
@@ -196,6 +202,8 @@ def run(fires_manager, config=None):
     # config, and get msg_level and burn_type from config
     msg_level = 2  # 1 => fewest messages; 3 => most messages
 
+    fuel_loadings_csv_generator = FuelLoadingsCsvGenerator(config)
+
     # TODO: can I safely instantiate one FuelConsumption object and
     # use it across all fires, or at lesat accross all fuelbeds within
     # a single fire?
@@ -211,8 +219,10 @@ def run(fires_manager, config=None):
         # the results, make sure that running all at once produces any performance
         # gain; if it doesn't, then it might not be worth the trouble
         for fb in fire.fuelbeds:
-            fuel_loadings_csv_filename = _generate_fuel_loadings_csv(config, fb['fccs_id'])
-            fc = consume.FuelConsumption(fccs_file=fuel_loadings_csv_filename.name) #msg_level=msg_level)
+            fuel_loadings_csv_filename = fuel_loadings_csv_generator.generate(
+                fb['fccs_id'])
+            fc = consume.FuelConsumption(
+                fccs_file=fuel_loadings_csv_filename.name) #msg_level=msg_level)
 
             fb['fuel_loadings'] = _get_fuel_loadings(fb['fccs_id'], fc.FCCS)
 
@@ -237,4 +247,5 @@ def run(fires_manager, config=None):
                 logging.error("Failed to calculate consumption for fire %s / %s fuelbed %s" % (
                     fire.id, fire.name, fb['fccs_id']
                 ))
-    fires_manager.summarize(consumption=datautils.summarize(fires_manager.fires, 'consumption'))
+    fires_manager.summarize(
+        consumption=datautils.summarize(fires_manager.fires, 'consumption'))
