@@ -219,10 +219,10 @@ def run(fires_manager, config=None):
         # the results, make sure that running all at once produces any performance
         # gain; if it doesn't, then it might not be worth the trouble
         for fb in fire.fuelbeds:
-            fuel_loadings_csv_filename = fuel_loadings_csv_generator.generate(
+            fuel_loadings_csv_file = fuel_loadings_csv_generator.generate(
                 fb['fccs_id'])
             fc = consume.FuelConsumption(
-                fccs_file=fuel_loadings_csv_filename.name) #msg_level=msg_level)
+                fccs_file=fuel_loadings_csv_file.name) #msg_level=msg_level)
 
             fb['fuel_loadings'] = _get_fuel_loadings(fb['fccs_id'], fc.FCCS)
 
