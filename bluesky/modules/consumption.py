@@ -133,7 +133,21 @@ class FuelLoadingsCsvGenerator(object):
     def __init__(self, config):
         self._all_fuel_loadings = get_config_value(config, 'consumption',
             'fuel_loadings')
+        self._defaults_fuel_loadings = {}
         self._custom = {}
+
+    def _defaults(self, fccs_id):
+        if fccs_id not in self._defaults_fuel_loadings:
+            self._defaults_fuel_loadings[fccs_id] = _get_fuel_loadings(fccs_id)
+        return self._defaults_fuel_loadings[fccs_id]
+
+    def _fill_in_defaults(self, fuel_loadings):
+        based_on_fccs_id = fuel_loadings.pop('based_on_fccs_id', None)
+        if based_on_fccs_id:
+            defaults = self._defaults(based_on_fccs_id)
+            for k in based_on_fccs_id:
+                if k not in fuel_loadings:
+                    fuel_loadings[k] = defaults[k]
 
     def _generate(self, fccs_id):
         if fccs_id not in self._custom:
@@ -150,9 +164,9 @@ class FuelLoadingsCsvGenerator(object):
             for k in self.NON_LOADINGS_FIELDS:
                 fuel_loadings[k] = fuel_loadings.get(k, "")
 
-            # TODO: look for 'based_on_fccs_id' in fuel_loadings dict, pop it if it's
-            # defined, and use that fccs id's default values to fill in missing loadings
-            # values (using consume.fccs_Db.FCCSDB, via _get_fuel_loadings(fccs_id))
+            self._fill_in_defaults(fuel_loadings)
+
+
             # Keep the try/except in case based_on_fccs_id isn't defined and defaults
             # aren't filled in.
             try:
