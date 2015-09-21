@@ -177,7 +177,7 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
             # calling self.get_fuel_loadings without passing fccsdb obj
             # returns defaults
             defaults = self.get_fuel_loadings(based_on_fccs_id)
-            for k in based_on_fccs_id:
+            for k in defaults:
                 if k not in fuel_loadings:
                     fuel_loadings[k] = defaults[k]
 
