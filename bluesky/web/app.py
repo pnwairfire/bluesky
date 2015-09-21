@@ -15,10 +15,12 @@ from bluesky.configuration import get_config_value
 #  ]
 # and have dispatcher try to dynamically import and run the
 # appropriate hander, returning 404 if not implemented
+from .api.ping import Ping
 from .api.v1.run import Run as RunV1
 
 routes = [
-    (r"/api/v1/run/", RunV1),
+    (r"/api/ping/", Ping),
+    (r"/api/v1/run/", RunV1)
 ]
 
 LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
