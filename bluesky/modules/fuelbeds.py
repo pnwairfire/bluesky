@@ -36,6 +36,17 @@ def run(fires_manager, config=None):
         lookup = FccsLookUp(is_alaska=fire['location'].get('state')=='AK',
             fccs_version=FCCS_VERSION)
         Estimator(lookup).estimate(fire)
+
+    # TODO: Add fuel loadings data to each fuelbed object (????)
+    #  If we do so here, use bluesky.modules.consumption.FuelLoadingsManager
+    #  (which should maybe be moved to a common module if to be used here)
+    #     fm = FuelLoadingsManager()
+    #     for fire in fires_manager.fires:
+    #       for fb in get_fuel_loadings():
+    #         fb['fuel_loadings'] = fm.get_fuel_loadings(fb['fccs_id'])
+    #  Note: probably no need to do this here since we do it in the
+    #  consumption module
+
     fires_manager.summarize(fuelbeds=summarize(fires_manager.fires))
 
 def summarize(fires):
