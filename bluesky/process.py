@@ -49,3 +49,6 @@ def run_modules(module_names, fires_manager, config):
             "traceback": str(tb)
         }
         raise BlueSkyModuleError(e)
+
+def run_asynchrously(module_names, data):
+    raise NotImplementedError("asynchrounous running of bluesky not yet implemented")
