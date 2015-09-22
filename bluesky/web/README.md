@@ -209,11 +209,11 @@ other control parameters.
  - method: POST
  - post data:
 
-    {
-        "modules": [ ... ],
-        "fire_information": [ ... ],
-        "config": { ... }
-    }
+        {
+            "modules": [ ... ],
+            "fire_information": [ ... ],
+            "config": { ... }
+        }
 
 See [BlueSky Pipeline](../../README.md) for more information about required
 and optional post data
