@@ -17,10 +17,8 @@ from bluesky.configuration import get_config_value
 # appropriate hander, returning 404 if not implemented
 from .api.ping import Ping
 from .api.v1.domain import (
-    DomainInfo as DomainInfoV1
-)
-from .api.v1.dates import (
-    AvailableDates as AvailableDatesV1
+    DomainInfo as DomainInfoV1,
+    DomainAvailableDates as DomainAvailableDatesV1
 )
 from .api.v1.run import (
     RunExecuter as RunExecuterV1,
@@ -31,10 +29,9 @@ from .api.v1.run import (
 routes = [
     # TODO: update all patterns to allow optional trailing slash
     (r"/api/ping/", Ping),
-    (r"/api/v1/available-dates", AvailableDatesV1),
-    (r"/api/v1/domains/([^/]+)/available-dates", AvailableDatesV1),
     (r"/api/v1/domains/", DomainInfoV1),
     (r"/api/v1/domains/([^/]+)/", DomainInfoV1),
+    (r"/api/v1/domains/([^/]+)/available-dates/", DomainAvailableDatesV1),
     (r"/api/v1/run", RunExecuterV1),
     (r"/api/v1/run/([^/]+)/status", RunStatusV1),
     (r"/api/v1/run/([^/]+)/output", RunOutputV1)
