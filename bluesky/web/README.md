@@ -14,7 +14,7 @@ This API returns information about all domains with ARL data
 
 #### Request
 
- - url: http://hostname/api/v1/domains/
+ - url: http://bluesky-api-hostname/api/v1/domains/
  - method: GET
 
 #### Response
@@ -41,7 +41,7 @@ This API returns information about all domains with ARL data
 
 #### Example
 
-    $ curl 'http://hostname/api/v1/domains/'
+    $ curl 'http://bluesky-api-hostname/api/v1/domains/'
     {
         "domains": {
             "CANSAC-6km": {
@@ -79,7 +79,7 @@ This API returns information about a specific domain with ARL data
 
 #### Request
 
- - url: http://hostname/api/v1/domains/<domain_id>/
+ - url: http://bluesky-api-hostname/api/v1/domains/<domain_id>/
  - method: GET
 
 #### Response
@@ -103,7 +103,7 @@ This API returns information about a specific domain with ARL data
 
 #### Example
 
-    $ curl 'http://hostname/api/v1/domains/PNW-4km/'
+    $ curl 'http://bluesky-api-hostname/api/v1/domains/PNW-4km/'
     {
         "PNW-4km": {
             "boundary": {
@@ -126,7 +126,7 @@ This API returns the dates for which a specific d has ARL data
 
 #### Request
 
- - url: http://hostname/api/v1/domains/<domain_id>/available-dates
+ - url: http://bluesky-api-hostname/api/v1/domains/<domain_id>/available-dates
  - method: GET
 
 #### Response
@@ -141,7 +141,7 @@ This API returns the dates for which a specific d has ARL data
 
 #### Example
 
-    $ curl 'http://hostname/api/v1/domains/PNW-4km/available-dates
+    $ curl 'http://bluesky-api-hostname/api/v1/domains/PNW-4km/available-dates
 
     {
         "dates": [
@@ -158,7 +158,7 @@ This API returns the dates, by domain, for which there exist ARL data
 
 #### Request
 
- - url: http://hostname/api/v1/available-dates/
+ - url: http://bluesky-api-hostname/api/v1/available-dates/
  - method: GET
 
 #### Response
@@ -176,7 +176,7 @@ This API returns the dates, by domain, for which there exist ARL data
 
 #### Example
 
-    $ curl 'http://hostname/api/v1/domains/PNW-4km/available-dates
+    $ curl 'http://bluesky-api-hostname/api/v1/domains/PNW-4km/available-dates
 
     {
         "dates": {
@@ -198,14 +198,14 @@ This API returns the dates, by domain, for which there exist ARL data
 
 This API requires posted JSON with three top level keys -
 'modules', 'fire_information', and 'config'.
-The 'fire_information' key lists the one or more fires to process. The 'modules' key is
-the order specific list of modules through which the fires should be run.
-The 'config' key specifies configuration data and other control parameters.
-
+The 'fire_information' key lists the one or more fires to process. The
+'modules' key is the order specific list of modules through which the fires
+should be run. The optional 'config' key specifies configuration data and
+other control parameters.
 
 #### Request
 
- - url: http://hostname/api/v1/run/
+ - url: http://bluesky-api-hostname/api/v1/run/
  - method: POST
  - post data:
 
@@ -220,6 +220,26 @@ and optional post data
 
 #### Response
 
+What you get in response depends on which modules you're executing.  If
+your run does ***not*** include hysplit, then bluesky will be run in realtime,
+and the results will be in the API response.  The response data will be the
+modified version of the request data.  It will include the
+"fire_information" keys, the "config" key (if specified), a "processing"
+key that includes information from the modules that processed the data, and
+possibly a "summary" key (depending on whether or not the modules run add
+summary data)
+
+    {
+        "fire_information": { ... },
+        "config": { ... },
+        "processing": [ ... ],
+        "summary": { ... }
+    }
+
+If hysplit is run, however, bluesky will be run asynchronously, and the
+API reponse will include a guid to identify the run in subsequent
+status and output API requests (described below).
+
     {
         run_id: <guid>
     }
@@ -231,7 +251,7 @@ and optional post data
 This example requires very little data, since it's starting off with ```fuelbeds```,
 one of the earlier modules in the pipeline.
 
-    $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
+    $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["fuelbeds", "consumption", "emissions"],
         "fire_information": [
@@ -263,7 +283,7 @@ one of the earlier modules in the pipeline.
 
 Another exmaple, with fire location data specified as lat + lng + size
 
-    $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
+    $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["fuelbeds", "consumption", "emissions"],
         "fire_information": [
@@ -290,7 +310,7 @@ This example starts with fire data that already had fuelbed information and
 passes it through consumption and emissions.  Note that is passes in some
 custom fuel loadings information.
 
-    $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
+    $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["consumption", "emissions"],
         "config": {
@@ -338,7 +358,7 @@ This example assumes you've already run up through emissions.  The consumption d
 that would have nested along side the emissions data has been stripped out, since
 it's not needed.
 
-    $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
+    $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["localmet", "timeprofile", "plumerise", "dispersion", "visualization", "export"],
         "fire_information": [
@@ -431,7 +451,7 @@ and emissions data will all be of length 1.
 
 ##### Running ```ingestion```, ```fuelbeds```, ```consumption```, ```emissions```, ```localmet```, ```timeprofile```, ```plumerise```, ```dispersion```, ```visualization```, ```export```:
 
-    $ curl 'http://hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
+    $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
         "modules": ["timeprofile", "plumerise", "dispersion"],
         "fire_information": [
@@ -456,7 +476,79 @@ and emissions data will all be of length 1.
         ]
     }
 
-## API Aliase
+### GET /api/v1/run/<guid>/status
+
+This API returns the status of a specific hysplit run
+
+#### Request
+
+ - url: http://bluesky-api-hostname/api/v1/run/<guid>/status
+ - method: GET
+
+#### Response
+
+    {
+        "complete": <boolean>,
+        "percent": <double>, /* (if available) */
+        "failed": <boolean>,
+        "message": <string>
+    }
+
+#### Example:
+
+    $ curl 'http://bluesky-api-hostname/api/v1/run/abc123/status'
+
+    {
+        "complete": false,
+        "percent": 62.3, /* (if available) */
+        "failed": false,
+        "message": "Started HYSPLIT"
+    }
+
+### GET /api/v1/run/<guid>/output
+
+This API returns the output location for a specific run
+
+#### Request
+
+ - url: http://bluesky-api-hostname/api/v1/run/<guid>/output
+ - method: GET
+
+#### Response
+
+
+#### Example:
+
+    $ curl 'http://bluesky-api-hostname/api/v1/run/abc123/output'
+
+    {
+       "output": {
+           "directory": <absolute_path>,
+           "images": {
+               "hourly": [
+                   <filename|relative_path>,
+                   ...
+               ],
+               "daily": {
+                   "average": [
+                       <filename|relative_path>,
+                       ...
+                   ],
+                   "maximum": [
+                       <filename|relative_path>,
+                       ...
+                   ],
+               }
+           },
+           "netCDF": <filename|relative_path>,
+           "kmz": <filename|relative_path>,
+           "fireLocations": <filename|relative_path>, (needed?)
+           "fireEvents": <filename|relative_path>, (needed?)
+           "fireEmissions": <filename|relative_path> (needed?)
+       }
+    }
+
+## API Aliases (Proposed)
 
 ### POST /api/v1/playground/1/
 
@@ -473,7 +565,7 @@ key or the export type.
 
 Example:
 
-    $ curl 'http://hostname/api/v1/playground/2/' -H 'Content-Type: application/json' -d '
+    $ curl 'http://bluesky-api-hostname/api/v1/playground/2/' -H 'Content-Type: application/json' -d '
     {
         "fire_information": [
             {
@@ -532,76 +624,3 @@ Example:
             }
         }
     }'
-
-
-### GET /api/v1/run/<guid>/status
-
-This API returns the status of a specific run
-
-#### Request
-
- - url: http://hostname/api/v1/run/<guid>/status
- - method: GET
-
-#### Response
-
-    {
-        "complete": <boolean>,
-        "percent": <double>, /* (if available) */
-        "failed": <boolean>,
-        "message": <string>
-    }
-
-#### Example:
-
-    $ curl 'http://hostname/api/v1/run/abc123/status'
-
-    {
-        "complete": false,
-        "percent": 62.3, /* (if available) */
-        "failed": false,
-        "message": "Started HYSPLIT"
-    }
-
-### GET /api/v1/run/<guid>/output
-
-This API returns the output location for a specific run
-
-#### Request
-
- - url: http://hostname/api/v1/run/<guid>/output
- - method: GET
-
-#### Response
-
-
-#### Example:
-
-    $ curl 'http://hostname/api/v1/run/abc123/output'
-
-    {
-       "output": {
-           "directory": <absolute_path>,
-           "images": {
-               "hourly": [
-                   <filename|relative_path>,
-                   ...
-               ],
-               "daily": {
-                   "average": [
-                       <filename|relative_path>,
-                       ...
-                   ],
-                   "maximum": [
-                       <filename|relative_path>,
-                       ...
-                   ],
-               }
-           },
-           "netCDF": <filename|relative_path>,
-           "kmz": <filename|relative_path>,
-           "fireLocations": <filename|relative_path>, (needed?)
-           "fireEvents": <filename|relative_path>, (needed?)
-           "fireEmissions": <filename|relative_path> (needed?)
-       }
-    }
