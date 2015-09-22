@@ -839,6 +839,173 @@ while the following is an example of the latter:
 
 See [BlueSky Web](bluesky/web/README.md)
 
+## Required and Optional Fields
+
+#### 'fire_information' Fields
+
+The top level 'fire_information' object has data added to it as it moves through
+the pipeline of modules.  Each module has its own set of required and optional
+fields that it uses, so that the set of data needed for each fire depends
+on the modules to be run. Generally, the further you are along the pipeline
+of modules, the more data you need.  (Note, however, that some data required
+by earlier modules can be dropped when you pipe the fire data into downstream
+modules.)
+
+##### fuelbeds
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### consumption
+
+###### Required
+ - ...
+
+###### Optional
+ - 'fire_information' > 'location' > 'ecoregion'
+ - 'fire_information' > 'type' -- fire type (ex. 'rx' or 'natural')
+
+##### emissions
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### localmet
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### timeprofile
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### plumerise
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### dispersion
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### visualization
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### export
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+#### 'config' Fields
+
+The 'config' object has sub-objects specific to the modules to be run, as
+well as top level fields that apply to multiple modules. As with
+the fire data, each module has its own set of required and optional fields.
+
+
+##### fuelbeds
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### consumption
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### emissions
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### localmet
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### timeprofile
+
+###### Required
+ - 'config' > 'start' -- modeling start time (ex. "20150121T000000Z")
+ - 'config' > 'end' -- modeling end time (ex. "20150123T000000Z")
+
+###### Optional
+ - ...
+
+##### plumerise
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### dispersion
+
+###### Required
+ - 'config' > 'start' -- modeling start time (ex. "20150121T000000Z")
+ - 'config' > 'end' -- modeling end time (ex. "20150123T000000Z")
+ - 'config' > 'met_domain' -- met domain (ex. "PNW-4km")
+
+###### Optional
+ - 'config' > 'dispersion' > 'module' -- dispersion module; defaults to "hysplit"
+
+##### visualization
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
+##### export
+
+###### Required
+ - ...
+
+###### Optional
+ - ...
+
 ## Vagrant
 
 If you'd like to use vagrant to spin up virtual machines for running BlueSky

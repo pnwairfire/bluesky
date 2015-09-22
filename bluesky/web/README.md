@@ -8,13 +8,78 @@ Use the help (-h) option to see usage and available config options:
 
 ## APIs
 
-### GET /api/v1/domains/[<domain_id>/]
+### GET /api/v1/domains/
 
-This API returns domains with ARL data
+This API returns information about all domains with ARL data
 
 #### Request
 
  - url: http://hostname/api/v1/domains/
+ - method: GET
+
+#### Response
+
+    {
+        "domains": {
+            "<domain_id>": {
+                "dates": [
+                    <date>,
+                    ...
+                ],
+                "boundary": {
+                    "center_latitude": <lat>,
+                    "center_longitude": <lng>,
+                    "width_longitude": <degrees>,
+                    "height_latitude": <degrees>
+                },
+                <other_domain_data?>: <data>,
+                ...
+            },
+            ...
+        }
+    }
+
+#### Example
+
+    $ curl 'http://hostname/api/v1/domains/'
+    {
+        "domains": {
+            "CANSAC-6km": {
+                "boundary": {
+                    "center_latitude": 36.5,
+                    "center_longitude": -119.0,
+                    "height_latitude": 17.5,
+                    "width_longitude": 25.0
+                },
+                "dates": [
+                    "20150922",
+                    "20150921",
+                    "20150920"
+                ]
+            },
+            "PNW-4km": {
+                "boundary": {
+                    "center_latitude": 45.0,
+                    "center_longitude": -118.3,
+                    "height_latitude": 10.0,
+                    "width_longitude": 20.0
+                },
+                "dates": [
+                    "20150922",
+                    "20150921",
+                    "20150920"
+                ]
+            }
+        }
+    }
+
+### GET /api/v1/domains/<domain_id>/
+
+This API returns information about a specific domain with ARL data
+
+#### Request
+
+ - url: http://hostname/api/v1/domains/<domain_id>/
  - method: GET
 
 #### Response
@@ -33,65 +98,35 @@ This API returns domains with ARL data
             },
             <other_domain_data?>: <data>,
             ...
-        },
-        ...
+        }
     }
 
-#### Examples
+#### Example
 
-    $ curl 'http://hostname/api/v1/domains/'
-
-    [
-        {
-            "PNW-4km: {
-                "dates": [
-                    "20150612", "20150613"
-                ],
-                "boundary": {
-                    "center_latitude": 45.0,
-                    "center_longitude": -118.3,
-                    "width_longitude": 20.0,
-                    "height_latitude": 10.0
-                }
-            }
-        },
-        {
-            "CANSAC-6km: {
-                "dates": [
-                    "20150611", "20150612", "20150613"
-                ],
-                "boundary": {
-                    "center_latitude": 45.0,
-                    "center_longitude": -118.3,
-                    "width_longitude": 20.0,
-                    "height_latitude": 10.0
-                }
-            }
-        }
-    ]
     $ curl 'http://hostname/api/v1/domains/PNW-4km/'
-
     {
-        "PNW-4km: {
-            "dates": [
-                "20150612", "20150613"
-            ],
+        "PNW-4km": {
             "boundary": {
                 "center_latitude": 45.0,
                 "center_longitude": -118.3,
-                "width_longitude": 20.0,
-                "height_latitude": 10.0
-            }
+                "height_latitude": 10.0,
+                "width_longitude": 20.0
+            },
+            "dates": [
+                "20150922",
+                "20150921",
+                "20150920"
+            ]
         }
     }
 
-### GET /api/v1/domains/<domain_id>/dates/
+### GET /api/v1/domains/<domain_id>/available-dates/
 
-This API returns the dates for which a has ARL data
+This API returns the dates for which a specific d has ARL data
 
 #### Request
 
- - url: http://hostname/api/v1/domains/<domain_id>/dates
+ - url: http://hostname/api/v1/domains/<domain_id>/available-dates
  - method: GET
 
 #### Response
@@ -106,12 +141,56 @@ This API returns the dates for which a has ARL data
 
 #### Example
 
-    $ curl 'http://hostname/api/v1/domains/PNW-4km/dates
+    $ curl 'http://hostname/api/v1/domains/PNW-4km/available-dates
 
     {
         "dates": [
-            "20150612", "20150613"
+            "20150922",
+            "20150921",
+            "20150920"
         ]
+    }
+
+
+### GET /api/v1/domains/available-dates/
+
+This API returns the dates, by domain, for which there exist ARL data
+
+#### Request
+
+ - url: http://hostname/api/v1/available-dates/
+ - method: GET
+
+#### Response
+
+    {
+        "dates": [
+            "<domain_id>": [
+                <date>,
+                ...
+            ]
+           ...
+        ]
+    }
+
+
+#### Example
+
+    $ curl 'http://hostname/api/v1/domains/PNW-4km/available-dates
+
+    {
+        "dates": {
+            "CANSAC-6km": [
+                "20150922",
+                "20150921",
+                "20150920"
+            ],
+            "PNW-4km": [
+                "20150922",
+                "20150921",
+                "20150920"
+            ]
+        }
     }
 
 
@@ -126,7 +205,7 @@ The 'config' key specifies configuration data and other control parameters.
 
 #### Request
 
- - url: http://hostname/api/v1/domains/<domain_id>/dates
+ - url: http://hostname/api/v1/run/
  - method: POST
  - post data:
 
@@ -136,176 +215,14 @@ The 'config' key specifies configuration data and other control parameters.
         "config": <configuration>
     }
 
+See [BlueSky Pipeline](../../README.md) for more information about required
+and optional post data
+
 #### Response
 
     {
         run_id: <guid>
     }
-
-#### 'fire_information' Fields
-
-The top level 'fire_information' object has data added to it as it moves through
-the pipeline of modules.  Each module has its own set of required and optional
-fields that it uses, so that the set of data needed for each fire depends
-on the modules to be run. Generally, the further you are along the pipeline
-of modules, the more data you need.  (Note, however, that some data required
-by earlier modules can be dropped when you pipe the fire data into downstream
-modules.)
-
-##### fuelbeds
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### consumption
-
-###### Required
- - ...
-
-###### Optional
- - 'fire_information' > 'location' > 'ecoregion'
- - 'fire_information' > 'type' -- fire type (ex. 'rx' or 'natural')
-
-##### emissions
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### localmet
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### timeprofile
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### plumerise
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### dispersion
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### visualization
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### export
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-#### 'config' Fields
-
-The 'config' object has sub-objects specific to the modules to be run, as
-well as top level fields that apply to multiple modules. As with
-the fire data, each module has its own set of required and optional fields.
-
-
-##### fuelbeds
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### consumption
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### emissions
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### localmet
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### timeprofile
-
-###### Required
- - 'config' > 'start' -- modeling start time (ex. "20150121T000000Z")
- - 'config' > 'end' -- modeling end time (ex. "20150123T000000Z")
-
-###### Optional
- - ...
-
-##### plumerise
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### dispersion
-
-###### Required
- - 'config' > 'start' -- modeling start time (ex. "20150121T000000Z")
- - 'config' > 'end' -- modeling end time (ex. "20150123T000000Z")
- - 'config' > 'met_domain' -- met domain (ex. "PNW-4km")
-
-###### Optional
- - 'config' > 'dispersion' > 'module' -- dispersion module; defaults to "hysplit"
-
-##### visualization
-
-###### Required
- - ...
-
-###### Optional
- - ...
-
-##### export
-
-###### Required
- - ...
-
-###### Optional
- - ...
 
 #### Examples
 
