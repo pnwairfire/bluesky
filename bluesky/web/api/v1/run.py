@@ -71,12 +71,58 @@ class RunExecuter(tornado.web.RequestHandler):
                 logging.error('Exception: {}'.format(e))
                 self.set_status(500)
 
+
+
+## ***
+## *** TODO: REPLACE DUMMY DATA WITH REAL!!!
+## ***
+## *** Will need to add configuration options to web service to point
+## *** to source of data (e.g. url of mongodb containing the data vs.
+## *** root url or path to crawl for data given run id vs. something else...)
+## ***
+
 class RunStatus(tornado.web.RequestHandler):
 
     def get(self, run_id):
-        self.set_status(501, "runs status check not yet implemented")
+        self.write({
+            "complete": False,
+            "percent": 90.0,
+            "failed": False,
+            "message": "This is dummy data",
+            "IS_DUMMY_DATA": True
+        })
 
 class RunOutput(tornado.web.RequestHandler):
 
     def get(self, run_id):
-        self.set_status(501, "runs output not yet implemented")
+        self.write({
+           "output": {
+               "directory": "http://smoke.airfire.org/bluesky-daily/output/standard/PNW-4km/2015082800/",
+               "images": {
+                   "hourly": [
+                       "images/hourly/1RedColorBar/hourly_201508280000.png",
+                       "images/hourly/1RedColorBar/hourly_201508280100.png",
+                       "images/hourly/1RedColorBar/hourly_201508280200.png",
+                       "images/hourly/1RedColorBar/hourly_201508280300.png",
+                       "images/hourly/1RedColorBar/hourly_201508280400.png",
+                       "images/hourly/1RedColorBar/hourly_201508280500.png",
+                       "images/hourly/1RedColorBar/hourly_201508280600.png"
+                   ],
+                   "daily": {
+                       "average": [
+                           "images/daily_average/1RedColorBar/daily_average_20150828.png",
+                            "images/daily_average/1RedColorBar/daily_average_20150829.png"
+                       ],
+                       "maximum": [
+                            "images/daily_average/1RedColorBar/daily_maximum_20150828.png",
+                            "images/daily_average/1RedColorBar/daily_maximum_20150829.png"
+                       ],
+                   }
+               },
+               "netCDF": "data/ smoke_dispersion.nc",
+               "kmz": "smoke_dispersion.kmz",
+               "fireLocations": "data/fire_locations.csv",
+               "fireEvents": "data/fire_events.csv",
+               "fireEmissions": "data/fire_emissions.csv"
+           }
+        })

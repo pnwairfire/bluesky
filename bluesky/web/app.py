@@ -34,8 +34,8 @@ routes = [
     (r"/api/v1/domains/([^/]+)/available-dates/", DomainAvailableDatesV1),
     (r"/api/v1/available-dates/", DomainAvailableDatesV1),
     (r"/api/v1/run/", RunExecuterV1),
-    (r"/api/v1/run/([^/]+)/status", RunStatusV1),
-    (r"/api/v1/run/([^/]+)/output", RunOutputV1)
+    (r"/api/v1/run/([^/]+)/status/", RunStatusV1),
+    (r"/api/v1/run/([^/]+)/output/", RunOutputV1)
 ]
 
 LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
