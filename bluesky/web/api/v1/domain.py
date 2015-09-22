@@ -27,8 +27,7 @@ DUMMY_DOMAIN_DATA = {
             "center_longitude": -118.3,
             "width_longitude": 20.0,
             "height_latitude": 10.0
-        },
-        "IS_DUMMY_DATA": True
+        }
     },
     "CANSAC-6km": {
         "dates": [
@@ -41,8 +40,7 @@ DUMMY_DOMAIN_DATA = {
             "center_longitude": -119.0,
             "width_longitude": 25.0,
             "height_latitude": 17.5
-        },
-        "IS_DUMMY_DATA": True
+        }
     }
 }
 
@@ -50,22 +48,31 @@ class DomainInfo(tornado.web.RequestHandler):
 
     def get(self, domain_id=None):
         if not domain_id:
-            self.write(DUMMY_DOMAIN_DATA)
+            self.write({
+                "domains": DUMMY_DOMAIN_DATA,
+                "IS_DUMMY_DATA": True
+            })
         elif domain_id in DUMMY_DOMAIN_DATA:
-            self.write(DUMMY_DOMAIN_DATA[domain_id])
+            self.write({
+                domain_id: DUMMY_DOMAIN_DATA[domain_id],
+                "IS_DUMMY_DATA": True
+            })
         else:
             self.set_status(404, "Domain does not exist")
 
 
 class DomainAvailableDates(tornado.web.RequestHandler):
 
-    def get(self, domain_id):
-        if domain_id in DUMMY_DOMAIN_DATA:
-            # We need to dump the dates array to json and explicitly set the
-            # content type (to json) - something that RequestHandler.write does
-            # for bytes, unicode, and dict objects - beacuse lists are not
-            # accepted by RequestHandler.write (for security reasons)
-            self.set_header('Content-Type', 'application/json') #; charset=UTF-8')
-            self.write(json.dumps(DUMMY_DOMAIN_DATA[domain_id]["dates"]))
+    def get(self, domain_id=None):
+        if not domain_id:
+            self.write({
+                "dates": {d: data['dates'] for d,data in DUMMY_DOMAIN_DATA.items()},
+                "IS_DUMMY_DATA": True
+            })
+        elif domain_id in DUMMY_DOMAIN_DATA:
+            self.write({
+                "dates": DUMMY_DOMAIN_DATA[domain_id]["dates"],
+                "IS_DUMMY_DATA": True
+            })
         else:
             self.set_status(404, "Domain does not exist")
