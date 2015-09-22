@@ -8,7 +8,7 @@ Use the help (-h) option to see usage and available config options:
 
 ## APIs
 
-### GET /api/v1/domains/
+### GET /api/v1/domains/[<domain_id>/]
 
 This API returns domains with ARL data
 
@@ -37,9 +37,39 @@ This API returns domains with ARL data
         ...
     }
 
-#### Example
+#### Examples
 
     $ curl 'http://hostname/api/v1/domains/'
+
+    [
+        {
+            "PNW-4km: {
+                "dates": [
+                    "20150612", "20150613"
+                ],
+                "boundary": {
+                    "center_latitude": 45.0,
+                    "center_longitude": -118.3,
+                    "width_longitude": 20.0,
+                    "height_latitude": 10.0
+                }
+            }
+        },
+        {
+            "CANSAC-6km: {
+                "dates": [
+                    "20150611", "20150612", "20150613"
+                ],
+                "boundary": {
+                    "center_latitude": 45.0,
+                    "center_longitude": -118.3,
+                    "width_longitude": 20.0,
+                    "height_latitude": 10.0
+                }
+            }
+        }
+    ]
+    $ curl 'http://hostname/api/v1/domains/PNW-4km/'
 
     {
         "PNW-4km: {
