@@ -176,7 +176,7 @@ This API returns the dates, by domain, for which there exist ARL data
 
 #### Example
 
-    $ curl 'http://bluesky-api-hostname/api/v1/domains/PNW-4km/available-dates
+    $ curl 'http://bluesky-api-hostname/api/v1/available-dates
 
     {
         "dates": {
