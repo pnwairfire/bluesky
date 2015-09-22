@@ -210,9 +210,9 @@ other control parameters.
  - post data:
 
     {
-        "modules": <array_of_modules>,
-        "fire_information": <fire_data>,
-        "config": <configuration>
+        "modules": [ ... ],
+        "fire_information": [ ... ],
+        "config": { ... }
     }
 
 See [BlueSky Pipeline](../../README.md) for more information about required
@@ -230,7 +230,7 @@ possibly a "summary" key (depending on whether or not the modules run add
 summary data)
 
     {
-        "fire_information": { ... },
+        "fire_information": [ ... ],
         "config": { ... },
         "processing": [ ... ],
         "summary": { ... }
