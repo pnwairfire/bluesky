@@ -14,7 +14,7 @@ from bluesky.configuration import config_from_dict
 from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
 
 
-class Run(tornado.web.RequestHandler):
+class RunExecuter(tornado.web.RequestHandler):
     # def _bad_request(self, msg):
     #     self.set_status(400)
     #     self.write({"error": msg})
@@ -59,3 +59,13 @@ class Run(tornado.web.RequestHandler):
                 # IF exceptions aren't caught, the traceback is returned as
                 # the response body
                 self.set_status(500)
+
+class RunStatus(tornado.web.RequestHandler):
+
+    def get(self, run_id):
+        self.set_status(501, "runs status check not yet implemented")
+
+class RunOutput(tornado.web.RequestHandler):
+
+    def get(self, run_id):
+        self.set_status(501, "runs output not yet implemented")

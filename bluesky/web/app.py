@@ -16,11 +16,28 @@ from bluesky.configuration import get_config_value
 # and have dispatcher try to dynamically import and run the
 # appropriate hander, returning 404 if not implemented
 from .api.ping import Ping
-from .api.v1.run import Run as RunV1
+from .api.v1.domain import (
+    DomainInfo as DomainInfoV1
+)
+from .api.v1.dates import (
+    AvailableDates as AvailableDatesV1
+)
+from .api.v1.run import (
+    RunExecuter as RunExecuterV1,
+    RunStatus as RunStatusV1,
+    RunOutput as RunOutputV1
+)
 
 routes = [
+    # TODO: update all patterns to allow optional trailing slash
     (r"/api/ping/", Ping),
-    (r"/api/v1/run/", RunV1)
+    (r"/api/v1/available-dates", AvailableDatesV1),
+    (r"/api/v1/domains/([^/]+)/available-dates", AvailableDatesV1),
+    (r"/api/v1/domains/", DomainInfoV1),
+    (r"/api/v1/domains/([^/]+)/", DomainInfoV1),
+    (r"/api/v1/run", RunExecuterV1),
+    (r"/api/v1/run/([^/]+)/status", RunStatusV1),
+    (r"/api/v1/run/([^/]+)/output", RunOutputV1)
 ]
 
 LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
