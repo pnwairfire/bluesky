@@ -11,7 +11,7 @@ import tornado.web
 
 #from bluesky.web.lib.auth import b_auth
 from bluesky import modules, models, process
-from bluesky.configuration import config_from_dict
+from bluesky.configuration import config_parser_from_dict
 from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
 
 
@@ -45,7 +45,7 @@ class RunExecuter(tornado.web.RequestHandler):
                 else:
                     fires_manager = models.fires.FiresManager()
                     fires_manager.load(data)
-                    config = config_from_dict(data.get('config') or {})
+                    config = config_parser_from_dict(data.get('config') or {})
                     try:
                         process.run_modules(modules, fires_manager, config)
                     except BlueSkyModuleError, e:

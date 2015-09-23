@@ -133,7 +133,7 @@ def main():
 
     try:
         fires_manager = load_fires(args)
-        config = configuration.config_from_dict(fires_manager.config or {})
+        config = configuration.config_parser_from_dict(fires_manager.config or {})
         # TODO: uncomment/enable '-D'/'--contig-option' and merge the config
         # values specified in args.config_options into config. It may be easier
         # to refactor that option to produce nested dict rather than a

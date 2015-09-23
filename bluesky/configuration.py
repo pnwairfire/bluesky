@@ -9,7 +9,11 @@ __all__ = [
     'get_config_value'
 ]
 
-def config_from_dict(config_dict):
+##
+## Converting between dict and ConfigParser objects
+##
+
+def config_parser_from_dict(config_dict):
     """Converts a dict of configuration data into a configparser object
 
     args:
@@ -29,10 +33,15 @@ def config_from_dict(config_dict):
 
     """
     config = ConfigParser.ConfigParser()
-    for s, s_dict in config_dict.items():
-        config.add_section(s)
-        for o, v in s_dict.items():
-            config.set(s, o, v)
+    if config_dict:
+        if not isinstance(config_dict, dict):
+            raise ValueError("Config must be specified as a dict of nested section dicts")
+        for s, s_dict in config_dict.items():
+            if not isinstance(s_dict, dict):
+                raise ValueError("Config sections must be specified as a dicts")
+            config.add_section(s)
+            for o, v in s_dict.items():
+                config.set(s, o, v)
     return config
 
 def get_config_value(config, section, key, default=None):
