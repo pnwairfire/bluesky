@@ -38,18 +38,34 @@ routes = [
     (r"/api/v1/run/([^/]+)/output/?", RunOutputV1)
 ]
 
-def main(port, debug=False):
+DEFAULT_LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
+def configure_logging(log_level_str, log_file, log_format):
+    log_level = getattr(logging, log_level_str)
+    logging.basicConfig(level=log_level, format=log_format)
+
+    log_file = log_file
+    if log_file:
+        fh = logging.FileHandler(log_file)
+        fh.setFormatter(logging.Formatter(log_format))
+        logging.getLogger().addHandler(fh)
+
+def main(port, log_level_str=None, log_file=None,
+        log_format=None, debug=False):
     """Main method for starting bluesky tornado web service
 
     args:
      - port -- port to listen on
 
     kwargs:
+     - log_level_str -- DEBUG, INFO, etc.
+     - log_file -- file to write logs to
+     - log_format -- format of log messages
      - debug -- whether or not to run in debug mode (with code
         auto-reloading etc)
-
-    Note that calling code is responsible for configuring logging
     """
+    log_level_str = log_level_str or 'WARNING'
+    log_format = log_format or DEFAULT_LOG_FORMAT
+    configure_logging(log_level_str, log_file, log_format)
     application = tornado.web.Application(routes, debug=debug)
     logging.info(' * Debug mode: {}'.format(debug))
     logging.info(' * Port: {}'.format(port))

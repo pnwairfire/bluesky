@@ -16,9 +16,6 @@ except:
     sys.path.insert(0, root_dir)
     from bluesky.web.app import main
 
-# Set log format (note that loggin)
-LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
-
 OPTIONAL_ARGS = [
     {
         'short': '-p',
@@ -35,11 +32,16 @@ OPTIONAL_ARGS = [
         'help': 'run the server in debug mode (with auto-reloading of code, etc.)',
         'action': "store_true",
         'default': False
-    }
+    },
+
 ]
 
 if __name__ == "__main__":
-    parser, args = scripting.args.parse_args([], OPTIONAL_ARGS)
-    # if not args.log_message_format:
-    #     logging.basicConfig(format=format)
-    main(args.port, debug=args.debug)
+    parser = scripting.args.ArgumentParser()
+    scripting.args.add_arguments(parser, OPTIONAL_ARGS)
+    # Use pyairfire to add logging options to the parser object, but we'll
+    # configure logging oureselves in app.main
+    scripting.args.add_logging_options(parser)
+    args = parser.parse_args()
+    main(args.port, log_level_str=args.log_level, log_file=args.log_file,
+        log_format=args.log_message_format, debug=args.debug)
