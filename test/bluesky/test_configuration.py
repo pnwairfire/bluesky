@@ -66,7 +66,8 @@ class TestGetConfigValue(object):
                 'cc': {
                     'ccc': "SDF"
                 }
-            }
+            },
+            'c': 12
         }
 
         assert None == get_config_value(config, 'z')
@@ -80,6 +81,8 @@ class TestGetConfigValue(object):
         assert 1 == get_config_value(config, 'b', 'cc', 'z', default=1)
         assert 1 == get_config_value(config, 'a', 'aa', 'z', default=1)
 
+        assert 12 == get_config_value(config, 'c')
+        assert 12 == get_config_value(config, 'c', default=1)
         assert {'aa': 'sdf','ab': 343} == get_config_value(config, 'a')
         assert {'aa': 'sdf','ab': 343} == get_config_value(config, 'a', default=1)
         assert 'sdf' == get_config_value(config, 'a', 'aa')
