@@ -32,14 +32,6 @@ except:
 REQUIRED_ARGS = []
 
 OPTIONAL_ARGS = [
-    # {
-    #     'short': '-c',
-    #     'long': '--config-file',
-    #     'dest': 'config_file',
-    #     'help': 'config file comtaining overrides for default config values',
-    #     'action': "store",
-    #     'default': None
-    # },
     {
         'short': '-i',
         'long': '--input-file',
@@ -64,6 +56,17 @@ OPTIONAL_ARGS = [
         'action': "append",
         'default': []
     },
+    # If we resurrect loading config settings from file, consider accepting json,
+    # instead of or in addition to ConfigParser ini format, in order to accept
+    # values other than just strings (e.g. numeric values)
+    # {
+    #     'short': '-c',
+    #     'long': '--config-file',
+    #     'dest': 'config_file',
+    #     'help': 'config file comtaining overrides for default config values',
+    #     'action': "store",
+    #     'default': None
+    # },
     # {
     #     'short': "-D",
     #     'long': '--config-option',
