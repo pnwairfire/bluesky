@@ -32,14 +32,14 @@ except:
 REQUIRED_ARGS = []
 
 OPTIONAL_ARGS = [
-    {
-        'short': '-c',
-        'long': '--config-file',
-        'dest': 'config_file',
-        'help': 'config file comtaining overrides for default config values',
-        'action': "store",
-        'default': None
-    },
+    # {
+    #     'short': '-c',
+    #     'long': '--config-file',
+    #     'dest': 'config_file',
+    #     'help': 'config file comtaining overrides for default config values',
+    #     'action': "store",
+    #     'default': None
+    # },
     {
         'short': '-i',
         'long': '--input-file',
