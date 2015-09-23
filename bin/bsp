@@ -67,6 +67,9 @@ OPTIONAL_ARGS = [
     #     'action': "store",
     #     'default': None
     # },
+    # If we resurrect loading config settings from command line option, accept
+    # any nesting (ex. foo=1, foo.bar=1, foo.bar.baz=2), and load into dict
+    # instead of ConfigParser object
     # {
     #     'short': "-D",
     #     'long': '--config-option',
@@ -138,9 +141,13 @@ def main():
         fires_manager = load_fires(args)
         config = configuration.config_parser_from_dict(fires_manager.config or {})
         # TODO: uncomment/enable '-D'/'--contig-option' and merge the config
-        # values specified in args.config_options into config. It may be easier
-        # to refactor that option to produce nested dict rather than a
-        # ConfigParser object.  Make sure output json contains merged config
+        #  values specified in args.config_options into config. First refactor
+        #  that option to produce nested dict rather than a ConfigParser object
+        #  object.  Make sure output json contains merged config (with tests)
+        # TODO: uncomment/enable '-c'/'--config-file' option, load into
+        #  ConfigParser object, convert that object into a dict, and merge that
+        #  dict into config.  Make sure output json contains merged config
+        #  (with tests)
         process.run_modules(args.module, fires_manager, config)
     except exceptions.BlueSkyModuleError, e:
         # The error was added to fires_manager's meta data, and will be
