@@ -8,49 +8,10 @@ import ConfigParser
 from py.test import raises
 
 from bluesky.configuration import (
-    config_parser_from_dict,
     config_parser_to_dict,
     get_config_value
 )
 
-
-##
-## Tests for Converting between dict and ConfigParser objects
-##
-
-class TestConfigParserFromDict(object):
-
-    def test_none(self):
-        c = config_parser_from_dict(None)
-        assert isinstance(c, ConfigParser.ConfigParser)
-        assert [] == c.sections()
-
-    def test_empty(self):
-        c = config_parser_from_dict({})
-        assert isinstance(c, ConfigParser.ConfigParser)
-        assert [] == c.sections()
-
-    def test_invalid(self):
-        with raises(ValueError) as e:
-            c = config_parser_from_dict("sdf")
-            # TODO: assert e's message
-
-        with raises(ValueError) as e:
-            c = config_parser_from_dict({'s': "sdf"})
-            # TODO: assert e's message
-
-    def test_valid(self):
-        d = {
-            'a': { 'aa': 'sdf', 'ab': "343"},
-            'b': { 'ba': "123", 'bb': 'sdfs'}
-        }
-        c = config_parser_from_dict(d)
-        assert isinstance(c, ConfigParser.ConfigParser)
-        assert ['a','b'] == c.sections()
-        assert 'sdf' == c.get('a', 'aa')
-        assert "343" == c.get('a', 'ab')
-        assert "123" == c.get('b', 'ba')
-        assert 'sdfs' == c.get('b', 'bb')
 
 class TestConfigParserToDict(object):
 
