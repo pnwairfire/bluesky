@@ -31,21 +31,20 @@ class RunExecuter(tornado.web.RequestHandler):
             self.set_status(400, "Bad request: 'fire_information' not specified")
         else:
             try:
-                modules = data.pop('modules')
                 includes_hysplit = ("dispersion" in modules and
                     data.get('config', {}).get('dispersion', {}).get('module') == 'hysplit')
                 if includes_hysplit:
                     # TODO: CALL run_asynchrously AND RETURN TRUE RUN ID
-                    #run_id = process.run_asynchrously(modules, data)
+                    #run_id = process.run_asynchrously(data)
                     self.write({
                         "run_id": str(uuid.uuid1()),
                         "IS_DUMMY_DATA": True
                     })
                 else:
                     fires_manager = models.fires.FiresManager()
-                    fires_manager.load(data)
                     try:
-                        process.run_modules(modules, fires_manager)
+                        fires_manager.load(data)
+                        fires_manager.run(fires_manager)
                     except BlueSkyModuleError, e:
                         # Exception was caught while running modules and added to
                         # fires_manager's meta data, and so will be included in

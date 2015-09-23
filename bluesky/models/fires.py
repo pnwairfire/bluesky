@@ -4,20 +4,21 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import csv
+import importlib
 import json
 import sys
 import uuid
 
 from bluesky import datautils, configuration
+from bluesky.exceptions import (
+    BlueSkyImportError, BlueSkyModuleError, InvalidFilterError
+)
 
 __all__ = [
     'Fire',
-    'InvalidFilterError',
     'FiresManager'
 ]
 
-class InvalidFilterError(ValueError):
-    pass
 
 class Fire(dict):
 
@@ -45,9 +46,10 @@ class FireEncoder(json.JSONEncoder):
 
 class FiresManager(object):
 
-    def __init__(self, fires=[]):
+    def __init__(self):
         self._meta = {}
-        self.fires = fires
+        self.modules = []
+        self.fires = []
 
     ## Importing
 
@@ -73,11 +75,34 @@ class FiresManager(object):
             else:
                 return sys.stdout
 
+    ##
     ## 'Public' Methods
+    ##
 
     @property
     def fires(self):
         return [self._fires[i] for i in self._fire_ids]
+
+    @fires.setter
+    def fires(self, fires_list):
+        self._fires = {}
+        self._fire_ids = []
+        for fire in fires_list:
+            self._add_fire(Fire(fire))
+
+    # @property
+    # def modules(self):
+    #     return self._modules
+
+    @modules.setter
+    def modules(self, module_names):
+        self._module_names = module_names
+        self._modules = []
+        for m in module_names:
+            try:
+                self._modules.append(importlib.import_module('bluesky.modules.%s' % (m)))
+            except ImportError, e:
+                raise BlueSkyImportError("Invalid module '{}'".format(m))
 
     @property
     def meta(self):
@@ -108,13 +133,6 @@ class FiresManager(object):
             self._meta[attr] = val
         super(FiresManager, self).__setattr__(attr, val)
 
-    @fires.setter
-    def fires(self, fires_list):
-        self._fires = {}
-        self._fire_ids = []
-        for fire in fires_list:
-            self._add_fire(fire)
-
     def processed(self, module_name, version, **data):
         # TODO: determine module from call stack rather than require name
         # to be passed in.  Also get version from module's __version__
@@ -136,9 +154,13 @@ class FiresManager(object):
     def load(self, input_dict):
         if not hasattr(input_dict, 'keys'):
             raise ValueError("Invalid fire data")
-        new_fires = [Fire(d) for d in input_dict.pop('fire_information', [])]
-        for fire in new_fires:
-            self._add_fire(fire)
+
+        # wipe out existing list of modules, if any
+        self.modules = input_dict.pop('modules', [])
+
+        # wipe out existing fires, if any
+        self.fires = input_dict.pop('fire_information', [])
+
         self._meta = input_dict
 
     def loads(self, input_stream=None, input_file=None):
@@ -151,6 +173,27 @@ class FiresManager(object):
             input_stream = self._stream(input_file, 'r')
         data = json.loads(''.join([d for d in input_stream]))
         return self.load(data)
+
+    def run(self):
+        try:
+            for module in self._modules:
+                # TODO: catch any exception raised by a module and dumps
+                # whatever is the current state of fires (or state of fires prior
+                # to calling hte module) ?
+                # 'run' modifies fires in place
+                module.run(fires_manager)
+        except Exception, e:
+            # when there's an error running modules, don't bail; raise
+            # BlueSkyModuleError so that the calling code can decide what to do
+            # (which, in the case of bsp and bsp-web, is to dump the data as is)
+            logging.error(e)
+            tb = traceback.format_exc()
+            logging.debug(tb)
+            fires_manager.error = {
+                "message": str(e),
+                "traceback": str(tb)
+            }
+            raise BlueSkyModuleError(e)
 
     ## Filtering data
 
@@ -170,7 +213,7 @@ class FiresManager(object):
     ## Dumping data
 
     def dump(self):
-        return dict(self._meta, fire_information=self.fires)
+        return dict(self._meta, fire_information=self.fires, modules=self._module_names)
 
     def dumps(self, output_stream=None, output_file=None):
         if output_stream and output_file:

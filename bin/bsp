@@ -87,12 +87,7 @@ OPTIONAL_ARGS = [
     }
 ]
 
-POSITIONAL_ARGS = [
-    {
-        'long': 'module',
-        'nargs': '*'
-    }
-]
+POSITIONAL_ARGS = []
 
 # Note: pkgutil.walk_packages recursively walks modules and packages, while
 # pkgutil.iter_modules iterates through only modules and packages that are
@@ -147,7 +142,7 @@ def main():
         #  ConfigParser object, convert that object into a dict, and merge that
         #  dict into config.  Make sure output json contains merged config
         #  (with tests)
-        process.run_modules(args.module, fires_manager)
+        fires_manager.run()
     except exceptions.BlueSkyModuleError, e:
         # The error was added to fires_manager's meta data, and will be
         # included in the output data

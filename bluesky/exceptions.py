@@ -16,3 +16,6 @@ class BlueSkyConfigurationError(ValueError):
 
 class BlueSkyModuleError(Exception):
     pass
+
+class InvalidFilterError(ValueError):
+    pass

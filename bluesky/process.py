@@ -6,49 +6,18 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-import importlib
 import logging
 import traceback
 
 from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
 
 __all__ = [
-    "run_modules"
+    "run_asynchrously"
 ]
 
 ##
 ## Public functions
 ##
 
-def run_modules(module_names, fires_manager):
-    """Imports modules and runs them.
-    """
-    modules = []
-    for m in module_names:
-        try:
-            modules.append(importlib.import_module('bluesky.modules.%s' % (m)))
-        except ImportError, e:
-            raise BlueSkyImportError("Invalid module '{}'".format(m))
-
-    try:
-        for module in modules:
-            # TDOO: catch any exception raised by a module and dumps
-            # whatever is the current state of fires (or state of fires prior
-            # to calling hte module) ?
-            # 'run' modifies fires in place
-            module.run(fires_manager)
-    except Exception, e:
-        # when there's an error running modules, don't bail; raise
-        # BlueSkyModuleError so that the calling code can decide what to do
-        # (which, in the case of bsp and bsp-web, is to dump the data as is)
-        logging.error(e)
-        tb = traceback.format_exc()
-        logging.debug(tb)
-        fires_manager.error = {
-            "message": str(e),
-            "traceback": str(tb)
-        }
-        raise BlueSkyModuleError(e)
-
-def run_asynchrously(module_names, data):
+def run_asynchrously(data):
     raise NotImplementedError("asynchrounous running of bluesky not yet implemented")
