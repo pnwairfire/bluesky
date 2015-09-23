@@ -19,15 +19,13 @@ __all__ = [
 ]
 __version__ = "0.1.0"
 
-def run(fires_manager, config=None):
+def run(fires_manager):
     """Runs emissions module
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
-    Kwargs:
-     - config -- optional configparser object
     """
-    efs = get_config_value(config, 'emissions', 'efs', 'feps').lower()
+    efs = fires_manager.get_config_value('emissions', 'efs', default='feps').lower()
     fires_manager.processed(__name__, __version__,
         emitcalc_version=emitcalc.__version__, ef_set=efs)
     if efs == 'urbanski':

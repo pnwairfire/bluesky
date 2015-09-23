@@ -83,6 +83,9 @@ class FiresManager(object):
     def meta(self):
         return self._meta
 
+    def get_config_value(self, *keys, **kwargs):
+        return configuration.get_config_value(self.config, *keys, **kwargs)
+
     # @property(self):
     # def meta(self):
     #     return self._meta

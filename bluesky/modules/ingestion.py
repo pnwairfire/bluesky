@@ -12,14 +12,12 @@ __all__ = [
 
 __version__ = "0.1.0"
 
-def run(fires_manager, config=None):
+def run(fires_manager):
     """Ingests the fire data, recording a copy of the raw input and restructuring
     the data as necessary
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
-    Kwargs:
-     - config -- optional configparser object
 
     Note: The input being recorded may not be purely 'raw', since any fire
       lacking an id will have one auto-generated during Fire object
@@ -31,7 +29,7 @@ def run(fires_manager, config=None):
     logging.debug("Running ingestion module")
     try:
         parsed_input = []
-        fire_ingester = FireIngester(config)
+        fire_ingester = FireIngester()
         for fire in fires_manager.fires:
             parsed_input.append(fire_ingester.ingest(fire))
         fires_manager.processed(__name__, __version__, parsed_input=parsed_input)
@@ -45,9 +43,6 @@ class FireIngester(object):
     """Inputs, transforms, and validates fire data, recording original copy
     under 'input' key.
     """
-
-    def __init__(self, config=None):
-        self._config = config
 
     # TODO: support synonyms (?)
     #  ex:
@@ -103,7 +98,8 @@ class FireIngester(object):
     ##
 
     def _ingest_custom_fields(self, fire):
-        # TODO: copy over custom fields specified in config
+        # TODO: copy over custom fields specified in config (need to pass
+        # ingestion config settings into FireIngester constructor)
         pass
 
     def _set_defaults(self, fire):

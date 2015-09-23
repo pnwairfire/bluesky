@@ -16,46 +16,30 @@ except:
     sys.path.insert(0, root_dir)
     from bluesky.web.app import main
 
-# TODO: somehow auto-generate list of 'Configuration Options' in epilog string
-# or use a centrally defined set of recognized options
-EPILOG_STR = """
-## Examples
+# Set log format (note that loggin)
+LOG_FORMAT = "%(asctime)s %(name)s %(levelname)s %(filename)s#%(funcName)s: %(message)s"
 
-    Help:
-        > bsp-web -h
-
-    Basic usage, no options:
-        > bsp-web
-
-    Run in debug mode, with automatic code reloading (helpful in development),
-    with log level set to DEBUG:
-        > ./bin/bsp-web -c logging.level=DEBUG -d
-
-## Configuration Options
-
-The following server config settings are supported:
-
-  - server.port -- default 8888
-  - logging.level -- default 'WARNING'
-  - logging.file -- default none
-
-Note: The configuration settings specied with bsp-web's '-c'/'--config'
-option are for the web server, not for the bluesky modules to be run.
-To configure the underlying modules, specify configuration settings under
-the request body's 'config' key.
-"""
+OPTIONAL_ARGS = [
+    {
+        'short': '-p',
+        'long': '--port',
+        'dest': 'port',
+        'help': 'run the server listening on speciied port',
+        'action': "store",
+        'default': 8888
+    },
+    {
+        'short': '-d',
+        'long': '--debug',
+        'dest': 'debug',
+        'help': 'run the server in debug mode (with auto-reloading of code, etc.)',
+        'action': "store_true",
+        'default': False
+    }
+]
 
 if __name__ == "__main__":
-    parser = scripting.args.ArgumentParser()
-    parser.epilog = EPILOG_STR
-    parser.formatter_class = scripting.args.RawTextHelpFormatter
-    parser.add_argument('-c', '--config', dest='config',
-        help="config settings for the server (ex. '-c server.PORT=8888'), not for bluesky modules",
-        default=scripting.args.ConfigParser.ConfigParser(),
-        action=scripting.args.SetConfigOptionAction)
-    parser.add_argument("-d", "--debug", dest="debug",
-        help="run the server in debug mode (with auto-reloading of code, etc.)",
-        default=False, action="store_true")
-    args = parser.parse_args()
-
-    main(args.config, debug=args.debug)
+    parser, args = scripting.args.parse_args([], OPTIONAL_ARGS)
+    # if not args.log_message_format:
+    #     logging.basicConfig(format=format)
+    main(args.port, debug=args.debug)

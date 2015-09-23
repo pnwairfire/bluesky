@@ -139,7 +139,6 @@ def main():
 
     try:
         fires_manager = load_fires(args)
-        config = configuration.config_parser_from_dict(fires_manager.config or {})
         # TODO: uncomment/enable '-D'/'--contig-option' and merge the config
         #  values specified in args.config_options into config. First refactor
         #  that option to produce nested dict rather than a ConfigParser object
@@ -148,7 +147,7 @@ def main():
         #  ConfigParser object, convert that object into a dict, and merge that
         #  dict into config.  Make sure output json contains merged config
         #  (with tests)
-        process.run_modules(args.module, fires_manager, config)
+        process.run_modules(args.module, fires_manager)
     except exceptions.BlueSkyModuleError, e:
         # The error was added to fires_manager's meta data, and will be
         # included in the output data

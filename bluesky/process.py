@@ -20,7 +20,7 @@ __all__ = [
 ## Public functions
 ##
 
-def run_modules(module_names, fires_manager, config):
+def run_modules(module_names, fires_manager):
     """Imports modules and runs them.
     """
     modules = []
@@ -36,7 +36,7 @@ def run_modules(module_names, fires_manager, config):
             # whatever is the current state of fires (or state of fires prior
             # to calling hte module) ?
             # 'run' modifies fires in place
-            module.run(fires_manager, config)
+            module.run(fires_manager)
     except Exception, e:
         # when there's an error running modules, don't bail; raise
         # BlueSkyModuleError so that the calling code can decide what to do

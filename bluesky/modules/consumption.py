@@ -11,7 +11,6 @@ from collections import defaultdict
 import consume
 
 from bluesky import datautils
-from bluesky.configuration import get_config_value
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
@@ -109,12 +108,8 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
     FCCS_LOADINGS_CSV_ROW_TEMPLATE = """{fuelbed_number},{filename},{cover_type},{ecoregion},{overstory_loading},{midstory_loading},{understory_loading},{snags_c1_foliage_loading},{snags_c1wo_foliage_loading},{snags_c1_wood_loading},{snags_c2_loading},{snags_c3_loading},{shrubs_primary_loading},{shrubs_secondary_loading},{shrubs_primary_perc_live},{shrubs_secondary_perc_live},{nw_primary_loading},{nw_secondary_loading},{nw_primary_perc_live},{nw_secondary_perc_live},{w_sound_0_quarter_loading},{w_sound_quarter_1_loading},{w_sound_1_3_loading},{w_sound_3_9_loading},{w_sound_9_20_loading},{w_sound_gt20_loading},{w_rotten_3_9_loading},{w_rotten_9_20_loading},{w_rotten_gt20_loading},{w_stump_sound_loading},{w_stump_rotten_loading},{w_stump_lightered_loading},{litter_depth},{litter_loading},{lichen_depth},{lichen_loading},{moss_depth},{moss_loading},{basal_accum_loading},{squirrel_midden_loading},{ladderfuels_loading},{duff_lower_depth},{duff_lower_loading},{duff_upper_depth},{duff_upper_loading},{pile_clean_loading},{pile_dirty_loading},{pile_vdirty_loading},{total_available_fuel_loading},{efg_natural},{efg_activity}
 """
 
-    def __init__(self, config=None):
-        self._all_fuel_loadings = {}
-        if config:
-            self._all_fuel_loadings = get_config_value(
-                config, 'consumption', 'fuel_loadings')
-
+    def __init__(self, all_fuel_loadings={}):
+        self._all_fuel_loadings = all_fuel_loadings
         self._default_fuel_loadings = {}
         self._default_fccsdb_obj = None # lazy instantiate
         self._custom = {}
@@ -213,14 +208,12 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
 
         return self._custom[fccs_id].name
 
-def run(fires_manager, config=None):
+def run(fires_manager):
     """Runs the fire data through consumption calculations, using the consume
     package for the underlying computations.
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
-    Kwargs:
-     - config -- optional configparser object
     """
     logging.debug("Running consumption module")
     # TODO: don't hard code consume_version; either update consume to define
@@ -231,11 +224,13 @@ def run(fires_manager, config=None):
     fires_manager.processed(__name__, __version__,
         consume_version="4.1.2")
 
-    # TODO: update bsp to have generic way of specifying module-specific
-    # config, and get msg_level and burn_type from config
+    # TODO: get msg_level and burn_type from fires_manager's config
     msg_level = 2  # 1 => fewest messages; 3 => most messages
 
-    fuel_loadings_manager = FuelLoadingsManager(config)
+    all_fuel_loadings = fires_manager.get_config_value('consumption',
+        'fuel_loadings')
+    fuel_loadings_manager = FuelLoadingsManager(all_fuel_loadings=all_fuel_loadings)
+
 
     # TODO: can I safely instantiate one FuelConsumption object and
     # use it across all fires, or at lesat accross all fuelbeds within
