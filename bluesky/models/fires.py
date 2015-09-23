@@ -8,7 +8,7 @@ import json
 import sys
 import uuid
 
-from bluesky import datautils
+from bluesky import datautils, configuration
 
 __all__ = [
     'Fire',
