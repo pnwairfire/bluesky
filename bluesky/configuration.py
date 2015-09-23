@@ -44,6 +44,16 @@ def config_parser_from_dict(config_dict):
                 config.set(s, o, v)
     return config
 
+def config_parser_to_dict(config):
+    d = {}
+    if config:
+        return {s:{k:v for k,v in config.items(s)} for s in config.sections()}
+    return d
+
+##
+## Utility mehtods
+##
+
 def get_config_value(config, section, key, default=None):
     if config:
         try:
