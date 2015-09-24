@@ -138,14 +138,18 @@ class FiresManager(object):
     def processed(self, module_name, version, **data):
         # TODO: determine module from call stack rather than require name
         # to be passed in.  Also get version from module's __version__
-        self.processing = self.processing or []
         v = {
             'module': module_name,
             'version': version,
         }
         if data:
             v.update(data)
-        self.processing.append(v)
+
+        if not self.processing or self.processing[-1].keys() != ['module_name']:
+            self.processing = self.processing or []
+            self.processing.append(v)
+        else:
+            self.processing[-1].update(v)
 
     def summarize(self, **data):
         self.summary = self.summary or {}
@@ -176,14 +180,17 @@ class FiresManager(object):
         data = json.loads(''.join([d for d in input_stream]))
         return self.load(data)
 
-    def run(self):
+    def run(self): #, module_names):
         try:
-            for module in self._modules:
-                # TODO: catch any exception raised by a module and dumps
-                # whatever is the current state of fires (or state of fires prior
-                # to calling hte module) ?
+            for i in range(len(self._modules)):
+                # initialize processing recotd
+                self.processing = self.processing or []
+                self.processing.append({
+                    "module_name": self._module_names[i]
+                })
+
                 # 'run' modifies fires in place
-                module.run(self)
+                self._modules[i].run(self)
         except Exception, e:
             # when there's an error running modules, don't bail; raise
             # BlueSkyModuleError so that the calling code can decide what to do
