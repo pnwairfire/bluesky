@@ -841,7 +841,7 @@ See [BlueSky Web](bluesky/web/README.md)
 
 ## Required and Optional Fields
 
-#### 'fire_information' Fields
+### 'fire_information' Fields
 
 The top level 'fire_information' object has data added to it as it moves through
 the pipeline of modules.  Each module has its own set of required and optional
@@ -853,78 +853,44 @@ modules.)
 
 ##### fuelbeds
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ##### consumption
 
-###### Required
- - ...
-
-###### Optional
- - 'fire_information' > 'location' > 'ecoregion'
- - 'fire_information' > 'type' -- fire type (ex. 'rx' or 'natural')
+ - ***'fire_information' > 'location' > 'ecoregion'*** -- *optional*
+ - ***'fire_information' > 'type'*** -- *optional* -- fire type (ex. 'rx' or 'natural')
 
 ##### emissions
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ##### localmet
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ##### timeprofile
 
-###### Required
- - ...
-
-###### Optional
- - ...
+ - ***'fire_information' > 'growth'*** -- *required* -- array of growth objects, each
+  containing 'start', 'end', and 'pct'; if only one object,
+  pct can be omitted and is assumed to be 100.0
 
 ##### plumerise
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ##### dispersion
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ##### visualization
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ##### export
 
-###### Required
  - ...
 
-###### Optional
- - ...
-
-#### 'config' Fields
+### 'config' Fields
 
 The 'config' object has sub-objects specific to the modules to be run, as
 well as top level fields that apply to multiple modules. As with
@@ -933,77 +899,44 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### fuelbeds
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ##### consumption
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ##### emissions
 
-###### Required
- - ...
-
-###### Optional
- - ...
+ - ***'config' > 'efs'*** -- *optional* -- emissions factors set; 'urbanski' or 'feps'; default 'feps'
+ - ***'config' > 'species'*** -- *optional* -- whitelist of species to compute emissions levels for
 
 ##### localmet
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ##### timeprofile
 
-###### Required
- - 'config' > 'start' -- modeling start time (ex. "20150121T000000Z")
- - 'config' > 'end' -- modeling end time (ex. "20150123T000000Z")
+ - ***'config' > 'start'*** -- *required* -- modeling start time (ex. "20150121T000000Z")
+ - ***'config' > 'end'*** -- *required* -- modeling end time (ex. "20150123T000000Z")
 
-###### Optional
- - ...
 
 ##### plumerise
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ##### dispersion
 
-###### Required
- - 'config' > 'start' -- modeling start time (ex. "20150121T000000Z")
- - 'config' > 'end' -- modeling end time (ex. "20150123T000000Z")
- - 'config' > 'met_domain' -- met domain (ex. "PNW-4km")
-
-###### Optional
- - 'config' > 'dispersion' > 'module' -- dispersion module; defaults to "hysplit"
+ - ***'config' > 'start'*** -- *required* -- modeling start time (ex. "20150121T000000Z")
+ - ***'config' > 'end'*** -- *required* -- modeling end time (ex. "20150123T000000Z")
+ - ***'config' > 'met_domain'*** -- *required* -- met domain (ex. "PNW-4km")
+ - ***'config' > 'dispersion' > 'module'*** -- *optional* -- dispersion module; defaults to "hysplit"
 
 ##### visualization
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ##### export
 
-###### Required
- - ...
-
-###### Optional
  - ...
 
 ## Vagrant
