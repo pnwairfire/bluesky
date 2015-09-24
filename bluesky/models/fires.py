@@ -6,7 +6,9 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import csv
 import importlib
 import json
+import logging
 import sys
+import traceback
 import uuid
 
 from bluesky import datautils, configuration
@@ -90,9 +92,9 @@ class FiresManager(object):
         for fire in fires_list:
             self._add_fire(Fire(fire))
 
-    # @property
-    # def modules(self):
-    #     return self._modules
+    @property
+    def modules(self):
+        return self._module_names
 
     @modules.setter
     def modules(self, module_names):
@@ -181,7 +183,7 @@ class FiresManager(object):
                 # whatever is the current state of fires (or state of fires prior
                 # to calling hte module) ?
                 # 'run' modifies fires in place
-                module.run(fires_manager)
+                module.run(self)
         except Exception, e:
             # when there's an error running modules, don't bail; raise
             # BlueSkyModuleError so that the calling code can decide what to do
@@ -213,7 +215,7 @@ class FiresManager(object):
     ## Dumping data
 
     def dump(self):
-        return dict(self._meta, fire_information=self.fires, modules=self._module_names)
+        return dict(self._meta, fire_information=self.fires, modules=self.modules)
 
     def dumps(self, output_stream=None, output_file=None):
         if output_stream and output_file:
