@@ -191,7 +191,7 @@ class FiresManager(object):
             logging.error(e)
             tb = traceback.format_exc()
             logging.debug(tb)
-            fires_manager.error = {
+            self.error = {
                 "message": str(e),
                 "traceback": str(tb)
             }
