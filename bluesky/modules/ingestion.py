@@ -212,5 +212,7 @@ class FireIngester(object):
                         raise ValueError("Missing groth field: '{}'".format(f))
                     growth[-1][f] = g[f]
         if growth:
+            if len(growth) == 1 and 'pct' not in growth[0]:
+                growth[0] = 100.0
             # TODO: make sure percentages add up to 100.0, with allowable error
             fire['growth'] = growth
