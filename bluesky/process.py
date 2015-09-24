@@ -6,11 +6,6 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-import logging
-import traceback
-
-from bluesky.exceptions import BlueSkyImportError, BlueSkyModuleError
-
 __all__ = [
     "run_asynchrously"
 ]
