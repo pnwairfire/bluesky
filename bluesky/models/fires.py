@@ -222,7 +222,17 @@ class FiresManager(object):
     ## Dumping data
 
     def dump(self):
-        return dict(self._meta, fire_information=self.fires, modules=self.modules)
+        # Don't include 'modules' in the output. The modules to be run may have
+        # been specified on the command line or in the input json. Either way,
+        # 'processing' contains a record of what modules were run (though it may
+        # be fewer modules than what were requested, which would be the case
+        # if there was a failure).  We don't want to include 'modules' in the
+        # output because that breaks the ability to pipe the results into
+        # another run of bsp.
+        # TODO: keep track of whether modules were specified in the input
+        # json or on the command line, and add them to the output if they
+        # were in the input
+        return dict(self._meta, fire_information=self.fires)
 
     def dumps(self, output_stream=None, output_file=None):
         if output_stream and output_file:
