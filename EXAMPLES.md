@@ -32,7 +32,7 @@ Assume you have the following input data:
                     },
                     "ecoregion": "southern",
                     "timezone": "-09:00"
-                }
+                },
                 "growth": [
                     {
                         "pct": 60,
@@ -43,8 +43,8 @@ Assume you have the following input data:
                         "pct": 40,
                         "start": "20150121",
                         "end": "20150122"
-                    },
-                ],
+                    }
+                ]
             }
         ]
     }
@@ -60,11 +60,23 @@ would give you:
     {
         "fire_information": [
             {
-                "id": "SF11C14225236095807750",
-                "event_of" :{
-                    "name": "Natural Fire near Snoqualmie Pass, WA",
-                    "id": "SF11E826544"
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
+                "growth": [
+                    {
+                        "end": "20150121",
+                        "pct": 60,
+                        "start": "20150120"
+                    },
+                    {
+                        "end": "20150122",
+                        "pct": 40,
+                        "start": "20150121"
+                    }
+                ],
+                "id": "SF11C14225236095807750",
                 "location": {
                     "ecoregion": "southern",
                     "perimeter": {
@@ -82,64 +94,57 @@ would give you:
                         "type": "MultiPolygon"
                     },
                     "timezone": "-09:00"
-                },
-                "growth": [
-                    {
-                        "pct": 60,
-                        "start": "20150120",
-                        "end": "20150121"
-                    },
-                    {
-                        "pct": 40,
-                        "start": "20150121",
-                        "end": "20150122"
-                    },
-                ],
+                }
             }
         ],
         "processing": [
             {
                 "module": "bluesky.modules.ingestion",
-                "version": "0.17.0",
-                "parsed_input":
-                    "id": "SF11C14225236095807750",
-                    "event_of": {
-                        "id": "SF11E826544",
-                        "name": "Natural Fire near Snoqualmie Pass, WA"
-                    },
-                    "location": {
-                        "type": "MultiPolygon",
-                        "perimeter": {
-                            "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
-                                ]
-                            ]
+                "module_name": "ingestion",
+                "parsed_input": [
+                    {
+                        "event_of": {
+                            "id": "SF11E826544",
+                            "name": "Natural Fire near Snoqualmie Pass, WA"
                         },
-                        "ecoregion": "southern",
-                        "timezone": "-09:00"
-                    },
-                    "growth": [
-                        {
-                            "pct": 60,
-                            "start": "20150120",
-                            "end": "20150121"
-                        },
-                        {
-                            "pct": 40,
-                            "start": "20150121",
-                            "end": "20150122"
-                        },
-                    ],
-                }
+                        "growth": [
+                            {
+                                "end": "20150121",
+                                "pct": 60,
+                                "start": "20150120"
+                            },
+                            {
+                                "end": "20150122",
+                                "pct": 40,
+                                "start": "20150121"
+                            }
+                        ],
+                        "id": "SF11C14225236095807750",
+                        "location": {
+                            "ecoregion": "southern",
+                            "perimeter": {
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
+                                ],
+                                "type": "MultiPolygon"
+                            },
+                            "timezone": "-09:00"
+                        }
+                    }
+                ],
+                "version": "0.1.0"
             }
         ]
     }
+
 
 Piping that through fuelbeds
 
@@ -151,12 +156,36 @@ would give you:
 
     {
         "fire_information": [
-                "id": "SF11C14225236095807750",
-                "event_of" :{
-                    "name": "Natural Fire near Snoqualmie Pass, WA",
-                    "id": "SF11E826544"
+            {
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
+                "fuelbeds": [
+                    {
+                        "fccs_id": "49",
+                        "pct": 50.0
+                    },
+                    {
+                        "fccs_id": "46",
+                        "pct": 50.0
+                    }
+                ],
+                "growth": [
+                    {
+                        "end": "20150121",
+                        "pct": 60,
+                        "start": "20150120"
+                    },
+                    {
+                        "end": "20150122",
+                        "pct": 40,
+                        "start": "20150121"
+                    }
+                ],
+                "id": "SF11C14225236095807750",
                 "location": {
+                    "area": 2398.94477979842,
                     "ecoregion": "southern",
                     "perimeter": {
                         "coordinates": [
@@ -173,95 +202,75 @@ would give you:
                         "type": "MultiPolygon"
                     },
                     "timezone": "-09:00"
-                },
-                "growth": [
-                    {
-                        "pct": 60,
-                        "start": "20150120",
-                        "end": "20150121"
-                    },
-                    {
-                        "pct": 40,
-                        "start": "20150121",
-                        "end": "20150122"
-                    },
-                ],
-                "fuelbeds": [
-                    {
-                        "fccs_id": "49",
-                        "pct": 50.0
-                    },
-                    {
-                        "fccs_id": "46",
-                        "pct": 50.0
-                    }
-                ],
+                }
             }
         ],
-        "summary": {
-            "area": {
-                "total":234234,
-                "burned": 234
-            },
-            "fuelbeds": [
-                {
-                    "fccs_id": "49",
-                    "pct": 50.0
-                },
-                {
-                    "fccs_id": "46",
-                    "pct": 50.0
-                }
-            ]
-        },
         "processing": [
             {
                 "module": "bluesky.modules.ingestion",
-                "version": "0.17.0",
-                "parsed_input":
-                    "event_of": {
-                        "id": "SF11E826544",
-                        "name": "Natural Fire near Snoqualmie Pass, WA"
-                    },
-                    "id": "SF11C14225236095807750",
-                    "location": {
-                        "type": "MultiPolygon",
-                        "perimeter": {
-                            "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
-                                ]
-                            ]
+                "module_name": "ingestion",
+                "parsed_input": [
+                    {
+                        "event_of": {
+                            "id": "SF11E826544",
+                            "name": "Natural Fire near Snoqualmie Pass, WA"
                         },
-                        "ecoregion": "southern",
-                        "timezone": "-09:00"
-                    },
-                    "growth": [
-                        {
-                            "pct": 60,
-                            "start": "20150120",
-                            "end": "20150121"
-                        },
-                        {
-                            "pct": 40,
-                            "start": "20150121",
-                            "end": "20150122"
-                        },
-                    ],
-                }
+                        "growth": [
+                            {
+                                "end": "20150121",
+                                "pct": 60,
+                                "start": "20150120"
+                            },
+                            {
+                                "end": "20150122",
+                                "pct": 40,
+                                "start": "20150121"
+                            }
+                        ],
+                        "id": "SF11C14225236095807750",
+                        "location": {
+                            "ecoregion": "southern",
+                            "perimeter": {
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
+                                ],
+                                "type": "MultiPolygon"
+                            },
+                            "timezone": "-09:00"
+                        }
+                    }
+                ],
+                "version": "0.1.0"
             },
             {
+                "fccsmap_version": "0.1.7",
                 "module": "bluesky.modules.fuelbeds",
-                "version": "0.2.1",
-                "fccsmap_version": "0.2.1"
-            },
-        ]
+                "module_name": "fuelbeds",
+                "version": "0.1.0"
+            }
+        ],
+        "summary": {
+            "fuelbeds": [
+                {
+                    "fccs_id": "46",
+                    "pct": 50.0
+                },
+                {
+                    "fccs_id": "49",
+                    "pct": 50.0
+                }
+            ]
+        }
     }
+
 
 Piping that through consumption
 
@@ -274,12 +283,80 @@ would give you:
     {
         "fire_information": [
             {
-                "id": "SF11C14225236095807750",
-                "event_of" :{
-                    "name": "Natural Fire near Snoqualmie Pass, WA",
-                    "id": "SF11E826544"
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
+                "fuelbeds": [
+                    {
+                        "consumption": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                },
+                                "midstory": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                },
+                                ...
+                            ...
+                        },
+                        "fccs_id": "49",
+                        "fuel_loadings": {
+                            "basal_accum_loading": 0.0,
+                            "cover_type": 166,
+                            ...
+                        },
+                        "pct": 50.0
+                    },
+                    {
+                        "consumption": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                },
+                                "midstory": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0],
+                                    "total": [0.0]
+                                },
+                                ...
+                            ...
+                        },
+                        "fccs_id": "46",
+                        "fuel_loadings": {
+                            "basal_accum_loading": 0.0,
+                            "cover_type": 161,
+                            "duff_lower_depth": 0.2,
+                            ...
+                        },
+                        "pct": 50.0
+                    }
+                ],
+                "growth": [
+                    {
+                        "end": "20150121",
+                        "pct": 60,
+                        "start": "20150120"
+                    },
+                    {
+                        "end": "20150122",
+                        "pct": 40,
+                        "start": "20150121"
+                    }
+                ],
+                "id": "SF11C14225236095807750",
                 "location": {
+                    "area": 2398.94477979842,
                     "ecoregion": "southern",
                     "perimeter": {
                         "coordinates": [
@@ -296,102 +373,68 @@ would give you:
                         "type": "MultiPolygon"
                     },
                     "timezone": "-09:00"
-                },
-                "growth": [
+                }
+            }
+        ],
+        "processing": [
+            {
+                "module": "bluesky.modules.ingestion",
+                "module_name": "ingestion",
+                "parsed_input": [
                     {
-                        "pct": 60,
-                        "start": "20150120",
-                        "end": "20150121"
-                    },
-                    {
-                        "pct": 40,
-                        "start": "20150121",
-                        "end": "20150122"
-                    },
-                ],
-                "fuelbeds": [
-                    {
-                        "fccs_id": "49",
-                        "pct": 50.0,
-                        "fuel_loadings": {
-                            "Total_available_fuel_loading": 18.153765,
-                            "bas_loading": 0.0,
-                            /* ...fuel loadings... */
+                        "event_of": {
+                            "id": "SF11E826544",
+                            "name": "Natural Fire near Snoqualmie Pass, WA"
                         },
-                        "consumption": {
-                            "canopy": {
-                                "ladder fuels": {
-                                    "flaming": [0.0],
-                                    "residual": [0.0],
-                                    "smoldering": [0.0],
-                                    "total": [0.0]
-                                },
-                                /* ... */
-                                "understory": {
-                                    "flaming": [0.0],
-                                    "residual": [0.0],
-                                    "smoldering": [0.0],
-                                    "total": [0.0]
-                                }
-                                /* ... */
-                            }
-                            /* ... */
-                         }
-                     },
-                    {
-                        "fccs_id": "46",
-                        "pct": 50.0,
-                        "fuel_loadings": {
-                            "Total_available_fuel_loading": 18.153765,
-                            "bas_loading": 0.0,
-                            /* ...fuel loadings... */
-                        },
-                        "consumption": {
-                            "canopy": {
-                                "ladder fuels": {
-                                    "flaming": [0.0],
-                                    "residual": [0.0],
-                                    "smoldering": [0.0],
-                                    "total": [0.0]
-                                },
-                                /* ... */
-                                "understory": {
-                                    "flaming": [0.0],
-                                    "residual": [0.0],
-                                    "smoldering": [0.0],
-                                    "total": [0.0]
-                                }
+                        "growth": [
+                            {
+                                "end": "20150121",
+                                "pct": 60,
+                                "start": "20150120"
                             },
-                            "ground fuels": {
-                                "basal accumulations": {
-                                    "flaming": [0.0],
-                                    "residual": [0.0],
-                                    "smoldering": [0.0],
-                                    "total": [0.0]
-                                },
-                                /* ... */
+                            {
+                                "end": "20150122",
+                                "pct": 40,
+                                "start": "20150121"
                             }
-                            /* ... */
-                         }
+                        ],
+                        "id": "SF11C14225236095807750",
+                        "location": {
+                            "ecoregion": "southern",
+                            "perimeter": {
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
+                                ],
+                                "type": "MultiPolygon"
+                            },
+                            "timezone": "-09:00"
+                        }
                     }
                 ],
+                "version": "0.1.0"
+            },
+            {
+                "fccsmap_version": "0.1.7",
+                "module": "bluesky.modules.fuelbeds",
+                "module_name": "fuelbeds",
+                "version": "0.1.0"
+            },
+            {
+                "consume_version": "4.1.2",
+                "module": "bluesky.modules.consumption",
+                "module_name": "consumption",
+                "version": "0.1.0"
             }
         ],
         "summary": {
-            "area": {
-                "total":234234,
-                "burned": 234
-            },
-            "fuelbeds": [
-                {
-                    "fccs_id": "49",
-                    "pct": 50.0
-                },
-                {
-                    "fccs_id": "46",
-                    "pct": 50.0
-                }
-            ],
             "consumption": {
                 "canopy": {
                     "ladder fuels": {
@@ -406,70 +449,22 @@ would give you:
                         "smoldering": [0.0],
                         "total": [0.0]
                     },
-                    "overstory": {
-                        "flaming": [0.0],
-                        "residual": [0.0],
-                        "smoldering": [0.0],
-                        "total": [0.0]
-                    },
-                    /* ... */
-                }
-                /* ... */
-             }
-        },
-        "processing": [
-            {
-                "module": "bluesky.modules.ingestion",
-                "version": "0.17.0",
-                "parsed_input":
-                    "event_of": {
-                        "id": "SF11E826544",
-                        "name": "Natural Fire near Snoqualmie Pass, WA"
-                    },
-                    "id": "SF11C14225236095807750",
-                    "location": {
-                        "type": "MultiPolygon",
-                        "perimeter": {
-                            "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
-                                ]
-                            ]
-                        },
-                        "ecoregion": "southern",
-                        "timezone": "-09:00"
-                    },
-                    "growth": [
-                        {
-                            "pct": 60,
-                            "start": "20150120",
-                            "end": "20150121"
-                        },
-                        {
-                            "pct": 40,
-                            "start": "20150121",
-                            "end": "20150122"
-                        },
-                    ],
-                }
+                    ...
+                ...
             },
-            {
-                "module": "bluesky.modules.fuelbeds",
-                "version": "0.2.1",
-                "fccsmap_version": "0.2.1"
-            },
-            {
-                "module": "bluesky.modules.consumption",
-                "version": "0.1.2",
-                "consume_version": "0.4.3"
-            }
-        ]
+            "fuelbeds": [
+                {
+                    "fccs_id": "46",
+                    "pct": 50.0
+                },
+                {
+                    "fccs_id": "49",
+                    "pct": 50.0
+                }
+            ]
+        }
     }
+
 
 Finally, piping that through emissions
 
@@ -479,17 +474,165 @@ Finally, piping that through emissions
 
 would give you:
 
-
-
     {
         "fire_information": [
             {
-                "id": "SF11C14225236095807750",
-                "event_of" :{
-                    "name": "Natural Fire near Snoqualmie Pass, WA",
-                    "id": "SF11E826544"
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
+                "fuelbeds": [
+                    {
+                        "consumption": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0]
+                                },
+                                "midstory": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0]
+                                },
+                                ...
+                            ...
+                        },
+                        "emissions": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": {
+                                        "CH4": [0.0],
+                                        "CO": [0.0],
+                                        "CO2": [0.0],
+                                        "NH3": [0.0],
+                                        "NOx": [0.0],
+                                        "PM10": [0.0],
+                                        "PM25": [0.0],
+                                        "SO2": [0.0],
+                                        "VOC": [0.0]
+                                    },
+                                    "residual": {
+                                        "CH4": [0.0],
+                                        "CO": [0.0],
+                                        "CO2": [0.0],
+                                        "NH3": [0.0],
+                                        "NOx": [0.0],
+                                        "PM10": [0.0],
+                                        "PM25": [0.0],
+                                        "SO2": [0.0],
+                                        "VOC": [0.0]
+                                    },
+                                    "smoldering": {
+                                        "CH4": [0.0],
+                                        "CO": [0.0],
+                                        "CO2": [0.0],
+                                        "NH3": [0.0],
+                                        "NOx": [0.0],
+                                        "PM10": [0.0],
+                                        "PM25": [0.0],
+                                        "SO2": [0.0],
+                                        "VOC": [0.0]
+                                    }
+                                },
+                                ...
+                            ...
+                        },
+                        "fccs_id": "49",
+                        "fuel_loadings": {
+                            "basal_accum_loading": 0.0,
+                            "cover_type": 166,
+                            "duff_lower_depth": 0.0,
+                            ...
+                        },
+                        "pct": 50.0
+                    },
+                    {
+                        "consumption": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0]
+                                },
+                                "midstory": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0]
+                                },
+                                "overstory": {
+                                    "flaming": [0.0],
+                                    "residual": [0.0],
+                                    "smoldering": [0.0]
+                                },
+                                ...
+                            ...
+                        },
+                        "emissions": {
+                            "canopy": {
+                                "ladder fuels": {
+                                    "flaming": {
+                                        "CH4": [0.0],
+                                        "CO": [0.0],
+                                        "CO2": [0.0],
+                                        "NH3": [0.0],
+                                        "NOx": [0.0],
+                                        "PM10": [0.0],
+                                        "PM25": [0.0],
+                                        "SO2": [0.0],
+                                        "VOC": [0.0]
+                                    },
+                                    "residual": {
+                                        "CH4": [0.0],
+                                        "CO": [0.0],
+                                        "CO2": [0.0],
+                                        "NH3": [0.0],
+                                        "NOx": [0.0],
+                                        "PM10": [0.0],
+                                        "PM25": [0.0],
+                                        "SO2": [0.0],
+                                        "VOC": [0.0]
+                                    },
+                                    "smoldering": {
+                                        "CH4": [0.0],
+                                        "CO": [0.0],
+                                        "CO2": [0.0],
+                                        "NH3": [0.0],
+                                        "NOx": [0.0],
+                                        "PM10": [0.0],
+                                        "PM25": [0.0],
+                                        "SO2": [0.0],
+                                        "VOC": [0.0]
+                                    }
+                                },
+                                ...
+                            ...
+                        },
+                        "fccs_id": "46",
+                        "fuel_loadings": {
+                            "basal_accum_loading": 0.0,
+                            "cover_type": 161,
+                            "duff_lower_depth": 0.2,
+                            ...
+                        },
+                        "pct": 50.0
+                    }
+                ],
+                "growth": [
+                    {
+                        "end": "20150121",
+                        "pct": 60,
+                        "start": "20150120"
+                    },
+                    {
+                        "end": "20150122",
+                        "pct": 40,
+                        "start": "20150121"
+                    }
+                ],
+                "id": "SF11C14225236095807750",
                 "location": {
+                    "area": 2398.94477979842,
                     "ecoregion": "southern",
                     "perimeter": {
                         "coordinates": [
@@ -506,255 +649,145 @@ would give you:
                         "type": "MultiPolygon"
                     },
                     "timezone": "-09:00"
-                },
-                "growth": [
+                }
+            }
+        ],
+        "processing": [
+            {
+                "module": "bluesky.modules.ingestion",
+                "module_name": "ingestion",
+                "parsed_input": [
                     {
-                        "pct": 60,
-                        "start": "20150120",
-                        "end": "20150121"
-                    },
-                    {
-                        "pct": 40,
-                        "start": "20150121",
-                        "end": "20150122"
-                    },
-                ],
-                "fuelbeds": [
-                    {
-                        "fccs_id": "49",
-                        "pct": 50.0
-                        "fuel_loadings": {
-                            "Total_available_fuel_loading": 18.153765,
-                            "bas_loading": 0.0,
-                            /* ...fuel loadings... */
+                        "event_of": {
+                            "id": "SF11E826544",
+                            "name": "Natural Fire near Snoqualmie Pass, WA"
                         },
-                        "consumption": {
-                            "canopy": {
-                                "ladder fuels": {
-                                    "flaming": [0.0],
-                                    "residual": [0.0],
-                                    "smoldering": [0.0],
-                                    "total": [0.0]
-                                },
-                                /* ... */
-                                "understory": {
-                                    "flaming": [0.0],
-                                    "residual": [0.0],
-                                    "smoldering": [0.0],
-                                    "total": [0.0]
-                                }
-                                /* ... */
-                            }
-                            /* ... */
-                        },
-                        "emissions": {
-                            "canopy": {
-                                "ladder fuels": {
-                                    "flaming": {
-                                        "CH4": [0.0],
-                                        /* ... */
-                                    },
-                                    "residual": {
-                                        "CH4": [0.0],
-                                        /* ... */
-                                    },
-                                    "smoldering": {
-                                        "CH4": [0.0],
-                                        /* ... */
-                                    }
-                                },
-                                /* ... */
-                            }
-                            /* ... */
-                        }
-                     },
-                    {
-                        "fccs_id": "46",
-                        "pct": 50.0
-                        "fuel_loadings": {
-                            "Total_available_fuel_loading": 18.153765,
-                            "bas_loading": 0.0,
-                            /* ...fuel loadings... */
-                        },
-                        "consumption": {
-                            "canopy": {
-                                "ladder fuels": {
-                                    "flaming": [0.0],
-                                    "residual": [0.0],
-                                    "smoldering": [0.0],
-                                    "total": [0.0]
-                                },
-                                /* ... */
-                                "understory": {
-                                    "flaming": [0.0],
-                                    "residual": [0.0],
-                                    "smoldering": [0.0],
-                                    "total": [0.0]
-                                }
+                        "growth": [
+                            {
+                                "end": "20150121",
+                                "pct": 60,
+                                "start": "20150120"
                             },
-                            "ground fuels": {
-                                "basal accumulations": {
-                                    "flaming": [0.0],
-                                    "residual": [0.0],
-                                    "smoldering": [0.0],
-                                    "total": [0.0]
-                                },
-                                /* ... */
+                            {
+                                "end": "20150122",
+                                "pct": 40,
+                                "start": "20150121"
                             }
-                            /* ... */
-                        }
-                        "emissions": {
-                            "canopy": {
-                                "ladder fuels": {
-                                    "flaming": {
-                                        "CH4": [0.0],
-                                        /* ... */
-                                    },
-                                    "residual": {
-                                        "CH4": [0.0],
-                                        /* ... */
-                                    },
-                                    "smoldering": {
-                                        "CH4": [0.0],
-                                        /* ... */
-                                    }
-                                },
-                                /* ... */
-                            }
-                            /* ... */
+                        ],
+                        "id": "SF11C14225236095807750",
+                        "location": {
+                            "ecoregion": "southern",
+                            "perimeter": {
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
+                                ],
+                                "type": "MultiPolygon"
+                            },
+                            "timezone": "-09:00"
                         }
                     }
                 ],
+                "version": "0.1.0"
+            },
+            {
+                "fccsmap_version": "0.1.7",
+                "module": "bluesky.modules.fuelbeds",
+                "module_name": "fuelbeds",
+                "version": "0.1.0"
+            },
+            {
+                "consume_version": "4.1.2",
+                "module": "bluesky.modules.consumption",
+                "module_name": "consumption",
+                "version": "0.1.0"
+            },
+            {
+                "ef_set": "feps",
+                "emitcalc_version": "0.3.2",
+                "module": "bluesky.modules.emissions",
+                "module_name": "emissions",
+                "version": "0.1.0"
             }
         ],
         "summary": {
-            "area": {
-                "total":234234,
-                "burned": 234
-            },
-            "fuelbeds": [
-                {
-                    "fccs_id": "49",
-                    "pct": 50.0
-                },
-                {
-                    "fccs_id": "46",
-                    "pct": 50.0
-                }
-            ],
             "consumption": {
                 "canopy": {
                     "ladder fuels": {
                         "flaming": [0.0],
                         "residual": [0.0],
                         "smoldering": [0.0],
-                        "total": [0.0]
+                        "total": [
+                            0.0
+                        ]
                     },
                     "midstory": {
                         "flaming": [0.0],
                         "residual": [0.0],
                         "smoldering": [0.0],
-                        "total": [0.0]
+                        "total": [
+                            0.0
+                        ]
                     },
-                    "overstory": {
-                        "flaming": [0.0],
-                        "residual": [0.0],
-                        "smoldering": [0.0],
-                        "total": [0.0]
-                    },
-                    /* ... */
-                }
-                /* ... */
+                    ...
+                ...
             },
             "emissions": {
                 "canopy": {
                     "ladder fuels": {
                         "flaming": {
                             "CH4": [0.0],
-                            /* ... */
+                            "CO": [0.0],
+                            "CO2": [0.0],
+                            "NH3": [0.0],
+                            "NOx": [0.0],
+                            "PM10": [0.0],
+                            "PM25": [0.0],
+                            "SO2": [0.0],
+                            "VOC": [0.0]
                         },
                         "residual": {
                             "CH4": [0.0],
-                            /* ... */
+                            "CO": [0.0],
+                            "CO2": [0.0],
+                            "NH3": [0.0],
+                            "NOx": [0.0],
+                            "PM10": [0.0],
+                            "PM25": [0.0],
+                            "SO2": [0.0],
+                            "VOC": [0.0]
                         },
                         "smoldering": {
                             "CH4": [0.0],
-                            /* ... */
+                            "CO": [0.0],
+                            "CO2": [0.0],
+                            "NH3": [0.0],
+                            "NOx": [0.0],
+                            "PM10": [0.0],
+                            "PM25": [0.0],
+                            "SO2": [0.0],
+                            "VOC": [0.0]
                         }
                     },
-                    /* ... */
+                    ...
+                ...
+            },
+            "fuelbeds": [
+                {
+                    "fccs_id": "46",
+                    "pct": 50.0
+                },
+                {
+                    "fccs_id": "49",
+                    "pct": 50.0
                 }
-                /* ... */
-            }
-        },
-        "processing": [
-            {
-                "module": "bluesky.modules.ingestion",
-                "version": "0.17.0",
-                "parsed_input":
-                    "event_of": {
-                        "id": "SF11E826544",
-                        "name": "Natural Fire near Snoqualmie Pass, WA"
-                    },
-                    "id": "SF11C14225236095807750",
-                    "location": {
-                        "type": "MultiPolygon",
-                        "perimeter": {
-                            "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
-                                ]
-                            ]
-                        },
-                        "ecoregion": "southern",
-                        "timezone": "-09:00"
-                    },
-                    "growth": [
-                        {
-                            "pct": 60,
-                            "start": "20150120",
-                            "end": "20150121"
-                        },
-                        {
-                            "pct": 40,
-                            "start": "20150121",
-                            "end": "20150122"
-                        },
-                    ],
-                }
-            },
-            {
-                "module": "bluesky.modules.fuelbeds",
-                "version": "0.2.1",
-                "fccsmap_version": "0.2.1"
-            },
-            {
-                "module": "bluesky.modules.consumption",
-                "version": "0.1.2",
-                "consume_version": "0.4.3"
-            },
-            {
-                "module": "bluesky.modules.emissions",
-                "version": "0.1.0",
-                "emitcalc_version": "0.5.2",
-                "ef_set": "feps"
-            }
-        ]
+            ]
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
