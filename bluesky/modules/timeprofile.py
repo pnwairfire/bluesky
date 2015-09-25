@@ -33,7 +33,7 @@ def run(fires_manager):
             for fb in fire.fuelbeds:
                 fb['profiled_emissions'] = []
             for g in fire.growth:
-                profiler = StaticTimeProfiler(g['start'], g['end']
+                profiler = StaticTimeProfiler(g['start'], g['end'],
                     hourly_fractions=daily_hourly_fractions)
                 g['hourly_fractions'] = profiler.hourly_fractions
                 for fb in fire.fuelbeds:
