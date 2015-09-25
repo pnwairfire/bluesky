@@ -352,7 +352,7 @@ custom fuel loadings information.
         ]
     }'
 
-##### Running  ```localmet```, ```timeprofile```, ```plumerise```, ```dispersion```, ```visualization```, ```export```:
+##### Running  ```localmet```, ```timeprofiling```, ```plumerise```, ```dispersion```, ```visualization```, ```export```:
 
 This example assumes you've already run up through emissions.  The consumption data
 that would have nested along side the emissions data has been stripped out, since
@@ -360,7 +360,7 @@ it's not needed.
 
     $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
-        "modules": ["localmet", "timeprofile", "plumerise", "dispersion", "visualization", "export"],
+        "modules": ["localmet", "timeprofiling", "plumerise", "dispersion", "visualization", "export"],
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
@@ -413,7 +413,7 @@ it's not needed.
             "localmet": {
                 /* ... */
             },
-            "timeprofile": {
+            "timeprofiling": {
                 "module": "standard" /* or "feps_rx_timing" or "custom" */
             },
             "plumerise": {
@@ -434,7 +434,7 @@ it's not needed.
         }
     }'
 
-The nested keys in the emissions data are arbitrary.  The timeprofile
+The nested keys in the emissions data are arbitrary.  The timeprofiling
 module simply expects a hierarchy of keys.  Generally speaking, the hiearchy
 is of the form:
 
@@ -449,11 +449,11 @@ The length of each array equals the number of fuelbeds passed into consume.
 Since consume is called on each fuelbed separately, the arrays of consumption
 and emissions data will all be of length 1.
 
-##### Running ```ingestion```, ```fuelbeds```, ```consumption```, ```emissions```, ```localmet```, ```timeprofile```, ```plumerise```, ```dispersion```, ```visualization```, ```export```:
+##### Running ```ingestion```, ```fuelbeds```, ```consumption```, ```emissions```, ```localmet```, ```timeprofiling```, ```plumerise```, ```dispersion```, ```visualization```, ```export```:
 
     $ curl 'http://bluesky-api-hostname/api/v1/run/' -H 'Content-Type: application/json' -d '
     {
-        "modules": ["timeprofile", "plumerise", "dispersion"],
+        "modules": ["timeprofiling", "plumerise", "dispersion"],
         "fire_information": [
             {
                 "id": "SF11C14225236095807750",
@@ -559,7 +559,7 @@ to specify the 'modules' key.  Also
 ### POST /api/v1/playground/2/
 
 This is just an alias for ```/api/v1/run/```, and running ```localmet```,
-```timeprofile```, ```plumerise```, ```dispersion```, ```visualization```,
+```timeprofiling```, ```plumerise```, ```dispersion```, ```visualization```,
 ```export```.  As with /1/, you don't have to specify either the 'modules'
 key or the export type.
 
@@ -619,7 +619,7 @@ Example:
             "start": "20150121T000000Z",
             "end": "20150123T000000Z",
             "met_domain": "PNW-4km",
-            "timeprofile": {
+            "timeprofiling": {
                 "module": "custom"
             }
         }

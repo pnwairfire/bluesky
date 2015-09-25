@@ -868,7 +868,7 @@ modules.)
 
  - ...
 
-##### timeprofile
+##### timeprofiling
 
  - ***'fire_information' > 'growth'*** -- *required* -- array of growth objects, each
   containing 'start', 'end', and 'pct'; if only one object,
@@ -914,11 +914,11 @@ the fire data, each module has its own set of required and optional fields.
 
  - ...
 
-##### timeprofile
+##### timeprofiling
 
  - ***'config' > 'start'*** -- *required* -- modeling start time (ex. "20150121T000000Z")
  - ***'config' > 'end'*** -- *required* -- modeling end time (ex. "20150123T000000Z")
- - ***'config' > 'timeprofile' > 'daily_hourly_fractions' *** -- *optional* --
+ - ***'config' > 'timeprofiling' > 'daily_hourly_fractions' *** -- *optional* --
 
 
 ##### plumerise

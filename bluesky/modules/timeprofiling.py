@@ -1,4 +1,4 @@
-"""bluesky.modules.timeprofile"""
+"""bluesky.modules.timeprofiling"""
 
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
@@ -19,12 +19,12 @@ __all__ = [
 __version__ = "0.1.0"
 
 def run(fires_manager):
-    """Runs timeprofile module
+    """Runs timeprofiling module
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    daily_hourly_fractions = fires_manager.get_config_value('timeprofile', 'daily_hourly_fractions')
+    daily_hourly_fractions = fires_manager.get_config_value('timeprofiling', 'daily_hourly_fractions')
     fires_manager.processed(__name__, __version__,
         timeprofile_version=timeprofile.__version__)
     try:
@@ -48,10 +48,10 @@ def run(fires_manager):
 
     except InvalidDailyHourlyFractionsError, e:
         raise BlueSkyConfigurationError(
-            "Invalid timeprofile daily hourly fractions: '{}'".format(e.message))
+            "Invalid timeprofiling daily hourly fractions: '{}'".format(e.message))
     except InvalidStartEndTimesError, e:
         raise BlueSkyConfigurationError(
-            "Invalid timeprofile start end times: '{}'".format(e.message))
+            "Invalid timeprofiling start end times: '{}'".format(e.message))
     # except InvalidEmissionsDataError, e:
     #     TODO: do anything with InvalidEmissionsDataError?
     #     raise
@@ -61,13 +61,13 @@ def run(fires_manager):
 def _validate_fire(fire):
     if 'growth' not in fire:
         raise ValueError(
-            "Missing growth data required for computing timeprofile")
+            "Missing growth data required for time profiling")
     # TODO: make sure each growth object is valid (and make sure 'pct'
     # add up to 100% ?)
     if 'fuelbeds' not in fire:
         raise ValueError(
-            "Missing fuelbed data required for computing timeprofile")
+            "Missing fuelbed data required for time profiling")
     for fb in fire.fuelbeds:
         if 'emissions' not in fb:
             raise ValueError(
-                "Missing emissions data required for computing timeprofile")
+                "Missing emissions data required for time profiling")
