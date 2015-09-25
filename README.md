@@ -102,16 +102,17 @@ See [pytest](http://pytest.org/latest/getting-started.html#getstarted) for more 
 First, install pip (with sudo if necessary):
 
     apt-get install python-pip
+    pip install --upgrade pip
 
-Then, to install, for example, v0.3.0, use the following (with sudo if necessary):
+Then, to install, for example, v0.3.1, use the following (with sudo if necessary):
 
-    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==0.3.0
+    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==0.3.1
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
     -i http://pypi.smoke.airfire.org/simple/
-    bluesky==0.3.0
+    bluesky==0.3.1
 
 See the Development > Install Dependencies > Notes section, above, for
 notes on resolving pip and gdal issues.
