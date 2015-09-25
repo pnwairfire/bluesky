@@ -11,6 +11,8 @@ from timeprofile.static import (
     InvalidEmissionsDataError
 )
 
+from pyairfire.datetime import parsing as datetime_parsing
+
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
@@ -62,8 +64,18 @@ def _validate_fire(fire):
     if 'growth' not in fire:
         raise ValueError(
             "Missing growth data required for time profiling")
-    # TODO: make sure each growth object is valid (and make sure 'pct'
-    # add up to 100% ?)
+    for g in fire.growth:
+        if 'start' not in g or 'end' not in g or 'pct' not in g:
+            raise ValueError(
+                "Insufficient growth data required for time profiling")
+        # datetime_parsing will raise ValueError if invalid format
+        for k in ['start', 'end']:
+            try:
+                g[k] = datetime_parsing.parse(g[k])
+            except ValueError, e:
+                # reraise wih specific msg
+                raise ValueError("Invalid datetime format for growth {} field: {}".format(k, g[k]))
+    # TODO: make sure 'pct' add up to 100% ?
     if 'fuelbeds' not in fire:
         raise ValueError(
             "Missing fuelbed data required for time profiling")
