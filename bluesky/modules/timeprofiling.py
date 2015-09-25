@@ -49,7 +49,7 @@ def run(fires_manager):
                 g['hourly_fractions'] = profiler.hourly_fractions
                 for fb in fire.fuelbeds:
                     emissions = fb['emissions'] # TODO: multiply each emission by g['pct']
-                    tpe = profiler.profile()
+                    tpe = profiler.profile(emissions)
                     fb['profiled_emissions'].append({
                         "start": g["start"],
                         "end": g["end"],
