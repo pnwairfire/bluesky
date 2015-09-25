@@ -35,7 +35,16 @@ def run(fires_manager):
             for fb in fire.fuelbeds:
                 fb['profiled_emissions'] = []
             for g in fire.growth:
-                profiler = StaticTimeProfiler(g['start'], g['end'],
+                # datetime_parsing will raise ValueError if invalid format
+                tw = {}
+                for k in ['start', 'end']:
+                    try:
+                        tw[k] = datetime_parsing.parse(g[k])
+                    except ValueError, e:
+                        # reraise wih specific msg
+                        raise ValueError("Invalid datetime format for growth {} field: {}".format(k, g[k]))
+
+                profiler = StaticTimeProfiler(tw['start'], tw['end'],
                     hourly_fractions=daily_hourly_fractions)
                 g['hourly_fractions'] = profiler.hourly_fractions
                 for fb in fire.fuelbeds:
@@ -68,13 +77,6 @@ def _validate_fire(fire):
         if 'start' not in g or 'end' not in g or 'pct' not in g:
             raise ValueError(
                 "Insufficient growth data required for time profiling")
-        # datetime_parsing will raise ValueError if invalid format
-        for k in ['start', 'end']:
-            try:
-                g[k] = datetime_parsing.parse(g[k])
-            except ValueError, e:
-                # reraise wih specific msg
-                raise ValueError("Invalid datetime format for growth {} field: {}".format(k, g[k]))
     # TODO: make sure 'pct' add up to 100% ?
     if 'fuelbeds' not in fire:
         raise ValueError(
