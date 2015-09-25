@@ -6,7 +6,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import timeprofile
 from timeprofile.static import (
     StaticTimeProfiler,
-    InvalidDailyHourlyFractionsError,
+    InvalidHourlyFractionsError,
     InvalidStartEndTimesError,
     InvalidEmissionsDataError
 )
@@ -46,7 +46,7 @@ def run(fires_manager):
                     })
 
 
-    except InvalidDailyHourlyFractionsError, e:
+    except InvalidHourlyFractionsError, e:
         raise BlueSkyConfigurationError(
             "Invalid timeprofiling daily hourly fractions: '{}'".format(e.message))
     except InvalidStartEndTimesError, e:
