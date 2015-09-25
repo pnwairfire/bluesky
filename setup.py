@@ -23,6 +23,7 @@ setup(
         "eflookup>=0.6.2",
         "emitcalc>=0.3.2",
         "fccsmap>=0.1.6",
+        "timeprofile>=0.1.0",
         "apps-consume4>=4.1.2",
         "tornado==4.2.1"
     ],
@@ -31,6 +32,7 @@ setup(
         "https://pypi.smoke.airfire.org/simple/eflookup/",
         "https://pypi.smoke.airfire.org/simple/emitcalc/",
         "https://pypi.smoke.airfire.org/simple/fccsmap/",
+        "https://pypi.smoke.airfire.org/simple/timeprofile/",
         "https://pypi.smoke.airfire.org/simple/apps-consume4/"
     ],
     tests_require=test_requirements
