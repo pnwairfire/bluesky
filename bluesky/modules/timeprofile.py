@@ -34,12 +34,16 @@ def run(fires_manager):
                 fb['profiled_emissions'] = []
             for g in fire.growth:
                 profiler = StaticTimeProfiler(g['start'], g['end']
-                    daily_hourly_fractions=daily_hourly_fractions)
+                    hourly_fractions=daily_hourly_fractions)
                 g['hourly_fractions'] = profiler.hourly_fractions
                 for fb in fire.fuelbeds:
-                    emissions = fb['emissions'] # TODO: multiple
+                    emissions = fb['emissions'] # TODO: multiply each emission by g['pct']
                     tpe = profiler.profile()
-                    # TODO: where to put time profiled emissions
+                    fb['profiled_emissions'].append({
+                        "start": g["start"],
+                        "end": g["end"],
+                        "emissions": tpe
+                    })
 
 
     except InvalidDailyHourlyFractionsError, e:
@@ -52,7 +56,7 @@ def run(fires_manager):
     #     TODO: do anything with InvalidEmissionsDataError?
     #     raise
 
-    fires_manager.summarize(daily_hourly_fractions=profiler.daily_hourly_fractions)
+    fires_manager.summarize(hourly_fractions=profiler.hourly_fractions)
 
 def _validate_fire(fire):
     if 'growth' not in fire:
