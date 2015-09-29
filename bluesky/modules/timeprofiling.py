@@ -69,6 +69,11 @@ def run(fires_manager):
 
     fires_manager.summarize(hourly_fractions=profiler.hourly_fractions)
 
+# Allow summed growth percentages to be between 99.5% and 100.5%
+# TODO: Move to common constants module? (fuelbeds defines constant for
+# total fuelbeds percentage)
+TOTAL_PCT_THRESHOLD = 0.5
+
 def _validate_fire(fire):
     if 'growth' not in fire:
         raise ValueError(
@@ -77,7 +82,9 @@ def _validate_fire(fire):
         if 'start' not in g or 'end' not in g or 'pct' not in g:
             raise ValueError(
                 "Insufficient growth data required for time profiling")
-    # TODO: make sure 'pct' add up to 100% ?
+    if TOTAL_PCT_THRESHOLD < abs(100.0 - reduce(lambda a, b: a + b, [g['pct'] for g in fire.growth])):
+        raise RuntimeError(
+            "Growth percentages don't add up to 100% - {}".format(fire.growth))
     if 'fuelbeds' not in fire:
         raise ValueError(
             "Missing fuelbed data required for time profiling")

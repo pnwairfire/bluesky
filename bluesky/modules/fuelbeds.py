@@ -68,6 +68,8 @@ def summarize(fires):
 # According to https://en.wikipedia.org/wiki/Acre, an acre is 4046.8564224 m^2
 ACRES_PER_SQUARE_METER = 1 / 4046.8564224  # == 0.0002471053814671653
 # Allow summed fuel percentages to be between 99.5% and 100.5%
+# TODO: Move to common constants module? (timeprofiling defines similar
+# constant for total growth percentage)
 TOTAL_PCT_THRESHOLD = 0.5
 
 class Estimator(object):
