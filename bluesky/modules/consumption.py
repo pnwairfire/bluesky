@@ -231,13 +231,12 @@ def run(fires_manager):
         'fuel_loadings')
     fuel_loadings_manager = FuelLoadingsManager(all_fuel_loadings=all_fuel_loadings)
 
+    _validate_input(fires_manager)
 
     # TODO: can I safely instantiate one FuelConsumption object and
     # use it across all fires, or at lesat accross all fuelbeds within
     # a single fire?
     for fire in fires_manager.fires:
-        if 'fuelbeds' not in fire:
-            raise ValueError("Missing fuelbed data required for computing consumption")
 
         burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
         valid_settings = SETTINGS[burn_type] + SETTINGS['all']
@@ -277,3 +276,17 @@ def run(fires_manager):
                 ))
     fires_manager.summarize(
         consumption=datautils.summarize(fires_manager.fires, 'consumption'))
+
+REQUIRED_LOCATION_FIELDS = ['area', 'ecoregion']
+def _validate_input(fires_manager):
+    for fire in fires_manager.fires:
+        if not fire.get('fuelbeds'):
+            raise ValueError("Missing fuelbed data required for computing consumption")
+        if not fire.get('location'):
+            raise ValueError("Missing location data required for computing consumption")
+        if any([not fire.location.get(k) for k in REQUIRED_LOCATION_FIELDS]):
+            raise ValueError("Fire location data must define 'area' and "
+                "'ecoregion' for computing consumption")
+        for fb in fire.fuelbeds:
+            if not fb.get('fccs_id') or not fb.get('pct'):
+                raise ValueError("Each fuelbed must define 'id' and 'pct'")
