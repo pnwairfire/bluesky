@@ -181,8 +181,8 @@ class FiresManager(object):
         return self.load(data)
 
     def run(self): #, module_names):
-        try:
-            for i in range(len(self._modules)):
+        for i in range(len(self._modules)):
+            try:
                 # initialize processing recotd
                 self.processing = self.processing or []
                 self.processing.append({
@@ -191,18 +191,19 @@ class FiresManager(object):
 
                 # 'run' modifies fires in place
                 self._modules[i].run(self)
-        except Exception, e:
-            # when there's an error running modules, don't bail; raise
-            # BlueSkyModuleError so that the calling code can decide what to do
-            # (which, in the case of bsp and bsp-web, is to dump the data as is)
-            logging.error(e)
-            tb = traceback.format_exc()
-            logging.debug(tb)
-            self.error = {
-                "message": str(e),
-                "traceback": str(tb)
-            }
-            raise BlueSkyModuleError(e)
+            except Exception, e:
+                # when there's an error running modules, don't bail; raise
+                # BlueSkyModuleError so that the calling code can decide what to do
+                # (which, in the case of bsp and bsp-web, is to dump the data as is)
+                logging.error(e)
+                tb = traceback.format_exc()
+                logging.debug(tb)
+                self.error = {
+                    "module": self._module_names[i],
+                    "message": str(e),
+                    "traceback": str(tb)
+                }
+                raise BlueSkyModuleError(e)
 
     ## Filtering data
 
