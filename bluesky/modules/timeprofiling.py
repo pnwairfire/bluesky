@@ -26,7 +26,8 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    daily_hourly_fractions = fires_manager.get_config_value('timeprofiling', 'daily_hourly_fractions')
+    hourly_fractions = fires_manager.get_config_value('timeprofiling', 'hourly_fractions')
+
     fires_manager.processed(__name__, __version__,
         timeprofile_version=timeprofile.__version__)
     try:
@@ -45,7 +46,7 @@ def run(fires_manager):
                         raise ValueError("Invalid datetime format for growth {} field: {}".format(k, g[k]))
 
                 profiler = StaticTimeProfiler(tw['start'], tw['end'],
-                    hourly_fractions=daily_hourly_fractions)
+                    hourly_fractions=hourly_fractions)
                 g['hourly_fractions'] = profiler.hourly_fractions
                 for fb in fire.fuelbeds:
                     emissions = fb['emissions'] # TODO: multiply each emission by g['pct']
@@ -59,7 +60,7 @@ def run(fires_manager):
 
     except InvalidHourlyFractionsError, e:
         raise BlueSkyConfigurationError(
-            "Invalid timeprofiling daily hourly fractions: '{}'".format(e.message))
+            "Invalid timeprofiling hourly fractions: '{}'".format(e.message))
     except InvalidStartEndTimesError, e:
         raise BlueSkyConfigurationError(
             "Invalid timeprofiling start end times: '{}'".format(e.message))

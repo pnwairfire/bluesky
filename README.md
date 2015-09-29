@@ -919,7 +919,7 @@ the fire data, each module has its own set of required and optional fields.
 
  - ***'config' > 'start'*** -- *required* -- modeling start time (ex. "20150121T000000Z")
  - ***'config' > 'end'*** -- *required* -- modeling end time (ex. "20150123T000000Z")
- - ***'config' > 'timeprofiling' > 'daily_hourly_fractions' *** -- *optional* --
+ - ***'config' > 'timeprofiling' > 'hourly_fractions' *** -- *optional* --
 
 
 ##### plumerise
