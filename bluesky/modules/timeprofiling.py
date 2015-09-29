@@ -32,6 +32,17 @@ def run(fires_manager):
         timeprofile_version=timeprofile.__version__)
     try:
         for fire in fires_manager.fires:
+
+            if (hourly_fractions and len(fire.growth) > 1 and
+                    set([len(e) for p,e in hourly_fractions.items()]) != set([24])):
+                # TODO: Support this scenario, but make sure
+                # len(hourly_fractions) equals the total number of hours
+                # represented by all growth objects, and pass the appropriate
+                # slice into each instantiation of StaticTimeProfiler
+                # (or build this into StaticProfiler???)
+                raise BlueSkyConfigurationError("Only 24-hour repeatable time "
+                    "profiles supported for fires with multiple growth windows")
+
             _validate_fire(fire)
             for fb in fire.fuelbeds:
                 fb['profiled_emissions'] = []
