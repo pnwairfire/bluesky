@@ -7,12 +7,17 @@
             ]
         },
         "timeprofiling": {
-            "hourly_fractions": [
-                0.005700,
-                0.005700,
-                0.005700,
-                0.005700
-            ]
+            "hourly_fractions": {
+                "flaming": [
+                    0.4, 0.1, 0.3, 0.2
+                ],
+                "smoldering": [
+                    0.4, 0.1, 0.3, 0.2
+                ],
+                "residual": [
+                    0.4, 0.1, 0.3, 0.2
+                ]
+            }
         }
     },
     "fire_information": [
