@@ -1,0 +1,49 @@
+{
+    "config": {
+        "consumption": {
+            "fuel_loadings": {
+                "10046": {
+                    "based_on_fccs_id": "46",
+                    "w_sound_9_20_loading": 0.42,
+                    "w_sound_gt20_loading": 0.43,
+                    "w_sound_quarter_1_loading": 0.44,
+                    "w_stump_lightered_loading": 0.45,
+                    "w_stump_rotten_loading": 0.46,
+                    "w_stump_sound_loading": 0.47
+                }
+            }
+        },
+        "emissions": {
+            "species": ["PM25"]
+        }
+    },
+    "fire_information": [
+        {
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "fuelbeds": [
+                {
+                    "fccs_id": "10046",
+                    "pct": 100.0
+                }
+            ],
+            "growth": [
+                {
+                    "end": "20150120",
+                    "pct": 100.0,
+                    "start": "20150120"
+                }
+            ],
+            "id": "SF11C14225236095807750",
+            "location": {
+                "area": 200,
+                "ecoregion": "southern",
+                "latitude": 47.4316976,
+                "longitude": -121.3990506,
+                "timezone": "-09:00"
+            }
+        }
+    ]
+}
