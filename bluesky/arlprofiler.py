@@ -42,11 +42,7 @@ class ArlProfiler(object):
 
             self._call(d, f, lat, lng, time_step)
             local_met_data.update(self._load())
-
-
-
-            # TODO: call another method to parse output
-        return
+        return local_met_data
 
 
 
@@ -73,11 +69,221 @@ class ArlProfiler(object):
             raise RuntimeError("profile failed with exit code {}".format(
                 status))
 
-    PROFILE_OUTPUT_FILE = 'profile.txt'
+    PROFILE_OUTPUT_FILE = './profile.txt'
     def _load(self):
-        data = {}
-        with open(self.PROFILE_OUTPUT_FILE, 'w') as f:
-            for line in f....
+        # data = {}
+        # with open(self.PROFILE_OUTPUT_FILE, 'w') as f:
+        #     for line in f....
+        full_path = os.path.abspath(self.PROFILE_OUTPUT_FILE)
+        profile = ARLProfile(fule_path, ___DATETIME_OBJ___)
+        profile_dict = {}
+        # TODO: convert profile to profile_dict
+        return profile_dict
+
+
+class ARLProfile(object):
+    """Interprets raw ARL data in from text file parses into a complete dataset
+
+    ARLProfile was copied from BlueSky Framework.  It's written
+    """
+
+    def __init__(self, filename, dt):
+        self.raw_file = filename
+        self.dt = dt
+        self.hourly_profile = {}
+
+    ###############################################################
+    # To aid clarity, here is an example of one hour of the output
+    # files that we are parsing using the following method:
+    #___________________________________________________
+    # Profile Time:  13  1  2  0  0
+    # Profile Location:    40.61 -100.56  ( 93, 65)
+    #
+    #       TPP3  T02M  RH2M  U10M  V10M  PRSS
+    #                                     hPa
+    # 1013     0     0     0     0     0     0
+    #
+    #       UWND  VWND  HGTS  TEMP  WWND  RELH     TPOT  WDIR  WSPD
+    #        m/s   m/s          oC  mb/h     %       oK   deg   m/s
+    # 1000   2.6  0.96   196 -0.50     0  66.0    272.7 247.6   2.8
+    #  975   2.6   1.2   397  -1.8     0  66.0    273.4 243.6   2.8
+    #  950   2.7   1.1   603  -3.1     0  66.0    274.1 244.6   2.9
+    #  925   2.5  0.91   813  -5.0     0  67.0    274.2 247.6   2.7
+    #  900   7.6  -1.9  1029  -3.1   6.2  40.0    278.3 282.0   7.8
+    #  875   6.8  -3.5  1252  -2.9   6.2  50.0    280.8 294.8   7.6
+    #  850   7.1  -3.2  1481  -4.5   6.0  60.0    281.4 291.8   7.7
+    #  800   7.6  -3.1  1955  -7.7   2.6  63.0    283.0 289.7   8.2
+    #  750   7.0  -3.8  2454 -11.1  0.58  59.0    284.5 295.8   8.0
+    #  700   6.9  -3.6  2980 -13.5     0  54.0    287.5 295.2   7.8
+    #  650   8.5  -3.1  3541 -16.3     0  42.0    290.6 287.4   9.1
+    #  600  10.7  -1.3  4138 -19.7  0.94  35.0    293.4 274.6  10.8
+    #  550   9.3  -1.3  4779 -23.3   1.6  29.0    296.5 275.9   9.4
+    #  500   6.4  -2.3  5470 -28.2   1.2  22.0    298.6 287.4   6.8
+    #  450   2.6  -4.0  6216 -33.7     0  22.0    300.9 324.3   4.8
+    #  400  -1.6  -5.3  7032 -39.2  -3.3  26.0    304.1  14.5   5.6
+    #  350  -2.4  -4.2  7933 -45.2 -0.85  26.0    307.8  27.7   4.9
+    #  300   4.8  -1.1  8955 -47.5     0  19.0    318.4 281.0   5.0
+    #  250  13.5   2.9 10154 -49.1  -1.1  11.0    333.1 255.5  13.8
+    #  200  19.4   4.3 11618 -48.5   1.1   4.0    356.0 255.2  19.9
+    #  150  28.1   6.9 13505 -51.9  0.52   9.0    380.7 253.8  29.0
+    #  100  18.0   4.8 16116 -55.3 -0.75   2.0    421.0 252.7  18.7
+    #   50   6.8 -0.15 20468 -60.8  0.54   2.0    500.2 268.9   6.8
+    #
+    #___________________________________________________
+    ###############################################################
+    def get_hourly_params(self):
+        """ Read a raw profile.txt into an hourly dictionary of parameters """
+        read_data = False
+        hour_separator = "______"  # The output file uses this text string to separate hours.
+
+        # read raw text into a dictionary
+        profile = []
+        hour_step = []
+        for line in fileinput.input(self.raw_file):
+            if hour_separator in line:
+                read_data = True
+                profile.append(hour_step)
+                hour_step = []
+            if read_data:
+                hour_step.append(line)
+        if [] in profile: profile.remove([])
+
+        if profile == []: return {}
+
+        # process raw output into necessary data
+        self.parse_hourly_text(profile)
+        self.fix_first_hour()
+        self.remove_below_ground_levels()
+        self.spread_hourly_results()
+
+        return self.hourly_profile
+
+    def parse_hourly_text(self, profile):
+        """ Parse raw hourly text into a more useful dictionary """
+        for hour in profile:
+            # 'date' is of the form: ['12', '6', '22', '18', '0']
+            date = hour[1][hour[1].find(":") + 1:].strip().split()
+            year = int(date[0]) if int(date[0]) > 1980 else (2000 + int(date[0]))
+            t = datetime(year, int(date[1]), int(date[2]), int(date[3]))
+            vars = {}
+
+            # parameters appear on different line #s, for the two file types
+            line_numbers = [4, 6, 8, 10] if hour[5][2:6].split() == [] else [4, 8, 10, 12]
+            # parse at-surface variables
+            first_vars = []
+            first_vars.append('pressure_at_surface')
+            for var_str in hour[line_numbers[0]].split():
+                first_vars.append(var_str)
+            first_vals = hour[line_numbers[1]].split()
+            for v in xrange(len(first_vars)):
+                vars[first_vars[v]] = []
+                vars[first_vars[v]].append(first_vals[v])
+
+            # parse variables at pressure levels
+            main_vars = []
+            main_vars.append("pressure")
+            for var_str in hour[line_numbers[2]].split():
+                main_vars.append(var_str)
+            for v in main_vars:
+                vars[v] = []
+            for i in xrange(line_numbers[3], len(hour)):
+                line = hour[i].split()
+                if len(line) > 0:
+                    for j in xrange(len(line)):
+                        vars[main_vars[j]].append(line[j])
+
+            self.hourly_profile[t] = vars
+
+    def fix_first_hour(self):
+        """
+        Some ARL file keep a special place for at-surface met variables. However, sometimes these variables are not
+        populated correctly at the zero hour (they will all be zero), and that needs to be fixed.
+        """
+        t = datetime(self.dt.year, self.dt.month, self.dt.day)
+        second_hr = t
+        # find second hour in file
+        for hr in xrange(1, 23):
+            second_hr = datetime(int(t.year), int(t.month), int(t.day), int(hr))
+            if second_hr in self.hourly_profile:
+                break
+
+        # back-fill first hour's values, if they are empty
+        # These opaque variable names are defined by the ARL standard, and are described in types.ini
+        if float(self.hourly_profile[t]["PRSS"][0]) == 0.0 and float(self.hourly_profile[t]["T02M"][0]) == 0.0:
+            keys = ['pressure_at_surface', 'TPP3', 'T02M', 'RH2M', 'U10M', 'V10M', 'PRSS']
+            self.hourly_profile[t].update(dict((k, self.hourly_profile[second_hr][k]) for k in keys))
+
+    def remove_below_ground_levels(self):
+        """
+        Frequently, ARL files will include met variables at
+        pressure levels that are below the surface of the Earth.
+        This data is all nonsense, so it needs to be removed.
+        """
+        for dt, param_dict in self.hourly_profile.iteritems():
+            surface_p = float(param_dict['pressure_at_surface'][0])
+            if surface_p > float(param_dict['pressure'][0]) or surface_p < float(param_dict['pressure'][-1]):
+                continue
+            new_dict = {}
+            for i in xrange(len(param_dict['pressure'])):
+                if float(param_dict['pressure'][i]) < surface_p:
+                    surface_index = i
+                    break
+            for k in param_dict.keys():
+                # loop through each array, and append to new one
+                if len(param_dict[k]) > 1:
+                    new_array = []
+                    for j in xrange(len(param_dict[k])):
+                        if j >= surface_index:
+                            new_array.append(float(param_dict[k][j]))
+                    new_dict[k] = new_array
+                elif len(param_dict[k]) == 1:
+                    new_dict[k] = param_dict[k]
+
+            # replace old dict with new
+            del self.hourly_profile[dt]
+            self.hourly_profile[dt] = new_dict
+
+    def spread_hourly_results(self):
+        """
+        Frequently, ARL files will only have data every 3 or 6 hours.
+        If so, we need to spread those values out to become hourly data.
+        """
+        t = datetime(self.dt.year, self.dt.month, self.dt.day)
+        tz_str = str(self.dt.tzinfo.tzname(self.dt)).strip()
+        tz = ARLProfile.calc_tz(tz_str)
+        first_hr = t - timedelta(hours=tz)
+
+        # clean up unwanted days of information
+        for k in self.hourly_profile.keys():
+            if k < first_hr or k > (first_hr + timedelta(hours=23)):
+                del self.hourly_profile[k]
+
+        dates = sorted(self.hourly_profile.keys())
+
+        # spread values if the data is not hourly
+        for hr in xrange(24):
+            new_datetime = first_hr + timedelta(hours=hr)
+            if new_datetime not in dates:
+                closest_date = sorted(dates, key=lambda d:abs(new_datetime - d))[0]
+                self.hourly_profile[new_datetime] = self.hourly_profile[closest_date]
+
+    @staticmethod
+    def calc_tz(tz_str):
+        """There are several ways time zones can be written.
+        This method takes care of those details for you."""
+        time_zones = {'MIT': -11, 'HAST': -10, 'AKST': -9, 'AKDT': -8,
+                      'PST': -8, 'PDT': -7, 'MST': -7, 'MDT': -6, 'CST':-6,
+                      'CDT': -5, 'EST': -5, 'EDT': -4, 'PRT': -4, 'CNT': -3.5,
+                      'AGT': -3, 'BET': -3, 'CAT': -1, 'UTC': 0, 'WET': 0, 'WEST': 1,
+                      'CET': 1, 'CEST': 2, 'EET': 2, 'EEST': 3, 'ART': 2,
+                      'EAT': 3, 'MET': 3.5, 'NET': 4, 'PLT': 4, 'IST': 5.3,
+                      'BST': 6, 'ICT': 7, 'CTT': 8, 'AWST': 8, 'JST': 9,
+                      'ACST': 9.5, 'AEST': 10, 'SST': 11, 'NZST': 12, 'NZDT': 13}
+
+        if len(tz_str) > 4:
+            return int(tz_str[3:6])
+        else:
+            return time_zones[tz_str]
 
 
 # 'profile' is assumed to be in search path, unless configured to point to
