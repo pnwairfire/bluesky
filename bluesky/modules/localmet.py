@@ -1,4 +1,11 @@
-"""bluesky.modules.localmet"""
+"""bluesky.modules.localmet
+
+This module relies on the fortran arl profile utility. It is expected to
+reside in a directory in the search path. (This module prevents configuring
+relative or absolute paths to profile, to eliminiate security vulnerabilities
+when invoked by web service request.) To obtain profile, contact NOAA.
+
+"""
 
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"

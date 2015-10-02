@@ -4,6 +4,8 @@ BlueSky Framework rearchitected as a pipeable collection of standalone modules.
 
 ## Non-python Dependencies
 
+### fuelbeds
+
 For the fuelbeds module, you'll need to manually install some
 dependencies needed by the fccsmap package, which fuelbeds uses.
 See the [fccsmap github page](https://github.com/pnwairfire/fccsmap)
@@ -12,6 +14,17 @@ for instructions.
 Additionally, on ubuntu, you'll need to install libxml
 
     sudo apt-get install libxml2-dev libxslt1-dev
+
+### localmet
+
+The localmet module relies on the fortran arl profile utility. It is
+expected to reside in a directory in the search path. To obtain `profile`,
+contact NOAA.
+
+### dispersion
+
+If running hysplit dispersion, you'll need to obtain hysplit from NOAA. To obtain
+it, go to their [hysplit distribution page](http://ready.arl.noaa.gov/HYSPLIT.php).
 
 ## Development
 

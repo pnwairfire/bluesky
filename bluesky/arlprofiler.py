@@ -2,9 +2,10 @@
 
 This module wraps the fortran arl profile utility.  Unless an absolute or
 relative path to profile is provided on ArlProfile instantiation, profile
-is expected to be in directory in the search path
-
-To obtain profile, ...TODO: FILL IN...
+is expected to be in a directory in the search path. (This module prevents
+configuring relative or absolute paths to hysplit, to eliminiate security
+vulnerabilities when invoked by web service request.) To obtain profile,
+contact NOAA.
 
 TODO: move this to pyairfire or into it's own repo (arl-profile[r]) ?
 """
