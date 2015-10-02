@@ -8,6 +8,8 @@ __all__ = [
     'summarize'
 ]
 
+from pyairfire.datetime import parsing as datetime_parsing
+
 def deepmerge(a, b):
     """Merges b into a, retaining nested keys in a that aren't in b, replacing
     and common keys with b's value.
@@ -51,3 +53,17 @@ def summarize(fires, subdata_key):
         for fb in fire.fuelbeds:
             summary = _summarize(fb[subdata_key], summary)
     return summary
+
+# TODO: move parse_datetimes to more appropriate common module
+def parse_datetimes(d, *keys):
+    r = {}
+    for k in keys:
+        try:
+            r[k] = datetime_parsing.parse(d[k])
+        except ValueError, e:
+            # datetime_parsing will raise ValueError if invalid format
+            # reraise wih specific msg
+            raise ValueError("Invalid datetime format for '{}' field: {}".format(k, d[k]))
+        except KeyError, e:
+            raise ValueError("Missing '{}' datetime field".format(k))
+    return r

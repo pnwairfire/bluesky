@@ -11,8 +11,7 @@ from timeprofile.static import (
     InvalidEmissionsDataError
 )
 
-from pyairfire.datetime import parsing as datetime_parsing
-
+from bluesky.datautils import parse_datetimes
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
@@ -47,15 +46,7 @@ def run(fires_manager):
             for fb in fire.fuelbeds:
                 fb['profiled_emissions'] = []
             for g in fire.growth:
-                # datetime_parsing will raise ValueError if invalid format
-                tw = {}
-                for k in ['start', 'end']:
-                    try:
-                        tw[k] = datetime_parsing.parse(g[k])
-                    except ValueError, e:
-                        # reraise wih specific msg
-                        raise ValueError("Invalid datetime format for growth {} field: {}".format(k, g[k]))
-
+                tw = parse_datetimes(g, 'start', 'end')
                 profiler = StaticTimeProfiler(tw['start'], tw['end'],
                     hourly_fractions=hourly_fractions)
                 g['hourly_fractions'] = profiler.hourly_fractions
