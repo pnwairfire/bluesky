@@ -34,6 +34,9 @@ class ArlProfiler(object):
         self._profile_exe = profile_exe
 
     def profile(self, start, end, lat, lng, time_step=None):
+        if start > end:
+            raise ValueError("Start date can't before after end date")
+
         time_step = time_step or 1
         met_files = self._find_files(start, end)
         local_met_data = {}
