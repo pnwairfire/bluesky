@@ -86,7 +86,8 @@ class ArlProfiler(object):
 class ARLProfile(object):
     """Interprets raw ARL data in from text file parses into a complete dataset
 
-    ARLProfile was copied from BlueSky Framework.  It's written
+    ARLProfile was copied from BlueSky Framework.
+    TODO: acknoledge authors (STI?)
     """
 
     def __init__(self, filename, dt):
