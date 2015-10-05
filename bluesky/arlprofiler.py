@@ -27,7 +27,7 @@ class ArlProfiler(object):
         # profile exe or that it's
         profile_exe = profile_exe or 'profile'
         try:
-            subprocess.call([profile_exe]
+            subprocess.call([profile_exe])
         except OSError:
             raise ValueError(
                 "{} is not an existing/valid profile executable".format(profile_exe))
