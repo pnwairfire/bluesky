@@ -11,10 +11,11 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import logging
+import os
 
 from pyairfire.datetime import parsing as datetime_parsing
 
-from bluesky.airlprofiler import ArlProfiler
+from bluesky.met.airlprofiler import ArlProfiler
 from bluesky.datautils import parse_datetimes
 
 __all__ = [
@@ -34,10 +35,14 @@ def run(fires_manager, config=None):
     logging.info("Running localmet module")
     fires_manager.processed(__name__, __version__)
 
-    arl_profiler = ArlProfiler(config.get(''))
     for fire in fires_manager.fires:
         lat,lng = _fire_lat_lng(fire)
         for g in fire.growth:
+            # Note: ArlProfiler will raise an exception if met_root_dir is undefined
+            # or is not a valid directory
+            # TODO: shoudl met_files be specifeid in config, to apply to all fires?
+            met_files = _parse_met_files(g.get('met_files'))
+            arl_profiler = arlprofiler.ArlProfiler(met_files)
             tw = parse_datetimes(g, 'start', 'end')
             g['localmet'] = arl_profiler.profile(tw['start'], tw['end'], lat, lng)
 
@@ -63,3 +68,21 @@ def _fire_lat_lng(fire):
             "Insufficient location data required for looking up lcalmet data")
 
     return (lat, lng)
+
+def _parse_met_files(met_files):
+    """Converts array of arl file w/ time range items to hash of hour to arl
+    file.  Also validates data.
+    """
+    _met_files = {}
+    for f_dict in met_files:
+        tw = parse_datetimes(f_dict, 'start', 'end')
+        f = f_dict.get("file")
+        # TODO: make sure start/end are even hours
+        if not f or not os.path.isfile(f):
+            raise ValueError("{} is not a valid file".format(f))
+        # TODO:
+        #  - for each hour from start to end (including end?)
+        #     - if hour is already in _met_files, raise exception (overlapping coverage)
+        #     - _met_files[hour datetime object] = f_dict[]
+
+    pass _met_files

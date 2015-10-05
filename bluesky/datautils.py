@@ -12,7 +12,7 @@ from pyairfire.datetime import parsing as datetime_parsing
 
 def deepmerge(a, b):
     """Merges b into a, retaining nested keys in a that aren't in b, replacing
-    and common keys with b's value.
+    any common keys with b's value.
 
     Updates a in place, but returns new value as well
 

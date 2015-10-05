@@ -17,11 +17,23 @@ import os
 import subprocess
 
 class ArlProfiler(object):
-    def __init__(self, met_root_dir, profile_exe=None):
-        # make sure met_root_dir is an existing directory
-        if not met_root_dir or not os.path.isdir(met_root_dir):
-            raise ValueError("{} is not a valid directory".format(met_root_dir))
-        self._met_root_dir = met_root_dir
+    def __init__(self, met_files, profile_exe=None):
+        """Constructor
+
+        Carries out initialization and validation
+
+        args:
+         - met_files
+        kwargs:
+         - profile_exe
+
+        met_files is expected to be a list of dicts, each dict specifying an
+        arl met file along with a datetime range to use it for.
+        Ex.:
+
+        """
+        # TODO: make sure each file in met_files is an existing file, and make
+        # there there are no overlaping time windows
 
         # make sure profile_exe is a valid fully qualified pathname to the
         # profile exe or that it's
@@ -38,6 +50,8 @@ class ArlProfiler(object):
             raise ValueError("Start date can't before after end date")
 
         time_step = time_step or 1
+        # TODO: make sure time_step is integer
+
         met_files = self._find_files(start, end)
         local_met_data = {}
         for met_file in met_files:
@@ -49,13 +63,6 @@ class ArlProfiler(object):
             local_met_data.update(self._load())
         return local_met_data
 
-
-
-    def _find_files(self, start, end):
-        # TODO: for each date in date range defined by start/end, look in
-        # self._met_root_dir for matching dir, find arl12hrindex.csv file,
-        # determine which files need to be parsed, and return
-        pass
 
     def _call(self, d, f, lat, lng, time_step):
         # TODO: cd into tmp dir before calling, or somehow specify

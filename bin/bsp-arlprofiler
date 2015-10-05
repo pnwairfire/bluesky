@@ -4,26 +4,49 @@ __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 
 import json
+import logging
+import sys
+import traceback
 import tornado.ioloop
 
 from pyairfire import scripting
 
 try:
-    from bluesky import arlprofiler
+    from bluesky.met import arlprofiler
 except:
     import os
     import sys
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from bluesky import arlprofiler
+    from bluesky.met import arlprofiler
+
+class ParseArlFilesAction(Action):
+
+    KEY_VALUE_EXTRACTER = re.compile('^([^=]+)=([^=]+)$')
+
+    def __call__(self, parser, namespace, value, option_string=None):
+        """Splits value into key/value, and set in destination dict
+
+        Note: Expects value to be of the format 'key=value'.  Also expects
+        destination (i.e. parser.value's self.dest attribute), to be
+        initialized as an empty dict.
+        """
+        m = value.split(';')
+        if len(m) != 3:
+            msg = "Invalid value '{}' for option '{}' - value must be of the "
+                "form '<file>;<start>;<end>'".format(value, opt)
+            raise scripting.args.ArgumentTypeError(msg)
+        d = getattr(namespace, self.dest)
+        d = d or []
+        d.append({"file": m[0], "start": m[1], "start": m[2]})
 
 REQUIRED_ARGS = [
     {
-        'short': '-d',
-        'long': '--met-root-dir',
-        'dest': 'met_root_dir',
-        'help': 'Root directory containing met data',
-        'action': 'store'
+        'short': '-f',
+        'long': '--met-file',
+        'dest': 'met_files',
+        'help': 'Met file with date range to use it for; format "<file>;<start>;<end>"',
+        'action': ParseDatetimeAction
     },
     {
         'short': '-s',
@@ -85,7 +108,12 @@ EXAMPLES_STR = """Examples:
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
-    profiler = arlprofiler.ArlProfiler(args.met_root_dir,
-        profile_exe=args.profile_exe)
-    print json.dumps(profiler.profile(args.start, args.end, args.lat,
-        args.lng))
+    try:
+        profiler = arlprofiler.ArlProfiler(args.met_files,
+            profile_exe=args.profile_exe)
+        sys.stdout.write(json.dumps(profiler.profile(args.start, args.end,
+            args.lat, args.lng)))
+    except Exception, e:
+        logging.error(e)
+        logging.debug(traceback.format_exc())
+        scripting.utils.exit_with_msg(e)
