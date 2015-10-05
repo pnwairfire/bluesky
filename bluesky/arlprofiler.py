@@ -17,7 +17,7 @@ import os
 import subprocess
 
 class ArlProfiler(object):
-    def __init__(self, met_root_dir, profile_exe='profile'):
+    def __init__(self, met_root_dir, profile_exe=None):
         # make sure met_root_dir is an existing directory
         if not met_root_dir or not os.path.isdir(met_root_dir):
             raise ValueError("{} is not a valid directory".format(met_root_dir))
@@ -25,6 +25,7 @@ class ArlProfiler(object):
 
         # make sure profile_exe is a valid fully qualified pathname to the
         # profile exe or that it's
+        profile_exe = profile_exe or 'profile'
         try:
             subprocess.call([profile_exe]
         except OSError:
@@ -32,7 +33,8 @@ class ArlProfiler(object):
                 "{} is not an existing/valid profile executable".format(profile_exe))
         self._profile_exe = profile_exe
 
-    def profile(self, start, end, lat, lng, time_step=1):
+    def profile(self, start, end, lat, lng, time_step=None):
+        time_step = time_step or 1
         met_files = self._find_files(start, end)
         local_met_data = {}
         for met_file in met_files:
