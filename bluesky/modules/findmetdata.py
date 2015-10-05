@@ -24,6 +24,12 @@ def run(fires_manager, config=None):
     """
     logging.info("Running findmetdata module")
     fires_manager.processed(__name__, __version__)
+
+    # TODO: For playground, there will be only one file containing data for
+    # any particular hour.  Allow config to specify using simplified logic
+    # for this scenario.  Otherwise, use more complicated logic in
+    # arlfinder.ArlFinder (or put both code paths in ArlFinder?)
+
     # Note: ArlFinder will raise an exception if met_root_dir is undefined
     # or is not a valid directory
     met_root_dir = config.get('localmet', [}).get('met_root_dir')

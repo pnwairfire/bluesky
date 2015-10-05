@@ -6,7 +6,6 @@ This module finds arl met data files for a particular domain and time window.
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-
 class ArlFinder(object):
     def __init__(self, met_root_dir):
         # make sure met_root_dir is an existing directory
