@@ -15,6 +15,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import os
 import subprocess
+from datetime import date, datetime, time, timedelta
 
 from bluesky.datautils import parse_datetimes
 
@@ -30,19 +31,25 @@ class ArlProfiler(object):
          - profile_exe
 
         met_files is expected to be a list of dicts, each dict specifying an
-        arl met file along with a datetime range to use it for.
-        Ex.:
-
+        arl met file along with a 'first', 'start', and 'end' datetimes. For
+        example:
+           [
+              {"file": "...", "first": "...", "start": "...", "end": "..."}
+           ]
+        'first' is the first hour in the arl file. 'start' and 'end' define
+        the time window for which local met data is desired.  Though fire
+        growth windows don't have to start or end on the hour, 'first',
+        'start', and 'end' do.
         """
-        # TODO: make sure each file in met_files is an existing file, and make
-        # there there are no overlaping time windows
-        self._met_files = met_files
+        # _parse_met_files validates information in met_files
+        self._met_files = self._parse_met_files(met_files)
 
         # make sure profile_exe is a valid fully qualified pathname to the
         # profile exe or that it's
         profile_exe = profile_exe or 'profile'
         try:
-            subprocess.call([profile_exe])
+            # Use check_output so that output isn't sent to stdout
+            output = subprocess.check_output([profile_exe])
         except OSError:
             raise ValueError(
                 "{} is not an existing/valid profile executable".format(profile_exe))
@@ -57,21 +64,47 @@ class ArlProfiler(object):
         full_path_profile_txt = os.path.abspath(self.PROFILE_OUTPUT_FILE)
         local_met_data = {}
         for met_file in self._met_files:
-            t = parse_datetimes(g, 'first', 'start', 'end')
-            if t['first'] > t['start']:
-                raise ValueError("Start time can't be before ARL file's first time")
-            if t['start'] > t['end']:
-                raise ValueError("Start time can't be after end time")
-
             d, f = os.path.split(met_file["file"])
             # split returns dir without trailing slash, which is required by profile
             d = d + '/'
 
             self._call(d, f, lat, lng, time_step)
-
-            local_met_data.update(self._load(full_path_profile_txt, t['first'],
-                t['start'], t['end']))
+            lmd = self._load(full_path_profile_txt, met_file['first'],
+                met_file['start'], met_file['end'])
+            local_met_data.update(lmd)
         return local_met_data
+
+    ONE_HOUR = timedelta(hours=1)
+
+    def _parse_met_files(self, met_files):
+        if not met_files:
+            raise ValueError(
+                "ArlProfiler can't be instantiated without met files defined")
+
+        # TODO: make sure ranges in met_files don't overlap
+
+        # don't override values in original
+        _met_files = []
+        for met_file in met_files:
+            # parse datetimes, and make sure they're valid
+            _met_file = parse_datetimes(met_file, 'first', 'start', 'end')
+            for k in 'first', 'start', 'end':
+                d = _met_file[k]
+                if datetime(d.year, d.month, d.day, d.hour) != d:
+                    raise ValueError("Arl profile first, start, and end times must be round hours")
+            if _met_file['first'] > _met_file['start']:
+                raise ValueError("Start time can't be before ARL file's first time")
+            if _met_file['start'] > _met_file['end']:
+                raise ValueError("Start time can't be after end time")
+
+            # make sure file exists
+            if not met_file.get("file"):
+                raise ValueError("Arl met file not defined")
+            _met_file["file"] = os.path.abspath(met_file.get("file"))
+            if not os.path.isfile(_met_file["file"]):
+                raise ValueError("{} is not an existing file".format(
+                    _met_file["file"]))
+        return _met_files
 
 
     def _call(self, d, f, lat, lng, time_step):
@@ -86,6 +119,7 @@ class ArlProfiler(object):
         # Note: if we need the stdout/stderr output, we can use:
         #  > output = subprocess.check_output(cmd_args,
         #        stderr=subprocess.STDOUT)
+        # TODO: capture stdout/stderr
         status = subprocess.call(cmd_args)
         if status:
             raise RuntimeError("profile failed with exit code {}".format(
@@ -96,8 +130,15 @@ class ArlProfiler(object):
         # with open(full_path_profile_txt, 'w') as f:
         #     for line in f....
         profile = ARLProfile(full_path_profile_txt, first)
+        hourly_profiles = profile.get_hourly_params()
         profile_dict = {}
-        # TODO: convert profile to profile_dict; limit to data from start hr to end
+        dt = start
+        while dt <= end:
+            if dt not in hourly_profiles:
+                raise ValueError("{} not in arl file {}".format(dt.isoformat,
+                    full_path_profile_txt))
+            # TDOO: manipulate hourly_profiles[dt] at all?
+            profile_dict[dt] = hourly_profiles[dt]
         return profile_dict
 
 

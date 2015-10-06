@@ -19,6 +19,9 @@ class ArlFinder(object):
         # hour; return list of datetime ranges with arl file to use for each range
         # Ex.
         #  [
-        #     {"file": "...", "start": "...", "end": "..."}
+        #     {"file": "...", "first": "...", "start": "...", "end": "..."}
         #  ]
+        # TODO: Allow 'start' and 'end' to not be round hours, but round them both back
+        # to the hour. ex. if start is 03:33 and end is 04:22, find arl files
+        # to cover range from 03:00 to 04:00 (i.e. the two hours 03:00 and 04:00)
         raise NotImplementedError("findmetdata not yet implemented")
