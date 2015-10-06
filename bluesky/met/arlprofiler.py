@@ -272,9 +272,12 @@ class ARLProfile(object):
 
         # back-fill first hour's values, if they are empty
         # These opaque variable names are defined by the ARL standard, and are described in types.ini
-        if float(self.hourly_profile[t]["PRSS"][0]) == 0.0 and float(self.hourly_profile[t]["T02M"][0]) == 0.0:
-            keys = ['pressure_at_surface', 'TPP3', 'T02M', 'RH2M', 'U10M', 'V10M', 'PRSS']
-            self.hourly_profile[t].update(dict((k, self.hourly_profile[second_hr][k]) for k in keys))
+        if (float(self.hourly_profile[self.dt]["PRSS"][0]) == 0.0
+                and float(self.hourly_profile[self.dt]["T02M"][0]) == 0.0):
+            keys = [
+                'pressure_at_surface', 'TPP3', 'T02M', 'RH2M', 'U10M', 'V10M', 'PRSS'
+            ]
+            self.hourly_profile[self.dt].update(dict((k, self.hourly_profile[second_hr][k]) for k in keys))
 
     def remove_below_ground_levels(self):
         """
