@@ -201,13 +201,14 @@ class ARLProfile(object):
         # read raw text into a dictionary
         profile = []
         hour_step = []
-        for line in fileinput.input(self.raw_file):
-            if hour_separator in line:
-                read_data = True
-                profile.append(hour_step)
-                hour_step = []
-            if read_data:
-                hour_step.append(line)
+        with open(self.raw_file, 'r') as f:
+            for line in f.readlines():
+                if hour_separator in line:
+                    read_data = True
+                    profile.append(hour_step)
+                    hour_step = []
+                if read_data:
+                    hour_step.append(line)
         if [] in profile: profile.remove([])
 
         if profile == []: return {}
