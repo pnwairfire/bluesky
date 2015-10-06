@@ -20,9 +20,7 @@ except:
     sys.path.insert(0, root_dir)
     from bluesky.met import arlprofiler
 
-class ParseArlFilesAction(Action):
-
-    KEY_VALUE_EXTRACTER = re.compile('^([^=]+)=([^=]+)$')
+class ParseArlFilesAction(scripting.args.Action):
 
     def __call__(self, parser, namespace, value, option_string=None):
         """Splits value into key/value, and set in destination dict
@@ -33,8 +31,8 @@ class ParseArlFilesAction(Action):
         """
         m = value.split(';')
         if len(m) != 3:
-            msg = "Invalid value '{}' for option '{}' - value must be of the "
-                "form '<file>;<start>;<end>'".format(value, opt)
+            msg = ("Invalid value '{}' for option '{}' - value must be of the "
+                "form '<file>;<start>;<end>'".format(value, opt))
             raise scripting.args.ArgumentTypeError(msg)
         d = getattr(namespace, self.dest)
         d = d or []
@@ -46,7 +44,7 @@ REQUIRED_ARGS = [
         'long': '--met-file',
         'dest': 'met_files',
         'help': 'Met file with date range to use it for; format "<file>;<start>;<end>"',
-        'action': ParseDatetimeAction
+        'action': ParseArlFilesAction
     },
     {
         'short': '-s',
