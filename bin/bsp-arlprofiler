@@ -30,13 +30,14 @@ class ParseArlFilesAction(scripting.args.Action):
         initialized as an empty dict.
         """
         m = value.split(';')
-        if len(m) != 3:
+        if len(m) != 4:
             msg = ("Invalid value '{}' for option '{}' - value must be of the "
                 "form '<file>;<first>;<start>;<end>'".format(value, option_string))
             raise scripting.args.ArgumentTypeError(msg)
         d = getattr(namespace, self.dest)
         d = d or []
         d.append({"file": m[0], "first": m[1], "start": m[2], "end": m[3]})
+        setattr(namespace, self.dest, d)
 
 REQUIRED_ARGS = [
     {
@@ -86,12 +87,12 @@ OPTIONAL_ARGS = [
 EXAMPLES_STR = """Examples:
   $ PATH=~/path/to/profile/exe/dir/:$PATH \\
      ./bin/bsp-arlprofiler \\
-     -f /DRI_6km/2014052912/wrfout_d2.2014052912.f00-11_12hr01.arl;2014-05-29T12:00:00;2014-05-29T20:00:00;2014-05-29T23:00:00 \\
-     -f /DRI_6km/2014053000/wrfout_d2.2014053000.f00-11_12hr01.arl;2014-05-30T00:00:00;2014-05-30T00:00:00;2014-05-30T01:00:00 \\
+     -f "/DRI_6km/2014052912/wrfout_d2.2014052912.f00-11_12hr01.arl;2014-05-29T12:00:00;2014-05-29T20:00:00;2014-05-29T23:00:00" \\
+     -f "/DRI_6km/2014053000/wrfout_d2.2014053000.f00-11_12hr01.arl;2014-05-30T00:00:00;2014-05-30T00:00:00;2014-05-30T01:00:00" \\
      -l 37 -g -121
   $ PATH=~/path/to/profile/exe/dir/:$PATH \\
      ./bin/bsp-arlprofiler  \\
-     -f /DRI_6km/2014053000/wrfout_d2.2014053000.f00-11_12hr01.arl;2014-05-30T00:00:00;2014-05-30T00:00:00;2014-05-30T01:00:00 \\
+     -f "/DRI_6km/2014053000/wrfout_d2.2014053000.f00-11_12hr01.arl;2014-05-30T00:00:00;2014-05-30T00:00:00;2014-05-30T01:00:00" \\
      -l 37 -g -121 -t 2
 """
 
