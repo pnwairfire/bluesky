@@ -16,6 +16,8 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import os
 import subprocess
 
+from bluesky.datautils import parse_datetimes
+
 class ArlProfiler(object):
     def __init__(self, met_files, profile_exe=None):
         """Constructor
@@ -34,6 +36,7 @@ class ArlProfiler(object):
         """
         # TODO: make sure each file in met_files is an existing file, and make
         # there there are no overlaping time windows
+        self._met_files = met_files
 
         # make sure profile_exe is a valid fully qualified pathname to the
         # profile exe or that it's
@@ -45,6 +48,8 @@ class ArlProfiler(object):
                 "{} is not an existing/valid profile executable".format(profile_exe))
         self._profile_exe = profile_exe
 
+    PROFILE_OUTPUT_FILE = './profile.txt'
+
     def profile(self, start, end, lat, lng, time_step=None):
         if start > end:
             raise ValueError("Start date can't before after end date")
@@ -52,15 +57,18 @@ class ArlProfiler(object):
         time_step = time_step or 1
         # TODO: make sure time_step is integer
 
-        met_files = self._find_files(start, end)
+        full_path_profile_txt = os.path.abspath(self.PROFILE_OUTPUT_FILE)
         local_met_data = {}
-        for met_file in met_files:
-            d, f = os.path.split(met_file)
+        for met_file in self._met_files:
+            d, f = os.path.split(met_file["file"])
             # split returns dir without trailing slash, which is required by profile
             d = d + '/'
 
             self._call(d, f, lat, lng, time_step)
-            local_met_data.update(self._load())
+
+            t = parse_datetimes(g, 'first', 'start', 'end')
+            local_met_data.update(self._load(full_path_profile_txt, t['first'],
+                t['start'], t['end']))
         return local_met_data
 
 
@@ -81,20 +89,18 @@ class ArlProfiler(object):
             raise RuntimeError("profile failed with exit code {}".format(
                 status))
 
-    PROFILE_OUTPUT_FILE = './profile.txt'
-    def _load(self):
+    def _load(self, full_path_profile_txt, first, start, end):
         # data = {}
-        # with open(self.PROFILE_OUTPUT_FILE, 'w') as f:
+        # with open(full_path_profile_txt, 'w') as f:
         #     for line in f....
-        full_path = os.path.abspath(self.PROFILE_OUTPUT_FILE)
-        profile = ARLProfile(fule_path, ___DATETIME_OBJ___)
+        profile = ARLProfile(full_path_profile_txt, first)
         profile_dict = {}
-        # TODO: convert profile to profile_dict
+        # TODO: convert profile to profile_dict, using data from start hr to end hr
         return profile_dict
 
 
 class ARLProfile(object):
-    """Interprets raw ARL data in from text file parses into a complete dataset
+    """Reads raw ARL data in text file, parsing it into a complete dataset
 
     ARLProfile was copied from BlueSky Framework.
     TODO: acknoledge authors (STI?)

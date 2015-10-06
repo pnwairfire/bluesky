@@ -13,8 +13,6 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import logging
 import os
 
-from pyairfire.datetime import parsing as datetime_parsing
-
 from bluesky.met.airlprofiler import ArlProfiler
 from bluesky.datautils import parse_datetimes
 
