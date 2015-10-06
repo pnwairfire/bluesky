@@ -41,8 +41,9 @@ def run(fires_manager, config=None):
             # TODO: shoudl met_files be specifeid in config, to apply to all fires?
             met_files = _parse_met_files(g.get('met_files'))
             arl_profiler = arlprofiler.ArlProfiler(met_files)
-            tw = parse_datetimes(g, 'start', 'end')
-            g['localmet'] = arl_profiler.profile(tw['start'], tw['end'], lat, lng)
+            g['localmet'] = arl_profiler.profile(lat, lng)
+            # TODO: make sure entire growth window is covered (and no more?);
+            #  use tw = parse_datetimes(g, 'start', 'end') to parse growth window
 
     # fires_manager.summarize(...)
 

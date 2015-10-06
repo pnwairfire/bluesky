@@ -50,23 +50,25 @@ class ArlProfiler(object):
 
     PROFILE_OUTPUT_FILE = './profile.txt'
 
-    def profile(self, start, end, lat, lng, time_step=None):
-        if start > end:
-            raise ValueError("Start date can't before after end date")
-
+    def profile(self, lat, lng, time_step=None):
         time_step = time_step or 1
         # TODO: make sure time_step is integer
 
         full_path_profile_txt = os.path.abspath(self.PROFILE_OUTPUT_FILE)
         local_met_data = {}
         for met_file in self._met_files:
+            t = parse_datetimes(g, 'first', 'start', 'end')
+            if t['first'] > t['start']:
+                raise ValueError("Start time can't be before ARL file's first time")
+            if t['start'] > t['end']:
+                raise ValueError("Start time can't be after end time")
+
             d, f = os.path.split(met_file["file"])
             # split returns dir without trailing slash, which is required by profile
             d = d + '/'
 
             self._call(d, f, lat, lng, time_step)
 
-            t = parse_datetimes(g, 'first', 'start', 'end')
             local_met_data.update(self._load(full_path_profile_txt, t['first'],
                 t['start'], t['end']))
         return local_met_data
@@ -95,7 +97,7 @@ class ArlProfiler(object):
         #     for line in f....
         profile = ARLProfile(full_path_profile_txt, first)
         profile_dict = {}
-        # TODO: convert profile to profile_dict, using data from start hr to end hr
+        # TODO: convert profile to profile_dict; limit to data from start hr to end
         return profile_dict
 
 
