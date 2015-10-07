@@ -158,7 +158,7 @@ class ArlProfiler(object):
         while dt <= end:
             logging.debug("Loading {}".format(dt.isoformat()))
             if dt not in hourly_profiles:
-                raise ValueError("{} not in arl file {}".format(dt.isoformat,
+                raise ValueError("{} not in arl file {}".format(dt.isoformat(),
                     full_path_profile_txt))
             # TDOO: manipulate hourly_profiles[dt] at all?
             profile_dict[dt - timedelta(hours=utc_offset)] = hourly_profiles[dt]
