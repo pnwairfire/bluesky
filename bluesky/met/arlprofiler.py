@@ -13,6 +13,7 @@ TODO: move this to pyairfire or into it's own repo (arl-profile[r]) ?
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import logging
 import os
 import subprocess
 from datetime import date, datetime, time, timedelta
@@ -81,6 +82,7 @@ class ArlProfiler(object):
     ONE_HOUR = timedelta(hours=1)
 
     def _parse_met_files(self, met_files):
+        logging.debug("Parsing met file specifications")
         if not met_files:
             raise ValueError(
                 "ArlProfiler can't be instantiated without met files defined")
@@ -117,19 +119,21 @@ class ArlProfiler(object):
         # TODO: add another method for calling profile?
         # Note: there must be no space between each option and it's value
         # Note: '-w2' indicates wind direction, instead of components
-        cmd_args = "{exe} -d{dir} -f{file} -y{lat} -x{lng} -w2 -t{time_step}".format(
+        cmd = "{exe} -d{dir} -f{file} -y{lat} -x{lng} -w2 -t{time_step}".format(
             exe=self._profile_exe, dir=d, file=f, lat=lat,
-            lng=lng, time_step=time_step).split(' ')
+            lng=lng, time_step=time_step)
+        logging.debug("Calling '{}'".format(cmd))
         # Note: if we need the stdout/stderr output, we can use:
         #  > output = subprocess.check_output(cmd_args,
         #        stderr=subprocess.STDOUT)
         # TODO: capture stdout/stderr
-        status = subprocess.call(cmd_args)
+        status = subprocess.call(cmd.split(' '))
         if status:
             raise RuntimeError("profile failed with exit code {}".format(
                 status))
 
     def _load(self, full_path_profile_txt, first, start, end, utc_offset):
+        logging.debug("Loading {}".format(full_path_profile_txt))
         # data = {}
         # with open(full_path_profile_txt, 'w') as f:
         #     for line in f....
@@ -139,6 +143,7 @@ class ArlProfiler(object):
         profile_dict = {}
         dt = start
         while dt <= end:
+            logging.debug("Loading {}".format(dt.isoformat()))
             if dt not in hourly_profiles:
                 raise ValueError("{} not in arl file {}".format(dt.isoformat,
                     full_path_profile_txt))
