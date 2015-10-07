@@ -127,9 +127,14 @@ class ArlProfiler(object):
             lng=lng, time_step=time_step)
         logging.debug("Calling '{}'".format(cmd))
         # Note: if we need the stdout/stderr output, we can use:
-        #  > output = subprocess.check_output(cmd_args,
+        #  > output = subprocess.check_output(cmd.split(' '),
         #        stderr=subprocess.STDOUT)
-        # TODO: capture stdout/stderr
+        # or do something like:
+        #  > output = StringIO.StringIO()
+        #  > status = subprocess.check_output(cmd.split(' '),
+        #        stdout=output, stderr=subprocess.STDOUT)
+        # TODO: if writing to '/dev/null' isn't portable, capture stdout/stderr
+        # in tmp file or in StringIO.StringIO object, and just throw away
         status = subprocess.call(cmd.split(' '),
             stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
         if status:
