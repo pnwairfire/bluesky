@@ -20,6 +20,8 @@ from datetime import date, datetime, time, timedelta
 
 from bluesky.datautils import parse_datetimes
 
+ONE_HOUR = timedelta(hours=1)
+
 class ArlProfiler(object):
     def __init__(self, met_files, profile_exe=None):
         """Constructor
@@ -78,8 +80,6 @@ class ArlProfiler(object):
                 met_file['start'], met_file['end'], utc_offset)
             local_met_data.update(lmd)
         return local_met_data
-
-    ONE_HOUR = timedelta(hours=1)
 
     def _parse_met_files(self, met_files):
         logging.debug("Parsing met file specifications")
@@ -149,8 +149,8 @@ class ArlProfiler(object):
                     full_path_profile_txt))
             # TDOO: manipulate hourly_profiles[dt] at all?
             profile_dict[dt - timedelta(hours=utc_offset)] = hourly_profiles[dt]
+            dt += ONE_HOUR
         return profile_dict
-
 
 class ARLProfile(object):
     """Reads raw ARL data in text file, parsing it into a complete dataset
@@ -337,6 +337,7 @@ class ARLProfile(object):
             if new_datetime not in times:
                 closest_date = sorted(times, key=lambda d:abs(new_datetime - d))[0]
                 self.hourly_profile[new_datetime] = self.hourly_profile[closest_date]
+            new_datetime += ONE_HOUR
 
 
 # 'profile' is assumed to be in search path, unless configured to point to
