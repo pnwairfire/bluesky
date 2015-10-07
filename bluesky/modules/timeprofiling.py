@@ -11,7 +11,7 @@ from timeprofile.static import (
     InvalidEmissionsDataError
 )
 
-from bluesky.datautils import parse_datetimes
+from bluesky.datetimeutils import parse_datetimes
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [

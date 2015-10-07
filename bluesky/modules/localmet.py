@@ -14,7 +14,7 @@ import logging
 import os
 
 from bluesky.met.arlprofiler import ArlProfiler
-from bluesky.datautils import parse_datetimes
+from bluesky.datetimeutils import parse_datetimes
 
 __all__ = [
     'run'

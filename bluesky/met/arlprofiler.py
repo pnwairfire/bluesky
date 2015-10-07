@@ -18,7 +18,7 @@ import os
 import subprocess
 from datetime import date, datetime, time, timedelta
 
-from bluesky.datautils import parse_datetimes
+from bluesky.datetimeutils import parse_datetimes
 
 ONE_HOUR = timedelta(hours=1)
 

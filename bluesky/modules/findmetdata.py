@@ -8,6 +8,8 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 from bluesky.met import arlfinder
 
+from bluesky.datetimeutils import parse_datetimes
+
 __all__ = [
     'run'
 ]
