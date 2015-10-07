@@ -60,6 +60,8 @@ class ArlProfiler(object):
                 "{} is not an existing/valid profile executable".format(profile_exe))
         self._profile_exe = profile_exe
 
+    # TODO: is there a way to tell 'profile' to write profile.txt and MESSAGE
+    #  to an alternate dir (e.g. to a /tmp/ dir)
     PROFILE_OUTPUT_FILE = './profile.txt'
 
     def profile(self, lat, lng, utc_offset, time_step=None):
