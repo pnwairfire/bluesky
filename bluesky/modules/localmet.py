@@ -14,7 +14,7 @@ import logging
 import os
 
 from bluesky.met.arlprofiler import ArlProfiler
-from bluesky.datetimeutils import parse_datetimes
+from bluesky.datetimeutils import parse_datetimes, parse_utc_offset
 
 __all__ = [
     'run'
@@ -35,10 +35,8 @@ def run(fires_manager, config=None):
 
     for fire in fires_manager.fires:
         lat,lng = _fire_lat_lng(fire)
-        # TODO: make sure fire.location['timezone'] is defined and valid
-        # TODO: rename 'timezone' as something like utc_offset ?
-        # TODO: parse utc offset from fire.location['timezone']
-        utc_offset = 0
+        # parse_utc_offset makes sure utc offset is defined and valid
+        utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
         for g in fire.growth:
             # Note: ArlProfiler will raise an exception if met_root_dir is undefined
             # or is not a valid directory
