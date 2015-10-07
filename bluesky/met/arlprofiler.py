@@ -130,7 +130,8 @@ class ArlProfiler(object):
         #  > output = subprocess.check_output(cmd_args,
         #        stderr=subprocess.STDOUT)
         # TODO: capture stdout/stderr
-        status = subprocess.call(cmd.split(' '))
+        status = subprocess.call(cmd.split(' '),
+            stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
         if status:
             raise RuntimeError("profile failed with exit code {}".format(
                 status))
