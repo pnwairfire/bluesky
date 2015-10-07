@@ -56,7 +56,7 @@
                     ]
                 },
                 "ecoregion": "southern",
-                "timezone": "-07:00"
+                "utc_offset": "-07:00"
             }
         }
     ]

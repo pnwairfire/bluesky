@@ -1288,7 +1288,7 @@
                 "ecoregion": "southern",
                 "latitude": 47.4316976,
                 "longitude": -121.3990506,
-                "timezone": "-09:00"
+                "utc_offset": "-09:00"
             }
         }
     ]

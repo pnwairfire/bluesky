@@ -160,7 +160,7 @@ class TestIngester(object):
             "ecoregion": "southern",
             "start": "20150120",
             "end": "20150120",
-            "timezone": "-07:00"
+            "utc_offset": "-07:00"
         }
         expected = {
             "id": "SF11C14225236095807750",
@@ -184,7 +184,7 @@ class TestIngester(object):
                     ]
                 },
                 "ecoregion": "southern",
-                "timezone": "-07:00"
+                "utc_offset": "-07:00"
             },
             'growth': [
                 {
@@ -230,7 +230,7 @@ class TestIngester(object):
                     "pct": 100.0
                 }
             ],
-            "timezone": "-07:00"
+            "utc_offset": "-07:00"
         }
         expected = {
             "id": "SF11C14225236095807750",
@@ -254,7 +254,7 @@ class TestIngester(object):
                     ]
                 },
                 "ecoregion": "southern",
-                "timezone": "-07:00"
+                "utc_offset": "-07:00"
             },
             "growth": [
                 {

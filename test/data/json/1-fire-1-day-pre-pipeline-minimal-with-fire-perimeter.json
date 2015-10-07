@@ -25,7 +25,7 @@
                 "slope": 20.0,
                 "elevation": 2320.0,
                 "max_humid": 70.0,
-                "timezone": "-07:00"
+                "utc_offset": "-07:00"
             },
             "growth": [
                 {

@@ -16,7 +16,7 @@
                 "county": "",
                 "ecoregion": "southern",
                 "area": 200,
-                "timezone": "-07:00"
+                "utc_offset": "-07:00"
             },
             "growth": [
                 {
@@ -50,7 +50,7 @@
                 "area": 300
             },
             "time":{
-                "timezone": -7.0,
+                "utc_offset": -7.0,
                 "end": "20150120T000000Z",
                 "state": "KS"
             },

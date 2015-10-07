@@ -31,7 +31,7 @@ Assume you have the following input data:
                         ]
                     },
                     "ecoregion": "southern",
-                    "timezone": "-09:00"
+                    "utc_offset": "-09:00"
                 },
                 "growth": [
                     {
@@ -93,7 +93,7 @@ would give you:
                         ],
                         "type": "MultiPolygon"
                     },
-                    "timezone": "-09:00"
+                    "utc_offset": "-09:00"
                 }
             }
         ],
@@ -136,7 +136,7 @@ would give you:
                                 ],
                                 "type": "MultiPolygon"
                             },
-                            "timezone": "-09:00"
+                            "utc_offset": "-09:00"
                         }
                     }
                 ],
@@ -201,7 +201,7 @@ would give you:
                         ],
                         "type": "MultiPolygon"
                     },
-                    "timezone": "-09:00"
+                    "utc_offset": "-09:00"
                 }
             }
         ],
@@ -244,7 +244,7 @@ would give you:
                                 ],
                                 "type": "MultiPolygon"
                             },
-                            "timezone": "-09:00"
+                            "utc_offset": "-09:00"
                         }
                     }
                 ],
@@ -372,7 +372,7 @@ would give you:
                         ],
                         "type": "MultiPolygon"
                     },
-                    "timezone": "-09:00"
+                    "utc_offset": "-09:00"
                 }
             }
         ],
@@ -415,7 +415,7 @@ would give you:
                                 ],
                                 "type": "MultiPolygon"
                             },
-                            "timezone": "-09:00"
+                            "utc_offset": "-09:00"
                         }
                     }
                 ],
@@ -648,7 +648,7 @@ would give you:
                         ],
                         "type": "MultiPolygon"
                     },
-                    "timezone": "-09:00"
+                    "utc_offset": "-09:00"
                 }
             }
         ],
@@ -691,7 +691,7 @@ would give you:
                                 ],
                                 "type": "MultiPolygon"
                             },
-                            "timezone": "-09:00"
+                            "utc_offset": "-09:00"
                         }
                     }
                 ],

@@ -26,7 +26,7 @@
                 "days_since_rain": 4,
                 "length_of_ignition": 23,
                 "output_units": "tons",
-                "timezone": "-07:00"
+                "utc_offset": "-07:00"
             },
             "growth": [
                 {

@@ -47,6 +47,7 @@ class FireIngester(object):
     # TODO: support synonyms (?)
     #  ex:
     #    SYNONYMS = {
+    #        "timezone": "utc_offset",
     #        "date_time": "start"
     #        # TODO: fill in other synonyms
     #    }
@@ -146,8 +147,7 @@ class FireIngester(object):
 
     OPTIONAL_LOCATION_FIELDS = [
         "ecoregion",
-        # TODO: should timezone be required, or only by modules using met data?
-        "timezone"
+        "utc_offset" # utc_offest is only required by modules using met data
         # TODO: fill in others
     ]
 
