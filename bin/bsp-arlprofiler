@@ -63,6 +63,14 @@ REQUIRED_ARGS = [
         'help': 'longitude',
         'action': 'store',
         'type': float
+    },
+    {
+        'short': '-o',
+        'long': '--utc-offset',
+        'dest': 'utc_offset',
+        'help': 'utc offset at lat/lng',
+        'action': 'store',
+        'type': float
     }
 
 ]
@@ -102,7 +110,7 @@ if __name__ == "__main__":
     try:
         profiler = arlprofiler.ArlProfiler(args.met_files,
             profile_exe=args.profile_exe)
-        arl_profile = profiler.profile(args.lat, args.lng,
+        arl_profile = profiler.profile(args.lat, args.lng, args.utc_offset,
             time_step=args.time_step)
         sys.stdout.write(json.dumps(arl_profile))
     except Exception, e:

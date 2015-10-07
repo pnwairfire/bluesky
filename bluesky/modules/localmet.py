@@ -35,12 +35,16 @@ def run(fires_manager, config=None):
 
     for fire in fires_manager.fires:
         lat,lng = _fire_lat_lng(fire)
+        # TODO: make sure fire.location['timezone'] is defined and valid
+        # TODO: rename 'timezone' as something like utc_offset ?
+        # TODO: parse utc offset from fire.location['timezone']
+        utc_offset = 0
         for g in fire.growth:
             # Note: ArlProfiler will raise an exception if met_root_dir is undefined
             # or is not a valid directory
             # TODO: shoudl met_files be specifeid in config, to apply to all fires?
             met_files = _parse_met_files(g.get('met_files'))
-            arl_profiler = arlprofiler.ArlProfiler(met_files)
+            arl_profiler = arlprofiler.ArlProfiler(met_files, utc_offset)
             g['localmet'] = arl_profiler.profile(lat, lng)
             # TODO: make sure entire growth window is covered (and no more?);
             #  use tw = parse_datetimes(g, 'start', 'end') to parse growth window

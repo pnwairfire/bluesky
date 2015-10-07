@@ -40,6 +40,8 @@ class ArlProfiler(object):
         the time window for which local met data is desired.  Though fire
         growth windows don't have to start or end on the hour, 'first',
         'start', and 'end' do.
+
+        'first', 'start', and 'end' are all assumed to be UTC.
         """
         # _parse_met_files validates information in met_files
         self._met_files = self._parse_met_files(met_files)
@@ -57,7 +59,9 @@ class ArlProfiler(object):
 
     PROFILE_OUTPUT_FILE = './profile.txt'
 
-    def profile(self, lat, lng, time_step=None):
+    def profile(self, lat, lng, utc_offset, time_step=None):
+        # TODO: validate utc_offset?
+
         time_step = time_step or 1
         # TODO: make sure time_step is integer
 
@@ -70,7 +74,7 @@ class ArlProfiler(object):
 
             self._call(d, f, lat, lng, time_step)
             lmd = self._load(full_path_profile_txt, met_file['first'],
-                met_file['start'], met_file['end'])
+                met_file['start'], met_file['end'], utc_offset)
             local_met_data.update(lmd)
         return local_met_data
 
@@ -125,11 +129,11 @@ class ArlProfiler(object):
             raise RuntimeError("profile failed with exit code {}".format(
                 status))
 
-    def _load(self, full_path_profile_txt, first, start, end):
+    def _load(self, full_path_profile_txt, first, start, end, utc_offset):
         # data = {}
         # with open(full_path_profile_txt, 'w') as f:
         #     for line in f....
-        profile = ARLProfile(full_path_profile_txt, first)
+        profile = ARLProfile(full_path_profile_txt, first, utc_offset)
         hourly_profiles = profile.get_hourly_params()
         profile_dict = {}
         dt = start
@@ -149,9 +153,10 @@ class ARLProfile(object):
     TODO: acknoledge authors (STI?)
     """
 
-    def __init__(self, filename, dt):
+    def __init__(self, filename, dt, utc_offset):
         self.raw_file = filename
         self.dt = dt
+        self.utc_offset = utc_offset
         self.hourly_profile = {}
 
     ###############################################################
@@ -315,9 +320,7 @@ class ARLProfile(object):
         If so, we need to spread those values out to become hourly data.
         """
         t = datetime(self.dt.year, self.dt.month, self.dt.day)
-        tz_str = str(self.dt.tzinfo.tzname(self.dt)).strip()
-        tz = ARLProfile.calc_tz(tz_str)
-        first_hr = t - timedelta(hours=tz)
+        first_hr = t - timedelta(hours=self.utc_offset)
 
         # clean up unwanted days of information
         for k in self.hourly_profile.keys():
@@ -332,24 +335,6 @@ class ARLProfile(object):
             if new_datetime not in dates:
                 closest_date = sorted(dates, key=lambda d:abs(new_datetime - d))[0]
                 self.hourly_profile[new_datetime] = self.hourly_profile[closest_date]
-
-    @staticmethod
-    def calc_tz(tz_str):
-        """There are several ways time zones can be written.
-        This method takes care of those details for you."""
-        time_zones = {'MIT': -11, 'HAST': -10, 'AKST': -9, 'AKDT': -8,
-                      'PST': -8, 'PDT': -7, 'MST': -7, 'MDT': -6, 'CST':-6,
-                      'CDT': -5, 'EST': -5, 'EDT': -4, 'PRT': -4, 'CNT': -3.5,
-                      'AGT': -3, 'BET': -3, 'CAT': -1, 'UTC': 0, 'WET': 0, 'WEST': 1,
-                      'CET': 1, 'CEST': 2, 'EET': 2, 'EEST': 3, 'ART': 2,
-                      'EAT': 3, 'MET': 3.5, 'NET': 4, 'PLT': 4, 'IST': 5.3,
-                      'BST': 6, 'ICT': 7, 'CTT': 8, 'AWST': 8, 'JST': 9,
-                      'ACST': 9.5, 'AEST': 10, 'SST': 11, 'NZST': 12, 'NZDT': 13}
-
-        if len(tz_str) > 4:
-            return int(tz_str[3:6])
-        else:
-            return time_zones[tz_str]
 
 
 # 'profile' is assumed to be in search path, unless configured to point to
