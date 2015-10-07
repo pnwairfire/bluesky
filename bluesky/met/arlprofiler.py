@@ -110,6 +110,7 @@ class ArlProfiler(object):
             if not os.path.isfile(_met_file["file"]):
                 raise ValueError("{} is not an existing file".format(
                     _met_file["file"]))
+            _met_files.append(_met_file)
         return _met_files
 
 
