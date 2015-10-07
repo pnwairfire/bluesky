@@ -163,6 +163,8 @@ class ARLProfile(object):
     def __init__(self, filename, first, start, end):
         self.raw_file = filename
         self.first = first
+        self.start = start
+        self.end = end
         self.hourly_profile = {}
 
     ###############################################################
