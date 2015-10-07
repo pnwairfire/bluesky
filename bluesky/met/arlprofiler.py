@@ -133,8 +133,9 @@ class ArlProfiler(object):
         # data = {}
         # with open(full_path_profile_txt, 'w') as f:
         #     for line in f....
-        profile = ARLProfile(full_path_profile_txt, first, utc_offset)
+        profile = ARLProfile(full_path_profile_txt, first, start, end)
         hourly_profiles = profile.get_hourly_params()
+        # profile dict will contain local met data index by *local* time
         profile_dict = {}
         dt = start
         while dt <= end:
@@ -142,7 +143,7 @@ class ArlProfiler(object):
                 raise ValueError("{} not in arl file {}".format(dt.isoformat,
                     full_path_profile_txt))
             # TDOO: manipulate hourly_profiles[dt] at all?
-            profile_dict[dt] = hourly_profiles[dt]
+            profile_dict[dt - timedelta(hours=utc_offset)] = hourly_profiles[dt]
         return profile_dict
 
 
@@ -153,10 +154,9 @@ class ARLProfile(object):
     TODO: acknoledge authors (STI?)
     """
 
-    def __init__(self, filename, dt, utc_offset):
+    def __init__(self, filename, first, start, end):
         self.raw_file = filename
-        self.dt = dt
-        self.utc_offset = utc_offset
+        self.first = first
         self.hourly_profile = {}
 
     ###############################################################
@@ -267,7 +267,7 @@ class ARLProfile(object):
         Some ARL file keep a special place for at-surface met variables. However, sometimes these variables are not
         populated correctly at the zero hour (they will all be zero), and that needs to be fixed.
         """
-        t = datetime(self.dt.year, self.dt.month, self.dt.day)
+        t = datetime(self.first.year, self.first.month, self.first.day)
         second_hr = t
         # find second hour in file
         for hr in xrange(1, 23):
@@ -277,12 +277,12 @@ class ARLProfile(object):
 
         # back-fill first hour's values, if they are empty
         # These opaque variable names are defined by the ARL standard, and are described in types.ini
-        if (float(self.hourly_profile[self.dt]["PRSS"][0]) == 0.0
-                and float(self.hourly_profile[self.dt]["T02M"][0]) == 0.0):
+        if (float(self.hourly_profile[self.first]["PRSS"][0]) == 0.0
+                and float(self.hourly_profile[self.first]["T02M"][0]) == 0.0):
             keys = [
                 'pressure_at_surface', 'TPP3', 'T02M', 'RH2M', 'U10M', 'V10M', 'PRSS'
             ]
-            self.hourly_profile[self.dt].update(dict((k, self.hourly_profile[second_hr][k]) for k in keys))
+            self.hourly_profile[self.first].update(dict((k, self.hourly_profile[second_hr][k]) for k in keys))
 
     def remove_below_ground_levels(self):
         """
@@ -319,21 +319,18 @@ class ARLProfile(object):
         Frequently, ARL files will only have data every 3 or 6 hours.
         If so, we need to spread those values out to become hourly data.
         """
-        t = datetime(self.dt.year, self.dt.month, self.dt.day)
-        first_hr = t - timedelta(hours=self.utc_offset)
-
-        # clean up unwanted days of information
+        # clean up unwanted hours of information
         for k in self.hourly_profile.keys():
-            if k < first_hr or k > (first_hr + timedelta(hours=23)):
+            if k < self.start or k > (self.end):
                 del self.hourly_profile[k]
 
-        dates = sorted(self.hourly_profile.keys())
+        times = sorted(self.hourly_profile.keys())
 
         # spread values if the data is not hourly
-        for hr in xrange(24):
-            new_datetime = first_hr + timedelta(hours=hr)
-            if new_datetime not in dates:
-                closest_date = sorted(dates, key=lambda d:abs(new_datetime - d))[0]
+        new_datetime = self.start
+        while new_datetime <= self.end:
+            if new_datetime not in times:
+                closest_date = sorted(times, key=lambda d:abs(new_datetime - d))[0]
                 self.hourly_profile[new_datetime] = self.hourly_profile[closest_date]
 
 

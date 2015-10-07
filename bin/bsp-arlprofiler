@@ -32,7 +32,8 @@ class ParseArlFilesAction(scripting.args.Action):
         m = value.split(';')
         if len(m) != 4:
             msg = ("Invalid value '{}' for option '{}' - value must be of the "
-                "form '<file>;<first>;<start>;<end>'".format(value, option_string))
+                "form '<file>;<first>;<start>;<end>', where 'first', 'start', "
+                "'end' are UTC".format(value, option_string))
             raise scripting.args.ArgumentTypeError(msg)
         d = getattr(namespace, self.dest)
         d = d or []
@@ -44,8 +45,9 @@ REQUIRED_ARGS = [
         'short': '-f',
         'long': '--met-file',
         'dest': 'met_files',
-        'help': 'Met file with it\'s first hour and the date range to use it'
-            ' for; format "<file>;<first>;<start>;<end>"',
+        'help': "Met file with it's first hour and the date range to use it"
+            " for; format '<file>;<first>;<start>;<end>'; 'first', 'start', "
+            "and 'end' are expected to be UTC",
         'action': ParseArlFilesAction
     },
     {
