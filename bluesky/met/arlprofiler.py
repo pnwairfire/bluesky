@@ -355,19 +355,10 @@ class ARLProfile(object):
             new_datetime += ONE_HOUR
 
 
-# 'profile' is assumed to be in search path, unless configured to point to
-# another location (is that dangerous for web service?...maybe API
-# requests shouldn't allow alternate 'profile' executable)
-
-# profiler from BSF:
-# https://bitbucket.org/fera/airfire-bluesky-framework/src/09f2c16d08128ba9bf5fdeb9a6c35c5a0632b2f2/src/base/fileIO/metData/arl_profiler/?at=master&fileviewer=file-view-default
-
-# TODO: reuse any of the code from BSF's local_met_inforation module
-# (copied below) ?
 
 
 
-## BSF's local_met_information module:
+## Other code from BSF's local_met_information module:
 
 # import os
 # import re
