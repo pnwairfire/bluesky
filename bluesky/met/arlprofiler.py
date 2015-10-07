@@ -160,7 +160,8 @@ class ArlProfiler(object):
             if dt not in hourly_profiles:
                 raise ValueError("{} not in arl file {}".format(dt.isoformat(),
                     full_path_profile_txt))
-            # TDOO: manipulate hourly_profiles[dt] at all?
+            # TDOO: manipulate hourly_profiles[dt] at all (e.g. map keys to
+            # more human readable ones) ?
             profile_dict[dt - timedelta(hours=utc_offset)] = hourly_profiles[dt]
             dt += ONE_HOUR
         return {k.isoformat(): v for k,v in profile_dict.items()}
