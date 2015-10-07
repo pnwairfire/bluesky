@@ -8,6 +8,10 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 from bluesky.datetimeutils import parse_datetimes
 
+__all__ = [
+    'ArlFinder'
+]
+
 class ArlFinder(object):
     def __init__(self, met_root_dir):
         # make sure met_root_dir is an existing directory
