@@ -151,7 +151,7 @@ class ArlProfiler(object):
             # TDOO: manipulate hourly_profiles[dt] at all?
             profile_dict[dt - timedelta(hours=utc_offset)] = hourly_profiles[dt]
             dt += ONE_HOUR
-        return profile_dict
+        return {k.isoformat(): v for k,v in profile_dict.items()}
 
 class ARLProfile(object):
     """Reads raw ARL data in text file, parsing it into a complete dataset
