@@ -35,11 +35,12 @@ GET_URLS=(
     http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/output
     http://$BLUESKY_API_HOSTNAME/api/v1/run/abc123/output/
 )
+WRITE_OUT_PATTERN="%{http_code} (%{time_total}s)"
 for i in "${GET_URLS[@]}"
   do
     echo -n "Testing $i ... "
     echo -n "$i - " >> $OUTPUT_FILE
-    response=$(curl "$i" --write-out %{http_code} --silent -o "$OUTPUT_FILE-t")
+    response=$(curl "$i" --write-out "$WRITE_OUT_PATTERN" --silent -o "$OUTPUT_FILE-t")
     cat $OUTPUT_FILE-t >> $OUTPUT_FILE
     echo "" >> $OUTPUT_FILE
     echo $response
@@ -48,7 +49,7 @@ done
 
 echo -n "Testing http://$BLUESKY_API_HOSTNAME/api/v1/run/ ... "
 echo -n "http://$BLUESKY_API_HOSTNAME/api/v1/run/ - " >> $OUTPUT_FILE
-response=$(curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/" --write-out %{http_code} --silent  -H "Content-Type: application/json" -d '{
+response=$(curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/" --write-out "$WRITE_OUT_PATTERN" --silent  -H "Content-Type: application/json" -d '{
         "modules": ["fuelbeds", "consumption", "emissions"],
         "fire_information": [
             {
