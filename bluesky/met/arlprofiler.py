@@ -196,10 +196,21 @@ class ArlProfiler(object):
             hourly_profile['sunrise_hour'] = sunrise
             hourly_profile['sunset_hour'] = sunset
             for k in ['TO2M', 'RH2M', 'TPP3', 'TPP6', 'PBLH']:
-                a = hourly_profile.get(k)
-                hourly_profile[k] = float(a[0]) if a else None
-            hpbl = hourly_profile.get('HPBL')
-            hourly_profile['HPBL'] = float(hpbl[0]) if hpbl else default_pbl(hr, sunrise, sunset)
+                self.list_to_scalar(hourly_profile, k, lambda: None)
+            self.list_to_scalar(hourly_profile, 'HBPL',
+                lambda: default_pbl(hr, sunrise, sunset))
+
+    def list_to_scalar(self, hourly_profile, k, default):
+        a = hourly_profile.get(k)
+        if a:
+            if hasattr(a, 'append'):
+                hourly_profile[k] = float(a[0])
+            elif hasattr(a, 'strip'):
+                hourly_profile[k] = float(a)
+            # else, leave as is
+        else:
+            hourly_profile[k] = default()
+
 
     def calc_dew_point(self, rh, temp):
         """ dew_point_temp = (-5321/((ln(RH/100))-(5321/(273+T))))-273 """
