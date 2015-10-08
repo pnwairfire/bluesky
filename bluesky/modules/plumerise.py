@@ -8,6 +8,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import consume
 import logging
+from plumerise import sev
 
 __all__ = [
     'run'
@@ -24,4 +25,22 @@ def run(fires_manager, config=None):
     Kwargs:
      - config -- optional configparser object
     """
-    raise NotImplementedError("plumerise not yet implemented")
+    model = fires_manager.get_config_value('plumerise', 'model', default='sev').lower()
+    fires_manager.processed(__name__, __version__,
+        plumerise_version=.__version__, model=model)
+    if model == 'sev':
+        pr = sev.SEVPlumeRise()
+    else:
+        raise BlueSkyConfigurationError(
+            "Invalid plumerise model: '{}'".format(model))
+    for fire in fires_manager.fires:
+        if not fire.locaion.get('area'):
+            raise ValueError(
+                "Missing fire area required for computing plumerise")
+        for g in fire.growth:
+            if not g.get('localmet'):
+                raise ValueError(
+                    "Missing localmet data required for computing plumerise")
+            g['plumerise'] = pr.compute(g['localmet'], fire.location['area']))
+    # fires_manager.summarize(emissions=datautils.summarize(
+    #     fires_manager.fires, 'emissions'))
