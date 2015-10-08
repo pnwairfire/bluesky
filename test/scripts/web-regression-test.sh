@@ -81,9 +81,11 @@ response=$(curl "http://$BLUESKY_API_HOSTNAME/api/v1/run/" --write-out %{http_co
                 "species": ["PM25"]
             }
         }
-    }' >> "$OUTPUT_FILE")
+    }' -o "$OUTPUT_FILE-t")
+cat $OUTPUT_FILE-t >> $OUTPUT_FILE
 echo "" >> $OUTPUT_FILE
 echo $response
+rm $OUTPUT_FILE-t
 
 # to post data in a file
 # curl -D - "http://$BLUESKY_API_HOSTNAME/api/v1/run/" \
