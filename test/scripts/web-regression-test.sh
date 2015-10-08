@@ -39,9 +39,11 @@ for i in "${GET_URLS[@]}"
   do
     echo -n "Testing $i ... "
     echo -n "$i - " >> $OUTPUT_FILE
-    response=$(curl "$i" --write-out %{http_code} --silent >> "$OUTPUT_FILE")
+    response=$(curl "$i" --write-out %{http_code} --silent -o "$OUTPUT_FILE-t")
+    cat $OUTPUT_FILE-t >> $OUTPUT_FILE
     echo "" >> $OUTPUT_FILE
     echo $response
+    rm $OUTPUT_FILE-t
 done
 
 echo -n "Testing http://$BLUESKY_API_HOSTNAME/api/v1/run/ ... "
