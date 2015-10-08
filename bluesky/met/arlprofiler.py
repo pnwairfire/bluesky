@@ -288,6 +288,7 @@ class ARLProfile(object):
         self.fix_first_hour()
         self.remove_below_ground_levels()
         self.spread_hourly_results()
+        self.cast_strings_to_floats()
         self.fill_in_fields()
         self.utc_to_local()
         return self.hourly_profile
@@ -400,6 +401,18 @@ class ARLProfile(object):
                 self.hourly_profile[new_datetime] = self.hourly_profile[closest_date]
             new_datetime += ONE_HOUR
 
+    def cast_strings_to_floats(self):
+        # TODO: distinguish between floats and ints; use '<string>.isdigit()'
+        # (which returns true if integer); can assume that, if string and not int,
+        # then it's a float (?)
+        for dt, hp in self.hourly_profile.items():
+            for k in hp:
+                if hasattr(hp[k], 'append'):
+                    for i in range(len(hp[k])):
+                        if hasattr(hp[k][i], 'strip'):
+                            hp[k][i] = float(hp[k][i])
+                elif hasattr(hp[k], 'strip'):
+                    hp[k] = float(hp[k])
 
     def fill_in_fields(self):
         # The following is from BSF
