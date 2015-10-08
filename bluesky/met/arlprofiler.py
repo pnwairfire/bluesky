@@ -403,7 +403,7 @@ class ARLProfile(object):
 
     def fill_in_fields(self):
         # The following is from BSF
-        tmidday = datetime(first.year, first.month, first.day, 12)
+        tmidday = datetime(self.first.year, self.first.month, self.first.day, 12)
         s = Sun(lat=self.lat, long=self.lng)
         sunrise = s.sunrise_hr(tmidday) + self.utc_offset
         sunset = s.sunset_hr(tmidday) + self.utc_offset
@@ -487,17 +487,17 @@ class ARLProfile(object):
 
         return map(lambda p: (self.T_REF/(self.LAPSE_RATE*0.001))*(1.0 - pow(float(p)/self.P_SURFACE, self.Rd*self.LAPSE_RATE*0.001/self.G)), pressure)
 
-    def uct_to_local(self):
+    def utc_to_local(self):
         # profile dict will contain local met data index by *local* time
         local_hourly_profile = {}
         dt = self.start
         while dt <= self.end:
             logging.debug("Loading {}".format(dt.isoformat()))
-            if dt not in hourly_profile:
+            if dt not in self.hourly_profile:
                 raise ValueError("{} not in arl file {}".format(dt.isoformat(),
                     full_path_profile_txt))
 
-            local_hourly_profile[dt - timedelta(hours=utc_offset)] = hourly_profile[dt]
+            local_hourly_profile[dt - timedelta(hours=self.utc_offset)] = self.hourly_profile[dt]
             dt += ONE_HOUR
         self.hourly_profile = local_hourly_profile
 
