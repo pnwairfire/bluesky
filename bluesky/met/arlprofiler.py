@@ -157,7 +157,8 @@ class ArlProfiler(object):
         local_hourly_profile = profile.get_hourly_params()
 
         # TDOO: manipulate local_hourly_profile[dt] at all (e.g. map keys to
-        # more human readable ones) ?
+        # more human readable ones...look in SEVPlumeRise for mappings, and remove
+        # code from there if mapping is done here) ?
 
         return {k.isoformat(): v for k,v in local_hourly_profile.items()}
 
@@ -437,6 +438,7 @@ class ARLProfile(object):
             hp['dew_point'] = self.calc_dew_point(hp['RELH'], hp['TEMP'])
             hp['sunrise_hour'] = sunrise
             hp['sunset_hour'] = sunset
+            # TODO: add other fields, ex. U10M, V10M, PRSS, SHGT, TPPA
             for k in ['TO2M', 'RH2M', 'TPP3', 'TPP6', 'PBLH']:
                 self.list_to_scalar(hp, k, lambda: None)
             self.list_to_scalar(hp, 'HBPL',
