@@ -209,6 +209,7 @@ HOURLY_PROFILES_ONE_HOUR_1 = {
 }
 
 HOURLY_PROFILES_ONE_HOUR_2 = {
+    'HBPL': 100.0,
     'HGTS': [59.20695352193937,135.82881398535508,230.2522349481686,360.414411605392,518.8055921541387,715.7651461641137,962.7815105469939,1301.743826670549,1742.0947221259023,2192.250857281424,2663.856567251226,3345.982389068354,4259.947450680663,5186.011915491956,6120.21175643276,7056.643626913428,8006.417923710241,8986.451540456597,9972.250805846712,10981.449306410641,12042.198782182653,13124.193667771762,14261.080058165118,15406.309765306385,16658.518561184595,17976.158502586513,19355.563010823662,20904.261267868987,22702.76242092459,24927.524263410254,28825.25346629527],
     'PBLH': 1474.0,
     'PRES': [993.0,984.0,975.0,961.0,943.0,921.0,896.0,862.0,820.0,778.0,736.0,678.0,608.0,544.0,486.0,432.0,383.0,339.0,299.0,263.0,230.0,200.0,174.0,150.0,130.0,112.0,96.9,83.6,72.3,62.4,53.9],
@@ -239,23 +240,23 @@ HOURLY_PROFILES_ONE_HOUR_2 = {
 }
 
 HOURLY_PROFILES_ONE_ALL_HOURS_WITH_OFFSET = {
-    datetime.datetime(2014, 5, 29, 17, 0): dict(HOURLY_PROFILES_ONE_HOUR_0, sunrise_hr=6, sunset_hr=18),
-    datetime.datetime(2014, 5, 29, 18, 0): dict(HOURLY_PROFILES_ONE_HOUR_1, sunrise_hr=6, sunset_hr=18),
-    datetime.datetime(2014, 5, 29, 19, 0): dict(HOURLY_PROFILES_ONE_HOUR_2, sunrise_hr=6, sunset_hr=18)
+    datetime.datetime(2014, 5, 29, 17, 0): dict(HOURLY_PROFILES_ONE_HOUR_0, sunrise_hour=6, sunset_hour=18),
+    datetime.datetime(2014, 5, 29, 18, 0): dict(HOURLY_PROFILES_ONE_HOUR_1, sunrise_hour=6, sunset_hour=18),
+    datetime.datetime(2014, 5, 29, 19, 0): dict(HOURLY_PROFILES_ONE_HOUR_2, sunrise_hour=6, sunset_hour=18)
 }
 
 HOURLY_PROFILES_ONE_ALL_HOURS_NO_OFFSET = {
-    datetime.datetime(2014, 5, 30, 0, 0): dict(HOURLY_PROFILES_ONE_HOUR_0, sunrise_hr=13, sunset_hr=25),
-    datetime.datetime(2014, 5, 30, 1, 0): dict(HOURLY_PROFILES_ONE_HOUR_1, sunrise_hr=13, sunset_hr=25),
-    datetime.datetime(2014, 5, 30, 2, 0): dict(HOURLY_PROFILES_ONE_HOUR_2, sunrise_hr=13, sunset_hr=25)
+    datetime.datetime(2014, 5, 30, 0, 0): dict(HOURLY_PROFILES_ONE_HOUR_0, sunrise_hour=13, sunset_hour=25),
+    datetime.datetime(2014, 5, 30, 1, 0): dict(HOURLY_PROFILES_ONE_HOUR_1, sunrise_hour=13, sunset_hour=25),
+    datetime.datetime(2014, 5, 30, 2, 0): dict(HOURLY_PROFILES_ONE_HOUR_2, sunrise_hour=13, sunset_hour=25)
 }
 
 HOURLY_PROFILES_ONE_PARTIAL_WITH_OFFSET = {
-    datetime.datetime(2014, 5, 29, 18, 0): dict(HOURLY_PROFILES_ONE_HOUR_1, sunrise_hr=6, sunset_hr=18)
+    datetime.datetime(2014, 5, 29, 18, 0): dict(HOURLY_PROFILES_ONE_HOUR_1, sunrise_hour=6, sunset_hour=18)
 }
 
 HOURLY_PROFILES_ONE_PARTIAL_NO_OFFSET = {
-    datetime.datetime(2014, 5, 30, 1, 0): dict(HOURLY_PROFILES_ONE_HOUR_1, sunrise_hr=13, sunset_hr=25)
+    datetime.datetime(2014, 5, 30, 1, 0): dict(HOURLY_PROFILES_ONE_HOUR_1, sunrise_hour=13, sunset_hour=25)
 }
 
 
@@ -327,7 +328,8 @@ class TestARLProfile(object):
                 -7, # utc offset
                 37, # lat
                 -122) # lng
-            assert HOURLY_PROFILES_ONE_ALL_HOURS_WITH_OFFSET == profiler.get_hourly_params()
+            hourly_profiles = profiler.get_hourly_params()
+            assert HOURLY_PROFILES_ONE_ALL_HOURS_WITH_OFFSET == hourly_profiles
 
     def test_one_all_hours_no_offset(self, monkeypatch):
         self.monkeypatch_sun(monkeypatch)
@@ -341,7 +343,8 @@ class TestARLProfile(object):
                 0, # utc offset
                 37, # lat
                 -122) # lng
-            assert HOURLY_PROFILES_ONE_ALL_HOURS_NO_OFFSET == profiler.get_hourly_params()
+            hourly_profiles = profiler.get_hourly_params()
+            assert HOURLY_PROFILES_ONE_ALL_HOURS_NO_OFFSET == hourly_profiles
 
     def test_one_partial_with_offset(self, monkeypatch):
         self.monkeypatch_sun(monkeypatch)
@@ -355,7 +358,8 @@ class TestARLProfile(object):
                 -7, # utc offset
                 37, # lat
                 -122) # lng
-            assert HOURLY_PROFILES_ONE_PARTIAL_WITH_OFFSET == profiler.get_hourly_params()
+            hourly_profiles = profiler.get_hourly_params()
+            assert HOURLY_PROFILES_ONE_PARTIAL_WITH_OFFSET == hourly_profiles
 
     def test_one_partial_no_offset(self, monkeypatch):
         self.monkeypatch_sun(monkeypatch)
@@ -369,5 +373,6 @@ class TestARLProfile(object):
                 0, # utc offset
                 37, # lat
                 -122) # lng
-            assert HOURLY_PROFILES_ONE_PARTIAL_NO_OFFSET == profiler.get_hourly_params()
+            hourly_profiles = profiler.get_hourly_params()
+            assert HOURLY_PROFILES_ONE_PARTIAL_NO_OFFSET == hourly_profiles
 
