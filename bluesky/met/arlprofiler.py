@@ -263,6 +263,7 @@ class ARLProfile(object):
         self.lat = lat
         self.lng = lng
         self.hourly_profile = {}
+
     def get_hourly_params(self):
         """ Read a raw profile.txt into an hourly dictionary of parameters """
         read_data = False
