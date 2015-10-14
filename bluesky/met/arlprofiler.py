@@ -511,7 +511,7 @@ class ARLProfile(object):
                 raise ValueError("{} not in arl file {}".format(dt.isoformat(),
                     full_path_profile_txt))
 
-            local_hourly_profile[dt - timedelta(hours=self.utc_offset)] = self.hourly_profile[dt]
+            local_hourly_profile[dt + timedelta(hours=self.utc_offset)] = self.hourly_profile[dt]
             dt += ONE_HOUR
         self.hourly_profile = local_hourly_profile
 
