@@ -5,8 +5,9 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import logging
 
-import emitcalc
+from emitcalc import __version__ as emitcalc_version
 from emitcalc.calculator import EmissionsCalculator
+from eflookup import __version__ as eflookup_version
 from eflookup.fccs2ef.lookup import Fccs2Ef
 from eflookup.fepsef import FepsEFLookup
 
@@ -26,8 +27,8 @@ def run(fires_manager):
     """
     efs = fires_manager.get_config_value('emissions', 'efs', default='feps').lower()
     species = fires_manager.get_config_value('emissions', 'species', default=[])
-    fires_manager.processed(__name__, __version__,
-        emitcalc_version=emitcalc.__version__, ef_set=efs)
+    fires_manager.processed(__name__, __version__, ef_set=efs,
+        emitcalc_version=emitcalc_version, eflookup_version=eflookup_version)
     if efs == 'urbanski':
         _run_urbanski(fires_manager, species)
     elif efs == 'feps':
