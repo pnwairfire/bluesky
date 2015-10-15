@@ -5,3 +5,5 @@ build/
 dist/
 bluesky.egg-info/
 logs/
+MESSAGE
+profile.txt
