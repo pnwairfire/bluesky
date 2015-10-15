@@ -338,9 +338,6 @@ class TestARLProfile(object):
         for dt in expected:
             assert set(expected[dt].keys()) == set(actual[dt].keys())
             for k in expected[dt]:
-                if k =='dew_point':
-                    print "{} expected: {}".format(dt, expected[dt][k])
-                    print "{} actual: {}".format(dt, actual[dt][k])
                 if isinstance(expected[dt][k], list):
                     for i in range(len(expected[dt][k])):
                         check_vals(k, actual[dt][k][i], expected[dt][k][i])
