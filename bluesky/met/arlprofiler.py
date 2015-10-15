@@ -446,7 +446,7 @@ class ARLProfile(object):
 
     def list_to_scalar(self, hourly_profile, k, default):
         a = hourly_profile.get(k)
-        if a:
+        if a is not None:
             if hasattr(a, 'append'):
                 hourly_profile[k] = float(a[0])
             elif hasattr(a, 'strip'):
