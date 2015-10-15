@@ -439,7 +439,8 @@ class ARLProfile(object):
             hp['sunrise_hour'] = sunrise
             hp['sunset_hour'] = sunset
             for k in ['TO2M', 'RH2M', 'TPP3', 'TPP6', 'PBLH',
-                    'U10M', 'V10M', 'PRSS', 'SHGT', 'TPPA']:
+                    'T02M', 'U10M', 'V10M', 'PRSS', 'SHGT', 'TPPA',
+                    'pressure_at_surface',]:
                 self.list_to_scalar(hp, k, lambda: None)
             self.list_to_scalar(hp, 'HBPL',
                 lambda: default_pbl(hr, sunrise, sunset))
