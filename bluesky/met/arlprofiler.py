@@ -480,13 +480,9 @@ class ARLProfile(object):
         if not pressure or not sphu or not temp:
             return None
 
-        #rh = []
-        #for i in xrange(len(sphu)):
-        #    print sphu[i], pressure[i], temp[i]
-        #    rh.append((sphu[i] * pressure[i] / 0.622) / (exp(21.4 - (5351.0 / (temp[i] + 273.15)))))
-
-        return map(lambda s,p,t: (float(s) * float(p) / 0.622) / (exp(21.4 - (5351.0 /(float(t) + 273.15)))), sphu,pressure,temp)
-        #return rh
+        rh = map(lambda s,p,t: (float(s) * float(p) / 0.622) / (exp(21.4 - (5351.0 /(float(t) + 273.15)))), sphu,pressure,temp)
+        # The above calculation is off by a factor of 10. Divide all values by 10
+        return map(lambda h: h / 10.0, rh)
 
     P_SURFACE = 1000  # Psfc (mb)
     T_REF = 288.15    # Tref (K)
