@@ -49,7 +49,7 @@ def run(fires_manager):
                 tw = parse_datetimes(g, 'start', 'end')
                 profiler = StaticTimeProfiler(tw['start'], tw['end'],
                     hourly_fractions=hourly_fractions)
-                g['hourly_fractions'] = profiler.hourly_fractions
+                g['timeprofile'] = profiler.hourly_fractions
                 for fb in fire.fuelbeds:
                     emissions = fb['emissions'] # TODO: multiply each emission by g['pct']
                     tpe = profiler.profile(emissions)
