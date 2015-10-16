@@ -47,5 +47,8 @@ def run(fires_manager):
                 raise ValueError(
                     "Missing localmet data required for computing plumerise")
             g['plumerise'] = pr.compute(g['localmet'], fire.location['area'])
-    # fires_manager.summarize(emissions=datautils.summarize(
-    #     fires_manager.fires, 'emissions'))
+    # TODO: spread out emissions over plume and set in growth or fuelbed objects ???
+    #   (be consistent with profiled emissions, setting in same place or not setting at all)
+
+    # TODO: set summary?
+    # fires_manager.summarize(plumerise=...)
