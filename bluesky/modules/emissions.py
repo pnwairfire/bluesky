@@ -36,8 +36,12 @@ def run(fires_manager):
     else:
         raise BlueSkyConfigurationError(
             "Invalid emissions factors set: '{}'".format(efs))
-    fires_manager.summarize(emissions=datautils.summarize(
-        fires_manager.fires, 'emissions'))
+    fires_manager.summarize(
+        emissions_details=datautils.summarize(
+            fires_manager.fires, 'emissions_details'),
+        emissions=datautils.summarize(
+            fires_manager.fires, 'emissions')
+    )
 
 def _run_feps(fires_manager, species):
     logging.debug("Running emissions module FEPS EFs")
@@ -52,7 +56,8 @@ def _run_feps(fires_manager, species):
             if 'consumption' not in fb:
                 raise ValueError(
                     "Missing consumption data required for computing emissions")
-            fb['emissions'] = calculator.calculate(fb["consumption"])
+            fb['emissions_details'] = calculator.calculate(fb["consumption"])
+            fb['emissions'] = fb['emissions_details']['summary']['total']
 
 def _run_urbanski(fires_manager, species):
     logging.debug("Running emissions module with Urbanski EFs")
@@ -72,4 +77,5 @@ def _run_urbanski(fires_manager, species):
                     "Missing consumption data required for computing emissions")
             calculator = EmissionsCalculator([fccs2ef[fb["fccs_id"]]],
                 species=species)
-            fb['emissions'] = calculator.calculate(fb["consumption"])
+            fb['emissions_details'] = calculator.calculate(fb["consumption"])
+            fb['emissions'] = fb['emissions_details']['summary']['total']
