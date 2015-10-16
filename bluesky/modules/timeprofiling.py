@@ -70,8 +70,6 @@ def run(fires_manager):
     #     TODO: do anything with InvalidEmissionsDataError?
     #     raise
 
-    fires_manager.summarize(hourly_fractions=profiler.hourly_fractions)
-
 # Allow summed growth percentages to be between 99.5% and 100.5%
 # TODO: Move to common constants module? (fuelbeds defines constant for
 # total fuelbeds percentage)
