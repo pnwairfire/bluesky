@@ -24,7 +24,7 @@ setup(
         "emitcalc>=0.3.2",
         "fccsmap>=0.1.6",
         "timeprofile>=0.1.0",
-        "plumerise>=0.1.0",
+        "plumerise>=0.1.1",
         "apps-consume4>=4.1.2",
         "tornado==4.2.1"
     ],
