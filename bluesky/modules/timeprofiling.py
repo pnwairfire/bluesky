@@ -3,6 +3,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import copy
 import timeprofile
 from timeprofile.static import (
     StaticTimeProfiler,
@@ -51,12 +52,18 @@ def run(fires_manager):
                     hourly_fractions=hourly_fractions)
                 g['timeprofile'] = profiler.hourly_fractions
                 for fb in fire.fuelbeds:
-                    emissions = fb['emissions'] # TODO: multiply each emission by g['pct']
+                    emissions = copy.deepcopy(fb['emissions_details'])
+                    _scale_emissions(emissions, g['pct'])
                     tpe = profiler.profile(emissions)
+
+                    # TODO: set timeprofiled emissions in growth objects (aggregated
+                    #  accross all fuelbeds), or maybe don't even bother
+                    # computing profiled emissions here
                     fb['timeprofiled_emissions'].append({
                         "start": g["start"],
                         "end": g["end"],
-                        "emissions": tpe
+                        #"details": tpe,
+                        "total": tpe['summary']['total']
                     })
 
 
@@ -69,6 +76,13 @@ def run(fires_manager):
     # except InvalidEmissionsDataError, e:
     #     TODO: do anything with InvalidEmissionsDataError?
     #     raise
+
+def _scale_emissions(data, pct):
+    for k in data:
+        if isinstance(data[k], dict):
+            _scale_emissions(data[k], pct)
+        else:
+            data[k] = [e * pct/100.0 for e in data[k]]
 
 # Allow summed growth percentages to be between 99.5% and 100.5%
 # TODO: Move to common constants module? (fuelbeds defines constant for
