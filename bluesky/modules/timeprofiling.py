@@ -52,13 +52,19 @@ def run(fires_manager):
                     hourly_fractions=hourly_fractions)
                 g['timeprofile'] = profiler.hourly_fractions
                 for fb in fire.fuelbeds:
+                    # TODO: update profiler.profile to support profiling
+                    #  total emissions in a dict lacking top level fuel category
+                    #  and secondary fuel subcategory keys, and then use
+                    #  fb['emissions'] instead of fb['emissions_details']
+                    #  we'd then need to change the code, below, to
+                    #     "total": tpe
                     emissions = copy.deepcopy(fb['emissions_details'])
                     _scale_emissions(emissions, g['pct'])
                     tpe = profiler.profile(emissions)
 
                     # TODO: set timeprofiled emissions in growth objects (aggregated
                     #  accross all fuelbeds), or maybe don't even bother
-                    # computing profiled emissions here
+                    #  computing profiled emissions here
                     fb['timeprofiled_emissions'].append({
                         "start": g["start"],
                         "end": g["end"],
