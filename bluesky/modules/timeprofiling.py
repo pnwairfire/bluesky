@@ -44,7 +44,7 @@ def run(fires_manager):
 
             _validate_fire(fire)
             for fb in fire.fuelbeds:
-                fb['profiled_emissions'] = []
+                fb['timeprofiled_emissions'] = []
             for g in fire.growth:
                 tw = parse_datetimes(g, 'start', 'end')
                 profiler = StaticTimeProfiler(tw['start'], tw['end'],
@@ -53,7 +53,7 @@ def run(fires_manager):
                 for fb in fire.fuelbeds:
                     emissions = fb['emissions'] # TODO: multiply each emission by g['pct']
                     tpe = profiler.profile(emissions)
-                    fb['profiled_emissions'].append({
+                    fb['timeprofiled_emissions'].append({
                         "start": g["start"],
                         "end": g["end"],
                         "emissions": tpe

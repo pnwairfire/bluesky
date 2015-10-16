@@ -4443,7 +4443,7 @@
                         "w_stump_sound_loading": 0.0
                     },
                     "pct": 100.0,
-                    "profiled_emissions": [
+                    "timeprofiled_emissions": [
                         {
                             "emissions": {
                                 "canopy": {
