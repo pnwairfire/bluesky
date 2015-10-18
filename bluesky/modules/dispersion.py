@@ -13,6 +13,8 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import consume
 import logging
 
+from bluesky.hysplit import hysplit
+
 __all__ = [
     'run'
 ]
@@ -27,10 +29,20 @@ def run(fires_manager, config=None):
     Kwargs:
      - config -- optional configparser object
     """
-    # TODO: Create a separate hysplit wrapper module.  If config > dispersion
-    #  > module (?) specifies hysplit, use the hysplit wrapper module, which will
-    # produce input files for hysplit, call hysplit, parse it's output (or not?), and
-    # then add information to fires_manager indicating where to find the hysplit output
-    # (not sure if hysplit will be called per fire or on all fires at once).
+    model = fires_manager.get_config_value('dispersion', 'model',
+        default='hysplit').lower()
+
     # TODO: support VSMOKE as well
-    raise NotImplementedError("dispersion not yet implemented")
+    if model == 'hysplit':
+        hysplit_config = fires_manager.get_config_value('dispersion', 'hysplit',
+            default={})
+        disperser = hysplit.HYSPLITDispersion(**hysplit_config)
+    else:
+        raise BlueSkyConfigurationError(
+            "Invalid dispersion model: '{}'".format(model))
+
+
+    # TODO: pass gathered data into wrapper
+    disperser.run(fires_manager)
+
+    # TODO: add information to fires_manager indicating where to find the hysplit output
