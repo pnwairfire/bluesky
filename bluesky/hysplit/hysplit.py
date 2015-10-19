@@ -72,21 +72,22 @@ class HYSPLITDispersion(object):
     def config(self, key):
         return self._config.get(key.lower(), getattr(self, key, None))
 
-    def run(self, fires_manager, start, end):
+    def run(self, fires, start, end):
         logging.info("Running the HYSPLIT49 Dispersion model")
-        self.model_start = start
-        self.model_end = end
-        # TODO: make sure start and end are within
-        # metmin(self.metInfo.dispersion_end, self.metInfo.met_end)
-        dur = self.model_end - self.model_start
+        self._fires =
+        # TODO: make sure start and end are defined
+        self._model_start = start
+        self._model_end = end
+        dur = self._model_end - self._model_start
         self.hours_to_run = ((dur.days * 86400) + dur.seconds) / 3600
 
-        self.gather_data(fires_manager)
-        self.set_reduction_factor()
-        filteredFires = list(self.filterFires())
+        fires = self.collect_fire_data()
+        filtered_fires = list(self.filterFires(fires))
 
-        if(len(filteredFires) == 0):
-            filteredFires = [self.generate_dummy_fire()]
+        self.set_reduction_factor()
+
+        if(len(filtered_fires) == 0):
+            filtered_fires = [self.generate_dummy_fire()]
 
         tranching_config = {
             'num_processes': self.config("NPROCESSES", int),
@@ -100,7 +101,7 @@ class HYSPLITDispersion(object):
         # for more code to be encapsulated in hysplit_utils, which then allows
         # for greater testability.  (hysplit_utils.create_fire_sets could be
         # skipped if either NPROCESSES > 1 or NFIRES_PER_PROCESS > 1)
-        filtered_fire_location_sets = hysplit_utils.create_fire_sets(filteredFires)
+        filtered_fire_location_sets = hysplit_utils.create_fire_sets(filtered_fires)
         num_fire_sets = len(filtered_fire_location_sets)
         num_processes = hysplit_utils.compute_num_processes(num_fire_sets,
             **tranching_config)
@@ -116,14 +117,14 @@ class HYSPLITDispersion(object):
                     self.run_parallel(context, num_processes, filtered_fire_location_sets)
             else:
                 logging.info("Running one HYSPLIT49 Dispersion model process")
-                self.run_process(context, filteredFires)
+                self.run_process(context, filtered_fires)
 
             # DispersionData output
             dispersionData = construct_type("DispersionData")
             dispersionData["grid_filetype"] = "NETCDF"
             dispersionData["grid_filename"] = context.full_path(self.OUTPUT_FILE_NAME)
             dispersionData["parameters"] = {"pm25": "PM25"}
-            dispersionData["start_time"] = self.model_start
+            dispersionData["start_time"] = self._model_start
             dispersionData["hours"] = self.hours_to_run
             self.fireInfo.dispersion = dispersionData
             self.set_output("fires", self.fireInfo)
@@ -143,24 +144,27 @@ class HYSPLITDispersion(object):
         'area_fract', 'flame_profile', 'smolder_profile', 'residual_profile'
         ]
 
-    def gather_data(self, fires_manager):
-        # TODO: Iterate over all fires to gather required data,
-        #  aggreagating over all fires (if possible)
-        #  use self.config["start"] and self.config["end"]
-        #  to determine dispserion time window, and then look at
+    def collect_fire_data(self):
+        fires = []
+
+        # TODO: aggreagating over all fires (if psossible)
+        #  use self.model_start and self.model_end
+        #  as disperion time window, and then look at
         #  growth window(s) of each fire to fill in emissions for each
         #  fire spanning hysplit time window
         # TODO: determine set of arl fires by aggregating arl files
         #  specified per growth per fire, or expect global arl files
         #  specifications?  (if aggregating over fires, make sure they're
         #  conistent with met domain; if not, raise exception or run them
-        #  separately...raising exception easier for now)
-        for fire in fires_manager.fires:
+        #  separately...raising exception would be easier for now)
+        # Make sure met files span dispersion time window
+        for fire in self.fires_manager.fires:
             # TODO: ...
             for g in fire.growth:
                 # TODO: ...
                 pass
 
+        return fires
 
     def generate_dummy_fire(self):
         logging.info("Generating dummy fire for HYSPLIT")
@@ -169,7 +173,7 @@ class HYSPLITDispersion(object):
         dummy_loc['latitude'] = self.config("CENTER_LATITUDE", float)
         dummy_loc['longitude'] = self.config("CENTER_LONGITUDE", float)
         dummy_loc['area'] = 1
-        dummy_loc['date_time'] = self.model_start
+        dummy_loc['date_time'] = self._model_start
 
         dummy_loc['emissions'] =  construct_type("EmissionsData")
         for k in self.DUMMY_EMISSIONS:
@@ -425,7 +429,7 @@ class HYSPLITDispersion(object):
 
             yield fireLoc
 
-    def writeEmissions(self, filteredFires, emissionsFile):
+    def writeEmissions(self, filtered_fires, emissionsFile):
         # Note: HYSPLIT can accept concentrations in any units, but for
         # consistency with CALPUFF and other dispersion models, we convert to
         # grams in the emissions file.
@@ -445,10 +449,10 @@ class HYSPLITDispersion(object):
 
             # Loop through the timesteps
             for hour in range(self.hours_to_run):
-                dt = self.model_start + timedelta(hours=hour)
+                dt = self._model_start + timedelta(hours=hour)
                 dt_str = dt.strftime("%y %m %d %H")
 
-                num_fires = len(filteredFires)
+                num_fires = len(filtered_fires)
                 #num_heights = 21 # 20 quantile gaps, plus ground level
                 num_heights = self.num_output_quantiles + 1
                 num_sources = num_fires * num_heights
@@ -463,7 +467,7 @@ class HYSPLITDispersion(object):
                 noEmis = 0
 
                 # Loop through the fire locations
-                for fireLoc in filteredFires:
+                for fireLoc in filtered_fires:
                     dummy = False
 
                     # Get some properties from the fire location
@@ -473,7 +477,7 @@ class HYSPLITDispersion(object):
                     # Figure out what index (h) to use into our hourly arrays of data,
                     # based on the hour in our outer loop and the fireLoc's available
                     # data.
-                    padding = fireLoc.date_time - self.model_start
+                    padding = fireLoc.date_time - self._model_start
                     padding_hours = ((padding.days * 86400) + padding.seconds) / 3600
                     num_hours = min(len(fireLoc.emissions.heat), len(fireLoc.plume_rise.hours))
                     h = hour - padding_hours
@@ -574,8 +578,8 @@ class HYSPLITDispersion(object):
 
         return verticalMethod
 
-    def writeControlFile(self, filteredFires, controlFile, concFile):
-        num_fires = len(filteredFires)
+    def writeControlFile(self, filtered_fires, controlFile, concFile):
+        num_fires = len(filtered_fires)
         num_heights = self.num_output_quantiles + 1  # number of quantiles used, plus ground level
         num_sources = num_fires * num_heights
 
@@ -589,7 +593,7 @@ class HYSPLITDispersion(object):
         # Height of the top of the model domain
         modelTop = self.config("TOP_OF_MODEL_DOMAIN", float)
 
-        #modelEnd = self.model_start + timedelta(hours=self.hours_to_run)
+        #modelEnd = self._model_start + timedelta(hours=self.hours_to_run)
 
         # Build the vertical Levels string
         verticalLevels = self.config("VERTICAL_LEVELS")
@@ -709,13 +713,13 @@ class HYSPLITDispersion(object):
 
         with open(controlFile, "w") as f:
             # Starting time (year, month, day hour)
-            f.write(self.model_start.strftime("%y %m %d %H") + "\n")
+            f.write(self._model_start.strftime("%y %m %d %H") + "\n")
 
             # Number of sources
             f.write("%d\n" % num_sources)
 
             # Source locations
-            for fireLoc in filteredFires:
+            for fireLoc in filtered_fires:
                 for height in range(num_heights):
                     f.write("%9.3f %9.3f %9.3f\n" % (fireLoc.latitude, fireLoc.longitude, sourceHeight))
 
@@ -744,7 +748,7 @@ class HYSPLITDispersion(object):
             # Duration of emissions (hours)
             f.write(" %9.3f\n" % self.hours_to_run)
             # Source release start time (year, month, day, hour, minute)
-            f.write("%s\n" % self.model_start.strftime("%y %m %d %H %M"))
+            f.write("%s\n" % self._model_start.strftime("%y %m %d %H %M"))
 
             # Number of simultaneous concentration grids
             f.write("1\n")
@@ -773,9 +777,9 @@ class HYSPLITDispersion(object):
             f.write("%s\n" % verticalLevels)
 
             # Sampling start time (year month day hour minute)
-            f.write("%s\n" % self.model_start.strftime("%y %m %d %H %M"))
+            f.write("%s\n" % self._model_start.strftime("%y %m %d %H %M"))
             # Sampling stop time (year month day hour minute)
-            f.write("%s\n" % self.model_end.strftime("%y %m %d %H %M"))
+            f.write("%s\n" % self._model_end.strftime("%y %m %d %H %M"))
             # Sampling interval (type hour minute)
             f.write("0 1 00\n") # Sampling interval:  type hour minute.  A type of 0 gives an average over the interval.
 
@@ -805,16 +809,16 @@ class HYSPLITDispersion(object):
             # Pollutant deposition resuspension constant (1/m)
             f.write("0.0\n")
 
-    def writeSetupFile(self, filteredFires, emissionsFile, setupFile, ninit_val, ncpus):
+    def writeSetupFile(self, filtered_fires, emissionsFile, setupFile, ninit_val, ncpus):
         # Advanced setup options
         # adapted from Robert's HysplitGFS Perl script
 
         khmax_val = int(self.config("KHMAX"))
         ndump_val = int(self.config("NDUMP"))
         ncycl_val = int(self.config("NCYCL"))
-        dump_datetime = self.model_start + timedelta(hours=ndump_val)
+        dump_datetime = self._model_start + timedelta(hours=ndump_val)
 
-        num_fires = len(filteredFires)
+        num_fires = len(filtered_fires)
         num_heights = self.num_output_quantiles + 1
         num_sources = num_fires * num_heights
 

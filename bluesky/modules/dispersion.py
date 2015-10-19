@@ -40,6 +40,7 @@ def run(fires_manager, config=None):
 
 
     # TODO: pass gathered data into wrapper
-    disperser.run(fires_manager)
+    disperser.run(fires_manager, fires_manager.get_config_value('start'),
+        fires_manager.get_config_value('end'))
 
     # TODO: add information to fires_manager indicating where to find the hysplit output
