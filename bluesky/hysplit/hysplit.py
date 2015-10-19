@@ -658,8 +658,7 @@ class HYSPLITDispersion(object):
             minSpacingLat = spacingLat
             maxSpacingLon = self.config("MAX_SPACING_LONGITUDE", float)
             maxSpacingLat = self.config("MAX_SPACING_LATITUDE", float)
-            fireIntervals = self.config("FIRE_INTERVALS")
-            intervals = sorted([int(x) for x in fireIntervals.split()])
+            intervals = sorted([int(x) for x in self.config("FIRE_INTERVALS")])
 
             # Maximum grid spacing cannot be smaller than the minimum grid spacing
             if maxSpacingLon < minSpacingLon:
