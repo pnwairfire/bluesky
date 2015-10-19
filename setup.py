@@ -16,6 +16,14 @@ setup(
         'bin/bsp',
         'bin/bsp-web'
     ],
+    package_data={
+        # TODO: not sure how to specify package data for nested package.
+        #   a)  {'hysplit': ['bdyfiles/*.']}
+        #   b)  {'bluesky': ['hysplit/bdyfiles/*.']}
+        #   c)  {'bluesky': {'hysplit': ['bdyfiles/*.']} }
+        #   d)  some other way?
+        'hysplit': ['bdyfiles/*.']
+    },
     url='https://github.com/pnwairfire/bluesky',
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
     install_requires=[
