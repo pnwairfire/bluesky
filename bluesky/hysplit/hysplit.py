@@ -104,7 +104,7 @@ class HYSPLITDispersion(object):
         num_fire_sets = len(filtered_fire_location_sets)
         num_processes = hysplit_utils.compute_num_processes(num_fire_sets,
             **tranching_config)
-        self.log.debug('Parallel HYSPLIT? num_fire_sets=%s, %s -> num_processes=%s' %(
+        logging.debug('Parallel HYSPLIT? num_fire_sets=%s, %s -> num_processes=%s' %(
             num_fire_sets, ', '.join(['%s=%s'%(k,v) for k,v in tranching_config.items()]),
             num_processes
         ))
@@ -115,7 +115,7 @@ class HYSPLITDispersion(object):
                     # and number of fires each
                     self.run_parallel(context, num_processes, filtered_fire_location_sets)
             else:
-                self.log.info("Running one HYSPLIT49 Dispersion model process")
+                logging.info("Running one HYSPLIT49 Dispersion model process")
                 self.run_process(context, filteredFires)
 
             # DispersionData output
@@ -163,7 +163,7 @@ class HYSPLITDispersion(object):
 
 
     def generate_dummy_fire(self):
-        self.log.info("Generating dummy fire for HYSPLIT")
+        logging.info("Generating dummy fire for HYSPLIT")
         from kernel.types import construct_type
         dummy_loc = construct_type("FireLocationData", "DUMMY_FIRE")
         dummy_loc['latitude'] = self.config("CENTER_LATITUDE", float)
@@ -215,7 +215,7 @@ class HYSPLITDispersion(object):
             fires = fire_tranches[nproc]
             _context = Context(os.path.join(context.workdir, str(nproc)))
             # Note: no need to set _context.basedir; it will be set to workdir
-            self.log.info("Starting thread to run HYSPLIT on %d fires." % (len(fires)))
+            logging.info("Starting thread to run HYSPLIT on %d fires." % (len(fires)))
             t = T(_context, fires)
             t.start()
             threads.append(t)
@@ -282,19 +282,19 @@ class HYSPLITDispersion(object):
                  msg = "Found no matching particle initialization files. Stop."
                  raise Exception(msg)
               else:
-                 self.log.warn("No matching particle initialization file found; Using no particle initialization")
-                 self.log.debug("Particle initialization file not found '%s'", parinit_file)
+                 logging.warn("No matching particle initialization file found; Using no particle initialization")
+                 logging.debug("Particle initialization file not found '%s'", parinit_file)
            else:
               context.link_file(parinit_file)
-              self.log.info("Using particle initialization file %s" % parinit_file)
+              logging.info("Using particle initialization file %s" % parinit_file)
               ninit_val = "1"
 
         # Prepare for an MPI run
         if self.config("MPI", bool):
             NCPUS = self.config("NCPUS", int)
-            self.log.info("Running MPI HYSPLIT with %s processors." % NCPUS)
+            logging.info("Running MPI HYSPLIT with %s processors." % NCPUS)
             if NCPUS < 1:
-                self.log.warn("Invalid NCPUS specified...resetting NCPUS to 1 for this run.")
+                logging.warn("Invalid NCPUS specified...resetting NCPUS to 1 for this run.")
                 NCPUS = 1
 
             messageFiles = ["MESSAGE.%3.3i" % (i+1) for i in range(NCPUS)]
@@ -309,7 +309,7 @@ class HYSPLITDispersion(object):
             #     msg = "HYSPLIT MPI executable %s not found." % SHYSPLIT_MPI_BINARY
             #     raise AssertionError(msg)
             if self.config("READ_INIT_FILE", bool): # TODO: Finish MPI support for particle initialization
-                self.log.warn("Particile initialization in BlueSky module not currently supported for MPI runs.")
+                logging.warn("Particile initialization in BlueSky module not currently supported for MPI runs.")
         else:
             NCPUS = 1
 
@@ -320,7 +320,7 @@ class HYSPLITDispersion(object):
         # Copy in the user_defined SETUP.CFG file or write a new one
         HYSPLIT_SETUP_FILE = self.config("HYSPLIT_SETUP_FILE")
         if HYSPLIT_SETUP_FILE != None:
-            self.log.debug("Copying HYSPLIT SETUP file from %s" % (HYSPLIT_SETUP_FILE))
+            logging.debug("Copying HYSPLIT SETUP file from %s" % (HYSPLIT_SETUP_FILE))
             config_setup_file = open(HYSPLIT_SETUP_FILE, 'rb')
             setup_file = open(setupFile, 'wb')
             copyfileobj(config_setup_file, setup_file)
@@ -340,7 +340,7 @@ class HYSPLITDispersion(object):
             raise AssertionError(msg)
 
         if self.config('CONVERT_HYSPLIT2NETCDF'):
-            self.log.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (outputConcFile, outputFile))
+            logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (outputConcFile, outputFile))
             context.execute(HYSPLIT2NETCDF_BINARY,
                 "-I" + outputConcFile,
                 "-O" + os.path.basename(outputFile),
@@ -391,36 +391,36 @@ class HYSPLITDispersion(object):
         # Ensure a valid reduction factor
         if self.reductionFactor > self.NQUANTILES:
             self.reductionFactor = self.NQUANTILES
-            self.log.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to %s" % str(self.NQUANTILES))
+            logging.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to %s" % str(self.NQUANTILES))
         elif self.reductionFactor <= 0:
             self.reductionFactor = 1
-            self.log.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to 1")
+            logging.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to 1")
         while (self.NQUANTILES % self.reductionFactor) != 0:  # make sure factor evenly divides into the number of quantiles
             self.reductionFactor -= 1
-            self.log.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to %s" % str(self.reductionFactor))
+            logging.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to %s" % str(self.reductionFactor))
 
         self.num_output_quantiles = self.NQUANTILES/self.reductionFactor
 
         if self.reductionFactor != 1:
-            self.log.info("Number of vertical emission levels reduced by factor of %s" % str(self.reductionFactor))
-            self.log.info("Number of vertical emission quantiles will be %s" % str(self.num_output_quantiles))
+            logging.info("Number of vertical emission levels reduced by factor of %s" % str(self.reductionFactor))
+            logging.info("Number of vertical emission quantiles will be %s" % str(self.num_output_quantiles))
 
     def filterFires(self):
         for fireLoc in self.fireInfo.locations():
             if fireLoc.time_profile is None:
-                self.log.debug("Fire %s has no time profile data; skip...", fireLoc.id)
+                logging.debug("Fire %s has no time profile data; skip...", fireLoc.id)
                 continue
 
             if fireLoc.plume_rise is None:
-                self.log.debug("Fire %s has no plume rise data; skip...", fireLoc.id)
+                logging.debug("Fire %s has no plume rise data; skip...", fireLoc.id)
                 continue
 
             if fireLoc.emissions is None:
-                self.log.debug("Fire %s has no emissions data; skip...", fireLoc.id)
+                logging.debug("Fire %s has no emissions data; skip...", fireLoc.id)
                 continue
 
             if fireLoc.emissions.sum("heat") < 1.0e-6:
-                self.log.debug("Fire %s has less than 1.0e-6 total heat; skip...", fireLoc.id)
+                logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fireLoc.id)
                 continue
 
             yield fireLoc
@@ -482,7 +482,7 @@ class HYSPLITDispersion(object):
                     # to stick in dummy records anyway (so we have the correct number of sources).
 
                     if h < 0 or h >= num_hours:
-                        self.log.debug("Fire %s has no emissions for hour %s", fireLoc.id, hour)
+                        logging.debug("Fire %s has no emissions for hour %s", fireLoc.id, hour)
                         noEmis += 1
                         dummy = True
 
@@ -551,7 +551,7 @@ class HYSPLITDispersion(object):
                         emis.write(record_fmt % (dt_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
 
                 if noEmis > 0:
-                    self.log.debug("%d of %d fires had no emissions for hour %d", noEmis, num_fires, hour)
+                    logging.debug("%d of %d fires had no emissions for hour %d", noEmis, num_fires, hour)
 
 
     VERTICAL_CHOICES = {
@@ -599,11 +599,11 @@ class HYSPLITDispersion(object):
 
         # Warn about multiple sampling grid levels and KML/PNG image generation
         if numLevels > 1:
-            self.log.warn("KML and PNG images will be empty since more than 1 vertical level is selected")
+            logging.warn("KML and PNG images will be empty since more than 1 vertical level is selected")
 
         if self.config("USER_DEFINED_GRID", bool):
             # User settings that can override the default concentration grid info
-            self.log.info("User-defined sampling/concentration grid invoked")
+            logging.info("User-defined sampling/concentration grid invoked")
             centerLat = self.config("CENTER_LATITUDE", float)
             centerLon = self.config("CENTER_LONGITUDE", float)
             widthLon = self.config("WIDTH_LONGITUDE", float)
@@ -614,7 +614,7 @@ class HYSPLITDispersion(object):
             # Calculate output concentration grid parameters.
             # Ensure the receptor spacing divides nicely into the grid width and height,
             # and that the grid center will be a receptor point (i.e., nx, ny will be ODD).
-            self.log.info("Automatic sampling/concentration grid invoked")
+            logging.info("Automatic sampling/concentration grid invoked")
 
             projection = self.metInfo.met_domain_info.domainID
             grid_spacing_km = self.metInfo.met_domain_info.dxKM
@@ -642,7 +642,7 @@ class HYSPLITDispersion(object):
             lon_count = (lon_max_s - lon_min_s) / spacing_s
             lon_count += 1 if lon_count % 2 == 0 else 0  # lon_count should be odd
             lon_max_s = lon_min_s + ((lon_count-1) * spacing_s)
-            self.log.info("HYSPLIT grid DIMENSIONS will be %s by %s" % (lon_count, lat_count))
+            logging.info("HYSPLIT grid DIMENSIONS will be %s by %s" % (lon_count, lat_count))
 
             spacingLon = float(spacing_s)/SCALE
             spacingLat = spacingLon
@@ -653,7 +653,7 @@ class HYSPLITDispersion(object):
 
         # Decrease the grid resolution based on number of fires
         if self.config("OPTIMIZE_GRID_RESOLUTION", bool):
-            self.log.info("Grid resolution adjustment option invoked")
+            logging.info("Grid resolution adjustment option invoked")
             minSpacingLon = spacingLon
             minSpacingLat = spacingLat
             maxSpacingLon = self.config("MAX_SPACING_LONGITUDE", float)
@@ -664,27 +664,27 @@ class HYSPLITDispersion(object):
             # Maximum grid spacing cannot be smaller than the minimum grid spacing
             if maxSpacingLon < minSpacingLon:
                 maxSpacingLon = minSpacingLon
-                self.log.debug("maxSpacingLon > minSpacingLon...longitude grid spacing will not be adjusted")
+                logging.debug("maxSpacingLon > minSpacingLon...longitude grid spacing will not be adjusted")
             if maxSpacingLat < minSpacingLat:
                 maxSpacingLat = minSpacingLat
-                self.log.debug("maxSpacingLat > minSpacingLat...latitude grid spacing will not be adjusted")
+                logging.debug("maxSpacingLat > minSpacingLat...latitude grid spacing will not be adjusted")
 
             # Throw out negative intervals
             intervals = [x for x in intervals if x >= 0]
 
             if len(intervals) == 0:
                 intervals = [0,num_fires]
-                self.log.debug("FIRE_INTERVALS had no values >= 0...grid spacing will not be adjusted")
+                logging.debug("FIRE_INTERVALS had no values >= 0...grid spacing will not be adjusted")
 
             # First bin should always start with zero
             if intervals[0] != 0:
                 intervals.insert(0,0)
-                self.log.debug("Zero added to the beginning of FIRE_INTERVALS list")
+                logging.debug("Zero added to the beginning of FIRE_INTERVALS list")
 
             # must always have at least 2 intervals
             if len(intervals) < 2:
                 intervals = [0,num_fires]
-                self.log.debug("Need at least two FIRE_INTERVALS...grid spacing will not be adjusted")
+                logging.debug("Need at least two FIRE_INTERVALS...grid spacing will not be adjusted")
 
             # Increase the grid spacing depending on number of fires
             i = 0
@@ -696,17 +696,17 @@ class HYSPLITDispersion(object):
                     spacingLat = minSpacingLat + (i * rangeSpacingLat)
                     spacingLon = minSpacingLon + (i * rangeSpacingLon)
                     i += 1
-                self.log.debug("Lon,Lat grid spacing for interval %d adjusted to %f,%f" % (interval,spacingLon,spacingLat))
-            self.log.info("Lon/Lat grid spacing for %d fires will be %f,%f" % (num_fires,spacingLon,spacingLat))
+                logging.debug("Lon,Lat grid spacing for interval %d adjusted to %f,%f" % (interval,spacingLon,spacingLat))
+            logging.info("Lon/Lat grid spacing for %d fires will be %f,%f" % (num_fires,spacingLon,spacingLat))
 
         # Note: Due to differences in projections, the dimensions of this
         #       output grid are conservatively large.
-        self.log.info("HYSPLIT grid CENTER_LATITUDE = %s" % centerLat)
-        self.log.info("HYSPLIT grid CENTER_LONGITUDE = %s" % centerLon)
-        self.log.info("HYSPLIT grid HEIGHT_LATITUDE = %s" % heightLat)
-        self.log.info("HYSPLIT grid WIDTH_LONGITUDE = %s" % widthLon)
-        self.log.info("HYSPLIT grid SPACING_LATITUDE = %s" % spacingLat)
-        self.log.info("HYSPLIT grid SPACING_LONGITUDE = %s" % spacingLon)
+        logging.info("HYSPLIT grid CENTER_LATITUDE = %s" % centerLat)
+        logging.info("HYSPLIT grid CENTER_LONGITUDE = %s" % centerLon)
+        logging.info("HYSPLIT grid HEIGHT_LATITUDE = %s" % heightLat)
+        logging.info("HYSPLIT grid WIDTH_LONGITUDE = %s" % widthLon)
+        logging.info("HYSPLIT grid SPACING_LATITUDE = %s" % spacingLat)
+        logging.info("HYSPLIT grid SPACING_LONGITUDE = %s" % spacingLon)
 
         with open(controlFile, "w") as f:
             # Starting time (year, month, day hour)
@@ -870,7 +870,7 @@ class HYSPLITDispersion(object):
             # poutf: particle output/dump file
             if self.config("MAKE_INIT_FILE", bool):
                 f.write("  POUTF = \"PARDUMP\",\n")
-                self.log.info("Dumping particles to PARDUMP starting at %s every %s hours" % (dump_datetime, ncycl_val))
+                logging.info("Dumping particles to PARDUMP starting at %s every %s hours" % (dump_datetime, ncycl_val))
 
             # ndump: when/how often to dump a poutf file negative values indicate to
             #        just one  create just one 'restart' file at abs(hours) after the
