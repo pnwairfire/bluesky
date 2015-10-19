@@ -1,10 +1,7 @@
 """bluesky.modules.dispersion
 
-If running hysplit dispersion, you'll need to obtain hysplit from NOAA.It is
-expected to reside in a directory in the search path. (This module prevents
-configuring relative or absolute paths to hysplit, to eliminiate security
-vulnerabilities when invoked by web service request.) To obtain hysplit, Go to
-NOAA's [hysplit distribution page](http://ready.arl.noaa.gov/HYSPLIT.php).
+If running hysplit dispersion, you'll need to obtain hysplit and various other
+Executables. See the repo README.md for more information.
 """
 
 __author__      = "Joel Dubowy"

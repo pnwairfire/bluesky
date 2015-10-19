@@ -23,8 +23,21 @@ contact NOAA.
 
 ### dispersion
 
+#### hysplit
+
 If running hysplit dispersion, you'll need to obtain hysplit from NOAA. To obtain
 it, go to their [hysplit distribution page](http://ready.arl.noaa.gov/HYSPLIT.php).
+Additionally, you'll need the following executables:
+
+ - ```ncea```:  ...
+ - ```ncks```:  ...
+ - ```mpiexec```: this is only needed if opting to run multi-processor hysplit; to obtain ...
+ - ```hycm_std```: this is only needed if opting to run multi-processor hysplit; to obtain ...
+ - ```hysplit2netcdf```: this is only needed if opting to convert hysplit output to netcdf; to obtain, ...
+
+Each of these executables are assumed to reside in a directory in the search
+path. As a security measure, to avoid security vulnerabilities when hsyplit is
+invoked by web service requests, these executables may not be configured to point to relative or absolute paths.
 
 ## Development
 
