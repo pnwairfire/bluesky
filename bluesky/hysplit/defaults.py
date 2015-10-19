@@ -8,9 +8,9 @@ OUTPUT_DIRECTORY = '.'
 
 # Ancillary data files (note: HYSPLIT4.9 balks if it can't find ASCDATA.CFG)
 _bdyfiles_path = os.path.join(os.path.dirname(__file__), 'bdyfiles')
-ASCDATA_FILE = os.path.join(bdyfiles_path, 'ASCDATA.CFG')
-LANDUSE_FILE = os.path.join(bdyfiles_path, 'LANDUSE.ASC')
-ROUGLEN_FILE = os.path.join(bdyfiles_path, 'ROUGLEN.ASC')
+ASCDATA_FILE = os.path.join(_bdyfiles_path, 'ASCDATA.CFG')
+LANDUSE_FILE = os.path.join(_bdyfiles_path, 'LANDUSE.ASC')
+ROUGLEN_FILE = os.path.join(_bdyfiles_path, 'ROUGLEN.ASC')
 
 # Program to convert raw HYSPLIT output to netCDF
 CONVERT_HYSPLIT2NETCDF = True
