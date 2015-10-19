@@ -8,12 +8,8 @@ Run with py.test:
 import datetime
 import time
 import timecop
-import unittest
 
-import os
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(sys.path[0], '../')))
-import hysplit_utils
+from bluesky.hysplit import hysplit_utils
 
 class MockFireLocationData(object):
     def __init__(self, location_id):
@@ -23,7 +19,7 @@ class MockFireLocationData(object):
         return "<%s %d, location_id: %d>" % (self.__class__.__name__, id(self), self.id)
     # __str__ = __repr__
 
-class TestHysplitUtils(unittest.TestCase):
+class TestHysplitUtils(object):
 
     def test_create_fire_sets(self):
         fires = [
@@ -48,7 +44,7 @@ class TestHysplitUtils(unittest.TestCase):
         # Note: The following assumes that, in create_fire_sets,
         # filtered_fires_dict.values() returns sets ordered by the dict keys
         # (i.e. location id)
-        self.assertEqual(expected_sets, fire_sets)
+        assert expected_sets == fire_sets
 
     def test_create_fire_tranches(self):
         fire_sets = [
@@ -66,11 +62,11 @@ class TestHysplitUtils(unittest.TestCase):
             [fire_sets[3][0], fire_sets[3][1]]
         ]
         fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 5)
-        self.assertEqual(expected_tranches, fire_tranches)
+        assert expected_tranches == fire_tranches
 
         # 4 fires locations, 4 proceses  <-- same expected set as when called with num_processes = 5
         fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 4)
-        self.assertEqual(expected_tranches, fire_tranches)
+        assert expected_tranches == fire_tranches
 
         # 4 fires locations, 3 proceses
         expected_tranches = [
@@ -80,7 +76,7 @@ class TestHysplitUtils(unittest.TestCase):
             [fire_sets[3][0], fire_sets[3][1]]
         ]
         fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 3)
-        self.assertEqual(expected_tranches, fire_tranches)
+        assert expected_tranches == fire_tranches
 
         # 4 fires locations, 2 proceses
         expected_tranches = [
@@ -90,7 +86,7 @@ class TestHysplitUtils(unittest.TestCase):
              fire_sets[3][0], fire_sets[3][1]]
         ]
         fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 2)
-        self.assertEqual(expected_tranches, fire_tranches)
+        assert expected_tranches == fire_tranches
 
         # 4 fires locations, 1 proceses
         expected_tranches = [
@@ -100,7 +96,7 @@ class TestHysplitUtils(unittest.TestCase):
              fire_sets[3][0], fire_sets[3][1]]
         ]
         fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 1)
-        self.assertEqual(expected_tranches, fire_tranches)
+        assert expected_tranches == fire_tranches
 
     def test_compute_num_processes(self):
         n = hysplit_utils.compute_num_processes(4)
