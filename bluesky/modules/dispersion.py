@@ -10,6 +10,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import consume
 import logging
 
+from bluesky import datetimeutils
 from bluesky.hysplit import hysplit
 
 __all__ = [
@@ -40,7 +41,11 @@ def run(fires_manager, config=None):
 
 
     # TODO: pass gathered data into wrapper
-    disperser.run(fires_manager, fires_manager.get_config_value('start'),
-        fires_manager.get_config_value('end'))
+
+    start = datetimeutils.parse_datetime(
+        fires_manager.get_config_value('start'), 'start')
+    end = datetimeutils.parse_datetime(
+        fires_manager.get_config_value('end'), 'end')
+    disperser.run(fires_manager, start, end)
 
     # TODO: add information to fires_manager indicating where to find the hysplit output
