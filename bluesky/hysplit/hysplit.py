@@ -15,6 +15,7 @@ import logging
 import math
 import os
 import shutil
+import subprocess
 # import tarfile
 import tempfile
 import threading
@@ -60,6 +61,10 @@ class HYSPLITDispersion(object):
 
     def archive_file(self, file):
         self._files_to_archive.append(file)
+
+    def execute(self, *args):
+        # TODO: make sure this is the corrrect way to call
+        subprocess.call(*args)
 
     def run(self, fires, start, end):
         self._files_to_archive = []
@@ -189,15 +194,15 @@ class HYSPLITDispersion(object):
     def run_parallel(self, num_processes, filtered_fire_location_sets, working_dir):
         runner = self
         class T(threading.Thread):
-            def  __init__(self, context, fires):
+            def  __init__(self, fires, working_dir):
                 super(T, self).__init__()
-                self.context = context
                 self.fires = fires
+                self.working_dir = working_dir
                 self.exc = None
 
             def run(self):
                 try:
-                    runner.run_process(self.fires, working_dir)
+                    runner.run_process(self.fires, self.working_dir)
                 except Exception, e:
                     self.exc = e
 
@@ -206,10 +211,9 @@ class HYSPLITDispersion(object):
         threads = []
         for nproc in xrange(len(fire_tranches)):
             fires = fire_tranches[nproc]
-            _context = Context(os.path.join(context.workdir, str(nproc)))
             # Note: no need to set _context.basedir; it will be set to workdir
             logging.info("Starting thread to run HYSPLIT on %d fires." % (len(fires)))
-            t = T(_context, fires)
+            t = T(fires, os.path.join(working_dir, str(nproc)))
             t.start()
             threads.append(t)
 
@@ -236,12 +240,12 @@ class HYSPLITDispersion(object):
         ncea_args = ["-O","-v","PM25","-y","ttl"]
         ncea_args.extend(["%d/%s" % (i, self.OUTPUT_FILE_NAME) for i in  xrange(num_processes)])
         ncea_args.append(output_file)
-        context.execute(NCEA_EXECUTABLE, *ncea_args)
+        self.execute(NCEA_EXECUTABLE, *ncea_args)
 
         ncks_args = ["-A","-v","TFLAG"]
         ncks_args.append("0/%s" % (self.OUTPUT_FILE_NAME))
         ncks_args.append(output_file)
-        context.execute(NCKS_EXECUTABLE, *ncks_args)
+        self.execute(NCKS_EXECUTABLE, *ncks_args)
 
     def run_process(self, fires, working_dir):
         logging.info("Running one HYSPLIT49 Dispersion model process")
@@ -270,7 +274,7 @@ class HYSPLITDispersion(object):
         ninit_val = "0"
 
         if self.config("READ_INIT_FILE", bool):
-           parinit_file = self.config("DISPERSION_FOLDER") + "/PARINIT"
+            parinit_file = self.config("DISPERSION_FOLDER") + "/PARINIT"
 
             if not os.path.isfile(parinit_file):
                 if self.config("STOP_IF_NO_PARINIT", bool):
@@ -279,7 +283,7 @@ class HYSPLITDispersion(object):
                 else:
                      logging.warn("No matching particle initialization file found; Using no particle initialization")
                      logging.debug("Particle initialization file not found '%s'", parinit_file)
-           else:
+            else:
                 os.symlink(parinit_file,
                     os.path.join(working_dir, os.path.dirname(parinit_file)))
                 logging.info("Using particle initialization file %s" % parinit_file)
@@ -327,9 +331,9 @@ class HYSPLITDispersion(object):
 
         # Run HYSPLIT
         if self.config("MPI", bool):
-            context.execute(MPIEXEC, "-n", str(NCPUS), SHYSPLIT_MPI_BINARY)
+            self.execute(MPIEXEC, "-n", str(NCPUS), SHYSPLIT_MPI_BINARY)
         else:  # standard serial run
-            context.execute(HYSPLIT_BINARY)
+            self.execute(HYSPLIT_BINARY)
 
         if not os.path.exists(output_conc_file):
             msg = "HYSPLIT failed, check MESSAGE file for details"
@@ -337,7 +341,7 @@ class HYSPLITDispersion(object):
 
         if self.config('CONVERT_HYSPLIT2NETCDF'):
             logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (output_conc_file, output_file))
-            context.execute(HYSPLIT2NETCDF_BINARY,
+            self.execute(HYSPLIT2NETCDF_BINARY,
                 "-I" + output_conc_file,
                 "-O" + os.path.basename(output_file),
                 "-X1000000.0",  # Scale factor to convert from grams to micrograms
