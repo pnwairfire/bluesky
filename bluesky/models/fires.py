@@ -31,6 +31,30 @@ class Fire(dict):
         if not self.get('id'):
             self['id'] = str(uuid.uuid1())[:8]
 
+    @property
+    def latitude(self):
+        if fire.location and 'centroid' in fire.location:
+            return fire.location['centroid']['latitude']
+        elif fire.location and 'latitude' in fire.location:
+            return fire.location['latitude']:
+        else:
+            # TODO: compute and memoize centroid and return it's lat
+            # see https://en.wikipedia.org/wiki/Centroid
+            raise NotImplementedError(
+                "computing centroid from shape infromation not yet implemented")
+
+    @property
+    def longitude(self):
+        if fire.location and 'centroid' in fire.location:
+            return fire.location['centroid']['longitude']
+        elif fire.location and 'longitude' in fire.location:
+            return fire.location['longitude']:
+        else:
+            # TODO: compute and memoize centroid and return it's lng
+            # see https://en.wikipedia.org/wiki/Centroid
+            raise NotImplementedError(
+                "computing centroid from shape information not yet implemented")
+
     def __getattr__(self, attr):
         if attr in self.keys():
             return self[attr]
