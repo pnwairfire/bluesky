@@ -57,14 +57,19 @@ class HYSPLITDispersion(object):
     def config(self, key):
         return self._config.get(key.lower(), getattr(self, key, None))
 
-    def archive_file(self, file):
-        self._files_to_archive.append(file)
-
-    def execute(self, *args):
-        # TODO: make sure this is the corrrect way to call
-        subprocess.call(*args)
-
     def run(self, fires, start, end):
+        """Runs hysplit
+
+        args:
+         - fires - list of fires to run through hysplit
+         - start - model run start hour
+         - end - model run end hour (inclusive)
+
+        TDOO: rename 'start' and 'end' to indicate that 'end' is included
+          e.g. if start=2014-05-29T22:00:00 and end=2014-05-30T00:00:00,
+          dispersion run is for the three hours 5/29 22:00, 5/29 23:00, 5/30 00:00
+        """
+
         self._files_to_archive = []
         logging.info("Running the HYSPLIT49 Dispersion model")
         self._fires = fires
@@ -74,13 +79,13 @@ class HYSPLITDispersion(object):
         dur = self._model_end - self._model_start
         self.hours_to_run = ((dur.days * 86400) + dur.seconds) / 3600
 
-        fires = self.collect_fire_data()
-        filtered_fires = list(self.filterFires(fires))
+        fires = self._collect_fire_data()
+        filtered_fires = list(self._filter_fires(fires))
 
-        self.set_reduction_factor()
+        self._set_reduction_factor()
 
         if(len(filtered_fires) == 0):
-            filtered_fires = [self.generate_dummy_fire(start, end)]
+            filtered_fires = [self._generate_dummy_fire(start, end)]
 
         tranching_config = {
             'num_processes': self.config("NPROCESSES", int),
@@ -107,9 +112,9 @@ class HYSPLITDispersion(object):
             if 1 < num_processes:
                     # hysplit_utils.create_fire_tranches will log number of processes
                     # and number of fires each
-                    self.run_parallel(num_processes, filtered_fire_location_sets, wdir)
+                    self._run_parallel(num_processes, filtered_fire_location_sets, wdir)
             else:
-                self.run_process(filtered_fires, wdir)
+                self._run_process(filtered_fires, wdir)
 
             # DispersionData output
             dispersionData = construct_type("DispersionData")
@@ -123,7 +128,15 @@ class HYSPLITDispersion(object):
 
             # TODO: Move to desired output location
 
-    def collect_fire_data(self):
+
+    def _archive_file(self, file):
+        self._files_to_archive.append(file)
+
+    def _execute(self, *args):
+        # TODO: make sure this is the corrrect way to call
+        subprocess.call(*args)
+
+    def _collect_fire_data(self):
         fires = []
 
         # TODO: aggreagating over all fires (if psossible)
@@ -158,12 +171,10 @@ class HYSPLITDispersion(object):
     )
     DUMMY_EMISSIONS_VALUE = 0.00001
     DUMMY_HOURS = 24
-    DUMMY_PLUME_RISE_HOUR_VALUES = (0.00001, 0.00001, 0.00001)
-    DUMMY_TIME_PROFILE_KEYS = [
-        'area_fract', 'flame_profile', 'smolder_profile', 'residual_profile'
-        ]
+    DUMMY_PLUMERISE_HOUR = dict({'percentile_%03d'%(e): 0.01*e for 5*e in range(21)},
+        smolder_fraction=0.0)
 
-    def generate_dummy_fire(self, start, end):
+    def _generate_dummy_fire(self, start, end):
         """Returns dummy fire formatted like
         """
         logging.info("Generating dummy fire for HYSPLIT")
@@ -171,15 +182,19 @@ class HYSPLITDispersion(object):
             area=1,
             latitude=self.config("CENTER_LATITUDE"),
             longitude=self.config("CENTER_LONGITUDE"),
-            plumerise=,
-            timeprofile=,
+            plumerise={},
+            timeprofile={},
             emissions={
                 p: {
                     e: self.DUMMY_EMISSIONS_VALUE for e in self.DUMMY_EMISSIONS
                 } for p in self.PHASES
             }
         }
-
+        num_hours = (end - start).hours
+        dt = start
+        while dt <= end:
+            f['plumerise'][dt] = self.DUMMY_PLUMERISE_HOUR
+            f['timeprofile'][dt] = {self.PHASES: 1.0 / float(num_hours)}
         # dummy_loc['plume_rise'] = construct_type("PlumeRise")
         # dummy_loc.plume_rise.hours = []
         # for h in xrange(self.DUMMY_HOURS):
@@ -193,7 +208,7 @@ class HYSPLITDispersion(object):
 
     OUTPUT_FILE_NAME = "hysplit_conc.nc"
 
-    def run_parallel(self, num_processes, filtered_fire_location_sets, working_dir):
+    def _run_parallel(self, num_processes, filtered_fire_location_sets, working_dir):
         runner = self
         class T(threading.Thread):
             def  __init__(self, fires, working_dir):
@@ -204,7 +219,7 @@ class HYSPLITDispersion(object):
 
             def run(self):
                 try:
-                    runner.run_process(self.fires, self.working_dir)
+                    runner._run_process(self.fires, self.working_dir)
                 except Exception, e:
                     self.exc = e
 
@@ -242,17 +257,17 @@ class HYSPLITDispersion(object):
         ncea_args = ["-O","-v","PM25","-y","ttl"]
         ncea_args.extend(["%d/%s" % (i, self.OUTPUT_FILE_NAME) for i in  xrange(num_processes)])
         ncea_args.append(output_file)
-        self.execute(NCEA_EXECUTABLE, *ncea_args)
+        self._execute(NCEA_EXECUTABLE, *ncea_args)
 
         ncks_args = ["-A","-v","TFLAG"]
         ncks_args.append("0/%s" % (self.OUTPUT_FILE_NAME))
         ncks_args.append(output_file)
-        self.execute(NCKS_EXECUTABLE, *ncks_args)
+        self._execute(NCKS_EXECUTABLE, *ncks_args)
 
-    def run_process(self, fires, working_dir):
+    def _run_process(self, fires, working_dir):
         logging.info("Running one HYSPLIT49 Dispersion model process")
-        # TODO: set all but context and fires as instance properties in self.run
-        # so that they don't have to be passed into each call to run_process
+        # TODO: set all but fires and working_dir as instance properties in self.run
+        # so that they don't have to be passed into each call to _run_process
         # The only things that change from call to call are context and fires
 
         for f in self.metInfo.files:
@@ -315,9 +330,9 @@ class HYSPLITDispersion(object):
         else:
             NCPUS = 1
 
-        self.writeEmissions(fires, emissions_file)
-        self.writecontrol_file(fires, control_file, output_conc_file)
-        self.writesetup_file(fires, emissions_file, setup_file, ninit_val, NCPUS)
+        self._write_emissions(fires, emissions_file)
+        self._write_control_file(fires, control_file, output_conc_file)
+        self._write_setup_file(fires, emissions_file, setup_file, ninit_val, NCPUS)
 
         # Copy in the user_defined SETUP.CFG file or write a new one
         HYSPLIT_SETUP_FILE = self.config("HYSPLIT_SETUP_FILE")
@@ -329,13 +344,13 @@ class HYSPLITDispersion(object):
             config_setup_file.close()
             setup_file.close()
         else:
-            self.writesetup_file(fires, emissions_file, setup_file, ninit_val, NCPUS)
+            self._write_setup_file(fires, emissions_file, setup_file, ninit_val, NCPUS)
 
         # Run HYSPLIT
         if self.config("MPI", bool):
-            self.execute(MPIEXEC, "-n", str(NCPUS), SHYSPLIT_MPI_BINARY)
+            self._execute(MPIEXEC, "-n", str(NCPUS), SHYSPLIT_MPI_BINARY)
         else:  # standard serial run
-            self.execute(HYSPLIT_BINARY)
+            self._execute(HYSPLIT_BINARY)
 
         if not os.path.exists(output_conc_file):
             msg = "HYSPLIT failed, check MESSAGE file for details"
@@ -343,7 +358,7 @@ class HYSPLITDispersion(object):
 
         if self.config('CONVERT_HYSPLIT2NETCDF'):
             logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (output_conc_file, output_file))
-            self.execute(HYSPLIT2NETCDF_BINARY,
+            self._execute(HYSPLIT2NETCDF_BINARY,
                 "-I" + output_conc_file,
                 "-O" + os.path.basename(output_file),
                 "-X1000000.0",  # Scale factor to convert from grams to micrograms
@@ -357,25 +372,25 @@ class HYSPLITDispersion(object):
 
         # TODO: config option to specify where to put output files
         # Archive data files
-        self.archive_file(emissions_file)
-        self.archive_file(control_file)
-        self.archive_file(setup_file)
+        self._archive_file(emissions_file)
+        self._archive_file(control_file)
+        self._archive_file(setup_file)
         for f in message_files:
-            self.archive_file(f)
+            self._archive_file(f)
         if self.config("MAKE_INIT_FILE", bool):
             if self.config("MPI", bool):
                 for f in pardumpFiles:
-                    self.archive_file(f)
+                    self._archive_file(f)
                     shutil.copy2(os.path.join(working_dir, f),self.config("OUTPUT_DIR"))
             else:
                 pardump_file = os.path.join(working_dir, "PARDUMP")
-                self.archive_file(pardump_file)
+                self._archive_file(pardump_file)
                 shutil.copy2(pardump_file, self.config("OUTPUT_DIR") + "/PARDUMP_"+ self.config("DATE"))
 
     # Number of quantiles in vertical emissions allocation scheme
     NQUANTILES = 20
 
-    def set_reduction_factor(self):
+    def _set_reduction_factor(self):
         """Retrieve factor for reducing the number of vertical emission levels"""
 
         #    Ensure the factor divides evenly into the number of quantiles.
@@ -408,7 +423,7 @@ class HYSPLITDispersion(object):
             logging.info("Number of vertical emission levels reduced by factor of %s" % str(self.reductionFactor))
             logging.info("Number of vertical emission quantiles will be %s" % str(self.num_output_quantiles))
 
-    def filterFires(self):
+    def _filter_fires(self):
         for fireLoc in self.fireInfo.locations():
             if fireLoc.timeprofile is None:
                 logging.debug("Fire %s has no time profile data; skip...", fireLoc.id)
@@ -428,7 +443,7 @@ class HYSPLITDispersion(object):
 
             yield fireLoc
 
-    def writeEmissions(self, filtered_fires, emissions_file):
+    def _write_emissions(self, filtered_fires, emissions_file):
         # Note: HYSPLIT can accept concentrations in any units, but for
         # consistency with CALPUFF and other dispersion models, we convert to
         # grams in the emissions file.
@@ -566,7 +581,7 @@ class HYSPLITDispersion(object):
         "DIVERG": 5,
         "ETA": 6
     }
-    def getVerticalMethod(self):
+    def _get_vertical_method(self):
         # Vertical motion choices:
 
         VERTICAL_METHOD = self.config("VERTICAL_METHOD")
@@ -577,7 +592,7 @@ class HYSPLITDispersion(object):
 
         return verticalMethod
 
-    def writecontrol_file(self, filtered_fires, control_file, concFile):
+    def _write_control_file(self, filtered_fires, control_file, concFile):
         num_fires = len(filtered_fires)
         num_heights = self.num_output_quantiles + 1  # number of quantiles used, plus ground level
         num_sources = num_fires * num_heights
@@ -587,7 +602,7 @@ class HYSPLITDispersion(object):
         # the actual source heights are overridden in the EMISS.CFG file.
         sourceHeight = 15.0
 
-        verticalMethod = getVerticalMethod(self)
+        verticalMethod = _get_vertical_method(self)
 
         # Height of the top of the model domain
         modelTop = self.config("TOP_OF_MODEL_DOMAIN", float)
@@ -808,7 +823,7 @@ class HYSPLITDispersion(object):
             # Pollutant deposition resuspension constant (1/m)
             f.write("0.0\n")
 
-    def writesetup_file(self, filtered_fires, emissions_file, setup_file, ninit_val, ncpus):
+    def _write_setup_file(self, filtered_fires, emissions_file, setup_file, ninit_val, ncpus):
         # Advanced setup options
         # adapted from Robert's HysplitGFS Perl script
 

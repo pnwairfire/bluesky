@@ -39,9 +39,9 @@ def run(fires_manager, config=None):
         raise BlueSkyConfigurationError(
             "Invalid dispersion model: '{}'".format(model))
 
-
-    # TODO: pass gathered data into wrapper
-
+    # TDOO: rename 'start' and 'end' to indicate that 'end' is included
+    #  e.g. if start=2014-05-29T22:00:00 and end=2014-05-30T00:00:00,
+    #  dispersion run is for the three hours 5/29 22:00, 5/29 23:00, 5/30 00:00
     start = datetimeutils.parse_datetime(
         fires_manager.get_config_value('start'), 'start')
     end = datetimeutils.parse_datetime(
