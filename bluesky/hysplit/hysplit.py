@@ -21,6 +21,7 @@ import tempfile
 import threading
 from datetime import timedelta
 
+from bluesky.models.fires import Fire
 import hysplit_utils
 import defaults
 
@@ -79,7 +80,7 @@ class HYSPLITDispersion(object):
         self.set_reduction_factor()
 
         if(len(filtered_fires) == 0):
-            filtered_fires = [self.generate_dummy_fire()]
+            filtered_fires = [self.generate_dummy_fire(start, end)]
 
         tranching_config = {
             'num_processes': self.config("NPROCESSES", int),
@@ -122,19 +123,6 @@ class HYSPLITDispersion(object):
 
             # TODO: Move to desired output location
 
-
-    DUMMY_EMISSIONS = (
-        "time", "heat", "pm25", "pm10",
-        "co", "co2", "ch4", "nox",
-        "nh3", "so2", "voc", "pm", "nmhc"
-    )
-    DUMMY_EMISSIONS_VALUE = 0.00001
-    DUMMY_HOURS = 24
-    DUMMY_PLUME_RISE_HOUR_VALUES = (0.00001, 0.00001, 0.00001)
-    DUMMY_TIME_PROFILE_KEYS = [
-        'area_fract', 'flame_profile', 'smolder_profile', 'residual_profile'
-        ]
-
     def collect_fire_data(self):
         fires = []
 
@@ -150,41 +138,58 @@ class HYSPLITDispersion(object):
         #  separately...raising exception would be easier for now)
         # Make sure met files span dispersion time window
         for fire in self.fires_manager.fires:
-            # TODO: ...
-            for g in fire.growth:
-                # TODO: ...
-                pass
+            f = Fire(
+                id=fire.id,
+                area=fire.location['area'],
+                latitude=fire.latitude,
+                longitude=fire.longitude,
+                plumerise=reduce(lambda r, g: r.update(g['plumerise']) or r, fire.growth, {}),
+                timeprofile=reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {}),
+                emissions=reduce(lambda r, fb: r.update(fb['emissions']) or r, fire.fuelbeds, {})
+            })
+            fires.append(f)
 
         return fires
 
-    def generate_dummy_fire(self):
+    PHASES = ('flaming', 'smoldering', 'residual')
+    DUMMY_EMISSIONS = (
+        "pm25", "pm10", "co", "co2", "ch4", "nox",
+        "nh3", "so2", "voc", "pm", "nmhc"
+    )
+    DUMMY_EMISSIONS_VALUE = 0.00001
+    DUMMY_HOURS = 24
+    DUMMY_PLUME_RISE_HOUR_VALUES = (0.00001, 0.00001, 0.00001)
+    DUMMY_TIME_PROFILE_KEYS = [
+        'area_fract', 'flame_profile', 'smolder_profile', 'residual_profile'
+        ]
+
+    def generate_dummy_fire(self, start, end):
+        """Returns dummy fire formatted like
+        """
         logging.info("Generating dummy fire for HYSPLIT")
-        from kernel.types import construct_type
-        dummy_loc = construct_type("FireLocationData", "DUMMY_FIRE")
-        dummy_loc['latitude'] = self.config("CENTER_LATITUDE", float)
-        dummy_loc['longitude'] = self.config("CENTER_LONGITUDE", float)
-        dummy_loc['area'] = 1
-        dummy_loc['date_time'] = self._model_start
+        f = Fire(
+            area=1,
+            latitude=self.config("CENTER_LATITUDE"),
+            longitude=self.config("CENTER_LONGITUDE"),
+            plumerise=,
+            timeprofile=,
+            emissions={
+                p: {
+                    e: self.DUMMY_EMISSIONS_VALUE for e in self.DUMMY_EMISSIONS
+                } for p in self.PHASES
+            }
+        }
 
-        dummy_loc['emissions'] =  construct_type("EmissionsData")
-        for k in self.DUMMY_EMISSIONS:
-            dummy_loc.emissions[k] = []
-            for h in xrange(self.DUMMY_HOURS):  #self.hours_to_run):
-                et = construct_type("EmissionsTuple")
-                et.flame = self.DUMMY_EMISSIONS_VALUE
-                et.smold = self.DUMMY_EMISSIONS_VALUE
-                et.resid = self.DUMMY_EMISSIONS_VALUE
-                dummy_loc.emissions[k].append(et)
+        # dummy_loc['plume_rise'] = construct_type("PlumeRise")
+        # dummy_loc.plume_rise.hours = []
+        # for h in xrange(self.DUMMY_HOURS):
+        #     prh = construct_type("PlumeRiseHour", *self.DUMMY_PLUME_RISE_HOUR_VALUES)
+        #     dummy_loc.plume_rise.hours.append(prh)
+        # dummy_loc['time_profile'] = construct_type("TimeProfileData")
+        # for k in self.DUMMY_TIME_PROFILE_KEYS:
+        #     dummy_loc.time_profile[k] = [1.0 / self.DUMMY_HOURS] * self.DUMMY_HOURS
 
-        dummy_loc['plume_rise'] = construct_type("PlumeRise")
-        dummy_loc.plume_rise.hours = []
-        for h in xrange(self.DUMMY_HOURS):
-            prh = construct_type("PlumeRiseHour", *self.DUMMY_PLUME_RISE_HOUR_VALUES)
-            dummy_loc.plume_rise.hours.append(prh)
-        dummy_loc['time_profile'] = construct_type("TimeProfileData")
-        for k in self.DUMMY_TIME_PROFILE_KEYS:
-            dummy_loc.time_profile[k] = [1.0 / self.DUMMY_HOURS] * self.DUMMY_HOURS
-        return dummy_loc
+        return f
 
     OUTPUT_FILE_NAME = "hysplit_conc.nc"
 
@@ -405,11 +410,11 @@ class HYSPLITDispersion(object):
 
     def filterFires(self):
         for fireLoc in self.fireInfo.locations():
-            if fireLoc.time_profile is None:
+            if fireLoc.timeprofile is None:
                 logging.debug("Fire %s has no time profile data; skip...", fireLoc.id)
                 continue
 
-            if fireLoc.plume_rise is None:
+            if fireLoc.plumerise is None:
                 logging.debug("Fire %s has no plume rise data; skip...", fireLoc.id)
                 continue
 
@@ -473,7 +478,7 @@ class HYSPLITDispersion(object):
                     # data.
                     padding = fireLoc.date_time - self._model_start
                     padding_hours = ((padding.days * 86400) + padding.seconds) / 3600
-                    num_hours = min(len(fireLoc.emissions.heat), len(fireLoc.plume_rise.hours))
+                    num_hours = min(len(fireLoc.emissions.heat), len(fireLoc.plumerise.hours))
                     h = hour - padding_hours
 
                     # If we don't have real data for the given timestep, we apparently need
@@ -490,10 +495,10 @@ class HYSPLITDispersion(object):
                     if not dummy:
                         # Extract the fraction of area burned in this timestep, and
                         # convert it from acres to square meters.
-                        area = fireLoc.area * fireLoc.time_profile.area_fract[h]
+                        area = fireLoc.area * fireLoc.timeprofile.area_fract[h]
                         area_meters = area * SQUARE_METERS_PER_ACRE
 
-                        smoldering_fraction = fireLoc.plume_rise.hours[h].smoldering_fraction
+                        smoldering_fraction = fireLoc.plumerise.hours[h].smoldering_fraction
                         # Total PM2.5 emitted at this timestep (grams)
                         pm25_emitted = fireLoc.emissions.pm25[h].sum() * GRAMS_PER_TON
                         # Total PM2.5 smoldering (not lofted in the plume)
@@ -532,9 +537,9 @@ class HYSPLITDispersion(object):
                             # and place the appropriate fraction of emissions at each level.
                             # ReductionFactor MUST evenly divide into the number of quantiles
 
-                            lower_height = fireLoc.plume_rise.hours[h]["percentile_%03d" % (pct)]
-                            #upper_height = fireLoc.plume_rise.hours[h]["percentile_%03d" % (pct + 5)]
-                            upper_height = fireLoc.plume_rise.hours[h]["percentile_%03d" % (pct + (self.reductionFactor*5))]
+                            lower_height = fireLoc.plumerise.hours[h]["percentile_%03d" % (pct)]
+                            #upper_height = fireLoc.plumerise.hours[h]["percentile_%03d" % (pct + 5)]
+                            upper_height = fireLoc.plumerise.hours[h]["percentile_%03d" % (pct + (self.reductionFactor*5))]
                             if self.reductionFactor == 1:
                                 height_meters = (lower_height + upper_height) / 2.0  # original approach
                             else:
