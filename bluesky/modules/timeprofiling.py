@@ -44,34 +44,17 @@ def run(fires_manager):
                     "profiles supported for fires with multiple growth windows")
 
             _validate_fire(fire)
-            for fb in fire.fuelbeds:
-                fb['timeprofiled_emissions'] = []
             for g in fire.growth:
                 tw = parse_datetimes(g, 'start', 'end')
                 profiler = StaticTimeProfiler(tw['start'], tw['end'],
                     hourly_fractions=hourly_fractions)
-                g['timeprofile'] = profiler.hourly_fractions
-                for fb in fire.fuelbeds:
-                    # TODO: update profiler.profile to support profiling
-                    #  total emissions in a dict lacking top level fuel category
-                    #  and secondary fuel subcategory keys, and then use
-                    #  fb['emissions'] instead of fb['emissions_details']
-                    #  we'd then need to change the code, below, to
-                    #     "total": tpe
-                    emissions = copy.deepcopy(fb['emissions_details'])
-                    _scale_emissions(emissions, g['pct'])
-                    tpe = profiler.profile(emissions)
-
-                    # TODO: set timeprofiled emissions in growth objects (aggregated
-                    #  accross all fuelbeds), or maybe don't even bother
-                    #  computing profiled emissions here
-                    fb['timeprofiled_emissions'].append({
-                        "start": g["start"],
-                        "end": g["end"],
-                        #"details": tpe,
-                        "total": tpe['summary']['total']
-                    })
-
+                # convert timeprofile to dict with dt keys
+                g['timeprofile'] = {}
+                phases = profiler.hourly_fractions.keys()
+                for i in range(len(profiler.hourly_fractions.items()[0])): # each phase should have same len
+                    hr = profiler.start_hour + (i * profiler.ONE_HOUR)
+                    g['timeprofile'][hr.isoformat()] = {
+                        p: profiler.hourly_fractions[p][i] for p in phases }
 
     except InvalidHourlyFractionsError, e:
         raise BlueSkyConfigurationError(
