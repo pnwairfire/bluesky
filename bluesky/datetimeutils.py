@@ -15,15 +15,19 @@ import re
 
 from pyairfire.datetime import parsing as datetime_parsing
 
+def parse_datetime(v, k):
+    try:
+        return datetime_parsing.parse(v)
+    except ValueError, e:
+        # datetime_parsing will raise ValueError if invalid format
+        # reraise wih specific msg
+        raise ValueError("Invalid datetime format for '{}' field: {}".format(k, v))
+
 def parse_datetimes(d, *keys):
     r = {}
     for k in keys:
         try:
-            r[k] = datetime_parsing.parse(d[k])
-        except ValueError, e:
-            # datetime_parsing will raise ValueError if invalid format
-            # reraise wih specific msg
-            raise ValueError("Invalid datetime format for '{}' field: {}".format(k, d[k]))
+            r[k] = parse_datetime(d[k], k)
         except KeyError, e:
             raise ValueError("Missing '{}' datetime field".format(k))
     return r
