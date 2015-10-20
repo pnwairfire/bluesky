@@ -11,29 +11,14 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 __version__ = "0.1.0"
 
-# import os.path
 import logging
+import math
 import os
-import tempfile
-# import math
-# from datetime import timedelta
+import shutil
 # import tarfile
-# import threading
-# import contextlib
-# from shutil import copyfileobj
-
-# from arlgridfile import ARLGridFile
-# from hysplitIndexedDataLocation import IndexedDataLocation, CatalogIndexedData
-
-# from glob import glob
-# from kernel.context import Context
-# from kernel.core import Process
-# from kernel.utility import which
-# from kernel.bs_datetime import BSDateTime,UTC
-# from kernel.types import construct_type
-# from kernel.log import SUMMARY
-# from trajectory import Trajectory, TrajectoryMet
-# from dispersion import Dispersion, DispersionMet
+import tempfile
+import threading
+from datetime import timedelta
 
 import hysplit_utils
 import defaults
@@ -50,6 +35,7 @@ class working_dir(object):
         self._original_dir = os.getcwd()
         self._working_dir = tempfile.mkdtemp()
         os.chdir(self._working_dir)
+        return self._working_dir
 
     def __exit__(self):
         os.chdir(self._original_dir)
@@ -72,9 +58,13 @@ class HYSPLITDispersion(object):
     def config(self, key):
         return self._config.get(key.lower(), getattr(self, key, None))
 
+    def archive_file(self, file):
+        self._files_to_archive.append(file)
+
     def run(self, fires, start, end):
+        self._files_to_archive = []
         logging.info("Running the HYSPLIT49 Dispersion model")
-        self._fires =
+        self._fires = fires
         # TODO: make sure start and end are defined
         self._model_start = start
         self._model_end = end
@@ -114,15 +104,14 @@ class HYSPLITDispersion(object):
             if 1 < num_processes:
                     # hysplit_utils.create_fire_tranches will log number of processes
                     # and number of fires each
-                    self.run_parallel(context, num_processes, filtered_fire_location_sets)
+                    self.run_parallel(num_processes, filtered_fire_location_sets, wdir)
             else:
-                logging.info("Running one HYSPLIT49 Dispersion model process")
-                self.run_process(context, filtered_fires)
+                self.run_process(filtered_fires, wdir)
 
             # DispersionData output
             dispersionData = construct_type("DispersionData")
             dispersionData["grid_filetype"] = "NETCDF"
-            dispersionData["grid_filename"] = context.full_path(self.OUTPUT_FILE_NAME)
+            dispersionData["grid_filename"] = os.path.join(wdir, self.OUTPUT_FILE_NAME)
             dispersionData["parameters"] = {"pm25": "PM25"}
             dispersionData["start_time"] = self._model_start
             dispersionData["hours"] = self.hours_to_run
@@ -197,7 +186,7 @@ class HYSPLITDispersion(object):
 
     OUTPUT_FILE_NAME = "hysplit_conc.nc"
 
-    def run_parallel(self, context, num_processes, filtered_fire_location_sets):
+    def run_parallel(self, num_processes, filtered_fire_location_sets, working_dir):
         runner = self
         class T(threading.Thread):
             def  __init__(self, context, fires):
@@ -208,7 +197,7 @@ class HYSPLITDispersion(object):
 
             def run(self):
                 try:
-                    runner.run_process(self.context, self.fires)
+                    runner.run_process(self.fires, working_dir)
                 except Exception, e:
                     self.exc = e
 
@@ -241,39 +230,41 @@ class HYSPLITDispersion(object):
         # prevents ncea from adding all the TFLAGs together and mucking up the
         # date
 
+        output_file = os.path.join(working_dir, self.OUTPUT_FILE_NAME)
+
         #ncea_args = ["-y", "ttl", "-O"]
         ncea_args = ["-O","-v","PM25","-y","ttl"]
         ncea_args.extend(["%d/%s" % (i, self.OUTPUT_FILE_NAME) for i in  xrange(num_processes)])
-        ncea_args.append(context.full_path(self.OUTPUT_FILE_NAME))
+        ncea_args.append(output_file)
         context.execute(NCEA_EXECUTABLE, *ncea_args)
 
         ncks_args = ["-A","-v","TFLAG"]
         ncks_args.append("0/%s" % (self.OUTPUT_FILE_NAME))
-        ncks_args.append(context.full_path(self.OUTPUT_FILE_NAME))
+        ncks_args.append(output_file)
         context.execute(NCKS_EXECUTABLE, *ncks_args)
 
-    def run_process(self, context, fires):
+    def run_process(self, fires, working_dir):
+        logging.info("Running one HYSPLIT49 Dispersion model process")
         # TODO: set all but context and fires as instance properties in self.run
         # so that they don't have to be passed into each call to run_process
         # The only things that change from call to call are context and fires
 
         for f in self.metInfo.files:
-            context.link_file(f.filename)
+            os.symlink(f.filename,
+                os.path.join(working_dir, os.path.dirname(f.filename)))
 
-        # Ancillary data files (note: HYSPLIT49 balks if it can't find ASCDATA.CFG).
-        ASCDATA_FILE = self.config("ASCDATA_FILE")
-        LANDUSE_FILE = self.config("LANDUSE_FILE")
-        ROUGLEN_FILE = self.config("ROUGLEN_FILE")
-        context.link_file(ASCDATA_FILE)
-        context.link_file(LANDUSE_FILE)
-        context.link_file(ROUGLEN_FILE)
+        # Create sym links to ancillary data files (note: HYSPLIT49 balks
+        # if it can't find ASCDATA.CFG).
+        os.symlink(self.config("ASCDATA_FILE"), os.path.join(working_dir, 'ASCDATA.CFG'))
+        os.symlink(self.config("LANDUSE_FILE"), os.path.join(working_dir, 'LANDUSE.ASC'))
+        os.symlink(self.config("ROUGLEN_FILE"), os.path.join(working_dir, 'ROUGLEN.ASC'))
 
-        emissionsFile = context.full_path("EMISS.CFG")
-        controlFile = context.full_path("CONTROL")
-        setupFile = context.full_path("SETUP.CFG")
-        messageFiles = [context.full_path("MESSAGE")]
-        outputConcFile = context.full_path("hysplit.con")
-        outputFile = context.full_path(self.OUTPUT_FILE_NAME)
+        emissions_file = os.path.join(working_dir, "EMISS.CFG")
+        control_file = os.path.join(working_dir, "CONTROL")
+        setup_file = os.path.join(working_dir, "SETUP.CFG")
+        message_files = [os.path.join(working_dir, "MESSAGE")]
+        output_conc_file = os.path.join(working_dir, "hysplit.con")
+        output_file = os.path.join(working_dir, self.OUTPUT_FILE_NAME)
 
         # Default value for NINIT for use in set up file.  0 equals no particle initialization
         ninit_val = "0"
@@ -281,17 +272,18 @@ class HYSPLITDispersion(object):
         if self.config("READ_INIT_FILE", bool):
            parinit_file = self.config("DISPERSION_FOLDER") + "/PARINIT"
 
-           if not context.file_exists(parinit_file):
-              if self.config("STOP_IF_NO_PARINIT", bool):
-                 msg = "Found no matching particle initialization files. Stop."
-                 raise Exception(msg)
-              else:
-                 logging.warn("No matching particle initialization file found; Using no particle initialization")
-                 logging.debug("Particle initialization file not found '%s'", parinit_file)
+            if not os.path.isfile(parinit_file):
+                if self.config("STOP_IF_NO_PARINIT", bool):
+                     msg = "Found no matching particle initialization files. Stop."
+                     raise Exception(msg)
+                else:
+                     logging.warn("No matching particle initialization file found; Using no particle initialization")
+                     logging.debug("Particle initialization file not found '%s'", parinit_file)
            else:
-              context.link_file(parinit_file)
-              logging.info("Using particle initialization file %s" % parinit_file)
-              ninit_val = "1"
+                os.symlink(parinit_file,
+                    os.path.join(working_dir, os.path.dirname(parinit_file)))
+                logging.info("Using particle initialization file %s" % parinit_file)
+                ninit_val = "1"
 
         # Prepare for an MPI run
         if self.config("MPI", bool):
@@ -301,15 +293,15 @@ class HYSPLITDispersion(object):
                 logging.warn("Invalid NCPUS specified...resetting NCPUS to 1 for this run.")
                 NCPUS = 1
 
-            messageFiles = ["MESSAGE.%3.3i" % (i+1) for i in range(NCPUS)]
+            message_files = ["MESSAGE.%3.3i" % (i+1) for i in range(NCPUS)]
             pardumpFiles = ["PARDUMP.%3.3i" % (i+1) for i in range(NCPUS)]
             # TODO: either update the following checks for MPIEXEC and
             # SHYSPLIT_MPI_BINARY to try running with -v or -h option or
             # something similar,  or remove them
-            # if not context.file_exists(MPIEXEC):
+            # if not os.path.isfile(MPIEXEC):
             #     msg = "Failed to find %s. Check MPIEXEC setting and/or your MPICH2 installation." % mpiexec
             #     raise AssertionError(msg)
-            # if not context.file_exists(SHYSPLIT_MPI_BINARY):
+            # if not os.path.isfile(SHYSPLIT_MPI_BINARY):
             #     msg = "HYSPLIT MPI executable %s not found." % SHYSPLIT_MPI_BINARY
             #     raise AssertionError(msg)
             if self.config("READ_INIT_FILE", bool): # TODO: Finish MPI support for particle initialization
@@ -317,21 +309,21 @@ class HYSPLITDispersion(object):
         else:
             NCPUS = 1
 
-        self.writeEmissions(fires, emissionsFile)
-        self.writeControlFile(fires, controlFile, outputConcFile)
-        self.writeSetupFile(fires, emissionsFile, setupFile, ninit_val, NCPUS)
+        self.writeEmissions(fires, emissions_file)
+        self.writecontrol_file(fires, control_file, output_conc_file)
+        self.writesetup_file(fires, emissions_file, setup_file, ninit_val, NCPUS)
 
         # Copy in the user_defined SETUP.CFG file or write a new one
         HYSPLIT_SETUP_FILE = self.config("HYSPLIT_SETUP_FILE")
         if HYSPLIT_SETUP_FILE != None:
             logging.debug("Copying HYSPLIT SETUP file from %s" % (HYSPLIT_SETUP_FILE))
             config_setup_file = open(HYSPLIT_SETUP_FILE, 'rb')
-            setup_file = open(setupFile, 'wb')
-            copyfileobj(config_setup_file, setup_file)
+            setup_file = open(setup_file, 'wb')
+            shutil.copyfileobj(config_setup_file, setup_file)
             config_setup_file.close()
             setup_file.close()
         else:
-            self.writeSetupFile(fires, emissionsFile, setupFile, ninit_val, NCPUS)
+            self.writesetup_file(fires, emissions_file, setup_file, ninit_val, NCPUS)
 
         # Run HYSPLIT
         if self.config("MPI", bool):
@@ -339,39 +331,40 @@ class HYSPLITDispersion(object):
         else:  # standard serial run
             context.execute(HYSPLIT_BINARY)
 
-        if not os.path.exists(outputConcFile):
+        if not os.path.exists(output_conc_file):
             msg = "HYSPLIT failed, check MESSAGE file for details"
             raise AssertionError(msg)
 
         if self.config('CONVERT_HYSPLIT2NETCDF'):
-            logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (outputConcFile, outputFile))
+            logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (output_conc_file, output_file))
             context.execute(HYSPLIT2NETCDF_BINARY,
-                "-I" + outputConcFile,
-                "-O" + os.path.basename(outputFile),
+                "-I" + output_conc_file,
+                "-O" + os.path.basename(output_file),
                 "-X1000000.0",  # Scale factor to convert from grams to micrograms
                 "-D1",  # Debug flag
                 "-L-1"  # Lx is x layers. x=-1 for all layers...breaks KML output for multiple layers
                 )
 
-            if not os.path.exists(outputFile):
+            if not os.path.exists(output_file):
                 msg = "Unable to convert HYSPLIT concentration file to NetCDF format"
                 raise AssertionError(msg)
 
         # TODO: config option to specify where to put output files
         # Archive data files
-        context.archive_file(emissionsFile)
-        context.archive_file(controlFile)
-        context.archive_file(setupFile)
-        for f in messageFiles:
-            context.archive_file(f)
+        self.archive_file(emissions_file)
+        self.archive_file(control_file)
+        self.archive_file(setup_file)
+        for f in message_files:
+            self.archive_file(f)
         if self.config("MAKE_INIT_FILE", bool):
             if self.config("MPI", bool):
                 for f in pardumpFiles:
-                    context.archive_file(f)
-                    context.copy_file(context.full_path(f),self.config("OUTPUT_DIR"))
+                    self.archive_file(f)
+                    shutil.copy2(os.path.join(working_dir, f),self.config("OUTPUT_DIR"))
             else:
-                context.archive_file(context.full_path("PARDUMP"))
-                context.copy_file(context.full_path("PARDUMP"),self.config("OUTPUT_DIR") + "/PARDUMP_"+ self.config("DATE"))
+                pardump_file = os.path.join(working_dir, "PARDUMP")
+                self.archive_file(pardump_file)
+                shutil.copy2(pardump_file, self.config("OUTPUT_DIR") + "/PARDUMP_"+ self.config("DATE"))
 
     # Number of quantiles in vertical emissions allocation scheme
     NQUANTILES = 20
@@ -429,7 +422,7 @@ class HYSPLITDispersion(object):
 
             yield fireLoc
 
-    def writeEmissions(self, filtered_fires, emissionsFile):
+    def writeEmissions(self, filtered_fires, emissions_file):
         # Note: HYSPLIT can accept concentrations in any units, but for
         # consistency with CALPUFF and other dispersion models, we convert to
         # grams in the emissions file.
@@ -442,7 +435,7 @@ class HYSPLITDispersion(object):
         # emissions into the model.
         SMOLDER_HEIGHT = self.config("SMOLDER_HEIGHT", float)
 
-        with open(emissionsFile, "w") as emis:
+        with open(emissions_file, "w") as emis:
             # HYSPLIT skips past the first two records, so these are for comment purposes only
             emis.write("emissions group header: YYYY MM DD HH QINC NUMBER\n")
             emis.write("each emission's source: YYYY MM DD HH MM DUR_HHMM LAT LON HT RATE AREA HEAT\n")
@@ -578,7 +571,7 @@ class HYSPLITDispersion(object):
 
         return verticalMethod
 
-    def writeControlFile(self, filtered_fires, controlFile, concFile):
+    def writecontrol_file(self, filtered_fires, control_file, concFile):
         num_fires = len(filtered_fires)
         num_heights = self.num_output_quantiles + 1  # number of quantiles used, plus ground level
         num_sources = num_fires * num_heights
@@ -711,7 +704,7 @@ class HYSPLITDispersion(object):
         logging.info("HYSPLIT grid SPACING_LATITUDE = %s" % spacingLat)
         logging.info("HYSPLIT grid SPACING_LONGITUDE = %s" % spacingLon)
 
-        with open(controlFile, "w") as f:
+        with open(control_file, "w") as f:
             # Starting time (year, month, day hour)
             f.write(self._model_start.strftime("%y %m %d %H") + "\n")
 
@@ -809,7 +802,7 @@ class HYSPLITDispersion(object):
             # Pollutant deposition resuspension constant (1/m)
             f.write("0.0\n")
 
-    def writeSetupFile(self, filtered_fires, emissionsFile, setupFile, ninit_val, ncpus):
+    def writesetup_file(self, filtered_fires, emissions_file, setup_file, ninit_val, ncpus):
         # Advanced setup options
         # adapted from Robert's HysplitGFS Perl script
 
@@ -824,7 +817,7 @@ class HYSPLITDispersion(object):
 
         max_particles = (num_sources * 1000) / ncpus
 
-        with open(setupFile, "w") as f:
+        with open(setup_file, "w") as f:
             f.write("&SETUP\n")
 
             # ichem: i'm only really interested in ichem = 4 in which case it causes
@@ -889,6 +882,6 @@ class HYSPLITDispersion(object):
 
             # efile: the name of the emissions info (used to vary emission rate etc (and
             #        can also be used to change emissions time
-            f.write("  EFILE = \"%s\",\n" % os.path.basename(emissionsFile))
+            f.write("  EFILE = \"%s\",\n" % os.path.basename(emissions_file))
 
             f.write("&END\n")
