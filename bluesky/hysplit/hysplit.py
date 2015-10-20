@@ -51,10 +51,7 @@ class HYSPLITDispersion(object):
     def __init__(self, **config):
         self._config = config
         # TODO: determine which config options we'll support
-
-    def __del__(self):
-        # TODO: explicitly destroy self._working_dir ?
-        pass
+        # TODO: make sure required executables are available
 
     def config(self, key):
         return self._config.get(key.lower(), getattr(self, key, None))
