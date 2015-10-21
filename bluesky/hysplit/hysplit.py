@@ -189,7 +189,7 @@ class HYSPLITDispersion(object):
                                 if k in self.MET_META_FIELDS
                         }
                         # hysplit just needs the name
-                        self._met_info['files'] = set([m['file'] for m in ['files']])
+                        self._met_info['files'] = set([m['file'] for m in g['met_info']['files']])
                     else:
                         for met_file in g['met_info']['files']:
                             self._met_info['files'].add(met_file['file'])
