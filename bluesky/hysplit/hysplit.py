@@ -161,7 +161,7 @@ class HYSPLITDispersion(object):
                 pluemrise = {}
                 timeprofile = {}
                 for i in range(self._num_hours):
-                    dt = self._model_start + timedelta(hours=hour)
+                    dt = self._model_start + timedelta(hours=i)
                     plumerise = all_plumerise.get(dt) or self.MISSING_PLUMERISE_HOUR
                     timeprofile = all_timeprofile.get(dt) or self.MISSING_TIMEPROFILE_HOUR
 
