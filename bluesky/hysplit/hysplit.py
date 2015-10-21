@@ -87,7 +87,7 @@ class HYSPLITDispersion(object):
                     # and number of fires each
                     self._run_parallel(num_processes, filtered_fire_location_sets, wdir)
             else:
-                self._run_process(filtered_fires, wdir)
+                self._run_process(self._fires, wdir)
 
             # DispersionData output
             dispersionData = construct_type("DispersionData")
