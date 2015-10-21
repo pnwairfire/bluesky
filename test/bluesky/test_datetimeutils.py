@@ -20,6 +20,8 @@ class TestParseDatetime(object):
 
     def test_invalid(self):
         with raises(ValueError):
+            parse_datetime(None, 'start')
+        with raises(ValueError):
             parse_datetime('sdfsdf', 'start')
 
     def test_valid(self):
@@ -34,6 +36,7 @@ class TestParseDatetime(object):
 class TestParseDatetimes(object):
 
     def test_invalid(self):
+        # Missing key
         with raises(ValueError):
             parse_datetimes({}, 'start')
         with raises(ValueError):
@@ -41,6 +44,9 @@ class TestParseDatetimes(object):
         with raises(ValueError):
             parse_datetimes({'s': '2015-02-01T10:09:08'}, 's', 'e')
 
+        # invalid values
+        with raises(ValueError):
+            parse_datetimes({'s':None, 'e':'sdfsdf'}, 's')
         with raises(ValueError):
             parse_datetimes({'s':'sdf', 'e':'sdfsdf'}, 's')
 

@@ -19,8 +19,11 @@ def parse_datetime(v, k):
     try:
         return datetime_parsing.parse(v)
     except ValueError, e:
-        # datetime_parsing will raise ValueError if invalid format
-        # reraise wih specific msg
+        # datetime_parsing will raise ValueError if invalid format; re-raise
+        # wih specific msg
+        raise ValueError("Invalid datetime format for '{}' field: {}".format(k, v))
+    except TypeError, e:
+        # TypeError will e raised if v is not a string; re-raise wih specific msg
         raise ValueError("Invalid datetime format for '{}' field: {}".format(k, v))
 
 def parse_datetimes(d, *keys):
