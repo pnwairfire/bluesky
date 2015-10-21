@@ -29,12 +29,14 @@ def run(fires_manager, config=None):
     """
     model = fires_manager.get_config_value('dispersion', 'model',
         default='hysplit').lower()
+    processed_kwargs = {}
     try:
         # TODO: support VSMOKE as well
         if model == 'hysplit':
             hysplit_config = fires_manager.get_config_value('dispersion', 'hysplit',
                 default={})
             disperser = hysplit.HYSPLITDispersion(**hysplit_config)
+            processed_kwargs.update(hysplit_version=hysplit.__version__)
         else:
             raise BlueSkyConfigurationError(
                 "Invalid dispersion model: '{}'".format(model))
@@ -47,12 +49,10 @@ def run(fires_manager, config=None):
         start = datetimeutils.parse_datetime(start_str, 'start')
         # further validation of start and num_hours done in HYSPLITDispersion.run
         disperser.run(fires_manager, start, num_hours)
-        # TODO: add information about fires processed
+        # TODO: add information about fires to processed_kwargs
+    finally:
         fires_manager.processed(__name__, __version__, model=model,
-            hysplit_version=hys.__version__)
-    except:
-        fires_manager.processed(__name__, __version__, model=model)
-        raise
+            **processed_kwargs)
 
 
 
