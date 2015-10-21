@@ -65,19 +65,18 @@ class HYSPLITDispersion(object):
          - start - model run start hour
          - num_hours - number of hours in model run
         """
+        logging.info("Running the HYSPLIT49 Dispersion model")
         if start.minute or start.second or start.microsecond:
             raise ValueError("Dispersion start time must be on the hour.")
         if type(num_hours) != int:
             raise ValueError("Dispersion num_hours must be an integer.")
 
         self._files_to_archive = []
-        logging.info("Running the HYSPLIT49 Dispersion model")
-        self._fires = fires
         self._model_start = start
         self._num_hours = num_hours
 
-        fires = self._collect_fire_data()
-        filtered_fires = list(self._filter_fires(fires))
+        self._set_fire_data(fires)
+        self._filter_fires()
 
         self._set_reduction_factor()
 
@@ -133,8 +132,11 @@ class HYSPLITDispersion(object):
         # TODO: make sure this is the corrrect way to call
         subprocess.call(*args)
 
-    def _collect_fire_data(self):
-        fires = []
+    MET_META_FIELDS = ('boundary', 'domain', 'grid_spacing_km')
+
+    def _set_fire_data(self, fires):
+        self._fires = []
+        self._met_info = {}
 
         # TODO: aggreagating over all fires (if psossible)
         #  use self.model_start and self.model_end
@@ -147,19 +149,43 @@ class HYSPLITDispersion(object):
         #  conistent with met domain; if not, raise exception or run them
         #  separately...raising exception would be easier for now)
         # Make sure met files span dispersion time window
-        for fire in self.fires_manager.fires:
+        for fire in fires:
+            if 'growth' not in fire:
+                raise ValueError(
+                    "Missing growth data required for computing dispersion")
+
+
+            # TODO: Make sure
+
             f = Fire(
                 id=fire.id,
                 area=fire.location['area'],
                 latitude=fire.latitude,
                 longitude=fire.longitude,
+                # TODO: only include plumerise and timeprofile keys within model run
+                # time window; and somehow fill in gaps (is this possible?)
                 plumerise=reduce(lambda r, g: r.update(g['plumerise']) or r, fire.growth, {}),
-                timeprofile=reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {}),
-                emissions=reduce(lambda r, fb: r.update(fb['emissions']) or r, fire.fuelbeds, {})
+                timeprofile=reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {})
+                # TODO: *sum* emissions over fuelbeds
             )
-            fires.append(f)
+            self._fires.append(f)
 
-        return fires
+            for g in fire.growth:
+                if 'met_info' not in g or any([k not in g for k in self.MET_META_FIELDS]):
+                    raise ValueError("Fire growth window lacking met information")
+                if 'files' == self._met_info.keys(): # first t
+                    self._met_info = {
+                        k:v for k,v in g['met_info'].items()
+                            if k in self.MET_META_FIELDS
+                    }
+                    # hysplit just needs the name
+                    self._met_info['files'] = set([m['file'] for m in ['files']])
+                else:
+                    for met_file in g['met_info']['files']:
+                        self._met_info['files'].add(met_file['file'])
+                    for k in self.MET_META_FIELDS:
+                        if self._met_info[k] != g['met_info'][k]:
+                            raise ValueError("Hysplit requires single met per run")
 
     PHASES = ('flaming', 'smoldering', 'residual')
     DUMMY_EMISSIONS = (
@@ -259,7 +285,7 @@ class HYSPLITDispersion(object):
         # so that they don't have to be passed into each call to _run_process
         # The only things that change from call to call are context and fires
 
-        for f in self.metInfo.files:
+        for f in self._met_info.files:
             os.symlink(f.filename,
                 os.path.join(working_dir, os.path.dirname(f.filename)))
 
@@ -413,24 +439,28 @@ class HYSPLITDispersion(object):
             logging.info("Number of vertical emission quantiles will be %s" % str(self.num_output_quantiles))
 
     def _filter_fires(self):
-        for fireLoc in self.fireInfo.locations():
-            if fireLoc.timeprofile is None:
+        filtered_fires = []
+        for fire in self._fires:
+            if not fire.timeprofile:
                 logging.debug("Fire %s has no time profile data; skip...", fireLoc.id)
                 continue
 
-            if fireLoc.plumerise is None:
+            if not fire.plumerise:
                 logging.debug("Fire %s has no plume rise data; skip...", fireLoc.id)
                 continue
 
-            if fireLoc.emissions is None:
+            if not fire.emissions:
                 logging.debug("Fire %s has no emissions data; skip...", fireLoc.id)
                 continue
 
-            if fireLoc.emissions.sum("heat") < 1.0e-6:
-                logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fireLoc.id)
-                continue
+            # TODO: figure out what to do to heat????
+            # if fireLoc.emissions.sum("heat") < 1.0e-6:
+            #     logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fireLoc.id)
+            #     continue
 
-            yield fireLoc
+            filtered_fires.append(fire)
+
+        self._fires = filtered_fires
 
     def _write_emissions(self, filtered_fires, emissions_file):
         # Note: HYSPLIT can accept concentrations in any units, but for
@@ -623,12 +653,13 @@ class HYSPLITDispersion(object):
             # and that the grid center will be a receptor point (i.e., nx, ny will be ODD).
             logging.info("Automatic sampling/concentration grid invoked")
 
-            projection = self.metInfo.met_domain_info.domainID
-            grid_spacing_km = self.metInfo.met_domain_info.dxKM
-            lat_min = self.metInfo.met_domain_info.lat_min
-            lat_max = self.metInfo.met_domain_info.lat_max
-            lon_min = self.metInfo.met_domain_info.lon_min
-            lon_max = self.metInfo.met_domain_info.lon_max
+            projection = self._met_info['domain']
+            grid_spacing_km = self._met_info['grid_spacing_km']
+
+            lat_min = self._met_info['boundary']['sw']['lat']
+            lat_max = self._met_info['boundary']['ne']['lat']
+            lon_min = self._met_info['boundary']['sw']['lng']
+            lon_max = self._met_info['boundary']['ne']['lng']
             lat_center = (lat_min + lat_max) / 2
             spacing = grid_spacing_km / ( 111.32 * math.cos(lat_center*math.pi/180.0) )
             if projection == "LatLon":
@@ -736,9 +767,9 @@ class HYSPLITDispersion(object):
             f.write("%9.1f\n" % modelTop)
 
             # Number of input data grids (met files)
-            f.write("%d\n" % len(self.metInfo.files))
+            f.write("%d\n" % len(self._met_info.files))
             # Directory for input data grid and met file name
-            for info in self.metInfo.files:
+            for info in self._met_info.files:
                 f.write("./\n")
                 f.write("%s\n" % os.path.basename(info.filename))
 
