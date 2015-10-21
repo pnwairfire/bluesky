@@ -490,7 +490,7 @@ class HYSPLITDispersion(object):
 
         # A value slightly above ground level at which to inject smoldering
         # emissions into the model.
-        SMOLDER_HEIGHT = self.config("SMOLDER_HEIGHT", float)
+        SMOLDER_HEIGHT = self.config("SMOLDER_HEIGHT")
 
         with open(emissions_file, "w") as emis:
             # HYSPLIT skips past the first two records, so these are for comment purposes only
@@ -641,7 +641,7 @@ class HYSPLITDispersion(object):
         verticalMethod = _get_vertical_method(self)
 
         # Height of the top of the model domain
-        modelTop = self.config("TOP_OF_MODEL_DOMAIN", float)
+        modelTop = self.config("TOP_OF_MODEL_DOMAIN")
 
         #modelEnd = self._model_start + timedelta(hours=self._num_hours)
 
@@ -658,12 +658,12 @@ class HYSPLITDispersion(object):
         if self.config("USER_DEFINED_GRID"):
             # User settings that can override the default concentration grid info
             logging.info("User-defined sampling/concentration grid invoked")
-            centerLat = self.config("CENTER_LATITUDE", float)
-            centerLon = self.config("CENTER_LONGITUDE", float)
-            widthLon = self.config("WIDTH_LONGITUDE", float)
-            heightLat = self.config("HEIGHT_LATITUDE", float)
-            spacingLon = self.config("SPACING_LONGITUDE", float)
-            spacingLat = self.config("SPACING_LATITUDE", float)
+            centerLat = self.config("CENTER_LATITUDE")
+            centerLon = self.config("CENTER_LONGITUDE")
+            widthLon = self.config("WIDTH_LONGITUDE")
+            heightLat = self.config("HEIGHT_LATITUDE")
+            spacingLon = self.config("SPACING_LONGITUDE")
+            spacingLat = self.config("SPACING_LATITUDE")
         else:
             # Calculate output concentration grid parameters.
             # Ensure the receptor spacing divides nicely into the grid width and height,
@@ -711,8 +711,8 @@ class HYSPLITDispersion(object):
             logging.info("Grid resolution adjustment option invoked")
             minSpacingLon = spacingLon
             minSpacingLat = spacingLat
-            maxSpacingLon = self.config("MAX_SPACING_LONGITUDE", float)
-            maxSpacingLat = self.config("MAX_SPACING_LATITUDE", float)
+            maxSpacingLon = self.config("MAX_SPACING_LONGITUDE")
+            maxSpacingLat = self.config("MAX_SPACING_LATITUDE")
             intervals = sorted([int(x) for x in self.config("FIRE_INTERVALS")])
 
             # Maximum grid spacing cannot be smaller than the minimum grid spacing
