@@ -39,7 +39,7 @@ class working_dir(object):
         os.chdir(self._working_dir)
         return self._working_dir
 
-    def __exit__(self):
+    def __exit__(self, type, value, traceback):
         os.chdir(self._original_dir)
         # TODO: delete self._working_dir or just let os clean it up ?
 
