@@ -880,30 +880,36 @@ modules.)
 
 ##### fuelbeds
 
- - ...
+ - ***'fire_information' > 'location'*** -- *required* -- containing either single lat/lng or polygon perimeter coordinates
+ - ***'fire_information' > 'location' > 'state'*** -- *required* if AK -- used to determine which FCCS version to use
 
 ##### consumption
 
+ - ***'fire_information' > 'fuelbeds'*** -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
+ - ***'fire_information' > 'location' > 'area'*** -- fire's total area
  - ***'fire_information' > 'location' > 'ecoregion'*** -- *optional*
- - ***'fire_information' > 'type'*** -- *optional* -- fire type (ex. 'rx' or 'natural')
+ - ***'fire_information' > 'type'*** -- *optional* -- fire type (defaults to 'natureal' unless set to 'rx');
 
 ##### emissions
 
- - ...
+ - ***'fire_information' > 'fuelbeds' > 'consumption'*** --
+
+##### findmetdata
+
+ - ***'fire_information' > 'growth'*** -- *required* -- array of growth objects, each containing 'start', 'end'
 
 ##### localmet
 
- - ...
+- ***'fire_information' > 'growth'*** > 'met_files -- *required* -- array of met file objects, each containing
+ - ***'fire_information' > 'location'*** -- *required* -- fire location information containing 'utc_offset' and either single lat/lng or polygon shape data with multiple lat/lng coordinates
 
 ##### timeprofiling
 
- - ***'fire_information' > 'growth'*** -- *required* -- array of growth objects, each
-  containing 'start', 'end', and 'pct'; if only one object,
-  pct can be omitted and is assumed to be 100.0
+ - ***'fire_information' > 'growth'*** -- *required* -- array of growth objects, each containing 'start', 'end', and 'pct'; if only one object, pct can be omitted and is assumed to be 100.0
 
-##### plumerise
+##### plumerising
 
- - ...
+ - ***'fire_information' > 'growth' > 'localmet'*** -- *required* --
 
 ##### dispersion
 
@@ -934,8 +940,12 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### emissions
 
- - ***'config' > 'efs'*** -- *optional* -- emissions factors set; 'urbanski' or 'feps'; default 'feps'
- - ***'config' > 'species'*** -- *optional* -- whitelist of species to compute emissions levels for
+ - ***'config' > 'emissions' > 'efs'*** -- *optional* -- emissions factors set; 'urbanski' or 'feps'; default 'feps'
+ - ***'config' > 'emissions' > 'species'*** -- *optional* -- whitelist of species to compute emissions levels for
+
+##### findmetdata
+
+ - ***'config' > 'findmetdata' > 'met_root_dir' *** -- *required* --
 
 ##### localmet
 
@@ -943,21 +953,18 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### timeprofiling
 
- - ***'config' > 'start'*** -- *required* -- modeling start time (ex. "20150121T000000Z")
- - ***'config' > 'end'*** -- *required* -- modeling end time (ex. "20150123T000000Z")
  - ***'config' > 'timeprofiling' > 'hourly_fractions' *** -- *optional* --
 
 
-##### plumerise
+##### plumerising
 
- - ...
+ - ***'config' > 'plumerising' > 'model'*** -- *optional* -- plumerise model; defaults to "sev"
 
 ##### dispersion
 
  - ***'config' > 'start'*** -- *required* -- modeling start time (ex. "20150121T000000Z")
  - ***'config' > 'end'*** -- *required* -- modeling end time (ex. "20150123T000000Z")
- - ***'config' > 'met_domain'*** -- *required* -- met domain (ex. "PNW-4km")
- - ***'config' > 'dispersion' > 'module'*** -- *optional* -- dispersion module; defaults to "hysplit"
+ - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
 
 ##### visualization
 
