@@ -278,9 +278,9 @@ class HYSPLITDispersion(object):
 
     def _compute_tranches(self):
         tranching_config = {
-            'num_processes': self.config("NPROCESSES", int),
-            'num_fires_per_process': self.config("NFIRES_PER_PROCESS", int),
-            'num_processes_max': self.config("NPROCESSES_MAX", int)
+            'num_processes': self.config("NPROCESSES"),
+            'num_fires_per_process': self.config("NFIRES_PER_PROCESS"),
+            'num_processes_max': self.config("NPROCESSES_MAX")
         }
 
         # Note: organizing the fire sets is wasted computation if we end up
@@ -383,11 +383,11 @@ class HYSPLITDispersion(object):
         # Default value for NINIT for use in set up file.  0 equals no particle initialization
         ninit_val = "0"
 
-        if self.config("READ_INIT_FILE", bool):
+        if self.config("READ_INIT_FILE"):
             parinit_file = self.config("DISPERSION_FOLDER") + "/PARINIT"
 
             if not os.path.isfile(parinit_file):
-                if self.config("STOP_IF_NO_PARINIT", bool):
+                if self.config("STOP_IF_NO_PARINIT"):
                      msg = "Found no matching particle initialization files. Stop."
                      raise Exception(msg)
                 else:
@@ -400,8 +400,8 @@ class HYSPLITDispersion(object):
                 ninit_val = "1"
 
         # Prepare for an MPI run
-        if self.config("MPI", bool):
-            NCPUS = self.config("NCPUS", int)
+        if self.config("MPI"):
+            NCPUS = self.config("NCPUS")
             logging.info("Running MPI HYSPLIT with %s processors." % NCPUS)
             if NCPUS < 1:
                 logging.warn("Invalid NCPUS specified...resetting NCPUS to 1 for this run.")
@@ -418,7 +418,7 @@ class HYSPLITDispersion(object):
             # if not os.path.isfile(SHYSPLIT_MPI_BINARY):
             #     msg = "HYSPLIT MPI executable %s not found." % SHYSPLIT_MPI_BINARY
             #     raise AssertionError(msg)
-            if self.config("READ_INIT_FILE", bool): # TODO: Finish MPI support for particle initialization
+            if self.config("READ_INIT_FILE"): # TODO: Finish MPI support for particle initialization
                 logging.warn("Particile initialization in BlueSky module not currently supported for MPI runs.")
         else:
             NCPUS = 1
@@ -440,7 +440,7 @@ class HYSPLITDispersion(object):
             self._write_setup_file(fires, emissions_file, setup_file, ninit_val, NCPUS)
 
         # Run HYSPLIT
-        if self.config("MPI", bool):
+        if self.config("MPI"):
             self._execute(MPIEXEC, "-n", str(NCPUS), SHYSPLIT_MPI_BINARY)
         else:  # standard serial run
             self._execute(HYSPLIT_BINARY)
@@ -470,8 +470,8 @@ class HYSPLITDispersion(object):
         self._archive_file(setup_file)
         for f in message_files:
             self._archive_file(f)
-        if self.config("MAKE_INIT_FILE", bool):
-            if self.config("MPI", bool):
+        if self.config("MAKE_INIT_FILE"):
+            if self.config("MPI"):
                 for f in pardumpFiles:
                     self._archive_file(f)
                     shutil.copy2(os.path.join(working_dir, f),self.config("OUTPUT_DIR"))
@@ -656,7 +656,7 @@ class HYSPLITDispersion(object):
         if numLevels > 1:
             logging.warn("KML and PNG images will be empty since more than 1 vertical level is selected")
 
-        if self.config("USER_DEFINED_GRID", bool):
+        if self.config("USER_DEFINED_GRID"):
             # User settings that can override the default concentration grid info
             logging.info("User-defined sampling/concentration grid invoked")
             centerLat = self.config("CENTER_LATITUDE", float)
@@ -708,7 +708,7 @@ class HYSPLITDispersion(object):
             heightLat = float(lat_max_s - lat_min_s) / SCALE
 
         # Decrease the grid resolution based on number of fires
-        if self.config("OPTIMIZE_GRID_RESOLUTION", bool):
+        if self.config("OPTIMIZE_GRID_RESOLUTION"):
             logging.info("Grid resolution adjustment option invoked")
             minSpacingLon = spacingLon
             minSpacingLat = spacingLat
@@ -912,7 +912,7 @@ class HYSPLITDispersion(object):
 
             # make the 'smoke initizilaztion' files?
             # pinfp: particle initialization file (see also ninit)
-            if self.config("READ_INIT_FILE", bool):
+            if self.config("READ_INIT_FILE"):
                f.write("  PINPF = \"PARINIT\",\n")
 
             # ninit: (used along side pinpf) sets the type of initialization...
@@ -924,20 +924,20 @@ class HYSPLITDispersion(object):
             f.write("  NINIT = %s,\n" % ninit_val)
 
             # poutf: particle output/dump file
-            if self.config("MAKE_INIT_FILE", bool):
+            if self.config("MAKE_INIT_FILE"):
                 f.write("  POUTF = \"PARDUMP\",\n")
                 logging.info("Dumping particles to PARDUMP starting at %s every %s hours" % (dump_datetime, ncycl_val))
 
             # ndump: when/how often to dump a poutf file negative values indicate to
             #        just one  create just one 'restart' file at abs(hours) after the
             #        model start
-            if self.config("MAKE_INIT_FILE", bool):
+            if self.config("MAKE_INIT_FILE"):
                 f.write("  NDUMP = %d,\n" % ndump_val)
 
             # ncycl: set the interval at which time a pardump file is written after the
             #        1st file (which is first created at T = ndump hours after the
             #        start of the model simulation
-            if self.config("MAKE_INIT_FILE", bool):
+            if self.config("MAKE_INIT_FILE"):
                 f.write("  NCYCL = %d,\n" % ncycl_val)
 
             # efile: the name of the emissions info (used to vary emission rate etc (and
