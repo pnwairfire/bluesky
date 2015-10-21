@@ -48,7 +48,7 @@ def run(fires_manager, config=None):
                 "Config settings 'start' and 'num_hours' required for computing dispersion")
         start = datetimeutils.parse_datetime(start_str, 'start')
         # further validation of start and num_hours done in HYSPLITDispersion.run
-        disperser.run(fires_manager, start, num_hours)
+        disperser.run(fires_manager.fires, start, num_hours)
         # TODO: add information about fires to processed_kwargs
     finally:
         fires_manager.processed(__name__, __version__, model=model,
