@@ -80,8 +80,7 @@ TOTAL_PCT_THRESHOLD = 0.5
 
 def _validate_fire(fire):
     if 'growth' not in fire:
-        raise ValueError(
-            "Missing growth data required for time profiling")
+        raise ValueError("Missing growth data required for time profiling")
     for g in fire.growth:
         if 'start' not in g or 'end' not in g or 'pct' not in g:
             raise ValueError(
