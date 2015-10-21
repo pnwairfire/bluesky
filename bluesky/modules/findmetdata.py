@@ -34,7 +34,7 @@ def run(fires_manager, config=None):
 
     # Note: ArlFinder will raise an exception if met_root_dir is undefined
     # or is not a valid directory
-    met_root_dir = config.get('localmet', [}).get('met_root_dir')
+    met_root_dir = config.get('findmetdata', [}).get('met_root_dir')
     arl_finder = arlfinder.ArlFinder(met_root_dir)
     for fire in fires_manager.fires:
         for g in fire.growth:
