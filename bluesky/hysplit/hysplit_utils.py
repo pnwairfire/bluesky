@@ -14,7 +14,7 @@ __all__ = [
     'create_fire_sets', 'create_fire_tranches'
     ]
 
-def create_fire_sets(filteredFires):
+def create_fire_sets(fires):
     """Creates sets of fires, grouping by location
 
     A single fire location may show up multiple times if it lasted multiple days,
@@ -23,22 +23,22 @@ def create_fire_sets(filteredFires):
     objects by location id and then tranche the location fire sets.
 
     @todo: make sure fire locations from any particular event don't get split up into
-      multiple HYSPLIT runs ???  (use filteredFires[N]['metadata']['sf_event_guid']) ?
+      multiple HYSPLIT runs ???  (use fires[N]['metadata']['sf_event_guid']) ?
     """
 
-    filtered_fires_dict = {e: [] for e in set([f.id for f in filteredFires])}
-    for f in filteredFires:
-        filtered_fires_dict[f.id].append(f)
-    return  filtered_fires_dict.values()
+    fires_dict = {e: [] for e in set([f.id for f in fires])}
+    for f in fires:
+        fires_dict[f.id].append(f)
+    return  fires_dict.values()
 
-def create_fire_tranches(filtered_fire_sets, num_processes, logger=None):
+def create_fire_tranches(fire_sets, num_processes, logger=None):
     """Creates tranches of FireLocationData, each tranche to be processed by its
     own HYSPLIT process.
 
     @todo: More sophisticated tranching (ex. taking into account acreage, location, etc.).
     """
 
-    n_sets = len(filtered_fire_sets)
+    n_sets = len(fire_sets)
     num_processes = min(n_sets, num_processes)  # just to be sure
     min_n_fire_sets_per_process = n_sets / num_processes
     extra_fire_cutoff = n_sets % num_processes
@@ -59,10 +59,10 @@ def create_fire_tranches(filtered_fire_sets, num_processes, logger=None):
         idx += min_n_fire_sets_per_process
         if nproc < extra_fire_cutoff:
             idx += 1
-        fire_sets = filtered_fire_sets[s:idx]
+        tranche_fire_sets = fire_sets[s:idx]
         if logger:
-            logger.debug("Process %d:  %d fire sets" % (nproc, len(fire_sets)))
-        fires = reduce(lambda x,y: x + y, fire_sets)
+            logger.debug("Process %d:  %d fire sets" % (nproc, len(tranche_fire_sets)))
+        fires = reduce(lambda x,y: x + y, tranche_fire_sets)
         fire_tranches.append(fires)
     return fire_tranches
 

@@ -79,13 +79,13 @@ class HYSPLITDispersion(object):
         self._set_fire_data(fires)
         self._create_dummy_fire_if_necessary()
         self._set_reduction_factor()
-        filtered_fire_location_sets, num_processes  = self._compute_tranches()
+        fire_sets, num_processes  = self._compute_tranches()
 
         with working_dir() as wdir:
             if 1 < num_processes:
                     # hysplit_utils.create_fire_tranches will log number of processes
                     # and number of fires each
-                    self._run_parallel(num_processes, filtered_fire_location_sets, wdir)
+                    self._run_parallel(num_processes, fire_sets, wdir)
             else:
                 self._run_process(self._fires, wdir)
 
@@ -289,19 +289,19 @@ class HYSPLITDispersion(object):
         # for more code to be encapsulated in hysplit_utils, which then allows
         # for greater testability.  (hysplit_utils.create_fire_sets could be
         # skipped if either NPROCESSES > 1 or NFIRES_PER_PROCESS > 1)
-        filtered_fire_location_sets = hysplit_utils.create_fire_sets(filtered_fires)
-        num_fire_sets = len(filtered_fire_location_sets)
+        fire_sets = hysplit_utils.create_fire_sets(self._fires)
+        num_fire_sets = len(fire_sets)
         num_processes = hysplit_utils.compute_num_processes(num_fire_sets,
             **tranching_config)
         logging.debug('Parallel HYSPLIT? num_fire_sets=%s, %s -> num_processes=%s' %(
             num_fire_sets, ', '.join(['%s=%s'%(k,v) for k,v in tranching_config.items()]),
             num_processes
         ))
-        return filtered_fire_location_sets, num_processes
+        return fire_sets, num_processes
 
     OUTPUT_FILE_NAME = "hysplit_conc.nc"
 
-    def _run_parallel(self, num_processes, filtered_fire_location_sets, working_dir):
+    def _run_parallel(self, num_processes, fire_sets, working_dir):
         runner = self
         class T(threading.Thread):
             def  __init__(self, fires, working_dir):
@@ -317,7 +317,7 @@ class HYSPLITDispersion(object):
                     self.exc = e
 
         fire_tranches = hysplit_utils.create_fire_tranches(
-            filtered_fire_location_sets, num_processes, logger=self.log)
+            fire_sets, num_processes, logger=self.log)
         threads = []
         for nproc in xrange(len(fire_tranches)):
             fires = fire_tranches[nproc]
