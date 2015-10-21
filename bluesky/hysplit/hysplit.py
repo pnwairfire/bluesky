@@ -137,12 +137,12 @@ class HYSPLITDispersion(object):
                 if 'growth' not in fire:
                     raise ValueError(
                         "Missing timeprofile and plumerise data required for computing dispersion")
-                if any([not g.get('timeprofile') for g in fire.growth]):
-                    raise ValueError(
-                        "Missing timeprofile data required for computing dispersion")
-                if any([not g.get('plumerise') for g in fire.growth]):
-                    raise ValueError(
-                        "Missing plumerise data required for computing dispersion")
+                for g in fire.growth:
+                    if any([not g.get(f) for f in ('met_info', 'timeprofile', 'plumerise')]):
+                        raise ValueError("Each growth window must have met info, "
+                            "timeprofile, and plumerise in order to compute hysplit")
+                    if any([not g['met_info'].get(f) for f in (self.MET_META_FIELDS)]):
+                        raise ValueError("Fire growth window has insufficien met information")
                 if ('fuelbeds' not in fire or
                         any([not fb.get('emissions') for fb in fire.fuelbeds])):
                     raise ValueError(
@@ -183,8 +183,6 @@ class HYSPLITDispersion(object):
                 self._fires.append(f)
 
                 for g in fire.growth:
-                    if 'met_info' not in g or any([k not in g for k in self.MET_META_FIELDS]):
-                        raise ValueError("Fire growth window lacking met information")
                     if 'files' == self._met_info.keys(): # first t
                         self._met_info = {
                             k:v for k,v in g['met_info'].items()
