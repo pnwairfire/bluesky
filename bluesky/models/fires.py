@@ -34,7 +34,7 @@ class Fire(dict):
     @property
     def latitude(self):
         if self.location and 'latitude' in self.location:
-            return fire.location['latitude']
+            return self.location['latitude']
         elif self.location and 'perimeter' in self.location:
             # TODO: get centroid of perimeter(s); also, can'st assume 3-deep nested
             # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
@@ -51,8 +51,8 @@ class Fire(dict):
 
     @property
     def longitude(self):
-        if fire.location and 'longitude' in fire.location:
-            return fire.location['longitude']
+        if self.location and 'longitude' in self.location:
+            return self.location['longitude']
         elif self.location and 'perimeter' in self.location:
             # TODO: get centroid of perimeter(s); also, can'st assume 3-deep nested
             # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
