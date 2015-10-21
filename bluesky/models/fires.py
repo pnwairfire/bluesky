@@ -35,13 +35,13 @@ class Fire(dict):
     def latitude(self):
         if not hasattr(self, '_latitude'):
             if self.location and 'latitude' in self.location:
-                setattr(self, '_latitude', self.location['latitude'])
+                self._latitude = self.location['latitude']
             elif self.location and 'perimeter' in self.location:
                 # TODO: get centroid of perimeter(s); also, can't assume 3-deep nested
                 # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
                 # see https://en.wikipedia.org/wiki/Centroid
-                setattr(self, '_latitude', self.location['perimeter']['coordinates'][0][0][0][1])
-                setattr(self, '_longitude', self.location['perimeter']['coordinates'][0][0][0][0])
+                self._latitude = self.location['perimeter']['coordinates'][0][0][0][1]
+                self._longitude = self.location['perimeter']['coordinates'][0][0][0][0]
             elif self.location and 'shape_file' in self.location:
                 raise NotImplementedError("Importing of shape data from file not implemented")
             else:
@@ -53,13 +53,13 @@ class Fire(dict):
     def longitude(self):
         if not hasattr(self, '_longitude'):
             if self.location and 'longitude' in self.location:
-                setattr(self, '_longitude', self.location['longitude'])
+                self._longitude = self.location['longitude']
             elif self.location and 'perimeter' in self.location:
                 # TODO: get centroid of perimeter(s); also, can'st assume 3-deep nested
                 # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
                 # see https://en.wikipedia.org/wiki/Centroid
-                setattr(self, '_latitude', self.location['perimeter']['coordinates'][0][0][0][1])
-                setattr(self, '_longitude', self.location['perimeter']['coordinates'][0][0][0][0])
+                self._latitude = self.location['perimeter']['coordinates'][0][0][0][1]
+                self._longitude = self.location['perimeter']['coordinates'][0][0][0][0]
             elif self.location and 'shape_file' in self.location:
                 raise NotImplementedError("Importing of shape data from file not implemented")
             else:
