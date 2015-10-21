@@ -317,7 +317,7 @@ class HYSPLITDispersion(object):
                     self.exc = e
 
         fire_tranches = hysplit_utils.create_fire_tranches(
-            fire_sets, num_processes, logger=self.log)
+            fire_sets, num_processes)
         threads = []
         for nproc in xrange(len(fire_tranches)):
             fires = fire_tranches[nproc]

@@ -7,6 +7,7 @@
 
 _bluesky_version_ = "3.5.1"
 
+import logging
 import math
 
 
@@ -31,7 +32,7 @@ def create_fire_sets(fires):
         fires_dict[f.id].append(f)
     return  fires_dict.values()
 
-def create_fire_tranches(fire_sets, num_processes, logger=None):
+def create_fire_tranches(fire_sets, num_processes):
     """Creates tranches of FireLocationData, each tranche to be processed by its
     own HYSPLIT process.
 
@@ -43,14 +44,13 @@ def create_fire_tranches(fire_sets, num_processes, logger=None):
     min_n_fire_sets_per_process = n_sets / num_processes
     extra_fire_cutoff = n_sets % num_processes
 
-    if logger:
-        logger.info("Running %d HYSPLIT49 Dispersion model processes "
-            "on %d fires (i.e. events)" % (num_processes, n_sets))
-        logger.info(" - %d processes with %d fires" % (
-            num_processes - extra_fire_cutoff, min_n_fire_sets_per_process))
-        if extra_fire_cutoff > 0:
-            logger.info(" - %d processes with %d fires" % (
-                extra_fire_cutoff, min_n_fire_sets_per_process+1))
+    logging.info("Running %d HYSPLIT49 Dispersion model processes "
+        "on %d fires (i.e. events)" % (num_processes, n_sets))
+    logging.info(" - %d processes with %d fires" % (
+        num_processes - extra_fire_cutoff, min_n_fire_sets_per_process))
+    if extra_fire_cutoff > 0:
+        logging.info(" - %d processes with %d fires" % (
+            extra_fire_cutoff, min_n_fire_sets_per_process+1))
 
     idx = 0
     fire_tranches = []
@@ -60,8 +60,7 @@ def create_fire_tranches(fire_sets, num_processes, logger=None):
         if nproc < extra_fire_cutoff:
             idx += 1
         tranche_fire_sets = fire_sets[s:idx]
-        if logger:
-            logger.debug("Process %d:  %d fire sets" % (nproc, len(tranche_fire_sets)))
+        logging.debug("Process %d:  %d fire sets" % (nproc, len(tranche_fire_sets)))
         fires = reduce(lambda x,y: x + y, tranche_fire_sets)
         fire_tranches.append(fires)
     return fire_tranches
