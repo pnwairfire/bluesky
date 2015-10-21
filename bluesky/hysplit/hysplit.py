@@ -169,7 +169,7 @@ class HYSPLITDispersion(object):
                 for p in self.PHASES:
                     for fb in fire.fuelbeds:
                         for s in fb['emissions'][p]:
-                            emissions[p][s] = emissions[p].get(s, 0.0) + fb['emissions'][p][s]
+                            emissions[p][s] = emissions[p].get(s, 0.0) + fb['emissions'][p][s][0]
 
                 f = Fire(
                     id=fire.id,
