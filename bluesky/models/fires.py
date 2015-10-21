@@ -33,27 +33,39 @@ class Fire(dict):
 
     @property
     def latitude(self):
-        if fire.location and 'centroid' in fire.location:
-            return fire.location['centroid']['latitude']
-        elif fire.location and 'latitude' in fire.location:
+        if self.location and 'latitude' in self.location:
             return fire.location['latitude']
-        else:
-            # TODO: compute and memoize centroid and return it's lat
+        elif self.location and 'perimeter' in self.location:
+            # TODO: get centroid of perimeter(s); also, can'st assume 3-deep nested
+            # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
             # see https://en.wikipedia.org/wiki/Centroid
-            raise NotImplementedError(
-                "computing centroid from shape infromation not yet implemented")
+            lat = self.location['perimeter']['coordinates'][0][0][0][1]
+            #lng = self.location['perimeter']['coordinates'][0][0][0][0]
+            # TODO: memoize centoid lat/lng
+            return lat
+        elif self.location and 'shape_file' in self.location:
+            raise NotImplementedError("Importing of shape data from file not implemented")
+        else:
+            raise ValueError(
+                "Insufficient location data required for looking up lcalmet data")
 
     @property
     def longitude(self):
-        if fire.location and 'centroid' in fire.location:
-            return fire.location['centroid']['longitude']
-        elif fire.location and 'longitude' in fire.location:
+        if fire.location and 'longitude' in fire.location:
             return fire.location['longitude']
-        else:
-            # TODO: compute and memoize centroid and return it's lng
+        elif self.location and 'perimeter' in self.location:
+            # TODO: get centroid of perimeter(s); also, can'st assume 3-deep nested
+            # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
             # see https://en.wikipedia.org/wiki/Centroid
-            raise NotImplementedError(
-                "computing centroid from shape information not yet implemented")
+            #lat = self.location['perimeter']['coordinates'][0][0][0][1]
+            lng = self.location['perimeter']['coordinates'][0][0][0][0]
+            # TODO: memoize centoid lat/lng
+            return lng
+        elif self.location and 'shape_file' in self.location:
+            raise NotImplementedError("Importing of shape data from file not implemented")
+        else:
+            raise ValueError(
+                "Insufficient location data required for looking up lcalmet data")
 
     def __getattr__(self, attr):
         if attr in self.keys():
