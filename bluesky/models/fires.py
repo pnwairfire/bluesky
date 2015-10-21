@@ -33,6 +33,10 @@ class Fire(dict):
 
     @property
     def latitude(self):
+        # This is if latitude is a true top level key
+        if self.get('latitude'):
+            return self['latitude']
+        # This is if latitude is nested somewhere or needs to be derived
         if not hasattr(self, '_latitude'):
             if self.location and 'latitude' in self.location:
                 self._latitude = self.location['latitude']
@@ -51,6 +55,10 @@ class Fire(dict):
 
     @property
     def longitude(self):
+        # This is if longitude is a true top level key
+        if self.get('longitude'):
+            return self['longitude']
+        # This is if longitude is nested somewhere or needs to be derived
         if not hasattr(self, '_longitude'):
             if self.location and 'longitude' in self.location:
                 self._longitude = self.location['longitude']
