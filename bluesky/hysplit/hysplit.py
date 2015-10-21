@@ -171,6 +171,7 @@ class HYSPLITDispersion(object):
     )
     DUMMY_EMISSIONS_VALUE = 0.00001
     DUMMY_HOURS = 24
+    # TODO: make sure these dummy plumerise values don't have unexpected consequences
     DUMMY_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.05*e for e in range(21)},
         smolder_fraction=0.0)
 
