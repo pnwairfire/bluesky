@@ -89,10 +89,3 @@ def _validate_fire(fire):
     if TOTAL_PCT_THRESHOLD < abs(100.0 - reduce(lambda a, b: a + b, [g['pct'] for g in fire.growth])):
         raise RuntimeError(
             "Growth percentages don't add up to 100% - {}".format(fire.growth))
-    if 'fuelbeds' not in fire:
-        raise ValueError(
-            "Missing fuelbed data required for time profiling")
-    for fb in fire.fuelbeds:
-        if 'emissions' not in fb:
-            raise ValueError(
-                "Missing emissions data required for time profiling")
