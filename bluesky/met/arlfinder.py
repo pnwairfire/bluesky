@@ -25,11 +25,38 @@ class ArlFinder(object):
     def find(self, start, end):
         # TODO: for each hour in date range defined by start/end, look in
         # self._met_root_dir to find most recent met data file containing that
-        # hour; return list of datetime ranges with arl file to use for each range
+        # hour; return object containing domain id, gridspacing, boundary information
+        # and list of file objects, each containing a datetime range with the arl file
+        # to use for each range
         # Ex.
-        #  [
-        #     {"file": "...", "first": "...", "start": "...", "end": "..."}
-        #  ]
+        #        {
+        #            "domain" : "DRI6km",
+        #            "grid_spacing_km": 6.0,
+        #            "boundary": {
+        #                "sw":{
+        #                    "lat": ,
+        #                    "lng":
+        #                },
+        #                "nw": {
+        #                    "lat": ,
+        #                    "lng":
+        #                }
+        #            },
+        #            "files": [
+        #                {
+        #                    "file": "/DRI_6km/2014052912/wrfout_d2.2014052912.f00-11_12hr01.arl",
+        #                    "first": "2014-05-29T12:00:00",
+        #                    "start": "2014-05-29T20:00:00",
+        #                    "end": "2014-05-29T23:00:00"
+        #                },
+        #                {
+        #                    "file": "/DRI_6km/2014053000/wrfout_d2.2014053000.f00-11_12hr01.arl",
+        #                    "first": "2014-05-30T00:00:00",
+        #                    "start": "2014-05-30T00:00:00",
+        #                    "end": "2014-05-30T00:00:00"
+        #                }
+        #            ],
+        #        }        #  [
         # TODO: Allow 'start' and 'end' to not be round hours, but round them both back
         # to the hour. ex. if start is 03:33 and end is 04:22, find arl files
         # to cover range from 03:00 to 04:00 (i.e. the two hours 03:00 and 04:00)

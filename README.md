@@ -900,7 +900,7 @@ modules.)
 
 ##### localmet
 
-- ***'fire_information' > 'growth'*** > 'met_files -- *required* -- array of met file objects, each containing
+- ***'fire_information' > 'growth' > 'met_info' > 'files'*** -- *required* -- array of met file objects, each containing
  - ***'fire_information' > 'location'*** -- *required* -- fire location information containing 'utc_offset' and either single lat/lng or polygon shape data with multiple lat/lng coordinates
 
 ##### timeprofiling

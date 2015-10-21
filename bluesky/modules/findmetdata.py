@@ -39,4 +39,4 @@ def run(fires_manager, config=None):
     for fire in fires_manager.fires:
         for g in fire.growth:
             tw = parse_datetimes(g, 'start', 'end')
-            g['met_files'] = arl_finder.find(tw['start'], tw['end'])
+            g['met_info'] = arl_finder.find(tw['start'], tw['end'])
