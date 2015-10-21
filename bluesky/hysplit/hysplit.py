@@ -363,9 +363,8 @@ class HYSPLITDispersion(object):
         # so that they don't have to be passed into each call to _run_process
         # The only things that change from call to call are context and fires
 
-        for f in self._met_info.files:
-            os.symlink(f.filename,
-                os.path.join(working_dir, os.path.dirname(f.filename)))
+        for f in self._met_info['files']:
+            os.symlink(f, os.path.join(working_dir, os.path.basename(f)))
 
         # Create sym links to ancillary data files (note: HYSPLIT49 balks
         # if it can't find ASCDATA.CFG).
