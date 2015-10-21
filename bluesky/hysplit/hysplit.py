@@ -57,27 +57,24 @@ class HYSPLITDispersion(object):
     def config(self, key):
         return self._config.get(key.lower(), getattr(self, key, None))
 
-    def run(self, fires, start, end):
+    def run(self, fires, start, num_hours):
         """Runs hysplit
 
         args:
          - fires - list of fires to run through hysplit
          - start - model run start hour
-         - end - model run end hour (inclusive)
-
-        TDOO: rename 'start' and 'end' to indicate that 'end' is included
-          e.g. if start=2014-05-29T22:00:00 and end=2014-05-30T00:00:00,
-          dispersion run is for the three hours 5/29 22:00, 5/29 23:00, 5/30 00:00
+         - num_hours - number of hours in model run
         """
+        if start.minute or start.second or start.microsecond:
+            raise ValueError("Dispersion start time must be on the hour.")
+        if type(num_hours) != int:
+            raise ValueError("Dispersion num_hours must be an integer.")
 
         self._files_to_archive = []
         logging.info("Running the HYSPLIT49 Dispersion model")
         self._fires = fires
-        # TODO: make sure start and end are defined
         self._model_start = start
-        self._model_end = end
-        dur = self._model_end - self._model_start
-        self.hours_to_run = ((dur.days * 86400) + dur.seconds) / 3600
+        self._num_hours = num_hours
 
         fires = self._collect_fire_data()
         filtered_fires = list(self._filter_fires(fires))
@@ -85,7 +82,7 @@ class HYSPLITDispersion(object):
         self._set_reduction_factor()
 
         if(len(filtered_fires) == 0):
-            filtered_fires = [self._generate_dummy_fire(start, end)]
+            filtered_fires = [self._generate_dummy_fire()]
 
         tranching_config = {
             'num_processes': self.config("NPROCESSES", int),
@@ -122,7 +119,7 @@ class HYSPLITDispersion(object):
             dispersionData["grid_filename"] = os.path.join(wdir, self.OUTPUT_FILE_NAME)
             dispersionData["parameters"] = {"pm25": "PM25"}
             dispersionData["start_time"] = self._model_start
-            dispersionData["hours"] = self.hours_to_run
+            dispersionData["hours"] = self._num_hours
             self.fireInfo.dispersion = dispersionData
             self.set_output("fires", self.fireInfo)
 
@@ -175,7 +172,7 @@ class HYSPLITDispersion(object):
     DUMMY_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.05*e for e in range(21)},
         smolder_fraction=0.0)
 
-    def _generate_dummy_fire(self, start, end):
+    def _generate_dummy_fire(self):
         """Returns dummy fire formatted like
         """
         logging.info("Generating dummy fire for HYSPLIT")
@@ -191,11 +188,10 @@ class HYSPLITDispersion(object):
                 } for p in self.PHASES
             }
         )
-        num_hours = (end - start).hours
-        dt = start
-        while dt <= end:
+        for i in range(self._num_hours):
+            dt = self._model_start + timedelta(hours=hour)
             f['plumerise'][dt] = self.DUMMY_PLUMERISE_HOUR
-            f['timeprofile'][dt] = {self.PHASES: 1.0 / float(num_hours)}
+            f['timeprofile'][dt] = {self.PHASES: 1.0 / float(self._num_hours)}
 
         return f
 
@@ -455,7 +451,7 @@ class HYSPLITDispersion(object):
             emis.write("each emission's source: YYYY MM DD HH MM DUR_HHMM LAT LON HT RATE AREA HEAT\n")
 
             # Loop through the timesteps
-            for hour in range(self.hours_to_run):
+            for hour in range(self._num_hours):
                 dt = self._model_start + timedelta(hours=hour)
                 dt_str = dt.strftime("%y %m %d %H")
 
@@ -600,7 +596,7 @@ class HYSPLITDispersion(object):
         # Height of the top of the model domain
         modelTop = self.config("TOP_OF_MODEL_DOMAIN", float)
 
-        #modelEnd = self._model_start + timedelta(hours=self.hours_to_run)
+        #modelEnd = self._model_start + timedelta(hours=self._num_hours)
 
         # Build the vertical Levels string
         verticalLevels = self.config("VERTICAL_LEVELS")
@@ -731,7 +727,7 @@ class HYSPLITDispersion(object):
                     f.write("%9.3f %9.3f %9.3f\n" % (fireLoc.latitude, fireLoc.longitude, sourceHeight))
 
             # Total run time (hours)
-            f.write("%04d\n" % self.hours_to_run)
+            f.write("%04d\n" % self._num_hours)
 
             # Method to calculate vertical motion
             f.write("%d\n" % verticalMethod)
@@ -753,7 +749,7 @@ class HYSPLITDispersion(object):
             # Emissions rate (per hour) (Ken's code says "Emissions source strength (mass per second)" -- which is right?)
             f.write("0.001\n")
             # Duration of emissions (hours)
-            f.write(" %9.3f\n" % self.hours_to_run)
+            f.write(" %9.3f\n" % self._num_hours)
             # Source release start time (year, month, day, hour, minute)
             f.write("%s\n" % self._model_start.strftime("%y %m %d %H %M"))
 
@@ -786,7 +782,8 @@ class HYSPLITDispersion(object):
             # Sampling start time (year month day hour minute)
             f.write("%s\n" % self._model_start.strftime("%y %m %d %H %M"))
             # Sampling stop time (year month day hour minute)
-            f.write("%s\n" % self._model_end.strftime("%y %m %d %H %M"))
+            model_end = self._model_start + datetime.timedelta(hours=self._num_hours)
+            f.write("%s\n" % model_end.strftime("%y %m %d %H %M"))
             # Sampling interval (type hour minute)
             f.write("0 1 00\n") # Sampling interval:  type hour minute.  A type of 0 gives an average over the interval.
 

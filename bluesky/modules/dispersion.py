@@ -39,13 +39,13 @@ def run(fires_manager, config=None):
         raise BlueSkyConfigurationError(
             "Invalid dispersion model: '{}'".format(model))
 
-    # TDOO: rename 'start' and 'end' to indicate that 'end' is included
-    #  e.g. if start=2014-05-29T22:00:00 and end=2014-05-30T00:00:00,
-    #  dispersion run is for the three hours 5/29 22:00, 5/29 23:00, 5/30 00:00
-    start = datetimeutils.parse_datetime(
-        fires_manager.get_config_value('start'), 'start')
-    end = datetimeutils.parse_datetime(
-        fires_manager.get_config_value('end'), 'end')
-    disperser.run(fires_manager, start, end)
+    start_str = fires_manager.get_config_value('dispersion', 'start')
+    num_hours = fires_manager.get_config_value('dispersion', 'num_hours')
+    if not start_str or not num_hours:
+        raise ValueError(
+            "Config settings 'start' and 'num_hours' required for computing dispersion")
+    start = datetimeutils.parse_datetime(start_str, 'start')
+    # further validation of start and num_hours done in HYSPLITDispersion.run
+    disperser.run(fires_manager, start, num_hours)
 
     # TODO: add information to fires_manager indicating where to find the hysplit output
