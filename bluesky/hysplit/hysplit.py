@@ -195,14 +195,6 @@ class HYSPLITDispersion(object):
         while dt <= end:
             f['plumerise'][dt] = self.DUMMY_PLUMERISE_HOUR
             f['timeprofile'][dt] = {self.PHASES: 1.0 / float(num_hours)}
-        # dummy_loc['plume_rise'] = construct_type("PlumeRise")
-        # dummy_loc.plume_rise.hours = []
-        # for h in xrange(self.DUMMY_HOURS):
-        #     prh = construct_type("PlumeRiseHour", *self.DUMMY_PLUME_RISE_HOUR_VALUES)
-        #     dummy_loc.plume_rise.hours.append(prh)
-        # dummy_loc['time_profile'] = construct_type("TimeProfileData")
-        # for k in self.DUMMY_TIME_PROFILE_KEYS:
-        #     dummy_loc.time_profile[k] = [1.0 / self.DUMMY_HOURS] * self.DUMMY_HOURS
 
         return f
 
