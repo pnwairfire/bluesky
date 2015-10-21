@@ -171,7 +171,7 @@ class HYSPLITDispersion(object):
     )
     DUMMY_EMISSIONS_VALUE = 0.00001
     DUMMY_HOURS = 24
-    DUMMY_PLUMERISE_HOUR = dict({'percentile_%03d'%(e): 0.01*e for 5*e in range(21)},
+    DUMMY_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.05*e for e in range(21)},
         smolder_fraction=0.0)
 
     def _generate_dummy_fire(self, start, end):
