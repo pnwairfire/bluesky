@@ -33,39 +33,39 @@ class Fire(dict):
 
     @property
     def latitude(self):
-        if self.location and 'latitude' in self.location:
-            return self.location['latitude']
-        elif self.location and 'perimeter' in self.location:
-            # TODO: get centroid of perimeter(s); also, can'st assume 3-deep nested
-            # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
-            # see https://en.wikipedia.org/wiki/Centroid
-            lat = self.location['perimeter']['coordinates'][0][0][0][1]
-            #lng = self.location['perimeter']['coordinates'][0][0][0][0]
-            # TODO: memoize centoid lat/lng
-            return lat
-        elif self.location and 'shape_file' in self.location:
-            raise NotImplementedError("Importing of shape data from file not implemented")
-        else:
-            raise ValueError(
-                "Insufficient location data required for looking up lcalmet data")
+        if not hasattr(self, '_latitude'):
+            if self.location and 'latitude' in self.location:
+                setattr(self, '_latitude', self.location['latitude'])
+            elif self.location and 'perimeter' in self.location:
+                # TODO: get centroid of perimeter(s); also, can't assume 3-deep nested
+                # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
+                # see https://en.wikipedia.org/wiki/Centroid
+                setattr(self, '_latitude', self.location['perimeter']['coordinates'][0][0][0][1])
+                setattr(self, '_longitude', self.location['perimeter']['coordinates'][0][0][0][0])
+            elif self.location and 'shape_file' in self.location:
+                raise NotImplementedError("Importing of shape data from file not implemented")
+            else:
+                raise ValueError("Insufficient location data required for "
+                    "determining single lat/lng for fire")
+        return self._latitude
 
     @property
     def longitude(self):
-        if self.location and 'longitude' in self.location:
-            return self.location['longitude']
-        elif self.location and 'perimeter' in self.location:
-            # TODO: get centroid of perimeter(s); also, can'st assume 3-deep nested
-            # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
-            # see https://en.wikipedia.org/wiki/Centroid
-            #lat = self.location['perimeter']['coordinates'][0][0][0][1]
-            lng = self.location['perimeter']['coordinates'][0][0][0][0]
-            # TODO: memoize centoid lat/lng
-            return lng
-        elif self.location and 'shape_file' in self.location:
-            raise NotImplementedError("Importing of shape data from file not implemented")
-        else:
-            raise ValueError(
-                "Insufficient location data required for looking up lcalmet data")
+        if not hasattr(self, '_longitude'):
+            if self.location and 'longitude' in self.location:
+                setattr(self, '_longitude', self.location['longitude'])
+            elif self.location and 'perimeter' in self.location:
+                # TODO: get centroid of perimeter(s); also, can'st assume 3-deep nested
+                # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
+                # see https://en.wikipedia.org/wiki/Centroid
+                setattr(self, '_latitude', self.location['perimeter']['coordinates'][0][0][0][1])
+                setattr(self, '_longitude', self.location['perimeter']['coordinates'][0][0][0][0])
+            elif self.location and 'shape_file' in self.location:
+                raise NotImplementedError("Importing of shape data from file not implemented")
+            else:
+                raise ValueError("Insufficient location data required for "
+                    "determining single lat/lng for fire")
+        return self._longitude
 
     def __getattr__(self, attr):
         if attr in self.keys():
@@ -73,7 +73,10 @@ class Fire(dict):
         raise KeyError(attr)
 
     def __setattr__(self, attr, val):
-        self[attr] = val
+        if not attr.startswith('_') and not hasattr(Fire, attr):
+            self[attr] = val
+        else:
+            super(Fire, self).__setattr__(attr, val)
 
 class FireEncoder(json.JSONEncoder):
     def default(self, obj):
