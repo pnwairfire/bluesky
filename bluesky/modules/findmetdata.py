@@ -39,4 +39,8 @@ def run(fires_manager, config=None):
     for fire in fires_manager.fires:
         for g in fire.growth:
             tw = parse_datetimes(g, 'start', 'end')
+            # TODO: It may not be the responsibility of this module, but downstream,
+            # maybe move domain, grid_spacing_km, and boundary to a more global
+            # location, like fires_manager.met_info, and only store met_files
+            # in each growth object ?
             g['met_info'] = arl_finder.find(tw['start'], tw['end'])
