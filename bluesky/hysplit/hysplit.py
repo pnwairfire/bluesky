@@ -57,7 +57,7 @@ class HYSPLITDispersion(object):
         # TODO: make sure required executables are available
 
     def config(self, key):
-        return self._config.get(key.lower(), getattr(self, key, None))
+        return self._config.get(key.lower(), getattr(defaults, key, None))
 
     def run(self, fires, start, num_hours):
         """Runs hysplit
