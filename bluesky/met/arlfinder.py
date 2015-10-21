@@ -15,7 +15,10 @@ __all__ = [
 class ArlFinder(object):
     def __init__(self, met_root_dir):
         # make sure met_root_dir is an existing directory
-        if not met_root_dir or not os.path.isdir(met_root_dir):
+        try:
+            if not met_root_dir or not os.path.isdir(met_root_dir):
+                raise ValueError("{} is not a valid directory".format(met_root_dir))
+        except TypeError:
             raise ValueError("{} is not a valid directory".format(met_root_dir))
         self._met_root_dir = met_root_dir
 
