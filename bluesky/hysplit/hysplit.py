@@ -159,7 +159,7 @@ class HYSPLITDispersion(object):
                 plumerise=reduce(lambda r, g: r.update(g['plumerise']) or r, fire.growth, {}),
                 timeprofile=reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {}),
                 emissions=reduce(lambda r, fb: r.update(fb['emissions']) or r, fire.fuelbeds, {})
-            })
+            )
             fires.append(f)
 
         return fires
@@ -189,7 +189,7 @@ class HYSPLITDispersion(object):
                     e: self.DUMMY_EMISSIONS_VALUE for e in self.DUMMY_EMISSIONS
                 } for p in self.PHASES
             }
-        }
+        )
         num_hours = (end - start).hours
         dt = start
         while dt <= end:
