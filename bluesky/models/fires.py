@@ -36,7 +36,7 @@ class Fire(dict):
         if fire.location and 'centroid' in fire.location:
             return fire.location['centroid']['latitude']
         elif fire.location and 'latitude' in fire.location:
-            return fire.location['latitude']:
+            return fire.location['latitude']
         else:
             # TODO: compute and memoize centroid and return it's lat
             # see https://en.wikipedia.org/wiki/Centroid
@@ -48,7 +48,7 @@ class Fire(dict):
         if fire.location and 'centroid' in fire.location:
             return fire.location['centroid']['longitude']
         elif fire.location and 'longitude' in fire.location:
-            return fire.location['longitude']:
+            return fire.location['longitude']
         else:
             # TODO: compute and memoize centroid and return it's lng
             # see https://en.wikipedia.org/wiki/Centroid
