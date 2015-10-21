@@ -183,7 +183,7 @@ class HYSPLITDispersion(object):
                 self._fires.append(f)
 
                 for g in fire.growth:
-                    if 'files' == self._met_info.keys(): # first t
+                    if not self._met_info.keys(): # first growth object
                         self._met_info = {
                             k:v for k,v in g['met_info'].items()
                                 if k in self.MET_META_FIELDS
