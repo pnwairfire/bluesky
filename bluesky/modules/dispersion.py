@@ -29,23 +29,32 @@ def run(fires_manager, config=None):
     """
     model = fires_manager.get_config_value('dispersion', 'model',
         default='hysplit').lower()
+    try:
+        # TODO: support VSMOKE as well
+        if model == 'hysplit':
+            hysplit_config = fires_manager.get_config_value('dispersion', 'hysplit',
+                default={})
+            disperser = hysplit.HYSPLITDispersion(**hysplit_config)
+        else:
+            raise BlueSkyConfigurationError(
+                "Invalid dispersion model: '{}'".format(model))
 
-    # TODO: support VSMOKE as well
-    if model == 'hysplit':
-        hysplit_config = fires_manager.get_config_value('dispersion', 'hysplit',
-            default={})
-        disperser = hysplit.HYSPLITDispersion(**hysplit_config)
-    else:
-        raise BlueSkyConfigurationError(
-            "Invalid dispersion model: '{}'".format(model))
+        start_str = fires_manager.get_config_value('dispersion', 'start')
+        num_hours = fires_manager.get_config_value('dispersion', 'num_hours')
+        if not start_str or not num_hours:
+            raise ValueError(
+                "Config settings 'start' and 'num_hours' required for computing dispersion")
+        start = datetimeutils.parse_datetime(start_str, 'start')
+        # further validation of start and num_hours done in HYSPLITDispersion.run
+        disperser.run(fires_manager, start, num_hours)
+        # TODO: add information about fires processed
+        fires_manager.processed(__name__, __version__, model=model,
+            hysplit_version=hys.__version__)
+    except:
+        fires_manager.processed(__name__, __version__, model=model)
+        raise
 
-    start_str = fires_manager.get_config_value('dispersion', 'start')
-    num_hours = fires_manager.get_config_value('dispersion', 'num_hours')
-    if not start_str or not num_hours:
-        raise ValueError(
-            "Config settings 'start' and 'num_hours' required for computing dispersion")
-    start = datetimeutils.parse_datetime(start_str, 'start')
-    # further validation of start and num_hours done in HYSPLITDispersion.run
-    disperser.run(fires_manager, start, num_hours)
+
+
 
     # TODO: add information to fires_manager indicating where to find the hysplit output

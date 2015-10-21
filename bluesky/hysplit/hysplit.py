@@ -115,7 +115,7 @@ class HYSPLITDispersion(object):
     MISSING_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.0 for e in range(21)},
         smolder_fraction=0.0)
     # TODO: is this an appropriate fill-in timeprofile hour?
-    MISSING_TIMEPROFILE_HOUR = {p: 0.0 for p in self.PHASES }
+    MISSING_TIMEPROFILE_HOUR = {p: 0.0 for p in PHASES }
 
     def _set_fire_data(self, fires):
         self._fires = []
