@@ -965,6 +965,7 @@ the fire data, each module has its own set of required and optional fields.
  - ***'config' > 'start'*** -- *required* -- modeling start time (ex. "20150121T000000Z")
  - ***'config' > 'end'*** -- *required* -- modeling end time (ex. "20150123T000000Z")
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
+ - ***'config' > 'dispersion' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
 
 ##### visualization
 

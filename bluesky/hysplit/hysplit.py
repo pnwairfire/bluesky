@@ -49,6 +49,8 @@ class HYSPLITDispersion(object):
     HYSPLIT Concentration model version 4.9
     """
 
+    PHASES = ('flaming', 'smoldering', 'residual')
+
     def __init__(self, **config):
         self._config = config
         # TODO: determine which config options we'll support
@@ -75,7 +77,6 @@ class HYSPLITDispersion(object):
         self._model_start = start
         self._num_hours = num_hours
         self._set_fire_data(fires)
-        self._filter_fires()
         self._create_dummy_fire_if_necessary()
         self._set_reduction_factor()
         filtered_fire_location_sets, num_processes  = self._compute_tranches()
@@ -110,6 +111,12 @@ class HYSPLITDispersion(object):
 
     MET_META_FIELDS = ('boundary', 'domain', 'grid_spacing_km')
 
+    # TODO: is this an appropriate fill-in plumerise hour?
+    MISSING_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.0 for e in range(21)},
+        smolder_fraction=0.0)
+    # TODO: is this an appropriate fill-in timeprofile hour?
+    MISSING_TIMEPROFILE_HOUR = {p: 0.0 for p in self.PHASES }
+
     def _set_fire_data(self, fires):
         self._fires = []
         self._met_info = {}
@@ -126,72 +133,82 @@ class HYSPLITDispersion(object):
         #  separately...raising exception would be easier for now)
         # Make sure met files span dispersion time window
         for fire in fires:
-            if 'growth' not in fire:
-                raise ValueError(
-                    "Missing growth data required for computing dispersion")
+            try:
+                if 'growth' not in fire:
+                    raise ValueError(
+                        "Missing timeprofile and plumerise data required for computing dispersion")
+                if any([not g.get('timeprofile') for g in fire.growth]):
+                    raise ValueError(
+                        "Missing timeprofile data required for computing dispersion")
+                if any([not g.get('plumerise') for g in fire.growth]):
+                    raise ValueError(
+                        "Missing plumerise data required for computing dispersion")
+                if ('fuelbeds' not in fire or
+                        any([not fb.get('emissions') for fb in fire.fuelbeds])):
+                    raise ValueError(
+                        "Missing emissions data required for computing dispersion")
+                # TODO: figure out what to do with heat????  here's the check from
+                # BSF's hysplit.py
+                # if fireLoc.emissions.sum("heat") < 1.0e-6:
+                #     logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fireLoc.id)
+                #     continue
 
 
-            # TODO: Make sure
-
-            f = Fire(
-                id=fire.id,
-                area=fire.location['area'],
-                latitude=fire.latitude,
-                longitude=fire.longitude,
                 # TODO: only include plumerise and timeprofile keys within model run
                 # time window; and somehow fill in gaps (is this possible?)
-                plumerise=reduce(lambda r, g: r.update(g['plumerise']) or r, fire.growth, {}),
-                timeprofile=reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {})
-                # TODO: *sum* emissions over fuelbeds
-            )
-            self._fires.append(f)
+                all_plumerise=reduce(lambda r, g: r.update(g['plumerise']) or r, fire.growth, {})
+                all_timeprofile=reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {})
+                pluemrise = {}
+                timeprofile = {}
+                for i in range(self._num_hours):
+                    dt = self._model_start + timedelta(hours=hour)
+                    plumerise = all_plumerise.get(dt) or self.MISSING_PLUMERISE_HOUR
+                    timeprofile = all_timeprofile.get(dt) or self.MISSING_TIMEPROFILE_HOUR
 
-            for g in fire.growth:
-                if 'met_info' not in g or any([k not in g for k in self.MET_META_FIELDS]):
-                    raise ValueError("Fire growth window lacking met information")
-                if 'files' == self._met_info.keys(): # first t
-                    self._met_info = {
-                        k:v for k,v in g['met_info'].items()
-                            if k in self.MET_META_FIELDS
-                    }
-                    # hysplit just needs the name
-                    self._met_info['files'] = set([m['file'] for m in ['files']])
+                emissions = {p:{} for p in self.PHASES}
+                for p in self.PHASES:
+                    for fb in fire.fuelbeds:
+                        for s in fb['emissions'][p]:
+                            emissions[p][s] = emissions[p].get(s, 0.0) + fb['emissions'][p][s]
+
+                f = Fire(
+                    id=fire.id,
+                    area=fire.location['area'],
+                    latitude=fire.latitude,
+                    longitude=fire.longitude,
+                    plumerise=plumerise,
+                    timeprofile=timeprofile,
+                    emissions=emissions
+                )
+                self._fires.append(f)
+
+                for g in fire.growth:
+                    if 'met_info' not in g or any([k not in g for k in self.MET_META_FIELDS]):
+                        raise ValueError("Fire growth window lacking met information")
+                    if 'files' == self._met_info.keys(): # first t
+                        self._met_info = {
+                            k:v for k,v in g['met_info'].items()
+                                if k in self.MET_META_FIELDS
+                        }
+                        # hysplit just needs the name
+                        self._met_info['files'] = set([m['file'] for m in ['files']])
+                    else:
+                        for met_file in g['met_info']['files']:
+                            self._met_info['files'].add(met_file['file'])
+                        for k in self.MET_META_FIELDS:
+                            if self._met_info[k] != g['met_info'][k]:
+                                raise ValueError("Hysplit requires single met per run")
+            except:
+                if self.config('skip_invalid_fires'):
+                    continue
                 else:
-                    for met_file in g['met_info']['files']:
-                        self._met_info['files'].add(met_file['file'])
-                    for k in self.MET_META_FIELDS:
-                        if self._met_info[k] != g['met_info'][k]:
-                            raise ValueError("Hysplit requires single met per run")
+                    raise
 
-    def _filter_fires(self):
-        filtered_fires = []
-        for fire in self._fires:
-            if not fire.timeprofile:
-                logging.debug("Fire %s has no time profile data; skip...", fireLoc.id)
-                continue
-
-            if not fire.plumerise:
-                logging.debug("Fire %s has no plume rise data; skip...", fireLoc.id)
-                continue
-
-            if not fire.emissions:
-                logging.debug("Fire %s has no emissions data; skip...", fireLoc.id)
-                continue
-
-            # TODO: figure out what to do to heat????
-            # if fireLoc.emissions.sum("heat") < 1.0e-6:
-            #     logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fireLoc.id)
-            #     continue
-
-            filtered_fires.append(fire)
-
-        self._fires = filtered_fires
 
     def _create_dummy_fire_if_necessary(self):
         if not self._fires:
             self._fires = [self._generate_dummy_fire()]
 
-    PHASES = ('flaming', 'smoldering', 'residual')
     DUMMY_EMISSIONS = (
         "pm25", "pm10", "co", "co2", "ch4", "nox",
         "nh3", "so2", "voc", "pm", "nmhc"
