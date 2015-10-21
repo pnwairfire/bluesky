@@ -74,35 +74,11 @@ class HYSPLITDispersion(object):
         self._files_to_archive = []
         self._model_start = start
         self._num_hours = num_hours
-
         self._set_fire_data(fires)
         self._filter_fires()
-
+        self._create_dummy_fire_if_necessary()
         self._set_reduction_factor()
-
-        if(len(filtered_fires) == 0):
-            filtered_fires = [self._generate_dummy_fire()]
-
-        tranching_config = {
-            'num_processes': self.config("NPROCESSES", int),
-            'num_fires_per_process': self.config("NFIRES_PER_PROCESS", int),
-            'num_processes_max': self.config("NPROCESSES_MAX", int)
-        }
-
-        # Note: organizing the fire sets is wasted computation if we end up
-        # running only one process, but doing so before looking at the
-        # NPROCESSES, NFIRES_PER_PROCESS, NPROCESSES_MAX config values allows
-        # for more code to be encapsulated in hysplit_utils, which then allows
-        # for greater testability.  (hysplit_utils.create_fire_sets could be
-        # skipped if either NPROCESSES > 1 or NFIRES_PER_PROCESS > 1)
-        filtered_fire_location_sets = hysplit_utils.create_fire_sets(filtered_fires)
-        num_fire_sets = len(filtered_fire_location_sets)
-        num_processes = hysplit_utils.compute_num_processes(num_fire_sets,
-            **tranching_config)
-        logging.debug('Parallel HYSPLIT? num_fire_sets=%s, %s -> num_processes=%s' %(
-            num_fire_sets, ', '.join(['%s=%s'%(k,v) for k,v in tranching_config.items()]),
-            num_processes
-        ))
+        filtered_fire_location_sets, num_processes  = self._compute_tranches()
 
         with working_dir() as wdir:
             if 1 < num_processes:
@@ -187,6 +163,34 @@ class HYSPLITDispersion(object):
                         if self._met_info[k] != g['met_info'][k]:
                             raise ValueError("Hysplit requires single met per run")
 
+    def _filter_fires(self):
+        filtered_fires = []
+        for fire in self._fires:
+            if not fire.timeprofile:
+                logging.debug("Fire %s has no time profile data; skip...", fireLoc.id)
+                continue
+
+            if not fire.plumerise:
+                logging.debug("Fire %s has no plume rise data; skip...", fireLoc.id)
+                continue
+
+            if not fire.emissions:
+                logging.debug("Fire %s has no emissions data; skip...", fireLoc.id)
+                continue
+
+            # TODO: figure out what to do to heat????
+            # if fireLoc.emissions.sum("heat") < 1.0e-6:
+            #     logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fireLoc.id)
+            #     continue
+
+            filtered_fires.append(fire)
+
+        self._fires = filtered_fires
+
+    def _create_dummy_fire_if_necessary(self):
+        if not self._fires:
+            self._fires = [self._generate_dummy_fire()]
+
     PHASES = ('flaming', 'smoldering', 'residual')
     DUMMY_EMISSIONS = (
         "pm25", "pm10", "co", "co2", "ch4", "nox",
@@ -220,6 +224,65 @@ class HYSPLITDispersion(object):
             f['timeprofile'][dt] = {self.PHASES: 1.0 / float(self._num_hours)}
 
         return f
+
+    # Number of quantiles in vertical emissions allocation scheme
+    NQUANTILES = 20
+
+    def _set_reduction_factor(self):
+        """Retrieve factor for reducing the number of vertical emission levels"""
+
+        #    Ensure the factor divides evenly into the number of quantiles.
+        #    For the 20 quantile vertical accounting scheme, the following values are appropriate:
+        #       reductionFactor = 1 .... 20 emission levels (no change from the original scheme)
+        #       reductionFactor = 2......10 emission levels
+        #       reductionFactor = 4......5 emission levels
+        #       reductionFactor = 5......4 emission levels
+        #       reductionFactor = 10.....2 emission levels
+        #       reductionFactor = 20.....1 emission level
+
+        # Pull reduction factor from user input
+        self._reduction_factor = self.config("VERTICAL_EMISLEVELS_REDUCTION_FACTOR")
+        self._reduction_factor = int(self._reduction_factor)
+
+        # Ensure a valid reduction factor
+        if self._reduction_factor > self.NQUANTILES:
+            self._reduction_factor = self.NQUANTILES
+            logging.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to %s" % str(self.NQUANTILES))
+        elif self._reduction_factor <= 0:
+            self._reduction_factor = 1
+            logging.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to 1")
+        while (self.NQUANTILES % self._reduction_factor) != 0:  # make sure factor evenly divides into the number of quantiles
+            self._reduction_factor -= 1
+            logging.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to %s" % str(self._reduction_factor))
+
+        self.num_output_quantiles = self.NQUANTILES/self._reduction_factor
+
+        if self._reduction_factor != 1:
+            logging.info("Number of vertical emission levels reduced by factor of %s" % str(self._reduction_factor))
+            logging.info("Number of vertical emission quantiles will be %s" % str(self.num_output_quantiles))
+
+    def _compute_tranches(self):
+        tranching_config = {
+            'num_processes': self.config("NPROCESSES", int),
+            'num_fires_per_process': self.config("NFIRES_PER_PROCESS", int),
+            'num_processes_max': self.config("NPROCESSES_MAX", int)
+        }
+
+        # Note: organizing the fire sets is wasted computation if we end up
+        # running only one process, but doing so before looking at the
+        # NPROCESSES, NFIRES_PER_PROCESS, NPROCESSES_MAX config values allows
+        # for more code to be encapsulated in hysplit_utils, which then allows
+        # for greater testability.  (hysplit_utils.create_fire_sets could be
+        # skipped if either NPROCESSES > 1 or NFIRES_PER_PROCESS > 1)
+        filtered_fire_location_sets = hysplit_utils.create_fire_sets(filtered_fires)
+        num_fire_sets = len(filtered_fire_location_sets)
+        num_processes = hysplit_utils.compute_num_processes(num_fire_sets,
+            **tranching_config)
+        logging.debug('Parallel HYSPLIT? num_fire_sets=%s, %s -> num_processes=%s' %(
+            num_fire_sets, ', '.join(['%s=%s'%(k,v) for k,v in tranching_config.items()]),
+            num_processes
+        ))
+        return filtered_fire_location_sets, num_processes
 
     OUTPUT_FILE_NAME = "hysplit_conc.nc"
 
@@ -402,66 +465,6 @@ class HYSPLITDispersion(object):
                 self._archive_file(pardump_file)
                 shutil.copy2(pardump_file, self.config("OUTPUT_DIR") + "/PARDUMP_"+ self.config("DATE"))
 
-    # Number of quantiles in vertical emissions allocation scheme
-    NQUANTILES = 20
-
-    def _set_reduction_factor(self):
-        """Retrieve factor for reducing the number of vertical emission levels"""
-
-        #    Ensure the factor divides evenly into the number of quantiles.
-        #    For the 20 quantile vertical accounting scheme, the following values are appropriate:
-        #       reductionFactor = 1 .... 20 emission levels (no change from the original scheme)
-        #       reductionFactor = 2......10 emission levels
-        #       reductionFactor = 4......5 emission levels
-        #       reductionFactor = 5......4 emission levels
-        #       reductionFactor = 10.....2 emission levels
-        #       reductionFactor = 20.....1 emission level
-
-        # Pull reduction factor from user input
-        self.reductionFactor = self.config("VERTICAL_EMISLEVELS_REDUCTION_FACTOR")
-        self.reductionFactor = int(self.reductionFactor)
-
-        # Ensure a valid reduction factor
-        if self.reductionFactor > self.NQUANTILES:
-            self.reductionFactor = self.NQUANTILES
-            logging.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to %s" % str(self.NQUANTILES))
-        elif self.reductionFactor <= 0:
-            self.reductionFactor = 1
-            logging.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to 1")
-        while (self.NQUANTILES % self.reductionFactor) != 0:  # make sure factor evenly divides into the number of quantiles
-            self.reductionFactor -= 1
-            logging.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to %s" % str(self.reductionFactor))
-
-        self.num_output_quantiles = self.NQUANTILES/self.reductionFactor
-
-        if self.reductionFactor != 1:
-            logging.info("Number of vertical emission levels reduced by factor of %s" % str(self.reductionFactor))
-            logging.info("Number of vertical emission quantiles will be %s" % str(self.num_output_quantiles))
-
-    def _filter_fires(self):
-        filtered_fires = []
-        for fire in self._fires:
-            if not fire.timeprofile:
-                logging.debug("Fire %s has no time profile data; skip...", fireLoc.id)
-                continue
-
-            if not fire.plumerise:
-                logging.debug("Fire %s has no plume rise data; skip...", fireLoc.id)
-                continue
-
-            if not fire.emissions:
-                logging.debug("Fire %s has no emissions data; skip...", fireLoc.id)
-                continue
-
-            # TODO: figure out what to do to heat????
-            # if fireLoc.emissions.sum("heat") < 1.0e-6:
-            #     logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fireLoc.id)
-            #     continue
-
-            filtered_fires.append(fire)
-
-        self._fires = filtered_fires
-
     def _write_emissions(self, filtered_fires, emissions_file):
         # Note: HYSPLIT can accept concentrations in any units, but for
         # consistency with CALPUFF and other dispersion models, we convert to
@@ -554,7 +557,7 @@ class HYSPLITDispersion(object):
                     emis.write(record_fmt % (dt_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
 
                     #for pct in range(0, 100, 5):
-                    for pct in range(0, 100, self.reductionFactor*5):
+                    for pct in range(0, 100, self._reduction_factor*5):
                         height_meters = 0.0
                         pm25_injected = 0.0
 
@@ -573,8 +576,8 @@ class HYSPLITDispersion(object):
 
                             lower_height = fireLoc.plumerise.hours[h]["percentile_%03d" % (pct)]
                             #upper_height = fireLoc.plumerise.hours[h]["percentile_%03d" % (pct + 5)]
-                            upper_height = fireLoc.plumerise.hours[h]["percentile_%03d" % (pct + (self.reductionFactor*5))]
-                            if self.reductionFactor == 1:
+                            upper_height = fireLoc.plumerise.hours[h]["percentile_%03d" % (pct + (self._reduction_factor*5))]
+                            if self._reduction_factor == 1:
                                 height_meters = (lower_height + upper_height) / 2.0  # original approach
                             else:
                                  height_meters = upper_height # top-edge approach
@@ -582,7 +585,7 @@ class HYSPLITDispersion(object):
                             pm25_entrained = pm25_emitted * entrainment_fraction
                             # Inject the proper fraction of the entrained PM2.5 in each quantile gap.
                             #pm25_injected = pm25_entrained * 0.05  # 1/20 = 0.05
-                            pm25_injected = pm25_entrained * (float(self.reductionFactor)/float(self.num_output_quantiles))
+                            pm25_injected = pm25_entrained * (float(self._reduction_factor)/float(self.num_output_quantiles))
 
                         # Write the record to the file
                         emis.write(record_fmt % (dt_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
