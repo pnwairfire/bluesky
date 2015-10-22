@@ -32,6 +32,14 @@ NCKS_EXECUTABLE = "ncks"
 MPIEXEC = "mpiexec"
 HYSPLIT2NETCDF_BINARY = "hysplit2netcdf"
 
+# Note: HYSPLIT can accept concentrations in any units, but for
+# consistency with CALPUFF and other dispersion models, we convert to
+# grams in the emissions file.
+GRAMS_PER_TON = 907184.74
+
+# Conversion factor for fire size
+SQUARE_METERS_PER_ACRE = 4046.8726
+
 class working_dir(object):
     def __enter__(self):
         self._original_dir = os.getcwd()
@@ -49,7 +57,8 @@ class HYSPLITDispersion(object):
     HYSPLIT Concentration model version 4.9
     """
 
-    PHASES = ('flaming', 'smoldering', 'residual')
+    PHASES = ['flaming', 'smoldering', 'residual']
+    TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
     def __init__(self, **config):
         self._config = config
@@ -111,11 +120,13 @@ class HYSPLITDispersion(object):
 
     MET_META_FIELDS = ('boundary', 'domain', 'grid_spacing_km')
 
+    # TODO: set these to None, and let _write_emissions using it's logic to
+    #  handle missing data?
     # TODO: is this an appropriate fill-in plumerise hour?
-    MISSING_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.0 for e in range(21)},
-        smolder_fraction=0.0)
-    # TODO: is this an appropriate fill-in timeprofile hour?
-    MISSING_TIMEPROFILE_HOUR = {p: 0.0 for p in PHASES }
+    # MISSING_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.0 for e in range(21)},
+    #     smolder_fraction=0.0)
+    # # TODO: is this an appropriate fill-in timeprofile hour?
+    # MISSING_TIMEPROFILE_HOUR = {p: 0.0 for p in PHASES }
 
     def _set_fire_data(self, fires):
         self._fires = []
@@ -149,8 +160,8 @@ class HYSPLITDispersion(object):
                         "Missing emissions data required for computing dispersion")
                 # TODO: figure out what to do with heat????  here's the check from
                 # BSF's hysplit.py
-                # if fireLoc.emissions.sum("heat") < 1.0e-6:
-                #     logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fireLoc.id)
+                # if fire.emissions.sum("heat") < 1.0e-6:
+                #     logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fire.id)
                 #     continue
 
 
@@ -162,14 +173,14 @@ class HYSPLITDispersion(object):
                 timeprofile = {}
                 for i in range(self._num_hours):
                     dt = self._model_start + timedelta(hours=i)
-                    plumerise = all_plumerise.get(dt) or self.MISSING_PLUMERISE_HOUR
-                    timeprofile = all_timeprofile.get(dt) or self.MISSING_TIMEPROFILE_HOUR
+                    plumerise = all_plumerise.get(dt) # or self.MISSING_PLUMERISE_HOUR
+                    timeprofile = all_timeprofile.get(dt) #or self.MISSING_TIMEPROFILE_HOUR
 
-                emissions = {p:{} for p in self.PHASES}
-                for p in self.PHASES:
-                    for fb in fire.fuelbeds:
+                emissions = {}
+                for fb in fire.fuelbeds:
+                    for p in self.PHASES:
                         for s in fb['emissions'][p]:
-                            emissions[p][s] = emissions[p].get(s, 0.0) + fb['emissions'][p][s][0]
+                            emissions[s] = emissions.get(s, 0.0) + fb['emissions'][p][s][0]
 
                 f = Fire(
                     id=fire.id,
@@ -236,7 +247,7 @@ class HYSPLITDispersion(object):
         for i in range(self._num_hours):
             dt = self._model_start + timedelta(hours=hour)
             f['plumerise'][dt] = self.DUMMY_PLUMERISE_HOUR
-            f['timeprofile'][dt] = {self.PHASES: 1.0 / float(self._num_hours)}
+            f['timeprofile'][dt] = {f: 1.0 / float(self._num_hours) for d in self.TIMEPROFILE_FIELDS}
 
         return f
 
@@ -422,7 +433,7 @@ class HYSPLITDispersion(object):
         else:
             NCPUS = 1
 
-        self._write_emissions(fires, emissions_file)
+        self._write_emissions(emissions_file)
         self._write_control_file(fires, control_file, output_conc_file)
         self._write_setup_file(fires, emissions_file, setup_file, ninit_val, NCPUS)
 
@@ -479,18 +490,10 @@ class HYSPLITDispersion(object):
                 self._archive_file(pardump_file)
                 shutil.copy2(pardump_file, self.config("OUTPUT_DIR") + "/PARDUMP_"+ self.config("DATE"))
 
-    def _write_emissions(self, filtered_fires, emissions_file):
-        # Note: HYSPLIT can accept concentrations in any units, but for
-        # consistency with CALPUFF and other dispersion models, we convert to
-        # grams in the emissions file.
-        GRAMS_PER_TON = 907184.74
-
-        # Conversion factor for fire size
-        SQUARE_METERS_PER_ACRE = 4046.8726
-
+    def _write_emissions(self, emissions_file):
         # A value slightly above ground level at which to inject smoldering
         # emissions into the model.
-        SMOLDER_HEIGHT = self.config("SMOLDER_HEIGHT")
+        smolder_height = self.config("SMOLDER_HEIGHT")
 
         with open(emissions_file, "w") as emis:
             # HYSPLIT skips past the first two records, so these are for comment purposes only
@@ -502,7 +505,7 @@ class HYSPLITDispersion(object):
                 dt = self._model_start + timedelta(hours=hour)
                 dt_str = dt.strftime("%y %m %d %H")
 
-                num_fires = len(filtered_fires)
+                num_fires = len(self._fires)
                 #num_heights = 21 # 20 quantile gaps, plus ground level
                 num_heights = self.num_output_quantiles + 1
                 num_sources = num_fires * num_heights
@@ -517,26 +520,19 @@ class HYSPLITDispersion(object):
                 noEmis = 0
 
                 # Loop through the fire locations
-                for fireLoc in filtered_fires:
+                for fire in self._fires:
                     dummy = False
 
                     # Get some properties from the fire location
-                    lat = fireLoc.latitude
-                    lon = fireLoc.longitude
-
-                    # Figure out what index (h) to use into our hourly arrays of data,
-                    # based on the hour in our outer loop and the fireLoc's available
-                    # data.
-                    padding = fireLoc.date_time - self._model_start
-                    padding_hours = ((padding.days * 86400) + padding.seconds) / 3600
-                    num_hours = min(len(fireLoc.emissions.heat), len(fireLoc.plumerise.hours))
-                    h = hour - padding_hours
+                    lat = fire.latitude
+                    lon = fire.longitude
 
                     # If we don't have real data for the given timestep, we apparently need
                     # to stick in dummy records anyway (so we have the correct number of sources).
-
-                    if h < 0 or h >= num_hours:
-                        logging.debug("Fire %s has no emissions for hour %s", fireLoc.id, hour)
+                    plumerise_hour = fire.plumerise.get(dt)
+                    timeprofile_hour = fire.timeprofile.get(dt)
+                    if not plumerise_hour or not timeprofile_hour:
+                        logging.debug("Fire %s has no emissions for hour %s", fire.id, hour)
                         noEmis += 1
                         dummy = True
 
@@ -546,12 +542,13 @@ class HYSPLITDispersion(object):
                     if not dummy:
                         # Extract the fraction of area burned in this timestep, and
                         # convert it from acres to square meters.
-                        area = fireLoc.area * fireLoc.timeprofile.area_fract[h]
+                        # TODO: ????? WHAT TIME PROFILE VALUE TO USE ?????
+                        area = fire.area * fire.timeprofile[dt]['area_fraction'][h]
                         area_meters = area * SQUARE_METERS_PER_ACRE
 
-                        smoldering_fraction = fireLoc.plumerise.hours[h].smoldering_fraction
+                        smoldering_fraction = plumerise_hour.smoldering_fraction
                         # Total PM2.5 emitted at this timestep (grams)
-                        pm25_emitted = fireLoc.emissions.pm25[h].sum() * GRAMS_PER_TON
+                        pm25_emitted = fire.emissions.get('PM25', 0.0) * GRAMS_PER_TON
                         # Total PM2.5 smoldering (not lofted in the plume)
                         pm25_injected = pm25_emitted * smoldering_fraction
 
@@ -564,7 +561,7 @@ class HYSPLITDispersion(object):
 
                     # Inject the smoldering fraction of the emissions at ground level
                     # (SMOLDER_HEIGHT represents a value slightly above ground level)
-                    height_meters = SMOLDER_HEIGHT
+                    height_meters = smolder_height
 
                     # Write the smoldering record to the file
                     record_fmt = "%s 00 0100 %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
@@ -588,9 +585,9 @@ class HYSPLITDispersion(object):
                             # and place the appropriate fraction of emissions at each level.
                             # ReductionFactor MUST evenly divide into the number of quantiles
 
-                            lower_height = fireLoc.plumerise.hours[h]["percentile_%03d" % (pct)]
-                            #upper_height = fireLoc.plumerise.hours[h]["percentile_%03d" % (pct + 5)]
-                            upper_height = fireLoc.plumerise.hours[h]["percentile_%03d" % (pct + (self._reduction_factor*5))]
+                            lower_height = plumerise_hour["percentile_%03d" % (pct)]
+                            #upper_height = plumerise_hour["percentile_%03d" % (pct + 5)]
+                            upper_height = plumerise_hour["percentile_%03d" % (pct + (self._reduction_factor*5))]
                             if self._reduction_factor == 1:
                                 height_meters = (lower_height + upper_height) / 2.0  # original approach
                             else:
@@ -770,9 +767,9 @@ class HYSPLITDispersion(object):
             f.write("%d\n" % num_sources)
 
             # Source locations
-            for fireLoc in filtered_fires:
+            for fire in filtered_fires:
                 for height in range(num_heights):
-                    f.write("%9.3f %9.3f %9.3f\n" % (fireLoc.latitude, fireLoc.longitude, sourceHeight))
+                    f.write("%9.3f %9.3f %9.3f\n" % (fire.latitude, fire.longitude, sourceHeight))
 
             # Total run time (hours)
             f.write("%04d\n" % self._num_hours)
