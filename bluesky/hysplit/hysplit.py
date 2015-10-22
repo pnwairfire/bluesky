@@ -21,6 +21,8 @@ import tempfile
 import threading
 from datetime import timedelta
 
+from pyairfire.datetime import parsing as datetime_parsing
+
 from bluesky.models.fires import Fire
 import hysplit_utils
 import defaults
@@ -168,14 +170,16 @@ class HYSPLITDispersion(object):
 
                 # TODO: only include plumerise and timeprofile keys within model run
                 # time window; and somehow fill in gaps (is this possible?)
-                all_plumerise=reduce(lambda r, g: r.update(g['plumerise']) or r, fire.growth, {})
-                all_timeprofile=reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {})
-                pluemrise = {}
+                all_plumerise = self._convert_keys_to_datetime(
+                    reduce(lambda r, g: r.update(g['plumerise']) or r, fire.growth, {}))
+                all_timeprofile = self._convert_keys_to_datetime(
+                    reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {}))
+                plumerise = {}
                 timeprofile = {}
                 for i in range(self._num_hours):
                     dt = self._model_start + timedelta(hours=i)
-                    plumerise = all_plumerise.get(dt) # or self.MISSING_PLUMERISE_HOUR
-                    timeprofile = all_timeprofile.get(dt) #or self.MISSING_TIMEPROFILE_HOUR
+                    plumerise[dt] = all_plumerise.get(dt) # or self.MISSING_PLUMERISE_HOUR
+                    timeprofile[dt] = all_timeprofile.get(dt) #or self.MISSING_TIMEPROFILE_HOUR
 
                 emissions = {}
                 for fb in fire.fuelbeds:
@@ -214,6 +218,8 @@ class HYSPLITDispersion(object):
                 else:
                     raise
 
+    def _convert_keys_to_datetime(self, d):
+        return { datetime_parsing.parse(k): v for k, v in d.items() }
 
     def _create_dummy_fire_if_necessary(self):
         if not self._fires:
@@ -545,13 +551,15 @@ class HYSPLITDispersion(object):
                         # Extract the fraction of area burned in this timestep, and
                         # convert it from acres to square meters.
                         # TODO: ????? WHAT TIME PROFILE VALUE TO USE ?????
-                        area = fire.area * timeprofile_hour[dt]['area_fraction']
+                        area = fire.area * timeprofile_hour['area_fraction']
                         area_meters = area * SQUARE_METERS_PER_ACRE
 
-                        smoldering_fraction = plumerise_hour['smoldering_fraction']
+                        smoldering_fraction = plumerise_hour['smolder_fraction']
                         # Total PM2.5 emitted at this timestep (grams)
                         # TODO: multiple this times the average of flaming, smoldering,
-                        #  and  residual plumerise fractions, or of some subset of those?
+                        #  and  residual timeprofile fractions, or of some subset of those?
+                        #  *or* retain per-phase emissions levels and multiply each by
+                        #  timeprofile fraction by the corresponding emissions level
                         pm25_emitted = fire.emissions.get('PM25', 0.0) * GRAMS_PER_TON
                         # Total PM2.5 smoldering (not lofted in the plume)
                         pm25_injected = pm25_emitted * smoldering_fraction
