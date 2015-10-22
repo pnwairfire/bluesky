@@ -44,6 +44,7 @@ class working_dir(object):
     def __enter__(self):
         self._original_dir = os.getcwd()
         self._working_dir = tempfile.mkdtemp()
+        logging.debug('Running hysplit in {}'.format(self._working_dir))
         os.chdir(self._working_dir)
         return self._working_dir
 
@@ -529,12 +530,13 @@ class HYSPLITDispersion(object):
 
                     # If we don't have real data for the given timestep, we apparently need
                     # to stick in dummy records anyway (so we have the correct number of sources).
-                    plumerise_hour = fire.plumerise.get(dt)
-                    timeprofile_hour = fire.timeprofile.get(dt)
-                    if not plumerise_hour or not timeprofile_hour:
+                    if not fire.plumerise or not fire.timeprofile:
                         logging.debug("Fire %s has no emissions for hour %s", fire.id, hour)
                         noEmis += 1
                         dummy = True
+                    else:
+                        plumerise_hour = fire.plumerise.get(dt)
+                        timeprofile_hour = fire.timeprofile.get(dt)
 
                     area_meters = 0.0
                     smoldering_fraction = 0.0
@@ -543,11 +545,13 @@ class HYSPLITDispersion(object):
                         # Extract the fraction of area burned in this timestep, and
                         # convert it from acres to square meters.
                         # TODO: ????? WHAT TIME PROFILE VALUE TO USE ?????
-                        area = fire.area * fire.timeprofile[dt]['area_fraction'][h]
+                        area = fire.area * timeprofile_hour[dt]['area_fraction']
                         area_meters = area * SQUARE_METERS_PER_ACRE
 
-                        smoldering_fraction = plumerise_hour.smoldering_fraction
+                        smoldering_fraction = plumerise_hour['smoldering_fraction']
                         # Total PM2.5 emitted at this timestep (grams)
+                        # TODO: multiple this times the average of flaming, smoldering,
+                        #  and  residual plumerise fractions, or of some subset of those?
                         pm25_emitted = fire.emissions.get('PM25', 0.0) * GRAMS_PER_TON
                         # Total PM2.5 smoldering (not lofted in the plume)
                         pm25_injected = pm25_emitted * smoldering_fraction
@@ -635,7 +639,7 @@ class HYSPLITDispersion(object):
         # the actual source heights are overridden in the EMISS.CFG file.
         sourceHeight = 15.0
 
-        verticalMethod = _get_vertical_method(self)
+        verticalMethod = self._get_vertical_method()
 
         # Height of the top of the model domain
         modelTop = self.config("TOP_OF_MODEL_DOMAIN")
@@ -643,8 +647,7 @@ class HYSPLITDispersion(object):
         #modelEnd = self._model_start + timedelta(hours=self._num_hours)
 
         # Build the vertical Levels string
-        verticalLevels = self.config("VERTICAL_LEVELS")
-        levels = [int(x) for x in verticalLevels.split()]
+        levels = self.config("VERTICAL_LEVELS")
         numLevels = len(levels)
         verticalLevels = " ".join(str(x) for x in levels)
 
@@ -781,11 +784,11 @@ class HYSPLITDispersion(object):
             f.write("%9.1f\n" % modelTop)
 
             # Number of input data grids (met files)
-            f.write("%d\n" % len(self._met_info.files))
+            f.write("%d\n" % len(self._met_info['files']))
             # Directory for input data grid and met file name
-            for info in self._met_info.files:
+            for filename in self._met_info['files']:
                 f.write("./\n")
-                f.write("%s\n" % os.path.basename(info.filename))
+                f.write("%s\n" % os.path.basename(filename))
 
             # Number of pollutants = 1 (only modeling PM2.5 for now)
             f.write("1\n")
@@ -827,7 +830,7 @@ class HYSPLITDispersion(object):
             # Sampling start time (year month day hour minute)
             f.write("%s\n" % self._model_start.strftime("%y %m %d %H %M"))
             # Sampling stop time (year month day hour minute)
-            model_end = self._model_start + datetime.timedelta(hours=self._num_hours)
+            model_end = self._model_start + timedelta(hours=self._num_hours)
             f.write("%s\n" % model_end.strftime("%y %m %d %H %M"))
             # Sampling interval (type hour minute)
             f.write("0 1 00\n") # Sampling interval:  type hour minute.  A type of 0 gives an average over the interval.
