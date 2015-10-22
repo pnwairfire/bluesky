@@ -181,11 +181,12 @@ class HYSPLITDispersion(object):
                     plumerise[dt] = all_plumerise.get(dt) # or self.MISSING_PLUMERISE_HOUR
                     timeprofile[dt] = all_timeprofile.get(dt) #or self.MISSING_TIMEPROFILE_HOUR
 
-                emissions = {}
+                # sum the emissions across all fuelbeds, but keep them separate by phase
+                emissions = {p: {} for p in self.PHASES}
                 for fb in fire.fuelbeds:
                     for p in self.PHASES:
                         for s in fb['emissions'][p]:
-                            emissions[s] = emissions.get(s, 0.0) + fb['emissions'][p][s][0]
+                            emissions[p][s] = emissions[p].get(s, 0.0) + sum(fb['emissions'][p][s])
 
                 f = Fire(
                     id=fire.id,
@@ -560,7 +561,11 @@ class HYSPLITDispersion(object):
                         #  and  residual timeprofile fractions, or of some subset of those?
                         #  *or* retain per-phase emissions levels and multiply each by
                         #  timeprofile fraction by the corresponding emissions level
-                        pm25_emitted = fire.emissions.get('PM25', 0.0) * GRAMS_PER_TON
+                        pm25_emitted = sum([
+                            timeprofile_hour[p]*fire.emissions[p].get('PM25', 0.0)
+                                for p in self.PHASES
+                        ])
+                        pm25_emitted *= GRAMS_PER_TON
                         # Total PM2.5 smoldering (not lofted in the plume)
                         pm25_injected = pm25_emitted * smoldering_fraction
 
