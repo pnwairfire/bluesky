@@ -1,12 +1,10 @@
 """bluesky.hysplit.hysplit
 
-This code in this module was copied from BlueSky Framework, and modified
-significantly.
-
-TODO: acknowledge original authors (STI?)
+The code in this module was copied from BlueSky Framework, and modified
+significantly.  It was originally written by Sonoma Technology, Inc.
 """
 
-__author__      = "Joel Dubowy and others (unknown)"
+__author__      = "Joel Dubowy and Sonoma Technology, Inc."
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 __version__ = "0.1.0"
