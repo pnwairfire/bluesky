@@ -4,7 +4,7 @@
             "start": "2014-05-29T22:00:00",
             "num_hours": 2,
             "model": "hysplit",
-            "output_dir": "~/bsp-output"
+            "output_dir": "/tmp/bsp-output"
         }
     },
     "fire_information": [
