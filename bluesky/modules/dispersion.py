@@ -54,13 +54,14 @@ def run(fires_manager, config=None):
 
         # further validation of start, num_hours, and output_dir done in
         # HYSPLITDispersion.run
-        # TODO: store output in summary?
+        dispersion_info = disperser.run(fires_manager.fires, start, num_hours, output_dir)
+        dispersion_info.update(model=model)
+        # TODO: store dispersion into in summary?
         #   > fires_manager.summarize(disperion=disperser.run(...))
-        fires_manager.dispersion = disperser.run(fires_manager.fires, start,
-            num_hours, output_dir)
-        fires_manager.dispersion.update(model=model)
+        fires_manager.dispersion = dispersion_info
 
         # TODO: add information about fires to processed_kwargs
+
     finally:
         fires_manager.processed(__name__, __version__, model=model,
             **processed_kwargs)
