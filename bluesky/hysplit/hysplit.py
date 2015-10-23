@@ -442,8 +442,8 @@ class HYSPLITDispersion(object):
             NCPUS = 1
 
         self._write_emissions(emissions_file)
-        self._write_control_file(fires, control_file, output_conc_file)
-        self._write_setup_file(fires, emissions_file, setup_file, ninit_val, NCPUS)
+        self._write_control_file(control_file, output_conc_file)
+        self._write_setup_file(emissions_file, setup_file, ninit_val, NCPUS)
 
         # Copy in the user_defined SETUP.CFG file or write a new one
         HYSPLIT_SETUP_FILE = self.config("HYSPLIT_SETUP_FILE")
@@ -643,8 +643,8 @@ class HYSPLITDispersion(object):
 
         return verticalMethod
 
-    def _write_control_file(self, filtered_fires, control_file, concFile):
-        num_fires = len(filtered_fires)
+    def _write_control_file(self, control_file, concFile):
+        num_fires = len(self._fires)
         num_heights = self.num_output_quantiles + 1  # number of quantiles used, plus ground level
         num_sources = num_fires * num_heights
 
@@ -784,7 +784,7 @@ class HYSPLITDispersion(object):
             f.write("%d\n" % num_sources)
 
             # Source locations
-            for fire in filtered_fires:
+            for fire in self._fires:
                 for height in range(num_heights):
                     f.write("%9.3f %9.3f %9.3f\n" % (fire.latitude, fire.longitude, sourceHeight))
 
@@ -875,7 +875,7 @@ class HYSPLITDispersion(object):
             # Pollutant deposition resuspension constant (1/m)
             f.write("0.0\n")
 
-    def _write_setup_file(self, filtered_fires, emissions_file, setup_file, ninit_val, ncpus):
+    def _write_setup_file(self, emissions_file, setup_file, ninit_val, ncpus):
         # Advanced setup options
         # adapted from Robert's HysplitGFS Perl script
 
@@ -884,7 +884,7 @@ class HYSPLITDispersion(object):
         ncycl_val = int(self.config("NCYCL"))
         dump_datetime = self._model_start + timedelta(hours=ndump_val)
 
-        num_fires = len(filtered_fires)
+        num_fires = len(self._fires)
         num_heights = self.num_output_quantiles + 1
         num_sources = num_fires * num_heights
 
