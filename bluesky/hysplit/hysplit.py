@@ -116,7 +116,7 @@ class HYSPLITDispersion(object):
                 "grid_filetype": "NETCDF",
                 "grid_filename": self.OUTPUT_FILE_NAME,
                 "parameters": {"pm25": "PM25"},
-                "start_time": self._model_start,
+                "start_time": self._model_start.isoformat(),
                 "hours": self._num_hours
             }
 
