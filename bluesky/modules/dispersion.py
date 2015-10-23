@@ -11,6 +11,7 @@ import consume
 import logging
 
 from bluesky import datetimeutils
+from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.hysplit import hysplit
 
 __all__ = [
