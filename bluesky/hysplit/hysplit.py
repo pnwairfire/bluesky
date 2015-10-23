@@ -227,6 +227,7 @@ class HYSPLITDispersion(object):
                         for k in self.MET_META_FIELDS:
                             if self._met_info[k] != g['met_info'][k]:
                                 raise ValueError("Hysplit requires single met per run")
+                self._met_info['files'] = list(self._met_info['files'])
             except:
                 if self.config('skip_invalid_fires'):
                     continue
