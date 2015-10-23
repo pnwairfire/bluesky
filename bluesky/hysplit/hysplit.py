@@ -126,7 +126,6 @@ class HYSPLITDispersion(object):
         self._files_to_archive.append(file)
 
     def _move_files(self):
-        os.mkdir(self._run_output_dir)
         for f in self._files_to_archive:
             shutil.move(f, self._run_output_dir)
 
