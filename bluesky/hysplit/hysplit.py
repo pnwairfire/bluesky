@@ -117,9 +117,9 @@ class HYSPLITDispersion(object):
                 "grid_filename": self.OUTPUT_FILE_NAME,
                 "parameters": {"pm25": "PM25"},
                 "start_time": self._model_start.isoformat(),
-                "hours": self._num_hours
-            }
-
+                "num_hours": self._num_hours,
+            },
+            "met_info": self._met_info
         }
 
     def _save_file(self, file):
