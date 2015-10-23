@@ -47,8 +47,15 @@ def run(fires_manager, config=None):
             raise ValueError(
                 "Config settings 'start' and 'num_hours' required for computing dispersion")
         start = datetimeutils.parse_datetime(start_str, 'start')
-        # further validation of start and num_hours done in HYSPLITDispersion.run
-        disperser.run(fires_manager.fires, start, num_hours)
+
+        output_dir = fires_manager.get_config_value('dispersion', 'output_dir')
+        if not output_dir:
+            raise ValueError("Specify directory to save dispersion run output")
+
+        # further validation of start, num_hours, and output_dir done in HYSPLITDispersion.run
+        fires_manager.dispersion = disperser.run(fires_manager.fires, start,
+            num_hours, output_dir)
+
         # TODO: add information about fires to processed_kwargs
     finally:
         fires_manager.processed(__name__, __version__, model=model,

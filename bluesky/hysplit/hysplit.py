@@ -19,6 +19,7 @@ import subprocess
 # import tarfile
 import tempfile
 import threading
+import uuid
 from datetime import timedelta
 
 from pyairfire.datetime import parsing as datetime_parsing
@@ -67,11 +68,12 @@ class HYSPLITDispersion(object):
         self._config = config
         # TODO: determine which config options we'll support
         # TODO: make sure required executables are available
+        # TODO: make sure all required config options are defined
 
     def config(self, key):
         return self._config.get(key.lower(), getattr(defaults, key, None))
 
-    def run(self, fires, start, num_hours):
+    def run(self, fires, start, num_hours, output_dir):
         """Runs hysplit
 
         args:
@@ -84,6 +86,11 @@ class HYSPLITDispersion(object):
             raise ValueError("Dispersion start time must be on the hour.")
         if type(num_hours) != int:
             raise ValueError("Dispersion num_hours must be an integer.")
+
+        self._output_dir = os.path.abspath(output_dir)
+        self._run_guid = str(uuid.uuid1())
+        self._run_output_dir = os.path.join(self._output_dir, self._run_guid)
+        os.makedirs(self._run_output_dir)
 
         self._files_to_archive = []
         self._model_start = start
@@ -101,21 +108,27 @@ class HYSPLITDispersion(object):
             else:
                 self._run_process(self._fires, wdir)
 
-            # DispersionData output
-            dispersionData = construct_type("DispersionData")
-            dispersionData["grid_filetype"] = "NETCDF"
-            dispersionData["grid_filename"] = os.path.join(wdir, self.OUTPUT_FILE_NAME)
-            dispersionData["parameters"] = {"pm25": "PM25"}
-            dispersionData["start_time"] = self._model_start
-            dispersionData["hours"] = self._num_hours
-            self.fireInfo.dispersion = dispersionData
-            self.set_output("fires", self.fireInfo)
+            self._move_files()
 
-            # TODO: Move to desired output location
+        return {
+            "output": {
+                "directory": self._run_output_dir,
+                "grid_filetype": "NETCDF",
+                "grid_filename": self.OUTPUT_FILE_NAME,
+                "parameters": {"pm25": "PM25"},
+                "start_time": self._model_start,
+                "hours": self._num_hours
+            }
 
+        }
 
-    def _archive_file(self, file):
+    def _save_file(self, file):
         self._files_to_archive.append(file)
+
+    def _move_files(self):
+        os.mkdir(self._run_output_dir)
+        for f in self._files_to_archive:
+            shutil.move(f, self._run_output_dir)
 
     def _execute(self, *args):
         # TODO: make sure this is the corrrect way to call
@@ -466,6 +479,7 @@ class HYSPLITDispersion(object):
         if not os.path.exists(output_conc_file):
             msg = "HYSPLIT failed, check MESSAGE file for details"
             raise AssertionError(msg)
+        self._save_file(output_conc_file)
 
         if self.config('CONVERT_HYSPLIT2NETCDF'):
             logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (output_conc_file, output_file))
@@ -480,23 +494,23 @@ class HYSPLITDispersion(object):
             if not os.path.exists(output_file):
                 msg = "Unable to convert HYSPLIT concentration file to NetCDF format"
                 raise AssertionError(msg)
+        self._save_file(output_file)
 
-        # TODO: config option to specify where to put output files
         # Archive data files
-        self._archive_file(emissions_file)
-        self._archive_file(control_file)
-        self._archive_file(setup_file)
+        self._save_file(emissions_file)
+        self._save_file(control_file)
+        self._save_file(setup_file)
         for f in message_files:
-            self._archive_file(f)
+            self._save_file(f)
         if self.config("MAKE_INIT_FILE"):
             if self.config("MPI"):
                 for f in pardumpFiles:
-                    self._archive_file(f)
-                    shutil.copy2(os.path.join(working_dir, f),self.config("OUTPUT_DIR"))
+                    self._save_file(f)
+                    #shutil.copy2(os.path.join(working_dir, f),self.config("OUTPUT_DIR"))
             else:
                 pardump_file = os.path.join(working_dir, "PARDUMP")
-                self._archive_file(pardump_file)
-                shutil.copy2(pardump_file, self.config("OUTPUT_DIR") + "/PARDUMP_"+ self.config("DATE"))
+                self._save_file(pardump_file)
+                #shutil.copy2(pardump_file, self.config("OUTPUT_DIR") + "/PARDUMP_"+ self.config("DATE"))
 
     def _write_emissions(self, emissions_file):
         # A value slightly above ground level at which to inject smoldering
