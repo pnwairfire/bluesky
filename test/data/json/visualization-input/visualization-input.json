@@ -1,0 +1,58 @@
+{
+    "config": {
+        "visualization": {
+            "target": "dispersion",
+            "hysplit": {
+                "layer": 1,
+                "is_aquipt": false
+            }
+        }
+    },
+    "dispersion": {
+        "model": "hysplit",
+        "met_info": {
+            "boundary": {
+                "ne": {
+                    "lat": 45.0,
+                    "lng": -106.0
+                },
+                "sw": {
+                    "lat": 28.0,
+                    "lng": -132
+                }
+            },
+            "domain": "DRI6km",
+            "files": [
+                "/DRI_6km/2014053000/wrfout_d2.2014053000.f00-11_12hr01.arl",
+                "/DRI_6km/2014052912/wrfout_d2.2014052912.f00-11_12hr01.arl"
+            ],
+            "grid_spacing_km": 6.0
+        },
+        "output": {
+            "start_time": "2014-05-29T22:00:00",
+            "num_hours": 2,
+            "directory": "/tmp/bsp-output/3b832b6a-79b9-11e5-9dc5-080027880ca6",
+            "grid_filename": "hysplit_conc.nc",
+            "grid_filetype": "NETCDF",
+            "parameters": {
+                "pm25": "PM25"
+            }
+        }
+    },
+    "fire_information": [
+        {
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Yosemite, CA"
+            },
+            "id": "SF11C14225236095807750",
+            "location": {
+                "area": 200,
+                "ecoregion": "southern",
+                "latitude": 37.909644,
+                "longitude": -119.7615805,
+                "utc_offset": "-09:00"
+            }
+        }
+    ]
+}
