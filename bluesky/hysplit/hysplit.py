@@ -455,7 +455,7 @@ class HYSPLITDispersion(object):
             config_setup_file.close()
             setup_file.close()
         else:
-            self._write_setup_file(fires, emissions_file, setup_file, ninit_val, NCPUS)
+            self._write_setup_file(emissions_file, setup_file, ninit_val, NCPUS)
 
         # Run HYSPLIT
         if self.config("MPI"):
