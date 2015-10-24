@@ -110,6 +110,7 @@ class HYSPLITDispersion(object):
 
         return {
             "output": {
+                "run_id": self._run_guid,
                 "directory": self._run_output_dir,
                 "grid_filetype": "NETCDF",
                 "grid_filename": self.OUTPUT_FILE_NAME,
