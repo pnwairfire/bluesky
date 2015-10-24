@@ -36,8 +36,11 @@ def run(fires_manager, config=None):
             processed_kwargs.update(dispersion_model=dispersion_model)
             visualization_info.update(dispersion_model=dispersion_model)
             if dispersion_model == 'hysplit':
+                hysplit_visualization_config = fires_manager.get_config_value(
+                    'visualization', 'hysplit', default={})
                 visualizer = visualizers.dispersion.HysplitVisualizer(
-                    fires_manager.dispersion['output'], fires_manager.fires)
+                    fires_manager.dispersion['output'], fires_manager.fires,
+                    **hysplit_visualization_config)
                 processed_kwargs.update(
                     hysplit_visualizer_version=visualizers.dispersion.__version__)
             else:

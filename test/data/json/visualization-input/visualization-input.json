@@ -2,8 +2,8 @@
     "config": {
         "visualization": {
             "target": "dispersion",
+            "output_dir": "/tmp/bsp-visualization",
             "hysplit": {
-                "layer": 1,
                 "is_aquipt": false
             }
         }
@@ -29,6 +29,7 @@
             "grid_spacing_km": 6.0
         },
         "output": {
+            "run_id": "3b832b6a-79b9-11e5-9dc5-080027880ca6",
             "start_time": "2014-05-29T22:00:00",
             "num_hours": 2,
             "directory": "/tmp/bsp-output/3b832b6a-79b9-11e5-9dc5-080027880ca6",

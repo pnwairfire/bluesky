@@ -917,7 +917,9 @@ modules.)
 
 ##### visualization
 
- - ...
+ - *** 'fire_information' > ... -- *required* --
+ - *** 'dispersion' > 'model' -- *required* (if visualizing dispersion) --
+ - *** 'dispersion' > 'output' -- *required* (if visualizing dispersion) --
 
 ##### export
 
@@ -962,14 +964,23 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### dispersion
 
- - ***'config' > 'start'*** -- *required* -- modeling start time (ex. "20150121T000000Z")
- - ***'config' > 'end'*** -- *required* -- modeling end time (ex. "20150123T000000Z")
+ - ***'config' > 'dispersion' > 'start'*** -- *required* -- modeling start time (ex. "2015-01-21T00:00:00Z")
+ - ***'config' > 'dispersion' > 'num_hours'*** -- *required* -- number of hours in model run
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
  - ***'config' > 'dispersion' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
 
 ##### visualization
 
- - ...
+ - ***'config' > 'visualization' > 'target'*** -- *optional* -- defaults to dispersion
+ - ***'config' > 'visualization' > 'output_dir'*** -- *optional* -- defaults to hysplit's output dir, if visualizing hysplit dispersion
+
+###### if visualizing hysplit dispersion:
+
+ - ***'config' > 'visualization' > 'hysplit' > 'smoke_dispersion_kmz_filename'*** -- *optional* -- defaults to 'smoke_dispersion.kmz'
+ - ***'config' > 'visualization' > 'hysplit' > 'fire_kmz_filename'*** -- *optional* -- defaults to 'smoke_dispersion.kmz'
+ - ***'config' > 'visualization' > 'hysplit' > 'layer'*** -- *optional* -- defaults to 1
+ - ***'config' > 'visualization' >  'hysplit' > 'prettykml'*** -- *optional* -- whether or not to make the kml human readable; defaults to false
+ - ***'config' > 'visualization' >  'hysplit' > 'is_aquipt'*** -- *optional* -- defaults to false
 
 ##### export
 
