@@ -35,6 +35,8 @@ BlueskyKmlArgs = namedtuple('BlueskyKmlArgs', ARGS)
 
 DEFAULT_SMOKE_DISPERSION_KMZ_FILENAME = 'smoke_dispersion.kmz'
 DEFAULT_FIRE_KMZ_FILENAME = 'fire_information.kmz'
+DEFAULT_FIRE_LOCATIONS_CSV_FILENAME = 'fire_locations.csv'
+DEFAULT_FIRE_EVENTS_CSV_FILENAME = 'fire_events.csv'
 
 class HysplitVisualizer(object):
     def __init__(self, hysplit_output_info, fires, **config):
@@ -60,12 +62,29 @@ class HysplitVisualizer(object):
 
         run_id = hysplit_output_info.get('run_id') or uuid.uuid3()
         output_directory = self_config.get('output_dir') or hysplit_output_directory
-        smoke_dispersion_kmz_file = os.path.join(output_directory,
-            self_config.get('smoke_dispersion_kmz_filename') or
-            DEFAULT_SMOKE_DISPERSION_KMZ_FILENAME)
-        fire_kmz_file = os.path.join(output_directory,
-            self_config.get('fire_kmz_filename') or DEFAULT_FIRE_KMZ_FILENAME)
 
+        smoke_dispersion_kmz_filename = self_config.get(
+            'smoke_dispersion_kmz_filename',
+            DEFAULT_SMOKE_DISPERSION_KMZ_FILENAME)
+        smoke_dispersion_kmz_file = os.path.join(output_directory,
+            smoke_dispersion_kmz_filename)
+
+        fire_kmz_filename = self_config.get(
+            'fire_kmz_filename',
+            DEFAULT_FIRE_KMZ_FILENAME)
+        fire_kmz_file = os.path.join(output_directory, fire_kmz_filename)
+
+        fire_locations_csv_filename = self_config.get(
+            'fire_locations_csv_filename',
+            DEFAULT_FIRE_LOCATIONS_CSV_FILENAME)
+        fire_locations_csv_file = os.path.join(output_directory,
+            fire_locations_csv_filename)
+
+        fire_events_csv_filename = self_config.get(
+            'fire_events_csv_filename',
+            DEFAULT_FIRE_EVENTS_CSV_FILENAME)
+        fire_events_csv_file = os.path.join(output_directory,
+            fire_events_csv_filename)
         # TODO: generate fires locations csv, or refactor blueskykml to accept
         #  fires as json? (look in blueskykml code to see what it uses from the csv)
         # TODO: generate fire events csv ? (look in blueskykml code to see
@@ -78,8 +97,8 @@ class HysplitVisualizer(object):
             verbose=False, # TODO: set to True if logging level is DEBUG
             config_options={}, # TODO: set anything here?
             inputfile=hysplit_output_file,
-            fire_locations_csv=,
-            fire_events_csv=,
+            fire_locations_csv=fire_locations_csv_file,
+            fire_events_csv=fire_events_csv_file,
             smoke_dispersion_kmz_file=smoke_dispersion_kmz_file,
             fire_kmz_file=fire_kmz_file,
             # even though 'layer' is an integer index, the option must be of type
@@ -91,7 +110,8 @@ class HysplitVisualizer(object):
 
 
         try:
-            # TODO: clean up any outputs created?  Should this be toggleable via command line option?
+            # TODO: clean up any outputs created?  Should this be toggleable
+            #   via config setting
             if self._config.get('is_aquipt'):
                 makeaquiptdispersionkml.main(args)
             else:
@@ -100,6 +120,14 @@ class HysplitVisualizer(object):
             raise BlueSkyConfigurationError(".....")
 
         return {
-            'blueskykml_version': blueskykml_version,
-            ....
+            'blueskykml_version': blueskykml_version
+            "output": {
+                "run_id": run_guid,
+                "directory": output_directory,
+                "hysplit_output_file": hysplit_output_file,
+                "smoke_dispersion_kmz_filename": smoke_dispersion_kmz_filename,
+                "fire_kmz_filename": fire_kmz_filename,
+                "fire_locations_csv_filename": fire_locations_csv_filename,
+                "fire_events_csv_filename": fire_events_csv_filename,
+                # TODO: add location of image files, etc.
         }
