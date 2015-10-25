@@ -33,10 +33,12 @@ ARGS = [
 ]
 BlueskyKmlArgs = namedtuple('BlueskyKmlArgs', ARGS)
 
-DEFAULT_SMOKE_DISPERSION_KMZ_FILENAME = 'smoke_dispersion.kmz'
-DEFAULT_FIRE_KMZ_FILENAME = 'fire_information.kmz'
-DEFAULT_FIRE_LOCATIONS_CSV_FILENAME = 'fire_locations.csv'
-DEFAULT_FIRE_EVENTS_CSV_FILENAME = 'fire_events.csv'
+DEFAULT_FILE_NAMES = {
+    "fire_locations_csv": 'fire_locations.csv',
+    "fire_events_csv": 'fire_events.csv',
+    "smoke_dispersion_kmz": 'smoke_dispersion.kmz',
+    "fire_kmz": 'fire_information.kmz'
+}
 
 class HysplitVisualizer(object):
     def __init__(self, hysplit_output_info, fires, **config):
@@ -63,28 +65,13 @@ class HysplitVisualizer(object):
         run_id = hysplit_output_info.get('run_id') or uuid.uuid3()
         output_directory = self_config.get('output_dir') or hysplit_output_directory
 
-        smoke_dispersion_kmz_filename = self_config.get(
-            'smoke_dispersion_kmz_filename',
-            DEFAULT_SMOKE_DISPERSION_KMZ_FILENAME)
-        smoke_dispersion_kmz_file = os.path.join(output_directory,
-            smoke_dispersion_kmz_filename)
+        files = {
+            'fire_locations_csv': self._get_file_name('fire_locations_csv'),
+            'fire_events_csv': self._get_file_name('fire_events_csv'),
+            'smoke_dispersion_kmz': self._get_file_name('smoke_dispersion_kmz'),
+            'fire_kmz': self._get_file_name('fire_kmz')
+        }
 
-        fire_kmz_filename = self_config.get(
-            'fire_kmz_filename',
-            DEFAULT_FIRE_KMZ_FILENAME)
-        fire_kmz_file = os.path.join(output_directory, fire_kmz_filename)
-
-        fire_locations_csv_filename = self_config.get(
-            'fire_locations_csv_filename',
-            DEFAULT_FIRE_LOCATIONS_CSV_FILENAME)
-        fire_locations_csv_file = os.path.join(output_directory,
-            fire_locations_csv_filename)
-
-        fire_events_csv_filename = self_config.get(
-            'fire_events_csv_filename',
-            DEFAULT_FIRE_EVENTS_CSV_FILENAME)
-        fire_events_csv_file = os.path.join(output_directory,
-            fire_events_csv_filename)
         # TODO: generate fires locations csv, or refactor blueskykml to accept
         #  fires as json? (look in blueskykml code to see what it uses from the csv)
         # TODO: generate fire events csv ? (look in blueskykml code to see
@@ -97,10 +84,10 @@ class HysplitVisualizer(object):
             verbose=False, # TODO: set to True if logging level is DEBUG
             config_options={}, # TODO: set anything here?
             inputfile=hysplit_output_file,
-            fire_locations_csv=fire_locations_csv_file,
-            fire_events_csv=fire_events_csv_file,
-            smoke_dispersion_kmz_file=smoke_dispersion_kmz_file,
-            fire_kmz_file=fire_kmz_file,
+            fire_locations_csv=files['fire_locations_csv']['file'],
+            fire_events_csv=files['fire_events_csv']['file'],
+            smoke_dispersion_kmz_file=files['smoke_dispersion_kmz']['file'],
+            fire_kmz_file=files['fire_kmz']['file'],
             # even though 'layer' is an integer index, the option must be of type
             # string or else config.get(section, "LAYER") will fail with error:
             #  > TypeError: argument of type 'int' is not iterable
@@ -125,9 +112,16 @@ class HysplitVisualizer(object):
                 "run_id": run_guid,
                 "directory": output_directory,
                 "hysplit_output_file": hysplit_output_file,
-                "smoke_dispersion_kmz_filename": smoke_dispersion_kmz_filename,
-                "fire_kmz_filename": fire_kmz_filename,
-                "fire_locations_csv_filename": fire_locations_csv_filename,
-                "fire_events_csv_filename": fire_events_csv_filename,
+                "smoke_dispersion_kmz_filename": files['smoke_dispersion_kmz']['name'],
+                "fire_kmz_filename": files['fire_kmz']['name'],
+                "fire_locations_csv_filename": files['fire_locations_csv']['name'],
+                "fire_events_csv_filename": files['fire_events_csv']['name'],
                 # TODO: add location of image files, etc.
+        }
+
+    def _get_file_name(f):
+        name = self_config.get('{}_filename'.format(f), DEFAULT_FILENAMES[f])
+        return {
+            "name": name,
+            "file": os.path.join(output_directory, name)
         }
