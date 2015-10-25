@@ -72,10 +72,8 @@ class HysplitVisualizer(object):
             'fire_kmz': self._get_file_name('fire_kmz')
         }
 
-        # TODO: generate fires locations csv, or refactor blueskykml to accept
-        #  fires as json? (look in blueskykml code to see what it uses from the csv)
-        # TODO: generate fire events csv ? (look in blueskykml code to see
-        #  what it uses from the csv)
+        self._generate_fire_csv_files(files['fire_locations_csv']['pathname'],
+            files['fire_events_csv']['pathname'])
 
         args = BlueskyKmlArgs(
             output_directory=output_directory,
@@ -84,17 +82,16 @@ class HysplitVisualizer(object):
             verbose=False, # TODO: set to True if logging level is DEBUG
             config_options={}, # TODO: set anything here?
             inputfile=hysplit_output_file,
-            fire_locations_csv=files['fire_locations_csv']['file'],
-            fire_events_csv=files['fire_events_csv']['file'],
-            smoke_dispersion_kmz_file=files['smoke_dispersion_kmz']['file'],
-            fire_kmz_file=files['fire_kmz']['file'],
+            fire_locations_csv=files['fire_locations_csv']['pathname'],
+            fire_events_csv=files['fire_events_csv']['pathname'],
+            smoke_dispersion_kmz_file=files['smoke_dispersion_kmz']['pathname'],
+            fire_kmz_file=files['fire_kmz']['pathname'],
             # even though 'layer' is an integer index, the option must be of type
             # string or else config.get(section, "LAYER") will fail with error:
             #  > TypeError: argument of type 'int' is not iterable
             # it will be cast to int if specified
             layer=str(self._config.get('layer'))
         )
-
 
         try:
             # TODO: clean up any outputs created?  Should this be toggleable
@@ -115,13 +112,42 @@ class HysplitVisualizer(object):
                 "smoke_dispersion_kmz_filename": files['smoke_dispersion_kmz']['name'],
                 "fire_kmz_filename": files['fire_kmz']['name'],
                 "fire_locations_csv_filename": files['fire_locations_csv']['name'],
-                "fire_events_csv_filename": files['fire_events_csv']['name'],
+                "fire_events_csv_filename": files['fire_events_csv']['name']
                 # TODO: add location of image files, etc.
+            }
         }
 
     def _get_file_name(f):
         name = self_config.get('{}_filename'.format(f), DEFAULT_FILENAMES[f])
         return {
             "name": name,
-            "file": os.path.join(output_directory, name)
+            "pathname": os.path.join(output_directory, name)
         }
+
+    def _generate_fire_csv_file(self, fire_locations_csv_pathname,
+            fire_events_csv_pathname):
+        """Generates fire locations and events csvs
+
+        These are used by blueskykml, but are also used by end users.
+        If it weren't for end users wanting the files, we might want to
+        consider refactoring blueskykml to accept the fire data in
+        memory (in the call to makedispersionkml.main(args)) rather
+        reading it from file.
+        """
+        # TODO: Make sure that the filed don't already exists
+        # TODO: look in blueskykml code to see what it uses from the two csvs
+
+        # First generate the fire locations csv file. as we iterate through
+        # the fires to generate it, collect the fire events information
+        events = {}
+        with open(fire_locations_csv_pathname, 'w'):
+            # TDOO: write the header
+            for f in self._fires:
+                # TODO: write the fire record
+                # TODO: update events
+                pass
+
+        with open(fire_events_csv_pathname, 'w'):
+            for e_id, e in events.items():
+                # TODO: write the event record
+                pass
