@@ -33,6 +33,9 @@ def run(fires_manager):
     # Note: ArlFinder will raise an exception if met_root_dir is undefined
     # or is not a valid directory
     met_root_dir = fires_manager.get_config_value('findmetdata', 'met_root_dir')
+    if not met_root_dir:
+        raise BlueSkyConfigurationError("Config setting 'met_root_dir' "
+            "required by findmetdata module".format(e.message))
     arl_finder = arlfinder.ArlFinder(met_root_dir)
     for fire in fires_manager.fires:
         for g in fire.growth:
