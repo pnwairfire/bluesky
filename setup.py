@@ -44,6 +44,7 @@ setup(
         "https://pypi.smoke.airfire.org/simple/fccsmap/",
         "https://pypi.smoke.airfire.org/simple/timeprofile/",
         "https://pypi.smoke.airfire.org/simple/plumerise/",
+        "https://pypi.smoke.airfire.org/simple/blueskykml/",
         "https://pypi.smoke.airfire.org/simple/apps-consume4/"
     ],
     tests_require=test_requirements
