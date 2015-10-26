@@ -87,16 +87,16 @@ class HysplitVisualizer(object):
 
         layer = self._config.get('layer')
         args = BlueskyKmlArgs(
-            output_directory=output_directory,
+            output_directory=str(output_directory),
             configfile=None, # TODO: allow this to be configurable?
             prettykml=self._config.get('prettykml'),
             verbose=False, # TODO: set to True if logging level is DEBUG
             config_options={}, # TODO: set anything here?
-            inputfile=hysplit_output_file,
-            fire_locations_csv=files['fire_locations_csv']['pathname'],
-            fire_events_csv=files['fire_events_csv']['pathname'],
-            smoke_dispersion_kmz_file=files['smoke_dispersion_kmz']['pathname'],
-            fire_kmz_file=files['fire_kmz']['pathname'],
+            inputfile=str(hysplit_output_file),
+            fire_locations_csv=str(files['fire_locations_csv']['pathname']),
+            fire_events_csv=str(files['fire_events_csv']['pathname']),
+            smoke_dispersion_kmz_file=str(files['smoke_dispersion_kmz']['pathname']),
+            fire_kmz_file=str(files['fire_kmz']['pathname']),
             # even though 'layer' is an integer index, the option must be of type
             # string or else config.get(section, "LAYER") will fail with error:
             #  > TypeError: argument of type 'int' is not iterable
