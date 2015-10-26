@@ -90,7 +90,11 @@ class HysplitVisualizer(object):
             output_directory=str(output_directory),
             configfile=None, # TODO: allow this to be configurable?
             prettykml=self._config.get('prettykml'),
-            verbose=False, # TODO: set to True if logging level is DEBUG
+            # in blueskykml, if verbose is True, then logging level will be set
+            # DEBUG; otherwise, logging level is left as is.  bsp already takes
+            # care of setting log level, so setting verbose to False will let
+            # blueskykml inherit logging level
+            verbose=False,
             config_options={}, # TODO: set anything here?
             inputfile=str(hysplit_output_file),
             fire_locations_csv=str(files['fire_locations_csv']['pathname']),
