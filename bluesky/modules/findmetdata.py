@@ -16,13 +16,11 @@ __all__ = [
 
 __version__ = "0.1.0"
 
-def run(fires_manager, config=None):
+def run(fires_manager):
     """runs the findmetdata module
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
-    Kwargs:
-     - config -- optional configparser object
     """
     logging.info("Running findmetdata module")
     fires_manager.processed(__name__, __version__)
@@ -34,7 +32,7 @@ def run(fires_manager, config=None):
 
     # Note: ArlFinder will raise an exception if met_root_dir is undefined
     # or is not a valid directory
-    met_root_dir = config.get('findmetdata', [}).get('met_root_dir')
+    met_root_dir = fires_manager.get_config_value('findmetdata', 'met_root_dir')
     arl_finder = arlfinder.ArlFinder(met_root_dir)
     for fire in fires_manager.fires:
         for g in fire.growth:

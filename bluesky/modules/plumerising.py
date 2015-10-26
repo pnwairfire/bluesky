@@ -24,8 +24,6 @@ def run(fires_manager):
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
-    Kwargs:
-     - config -- optional configparser object
     """
     model = fires_manager.get_config_value('plumerise', 'model',
         default='sev').lower()

@@ -15,13 +15,11 @@ __all__ = [
 
 __version__ = "0.1.0"
 
-def run(fires_manager, config=None):
+def run(fires_manager):
     """Runs dispersion module
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
-    Kwargs:
-     - config -- optional configparser object
     """
     target = fires_manager.get_config_value('visualization', 'target',
         default='dispersion').lower()

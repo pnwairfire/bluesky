@@ -4,7 +4,6 @@ This module relies on the fortran arl profile utility. It is expected to
 reside in a directory in the search path. (This module prevents configuring
 relative or absolute paths to profile, to eliminiate security vulnerabilities
 when invoked by web service request.) To obtain profile, contact NOAA.
-
 """
 
 __author__      = "Joel Dubowy"
@@ -22,13 +21,11 @@ __all__ = [
 
 __version__ = "0.1.0"
 
-def run(fires_manager, config=None):
+def run(fires_manager):
     """Runs plumerise module
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
-    Kwargs:
-     - config -- optional configparser object
     """
     logging.info("Running localmet module")
     fires_manager.processed(__name__, __version__)

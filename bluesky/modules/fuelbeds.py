@@ -18,13 +18,11 @@ __version__ = "0.1.0"
 
 FCCS_VERSION = '2' # TODO: make this configurable
 
-def run(fires_manager, config=None):
+def run(fires_manager):
     """Runs emissions module
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
-    Kwargs:
-     - config -- optional configparser object
     """
     logging.info("Running fuelbeds module")
     fires_manager.processed(__name__, __version__,
