@@ -55,7 +55,6 @@ def run(fires_manager, config=None):
         fires_manager.visualization = visualization_info
 
     finally:
-        fires_manager.processed(__name__, __version__,
-            target=target, **processed_kwargs)
+        fires_manager.processed(__name__, __version__, **processed_kwargs)
 
     # TODO: add information to fires_manager indicating where to find the hysplit output
