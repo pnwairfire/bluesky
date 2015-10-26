@@ -40,6 +40,11 @@ DEFAULT_FILE_NAMES = {
     "fire_kmz": 'fire_information.kmz'
 }
 
+def pick_representative_fuelbed(fire):
+    sorted_fuelbeds = reversed(fire.get('fuelbeds', []), key=lambda fb: fb['pct'])
+    if sorted_fuelbeds:
+        return sorted_fuelbeds[0]['fccs_id']
+
 class HysplitVisualizer(object):
     def __init__(self, hysplit_output_info, fires, **config):
         self._hysplit_output_info = hysplit_output_info
@@ -124,6 +129,45 @@ class HysplitVisualizer(object):
             "pathname": os.path.join(output_directory, name)
         }
 
+
+    FIRE_LOCATIONS_CSV_FIELDS = [
+        ('id', lambda f: f.id),
+        ('fccs_number', pick_representative_fuelbed)
+    ]
+    """List of fire location csv fields, with function to extract from fire object"""
+
+    FIRE_EVENTS_CSV_FIELDS = [
+        ('name', _assign_event_name),
+        ('total_area', _update_event_area),
+        ('total_pm25', _update_total_emissions_species('pm25')),
+        ('total_pm10', _update_total_emissions_species('pm10')),
+        ('total_co', _update_total_emissions_species('co')),
+        ('total_co2', _update_total_emissions_species('co2')),
+        ('total_ch4', _update_total_emissions_species('ch4')),
+        ('total_nmhc', _update_total_emissions_species('nmhc')),
+        ('total_nox', _update_total_emissions_species('nox')),
+        ('total_nh3', _update_total_emissions_species('nh3')),
+        ('total_so2', _update_total_emissions_species('so2')),
+        ('total_voc', _update_total_emissions_species('voc'))
+    ]
+    """List of fire event csv fields, with function to extract from fire object
+    and aggregate.  Note that this list lacks 'id', which is the first column.
+    """
+
+    def _collect_csv_fields(self):
+        # As we iterate through fires, collecting necessary fields, collect
+        # events information as well
+        fires = {}
+        events = {}
+        for fire in self._fires:
+            fires.append({k: l(fire) or '' for k, l in self.FIRE_LOCATIONS_CSV_FIELDS})
+            event_id = fire.get('event_of', {}).get('id')
+            if event_id:
+                events[event_id] = events.get(event_id, {})
+                for k, l in self.FIRE_EVENTS_CSV_FIELDS:
+                    events[event_id][k] = l(events[event_id], f)
+        return fires, events
+
     def _generate_fire_csv_file(self, fire_locations_csv_pathname,
             fire_events_csv_pathname):
         """Generates fire locations and events csvs
@@ -134,20 +178,48 @@ class HysplitVisualizer(object):
         memory (in the call to makedispersionkml.main(args)) rather
         reading it from file.
         """
-        # TODO: Make sure that the filed don't already exists
+        # TODO: Make sure that the files don't already exists
         # TODO: look in blueskykml code to see what it uses from the two csvs
 
-        # First generate the fire locations csv file. as we iterate through
-        # the fires to generate it, collect the fire events information
-        events = {}
-        with open(fire_locations_csv_pathname, 'w'):
-            # TDOO: write the header
-            for f in self._fires:
-                # TODO: write the fire record
-                # TODO: update events
-                pass
+        fires, events = self._collect_csv_fields()
+        with open(fire_locations_csv_pathname, 'w') as f:
+            f.write(','.join([k for k, l in self.FIRE_LOCATIONS_CSV_FIELDS]))
+            for fire in fires:
+                f.write(','.join([fire[k] for k, l in self.FIRE_LOCATIONS_CSV_FIELDS]))
 
-        with open(fire_events_csv_pathname, 'w'):
-            for e_id, e in events.items():
-                # TODO: write the event record
-                pass
+        with open(fire_events_csv_pathname, 'w') as f:
+            f.write(','.join([k for k, l in self.FIRE_EVENTS_CSV_FIELDS]))
+            for e_id, event in events.items():
+                f.write(','.join([e_id] +
+                    [event[k] for k, l in self.FIRE_EVENTS_CSV_FIELDS]))
+
+def _assign_event_name(event, fire):
+    if fire['event_of']['name']:
+        if event['name'] and fire['event_of']['name'] != event['name']:
+            logging.warn("Fire {} event name conflict: '{}' != '{}'".format(
+                fire['event_of']['name'], event['name']))
+        event['name'] = fire['event_of']['name']
+
+def _update_event_area(event, fire):
+    if not fire.get('location', {}).get('area'):
+        raise ValueError("Fire {} lacks area".format(fire.get('id')))
+    event['total_area'] = event.get('total_area', 0.0) + fire
+
+def _update_total_emissions_species(species):
+    key = 'total_{}'.format(species)
+    def f(event, fire):
+        if key in event and event[key] is None:
+            # previous fire didn't have this emissions value defined; abort so
+            # that we don't end up with misleading partial total
+            return
+
+        # value will be set to non-None if species is defined for all fuelbeds
+        event[key] = None
+        if fire.get('fuelbeds'):
+            values = [
+                fb.get('emissions', {}).get('total', {}).get(species.upper())
+                    for db in fire['fuelbeds']
+            ]
+            if not any([v is None for v in values]):
+                event[key] = sum(values)
+    return f
