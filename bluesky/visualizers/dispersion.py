@@ -117,7 +117,7 @@ class HysplitVisualizer(object):
         return {
             'blueskykml_version': blueskykml_version,
             "output": {
-                "run_id": run_guid,
+                "run_id": run_id,
                 "directory": output_directory,
                 "hysplit_output_file": hysplit_output_file,
                 "smoke_dispersion_kmz_filename": files['smoke_dispersion_kmz']['name'],
