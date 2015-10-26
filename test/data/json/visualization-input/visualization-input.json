@@ -2,9 +2,11 @@
     "config": {
         "visualization": {
             "target": "dispersion",
-            "output_dir": "/tmp/bsp-visualization",
             "hysplit": {
-                "is_aquipt": false
+                "is_aquipt": false,
+                "images_dir": "images/",
+                "data_dir": "data/",
+                "output_dir": "/tmp/bsp-visualizations"
             }
         }
     },
@@ -23,16 +25,15 @@
             },
             "domain": "DRI6km",
             "files": [
-                "/DRI_6km/2014053000/wrfout_d2.2014053000.f00-11_12hr01.arl",
                 "/DRI_6km/2014052912/wrfout_d2.2014052912.f00-11_12hr01.arl"
             ],
             "grid_spacing_km": 6.0
         },
         "output": {
-            "run_id": "3b832b6a-79b9-11e5-9dc5-080027880ca6",
-            "start_time": "2014-05-29T22:00:00",
-            "num_hours": 2,
-            "directory": "/tmp/bsp-output/3b832b6a-79b9-11e5-9dc5-080027880ca6",
+            "run_id": "ee0f58dc-7c23-11e5-b6b5-080027880ca6",
+            "start_time": "2014-05-29T12:00:00",
+            "num_hours": 12,
+            "directory": "/tmp/bsp-output/ee0f58dc-7c23-11e5-b6b5-080027880ca6",
             "grid_filename": "hysplit_conc.nc",
             "grid_filetype": "NETCDF",
             "parameters": {

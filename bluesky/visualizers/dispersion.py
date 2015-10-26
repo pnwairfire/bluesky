@@ -69,13 +69,18 @@ class HysplitVisualizer(object):
                 hysplit_output_file))
 
         run_id = self._hysplit_output_info.get('run_id') or uuid.uuid3()
-        output_directory = self._config.get('output_dir') or hysplit_output_directory
+        if self._config.get('output_dir'):
+            output_directory = os.path.join(self._config['output_dir'], run_id)
+        else:
+            output_directory =  hysplit_output_directory
+        data_dir = os.path.join(output_directory, self._config.get('data_dir') or '')
+        os.makedirs(data_dir)
 
         files = {
             'fire_locations_csv': self._get_file_name(
-                output_directory, 'fire_locations_csv'),
+                data_dir, 'fire_locations_csv'),
             'fire_events_csv': self._get_file_name(
-                output_directory, 'fire_events_csv'),
+                data_dir, 'fire_events_csv'),
             'smoke_dispersion_kmz': self._get_file_name(
                 output_directory, 'smoke_dispersion_kmz'),
             'fire_kmz': self._get_file_name(
@@ -85,6 +90,12 @@ class HysplitVisualizer(object):
         self._generate_fire_csv_files(files['fire_locations_csv']['pathname'],
             files['fire_events_csv']['pathname'])
 
+        config_options = {
+            'DispersionGridOutput': {
+                'OUTPUT_DIR': str(os.path.join(output_directory,
+                    self._config.get('images_dir') or ''))
+            }
+        }
         layer = self._config.get('layer')
         args = BlueskyKmlArgs(
             output_directory=str(output_directory),
@@ -95,7 +106,7 @@ class HysplitVisualizer(object):
             # care of setting log level, so setting verbose to False will let
             # blueskykml inherit logging level
             verbose=False,
-            config_options={}, # TODO: set anything here?
+            config_options=config_options,
             inputfile=str(hysplit_output_file),
             fire_locations_csv=str(files['fire_locations_csv']['pathname']),
             fire_events_csv=str(files['fire_events_csv']['pathname']),
@@ -132,11 +143,11 @@ class HysplitVisualizer(object):
             }
         }
 
-    def _get_file_name(self, output_directory, f):
+    def _get_file_name(self, directory, f):
         name = self._config.get('{}_filename'.format(f), DEFAULT_FILENAMES[f])
         return {
             "name": name,
-            "pathname": os.path.join(output_directory, name)
+            "pathname": os.path.join(directory, name)
         }
 
 
