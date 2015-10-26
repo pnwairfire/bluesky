@@ -151,7 +151,11 @@ class FiresManager(object):
             try:
                 self._modules.append(importlib.import_module('bluesky.modules.%s' % (m)))
             except ImportError, e:
-                raise BlueSkyImportError("Invalid module '{}'".format(m))
+                if e.message == 'No module named {}'.format(m):
+                    raise BlueSkyImportError("Invalid module '{}'".format(m))
+                else:
+                    logging.debug(traceback.format_exc())
+                    raise BlueSkyImportError("Error importing module {}".format(m))
 
     @property
     def meta(self):
