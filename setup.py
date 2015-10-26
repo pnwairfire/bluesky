@@ -33,7 +33,7 @@ setup(
         "fccsmap>=0.1.6",
         "timeprofile>=0.1.2",
         "plumerise>=0.1.1",
-        "blueskykml>=0.2.4",
+        "blueskykml>=0.2.5",
         "apps-consume4>=4.1.2",
         "tornado==4.2.1"
     ],
