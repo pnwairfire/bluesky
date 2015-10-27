@@ -41,11 +41,11 @@ DEFAULT_FILENAMES = {
     "fire_kmz": 'fire_information.kmz'
 }
 
-BLUESKYKML_DATE_FORMAT = smokedispersionkml.date_time_format
+BLUESKYKML_DATE_FORMAT = smokedispersionkml.FireData.date_time_format
 
 # as of blueskykml v0.2.5, this list is:
 #  'pm25', 'pm10', 'co', 'co2', 'ch4', 'nox', 'nh3', 'so2', 'voc'
-BLUESKYKML_SPECIES_LIST = emission_fields
+BLUESKYKML_SPECIES_LIST = smokedispersionkml.FireData.emission_fields
 
 class HysplitVisualizer(object):
     def __init__(self, hysplit_output_info, fires, **config):
@@ -208,27 +208,11 @@ class HysplitVisualizer(object):
                 f.write(','.join([e_id] +
                     [str(event[k] or '') for k, l in self.FIRE_EVENTS_CSV_FIELDS]) + '\n')
 
-
-    ##
-    ## Helper Functions for extracting fire location and event information to
-    ## write to csv files
-    ##
-
-    def _sum_fire_species_values(fire, species):
-        if fire.get('fuelbeds'):
-            species_array = [
-                fb.get('emissions', {}).get('total', {}).get(species.upper())
-                    for fb in fire['fuelbeds']
-            ]
-            if not any([v is None for v in species_array]):
-                return sum([sum(a) for a in species_array])
-
     ##
     ## Functions for extracting fire *location * information to write to csv files
     ##
 
     def _pick_start_time(fire):
-        import pdb;pdb.set_trace()
         sorted_growth = sorted(fire.get('growth', []),
             key=lambda g: g.get('start'))
         dt = None
@@ -252,7 +236,14 @@ class HysplitVisualizer(object):
 
     def _get_emissions_species(species):
         def f(fire):
-            return _sum_fire_species_values(fire, species)
+            if fire.get('fuelbeds'):
+                species_array = [
+                    fb.get('emissions', {}).get('total', {}).get(species.upper())
+                        for fb in fire['fuelbeds']
+                ]
+                # non-None value will be returned if species is defined for all fuelbeds
+                if not any([v is None for v in species_array]):
+                    return sum([sum(a) for a in species_array])
         return f
 
     # Fire locations csv columns from BSF:
@@ -277,11 +268,8 @@ class HysplitVisualizer(object):
         ('event_guid', lambda f: f.get('event_of', {}).get('event_id')),
         ('fccs_number', _pick_representative_fuelbed),
         # TDOO: add 'VEG' ?
-    ] + [
-        (s, _get_emissions_species(s)
-            for s in BLUESKYKML_SPECIES_LIST)
-    ]
-    ]
+        # TODO: Add other fields if user's want them
+    ] + [(s, _get_emissions_species(s)) for s in BLUESKYKML_SPECIES_LIST]
     """List of fire location csv fields, with function to extract from fire object"""
 
     ##
@@ -309,10 +297,11 @@ class HysplitVisualizer(object):
                 # that we don't end up with misleading partial total
                 return
 
-            # value will be set to non-None if species is defined for all fuelbeds
-            event[key] = None
-            if fire.get('fuelbeds'):
-                event[key] = _sum_fire_species_values(fire, species)
+            if fire.get(species):
+                event[key] = event.get(key, 0.0) + fire[species]
+            else:
+                # set to None so that that logic above knows to skip for other fires
+                event[key] = None
         return f
 
     # Fire events csv columns from BSF:
@@ -326,8 +315,8 @@ class HysplitVisualizer(object):
         ('total_area', _update_event_area),
         ('total_nmhc', _update_total_emissions_species('nmhc'))
     ] + [
-        ('total_{}'.format(s),_update_total_emissions_species(s)
-            for s in BLUESKYKML_SPECIES_LIST)
+        ('total_{}'.format(s), _update_total_emissions_species(s))
+            for s in BLUESKYKML_SPECIES_LIST
     ]
     """List of fire event csv fields, with function to extract from fire object
     and aggregate.  Note that this list lacks 'id', which is the first column.
