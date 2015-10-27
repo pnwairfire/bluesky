@@ -12,6 +12,7 @@ __all__ = [
 ]
 __version__ = "0.1.0"
 
+import csv
 import logging
 import os
 import uuid
@@ -197,16 +198,18 @@ class HysplitVisualizer(object):
         # TODO: look in blueskykml code to see what it uses from the two csvs
 
         fires, events = self._collect_csv_fields()
-        with open(fire_locations_csv_pathname, 'w') as f:
-            f.write(','.join([k for k, l in self.FIRE_LOCATIONS_CSV_FIELDS]) + '\n')
+        with open(fire_locations_csv_pathname, 'w') as _f:
+            f = csv.writer(_f)
+            f.writerow([k for k, l in self.FIRE_LOCATIONS_CSV_FIELDS])
             for fire in fires:
-                f.write(','.join([str(fire[k] or '') for k, l in self.FIRE_LOCATIONS_CSV_FIELDS]) + '\n')
+                f.writerow([str(fire[k] or '') for k, l in self.FIRE_LOCATIONS_CSV_FIELDS])
 
-        with open(fire_events_csv_pathname, 'w') as f:
-            f.write(','.join([k for k, l in self.FIRE_EVENTS_CSV_FIELDS]) + '\n')
+        with open(fire_events_csv_pathname, 'w') as _f:
+            f = csv.writer(_f)
+            f.writerow([k for k, l in self.FIRE_EVENTS_CSV_FIELDS])
             for e_id, event in events.items():
-                f.write(','.join([e_id] +
-                    [str(event[k] or '') for k, l in self.FIRE_EVENTS_CSV_FIELDS]) + '\n')
+                f.writerow([e_id] +
+                    [str(event[k] or '') for k, l in self.FIRE_EVENTS_CSV_FIELDS])
 
     ##
     ## Functions for extracting fire *location * information to write to csv files
