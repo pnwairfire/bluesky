@@ -206,7 +206,7 @@ class HysplitVisualizer(object):
 
         with open(fire_events_csv_pathname, 'w') as _f:
             f = csv.writer(_f)
-            f.writerow([k for k, l in self.FIRE_EVENTS_CSV_FIELDS])
+            f.writerow(['id'] + [k for k, l in self.FIRE_EVENTS_CSV_FIELDS])
             for e_id, event in events.items():
                 f.writerow([e_id] +
                     [str(event[k] or '') for k, l in self.FIRE_EVENTS_CSV_FIELDS])
