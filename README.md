@@ -888,7 +888,7 @@ modules.)
  - ***'fire_information' > 'fuelbeds'*** -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
  - ***'fire_information' > 'location' > 'area'*** -- fire's total area
  - ***'fire_information' > 'location' > 'ecoregion'*** -- *optional*
- - ***'fire_information' > 'type'*** -- *optional* -- fire type (defaults to 'natureal' unless set to 'rx');
+ - ***'fire_information' > 'type'*** -- *optional* -- fire type (defaults to 'natural' unless set to 'rx');
 
 ##### emissions
 

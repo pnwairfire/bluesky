@@ -33,7 +33,7 @@
             "run_id": "ee0f58dc-7c23-11e5-b6b5-080027880ca6",
             "start_time": "2014-05-29T12:00:00",
             "num_hours": 12,
-            "directory": "/tmp/bsp-output/ee0f58dc-7c23-11e5-b6b5-080027880ca6",
+            "directory": "/bluesky/bsp-dispersion-ouput/example-12hr/",
             "grid_filename": "hysplit_conc.nc",
             "grid_filetype": "NETCDF",
             "parameters": {
@@ -48,6 +48,7 @@
                 "name": "Natural Fire near Yosemite, CA"
             },
             "id": "SF11C14225236095807750",
+            "type": "natural",
             "location": {
                 "area": 200,
                 "ecoregion": "southern",

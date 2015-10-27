@@ -17,11 +17,12 @@ import os
 import uuid
 from collections import namedtuple
 
+from pyairfire.datetime import parsing as datetime_parsing
+
 from blueskykml import (
     makedispersionkml, makeaquiptdispersionkml, configuration,
-    __version__ as blueskykml_version
+    smokedispersionkml, __version__ as blueskykml_version
 )
-
 from bluesky.exceptions import BlueSkyConfigurationError
 
 ARGS = [
@@ -40,11 +41,11 @@ DEFAULT_FILENAMES = {
     "fire_kmz": 'fire_information.kmz'
 }
 
-def pick_representative_fuelbed(fire):
-    sorted_fuelbeds = sorted(fire.get('fuelbeds', []),
-        key=lambda fb: fb['pct'], reverse=True)
-    if sorted_fuelbeds:
-        return sorted_fuelbeds[0]['fccs_id']
+BLUESKYKML_DATE_FORMAT = smokedispersionkml.date_time_format
+
+# as of blueskykml v0.2.5, this list is:
+#  'pm25', 'pm10', 'co', 'co2', 'ch4', 'nox', 'nh3', 'so2', 'voc'
+BLUESKYKML_SPECIES_LIST = emission_fields
 
 class HysplitVisualizer(object):
     def __init__(self, hysplit_output_info, fires, **config):
@@ -74,7 +75,8 @@ class HysplitVisualizer(object):
         else:
             output_directory =  hysplit_output_directory
         data_dir = os.path.join(output_directory, self._config.get('data_dir') or '')
-        os.makedirs(data_dir)
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
 
         files = {
             'fire_locations_csv': self._get_file_name(
@@ -196,15 +198,95 @@ class HysplitVisualizer(object):
 
         fires, events = self._collect_csv_fields()
         with open(fire_locations_csv_pathname, 'w') as f:
-            f.write(','.join([k for k, l in self.FIRE_LOCATIONS_CSV_FIELDS]))
+            f.write(','.join([k for k, l in self.FIRE_LOCATIONS_CSV_FIELDS]) + '\n')
             for fire in fires:
-                f.write(','.join([fire[k] for k, l in self.FIRE_LOCATIONS_CSV_FIELDS]))
+                f.write(','.join([str(fire[k] or '') for k, l in self.FIRE_LOCATIONS_CSV_FIELDS]) + '\n')
 
         with open(fire_events_csv_pathname, 'w') as f:
-            f.write(','.join([k for k, l in self.FIRE_EVENTS_CSV_FIELDS]))
+            f.write(','.join([k for k, l in self.FIRE_EVENTS_CSV_FIELDS]) + '\n')
             for e_id, event in events.items():
                 f.write(','.join([e_id] +
-                    [event[k] or '' for k, l in self.FIRE_EVENTS_CSV_FIELDS]))
+                    [str(event[k] or '') for k, l in self.FIRE_EVENTS_CSV_FIELDS]) + '\n')
+
+
+    ##
+    ## Helper Functions for extracting fire location and event information to
+    ## write to csv files
+    ##
+
+    def _sum_fire_species_values(fire, species):
+        if fire.get('fuelbeds'):
+            species_array = [
+                fb.get('emissions', {}).get('total', {}).get(species.upper())
+                    for fb in fire['fuelbeds']
+            ]
+            if not any([v is None for v in species_array]):
+                return sum([sum(a) for a in species_array])
+
+    ##
+    ## Functions for extracting fire *location * information to write to csv files
+    ##
+
+    def _pick_start_time(fire):
+        import pdb;pdb.set_trace()
+        sorted_growth = sorted(fire.get('growth', []),
+            key=lambda g: g.get('start'))
+        dt = None
+        if sorted_growth:
+            dt = sorted_growth[0].get('start')
+
+        # TODO: if either no growth defined or 'start' not defined for growth
+        # window, return hysplit dispersion's start_time - would need to pass
+        # it into this function, or make this function a method on self, and
+        # grab from self._hysplit_output_info
+        if not dt:
+            raise ValueError("Fire {} lacks start time".format(fire.get('id')))
+
+        return datetime_parsing.parse(dt).strftime(BLUESKYKML_DATE_FORMAT)
+
+    def _pick_representative_fuelbed(fire):
+        sorted_fuelbeds = sorted(fire.get('fuelbeds', []),
+            key=lambda fb: fb['pct'], reverse=True)
+        if sorted_fuelbeds:
+            return sorted_fuelbeds[0]['fccs_id']
+
+    def _get_emissions_species(species):
+        def f(fire):
+            return _sum_fire_species_values(fire, species)
+        return f
+
+    # Fire locations csv columns from BSF:
+    #  id,event_id,latitude,longitude,type,area,date_time,elevation,slope,
+    #  state,county,country,fips,scc,fuel_1hr,fuel_10hr,fuel_100hr,fuel_1khr,
+    #  fuel_10khr,fuel_gt10khr,shrub,grass,rot,duff,litter,moisture_1hr,
+    #  moisture_10hr,moisture_100hr,moisture_1khr,moisture_live,moisture_duff,
+    #  consumption_flaming,consumption_smoldering,consumption_residual,
+    #  consumption_duff,min_wind,max_wind,min_wind_aloft,max_wind_aloft,
+    #  min_humid,max_humid,min_temp,max_temp,min_temp_hour,max_temp_hour,
+    #  sunrise_hour,sunset_hour,snow_month,rain_days,heat,pm25,pm10,co,co2,
+    #  ch4,nox,nh3,so2,voc,canopy,event_url,fccs_number,owner,sf_event_guid,
+    #  sf_server,sf_stream_name,timezone,veg
+    FIRE_LOCATIONS_CSV_FIELDS = [
+        ('id', lambda f: f.id),
+        ('type', lambda f: f.get('type', 'natural')),
+        ('latitude', lambda f: f.latitude),
+        ('longitude', lambda f: f.longitude),
+        ('area', lambda f: f.location.get('area')),
+        ('date_time', _pick_start_time),
+        ('event_name', lambda f: f.get('event_of', {}).get('name')),
+        ('event_guid', lambda f: f.get('event_of', {}).get('event_id')),
+        ('fccs_number', _pick_representative_fuelbed),
+        # TDOO: add 'VEG' ?
+    ] + [
+        (s, _get_emissions_species(s)
+            for s in BLUESKYKML_SPECIES_LIST)
+    ]
+    ]
+    """List of fire location csv fields, with function to extract from fire object"""
+
+    ##
+    ## Functions for extracting fire *event* information to write to csv files
+    ##
 
     def _assign_event_name(event, fire):
         name = fire.get('event_of', {}).get('name')
@@ -230,30 +312,8 @@ class HysplitVisualizer(object):
             # value will be set to non-None if species is defined for all fuelbeds
             event[key] = None
             if fire.get('fuelbeds'):
-                species_array = [
-                    fb.get('emissions', {}).get('total', {}).get(species.upper())
-                        for fb in fire['fuelbeds']
-                ]
-                if not any([v is None for v in species_array]):
-                    event[key] = sum([sum(a) for a in species_array])
+                event[key] = _sum_fire_species_values(fire, species)
         return f
-
-    # Fire locations csv columns from BSF:
-    #  id,event_id,latitude,longitude,type,area,date_time,elevation,slope,
-    #  state,county,country,fips,scc,fuel_1hr,fuel_10hr,fuel_100hr,fuel_1khr,
-    #  fuel_10khr,fuel_gt10khr,shrub,grass,rot,duff,litter,moisture_1hr,
-    #  moisture_10hr,moisture_100hr,moisture_1khr,moisture_live,moisture_duff,
-    #  consumption_flaming,consumption_smoldering,consumption_residual,
-    #  consumption_duff,min_wind,max_wind,min_wind_aloft,max_wind_aloft,
-    #  min_humid,max_humid,min_temp,max_temp,min_temp_hour,max_temp_hour,
-    #  sunrise_hour,sunset_hour,snow_month,rain_days,heat,pm25,pm10,co,co2,
-    #  ch4,nox,nh3,so2,voc,canopy,event_url,fccs_number,owner,sf_event_guid,
-    #  sf_server,sf_stream_name,timezone,veg
-    FIRE_LOCATIONS_CSV_FIELDS = [
-        ('id', lambda f: f.id),
-        ('fccs_number', pick_representative_fuelbed)
-    ]
-    """List of fire location csv fields, with function to extract from fire object"""
 
     # Fire events csv columns from BSF:
     #  id,event_name,total_area,total_heat,total_pm25,total_pm10,total_pm,
@@ -264,16 +324,10 @@ class HysplitVisualizer(object):
         ('event_name', _assign_event_name),
         ('total_heat', lambda event, fire: 0.0),
         ('total_area', _update_event_area),
-        ('total_pm25', _update_total_emissions_species('pm25')),
-        ('total_pm10', _update_total_emissions_species('pm10')),
-        ('total_co', _update_total_emissions_species('co')),
-        ('total_co2', _update_total_emissions_species('co2')),
-        ('total_ch4', _update_total_emissions_species('ch4')),
-        ('total_nmhc', _update_total_emissions_species('nmhc')),
-        ('total_nox', _update_total_emissions_species('nox')),
-        ('total_nh3', _update_total_emissions_species('nh3')),
-        ('total_so2', _update_total_emissions_species('so2')),
-        ('total_voc', _update_total_emissions_species('voc'))
+        ('total_nmhc', _update_total_emissions_species('nmhc'))
+    ] + [
+        ('total_{}'.format(s),_update_total_emissions_species(s)
+            for s in BLUESKYKML_SPECIES_LIST)
     ]
     """List of fire event csv fields, with function to extract from fire object
     and aggregate.  Note that this list lacks 'id', which is the first column.
