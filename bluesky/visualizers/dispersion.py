@@ -268,7 +268,7 @@ class HysplitVisualizer(object):
         ('area', lambda f: f.location.get('area')),
         ('date_time', _pick_start_time),
         ('event_name', lambda f: f.get('event_of', {}).get('name')),
-        ('event_guid', lambda f: f.get('event_of', {}).get('event_id')),
+        ('event_guid', lambda f: f.get('event_of', {}).get('id')),
         ('fccs_number', _pick_representative_fuelbed),
         # TDOO: add 'VEG' ?
         # TODO: Add other fields if user's want them
