@@ -983,6 +983,9 @@ the fire data, each module has its own set of required and optional fields.
  - ***'config' > 'visualization' > 'hysplit' > 'layer'*** -- *optional* -- defaults to 1
  - ***'config' > 'visualization' >  'hysplit' > 'prettykml'*** -- *optional* -- whether or not to make the kml human readable; defaults to false
  - ***'config' > 'visualization' >  'hysplit' > 'is_aquipt'*** -- *optional* -- defaults to false
+ - ***'config' > 'visualization' >  'hysplit' > 'output_dir' -- *optional* -- where to create visualization output directory (i.e. the parent directory to contain the ouput directory); if not specified, visualization output will go in hysplit output directory
+ - ***'config' > 'visualization' >  'hysplit' > 'images_dir' -- *optional* -- sub-directory to contain images (relative to output direcotry); default is 'graphics/''
+ - ***'config' > 'visualization' >  'hysplit' > 'data_dir' -- *optional* -- sub-directory to contain data files (relative to output direcotry); default is output directory root
 
 ##### export
 
