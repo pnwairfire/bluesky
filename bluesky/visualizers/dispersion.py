@@ -46,7 +46,10 @@ BLUESKYKML_DATE_FORMAT = smokedispersionkml.FireData.date_time_format
 
 # as of blueskykml v0.2.5, this list is:
 #  'pm25', 'pm10', 'co', 'co2', 'ch4', 'nox', 'nh3', 'so2', 'voc'
-BLUESKYKML_SPECIES_LIST = smokedispersionkml.FireData.emission_fields
+BLUESKYKML_SPECIES_LIST = [s.upper() for s in smokedispersionkml.FireData.emission_fields]
+if 'NOX' in BLUESKYKML_SPECIES_LIST:
+    BLUESKYKML_SPECIES_LIST.remove('NOX')
+    BLUESKYKML_SPECIES_LIST.append('NOx')
 
 class HysplitVisualizer(object):
     def __init__(self, hysplit_output_info, fires, **config):
@@ -181,7 +184,7 @@ class HysplitVisualizer(object):
             if event_id:
                 events[event_id] = events.get(event_id, {})
                 for k, l in self.FIRE_EVENTS_CSV_FIELDS:
-                    events[event_id][k] = l(events[event_id], fire)
+                    events[event_id][k] = l(events[event_id], fire, fires[-1])
         return fires, events
 
     def _generate_fire_csv_files(self, fire_locations_csv_pathname,
@@ -241,7 +244,7 @@ class HysplitVisualizer(object):
         def f(fire):
             if fire.get('fuelbeds'):
                 species_array = [
-                    fb.get('emissions', {}).get('total', {}).get(species.upper())
+                    fb.get('emissions', {}).get('total', {}).get(species)
                         for fb in fire['fuelbeds']
                 ]
                 # non-None value will be returned if species is defined for all fuelbeds
@@ -272,14 +275,14 @@ class HysplitVisualizer(object):
         ('fccs_number', _pick_representative_fuelbed),
         # TDOO: add 'VEG' ?
         # TODO: Add other fields if user's want them
-    ] + [(s, _get_emissions_species(s)) for s in BLUESKYKML_SPECIES_LIST]
+    ] + [(s.lower(), _get_emissions_species(s)) for s in BLUESKYKML_SPECIES_LIST]
     """List of fire location csv fields, with function to extract from fire object"""
 
     ##
     ## Functions for extracting fire *event* information to write to csv files
     ##
 
-    def _assign_event_name(event, fire):
+    def _assign_event_name(event, fire, new_fire):
         name = fire.get('event_of', {}).get('name')
         if name:
             if event.get('name') and name != event['name']:
@@ -287,24 +290,21 @@ class HysplitVisualizer(object):
                     name, event['name']))
             event['name'] = name
 
-    def _update_event_area(event, fire):
+    def _update_event_area(event, fire, new_fire):
         if not fire.get('location', {}).get('area'):
             raise ValueError("Fire {} lacks area".format(fire.get('id')))
         event['total_area'] = event.get('total_area', 0.0) + fire['location']['area']
 
     def _update_total_emissions_species(species):
         key = 'total_{}'.format(species)
-        def f(event, fire):
+        def f(event, fire, new_fire):
             if key in event and event[key] is None:
                 # previous fire didn't have this emissions value defined; abort so
                 # that we don't end up with misleading partial total
                 return
 
-            if fire.get(species):
-                event[key] = event.get(key, 0.0) + fire[species]
-            else:
-                # set to None so that that logic above knows to skip for other fires
-                event[key] = None
+            if new_fire.get(species):
+                return event.get(key, 0.0) + new_fire[species]
         return f
 
     # Fire events csv columns from BSF:
@@ -314,11 +314,11 @@ class HysplitVisualizer(object):
     #  total_tpc,total_tpm
     FIRE_EVENTS_CSV_FIELDS = [
         ('event_name', _assign_event_name),
-        ('total_heat', lambda event, fire: 0.0),
+        ('total_heat', lambda event, fire, new_fire: 0.0),
         ('total_area', _update_event_area),
         ('total_nmhc', _update_total_emissions_species('nmhc'))
     ] + [
-        ('total_{}'.format(s), _update_total_emissions_species(s))
+        ('total_{}'.format(s.lower()), _update_total_emissions_species(s.lower()))
             for s in BLUESKYKML_SPECIES_LIST
     ]
     """List of fire event csv fields, with function to extract from fire object
