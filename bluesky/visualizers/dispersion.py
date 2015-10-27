@@ -90,6 +90,22 @@ class HysplitVisualizer(object):
         self._generate_fire_csv_files(files['fire_locations_csv']['pathname'],
             files['fire_events_csv']['pathname'])
 
+        # TODO: support specifying old ini settings in config; maybe
+        #  something like:
+        #     "visualization": {
+        #         "target": "dispersion",
+        #         "hysplit": {
+        #             ...
+        #             "ini_config_settings"
+        #         }
+        #     }
+        #  they would be used to initialize config_options:
+        #   > config_options = self.config.get(ini_config_settings, {})
+        #  Would need to determine which takes preference - old-style
+        #  settings or top level hysplit settings; ex.
+        #      'hysplit' > 'images_dir'
+        #    vs.
+        #      'hysplit' > 'ini_config_settings' > 'DispersionGridOutput' > 'OUTPUT_DIR'
         config_options = {
             'DispersionGridOutput': {
                 'OUTPUT_DIR': str(os.path.join(output_directory,
