@@ -27,23 +27,25 @@ def run(fires_manager):
     """
     efs = fires_manager.get_config_value('emissions', 'efs', default='feps').lower()
     species = fires_manager.get_config_value('emissions', 'species', default=[])
+    include_emissions_details = fires_manager.get_config_value('emissions',
+        'include_emissions_details', default=False)
     fires_manager.processed(__name__, __version__, ef_set=efs,
         emitcalc_version=emitcalc_version, eflookup_version=eflookup_version)
     if efs == 'urbanski':
-        _run_urbanski(fires_manager, species)
+        _run_urbanski(fires_manager, species, include_emissions_details)
     elif efs == 'feps':
-        _run_feps(fires_manager, species)
+        _run_feps(fires_manager, species, include_emissions_details)
     else:
         raise BlueSkyConfigurationError(
             "Invalid emissions factors set: '{}'".format(efs))
-    fires_manager.summarize(
-        emissions_details=datautils.summarize(
-            fires_manager.fires, 'emissions_details'),
-        emissions=datautils.summarize(
-            fires_manager.fires, 'emissions')
-    )
 
-def _run_feps(fires_manager, species):
+    summary = dict(emissions=datautils.summarize(fires_manager.fires, 'emissions'))
+    if include_emissions_details:
+        summary.update(emissions_details=datautils.summarize(
+            fires_manager.fires, 'emissions_details'))
+    fires_manager.summarize(**summary)
+
+def _run_feps(fires_manager, species, include_emissions_details):
     logging.debug("Running emissions module FEPS EFs")
 
     # The same lookup object is used for both Rx and WF
@@ -56,10 +58,9 @@ def _run_feps(fires_manager, species):
             if 'consumption' not in fb:
                 raise ValueError(
                     "Missing consumption data required for computing emissions")
-            fb['emissions_details'] = calculator.calculate(fb["consumption"])
-            fb['emissions'] = fb['emissions_details']['summary']['total']
+            _calculate(calculator, fb, include_emissions_details)
 
-def _run_urbanski(fires_manager, species):
+def _run_urbanski(fires_manager, species, include_emissions_details):
     logging.debug("Running emissions module with Urbanski EFs")
 
     # Instantiate two lookup object, one Rx and one WF, to be reused
@@ -77,5 +78,10 @@ def _run_urbanski(fires_manager, species):
                     "Missing consumption data required for computing emissions")
             calculator = EmissionsCalculator([fccs2ef[fb["fccs_id"]]],
                 species=species)
-            fb['emissions_details'] = calculator.calculate(fb["consumption"])
-            fb['emissions'] = fb['emissions_details']['summary']['total']
+            _calculate(calculator, fb, include_emissions_details)
+
+def _calculate(calculator, fb, include_emissions_details):
+    emissions_details = calculator.calculate(fb["consumption"])
+    fb['emissions'] = emissions_details['summary']['total']
+    if include_emissions_details:
+        fb['emissions_details'] = emissions_details
