@@ -106,7 +106,7 @@ class Estimator(object):
         if fire['location'].get('perimeter'):
             fuelbed_info = self.lookup.look_up(fire['location']['perimeter'])
             # fuelbed_info['area'] is in m^2
-            # TDOO: only use fuelbed_info['area'] is in m^2 if fire['location']['area']
+            # TDOO: only use fuelbed_info['area'] if fire['location']['area']
             # isn't already defined?
             if fuelbed_info:
                 fire['location']['area'] = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
