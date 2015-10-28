@@ -7,14 +7,14 @@ from py.test import raises
 
 from bluesky.visualizers import dispersion
 
-class TestPickRepresentativeFuelbed(object):
+class TestHysplitVisualizerPickRepresentativeFuelbed(object):
 
     def test_invalid_fuelbed(self):
         f = {
             "fuelbeds": 'sdf'
         }
         with raises(ValueError) as e_info:
-            dispersion.pick_representative_fuelbed(f)
+            dispersion._pick_representative_fuelbed(f)
         # TODO: assert e_info.value.message == '...''
 
         f = {
@@ -23,7 +23,7 @@ class TestPickRepresentativeFuelbed(object):
             ]
         }
         with raises(ValueError) as e_info:
-            dispersion.pick_representative_fuelbed(f)
+            dispersion._pick_representative_fuelbed(f)
         # TODO: assert e_info.value.message == '...''
         f = {
             "fuelbeds": [
@@ -31,12 +31,12 @@ class TestPickRepresentativeFuelbed(object):
             ]
         }
         with raises(ValueError) as e_info:
-            dispersion.pick_representative_fuelbed(f)
+            dispersion._pick_representative_fuelbed(f)
         # TODO: assert e_info.value.message == '...''
 
     def test_no_fuelbeds(self):
         f = {}
-        assert None == dispersion.pick_representative_fuelbed(f)
+        assert None == dispersion._pick_representative_fuelbed(f)
 
     def test_one_fuelbed(self):
         f = {
@@ -44,7 +44,7 @@ class TestPickRepresentativeFuelbed(object):
                 {"fccs_id": "46","pct": 100.0}
             ]
         }
-        assert "46" == dispersion.pick_representative_fuelbed(f)
+        assert "46" == dispersion._pick_representative_fuelbed(f)
 
     def test_three_fuelbed(self):
         f = {
@@ -54,7 +54,7 @@ class TestPickRepresentativeFuelbed(object):
                 {"fccs_id": "48","pct": 30.0}
             ]
         }
-        assert "47" == dispersion.pick_representative_fuelbed(f)
+        assert "47" == dispersion._pick_representative_fuelbed(f)
 
     def test_two_equal_size_fuelbeds(self):
         f = {
@@ -63,4 +63,4 @@ class TestPickRepresentativeFuelbed(object):
                 {"fccs_id": "44","pct": 100.0}
             ]
         }
-        assert "46" == dispersion.pick_representative_fuelbed(f)
+        assert "46" == dispersion._pick_representative_fuelbed(f)
