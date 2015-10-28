@@ -15,12 +15,12 @@
         "met_info": {
             "boundary": {
                 "ne": {
-                    "lat": 45.0,
-                    "lng": -106.0
+                    "lat": 45.25,
+                    "lng": -106.5
                 },
                 "sw": {
-                    "lat": 28.0,
-                    "lng": -132
+                    "lat": 27.75,
+                    "lng": -131.5
                 }
             },
             "domain": "DRI6km",

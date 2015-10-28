@@ -145,13 +145,13 @@
                         "domain" : "DRI6km",
                         "grid_spacing_km": 6.0,
                         "boundary": {
-                            "sw": {
-                                "lat": 28.0,
-                                "lng": -132
-                            },
                             "ne": {
-                                "lat": 45.0,
-                                "lng": -106.0
+                                "lat": 45.25,
+                                "lng": -106.5
+                            },
+                            "sw": {
+                                "lat": 27.75,
+                                "lng": -131.5
                             }
                         },
                         "files": [
