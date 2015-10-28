@@ -63,7 +63,7 @@ class FireIngester(object):
         "id"
     }
     NESTED_FIELDS = {
-        "location", "growth", "event_of"
+        "location", "growth", "event_of", "fuelbeds"
     }
 
     ##
@@ -175,9 +175,6 @@ class FireIngester(object):
             self.OPTIONAL_LOCATION_FIELDS))
 
 
-    OPTIONAL_EVENT_OF_FIELDS = [
-        "name", "id"
-    ]
 
     def _ingest_event_of(self, fire):
         event_of_fields = [
@@ -189,10 +186,18 @@ class FireIngester(object):
                 self._parsed_input.get('event_id'))
         ]
         event_of_dict = { k:v for k, v in event_of_fields if v}
+
         if event_of_dict:
             fire['event_of'] = event_of_dict
 
     GROWTH_FIELDS = ['start','end', 'pct']
+    OPTIONAL_GROWTH_FIELDS = ['met_info', 'localmet', 'timeprofile', 'plumerise']
+
+    def _ingest_optional_growth_fields(self, growth, src):
+        for f in self.OPTIONAL_GROWTH_FIELDS:
+            v = src.get(f)
+            if v:
+                growth[-1][f] = v
 
     def _ingest_growth(self, fire):
         # Note: can't use _get_field[s] as is because 'growth' is an array,
@@ -204,6 +209,7 @@ class FireIngester(object):
             end = self._parsed_input.get('end')
             if start and end:
                 growth.append({'start': start, 'end': end, 'pct': 100.0})
+            self._ingest_optional_growth_fields(growth, self._parsed_input)
         else:
             for g in self._parsed_input['growth']:
                 growth.append({})
@@ -211,8 +217,30 @@ class FireIngester(object):
                     if not g.get(f):
                         raise ValueError("Missing groth field: '{}'".format(f))
                     growth[-1][f] = g[f]
+                self._ingest_optional_growth_fields(growth, g)
+
         if growth:
             if len(growth) == 1 and 'pct' not in growth[0]:
                 growth[0] = 100.0
             # TODO: make sure percentages add up to 100.0, with allowable error
             fire['growth'] = growth
+
+    OPTIONAL_FUELBED_FIELDS = [
+        'fccs_id', 'pct', 'fuel_loadings',
+        'consumption', 'emissions', 'emissions_details'
+    ]
+
+    def _ingest_fuelbeds(self, fire):
+        if self._parsed_input.get('fuelbeds'):
+            fuelbeds = []
+            for fb in self._parsed_input['fuelbeds']:
+                fuelbed = {}
+                for f in self.OPTIONAL_FUELBED_FIELDS:
+                    v = fb.get(f)
+                    if v:
+                        fuelbed[f] = v
+                if fuelbed:
+                    fuelbeds.append(fuelbed)
+
+            if fuelbeds:
+                fire['fuelbeds'] = fuelbeds
