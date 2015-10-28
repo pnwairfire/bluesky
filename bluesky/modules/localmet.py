@@ -38,7 +38,7 @@ def run(fires_manager):
             # Note: ArlProfiler will raise an exception if met_root_dir is undefined
             # or is not a valid directory
             # TODO: should met_info be specifeid in config, to apply to all fires?
-            arl_profiler = ArlProfiler(g.get('met_info', {}).get('met_files'))
+            arl_profiler = ArlProfiler(g.get('met_info', {}).get('files'))
             g['localmet'] = arl_profiler.profile(lat, lng, utc_offset)
             # TODO: make sure entire growth window is covered (and no more?);
             #  use tw = parse_datetimes(g, 'start', 'end') to parse growth window
