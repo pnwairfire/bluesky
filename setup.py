@@ -30,7 +30,7 @@ setup(
         "pyairfire>=0.8.21",
         "eflookup>=0.6.2",
         "emitcalc>=0.3.2",
-        "fccsmap>=0.1.6",
+        "fccsmap>=0.2.0",
         "timeprofile>=0.1.2",
         "plumerise>=0.1.1",
         "blueskykml>=0.2.5",
