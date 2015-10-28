@@ -298,11 +298,11 @@ class HysplitVisualizer(object):
         fires = []
         events = {}
         for fire in self._fires:
-            fires.append({k: l(fire) or '' for k, l in self.FIRE_LOCATIONS_CSV_FIELDS})
+            fires.append({k: l(fire) or '' for k, l in FIRE_LOCATIONS_CSV_FIELDS})
             event_id = fire.get('event_of', {}).get('id')
             if event_id:
                 events[event_id] = events.get(event_id, {})
-                for k, l in self.FIRE_EVENTS_CSV_FIELDS:
+                for k, l in FIRE_EVENTS_CSV_FIELDS:
                     events[event_id][k] = l(events[event_id], fire, fires[-1])
         return fires, events
 
@@ -322,14 +322,14 @@ class HysplitVisualizer(object):
         fires, events = self._collect_csv_fields()
         with open(fire_locations_csv_pathname, 'w') as _f:
             f = csv.writer(_f)
-            f.writerow([k for k, l in self.FIRE_LOCATIONS_CSV_FIELDS])
+            f.writerow([k for k, l in FIRE_LOCATIONS_CSV_FIELDS])
             for fire in fires:
-                f.writerow([str(fire[k] or '') for k, l in self.FIRE_LOCATIONS_CSV_FIELDS])
+                f.writerow([str(fire[k] or '') for k, l in FIRE_LOCATIONS_CSV_FIELDS])
 
         with open(fire_events_csv_pathname, 'w') as _f:
             f = csv.writer(_f)
-            f.writerow(['id'] + [k for k, l in self.FIRE_EVENTS_CSV_FIELDS])
+            f.writerow(['id'] + [k for k, l in FIRE_EVENTS_CSV_FIELDS])
             for e_id, event in events.items():
                 f.writerow([e_id] +
-                    [str(event[k] or '') for k, l in self.FIRE_EVENTS_CSV_FIELDS])
+                    [str(event[k] or '') for k, l in FIRE_EVENTS_CSV_FIELDS])
 
