@@ -25,12 +25,12 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    model = fires_manager.get_config_value('plumerise', 'model',
+    model = fires_manager.get_config_value('plumerising', 'model',
         default='sev').lower()
     fires_manager.processed(__name__, __version__,
         plumerise_version=plumerise_version, model=model)
     if model == 'sev':
-        sef_config = fires_manager.get_config_value('plumerise', 'sev',
+        sef_config = fires_manager.get_config_value('plumerising', 'sev',
             default={})
         pr = sev.SEVPlumeRise(**sef_config)
     else:
