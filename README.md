@@ -903,7 +903,8 @@ Ingestion requires that none of the fires in 'fire_information' are empty object
  the fire has 'start' and 'end' keys, a growth object will be created with
  the 'start' and 'end' values and 'pct' set to 100.0
 
- Note about fuelbeds: no fuelbed data is required, but ingestion will pass on and fuelbeds is defined
+ Note about fuelbeds: no fuelbed data is required, but ingestion will pass
+ on and fuelbeds is defined
 
 ##### fuelbeds
 
@@ -912,14 +913,14 @@ Ingestion requires that none of the fires in 'fire_information' are empty object
 
 ##### consumption
 
- - ***'fire_information' > 'fuelbeds'*** -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
- - ***'fire_information' > 'location' > 'area'*** -- fire's total area
- - ***'fire_information' > 'location' > 'ecoregion'*** -- *optional*
+ - ***'fire_information' > 'fuelbeds'*** -- *required* -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
+ - ***'fire_information' > 'location' > 'area'*** -- *required* -- fire's total area
+ - ***'fire_information' > 'location' > 'ecoregion'*** -- *required*
  - ***'fire_information' > 'type'*** -- *optional* -- fire type (defaults to 'natural' unless set to 'rx');
 
 ##### emissions
 
- - ***'fire_information' > 'fuelbeds' > 'consumption'*** --
+ - ***'fire_information' > 'fuelbeds' > 'consumption'*** -- *required* --
 
 ##### findmetdata
 
@@ -932,21 +933,39 @@ Ingestion requires that none of the fires in 'fire_information' are empty object
 
 ##### timeprofiling
 
- - ***'fire_information' > 'growth'*** -- *required* -- array of growth objects, each containing 'start', 'end', and 'pct'; if only one object, pct can be omitted and is assumed to be 100.0
+ - ***'fire_information' > 'growth'*** -- *required* -- array of growth objects, each containing 'start', 'end', and 'pct'; if only one object, pct can be omitted and is assumed to be 100.0; note that percentages must add up to 100 (within 0.5%)
 
 ##### plumerising
 
- - ***'fire_information' > 'growth' > 'localmet'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'localmet'*** -- *required in each growth object* --
+ - ***'fire_information' > 'location' > 'area'*** -- *required* --
 
 ##### dispersion
 
- - ...
+ - *** 'fire_information' > 'growth' > 'met_info' > 'boundary' -- *required* --
+ - *** 'fire_information' > 'growth' > 'met_info' > 'domain' -- *required* --
+ - *** 'fire_information' > 'growth' > 'met_info' > 'grid_spacing_km' -- *required* --
+ - *** 'fire_information' > 'growth' > 'timeprofile' -- *required* --
+ - *** 'fire_information' > 'growth' > 'plumerise' -- *required* --
+ - *** 'fire_information' > 'fuelbeds' > 'emissions' -- *required* --
+ - *** 'fire_information' > 'location' > 'utc_offset' -- *optional* -- hours off UTC; default: 0.0
 
 ##### visualization
 
- - *** 'fire_information' > ... -- *required* --
- - *** 'dispersion' > 'model' -- *required* (if visualizing dispersion) --
- - *** 'dispersion' > 'output' -- *required* (if visualizing dispersion) --
+###### if visualizing hysplit dispersion:
+
+ - *** 'dispersion' > 'model' *** -- *required* --
+ - *** 'dispersion' > 'output' > 'directory' *** -- *required* --
+ - *** 'dispersion' > 'output' > 'grid_filename' *** -- *required* --
+ - *** 'dispersion' > 'output' > 'run_id' *** -- *optional* -- if not defined, generates new guid
+ - *** 'fire_information' > 'id' *** -- *required* --
+ - ***'fire_information' > 'location' *** -- *required* -- containing either single lat/lng + area or polygon perimeter coordinates + area
+ - *** 'fire_information' > 'type' *** -- *optional* --
+ - *** 'fire_information' > 'event_of' > 'name' *** -- *optional* --
+ - *** 'fire_information' > 'event_of' > 'id' *** -- *optional* --
+ - *** 'fire_information' > 'fuelbeds' > 'emissions' *** -- *optional* --
+ - *** 'fire_information' > 'fuelbeds' > 'fccs_id' *** -- *optional* --
+ - *** 'fire_information' > 'growth' > 'start' *** -- *required* --
 
 ##### export
 
