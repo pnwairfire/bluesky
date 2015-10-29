@@ -517,11 +517,11 @@ class HYSPLITDispersion(object):
             if self.config("MPI"):
                 for f in pardumpFiles:
                     self._save_file(f)
-                    #shutil.copy2(os.path.join(working_dir, f),self.config("OUTPUT_DIR"))
+                    #shutil.copy2(os.path.join(working_dir, f), self._output_dir)
             else:
                 pardump_file = os.path.join(working_dir, "PARDUMP")
                 self._save_file(pardump_file)
-                #shutil.copy2(pardump_file, self.config("OUTPUT_DIR") + "/PARDUMP_"+ self.config("DATE"))
+                #shutil.copy2(pardump_file, self._output_dir + "/PARDUMP_"+ self.config("DATE"))
 
     def _write_emissions(self, emissions_file):
         # A value slightly above ground level at which to inject smoldering
