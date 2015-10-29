@@ -134,6 +134,10 @@ class HYSPLITDispersion(object):
         logging.debug('Executing {}'.format(' '.join(args)))
         # Use check_output so that output isn't sent to stdout
         output = subprocess.check_output(args)
+        if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+            logging.debug('Captured {} output:'.format(args[0]))
+            for line in output.split('\n'):
+                logging.debug('{}: {}'.format(args[0], line))
 
     MET_META_FIELDS = ('boundary', 'domain', 'grid_spacing_km')
 
