@@ -22,6 +22,7 @@ from datetime import timedelta
 
 from pyairfire.datetime import parsing as datetime_parsing
 
+from bluesky.datetimeutils import parse_utc_offset
 from bluesky.models.fires import Fire
 import hysplit_utils
 import defaults
@@ -180,6 +181,8 @@ class HYSPLITDispersion(object):
                 #     logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fire.id)
                 #     continue
 
+                utc_offset = fire.get('location', {}).get('utc_offset')
+                utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
 
                 # TODO: only include plumerise and timeprofile keys within model run
                 # time window; and somehow fill in gaps (is this possible?)
@@ -190,9 +193,9 @@ class HYSPLITDispersion(object):
                 plumerise = {}
                 timeprofile = {}
                 for i in range(self._num_hours):
-                    dt = self._model_start + timedelta(hours=i)
-                    plumerise[dt] = all_plumerise.get(dt) # or self.MISSING_PLUMERISE_HOUR
-                    timeprofile[dt] = all_timeprofile.get(dt) #or self.MISSING_TIMEPROFILE_HOUR
+                    local_dt = self._model_start + timedelta(hours=(i + utc_offset))
+                    plumerise[local_dt] = all_plumerise.get(local_dt) # or self.MISSING_PLUMERISE_HOUR
+                    timeprofile[local_dt] = all_timeprofile.get(local_dt) #or self.MISSING_TIMEPROFILE_HOUR
 
                 # sum the emissions across all fuelbeds, but keep them separate by phase
                 emissions = {p: {} for p in self.PHASES}
@@ -206,6 +209,7 @@ class HYSPLITDispersion(object):
                     area=fire.location['area'],
                     latitude=fire.latitude,
                     longitude=fire.longitude,
+                    utc_offset=utc_offset,
                     plumerise=plumerise,
                     timeprofile=timeprofile,
                     emissions=emissions
@@ -255,9 +259,11 @@ class HYSPLITDispersion(object):
         """
         logging.info("Generating dummy fire for HYSPLIT")
         f = Fire(
+            # let fire autogenerate id
             area=1,
             latitude=self.config("CENTER_LATITUDE"),
             longitude=self.config("CENTER_LONGITUDE"),
+            utc_offset=0, # since plumerise and timeprofile will have utc keys
             plumerise={},
             timeprofile={},
             emissions={
@@ -557,8 +563,9 @@ class HYSPLITDispersion(object):
                         noEmis += 1
                         dummy = True
                     else:
-                        plumerise_hour = fire.plumerise.get(dt)
-                        timeprofile_hour = fire.timeprofile.get(dt)
+                        local_dt = dt + timedelta(hours=fire.utc_offset)
+                        plumerise_hour = fire.plumerise.get(local_dt)
+                        timeprofile_hour = fire.timeprofile.get(local_dt)
 
                     area_meters = 0.0
                     smoldering_fraction = 0.0
