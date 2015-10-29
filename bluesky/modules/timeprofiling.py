@@ -51,7 +51,7 @@ def run(fires_manager):
                 # convert timeprofile to dict with dt keys
                 g['timeprofile'] = {}
                 fields = profiler.hourly_fractions.keys()
-                for i in range(len(profiler.hourly_fractions.items()[0])): # each phase should have same len
+                for i in range(len(profiler.hourly_fractions.values()[0])): # each phase should have same len
                     hr = profiler.start_hour + (i * profiler.ONE_HOUR)
                     g['timeprofile'][hr.isoformat()] = {
                         p: profiler.hourly_fractions[p][i] for p in fields }
