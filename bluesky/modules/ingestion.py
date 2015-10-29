@@ -174,8 +174,6 @@ class FireIngester(object):
         fire['location'].update(self._get_fields('location',
             self.OPTIONAL_LOCATION_FIELDS))
 
-
-
     def _ingest_event_of(self, fire):
         event_of_fields = [
             # 'name' can be defined at the top level as well as under 'event_of'
@@ -209,7 +207,7 @@ class FireIngester(object):
             end = self._parsed_input.get('end')
             if start and end:
                 growth.append({'start': start, 'end': end, 'pct': 100.0})
-            self._ingest_optional_growth_fields(growth, self._parsed_input)
+                self._ingest_optional_growth_fields(growth, self._parsed_input)
         else:
             for g in self._parsed_input['growth']:
                 growth.append({})
