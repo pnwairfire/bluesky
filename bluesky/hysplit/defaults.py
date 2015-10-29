@@ -1,7 +1,5 @@
 import os
 
-OUTPUT_DIRECTORY = '.'
-
 # NOTE: executables are no longer configurable.  It is assumed that any
 # executable upon which hysplit depends is in a directory in the search path.
 # This is a security measure for when hysplit is executed via web requests.
@@ -37,12 +35,12 @@ VERTICAL_EMISLEVELS_REDUCTION_FACTOR = 1
 
 # User defined concentration grid option
 USER_DEFINED_GRID = False
-CENTER_LATITUDE = 44.0
-CENTER_LONGITUDE = -121
-WIDTH_LONGITUDE = 138
-HEIGHT_LATITUDE = 62
-SPACING_LONGITUDE = 0.5
-SPACING_LATITUDE = 0.5
+# CENTER_LATITUDE = 44.0
+# CENTER_LONGITUDE = -121
+# WIDTH_LONGITUDE = 138
+# HEIGHT_LATITUDE = 62
+# SPACING_LONGITUDE = 0.5
+# SPACING_LATITUDE = 0.5
 
 # Optimize (i.e. decrease) concentration grid resolution based on number of fires
 OPTIMIZE_GRID_RESOLUTION = False
