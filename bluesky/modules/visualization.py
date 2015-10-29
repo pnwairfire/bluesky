@@ -29,7 +29,9 @@ def run(fires_manager):
         # TODO: support VSMOKE as well
         if target == 'dispersion':
             if not fires_manager.dispersion or not fires_manager.dispersion.get('model'):
-                raise ValueError("Dispersion model must be specified for visualization")
+                raise ValueError("Dispersion model must be specified if visualizing dispersion")
+            if not fires_manager.dispersion or not fires_manager.dispersion.get('output'):
+                raise ValueError("Dispersion output information must be specified if visualizing dispersion")
             dispersion_model = fires_manager.dispersion['model']
             processed_kwargs.update(dispersion_model=dispersion_model)
             visualization_info.update(dispersion_model=dispersion_model)
