@@ -932,18 +932,23 @@ well as top level fields that apply to multiple modules. As with
 the fire data, each module has its own set of required and optional fields.
 
 
+##### ingestion
+
+(None)
+
 ##### fuelbeds
 
- - ...
+(None)
 
 ##### consumption
 
- - ...
+- ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
 
 ##### emissions
 
  - ***'config' > 'emissions' > 'efs'*** -- *optional* -- emissions factors set; 'urbanski' or 'feps'; default 'feps'
  - ***'config' > 'emissions' > 'species'*** -- *optional* -- whitelist of species to compute emissions levels for
+ - ***'config' > 'emissions' > 'include_emissions_details'*** -- *optional* -- whether or not to include emissions levels by fuel category; default: false
 
 ##### findmetdata
 
@@ -951,28 +956,77 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### localmet
 
- - ...
+(None)
 
 ##### timeprofiling
 
- - ***'config' > 'timeprofiling' > 'hourly_fractions' *** -- *optional* --
+ - ***'config' > 'timeprofiling' > 'hourly_fractions' *** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the growth window)
 
 
 ##### plumerising
 
  - ***'config' > 'plumerising' > 'model'*** -- *optional* -- plumerise model; defaults to "sev"
 
+###### if sev:
+
+ - ***'config' > 'plumerising' > 'sev'*** -- *optional* -- plumerise model; defaults to "sev"
+ - ***'config' > 'plumerising' > 'sev' > 'alpha'*** -- *optional* -- default: 0.24
+ - ***'config' > 'plumerising' > 'sev' > 'beta'*** -- *optional* -- default: 170
+ - ***'config' > 'plumerising' > 'sev' > 'ref_power'*** -- *optional* -- default: 1e6
+ - ***'config' > 'plumerising' > 'sev' > 'gamma'*** -- *optional* -- default: 0.35
+ - ***'config' > 'plumerising' > 'sev' > 'delta'*** -- *optional* -- default: 0.6
+ - ***'config' > 'plumerising' > 'sev' > 'ref_n'*** -- *optional* -- default: 2.5e-4
+ - ***'config' > 'plumerising' > 'sev' > 'gravity'*** -- *optional* -- default: 9.8
+ - ***'config' > 'plumerising' > 'sev' > 'plume_bottom_over_top'*** -- *optional* -- default: 0.5
+
 ##### dispersion
 
  - ***'config' > 'dispersion' > 'start'*** -- *required* -- modeling start time (ex. "2015-01-21T00:00:00Z")
  - ***'config' > 'dispersion' > 'num_hours'*** -- *required* -- number of hours in model run
+ - ***'config' > 'dispersion' > 'output_dir'*** -- *required* --
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
- - ***'config' > 'dispersion' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
+
+###### if visualizing hysplit dispersion:
+
+ - ***'config' > 'dispersion' > 'hysplit' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
+
+ - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_EMISLEVELS_REDUCTION_FACTOR' *** -- *optional* -- default: 1
+ - ***'config' > 'dispersion' > 'hysplit' > 'NPROCESSES' *** -- *optional* -- default: 1 (i.e. no tranching)
+ - ***'config' > 'dispersion' > 'hysplit' > 'NFIRES_PER_PROCESS' *** -- *optional* -- default: -1 (i.e. no tranching)
+ - ***'config' > 'dispersion' > 'hysplit' > 'NPROCESSES_MAX' *** -- *optional* -- default: -1  (i.e. no tranching)
+ - ***'config' > 'dispersion' > 'hysplit' > 'ASCDATA_FILE' *** -- *optional* -- default: use default file in package
+ - ***'config' > 'dispersion' > 'hysplit' > 'LANDUSE_FILE' *** -- *optional* -- default: use default file in package
+ - ***'config' > 'dispersion' > 'hysplit' > 'ROUGLEN_FILE' *** -- *optional* -- default: use default file in package
+ - ***'config' > 'dispersion' > 'hysplit' > 'READ_INIT_FILE' *** -- *optional* -- default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'DISPERSION_FOLDER' *** -- *optional* -- default: "./input/dispersion"
+ - ***'config' > 'dispersion' > 'hysplit' > 'STOP_IF_NO_PARINIT' *** -- *optional* -- default: True
+ - ***'config' > 'dispersion' > 'hysplit' > 'MPI' *** -- *optional* -- default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'NCPUS' *** -- *optional* -- default: 1
+ - ***'config' > 'dispersion' > 'hysplit' > 'HYSPLIT_SETUP_FILE' *** -- *optional* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'CONVERT_HYSPLIT2NETCDF' *** -- *optional* -- default: true
+ - ***'config' > 'dispersion' > 'hysplit' > 'MAKE_INIT_FILE' *** -- *optional* -- default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'SMOLDER_HEIGHT' *** -- *optional* -- default: 10.0
+ - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_METHOD' *** -- *optional* -- default: "DATA"
+ - ***'config' > 'dispersion' > 'hysplit' > 'TOP_OF_MODEL_DOMAIN' *** -- *optional* -- default: 30000.0
+ - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_LEVELS' *** -- *optional* -- default: [10]
+ - ***'config' > 'dispersion' > 'hysplit' > 'USER_DEFINED_GRID' *** -- *optional* -- default: False
+ - ***'config' > 'dispersion' > 'hysplit' > 'CENTER_LATITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'CENTER_LONGITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'WIDTH_LONGITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'HEIGHT_LATITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'SPACING_LONGITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'SPACING_LATITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'OPTIMIZE_GRID_RESOLUTION' *** -- *optional* -- default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'MAX_SPACING_LONGITUDE' *** -- *optional* -- default: 0.5
+ - ***'config' > 'dispersion' > 'hysplit' > 'MAX_SPACING_LATITUDE' *** -- *optional* -- default: 0.5
+ - ***'config' > 'dispersion' > 'hysplit' > 'FIRE_INTERVALS' *** -- *optional* -- default: [0, 100, 200, 500, 1000]
+ - ***'config' > 'dispersion' > 'hysplit' > 'KHMAX' *** -- *optional* -- default: 72
+ - ***'config' > 'dispersion' > 'hysplit' > 'NDUMP' *** -- *optional* -- default: 24
+ - ***'config' > 'dispersion' > 'hysplit' > 'NCYCL' *** -- *optional* -- default: 24
 
 ##### visualization
 
  - ***'config' > 'visualization' > 'target'*** -- *optional* -- defaults to dispersion
- - ***'config' > 'visualization' > 'output_dir'*** -- *optional* -- defaults to hysplit's output dir, if visualizing hysplit dispersion
 
 ###### if visualizing hysplit dispersion:
 
