@@ -192,7 +192,7 @@ class HysplitVisualizer(object):
             raise RuntimeError("hysplit output file {} does not exist".format(
                 hysplit_output_file))
 
-        run_id = self._hysplit_output_info.get('run_id') or uuid.uuid3()
+        run_id = self._hysplit_output_info.get('run_id') or str(uuid.uuid1())
         if self._config.get('output_dir'):
             output_directory = os.path.join(self._config['output_dir'], run_id)
         else:
