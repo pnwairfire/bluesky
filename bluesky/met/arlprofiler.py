@@ -97,7 +97,7 @@ class ArlProfiler(object):
         full_path_profile_txt = os.path.abspath(self.PROFILE_OUTPUT_FILE)
         local_met_data = {}
         for met_file in self._met_files:
-            if (met_file['first_hour'] > uct_end or
+            if (met_file['first_hour'] > utc_end or
                     met_file['last_hour'] + ONE_HOUR < utc_start):
                 # met file has no data within given timewindow
                 continue
