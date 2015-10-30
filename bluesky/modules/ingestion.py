@@ -189,7 +189,7 @@ class FireIngester(object):
             fire['event_of'] = event_of_dict
 
     GROWTH_FIELDS = ['start','end', 'pct']
-    OPTIONAL_GROWTH_FIELDS = ['met_info', 'localmet', 'timeprofile', 'plumerise']
+    OPTIONAL_GROWTH_FIELDS = ['localmet', 'timeprofile', 'plumerise']
 
     def _ingest_optional_growth_fields(self, growth, src):
         for f in self.OPTIONAL_GROWTH_FIELDS:
