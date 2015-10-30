@@ -70,8 +70,26 @@ class ArlProfiler(object):
     #  to an alternate dir (e.g. to a /tmp/ dir)
     PROFILE_OUTPUT_FILE = './profile.txt'
 
-    def profile(self, lat, lng, utc_offset, time_step=None):
+    def profile(self, lat, lng, local_start, local_end, utc_offset, time_step=None):
+        """Returns local met profile for specific location and timewindow
+
+        args:
+         - lat -- latitude of location
+         - lng -- longitude of location
+         - local_start -- local datetime object representing beginning of time window
+         - local_end -- local datetime object representing end of time window
+         - utc_offset -- hours ahead of or behind UTC
+
+        kwargs:
+         - time_step -- time step of arl file; defaults to 1
+        """
         # TODO: validate utc_offset?
+        if local_start > local_end:
+            raise ValueError("Invalid localmet time window: start={}, end={}".format(
+              local_start, local_end))
+
+        utc_start = local_start - timedelta(hours=self.utc_offset)
+        utc_end = local_end - timedelta(hours=self.utc_offset)
 
         time_step = time_step or 1
         # TODO: make sure time_step is integer
@@ -79,13 +97,23 @@ class ArlProfiler(object):
         full_path_profile_txt = os.path.abspath(self.PROFILE_OUTPUT_FILE)
         local_met_data = {}
         for met_file in self._met_files:
+            if (met_file['first_hour'] > uct_end or
+                    met_file['last_hour'] + ONE_HOUR < utc_start):
+                # met file has no data within given timewindow
+                continue
+
+            start = max(met_file['first_hour'], utc_start)
+            start = datetime.datetime(start.year, start.month, start.day, start.hour)
+            end = min(met_file['last_hour'], utc_end)
+            start = datetime.datetime(end.year, end.month, end.day, end.hour)
+
             d, f = os.path.split(met_file["file"])
             # split returns dir without trailing slash, which is required by profile
             d = d + '/'
 
             self._call(d, f, lat, lng, time_step)
-            lmd = self._load(full_path_profile_txt, met_file['first'],
-                met_file['start'], met_file['end'], utc_offset, lat, lng)
+            lmd = self._load(full_path_profile_txt, met_file['first_hour'],
+                start, end, utc_offset, lat, lng)
             local_met_data.update(lmd)
         return local_met_data
 
@@ -101,15 +129,13 @@ class ArlProfiler(object):
         _met_files = []
         for met_file in met_files:
             # parse datetimes, and make sure they're valid
-            _met_file = parse_datetimes(met_file, 'first', 'start', 'end')
-            for k in 'first', 'start', 'end':
+            _met_file = parse_datetimes(met_file, 'first_hour', 'last_hour')
+            for k in 'first_hour', 'last_hour':
                 d = _met_file[k]
                 if datetime(d.year, d.month, d.day, d.hour) != d:
-                    raise ValueError("Arl profile first, start, and end times must be round hours")
-            if _met_file['first'] > _met_file['start']:
-                raise ValueError("Start time can't be before ARL file's first time")
-            if _met_file['start'] > _met_file['end']:
-                raise ValueError("Start time can't be after end time")
+                    raise ValueError("Arl profile first_hour and last_hour times must be round hours")
+            if _met_file['first_hour'] > _met_file['last_hour']:
+                raise ValueError("ARL file's last hour can't be before ARL file's first first")
 
             # make sure file exists
             if not met_file.get("file"):
