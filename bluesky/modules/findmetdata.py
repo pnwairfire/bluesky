@@ -48,6 +48,7 @@ def run(fires_manager):
     for fire in fires_manager.fires:
         for g in fire.growth:
             tw = parse_datetimes(g, 'start', 'end')
+            # TODO: make sure tw['start'] < tw['end']
             earlist = min(earliest, tw['start'])
             latest = max(latest, tw['end'])
     arl_finder = arlfinder.ArlFinder(met_root_dir)
