@@ -1,6 +1,7 @@
 """bluesky.modules.findmetdata
 
-This module finds met data files to use for a particular domain and time window.
+This module finds met data files to use for a particular domain and time window
+spanning all fire growth periods.
 """
 
 __author__      = "Joel Dubowy"
@@ -32,16 +33,22 @@ def run(fires_manager):
 
     # Note: ArlFinder will raise an exception if met_root_dir is undefined
     # or is not a valid directory
+    # TODO: specify domain instead of met_root_dir, and somehow configure (not
+    # in the code, since this is open source), per domain, the root dir, arl file
+    # name pattern, etc.
     met_root_dir = fires_manager.get_config_value('findmetdata', 'met_root_dir')
     if not met_root_dir:
         raise BlueSkyConfigurationError("Config setting 'met_root_dir' "
             "required by findmetdata module".format(e.message))
-    arl_finder = arlfinder.ArlFinder(met_root_dir)
+    # Find earliest and latest datetimes that include all fire growth periods
+    # TODO: be more intelligent with possible gaps, so that met files for times
+    #  when no fire is growing are excluded ?
+    earliest = None
+    latest = None
     for fire in fires_manager.fires:
         for g in fire.growth:
             tw = parse_datetimes(g, 'start', 'end')
-            # TODO: It may not be the responsibility of this module, but downstream,
-            # maybe move domain, grid_spacing_km, and boundary to a more global
-            # location, like fires_manager.met_info, and only store met_files
-            # in each growth object ?
-            g['met_info'] = arl_finder.find(tw['start'], tw['end'])
+            earlist = min(earliest, tw['start'])
+            latest = max(latest, tw['end'])
+    arl_finder = arlfinder.ArlFinder(met_root_dir)
+    fires_manager.met = arl_finder.find(earliest, latest)
