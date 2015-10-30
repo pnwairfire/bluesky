@@ -88,8 +88,8 @@ class ArlProfiler(object):
             raise ValueError("Invalid localmet time window: start={}, end={}".format(
               local_start, local_end))
 
-        utc_start = local_start - timedelta(hours=self.utc_offset)
-        utc_end = local_end - timedelta(hours=self.utc_offset)
+        utc_start = local_start - timedelta(hours=utc_offset)
+        utc_end = local_end - timedelta(hours=utc_offset)
 
         time_step = time_step or 1
         # TODO: make sure time_step is integer
