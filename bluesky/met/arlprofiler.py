@@ -103,9 +103,9 @@ class ArlProfiler(object):
                 continue
 
             start = max(met_file['first_hour'], utc_start)
-            start = datetime.datetime(start.year, start.month, start.day, start.hour)
+            start = datetime(start.year, start.month, start.day, start.hour)
             end = min(met_file['last_hour'], utc_end)
-            start = datetime.datetime(end.year, end.month, end.day, end.hour)
+            start = datetime(end.year, end.month, end.day, end.hour)
 
             d, f = os.path.split(met_file["file"])
             # split returns dir without trailing slash, which is required by profile
