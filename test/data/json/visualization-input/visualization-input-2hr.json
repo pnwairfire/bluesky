@@ -10,25 +10,29 @@
             }
         }
     },
+    "met": {
+        "boundary": {
+            "ne": {
+                "lat": 45.25,
+                "lng": -106.5
+            },
+            "sw": {
+                "lat": 27.75,
+                "lng": -131.5
+            }
+        },
+        "domain": "DRI6km",
+        "files": [
+            {
+                "file": "/DRI_6km/2014052912/wrfout_d2.2014052912.f00-11_12hr01.arl",
+                "first_hour": "2014-05-29T12:00:00",
+                "last_hour": "2014-05-29T23:00:00"
+            }
+        ],
+        "grid_spacing_km": 6.0
+    },
     "dispersion": {
         "model": "hysplit",
-        "met_info": {
-            "boundary": {
-                "ne": {
-                    "lat": 45.25,
-                    "lng": -106.5
-                },
-                "sw": {
-                    "lat": 27.75,
-                    "lng": -131.5
-                }
-            },
-            "domain": "DRI6km",
-            "files": [
-                "/DRI_6km/2014052912/wrfout_d2.2014052912.f00-11_12hr01.arl"
-            ],
-            "grid_spacing_km": 6.0
-        },
         "output": {
             "run_id": "1bfbe6b6-7cc4-11e5-8782-080027880ca6",
             "start_time": "2014-05-29T12:00:00",
