@@ -36,10 +36,6 @@ def run(fires_manager):
         # parse_utc_offset makes sure utc offset is defined and valid
         utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
         for g in fire.growth:
-            # Note: ArlProfiler will raise an exception if met_root_dir is undefined
-            # or is not a valid directory
-            # TODO: should met_info be specifeid in config, to apply to all fires?
-
             tw = parse_datetimes(g, 'start', 'end')
             g['localmet'] = arl_profiler.profile(lat, lng, tw['start'],
                 tw['end'], utc_offset)
