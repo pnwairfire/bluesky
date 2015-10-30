@@ -34,7 +34,7 @@ def run(fires_manager):
         if model == 'hysplit':
             hysplit_config = fires_manager.get_config_value('dispersion', 'hysplit',
                 default={})
-            disperser = hysplit.HYSPLITDispersion(**hysplit_config)
+            disperser = hysplit.HYSPLITDispersion(fires_manager.met, **hysplit_config)
             processed_kwargs.update(hysplit_version=hysplit.__version__)
         else:
             raise BlueSkyConfigurationError(

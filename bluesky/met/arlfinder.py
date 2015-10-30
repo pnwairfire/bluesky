@@ -1,4 +1,4 @@
-"""bluesky.arlfinder
+"""bluesky.met.arlfinder
 
 This module finds arl met data files for a particular domain and time window.
 """

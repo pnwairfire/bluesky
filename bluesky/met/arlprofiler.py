@@ -1,4 +1,4 @@
-"""bluesky.arlprofiler
+"""bluesky.met.arlprofiler
 
 This module wraps the fortran arl profile utility.  Unless an absolute or
 relative path to profile is provided on ArlProfile instantiation, profile
@@ -133,7 +133,7 @@ class ArlProfiler(object):
             for k in 'first_hour', 'last_hour':
                 d = _met_file[k]
                 if datetime(d.year, d.month, d.day, d.hour) != d:
-                    raise ValueError("Arl profile first_hour and last_hour times must be round hours")
+                    raise ValueError("ARL file's first_hour and last_hour times must be round hours")
             if _met_file['first_hour'] > _met_file['last_hour']:
                 raise ValueError("ARL file's last hour can't be before ARL file's first first")
 

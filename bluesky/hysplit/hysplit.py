@@ -63,7 +63,8 @@ class HYSPLITDispersion(object):
     PHASES = ['flaming', 'smoldering', 'residual']
     TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
-    def __init__(self, **config):
+    def __init__(self, met_info, **config):
+        self._set_met_info(met_info)
         self._config = config
         # TODO: determine which config options we'll support
         # TODO: make sure required executables are available
@@ -141,6 +142,28 @@ class HYSPLITDispersion(object):
 
     MET_META_FIELDS = ('boundary', 'domain', 'grid_spacing_km')
 
+    def _set_met_info(self, met_info):
+        # TODO: move validation code into common module bluesky.met.validation ?
+        self._met_info = {
+            k: v for k, v in met_info.items()
+                if k in self.MET_META_FIELDS
+        }
+        if any([not self._met_info.get(k) for k in self.MET_META_FIELDS]):
+            raise ValueError("Met info must include {} fields".format(
+                ', '.join(self.MET_META_FIELDS)))
+
+        # hysplit just needs the name
+        self._met_info['files'] = set()
+        if not met_info.get('files'):
+            raise ValueError("Met info lacking arl file information")
+        for met_file in met_info.pop('files'):
+            if not met_file.get('file'):
+                raise ValueError("ARL file not defined for specified date range")
+            if not os.path.exists(met_file['file']):
+                raise ValueError("ARL file does not exist: {}".format(
+                    met_file['file']))
+            self._met_info['files'].add(met_file['file'])
+
     # TODO: set these to None, and let _write_emissions using it's logic to
     #  handle missing data?
     # TODO: is this an appropriate fill-in plumerise hour?
@@ -151,7 +174,6 @@ class HYSPLITDispersion(object):
 
     def _set_fire_data(self, fires):
         self._fires = []
-        self._met_info = {}
 
         # TODO: aggreagating over all fires (if psossible)
         #  use self.model_start and self.model_end
@@ -170,11 +192,9 @@ class HYSPLITDispersion(object):
                     raise ValueError(
                         "Missing timeprofile and plumerise data required for computing dispersion")
                 for g in fire.growth:
-                    if any([not g.get(f) for f in ('met_info', 'timeprofile', 'plumerise')]):
-                        raise ValueError("Each growth window must have met info, "
-                            "timeprofile, and plumerise in order to compute hysplit")
-                    if any([not g['met_info'].get(f) for f in (self.MET_META_FIELDS)]):
-                        raise ValueError("Fire growth window has insufficien met information")
+                    if any([not g.get(f) for f in ('timeprofile', 'plumerise')]):
+                        raise ValueError("Each growth window must have "
+                            "timeprofile and plumerise in order to compute hysplit")
                 if ('fuelbeds' not in fire or
                         any([not fb.get('emissions') for fb in fire.fuelbeds])):
                     raise ValueError(
@@ -220,21 +240,6 @@ class HYSPLITDispersion(object):
                 )
                 self._fires.append(f)
 
-                for g in fire.growth:
-                    if not self._met_info.keys(): # first growth object
-                        self._met_info = {
-                            k:v for k,v in g['met_info'].items()
-                                if k in self.MET_META_FIELDS
-                        }
-                        # hysplit just needs the name
-                        self._met_info['files'] = set([m['file'] for m in g['met_info']['files']])
-                    else:
-                        for met_file in g['met_info']['files']:
-                            self._met_info['files'].add(met_file['file'])
-                        for k in self.MET_META_FIELDS:
-                            if self._met_info[k] != g['met_info'][k]:
-                                raise ValueError("Hysplit requires single met per run")
-                self._met_info['files'] = list(self._met_info['files'])
             except:
                 if self.config('skip_invalid_fires'):
                     continue
