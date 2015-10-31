@@ -43,7 +43,7 @@ class ArlProfiler(object):
         arl met file along with a 'first', 'start', and 'end' datetimes. For
         example:
            [
-              {"file": "...", "first": "...", "start": "...", "end": "..."}
+              {"file": "...", "first_hour": "...", "last_hour": "..."}
            ]
         'first' is the first hour in the arl file. 'start' and 'end' define
         the time window for which local met data is desired.  Though fire
@@ -89,7 +89,11 @@ class ArlProfiler(object):
               local_start, local_end))
 
         utc_start = local_start - timedelta(hours=utc_offset)
+        utc_start_hour = datetime(utc_start.year, utc_start.month,
+            utc_start.day, utc_start.hour)
         utc_end = local_end - timedelta(hours=utc_offset)
+        utc_end_hour = datetime(utc_end.year, utc_end.month, utc_end.day,
+            utc_end.hour)
 
         time_step = time_step or 1
         # TODO: make sure time_step is integer
@@ -97,15 +101,13 @@ class ArlProfiler(object):
         full_path_profile_txt = os.path.abspath(self.PROFILE_OUTPUT_FILE)
         local_met_data = {}
         for met_file in self._met_files:
-            if (met_file['first_hour'] > utc_end or
-                    met_file['last_hour'] + ONE_HOUR < utc_start):
+            if (met_file['first_hour'] > utc_end_hour or
+                    met_file['last_hour'] < utc_start_hour):
                 # met file has no data within given timewindow
                 continue
 
-            start = max(met_file['first_hour'], utc_start)
-            start = datetime(start.year, start.month, start.day, start.hour)
-            end = min(met_file['last_hour'], utc_end)
-            end = datetime(end.year, end.month, end.day, end.hour)
+            start = max(met_file['first_hour'], utc_start_hour)
+            end = min(met_file['last_hour'], utc_end_hour)
 
             d, f = os.path.split(met_file["file"])
             # split returns dir without trailing slash, which is required by profile
