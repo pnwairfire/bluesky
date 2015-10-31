@@ -94,6 +94,10 @@ class ArlProfiler(object):
         utc_end = local_end - timedelta(hours=utc_offset)
         utc_end_hour = datetime(utc_end.year, utc_end.month, utc_end.day,
             utc_end.hour)
+        # Don't include end hour if it's on the hour
+        # TODO: should we indeed exclude it?
+        if utc_end == utc_end_hour:
+            utc_end_hour -= ONE_HOUR
 
         time_step = time_step or 1
         # TODO: make sure time_step is integer
