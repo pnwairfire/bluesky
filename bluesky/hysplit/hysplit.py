@@ -163,6 +163,7 @@ class HYSPLITDispersion(object):
                 raise ValueError("ARL file does not exist: {}".format(
                     met_file['file']))
             self._met_info['files'].add(met_file['file'])
+        self._met_info['files'] = list(self._met_info['files'])
 
     # TODO: set these to None, and let _write_emissions using it's logic to
     #  handle missing data?
