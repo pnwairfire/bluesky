@@ -47,21 +47,11 @@ class ArlFinder(object):
         This method searches for all arl met files under self._met_root_dir
         with data spanning the given time window and determines which file
         to use for each hour in the window.  The goal is to use the most
-        recent met data for any given hour.  It returns a dict containing domain id, gridspacing, boundary information
-        and list of file objects, each containing a datetime range with the arl file
+        recent met data for any given hour.  It returns a dict containing
+        a list of file objects, each containing a datetime range with the arl file
         to use for each range
         Ex.
                {
-                   "boundary": {
-                       "sw":{
-                           "lat": ,
-                           "lng":
-                       },
-                       "nw": {
-                           "lat": ,
-                           "lng":
-                       }
-                   },
                    "files": [
                        {
                            "file": "/DRI_6km/2014052912/wrfout_d2.2014052912.f00-11_12hr01.arl",
@@ -75,6 +65,29 @@ class ArlFinder(object):
                        }
                    ],
                }
+
+        TODO: extract grid information as well (boundary, spacing, domain),
+          and include in return object.
+          Ex.
+               {
+                   "files": [
+                        ...
+                    ],
+                    "grid": {
+                        "spacing": 6.0,
+                        "boundary": {
+                            "ne": {
+                                "lat": 45.25,
+                                "lng": -106.5
+                            },
+                            "sw": {
+                                "lat": 27.75,
+                                "lng": -131.5
+                            }
+                        }
+                    }
+                }
+          where 'domain' would be set to 'LatLon' if spacing is in degrees
         """
         index_files = self._find_index_files(self._met_root_dir)
 

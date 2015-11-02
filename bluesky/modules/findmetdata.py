@@ -44,16 +44,6 @@ def run(fires_manager):
         raise BlueSkyConfigurationError("Config setting 'met_root_dir' "
             "required by findmetdata module".format(e.message))
 
-    domain = (fires_manager.get_config_value('findmetdata', 'domain') or
-        os.path.basename(met_root_dir))
-
-    grid_spacing_km = fires_manager.get_config_value('findmetdata',
-        'grid_spacing_km')
-    if not grid_spacing_km:
-        # TODO: figure out how to determine this programatically
-        raise BlueSkyConfigurationError("Config setting 'grid_spacing_km' "
-            "required by findmetdata module".format(e.message))
-
     met_format = fires_manager.get_config_value('findmetdata', 'met_format',
         default="arl").lower()
     if met_format == arl:
@@ -83,4 +73,3 @@ def run(fires_manager):
             latest = max(latest, end)
 
     fires_manager.met = arl_finder.find(earliest, latest)
-    fires_manager.met.update(domain=domain, grid_spacing_km=grid_spacing_km)

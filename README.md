@@ -1005,9 +1005,6 @@ the fire data, each module has its own set of required and optional fields.
 ##### findmetdata
 
  - ***'config' > 'findmetdata' > 'met_root_dir'*** -- *required* --
- - ***'config' > 'findmetdata' > 'grid_spacing_km'*** -- *required* -- required in order to pass on to dispersion
- - ***'config' > 'findmetdata' > 'boundary'*** -- *required* -- required in order to pass on to dispersion
- - ***'config' > 'findmetdata' > 'domain'*** -- *optional* -- defaults to met_root_dir's inner most dir name
  - ***'config' > 'findmetdata' > 'met_format'*** -- *optional* -- defaults to 'arl'
 
 ###### if arl:
