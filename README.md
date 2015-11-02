@@ -898,12 +898,12 @@ Ingestion requires that none of the fires in 'fire_information' are empty object
  - ***'fire_information' > 'fuelbeds' > 'emissions'*** -- *optional* --
  - ***'fire_information' > 'fuelbeds' > 'emissions_details'*** -- *optional* --
 
- Note about growth:  if not growth objects are specified for a fire, but
- the fire has 'start' and 'end' keys, a growth object will be created with
- the 'start' and 'end' values and 'pct' set to 100.0
+Note about growth:  if not growth objects are specified for a fire, but
+the fire has 'start' and 'end' keys, a growth object will be created with
+the 'start' and 'end' values and 'pct' set to 100.0
 
- Note about fuelbeds: no fuelbed data is required, but ingestion will pass
- on and fuelbeds is defined
+Note about fuelbeds: no fuelbed data is required, but ingestion will pass
+on and fuelbeds is defined
 
 ##### fuelbeds
 
@@ -941,14 +941,14 @@ Ingestion requires that none of the fires in 'fire_information' are empty object
 
 ##### dispersion
 
- - ***'met' > 'boundary' -- *required* --
- - ***'met' > 'domain' -- *required* --
- - ***'met' > 'grid_spacing_km' -- *required* --
+ - ***'met' > 'boundary'*** -- *required* --
+ - ***'met' > 'domain'*** -- *required* --
+ - ***'met' > 'grid_spacing_km'*** -- *required* --
  - ***'met' > 'files'*** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
- - ***'fire_information' > 'growth' > 'timeprofile' -- *required* --
- - ***'fire_information' > 'growth' > 'plumerise' -- *required* --
- - ***'fire_information' > 'fuelbeds' > 'emissions' -- *required* --
- - ***'fire_information' > 'location' > 'utc_offset' -- *optional* -- hours off UTC; default: 0.0
+ - ***'fire_information' > 'growth' > 'timeprofile'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'plumerise'*** -- *required* --
+ - ***'fire_information' > 'fuelbeds' > 'emissions'*** -- *required* --
+ - ***'fire_information' > 'location' > 'utc_offset'*** -- *optional* -- hours off UTC; default: 0.0
 
 ##### visualization
 
