@@ -941,14 +941,20 @@ on and fuelbeds is defined
 
 ##### dispersion
 
- - ***'met' > 'boundary'*** -- *required* --
- - ***'met' > 'domain'*** -- *required* --
- - ***'met' > 'grid_spacing_km'*** -- *required* --
  - ***'met' > 'files'*** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
  - ***'fire_information' > 'growth' > 'timeprofile'*** -- *required* --
  - ***'fire_information' > 'growth' > 'plumerise'*** -- *required* --
  - ***'fire_information' > 'fuelbeds' > 'emissions'*** -- *required* --
  - ***'fire_information' > 'location' > 'utc_offset'*** -- *optional* -- hours off UTC; default: 0.0
+
+###### if visualizing hysplit dispersion:
+
+ - ***'met' > 'grid' > 'grid' > 'spacing'*** -- *reqiured* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *reqiured* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *reqiured* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *reqiured* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *reqiured* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'grid' > 'domain'*** -- *optional* -- default: 'LatLng' (which means the spacing is in degrees)
 
 ##### visualization
 
@@ -1042,7 +1048,12 @@ the fire data, each module has its own set of required and optional fields.
 ###### if visualizing hysplit dispersion:
 
  - ***'config' > 'dispersion' > 'hysplit' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
-
+ - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'spacing'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings --
+ - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'domain'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings -- default: 'LatLng' (which means the spacing is in degrees)
+ - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings --
+ - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings --
+ - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings --
+ - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings --
  - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_EMISLEVELS_REDUCTION_FACTOR'*** -- *optional* -- default: 1
  - ***'config' > 'dispersion' > 'hysplit' > 'NPROCESSES'*** -- *optional* -- default: 1 (i.e. no tranching)
  - ***'config' > 'dispersion' > 'hysplit' > 'NFIRES_PER_PROCESS'*** -- *optional* -- default: -1 (i.e. no tranching)
@@ -1076,6 +1087,15 @@ the fire data, each module has its own set of required and optional fields.
  - ***'config' > 'dispersion' > 'hysplit' > 'KHMAX'*** -- *optional* -- default: 72
  - ***'config' > 'dispersion' > 'hysplit' > 'NDUMP'*** -- *optional* -- default: 24
  - ***'config' > 'dispersion' > 'hysplit' > 'NCYCL'*** -- *optional* -- default: 24
+
+Note about the grid:  There are three ways to specify the dispersion grid.
+If USER_DEFINED_GRID is set to true, hysplit will expect BlueSky framework's
+user defined grid settings ('CENTER_LATITUDE', 'CENTER_LONGITUDE',
+'WIDTH_LONGITUDE', 'HEIGHT_LATITUDE', 'SPACING_LONGITUDE', and
+'SPACING_LONGITUDE').  Otherwise, it will look in 'config' > 'dispersion' >
+'hysplit' > 'grid' for 'boundary', 'spacing', and 'domain' fields.  If not
+defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
+'met' object.
 
 ##### visualization
 

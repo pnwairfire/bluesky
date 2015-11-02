@@ -140,17 +140,15 @@ class HYSPLITDispersion(object):
             for line in output.split('\n'):
                 logging.debug('{}: {}'.format(args[0], line))
 
-    MET_META_FIELDS = ('boundary', 'domain', 'grid_spacing_km')
-
     def _set_met_info(self, met_info):
         # TODO: move validation code into common module bluesky.met.validation ?
-        self._met_info = {
-            k: v for k, v in met_info.items()
-                if k in self.MET_META_FIELDS
-        }
-        if any([not self._met_info.get(k) for k in self.MET_META_FIELDS]):
-            raise ValueError("Met info must include {} fields".format(
-                ', '.join(self.MET_META_FIELDS)))
+        self._met_info = {}
+
+        if met_info.get('grid'):
+            self._met_info['grid'] = met_info['grid']
+        # The grid fields, 'domain', 'boundary', and 'grid_spacing_km' can be
+        # defined either in the met object or in the hsyplit config. Expections
+        # will be raised downstream if not defined in either place
 
         # hysplit just needs the name
         self._met_info['files'] = set()
@@ -702,6 +700,7 @@ class HYSPLITDispersion(object):
             logging.warn("KML and PNG images will be empty since more than 1 vertical level is selected")
 
         if self.config("USER_DEFINED_GRID"):
+            # This supports BSF config settings
             # User settings that can override the default concentration grid info
             logging.info("User-defined sampling/concentration grid invoked")
             centerLat = self.config("CENTER_LATITUDE")
@@ -717,16 +716,28 @@ class HYSPLITDispersion(object):
             logging.info("Automatic sampling/concentration grid invoked")
 
             projection = self._met_info['domain']
-            grid_spacing_km = self._met_info['grid_spacing_km']
 
-            lat_min = self._met_info['boundary']['sw']['lat']
-            lat_max = self._met_info['boundary']['ne']['lat']
-            lon_min = self._met_info['boundary']['sw']['lng']
-            lon_max = self._met_info['boundary']['ne']['lng']
+            grid = self.config('grid') or {}
+            grid_spacing = grid.get('spacing',
+                self._met_info.get('spacing'))
+            if not grid_spacing:
+                raise ValueError("grid spacing must be defined either in user "
+                    "defined grid or in met object.")
+            grid_boundary = grid.get('boundary',
+                self._met_info.get('boundary'))
+            if not grid_boundary:
+                raise ValueError("grid boundary must be defined either in user "
+                    "defined grid or in met object.")
+            # TODO: check that sw and ne lat/lng's are defined
+
+            lat_min = grid_boundary['sw']['lat']
+            lat_max = grid_boundary['ne']['lat']
+            lon_min = grid_boundary['sw']['lng']
+            lon_max = grid_boundary['ne']['lng']
             lat_center = (lat_min + lat_max) / 2
-            spacing = grid_spacing_km / ( 111.32 * math.cos(lat_center*math.pi/180.0) )
+            spacing = grid_spacing / ( 111.32 * math.cos(lat_center*math.pi/180.0) )
             if projection == "LatLon":
-                spacing = grid_spacing_km  # degrees
+                spacing = grid_spacing  # degrees
 
             # Build sampling grid parameters in scaled integer form
             SCALE = 100
