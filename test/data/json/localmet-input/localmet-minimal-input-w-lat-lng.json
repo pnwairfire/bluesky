@@ -1,18 +1,5 @@
 {
     "met": {
-        "grid":{
-            "pacing": 6.0,
-            "boundary": {
-                "sw":{
-                    "lat": 28.0,
-                    "lng": -132
-                },
-                "ne": {
-                    "lat": 45.0,
-                    "lng": -106.0
-                }
-            }
-        },
         "files": [
             {
                 "file": "/DRI_6km/2014053000/wrfout_d2.2014053000.f00-11_12hr01.arl",
