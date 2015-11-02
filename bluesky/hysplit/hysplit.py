@@ -718,16 +718,16 @@ class HYSPLITDispersion(object):
             # and that the grid center will be a receptor point (i.e., nx, ny will be ODD).
             logging.info("Automatic sampling/concentration grid invoked")
 
-            projection = self._met_info['domain']
-
-            grid = self.config('grid') or {}
-            grid_spacing = grid.get('spacing',
-                self._met_info.get('spacing'))
+            grid = self.config('grid') or self._met_info.get('grid')
+            if not grid:
+                raise ValueError("Dispersion grid must be defined either in the "
+                    "config or in the top level met object.")
+            projection = grid.get('domain', self._met_info.get('domain'))
+            grid_spacing = grid.get('spacing', self._met_info.get('spacing'))
             if not grid_spacing:
                 raise ValueError("grid spacing must be defined either in user "
                     "defined grid or in met object.")
-            grid_boundary = grid.get('boundary',
-                self._met_info.get('boundary'))
+            grid_boundary = grid.get('boundary', self._met_info.get('boundary'))
             if not grid_boundary:
                 raise ValueError("grid boundary must be defined either in user "
                     "defined grid or in met object.")
