@@ -220,6 +220,8 @@ def provision():
             sudo('make install')
             sudo('ldconfig')
     execute_in_virtualenv('apt-get install -y python-gdal')
+    execute_in_virtualenv('apt-get install -y libfreetype6-dev') # for matplotlib
+    execute_in_virtualenv('apt-get install -y libpng12-dev') # for matplotlib
     sudo('apt-get install libxml2-dev libxslt1-dev')
 
 @task
