@@ -10,7 +10,22 @@
             "start": "2014-05-30T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
-            "output_dir": "/tmp/bsp-output"
+            "output_dir": "/tmp/bsp-output",
+            "hysplit": {
+                "grid": {
+                    "spacing": 6.0,
+                    "boundary": {
+                        "ne": {
+                            "lat": 45.25,
+                            "lng": -106.5
+                        },
+                        "sw": {
+                            "lat": 27.75,
+                            "lng": -131.5
+                        }
+                    }
+                }
+            }
         },
         "visualization": {
             "target": "dispersion",

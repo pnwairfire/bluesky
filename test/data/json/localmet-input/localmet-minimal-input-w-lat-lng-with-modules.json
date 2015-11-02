@@ -1,16 +1,17 @@
 {
     "modules": ["localmet"],
     "met": {
-        "domain" : "DRI6km",
-        "grid_spacing_km": 6.0,
-        "boundary": {
-            "sw":{
-                "lat": 28.0,
-                "lng": -132
-            },
-            "ne": {
-                "lat": 45.0,
-                "lng": -106.0
+        "grid" : {
+            "spacing": 6.0,
+            "boundary": {
+                "sw":{
+                    "lat": 28.0,
+                    "lng": -132
+                },
+                "ne": {
+                    "lat": 45.0,
+                    "lng": -106.0
+                }
             }
         },
         "files": [

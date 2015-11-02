@@ -7,7 +7,22 @@
             "start": "2015-08-15T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
-            "output_dir": "/tmp/bsp-output"
+            "output_dir": "/tmp/bsp-output",
+            "hysplit": {
+                "grid": {
+                    "spacing": 1.33,
+                    "boundary": {
+                        "ne": {
+                            "lat": 48.97,
+                            "lng": -114.08
+                        },
+                        "sw": {
+                            "lat": 44.77,
+                            "lng": -126.08
+                        }
+                    }
+                }
+            }
         },
         "visualization": {
             "target": "dispersion",

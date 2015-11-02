@@ -15,16 +15,17 @@
         }
     },
     "met": {
-        "domain" : "DRI6km",
-        "grid_spacing_km": 6.0,
-        "boundary": {
-            "ne": {
-                "lat": 45.25,
-                "lng": -106.5
-            },
-            "sw": {
-                "lat": 27.75,
-                "lng": -131.5
+        "grid": {
+            "spacing": 6.0,
+            "boundary": {
+                "ne": {
+                    "lat": 45.25,
+                    "lng": -106.5
+                },
+                "sw": {
+                    "lat": 27.75,
+                    "lng": -131.5
+                }
             }
         },
         "files": [
