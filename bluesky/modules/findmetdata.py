@@ -7,6 +7,8 @@ spanning all fire growth periods.
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import logging
+
 from bluesky.met import arlfinder
 
 from bluesky.datetimeutils import parse_datetimes
@@ -36,20 +38,49 @@ def run(fires_manager):
     # TODO: specify domain instead of met_root_dir, and somehow configure (not
     # in the code, since this is open source), per domain, the root dir, arl file
     # name pattern, etc.
-    met_root_dir = fires_manager.get_config_value('findmetdata', 'met_root_dir')
+    met_root_dir = fires_manager.get_config_value('findmetdata',
+        'met_root_dir')
     if not met_root_dir:
         raise BlueSkyConfigurationError("Config setting 'met_root_dir' "
             "required by findmetdata module".format(e.message))
+
+    domain = (fires_manager.get_config_value('findmetdata', 'domain') or
+        os.path.basename(met_root_dir))
+
+    grid_spacing_km = fires_manager.get_config_value('findmetdata',
+        'grid_spacing_km')
+    if not grid_spacing_km:
+        # TODO: figure out how to determine this programatically
+        raise BlueSkyConfigurationError("Config setting 'grid_spacing_km' "
+            "required by findmetdata module".format(e.message))
+
+    met_format = fires_manager.get_config_value('findmetdata', 'met_format',
+        default="arl").lower()
+    if met_format == arl:
+        arl_config = fires_manager.get_config_value('findmetdata', 'arl',
+            default={})
+        arl_finder = arlfinder.ArlFinder(met_root_dir, **arl_config)
+    else:
+        raise BlueSkyConfigurationError(
+            "Invalid or unsupported met data format: '{}'".format(met_format))
+
     # Find earliest and latest datetimes that include all fire growth periods
     # TODO: be more intelligent with possible gaps, so that met files for times
     #  when no fire is growing are excluded ?
     earliest = None
     latest = None
     for fire in fires_manager.fires:
+        # parse_utc_offset makes sure utc offset is defined and valid
+        utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
         for g in fire.growth:
             tw = parse_datetimes(g, 'start', 'end')
-            # TODO: make sure tw['start'] < tw['end']
-            earlist = min(earliest, tw['start'])
-            latest = max(latest, tw['end'])
-    arl_finder = arlfinder.ArlFinder(met_root_dir)
+            if tw['start'] > tw['end']:
+                raise ValueError("Invalid growth time window - start: {}, end: {}".format(
+                    tw['start'], tw['end']))
+            start = tw['start'] - utc_offset
+            end = tw['end'] - utc_offset
+            earlist = min(earliest, start)
+            latest = max(latest, end)
+
     fires_manager.met = arl_finder.find(earliest, latest)
+    fires_manager.met.update(domain=domain, grid_spacing_km=grid_spacing_km)
