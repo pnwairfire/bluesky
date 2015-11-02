@@ -71,7 +71,10 @@ class HYSPLITDispersion(object):
         # TODO: make sure all required config options are defined
 
     def config(self, key):
-        return self._config.get(key.lower(), getattr(defaults, key, None))
+        # check if key is defined, in order, a) in the config as is, b) in
+        # the config as lower case, c) in the hardcoded defaults
+        return self._config.get(key,
+            self._config.get(key.lower(), getattr(defaults, key, None)))
 
     def run(self, fires, start, num_hours, output_dir):
         """Runs hysplit
