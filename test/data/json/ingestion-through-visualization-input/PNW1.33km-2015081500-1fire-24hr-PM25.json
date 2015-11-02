@@ -3,6 +3,9 @@
         "emissions": {
             "species": ["PM25"]
         },
+        "findmetdata": {
+            "met_root_dir": "/NWRMC/1.33km/"
+        },
         "dispersion": {
             "start": "2015-08-15T00:00:00",
             "num_hours": 24,
@@ -33,47 +36,6 @@
             }
         }
     },
-    "met": {
-        "domain": "DRI6km",
-        "grid_spacing_km": 1.33,
-        "boundary": {
-            "ne": {
-                "lat": 48.97,
-                "lng": -114.08
-            },
-            "sw": {
-                "lat": 44.77,
-                "lng": -126.08
-            }
-        },
-        "files": [
-            {
-                "file": "/NWRMC/1.33km/2015081500/wrfout_d4.2015081400.f24-35_12hr02.arl",
-                "first_hour": "2015-08-15T00:00:00",
-                "last_hour": "2015-08-15T11:00:00"
-            },
-            {
-                "file": "/NWRMC/1.33km/2015081500/wrfout_d4.2015081500.f12-23_12hr01.arl",
-                "first_hour": "2015-08-15T12:00:00",
-                "last_hour": "2015-08-15T23:00:00"
-            },
-            {
-                "file": "/NWRMC/1.33km/2015081500/wrfout_d4.2015081500.f24-35_12hr02.arl",
-                "first_hour": "2015-08-16T00:00:00",
-                "last_hour": "2015-08-16T11:00:00"
-            },
-            {
-                "file": "/NWRMC/1.33km/2015081500/wrfout_d4.2015081500.f36-47_12hr03.arl",
-                "first_hour": "2015-08-16T12:00:00",
-                "last_hour": "2015-08-16T23:00:00"
-            },
-            {
-                "file": "/NWRMC/1.33km/2015081500/wrfout_d4.2015081500.f48-59_12hr04.arl",
-                "first_hour": "2015-08-17T00:00:00",
-                "last_hour": "2015-08-17T11:00:00"
-            }
-        ]
-    }
     "fire_information": [
         {
             "event_of": {
