@@ -927,7 +927,7 @@ Ingestion requires that none of the fires in 'fire_information' are empty object
 
 ##### localmet
 
- - *** 'met' > 'files' *** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
+ - ***'met' > 'files'*** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
  - ***'fire_information' > 'location'*** -- *required* -- fire location information containing 'utc_offset' and either single lat/lng or polygon shape data with multiple lat/lng coordinates
 
 ##### timeprofiling
@@ -941,31 +941,31 @@ Ingestion requires that none of the fires in 'fire_information' are empty object
 
 ##### dispersion
 
- - *** 'met' > 'boundary' -- *required* --
- - *** 'met' > 'domain' -- *required* --
- - *** 'met' > 'grid_spacing_km' -- *required* --
- - *** 'met' > 'files' *** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
- - *** 'fire_information' > 'growth' > 'timeprofile' -- *required* --
- - *** 'fire_information' > 'growth' > 'plumerise' -- *required* --
- - *** 'fire_information' > 'fuelbeds' > 'emissions' -- *required* --
- - *** 'fire_information' > 'location' > 'utc_offset' -- *optional* -- hours off UTC; default: 0.0
+ - ***'met' > 'boundary' -- *required* --
+ - ***'met' > 'domain' -- *required* --
+ - ***'met' > 'grid_spacing_km' -- *required* --
+ - ***'met' > 'files'*** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
+ - ***'fire_information' > 'growth' > 'timeprofile' -- *required* --
+ - ***'fire_information' > 'growth' > 'plumerise' -- *required* --
+ - ***'fire_information' > 'fuelbeds' > 'emissions' -- *required* --
+ - ***'fire_information' > 'location' > 'utc_offset' -- *optional* -- hours off UTC; default: 0.0
 
 ##### visualization
 
 ###### if visualizing hysplit dispersion:
 
- - *** 'dispersion' > 'model' *** -- *required* --
- - *** 'dispersion' > 'output' > 'directory' *** -- *required* --
- - *** 'dispersion' > 'output' > 'grid_filename' *** -- *required* --
- - *** 'dispersion' > 'output' > 'run_id' *** -- *optional* -- if not defined, generates new guid
- - *** 'fire_information' > 'id' *** -- *required* --
- - ***'fire_information' > 'location' *** -- *required* -- containing either single lat/lng + area or polygon perimeter coordinates + area
- - *** 'fire_information' > 'type' *** -- *optional* --
- - *** 'fire_information' > 'event_of' > 'name' *** -- *optional* --
- - *** 'fire_information' > 'event_of' > 'id' *** -- *optional* --
- - *** 'fire_information' > 'fuelbeds' > 'emissions' *** -- *optional* --
- - *** 'fire_information' > 'fuelbeds' > 'fccs_id' *** -- *optional* --
- - *** 'fire_information' > 'growth' > 'start' *** -- *required* --
+ - ***'dispersion' > 'model'*** -- *required* --
+ - ***'dispersion' > 'output' > 'directory'*** -- *required* --
+ - ***'dispersion' > 'output' > 'grid_filename'*** -- *required* --
+ - ***'dispersion' > 'output' > 'run_id'*** -- *optional* -- if not defined, generates new guid
+ - ***'fire_information' > 'id'*** -- *required* --
+ - ***'fire_information' > 'location'*** -- *required* -- containing either single lat/lng + area or polygon perimeter coordinates + area
+ - ***'fire_information' > 'type'*** -- *optional* --
+ - ***'fire_information' > 'event_of' > 'name'*** -- *optional* --
+ - ***'fire_information' > 'event_of' > 'id'*** -- *optional* --
+ - ***'fire_information' > 'fuelbeds' > 'emissions'*** -- *optional* --
+ - ***'fire_information' > 'fuelbeds' > 'fccs_id'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'start'*** -- *required* --
 
 ##### export
 
@@ -998,7 +998,7 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### findmetdata
 
- - ***'config' > 'findmetdata' > 'met_root_dir' *** -- *required* --
+ - ***'config' > 'findmetdata' > 'met_root_dir'*** -- *required* --
 
 ##### localmet
 
@@ -1006,7 +1006,7 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### timeprofiling
 
- - ***'config' > 'timeprofiling' > 'hourly_fractions' *** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the growth window)
+ - ***'config' > 'timeprofiling' > 'hourly_fractions'*** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the growth window)
 
 
 ##### plumerising
@@ -1036,39 +1036,39 @@ the fire data, each module has its own set of required and optional fields.
 
  - ***'config' > 'dispersion' > 'hysplit' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
 
- - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_EMISLEVELS_REDUCTION_FACTOR' *** -- *optional* -- default: 1
- - ***'config' > 'dispersion' > 'hysplit' > 'NPROCESSES' *** -- *optional* -- default: 1 (i.e. no tranching)
- - ***'config' > 'dispersion' > 'hysplit' > 'NFIRES_PER_PROCESS' *** -- *optional* -- default: -1 (i.e. no tranching)
- - ***'config' > 'dispersion' > 'hysplit' > 'NPROCESSES_MAX' *** -- *optional* -- default: -1  (i.e. no tranching)
- - ***'config' > 'dispersion' > 'hysplit' > 'ASCDATA_FILE' *** -- *optional* -- default: use default file in package
- - ***'config' > 'dispersion' > 'hysplit' > 'LANDUSE_FILE' *** -- *optional* -- default: use default file in package
- - ***'config' > 'dispersion' > 'hysplit' > 'ROUGLEN_FILE' *** -- *optional* -- default: use default file in package
- - ***'config' > 'dispersion' > 'hysplit' > 'READ_INIT_FILE' *** -- *optional* -- default: false
- - ***'config' > 'dispersion' > 'hysplit' > 'DISPERSION_FOLDER' *** -- *optional* -- default: "./input/dispersion"
- - ***'config' > 'dispersion' > 'hysplit' > 'STOP_IF_NO_PARINIT' *** -- *optional* -- default: True
- - ***'config' > 'dispersion' > 'hysplit' > 'MPI' *** -- *optional* -- default: false
- - ***'config' > 'dispersion' > 'hysplit' > 'NCPUS' *** -- *optional* -- default: 1
- - ***'config' > 'dispersion' > 'hysplit' > 'HYSPLIT_SETUP_FILE' *** -- *optional* -- default: none
- - ***'config' > 'dispersion' > 'hysplit' > 'CONVERT_HYSPLIT2NETCDF' *** -- *optional* -- default: true
- - ***'config' > 'dispersion' > 'hysplit' > 'MAKE_INIT_FILE' *** -- *optional* -- default: false
- - ***'config' > 'dispersion' > 'hysplit' > 'SMOLDER_HEIGHT' *** -- *optional* -- default: 10.0
- - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_METHOD' *** -- *optional* -- default: "DATA"
- - ***'config' > 'dispersion' > 'hysplit' > 'TOP_OF_MODEL_DOMAIN' *** -- *optional* -- default: 30000.0
- - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_LEVELS' *** -- *optional* -- default: [10]
- - ***'config' > 'dispersion' > 'hysplit' > 'USER_DEFINED_GRID' *** -- *optional* -- default: False
- - ***'config' > 'dispersion' > 'hysplit' > 'CENTER_LATITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
- - ***'config' > 'dispersion' > 'hysplit' > 'CENTER_LONGITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
- - ***'config' > 'dispersion' > 'hysplit' > 'WIDTH_LONGITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
- - ***'config' > 'dispersion' > 'hysplit' > 'HEIGHT_LATITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
- - ***'config' > 'dispersion' > 'hysplit' > 'SPACING_LONGITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
- - ***'config' > 'dispersion' > 'hysplit' > 'SPACING_LATITUDE' *** -- *required if USER_DEFINED_GRID==true* -- default: none
- - ***'config' > 'dispersion' > 'hysplit' > 'OPTIMIZE_GRID_RESOLUTION' *** -- *optional* -- default: false
- - ***'config' > 'dispersion' > 'hysplit' > 'MAX_SPACING_LONGITUDE' *** -- *optional* -- default: 0.5
- - ***'config' > 'dispersion' > 'hysplit' > 'MAX_SPACING_LATITUDE' *** -- *optional* -- default: 0.5
- - ***'config' > 'dispersion' > 'hysplit' > 'FIRE_INTERVALS' *** -- *optional* -- default: [0, 100, 200, 500, 1000]
- - ***'config' > 'dispersion' > 'hysplit' > 'KHMAX' *** -- *optional* -- default: 72
- - ***'config' > 'dispersion' > 'hysplit' > 'NDUMP' *** -- *optional* -- default: 24
- - ***'config' > 'dispersion' > 'hysplit' > 'NCYCL' *** -- *optional* -- default: 24
+ - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_EMISLEVELS_REDUCTION_FACTOR'*** -- *optional* -- default: 1
+ - ***'config' > 'dispersion' > 'hysplit' > 'NPROCESSES'*** -- *optional* -- default: 1 (i.e. no tranching)
+ - ***'config' > 'dispersion' > 'hysplit' > 'NFIRES_PER_PROCESS'*** -- *optional* -- default: -1 (i.e. no tranching)
+ - ***'config' > 'dispersion' > 'hysplit' > 'NPROCESSES_MAX'*** -- *optional* -- default: -1  (i.e. no tranching)
+ - ***'config' > 'dispersion' > 'hysplit' > 'ASCDATA_FILE'*** -- *optional* -- default: use default file in package
+ - ***'config' > 'dispersion' > 'hysplit' > 'LANDUSE_FILE'*** -- *optional* -- default: use default file in package
+ - ***'config' > 'dispersion' > 'hysplit' > 'ROUGLEN_FILE'*** -- *optional* -- default: use default file in package
+ - ***'config' > 'dispersion' > 'hysplit' > 'READ_INIT_FILE'*** -- *optional* -- default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'DISPERSION_FOLDER'*** -- *optional* -- default: "./input/dispersion"
+ - ***'config' > 'dispersion' > 'hysplit' > 'STOP_IF_NO_PARINIT'*** -- *optional* -- default: True
+ - ***'config' > 'dispersion' > 'hysplit' > 'MPI'*** -- *optional* -- default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'NCPUS'*** -- *optional* -- default: 1
+ - ***'config' > 'dispersion' > 'hysplit' > 'HYSPLIT_SETUP_FILE'*** -- *optional* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'CONVERT_HYSPLIT2NETCDF'*** -- *optional* -- default: true
+ - ***'config' > 'dispersion' > 'hysplit' > 'MAKE_INIT_FILE'*** -- *optional* -- default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'SMOLDER_HEIGHT'*** -- *optional* -- default: 10.0
+ - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_METHOD'*** -- *optional* -- default: "DATA"
+ - ***'config' > 'dispersion' > 'hysplit' > 'TOP_OF_MODEL_DOMAIN'*** -- *optional* -- default: 30000.0
+ - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_LEVELS'*** -- *optional* -- default: [10]
+ - ***'config' > 'dispersion' > 'hysplit' > 'USER_DEFINED_GRID'*** -- *optional* -- default: False
+ - ***'config' > 'dispersion' > 'hysplit' > 'CENTER_LATITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'CENTER_LONGITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'WIDTH_LONGITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'HEIGHT_LATITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'SPACING_LONGITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'SPACING_LATITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none
+ - ***'config' > 'dispersion' > 'hysplit' > 'OPTIMIZE_GRID_RESOLUTION'*** -- *optional* -- default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'MAX_SPACING_LONGITUDE'*** -- *optional* -- default: 0.5
+ - ***'config' > 'dispersion' > 'hysplit' > 'MAX_SPACING_LATITUDE'*** -- *optional* -- default: 0.5
+ - ***'config' > 'dispersion' > 'hysplit' > 'FIRE_INTERVALS'*** -- *optional* -- default: [0, 100, 200, 500, 1000]
+ - ***'config' > 'dispersion' > 'hysplit' > 'KHMAX'*** -- *optional* -- default: 72
+ - ***'config' > 'dispersion' > 'hysplit' > 'NDUMP'*** -- *optional* -- default: 24
+ - ***'config' > 'dispersion' > 'hysplit' > 'NCYCL'*** -- *optional* -- default: 24
 
 ##### visualization
 
