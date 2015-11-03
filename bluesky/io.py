@@ -64,7 +64,7 @@ class CSV2JSON(object):
                     #headers = dict([(i, row[i].strip(' ')) for i in xrange(len(row))])
                     headers = [e.strip(' ') for e in row]
                 else:
-                    d = dict([(headers[i], row[i].strip(' ')) for i in xrange(len(row))])
+                    d = dict(zip(headers, [e.strip(' ') for e in row]))
                     self._cast_numeric_values(d)
                     data.append(d)
         return data
