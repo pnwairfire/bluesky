@@ -9,7 +9,8 @@ from py.test import raises
 from bluesky.datetimeutils import (
     parse_datetime,
     parse_datetimes,
-    parse_utc_offset
+    parse_utc_offset,
+    is_round_hour
 )
 
 ##
@@ -64,7 +65,7 @@ class TestParseDatetimes(object):
         assert parse_datetimes(s_and_e, 's', 'e') == {'s': s, 'e': e}
 
 ##
-## Tests for summarize
+## Tests for parse_utc_offset
 ##
 
 class TestParseUtcOffset(object):
@@ -84,3 +85,23 @@ class TestParseUtcOffset(object):
         assert 4.0 == parse_utc_offset('+04:00')
         assert -3.5 == parse_utc_offset('-03:30')
 
+##
+## Tests for is_round_hour
+##
+
+class TestIsRoundHour(object):
+
+    def test_invalid(self):
+        with raises(AttributeError):
+            is_round_hour(None)
+        with raises(AttributeError):
+            is_round_hour(123)
+        with raises(AttributeError):
+            is_round_hour('32')
+
+    def test_valid(self):
+        assert is_round_hour(datetime.datetime(2015,1,1,2))
+        assert not is_round_hour(datetime.datetime(2015,1,1,2,1))
+        assert not is_round_hour(datetime.datetime(2015,1,1,2,0,1))
+        assert not is_round_hour(datetime.datetime(2015,1,1,2,0,0,1))
+        assert not is_round_hour(datetime.datetime(2015,1,1,2,1,1,1))

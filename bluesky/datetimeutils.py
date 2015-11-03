@@ -65,3 +65,6 @@ def parse_utc_offset(utc_offset_str):
         raise ValueError("Invalid UTC offset: {}".format(utc_offset_str))
     hour_fraction = minutes / 60.0
     return (hours - hour_fraction) if (hours < 0) else (hours + hour_fraction)
+
+def is_round_hour(dt):
+    return dt.minute == dt.second == dt.microsecond == 0
