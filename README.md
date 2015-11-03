@@ -1008,7 +1008,8 @@ the fire data, each module has its own set of required and optional fields.
  - ***'config' > 'findmetdata' > 'met_format'*** -- *optional* -- defaults to 'arl'
 
 ###### if arl:
- - ***'config' > 'findmetdata' > 'arl' > 'index_filename'*** -- *optional* -- defaults to 'arl12hrindex.csv'
+ - ***'config' > 'findmetdata' > 'arl' > 'index_filename_pattern'*** -- *optional* -- defaults to 'arl12hrindex.csv'
+ - ***'config' > 'findmetdata' > 'arl' > 'max_met_days_out'*** -- *optional* -- defaults to 4
 
 ##### localmet
 

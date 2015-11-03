@@ -46,7 +46,7 @@ def run(fires_manager):
 
     met_format = fires_manager.get_config_value('findmetdata', 'met_format',
         default="arl").lower()
-    if met_format == arl:
+    if met_format == "arl":
         arl_config = fires_manager.get_config_value('findmetdata', 'arl',
             default={})
         arl_finder = arlfinder.ArlFinder(met_root_dir, **arl_config)
@@ -69,7 +69,7 @@ def run(fires_manager):
                     tw['start'], tw['end']))
             start = tw['start'] - utc_offset
             end = tw['end'] - utc_offset
-            earlist = min(earliest, start)
-            latest = max(latest, end)
+            earlist = min(earliest, start) if earliest else start
+            latest = max(latest, end) if latest else end
 
     fires_manager.met = arl_finder.find(earliest, latest)
