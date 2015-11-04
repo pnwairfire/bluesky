@@ -81,13 +81,14 @@ def run(fires_manager):
         for fire in fires_manager.fires:
             # parse_utc_offset makes sure utc offset is defined and valid
             utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
+            offset = datetime.timedelta(hours=utc_offset)
             for g in fire.growth:
                 tw = parse_datetimes(g, 'start', 'end')
                 if tw['start'] > tw['end']:
                     raise ValueError("Invalid growth time window - start: {}, end: {}".format(
                         tw['start'], tw['end']))
-                start = tw['start'] - utc_offset
-                end = tw['end'] - utc_offset
+                start = tw['start'] - offset
+                end = tw['end'] - offset
                 if not time_window:
                     time_window = {'start': start, 'end': end}
                 else:
