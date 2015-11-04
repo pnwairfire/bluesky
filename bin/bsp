@@ -14,7 +14,6 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import json
 import importlib
 import logging
-import pkgutil
 import sys
 import traceback
 import argparse
@@ -94,18 +93,11 @@ POSITIONAL_ARGS = [
     }
 ]
 
-# Note: pkgutil.walk_packages recursively walks modules and packages, while
-# pkgutil.iter_modules iterates through only modules and packages that are
-# one deep
-AVAILABLE_MODULES = [
-    #p[1].split('.')[-1] for p in pkgutil.iter_modules(modules.__path__, modules.__name__ + '.') #if p[2]
-    p[1] for p in pkgutil.iter_modules(modules.__path__)
-]
 # Note: the trailing space seems to be the only way to add an extra trailing line
 AVAILABLE_MODULES_STR = """\
 Available Modules:
     {}
- """.format('\n    '.join(AVAILABLE_MODULES))
+ """.format('\n    '.join(modules.AVAILABLE_MODULES))
 
 def validate_args(args):
     # TODO: validate args values as necessary
