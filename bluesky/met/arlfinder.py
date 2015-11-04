@@ -25,7 +25,7 @@ ONE_DAY = datetime.timedelta(days=1)
 class ArlFinder(object):
 
     DEFAULT_INDEX_FILENAME_PATTERN = "arl12hrindex.csv"
-    DEFAULT_MAX_MET_DAYS_OUT = 4
+    DEFAULT_MAX_DAYS_OUT = 4
 
     def __init__(self, met_root_dir, **config):
         """Constructor
@@ -48,8 +48,8 @@ class ArlFinder(object):
         self._index_filename_matcher = re.compile(
             config.get("index_filename_pattern",
             self.DEFAULT_INDEX_FILENAME_PATTERN))
-        self._max_met_days_out = int(config.get("max_met_days_out",
-            self.DEFAULT_MAX_MET_DAYS_OUT))
+        self._max_days_out = int(config.get("max_days_out",
+            self.DEFAULT_MAX_DAYS_OUT))
 
     def find(self, start, end):
         """finds met data spanning start/end time window
@@ -143,7 +143,7 @@ class ArlFinder(object):
         """
         num_days = (end.date()-start.date()).days
         dates_to_match = [start + ONE_DAY*i
-            for i in range(-self._max_met_days_out, num_days+1)]
+            for i in range(-self._max_days_out, num_days+1)]
         return re.compile(".*({}).*".format(
             '|'.join([dt.strftime('%Y%m%d') for dt in dates_to_match])))
 
