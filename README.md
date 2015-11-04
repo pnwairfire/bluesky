@@ -923,7 +923,7 @@ on and fuelbeds is defined
 
 ##### findmetdata
 
- - ***'fire_information' > 'growth'*** -- *required* -- array of growth objects, each containing 'start', 'end'
+ - ***'fire_information' > 'growth'*** -- *required* if time_window isn't specified in the config -- array of growth objects, each containing 'start', 'end'
 
 ##### localmet
 
@@ -1005,6 +1005,8 @@ the fire data, each module has its own set of required and optional fields.
 ##### findmetdata
 
  - ***'config' > 'findmetdata' > 'met_root_dir'*** -- *required* --
+ - ***'config' > 'findmetdata' > 'time_window' > 'first_hour'*** -- *required* if fire growth data isn't defined --
+ - ***'config' > 'findmetdata' > 'time_window' > 'last_hour'*** -- *required* if fire growth data isn't defined --
  - ***'config' > 'findmetdata' > 'met_format'*** -- *optional* -- defaults to 'arl'
 
 ###### if arl:
