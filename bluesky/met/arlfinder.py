@@ -233,11 +233,12 @@ class ArlFinder(object):
         for row in CSV2JSON(input_file=index_file)._load():
             tw = parse_datetimes(row, 'start', 'end')
             f = self._get_file_pathname(index_file, row['filename'])
-            dt = tw['start']
-            while dt <= tw['end']:
-                if not files_per_hour.get(dt) or files_per_hour[dt] < f:
-                    files_per_hour[dt] = f
-                dt += ONE_HOUR
+            if f:
+                dt = tw['start']
+                while dt <= tw['end']:
+                    if not files_per_hour.get(dt) or files_per_hour[dt] < f:
+                        files_per_hour[dt] = f
+                    dt += ONE_HOUR
 
     def _get_file_pathname(self, index_file, name):
         f = os.path.abspath(name)
@@ -248,8 +249,8 @@ class ArlFinder(object):
         if os.path.isfile(f):
             return f
 
-        raise ValueError("Can't find arl file {} listed in {}".format(
-            name, index_file))
+        # raise ValueError("Can't find arl file {} listed in {}".format(
+        #     name, index_file))
 
     def _find_index_files(self, dir, date_matcher):
         """Searches for index files under dir
