@@ -7,8 +7,10 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 __all__ = [
+    'parse_datetime',
     'parse_datetimes',
-    'parse_utc_offset'
+    'parse_utc_offset',
+    'is_round_hour'
 ]
 
 import re
