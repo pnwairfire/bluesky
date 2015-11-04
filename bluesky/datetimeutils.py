@@ -19,7 +19,7 @@ from pyairfire.datetime import parsing as datetime_parsing
 
 def parse_datetime(v, k):
     try:
-        return datetime_parsing.parse(v)
+        return datetime_parsing.parse(v, extra_formats=['%Y-%m-%d %H:%M:%S'])
     except ValueError, e:
         # datetime_parsing will raise ValueError if invalid format; re-raise
         # wih specific msg

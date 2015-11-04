@@ -107,16 +107,27 @@ class ArlFinder(object):
             raise ValueError('Start and end times must be defined to find arl data')
 
         date_matcher = self._create_date_matcher(start, end)
-
         index_files = self._find_index_files(self._met_root_dir, date_matcher)
-        files_per_hour = reduce(lambda r, e: self._parse_index_file(r, e), index_files, {})
+
+        #files_per_hour = reduce(lambda r, e: self._parse_index_file(r, e), index_files, {})
+        files_per_hour = {}
+        for f in index_files:
+            #logging.debug(files_per_hour)
+            self._parse_index_file(files_per_hour, f)
+
         files = []
         for dt, f in sorted(files_per_hour.items(), key=lambda e: e[0]):
-            if (not files or (e[0] - files[-1]['last_hour']) > ONE_HOUR or
-                    files[-1]['file'] != e[1]):
-                files.append({'file': e[1], 'first_hour':e[0], 'last_hour': e[0]})
+            if (not files or (dt - files[-1]['last_hour']) > ONE_HOUR or
+                    files[-1]['file'] != f):
+                files.append({'file': f, 'first_hour':dt, 'last_hour': dt})
             else:
-                files[-1]['last_hour'] = e[0]
+                files[-1]['last_hour'] = dt
+
+        for f in files:
+            f["first_hour"] = f['first_hour'].isoformat()
+            f["last_hour"] = f['last_hour'].isoformat()
+
+        return {'files': files}
 
     def _create_date_matcher(self, start, end):
         """Returns a compiled regex object that matches %Y%m%d date strings
@@ -127,7 +138,8 @@ class ArlFinder(object):
         num_days = (end.date()-start.date()).days
         dates_to_match = [start + ONE_DAY*i
             for i in range(-self._max_met_days_out, num_days+1)]
-        return re.compile('|'.join([dt.strftime('%Y%m%d') for dt in dates_to_match]))
+        return re.compile(".*({}).*".format(
+            '|'.join([dt.strftime('%Y%m%d') for dt in dates_to_match])))
 
     def _parse_index_file(self, files_per_hour, index_file):
         """Parses arl index file for files to use for each hour, and updates
@@ -215,8 +227,11 @@ class ArlFinder(object):
         for row in CSV2JSON(input_file=index_file)._load():
             tw = parse_datetimes(row, 'start', 'end')
             f = self._get_file_pathname(index_file, row['filename'])
-            # TODO: for each hour in range, if specified file is more recent than
-            #  what's in files_per_hour, then update files_per_hour
+            dt = tw['start']
+            while dt <= tw['end']:
+                if not files_per_hour.get(dt) or files_per_hour[dt] < f:
+                    files_per_hour[dt] = f
+                dt += ONE_HOUR
 
     def _get_file_pathname(self, index_file, name):
         f = os.path.abspath(name)
@@ -230,8 +245,8 @@ class ArlFinder(object):
         raise ValueError("Can't find arl file {} listed in {}".format(
             name, index_file))
 
-    def _find_index_files(self, dir, date_matcher, index_files=None):
-        """Recursively searches for index files under dir
+    def _find_index_files(self, dir, date_matcher):
+        """Searches for index files under dir
 
         Example index file locations:
 
@@ -245,14 +260,12 @@ class ArlFinder(object):
             /storage/NWRMC/1.33km/2015110300/arl12hrindex.csv
             /storage/NWRMC/4km/2015110300/arl12hrindex.csv
         """
-        index_files = index_files or []
+        index_files = []
         for root, dirs, files in os.walk(dir):
-            logging.debug('Root: {}'.format(root))
-            for f in files:
-                if (self._index_filename_matcher.match(f) #(os.path.basename(f)):
-                        and date_matcher.match(f)):
-                    index_files.append(os.path.join(root, f))
-            for d in dirs:
-                index_files.extend(self._find_index_files(
-                    os.path.join(root, d), date_matcher, index_files=files))
+            #logging.debug('Root: {}'.format(root))
+            if date_matcher.match(root):
+                for f in files:
+                    if self._index_filename_matcher.match(f): #(os.path.basename(f)):
+                        logging.debug('found index file: {}'.format(f))
+                        index_files.append(os.path.join(root, f))
         return index_files
