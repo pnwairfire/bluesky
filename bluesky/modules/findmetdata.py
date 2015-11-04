@@ -11,7 +11,8 @@ import logging
 
 from bluesky.met import arlfinder
 
-from bluesky.datetimeutils import parse_datetimes
+from bluesky.datetimeutils import parse_datetimes, is_round_hour
+from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
     'run'
@@ -54,22 +55,45 @@ def run(fires_manager):
         raise BlueSkyConfigurationError(
             "Invalid or unsupported met data format: '{}'".format(met_format))
 
-    # Find earliest and latest datetimes that include all fire growth periods
-    # TODO: be more intelligent with possible gaps, so that met files for times
-    #  when no fire is growing are excluded ?
-    earliest = None
-    latest = None
-    for fire in fires_manager.fires:
-        # parse_utc_offset makes sure utc offset is defined and valid
-        utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
-        for g in fire.growth:
-            tw = parse_datetimes(g, 'start', 'end')
-            if tw['start'] > tw['end']:
-                raise ValueError("Invalid growth time window - start: {}, end: {}".format(
-                    tw['start'], tw['end']))
-            start = tw['start'] - utc_offset
-            end = tw['end'] - utc_offset
-            earlist = min(earliest, start) if earliest else start
-            latest = max(latest, end) if latest else end
+    time_window = fires_manager.get_config_value('findmetdata', 'time_window')
+    if time_window:
+        logging.debug("Met time window specified in the config")
+        time_window = parse_datetimes(time_window, 'first_hour', 'last_hour')
+        # met data finder doesn't require round hours, but ....
+        if (not is_round_hour(time_window['first_hour']) or
+                not is_round_hour(time_window['last_hour'])):
+            raise BlueSkyConfigurationError(
+                "Met first and last hours must be round hours")
+        time_window = {
+            'start': time_window['first_hour'],
+            'end': time_window['last_hour'] # TODO: round this up to the next hour?
+        }
 
-    fires_manager.met = arl_finder.find(earliest, latest)
+    elif fires_manager.fires:
+        logging.debug("Met time window determined from fire growth data")
+        # Find earliest and latest datetimes that include all fire growth periods
+        # TODO: be more intelligent with possible gaps, so that met files for times
+        #  when no fire is growing are excluded ?
+        time_window = {}
+        for fire in fires_manager.fires:
+            # parse_utc_offset makes sure utc offset is defined and valid
+            utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
+            for g in fire.growth:
+                tw = parse_datetimes(g, 'start', 'end')
+                if tw['start'] > tw['end']:
+                    raise ValueError("Invalid growth time window - start: {}, end: {}".format(
+                        tw['start'], tw['end']))
+                start = tw['start'] - utc_offset
+                end = tw['end'] - utc_offset
+                if not time_window:
+                    time_window = {'start': start, 'end': end}
+                else:
+                    time_window['start'] = min(time_window['start'], start)
+                    # TODO: round end down to previous hour if it's a round hour
+                    time_window['end'] = max(time_window['end'], end)
+
+    if not time_window or not time_window.get('start') or not time_window.get('end'):
+        raise BlueSkyConfigurationError(
+            "Start and end times required to finding met data")
+
+    fires_manager.met = arl_finder.find(time_window['start'], time_window['end'])

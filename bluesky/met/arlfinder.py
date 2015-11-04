@@ -12,7 +12,7 @@ import logging
 import os
 import re
 
-from bluesky.datetimeutils import parse_datetimes
+from bluesky.datetimeutils import parse_datetimes, parse_utc_offset
 from bluesky.io import CSV2JSON
 
 __all__ = [
