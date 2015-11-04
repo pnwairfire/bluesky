@@ -7,11 +7,14 @@ spanning all fire growth periods.
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import datetime
 import logging
 
 from bluesky.met import arlfinder
 
-from bluesky.datetimeutils import parse_datetimes, is_round_hour
+from bluesky.datetimeutils import (
+    parse_datetimes, is_round_hour, parse_utc_offset
+)
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
