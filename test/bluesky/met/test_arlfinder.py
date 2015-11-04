@@ -43,8 +43,8 @@ class TestARLFinder(object):
         s = datetime.datetime(2015, 1, 1, 14)
         e = datetime.datetime(2015, 1, 4, 2)
         m = self.arl_finder._create_date_matcher(s,e)
-        assert m.pattern == '20141228|20141229|20141230|20141231|20150101|20150102|20150103|20150104'
+        assert m.pattern == '.*(20141228|20141229|20141230|20141231|20150101|20150102|20150103|20150104).*'
 
         self.arl_finder._max_met_days_out = 1
         m = self.arl_finder._create_date_matcher(s,e)
-        assert m.pattern == '20141231|20150101|20150102|20150103|20150104'
+        assert m.pattern == '.*(20141231|20150101|20150102|20150103|20150104).*'
