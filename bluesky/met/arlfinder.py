@@ -123,6 +123,12 @@ class ArlFinder(object):
             else:
                 files[-1]['last_hour'] = dt
 
+        files = [
+            f for f in files if
+                (f['first_hour'] >= start and f['first_hour'] <= end) or
+                (f['last_hour'] >= start and f['last_hour'] <= end)
+        ]
+
         for f in files:
             f["first_hour"] = f['first_hour'].isoformat()
             f["last_hour"] = f['last_hour'].isoformat()
