@@ -91,8 +91,8 @@ class HYSPLITDispersion(object):
             raise ValueError("Dispersion num_hours must be an integer.")
 
         self._output_dir = os.path.abspath(output_dir)
-        self._run_guid = str(uuid.uuid1())
-        self._run_output_dir = os.path.join(self._output_dir, self._run_guid)
+        self._run_id = self.config('run_id') or str(uuid.uuid1())
+        self._run_output_dir = os.path.join(self._output_dir, self._run_id)
         os.makedirs(self._run_output_dir)
 
         self._files_to_archive = []
@@ -115,7 +115,7 @@ class HYSPLITDispersion(object):
 
         return {
             "output": {
-                "run_id": self._run_guid,
+                "run_id": self._run_id,
                 "directory": self._run_output_dir,
                 "grid_filetype": "NETCDF",
                 "grid_filename": self.OUTPUT_FILE_NAME,

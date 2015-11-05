@@ -944,7 +944,7 @@ on and fuelbeds is defined
  - ***'fire_information' > 'fuelbeds' > 'emissions'*** -- *required* --
  - ***'fire_information' > 'location' > 'utc_offset'*** -- *optional* -- hours off UTC; default: 0.0
 
-###### if visualizing hysplit dispersion:
+###### if running hysplit dispersion:
 
  - ***'met' > 'grid' > 'grid' > 'spacing'*** -- *reqiured* if not specified in config (see below) --
  - ***'met' > 'grid' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *reqiured* if not specified in config (see below) --
@@ -1042,8 +1042,9 @@ the fire data, each module has its own set of required and optional fields.
  - ***'config' > 'dispersion' > 'output_dir'*** -- *required* --
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
 
-###### if visualizing hysplit dispersion:
+###### if running hysplit dispersion:
 
+ - ***'config' > 'dispersion' > 'hysplit' > 'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, a guid is generated
  - ***'config' > 'dispersion' > 'hysplit' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'spacing'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings --
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'domain'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings -- default: 'LatLng' (which means the spacing is in degrees)
