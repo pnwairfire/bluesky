@@ -13,8 +13,7 @@ setup(
     author_email='jdubowy@gmail.com',
     packages=find_packages(),
     scripts=[
-        'bin/bsp',
-        'bin/bsp-web'
+        'bin/bsp'
     ],
     package_data={
         # TODO: not sure how to specify package data for nested package.
@@ -34,8 +33,7 @@ setup(
         "timeprofile>=0.1.2",
         "plumerise>=0.1.1",
         "blueskykml>=0.2.5",
-        "apps-consume4>=4.1.2",
-        "tornado==4.2.1"
+        "apps-consume4>=4.1.2"
     ],
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/pyairfire/",
