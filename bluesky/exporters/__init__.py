@@ -3,6 +3,8 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+from bluesky import configuration
+
 class ExporterBase(object):
 
     def __init__(self, extra_exports, **config):
