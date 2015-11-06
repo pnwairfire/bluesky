@@ -9,13 +9,31 @@ __all__ = [
 
 __version__ = "0.1.0"
 
+from bluesky.exceptions import BlueSkyConfigurationError
+from bluesky.exporters import emailer, uploader, localsaver
+
+EXPORTERS = {
+    'email': emailer.EmailExporter,
+    'upload': uploader.UploadExporter,
+    'localsave': localsaver.LocalSaveExporter
+}
+
 def run(fires_manager):
     """runs the export module
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    # TODO: dump fires_manager to json (configurable dir and filename)
-    # TODO: make configurable what's to be exported (dispersion ourput,
-    #   visualization output, etc.)
-    raise NotImplementedError("Bluesky 'export' module not yet implemented")
+    mode = fires_manager.get_config_value('export', 'mode',
+        default='email').lower()
+
+    exporter_klass = EXPORTERS.get('mode'):
+    if not exporter_klass:
+        raise BlueSkyConfigurationError("Invalid exporter - {}".format()
+            exporter_klass)
+
+    extra_exports = fires_manager.get_config_value('export', 'extra_exports', default=[])
+    exporter_config = fires_manager.get_config_value('export', mode, default={})
+    exporter = exporter_klass(extra_exports, **exporter_config)
+
+    exporter_export(fires_manager)
