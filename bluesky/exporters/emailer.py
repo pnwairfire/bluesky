@@ -21,7 +21,7 @@ __version__ = "0.1.0"
 class EmailExporter(ExporterBase):
 
     # TODO: should there indeed be a default sender?
-    DEFAULT_SENDER = "blueskyexporter@gmail.com"
+    DEFAULT_SENDER = "bsp@airfire.org"
     DEFAULT_SUBJECT = "bluesky run output"
     DEFAULT_SMTP_SERVER = "localhost"
     DEFAULT_SMTP_PORT = 1025
@@ -30,7 +30,7 @@ class EmailExporter(ExporterBase):
         super(EmailExporter, self).__init__(extra_exports, **config)
         self._recipients = self.config('recipients')
         if not self._recipients:
-            raise BlueSkyConfigurationError("Specifu")
+            raise BlueSkyConfigurationError("Specify email recipients.")
         # TODO: make sure each email address is valid
         self._sender = self.config('sender') or self.DEFAULT_SENDER
         self._subject = self.config('subject') or self.DEFAULT_SUBJECT

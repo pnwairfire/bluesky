@@ -972,14 +972,14 @@ on and fuelbeds is defined
 
 ##### export
 
- - ...
+ - ***'dispersion' > 'output'*** -- *optional* -- if 'dispersion' is in the 'extra_exports' config setting (see below), its output files will be exported along with the bsp's json output data
+ - ***'visualization' > 'output'*** -- *optional* -- if 'visualization' is in the 'extra_exports' config setting (see below), its output files will be exported along with the bsp's json output data
 
 ### 'config' Fields
 
 The 'config' object has sub-objects specific to the modules to be run, as
 well as top level fields that apply to multiple modules. As with
 the fire data, each module has its own set of required and optional fields.
-
 
 ##### ingestion
 
@@ -1114,7 +1114,19 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 
 ##### export
 
- - ...
+- ***'config' > 'export' > 'mode' -- *optional* -- defaults to 'email'
+- ***'config' > 'export' > 'extra_exports' -- *optional* -- array of extra output files to export (ex. 'dispersion' or 'visualization' outputs); defaults to none
+
+###### if using email:
+
+- ***'config' > 'export' > 'email' > 'recipients'*** -- *required* --
+- ***'config' > 'export' > 'email' > 'sender'*** -- *optional* -- defaults to 'bsp@airfire.org'
+- ***'config' > 'export' > 'email' > 'subject'*** -- *optional* -- defaults to 'bluesky run output'
+- ***'config' > 'export' > 'email' > 'smtp_server'*** -- *optional* -- defaults to 'localhost'
+- ***'config' > 'export' > 'email' > 'smtp_port'*** -- *optional* -- defaults to 1025
+- ***'config' > 'export' > 'email' > 'smtp_starttls'*** -- *optional* -- defaults to False
+- ***'config' > 'export' > 'email' > 'username'*** -- *optional* --
+- ***'config' > 'export' > 'email' > 'password'*** -- *optional* --
 
 ## Vagrant
 
