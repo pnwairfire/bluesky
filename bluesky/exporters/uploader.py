@@ -63,6 +63,8 @@ class UploadExporter(ExporterBase):
                 "tarball": os.path.basename(tarball)
             }
 
+            # TODO: move extraction code to separate method, to share with other
+            #  future upload modes
             try:
                 subprocess.check_call(['ssh', remote_server, 'cd', destination,
                     '&&', 'tar', 'xzf', tarball])
