@@ -7,7 +7,7 @@
                 "is_aquipt": false,
                 "images_dir": "images/",
                 "data_dir": "data/",
-                "output_dir": "/tmp/bsp-visualizations"
+                "dest_dir": "/tmp/bsp-visualizations"
             }
         }
     },

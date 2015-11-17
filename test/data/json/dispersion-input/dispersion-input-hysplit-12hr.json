@@ -4,7 +4,7 @@
             "start": "2014-05-29T19:00:00Z",
             "num_hours": 12,
             "model": "hysplit",
-            "output_dir": "/tmp/bsp-output"
+            "dest_dir": "/tmp/bsp-output"
         },
         "visualization": {
             "target": "dispersion",

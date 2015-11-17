@@ -10,7 +10,7 @@
             "start": "2015-08-15T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
-            "output_dir": "/tmp/bsp-output",
+            "dest_dir": "/tmp/bsp-output",
             "hysplit": {
                 "grid": {
                     "spacing": 1.33,
