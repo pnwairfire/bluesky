@@ -145,7 +145,7 @@ class FiresManager(object):
     @property
     def run_id(self):
         if not self._meta.get('run_id'):
-            self._meta['run_id'] = str(uuid.uuid3())
+            self._meta['run_id'] = str(uuid.uuid1())
         return self._meta['run_id']
 
     @modules.setter
