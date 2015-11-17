@@ -4,6 +4,7 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import os
+import tarfile
 import tempfile
 import uuid
 
@@ -40,25 +41,36 @@ class ExporterBase(object):
 
         # create destination dir (to contain output dir) if necessary
         if not os.path.exists(dest):
-            os.makedirs(output_dir)
+            os.makedirs(dest)
 
         output_dir = os.path.join(dest, run_id)
         if os.path.exists(output_dir):
             if self.config('do_not_overwrite'):
                 raise RuntimeError("{} already exists".format(output_dir))
             else:
-                # delete it; otherwise, expection will be raised by shutil.copytree
-                shutil.rmtree(output_dir)
+                # delete it; otherwise, exception will be raised by shutil.copytree
+                if os.path.isdir(path)
+                    shutil.rmtree(output_dir)
+                else:
+                    # this really shouldn't ever be the case
+                    os.remove(output_dir)
 
         json_output_filename = self.config('json_output_filename') or 'output.json'
         with open(os.path.join(output_dir, json_output_filename), 'w') as f:
             f.write(json.dumps(fires_manager.dump()))
 
-        for k in ['dispersion', 'visualization']:
+        for k in self.extra_imports:
             d = getattr(fires_manager, k):
             if d and d.get('output', {}).get('directory'):
                 shutil.copytree(d['output']['directory'],
-        # TODO: copy all other extra_imports into temp dir (under module-specific
-        #  subdirs), tarball it,
-        # TODO: create tarball aand return tarball name, if create_tarball==True,
-        #  otherwise just return dir_name
+                    os.path.join(output_dir, k))
+
+        if create_tarball:
+            tarball = "{}.tar.gz".format(output_dir)
+            if os.path.exists:
+                os.remove(tarball)
+            with tarfile.open(tarball, "w:gz") as tar:
+                tar.add(output_dir, arcname=os.path.basename(output_dir))
+            return tarball
+
+        return output_dir

@@ -51,9 +51,10 @@ class UploadExporter(ExporterBase):
 
     def export(self, fires_manager):
         with tempfile.TemporaryDirectory() as temp_dir:
-            tarball = self._bundle(fires_manager, temp_dir.name, create_tarball=True)
+            self._bundle(fires_manager, temp_dir.name, create_tarball=True)
             r = {
                 'scp': self._scp(tarball)
                 # TODO: implement and call other upload options
             }
+            # Only include uploads that happened
             return {k: v for k,v in r.items() if v}
