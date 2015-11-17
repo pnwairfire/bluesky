@@ -56,7 +56,8 @@ def run(fires_manager):
 
         # further validation of start and num_hours done in
         # HYSPLITDispersion.run
-        dispersion_info = disperser.run(fires_manager.fires, start, num_hours, dest_dir)
+        dispersion_info = disperser.run(fires_manager.fires, start, num_hours,
+            dest_dir, output_dir_name)
         dispersion_info.update(model=model)
         # TODO: store dispersion into in summary?
         #   > fires_manager.summarize(disperion=disperser.run(...))
