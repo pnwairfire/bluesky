@@ -37,7 +37,7 @@ class ExporterBase(object):
                 raise RuntimeError("{} already exists".format(output_dir))
             else:
                 # delete it; otherwise, exception will be raised by shutil.copytree
-                if os.path.isdir(path):
+                if os.path.isdir(output_dir):
                     shutil.rmtree(output_dir)
                 else:
                     # this really shouldn't ever be the case
@@ -47,7 +47,7 @@ class ExporterBase(object):
         with open(os.path.join(output_dir, json_output_filename), 'w') as f:
             f.write(json.dumps(fires_manager.dump()))
 
-        for k in self.extra_imports:
+        for k in self._extra_exports:
             d = getattr(fires_manager, k)
             if d and d.get('output', {}).get('directory'):
                 shutil.copytree(d['output']['directory'],
