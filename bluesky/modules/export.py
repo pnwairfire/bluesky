@@ -24,20 +24,23 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    mode = fires_manager.get_config_value('export', 'mode',
-        default='email').lower()
-
-    exporter_klass = EXPORTERS.get(mode)
-    if not exporter_klass:
-        raise BlueSkyConfigurationError("Invalid exporter - {}".format(
-            exporter_klass))
+    modes = [m.lower() for m in
+        fires_manager.get_config_value('export', 'modes', default=[])]
 
     extra_exports = fires_manager.get_config_value(
         'export', 'extra_exports', default=[])
-    exporter_config = fires_manager.get_config_value(
-        'export', mode, default={})
-    exporter = exporter_klass(extra_exports, **exporter_config)
 
-    fires_manager.export = {
-        mode: exporter.export(fires_manager)
-    }
+    exporters = []
+    for mode in modes:
+        exporter_klass = EXPORTERS.get(mode)
+        if not exporter_klass:
+            raise BlueSkyConfigurationError("Invalid exporter - {}".format(
+                exporter_klass))
+
+        exporter_config = fires_manager.get_config_value(
+            'export', mode, default={})
+        exporters.append(exporter_klass(extra_exports, **exporter_config))
+
+    fires_manager.export = {}
+    for exporter in exporters
+        fires_manager.export[mode] = exporter.export(fires_manager)
