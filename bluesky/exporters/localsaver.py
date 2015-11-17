@@ -24,10 +24,10 @@ class LocalSaveExporter(ExporterBase):
 
     def __init__(self, extra_exports, **config):
         super(EmailExporter, self).__init__(extra_exports, **config)
-        self._dest = self.config('dest')
+        self._dest = self.config('dest_dir')
         if not self._dest:
             raise BlueSkyConfigurationError("Specify destination "
-                "('config' > 'localsave' > 'dest')")
+                "('config' > 'export' > 'localsave' > 'dest_dir')")
 
     def export(self, fires_manager):
         logging.info('Saving locally to %s', self._dest)
