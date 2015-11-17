@@ -171,9 +171,10 @@ and aggregate.  Note that this list lacks 'id', which is the first column.
 ##
 
 class HysplitVisualizer(object):
-    def __init__(self, hysplit_output_info, fires, **config):
+    def __init__(self, hysplit_output_info, fires, run_id, **config):
         self._hysplit_output_info = hysplit_output_info
         self._fires = fires
+        self._run_id = run_id
         self._config = config
 
     def run(self):
@@ -192,9 +193,8 @@ class HysplitVisualizer(object):
             raise RuntimeError("hysplit output file {} does not exist".format(
                 hysplit_output_file))
 
-        run_id = self._hysplit_output_info.get('run_id') or str(uuid.uuid1())
-        if self._config.get('output_dir'):
-            output_directory = os.path.join(self._config['output_dir'], run_id)
+        if self._config.get('dest_dir'):
+            output_directory = os.path.join(self._config['dest_dir'], self._run_id)
         else:
             output_directory =  hysplit_output_directory
         data_dir = os.path.join(output_directory, self._config.get('data_dir') or '')
@@ -273,7 +273,6 @@ class HysplitVisualizer(object):
         return {
             'blueskykml_version': blueskykml_version,
             "output": {
-                "run_id": run_id,
                 "directory": output_directory,
                 "hysplit_output_file": hysplit_output_file,
                 "smoke_dispersion_kmz_filename": files['smoke_dispersion_kmz']['name'],

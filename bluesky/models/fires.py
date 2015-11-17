@@ -142,6 +142,12 @@ class FiresManager(object):
     def modules(self):
         return self._module_names
 
+    @property
+    def run_id(self):
+        if not self._meta.get('run_id'):
+            self._meta['run_id'] = str(uuid.uuid3())
+        return self._meta['run_id']
+
     @modules.setter
     def modules(self, module_names):
         self._module_names = module_names

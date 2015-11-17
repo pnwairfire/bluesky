@@ -23,27 +23,14 @@ class ExporterBase(object):
         raise NotImplementedError("Bluesky's {} exporter needs to "
             "implement method 'export'".format(self.__class__.__name__))
 
-    def _get_run_id(self, fires_manager):
-        # look in dispersion and then visualization output objects
-        for k in ['dispersion', 'visualization']:
-            d = getattr(fires_manager, k):
-            if d and d.get('output', {}).get('run_id'):
-                return d['output']['run_id']
-
-        # next look in hysplit config
-        run_id = fires_manager.get_config_value('dispersion', 'hysplit', 'run_id')
-
-        # if not defined, generate new
-        return run_id or str(uuid.uuid1())
-
     def _bundle(self, fires_manager, dest, create_tarball=False):
-        self._run_id = self._get_run_id(fires_manager)
+        self._output_dir_name = self.config('output_dir_name') or fires_manager.run_id
 
         # create destination dir (to contain output dir) if necessary
         if not os.path.exists(dest):
             os.makedirs(dest)
 
-        output_dir = os.path.join(dest, self._run_id)
+        output_dir = os.path.join(dest, self._output_dir_name)
         if os.path.exists(output_dir):
             if self.config('do_not_overwrite'):
                 raise RuntimeError("{} already exists".format(output_dir))

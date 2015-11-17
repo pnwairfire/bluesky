@@ -9,6 +9,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import consume
 import logging
+import uuid
 
 from bluesky import datetimeutils
 from bluesky.exceptions import BlueSkyConfigurationError
@@ -43,17 +44,20 @@ def run(fires_manager):
         start_str = fires_manager.get_config_value('dispersion', 'start')
         num_hours = fires_manager.get_config_value('dispersion', 'num_hours')
         if not start_str or not num_hours:
-            raise ValueError(
-                "Config settings 'start' and 'num_hours' required for computing dispersion")
+            raise ValueError("Config settings 'start' and 'num_hours' required"
+                " for computing dispersion")
         start = datetimeutils.parse_datetime(start_str, 'start')
 
-        output_dir = fires_manager.get_config_value('dispersion', 'output_dir')
-        if not output_dir:
+        dest_dir = fires_manager.get_config_value('dispersion', 'dest_dir')
+        if not dest_dir:
             raise ValueError("Specify directory to save dispersion run output")
 
-        # further validation of start, num_hours, and output_dir done in
+        output_dir_name = (fires_manager.get_config_value('dispersion',
+            'output_dir_name') or fires_manager.run_id))
+
+        # further validation of start and num_hours done in
         # HYSPLITDispersion.run
-        dispersion_info = disperser.run(fires_manager.fires, start, num_hours, output_dir)
+        dispersion_info = disperser.run(fires_manager.fires, start, num_hours, dest_dir)
         dispersion_info.update(model=model)
         # TODO: store dispersion into in summary?
         #   > fires_manager.summarize(disperion=disperser.run(...))

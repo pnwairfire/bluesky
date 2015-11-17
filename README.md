@@ -964,6 +964,7 @@ on and fuelbeds is defined
  - ***'met' > 'grid' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *reqiured* if not specified in config (see below) --
  - ***'met' > 'grid' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *reqiured* if not specified in config (see below) --
  - ***'met' > 'grid' > 'grid' > 'domain'*** -- *optional* -- default: 'LatLng' (which means the spacing is in degrees)
+ - ***'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, generates new guid
 
 ##### visualization
 
@@ -972,7 +973,6 @@ on and fuelbeds is defined
  - ***'dispersion' > 'model'*** -- *required* --
  - ***'dispersion' > 'output' > 'directory'*** -- *required* --
  - ***'dispersion' > 'output' > 'grid_filename'*** -- *required* --
- - ***'dispersion' > 'output' > 'run_id'*** -- *optional* -- if not defined, generates new guid
  - ***'fire_information' > 'id'*** -- *required* --
  - ***'fire_information' > 'location'*** -- *required* -- containing either single lat/lng + area or polygon perimeter coordinates + area
  - ***'fire_information' > 'type'*** -- *optional* --
@@ -981,11 +981,17 @@ on and fuelbeds is defined
  - ***'fire_information' > 'fuelbeds' > 'emissions'*** -- *optional* --
  - ***'fire_information' > 'fuelbeds' > 'fccs_id'*** -- *optional* --
  - ***'fire_information' > 'growth' > 'start'*** -- *required* --
+ - ***'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, generates new guid
 
 ##### export
 
  - ***'dispersion' > 'output'*** -- *optional* -- if 'dispersion' is in the 'extra_exports' config setting (see below), its output files will be exported along with the bsp's json output data
  - ***'visualization' > 'output'*** -- *optional* -- if 'visualization' is in the 'extra_exports' config setting (see below), its output files will be exported along with the bsp's json output data
+
+###### if saving locally or uploading:
+
+ - ***'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, generates new guid
+
 
 ### 'config' Fields
 
@@ -1051,12 +1057,12 @@ the fire data, each module has its own set of required and optional fields.
 
  - ***'config' > 'dispersion' > 'start'*** -- *required* -- modeling start time (ex. "2015-01-21T00:00:00Z")
  - ***'config' > 'dispersion' > 'num_hours'*** -- *required* -- number of hours in model run
- - ***'config' > 'dispersion' > 'output_dir'*** -- *required* --
+ - ***'config' > 'dispersion' > 'dest_dir'*** -- *required* -- destination directory to contain output dir
+ - ***'config' > 'dispersion' > 'dest_dir'*** -- *optional* -- name of output directory; defaults to run_id, which is generated if not defined
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
 
 ###### if running hysplit dispersion:
 
- - ***'config' > 'dispersion' > 'hysplit' > 'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, a guid is generated
  - ***'config' > 'dispersion' > 'hysplit' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'spacing'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings --
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'domain'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings -- default: 'LatLng' (which means the spacing is in degrees)
@@ -1120,7 +1126,8 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
  - ***'config' > 'visualization' > 'hysplit' > 'layer'*** -- *optional* -- defaults to 1
  - ***'config' > 'visualization' >  'hysplit' > 'prettykml'*** -- *optional* -- whether or not to make the kml human readable; defaults to false
  - ***'config' > 'visualization' >  'hysplit' > 'is_aquipt'*** -- *optional* -- defaults to false
- - ***'config' > 'visualization' >  'hysplit' > 'output_dir' -- *optional* -- where to create visualization output directory (i.e. the parent directory to contain the ouput directory); if not specified, visualization output will go in hysplit output directory
+ - ***'config' > 'visualization' >  'hysplit' > 'dest_dir' -- *optional* -- where to create visualization output directory (i.e. the parent directory to contain the ouput directory); if not specified, visualization output will go in hysplit output directory
+ - ***'config' > 'visualization' >  'hysplit' > 'output_dir_name' -- *optional* --name of output directory to create in dest_dir; only used if dest_dir is defined; defaults to run_id, which is generated if not defined
  - ***'config' > 'visualization' >  'hysplit' > 'images_dir' -- *optional* -- sub-directory to contain images (relative to output direcotry); default is 'graphics/''
  - ***'config' > 'visualization' >  'hysplit' > 'data_dir' -- *optional* -- sub-directory to contain data files (relative to output direcotry); default is output directory root
 
@@ -1142,12 +1149,12 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 
 ###### if saving locally or uploading:
 
- - ***'config' > 'dispersion' > 'hysplit' > 'run_id'*** -- *optional* and only used if 'run_id' isn't in dispersion or visualization output -- directory to contain exported output directory
+ - ***'config' > 'export' > ['localsave'|'upload'] > 'output_dir_name'*** -- *optional* -- defaults to run_id, which is generated if not defined
  - ***'config' > 'export' > ['localsave'|'upload'] > 'json_output_filename'*** -- *optional* -- defaults to 'output.json'
 
 ###### if saving locally:
 
- - ***'config' > 'export' > 'localsave' > 'dest_dir'*** - *required* --
+ - ***'config' > 'export' > 'localsave' > 'dest_dir'*** - *required* -- destination directory to contain output directory
  - ***'config' > 'export' > 'localsave' > 'do_not_overwrite'*** - *optional* -- if true, raises exception if output dir already exists; defaults to false
 
 ###### if uploading:

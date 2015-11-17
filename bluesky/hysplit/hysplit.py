@@ -76,13 +76,15 @@ class HYSPLITDispersion(object):
         return self._config.get(key,
             self._config.get(key.lower(), getattr(defaults, key, None)))
 
-    def run(self, fires, start, num_hours, output_dir):
+    def run(self, fires, start, num_hours, dest_dir, output_dir_name):
         """Runs hysplit
 
         args:
          - fires - list of fires to run through hysplit
          - start - model run start hour
          - num_hours - number of hours in model run
+         - dest_dir - directory to contain output dir
+         - output_dir_name - name of output dir
         """
         logging.info("Running the HYSPLIT49 Dispersion model")
         if start.minute or start.second or start.microsecond:
@@ -90,9 +92,8 @@ class HYSPLITDispersion(object):
         if type(num_hours) != int:
             raise ValueError("Dispersion num_hours must be an integer.")
 
-        self._output_dir = os.path.abspath(output_dir)
-        self._run_id = self.config('run_id') or str(uuid.uuid1())
-        self._run_output_dir = os.path.join(self._output_dir, self._run_id)
+        self._run_output_dir = os.path.join(os.path.abspath(dest_dir),
+            output_dir_name)
         os.makedirs(self._run_output_dir)
 
         self._files_to_archive = []
@@ -115,7 +116,6 @@ class HYSPLITDispersion(object):
 
         return {
             "output": {
-                "run_id": self._run_id,
                 "directory": self._run_output_dir,
                 "grid_filetype": "NETCDF",
                 "grid_filename": self.OUTPUT_FILE_NAME,
@@ -524,11 +524,11 @@ class HYSPLITDispersion(object):
             if self.config("MPI"):
                 for f in pardumpFiles:
                     self._save_file(f)
-                    #shutil.copy2(os.path.join(working_dir, f), self._output_dir)
+                    #shutil.copy2(os.path.join(working_dir, f), self._run_output_dir)
             else:
                 pardump_file = os.path.join(working_dir, "PARDUMP")
                 self._save_file(pardump_file)
-                #shutil.copy2(pardump_file, self._output_dir + "/PARDUMP_"+ self.config("DATE"))
+                #shutil.copy2(pardump_file, self._run_output_dir + "/PARDUMP_"+ self.config("DATE"))
 
     def _write_emissions(self, emissions_file):
         # A value slightly above ground level at which to inject smoldering

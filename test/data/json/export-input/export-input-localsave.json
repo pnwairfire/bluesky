@@ -1,4 +1,5 @@
 {
+    "run_id": "1bfbe6b6-7cc4-11e5-8782-080027880ca6",
     "config": {
         "export": {
             "mode": "localsave",
@@ -11,7 +12,6 @@
     "dispersion": {
         "model": "hysplit",
         "output": {
-            "run_id": "1bfbe6b6-7cc4-11e5-8782-080027880ca6",
             "start_time": "2014-05-29T12:00:00",
             "num_hours": 2,
             "directory": "/bluesky/bsp-dispersion-ouput/example-2hr/",

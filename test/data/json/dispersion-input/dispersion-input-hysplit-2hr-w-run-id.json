@@ -1,13 +1,11 @@
 {
+    "run_id": "test-2hr-hysplit-dispersion",
     "config": {
         "dispersion": {
             "start": "2014-05-30T05:00:00Z",
             "num_hours": 2,
             "model": "hysplit",
-            "output_dir": "/tmp/bsp-output",
-            "hysplit": {
-                "run_id": "test-2hr-hysplit-dispersion"
-            }
+            "output_dir": "/tmp/bsp-output"
         },
         "visualization": {
             "target": "dispersion",

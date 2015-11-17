@@ -1,11 +1,3 @@
-# TODO: look at config>export>upload>remote_dest, which should be root dir to contain
-#   output dir, or outputdir itself (?).  If root dir containing, then also
-#   suport specifying a run_id, which is generated if not specified (could also
-#   look at dispersion or visualization run_id, if they're in data)
-
-# TODO: dump fires_manager to json (configurable dir and filename)
-
-
 """bluesky.exporters.uploader"""
 
 __author__      = "Joel Dubowy"
@@ -68,7 +60,7 @@ class UploadExporter(ExporterBase):
             try:
                 subprocess.check_call(['ssh', remote_server, 'cd', destination,
                     '&&', 'tar', 'xzf', tarball])
-                r.update["directory"] = self._run_id
+                r.update["directory"] = self._output_dir_name
             except:
                 r.update["error"] = "failed to extract {}".format(tarball)
 
