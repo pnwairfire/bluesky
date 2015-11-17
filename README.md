@@ -1140,13 +1140,22 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 - ***'config' > 'export' > 'email' > 'username'*** -- *optional* --
 - ***'config' > 'export' > 'email' > 'password'*** -- *optional* --
 
-###### if saving locally or uploading
+###### if saving locally or uploading:
 
- - ***'config' > 'dispersion' > 'hysplit' > 'run_id'*** -- *optional* and only used if 'run_id' isn't in dispersion or visualization output
+ - ***'config' > 'dispersion' > 'hysplit' > 'run_id'*** -- *optional* and only used if 'run_id' isn't in dispersion or visualization output -- directory to contain exported output directory
+ - ***'config' > 'export' > ['localsave'|'upload'] > 'json_output_filename'*** -- *optional* -- defaults to 'output.json'
 
-###### if saving locally
+###### if saving locally:
 
- - ***'config' > 'export' > 'localsave' > 'do_not_overwrite'*** - *optioanl* -- if true, raises exception if output dir already exists; default: false
+ - ***'config' > 'export' > 'localsave' > 'dest_dir'*** - *required* --
+ - ***'config' > 'export' > 'localsave' > 'do_not_overwrite'*** - *optional* -- if true, raises exception if output dir already exists; defaults to false
+
+###### if uploading:
+
+ - ***'config' > 'export' > 'upload' > 'tarball_name'*** - *optional* -- defaults to '<output_dir>.tar.gz'
+ - ***'config' > 'export' > 'upload' > 'scp' > 'user'*** - *required* if uploading via scp (which is currently the only supported upload mode) -- username to use in scp
+ - ***'config' > 'export' > 'upload' > 'scp' > 'host'*** - *required* if uploading via scp (which is currently the only supported upload mode) -- hostname of server to scp to
+ - ***'config' > 'export' > 'upload' > 'scp' > 'dest_dir'*** - *required* if uploading via scp (which is currently the only supported upload mode) -- destination directory on remote host to contain output directory
 
 ## Vagrant
 
