@@ -44,10 +44,32 @@ class UploadExporter(ExporterBase):
 
     def _scp(self, tarball):
         if self._upload_options['scp']:
-            # TODO: scp and then untar on remote server (using fabric or some
-            #  other package).
-            # TODO: return dict contaning where it's been uplaoded
-            raise NotImplementedError("SCP not yet implemented")
+            remote_server = "{}@{}".format(
+                self._upload_options['scp']['user'],
+                self._upload_options['scp']['host'])
+            destination = "{}:{}".format(remote_server,
+                self._upload_options['scp']['dest'])
+            try:
+                # Note: there are various ways of doing this: a) call scp directly,
+                #  b) use paramiko, c) use fabric, d) etc.....
+                #  See http://stackoverflow.com/questions/68335/how-do-i-copy-a-file-to-a-remote-server-in-python-using-scp-or-ssh
+                #  for examples
+                subprocess.check_call(['scp', tarball, destination])
+            except:
+                return {"error": "failed to upload {}".format(tarball)}
+
+            r = {
+                "destination": destination,
+                "tarball": os.path.basename(tarball)
+            }
+
+            try:
+                subprocess.check_call(['ssh', remote_server, 'cd', destination,
+                    '&&', 'tar', 'xzf', tarball])
+                r.update["directory"] = self._run_id
+            except:
+                r.update["error"] = "failed to extract {}".format(tarball)
+
 
     def export(self, fires_manager):
         with tempfile.TemporaryDirectory() as temp_dir:

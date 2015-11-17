@@ -37,13 +37,13 @@ class ExporterBase(object):
         return run_id or str(uuid.uuid1())
 
     def _bundle(self, fires_manager, dest, create_tarball=False):
-        run_id = self._get_run_id(fires_manager)
+        self._run_id = self._get_run_id(fires_manager)
 
         # create destination dir (to contain output dir) if necessary
         if not os.path.exists(dest):
             os.makedirs(dest)
 
-        output_dir = os.path.join(dest, run_id)
+        output_dir = os.path.join(dest, self._run_id)
         if os.path.exists(output_dir):
             if self.config('do_not_overwrite'):
                 raise RuntimeError("{} already exists".format(output_dir))
