@@ -52,7 +52,7 @@ def run(fires_manager):
             raise ValueError("Specify directory to save dispersion run output")
 
         output_dir_name = (fires_manager.get_config_value('dispersion',
-            'output_dir_name') or fires_manager.run_id))
+            'output_dir_name') or fires_manager.run_id)
 
         # further validation of start and num_hours done in
         # HYSPLITDispersion.run
