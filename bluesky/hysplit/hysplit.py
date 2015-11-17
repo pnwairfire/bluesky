@@ -17,7 +17,6 @@ import subprocess
 # import tarfile
 import tempfile
 import threading
-import uuid
 from datetime import timedelta
 
 from pyairfire.datetime import parsing as datetime_parsing

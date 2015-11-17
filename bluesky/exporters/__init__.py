@@ -6,7 +6,6 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import os
 import tarfile
 import tempfile
-import uuid
 
 from bluesky import configuration
 

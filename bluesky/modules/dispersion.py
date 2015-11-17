@@ -9,7 +9,6 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import consume
 import logging
-import uuid
 
 from bluesky import datetimeutils
 from bluesky.exceptions import BlueSkyConfigurationError

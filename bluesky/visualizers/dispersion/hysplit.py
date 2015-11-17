@@ -15,7 +15,6 @@ __version__ = "0.1.0"
 import csv
 import logging
 import os
-import uuid
 from collections import namedtuple
 
 from pyairfire.datetime import parsing as datetime_parsing
