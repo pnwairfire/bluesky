@@ -1140,6 +1140,14 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 - ***'config' > 'export' > 'email' > 'username'*** -- *optional* --
 - ***'config' > 'export' > 'email' > 'password'*** -- *optional* --
 
+###### if saving locally or uploading
+
+ - ***'config' > 'dispersion' > 'hysplit' > 'run_id'*** -- *optional* and only used if 'run_id' isn't in dispersion or visualization output
+
+###### if saving locally
+
+ - ***'config' > 'export' > 'localsave' > 'do_not_overwrite'*** - *optioanl* -- if true, raises exception if output dir already exists; default: false
+
 ## Vagrant
 
 If you'd like to use vagrant to spin up virtual machines for running BlueSky

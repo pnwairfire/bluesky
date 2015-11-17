@@ -35,16 +35,29 @@ class ExporterBase(object):
         # if not defined, generate new
         return run_id or str(uuid.uuid1())
 
-    def _bundle(self, fires_manager, create_tarball=False):
+    def _bundle(self, fires_manager, dest, create_tarball=False):
         run_id = self._get_run_id(fires_manager)
 
-        # Store temp dir object as object attribute so that it isn't deleted
-        # prematurely (it will be deleted the next time bundle is called and
-        # a new temp dir is created)
-        self._temp_dir = tempfile.TemporaryDirectory()
+        # create destination dir (to contain output dir) if necessary
+        if not os.path.exists(dest):
+            os.makedirs(output_dir)
 
-        dir_name = os.path.join(self._temp_dir.name, run_id)
-        # TODO: dump json into file in tmp dir
+        output_dir = os.path.join(dest, run_id)
+        if os.path.exists(output_dir):
+            if self.config('do_not_overwrite'):
+                raise RuntimeError("{} already exists".format(output_dir))
+            else:
+                # delete it; otherwise, expection will be raised by shutil.copytree
+                shutil.rmtree(output_dir)
+
+        json_output_filename = self.config('json_output_filename') or 'output.json'
+        with open(os.path.join(output_dir, json_output_filename), 'w') as f:
+            f.write(json.dumps(fires_manager.dump()))
+
+        for k in ['dispersion', 'visualization']:
+            d = getattr(fires_manager, k):
+            if d and d.get('output', {}).get('directory'):
+                shutil.copytree(d['output']['directory'],
         # TODO: copy all other extra_imports into temp dir (under module-specific
         #  subdirs), tarball it,
         # TODO: create tarball aand return tarball name, if create_tarball==True,

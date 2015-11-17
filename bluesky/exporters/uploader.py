@@ -50,9 +50,10 @@ class UploadExporter(ExporterBase):
             raise NotImplementedError("SCP not yet implemented")
 
     def export(self, fires_manager):
-        tarball = self._bundle(fires_manager, create_tarball=True)
-        r = {
-            'scp': self._scp(tarball)
-            # TODO: implement and call other upload options
-        }
-        return {k: v for k,v in r.items() if v}
+        with tempfile.TemporaryDirectory() as temp_dir:
+            tarball = self._bundle(fires_manager, temp_dir.name, create_tarball=True)
+            r = {
+                'scp': self._scp(tarball)
+                # TODO: implement and call other upload options
+            }
+            return {k: v for k,v in r.items() if v}
