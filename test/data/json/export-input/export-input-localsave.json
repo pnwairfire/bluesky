@@ -2,9 +2,9 @@
     "run_id": "1bfbe6b6-7cc4-11e5-8782-080027880ca6",
     "config": {
         "export": {
-            "mode": "localsave",
+            "modes": ["localsave"],
             "extra_exports": ["dispersion"],
-            "local": {
+            "localsave": {
                 "dest": "/tmp/bsp-output/"
             }
         }

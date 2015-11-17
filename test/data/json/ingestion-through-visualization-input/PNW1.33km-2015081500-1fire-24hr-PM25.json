@@ -36,11 +36,14 @@
             }
         },
         "export": {
-            "mode": "email",
+            "modes": ["email", "localsave"],
             "email": {
                 "recipients": ["jdubowy+blueskytest@gmail.com"],
                 "sender": "bsp@airfire.org",
                 "subject": "BSP output"
+            },
+            "localsave": {
+                "dest": "/tmp/bsp-output/"
             }
         }
     },
