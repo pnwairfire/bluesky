@@ -43,6 +43,9 @@ class ExporterBase(object):
                     # this really shouldn't ever be the case
                     os.remove(output_dir)
 
+        # create fresh empty dir
+        os.mkdir(output_dir)
+
         json_output_filename = self.config('json_output_filename') or 'output.json'
         with open(os.path.join(output_dir, json_output_filename), 'w') as f:
             f.write(json.dumps(fires_manager.dump()))
