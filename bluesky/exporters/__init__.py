@@ -3,6 +3,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import os
 import tempfile
 import uuid
 
@@ -36,9 +37,15 @@ class ExporterBase(object):
 
     def _bundle(self, fires_manager, create_tarball=False):
         run_id = self._get_run_id(fires_manager)
-        # TODO: create tmd dir, dump json into file in tmp dir, copy
-        #  all other extra_imports into that dir (under module-specific
-        #  subdirs), tarball it,
+
         # Store temp dir object as object attribute so that it isn't deleted
-        # prematurely
+        # prematurely (it will be deleted the next time bundle is called and
+        # a new temp dir is created)
         self._temp_dir = tempfile.TemporaryDirectory()
+
+        dir_name = os.path.join(self._temp_dir.name, run_id)
+        # TODO: dump json into file in tmp dir
+        # TODO: copy all other extra_imports into temp dir (under module-specific
+        #  subdirs), tarball it,
+        # TODO: create tarball aand return tarball name, if create_tarball==True,
+        #  otherwise just return dir_name
