@@ -15,6 +15,7 @@ __all__ = [
 __version__ = "0.1.0"
 
 DEFAULT_SCP_USER = "bluesky"
+DEFAULT_SCP_PORT = 22
 
 class UploadExporter(ExporterBase):
 
@@ -38,6 +39,7 @@ class UploadExporter(ExporterBase):
 
     def _scp(self, tarball):
         if self._upload_options['scp']:
+            port = self._upload_options['scp']['port'] or DEFAULT_SCP_PORT
             remote_server = "{}@{}".format(
                 self._upload_options['scp']['user'],
                 self._upload_options['scp']['host'])
@@ -48,7 +50,7 @@ class UploadExporter(ExporterBase):
                 #  b) use paramiko, c) use fabric, d) etc.....
                 #  See http://stackoverflow.com/questions/68335/how-do-i-copy-a-file-to-a-remote-server-in-python-using-scp-or-ssh
                 #  for examples
-                subprocess.check_call(['scp', tarball, destination])
+                subprocess.check_call(['scp', tarball, destination, '-P', port])
             except:
                 return {"error": "failed to upload {}".format(tarball)}
 
@@ -60,8 +62,8 @@ class UploadExporter(ExporterBase):
             # TODO: move extraction code to separate method, to share with other
             #  future upload modes
             try:
-                subprocess.check_call(['ssh', remote_server, 'cd', destination,
-                    '&&', 'tar', 'xzf', tarball])
+                subprocess.check_call(['ssh', remote_server, '-p', port,
+                    'cd', destination, '&&', 'tar', 'xzf', tarball])
                 r.update["directory"] = self._output_dir_name
             except:
                 r.update["error"] = "failed to extract {}".format(tarball)
