@@ -27,9 +27,9 @@ class UploadExporter(ExporterBase):
             raise BlueSkyConfigurationError("Specify at lease one mode of uploads")
 
     def _read_scp_config(self):
-        c = self.config('scp'):
+        c = self.config('scp')
         if c:
-            if any([not c.get(k) for k in ['user', 'host', 'dest_dir']):
+            if any([not c.get(k) for k in ['user', 'host', 'dest_dir']]):
                 raise BlueSkyConfigurationError(
                     "Specify user, host, and dest_dir for scp'ing")
             self._upload_options['scp'] = c

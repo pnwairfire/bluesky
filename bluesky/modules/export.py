@@ -42,5 +42,5 @@ def run(fires_manager):
         exporters.append(exporter_klass(extra_exports, **exporter_config))
 
     fires_manager.export = {}
-    for exporter in exporters
+    for exporter in exporters:
         fires_manager.export[mode] = exporter.export(fires_manager)
