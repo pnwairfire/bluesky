@@ -44,7 +44,7 @@ class UploadExporter(ExporterBase):
                 self._upload_options['scp']['user'] or DEFAULT_SCP_USER,
                 self._upload_options['scp']['host'])
             destination = "{}:{}".format(remote_server,
-                self._upload_options['scp']['dest'])
+                self._upload_options['scp']['dest_dir'])
             try:
                 # Note: there are various ways of doing this: a) call scp directly,
                 #  b) use paramiko, c) use fabric, d) etc.....
