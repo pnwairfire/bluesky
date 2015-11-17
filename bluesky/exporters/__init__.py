@@ -3,6 +3,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import tempfile
 import uuid
 
 from bluesky import configuration
@@ -32,3 +33,12 @@ class ExporterBase(object):
 
         # if not defined, generate new
         return run_id or str(uuid.uuid1())
+
+    def _bundle(self, fires_manager, create_tarball=False):
+        run_id = self._get_run_id(fires_manager)
+        # TODO: create tmd dir, dump json into file in tmp dir, copy
+        #  all other extra_imports into that dir (under module-specific
+        #  subdirs), tarball it,
+        # Store temp dir object as object attribute so that it isn't deleted
+        # prematurely
+        self._temp_dir = tempfile.TemporaryDirectory()

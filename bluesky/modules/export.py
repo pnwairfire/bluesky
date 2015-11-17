@@ -38,4 +38,6 @@ def run(fires_manager):
         'export', mode, default={})
     exporter = exporter_klass(extra_exports, **exporter_config)
 
-    exporter.export(fires_manager)
+    fires_manager.export = {
+        mode: exporter.export(fires_manager)
+    }

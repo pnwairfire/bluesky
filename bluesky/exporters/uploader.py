@@ -26,23 +26,33 @@ class UploadExporter(ExporterBase):
 
     def __init__(self, extra_exports, **config):
         super(EmailExporter, self).__init__(extra_exports, **config)
+        self._upload_options = {}
         # TODO: don't assume scp? maybe look for 'scp' > 'host' & 'user' & ...,
         #  and/or 'ftp' > ..., etc., and upload to all specified
         self._read_scp_config()
+        # TODO: other upload options
+        if not self._upload_options:
+            raise BlueSkyConfigurationError("Specify at lease one mode of uploads")
 
     def _read_scp_config(self):
-        self._scp_config = self.config('scp'):
-        if self._scp_config:
-            if not self._scp_config.get('user') or not self._config.get('host')
-                    or not self._config.get('dest_dir'):
+        c = self.config('scp'):
+        if c:
+            if any([not c.get(k) for k in ['user', 'host', 'dest_dir']):
                 raise BlueSkyConfigurationError(
-                    "Specify user, host, and dest_dir for scping")
+                    "Specify user, host, and dest_dir for scp'ing")
+            self._upload_options['scp'] = c
 
-    def _sep(self):
-        if self._scp_config:
-
+    def _scp(self, tarball):
+        if self._upload_options['scp']:
+            # TODO: scp and then untar on remote server (using fabric or some
+            #  other package).
+            # TODO: return dict contaning where it's been uplaoded
+            raise NotImplementedError("SCP not yet implemented")
 
     def export(self, fires_manager):
-        logging.info('Saving locally to %s', self._host)
-        self._scp()
-        # TODO: implement other upload options
+        tarball = self._bundle(fires_manager, create_tarball=True)
+        r = {
+            'scp': self._scp(tarball)
+            # TODO: implement and call other upload options
+        }
+        return {k: v for k,v in r.items() if v}

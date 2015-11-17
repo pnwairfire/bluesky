@@ -31,5 +31,8 @@ class LocalSaveExporter(ExporterBase):
 
     def export(self, fires_manager):
         logging.info('Saving locally to %s', self._dest)
-        # TODO: implement
-        raise NotImplementedError("localsave not implemented")
+        d = self._bundle(fires_manager, create_tarball=False)
+        # TODO: move d to self._dest
+        return {
+            'dest': os.path.join(self._dest, os.path.basename(d.rstrip('/')))
+        }
