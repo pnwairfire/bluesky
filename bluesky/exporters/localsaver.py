@@ -11,6 +11,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+from bluesky.exceptions import BlueSkyConfigurationError
 from . import ExporterBase
 
 __all__ = [
@@ -20,4 +21,15 @@ __all__ = [
 __version__ = "0.1.0"
 
 class LocalSaveExporter(ExporterBase):
-    pass
+
+    def __init__(self, extra_exports, **config):
+        super(EmailExporter, self).__init__(extra_exports, **config)
+        self._dest = self.config('dest')
+        if not self._dest:
+            raise BlueSkyConfigurationError("Specify destination "
+                "('config' > 'localsave' > 'dest')")
+
+    def export(self, fires_manager):
+        logging.info('Saving locally to %s', self._dest)
+        # TODO: implement
+        raise NotImplementedError("localsave not implemented")

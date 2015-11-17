@@ -34,6 +34,14 @@
                 "images_dir": "images/",
                 "data_dir": "data/"
             }
+        },
+        "export": {
+            "mode": "email",
+            "email": {
+                "recipients": ["jdubowy+blueskytest@gmail.com"],
+                "sender": "bsp@airfire.org",
+                "subject": "BSP output"
+            }
         }
     },
     "fire_information": [

@@ -24,7 +24,7 @@ class EmailExporter(ExporterBase):
     DEFAULT_SENDER = "bsp@airfire.org"
     DEFAULT_SUBJECT = "bluesky run output"
     DEFAULT_SMTP_SERVER = "localhost"
-    DEFAULT_SMTP_PORT = 1025
+    DEFAULT_SMTP_PORT = 25
 
     def __init__(self, extra_exports, **config):
         super(EmailExporter, self).__init__(extra_exports, **config)
