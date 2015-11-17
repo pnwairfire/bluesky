@@ -5,7 +5,10 @@
             "modes": ["upload"],
             "extra_exports": ["dispersion"],
             "upload": {
-                "remote_dest": "..."
+                "user": "vagrant",
+                "host": "127.0.0.1",
+                "port": "2222",
+                "dest_dir": "/tmp/bsp-exports/"
             }
         }
     },
