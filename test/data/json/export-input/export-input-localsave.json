@@ -5,7 +5,7 @@
             "modes": ["localsave"],
             "extra_exports": ["dispersion"],
             "localsave": {
-                "dest": "/tmp/bsp-output/"
+                "dest_dir": "/tmp/bsp-output/"
             }
         }
     },

@@ -45,7 +45,7 @@
                 "smtp_port": 1025
             },
             "localsave": {
-                "dest": "/tmp/bsp-output/"
+                "dest_dir": "/tmp/bsp-output/"
             }
         }
     },
