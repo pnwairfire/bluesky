@@ -41,7 +41,7 @@ class UploadExporter(ExporterBase):
         if self._upload_options['scp']:
             port = self._upload_options['scp']['port'] or DEFAULT_SCP_PORT
             remote_server = "{}@{}".format(
-                self._upload_options['scp']['user'],
+                self._upload_options['scp']['user'] or DEFAULT_SCP_USER,
                 self._upload_options['scp']['host'])
             destination = "{}:{}".format(remote_server,
                 self._upload_options['scp']['dest'])
