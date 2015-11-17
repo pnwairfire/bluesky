@@ -39,7 +39,9 @@
             "email": {
                 "recipients": ["jdubowy+blueskytest@gmail.com"],
                 "sender": "bsp@airfire.org",
-                "subject": "BSP output"
+                "subject": "BSP output",
+                "smtp_server": "127.0.0.1",
+                "smtp_port": 1025
             },
             "localsave": {
                 "dest": "/tmp/bsp-output/"
