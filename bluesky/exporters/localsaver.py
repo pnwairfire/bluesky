@@ -18,7 +18,7 @@ __version__ = "0.1.0"
 class LocalSaveExporter(ExporterBase):
 
     def __init__(self, extra_exports, **config):
-        super(EmailExporter, self).__init__(extra_exports, **config)
+        super(LocalSaveExporter, self).__init__(extra_exports, **config)
         self._dest = self.config('dest_dir')
         if not self._dest:
             raise BlueSkyConfigurationError("Specify destination "

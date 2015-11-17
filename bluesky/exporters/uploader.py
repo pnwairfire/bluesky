@@ -19,7 +19,7 @@ DEFAULT_SCP_USER = "bluesky"
 class UploadExporter(ExporterBase):
 
     def __init__(self, extra_exports, **config):
-        super(EmailExporter, self).__init__(extra_exports, **config)
+        super(UploadExporter, self).__init__(extra_exports, **config)
         self._upload_options = {}
         # TODO: don't assume scp? maybe look for 'scp' > 'host' & 'user' & ...,
         #  and/or 'ftp' > ..., etc., and upload to all specified
