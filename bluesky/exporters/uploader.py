@@ -54,8 +54,11 @@ class UploadExporter(ExporterBase):
                 #  b) use paramiko, c) use fabric, d) etc.....
                 #  See http://stackoverflow.com/questions/68335/how-do-i-copy-a-file-to-a-remote-server-in-python-using-scp-or-ssh
                 #  for examples
+                logging.info("Creating remote destination {}".format(
+                    self._upload_options['scp']['dest_dir']))
                 subprocess.check_call(['ssh', remote_server, '-p', port,
                     'mkdir', '-p', self._upload_options['scp']['dest_dir']])
+                logging.info("Uploading {} via scp".format(tarball))
                 subprocess.check_call(['scp', '-P', port, tarball, destination])
             except Exception, e:
                 return {"error": "failed to upload {} - {}".format(tarball,
