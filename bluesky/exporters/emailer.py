@@ -6,6 +6,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import json
 import logging
 import smtplib
+import StringIO
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
