@@ -60,7 +60,7 @@ class ExporterBase(object):
             tarball_name = self.config('tarball_name')
             tarball = (os.path.join(dest, tarball_name) if tarball_name
                 else "{}.tar.gz".format(output_dir))
-            if os.path.exists:
+            if os.path.exists(tarball):
                 os.remove(tarball)
             with tarfile.open(tarball, "w:gz") as tar:
                 tar.add(output_dir, arcname=os.path.basename(output_dir))
