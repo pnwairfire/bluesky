@@ -5,7 +5,7 @@
             "modes": ["localsave"],
             "extra_exports": ["dispersion"],
             "localsave": {
-                "dest_dir": "/tmp/bsp-output/"
+                "dest_dir": "/home/vagrant/bsp-local-exports/"
             }
         }
     },
