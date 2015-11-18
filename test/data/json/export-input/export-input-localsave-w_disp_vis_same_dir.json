@@ -3,23 +3,20 @@
     "config": {
         "export": {
             "modes": ["localsave"],
-            "extra_exports": ["dispersion"],
+            "extra_exports": ["dispersion", "visualization"],
             "localsave": {
-                "dest_dir": "/home/vagrant/bsp-local-exports/"
+                "dest_dir": "/tmp/bsp-local-exports/"
             }
         }
     },
     "dispersion": {
-        "model": "hysplit",
         "output": {
-            "start_time": "2014-05-29T12:00:00",
-            "num_hours": 2,
-            "directory": "/bluesky/bsp-dispersion-ouput/example-2hr/",
-            "grid_filename": "hysplit_conc.nc",
-            "grid_filetype": "NETCDF",
-            "parameters": {
-                "pm25": "PM25"
-            }
+            "directory": "/bluesky/bsp-dispersion-ouput/example-2hr/"
+        }
+    },
+    "visualization": {
+        "output": {
+            "directory": "/bluesky/bsp-dispersion-ouput/example-2hr/"
         }
     },
     "fire_information": [

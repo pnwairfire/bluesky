@@ -1,0 +1,46 @@
+{
+    "run_id": "1bfbe6b6-7cc4-11e5-8782-080027880ca6",
+    "config": {
+        "export": {
+            "modes": ["localsave"],
+            "extra_exports": ["dispersion", "visualization"],
+            "localsave": {
+                "dest_dir": "/tmp/bsp-local-exports/"
+            }
+        }
+    },
+    "dispersion": {
+        "output": {
+            "directory": "/bluesky/bsp-dispersion-ouput/example-2hr/"
+        }
+    },
+    "visualization": {
+        "output": {
+            "directory": "/tmp/bsp-visualizations/1bfbe6b6-7cc4-11e5-8782-080027880ca6/"
+        }
+    },
+    "fire_information": [
+        {
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Yosemite, CA"
+            },
+            "id": "SF11C14225236095807750",
+            "type": "natural",
+            "location": {
+                "area": 200,
+                "ecoregion": "southern",
+                "latitude": 37.909644,
+                "longitude": -119.7615805,
+                "utc_offset": "-09:00"
+            },
+            "growth": [
+                {
+                    "start": "2014-05-29T12:00:00",
+                    "end": "2014-05-30T00:00:00",
+                    "pct": 100.0
+                }
+            ]
+        }
+    ]
+}

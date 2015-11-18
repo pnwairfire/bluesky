@@ -50,11 +50,21 @@ class ExporterBase(object):
         with open(os.path.join(output_dir, json_output_filename), 'w') as f:
             fires_manager.dumps(output_stream=f)
 
+        copied = {}
         for k in self._extra_exports:
             d = getattr(fires_manager, k)
             if d and d.get('output', {}).get('directory'):
-                shutil.copytree(d['output']['directory'],
-                    os.path.join(output_dir, k))
+                if d['output']['directory'] in copied:
+                    # It was already copied, so rename directory to include
+                    # this module's name, and updaed 'copied'
+                    new_dirname = "{}-{}".format(
+                        copied[d['output']['directory']], k)
+                    os.rename(copied[d['output']['directory']], new_dirname)
+                    copied[d['output']['directory']] = new_dirname
+                else:
+                    dirname = os.path.join(output_dir, k)
+                    shutil.copytree(d['output']['directory'], dirname)
+                    copied[d['output']['directory']] = dirname
 
         if create_tarball:
             tarball_name = self.config('tarball_name')
