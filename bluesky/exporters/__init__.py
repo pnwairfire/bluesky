@@ -48,7 +48,7 @@ class ExporterBase(object):
 
         json_output_filename = self.config('json_output_filename') or 'output.json'
         with open(os.path.join(output_dir, json_output_filename), 'w') as f:
-            f.write(json.dumps(fires_manager.dump()))
+            fires_manager.dumps(output_stream=f)
 
         for k in self._extra_exports:
             d = getattr(fires_manager, k)

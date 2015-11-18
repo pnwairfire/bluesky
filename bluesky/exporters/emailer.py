@@ -55,7 +55,9 @@ class EmailExporter(ExporterBase):
 
             # TODO: attach json dump of fires_amanager instead of making it
             #   the email's content ?
-            content = json.dumps(fires_manager.dump())
+            d = StringIO.StringIO()
+            fires_manager.dumps(output_stream=d)
+            content = d.getvalue()
 
             # TODO: attach other output files according to what's in
             #   self._extra_exports
