@@ -85,7 +85,8 @@ class EmailExporter(ExporterBase):
                 "sent_to": self._recipients
             }
 
-        except smtplib.SMTPException, e:
-            msg = 'Failed to send email to {}'.format(', '.join(self._recipients))
+        except Exception, e:
+            msg = 'Failed to send email to {} - {}'.format(
+                ', '.join(self._recipients), e.message)
             logging.error(msg)
             return {"error": msg}
