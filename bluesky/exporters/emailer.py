@@ -81,7 +81,11 @@ class EmailExporter(ExporterBase):
 
             s.sendmail(msg['from'], self._recipients, msg.as_string())
             s.quit()
+            return {
+                "sent_to": self._recipients
+            }
 
         except smtplib.SMTPException, e:
-            # Note: e.message is blank
-            raise StatusNotificationError(str(e))
+            msg = 'Failed to send email to {}'.format(', '.join(self._recipients))
+            logging.error(msg)
+            return {"error": msg}
