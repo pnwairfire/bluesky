@@ -72,11 +72,14 @@ class UploadExporter(ExporterBase):
             # TODO: move extraction code to separate method, to share with other
             #  future upload modes
             try:
+                tarball_filename = os.path.basename(tarball)
+                logging.info("Extracting {}".format(tarball))
                 subprocess.check_call(['ssh', remote_server, '-p', port,
-                    'cd', destination, '&&', 'tar', 'xzf', tarball])
-                r.update["directory"] = self._output_dir_name
+                    'cd', self._upload_options['scp']['dest_dir'], '&&',
+                    'tar', 'xzf', tarball_filename])
+                r["directory"] = self._output_dir_name
             except:
-                r.update["error"] = "failed to extract {}".format(tarball)
+                r["error"] = "failed to extract {}".format(tarball)
 
 
     def export(self, fires_manager):
