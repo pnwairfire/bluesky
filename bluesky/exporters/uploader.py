@@ -83,11 +83,18 @@ class UploadExporter(ExporterBase):
 
 
     def export(self, fires_manager):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            self._bundle(fires_manager, temp_dir.name, create_tarball=True)
+        # Note: tempfile.TemporaryDirectory() isn't available until python
+        #  3.5, so we need to use tempfile.mkdtemp and delete it manually
+        # TODO: create context manager with __enter__/__exit__ to create
+        #  and cleanup tempdir;  put in common module (maybe even pyairfire?)
+        temp_dir = tempfile.mkdtemp()
+        try:
+            tarball = self._bundle(fires_manager, temp_dir, create_tarball=True)
             r = {
                 'scp': self._scp(tarball)
                 # TODO: implement and call other upload options
             }
             # Only include uploads that happened
             return {k: v for k,v in r.items() if v}
+        finally:
+            shutil.rmtree(temp_dir)
