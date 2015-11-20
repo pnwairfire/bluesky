@@ -26,6 +26,7 @@ def run(fires_manager):
     """
     modes = [m.lower() for m in
         fires_manager.get_config_value('export', 'modes', default=[])]
+    fires_manager.processed(__name__, __version__, modes=modes)
 
     extra_exports = fires_manager.get_config_value(
         'export', 'extra_exports', default=[])
