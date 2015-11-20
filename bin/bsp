@@ -16,7 +16,6 @@ import importlib
 import logging
 import sys
 import traceback
-import argparse
 
 from pyairfire import scripting
 
