@@ -94,7 +94,7 @@ class UploadExporter(ExporterBase):
             r .update(
                 scp=self._scp(tarball)
                 # TODO: implement and call other upload options
-            }
+            )
             # Only include uploads that happened
             return {k: v for k,v in r.items() if v}
         finally:

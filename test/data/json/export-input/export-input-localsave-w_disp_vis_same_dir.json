@@ -11,12 +11,12 @@
     },
     "dispersion": {
         "output": {
-            "directory": "/bluesky/bsp-dispersion-ouput/example-2hr/"
+            "directory": "/bluesky/bsp-dispersion-ouput/example-2hr-with-visualization/"
         }
     },
     "visualization": {
         "output": {
-            "directory": "/bluesky/bsp-dispersion-ouput/example-2hr/"
+            "directory": "/bluesky/bsp-dispersion-ouput/example-2hr-with-visualization/"
         }
     },
     "fire_information": [

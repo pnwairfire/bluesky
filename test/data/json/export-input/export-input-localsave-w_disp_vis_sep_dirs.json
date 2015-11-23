@@ -16,7 +16,7 @@
     },
     "visualization": {
         "output": {
-            "directory": "/tmp/bsp-visualizations/1bfbe6b6-7cc4-11e5-8782-080027880ca6/"
+            "directory": "/bluesky/bsp-visualization-ouput/example-2hr/"
         }
     },
     "fire_information": [

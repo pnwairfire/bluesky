@@ -3,8 +3,10 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import fnmatch
 import json
 import os
+import re
 import shutil
 import tarfile
 import tempfile
@@ -65,7 +67,7 @@ class ExporterBase(object):
             new_dirname = '-'.join(extra_imports)
             shutil.copytree(directory, os.path.join(output_dir, new_dirname))
             for k in extra_imports:
-                r[k] = {'sub_dir': new_dirname}
+                r[k] = {'sub_directory': new_dirname}
                 processor = getattr(self, '_process_{}'.format(k), None)
                 if processor:
                     processor(getattr(fires_manager, k), r)
@@ -84,15 +86,79 @@ class ExporterBase(object):
 
         return r
 
-    def _process_dispersion_(self, d, r):
-        # TODO: update r with relative location of nc file, etc.)
+    NETCDF_PATTERN = '*.nc'
+    def _process_dispersion(self, d, r):
         # TODO: look in 'd' to see what model of dispersion was run, what files
         #   exist, etc.; it won't necessarily say - so that's why we need
         #   the back-up logic of looking for specific files
-        # TODO: glob r['dispersion']['sub_dir'] for .nc file
         # TODO: Support option to rename nc file; other files too?
-        pass
+        netcdfs = self._find_files(d['output']['directory'], self.NETCDF_PATTERN)
+        if netcdfs:
+            if len(netcdfs) > 1:
+                # I dont think this should happen
+                r['dispersion']['netCDFs'] = netcdfs
+            else:
+                r['dispersion']['netCDF'] = netcdfs[0]
 
+    KMZ_PATTERN = '*.kmz'
+    IMAGE_PATTERN = '*.png'
+    SMOKE_KMZ_MATCHER = re.compile('.*smoke.*kmz')
+    FIRE_KMZ_MATCHER = re.compile('.*fire.*kmz')
+    HOURLY_IMG_MATCHER = re.compile('.*/hourly_.*')
+    THREE_HOUR_IMG_MATCHER = re.compile('.*/three_hour_.*')
+    DAILY_AVG_IMG_MATCHER = re.compile('.*/daily_average_.*')
+    DAILY_MAX_IMG_MATCHER = re.compile('.*/daily_maximum_.*')
     def _process_visualization(self, d, r):
-        # TODO: update r with relative location of kmz, images, etc.
-        pass
+        # TODO: look in 'd' to see the target of visualization, what files
+        #   exist, etc.; it won't necessarily say - so that's why we need
+        #   the back-up logic of looking for specific files
+        # Note:  glob.glob introduced recursive option in python 3.5. So,
+        #  we just need to recursively walk the directory
+        kmzs = set(self._find_files(d['output']['directory'], self.KMZ_PATTERN))
+        smoke_kmz = fire_kmz = None
+        for kmz in list(kmzs): # cast to list to allow discarding in loop
+            if smoke_kmz and fire_kmz:
+                break
+            if not smoke_kmz and self.SMOKE_KMZ_MATCHER.match(kmz):
+                smoke_kmz = kmz
+                kmzs.discard(kmz)
+                continue
+            if not fire_kmz and self.FIRE_KMZ_MATCHER.match(kmz):
+                fire_kmz = kmz
+                kmzs.discard(kmz)
+                continue
+        r['visualization']['kmzs'] = {
+            "smoke": smoke_kmz,
+            "fire": fire_kmz
+        }
+        if kmzs:
+            r['visualization']['kmzs']['other'] = list(kmzs)
+
+        images = self._find_files(d['output']['directory'], self.IMAGE_PATTERN)
+        hourly = [e for e in images if self.HOURLY_IMG_MATCHER.match(e)]
+        three_hour = [e for e in images if self.THREE_HOUR_IMG_MATCHER.match(e)]
+        daily_max = [e for e in images if self.DAILY_MAX_IMG_MATCHER.match(e)]
+        daily_avg = [e for e in images if self.DAILY_AVG_IMG_MATCHER.match(e)]
+        r['visualization']['images'] = {
+            "hourly": hourly,
+            "three_hour": three_hour,
+            "daily": {
+               "average": daily_avg,
+               "maximum": daily_max
+            },
+            "other": list(set(images) - set(hourly) - set(three_hour)
+                - set(daily_max) - set(daily_avg)),
+        }
+
+    def _find_files(self, directory, pattern):
+        """Recursively walks directory looking for files whose name match pattern
+
+        args
+         - directory -- root directory to walk
+         - pattern -- string filename pattern
+        """
+        matches = []
+        for root, dirnames, filenames in os.walk(directory):
+            for filename in fnmatch.filter(filenames, pattern):
+                matches.append(os.path.join(root, filename))
+        return [m.replace(directory, '').lstrip('/') for m in matches]
