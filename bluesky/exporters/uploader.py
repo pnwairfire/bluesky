@@ -92,6 +92,8 @@ class UploadExporter(ExporterBase):
             except:
                 r["error"] = "failed to extract {}".format(tarball)
 
+            return r
+
     def export(self, fires_manager):
         # Note: tempfile.TemporaryDirectory() isn't available until python
         #  3.5, so we need to use tempfile.mkdtemp and delete it manually
