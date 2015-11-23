@@ -45,6 +45,8 @@ class UploadExporter(ExporterBase):
             self._upload_options['scp'] = c
 
     def _scp(self, tarball):
+        # TODO: capture ssh/scp error output (ex.
+        #   'ssh: connect to host 127.0.0.1 port 2222: Connection refused')
         if self._upload_options['scp']:
             # TODO: check if host is in fact this server; if so,
             #   simply move tarball and unpack it rather than scp it;
