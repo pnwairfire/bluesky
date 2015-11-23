@@ -48,16 +48,7 @@ class ExporterBase(object):
         # create fresh empty dir
         os.mkdir(output_dir)
 
-        json_output_filename = self.config('json_output_filename') or 'output.json'
-        with open(os.path.join(output_dir, json_output_filename), 'w') as f:
-            fires_manager.dumps(output_stream=f)
-
-        # TODO: support options to dump fire and emissions information to csv
-        #   (i.e. fire_locations.csv, fire_events.csv, and fire_emissions.csv)
-
-        r = {
-            'output_json': json_output_filename
-        }
+        r = {}
 
         dirs_to_copy = {}
         for k in self._extra_exports:
@@ -79,6 +70,20 @@ class ExporterBase(object):
         #  to KMZ, to images, etc.);  sym-links are preserved by tarball;
         #  add sym link information to r
 
+        # TODO: support options to dump fire and emissions information to csv
+        #   (i.e. fire_locations.csv, fire_events.csv, and fire_emissions.csv)
+
+        if not create_tarball:
+            r['directory'] = output_dir
+
+        json_output_filename = self.config('json_output_filename') or 'output.json'
+        r['output_json'] = json_output_filename
+
+        fires_manager.export = fires_manager.export or {}
+        fires_manager.export[self.EXPORT_KEY] = r
+        with open(os.path.join(output_dir, json_output_filename), 'w') as f:
+            fires_manager.dumps(output_stream=f)
+
         if create_tarball:
             tarball_name = self.config('tarball_name')
             tarball = (os.path.join(dest, tarball_name) if tarball_name
@@ -87,11 +92,9 @@ class ExporterBase(object):
                 os.remove(tarball)
             with tarfile.open(tarball, "w:gz") as tar:
                 tar.add(output_dir, arcname=os.path.basename(output_dir))
-            r['tarball'] = tarball
-        else:
-            r['directory'] = output_dir
+            return tarball
 
-        return r
+        return output_dir
 
     NETCDF_PATTERN = '*.nc'
     def _process_dispersion(self, d, r):
@@ -103,9 +106,9 @@ class ExporterBase(object):
         if netcdfs:
             if len(netcdfs) > 1:
                 # I dont think this should happen
-                r['dispersion']['netCDFs'] = netcdfs
+                r['dispersion']['netcdfs'] = netcdfs
             else:
-                r['dispersion']['netCDF'] = netcdfs[0]
+                r['dispersion']['netcdf'] = netcdfs[0]
 
         # TODO: list other hysplit output files; maybe make this configurable
 

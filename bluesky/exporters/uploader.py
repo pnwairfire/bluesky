@@ -23,6 +23,8 @@ DEFAULT_SCP_PORT = 22
 
 class UploadExporter(ExporterBase):
 
+    EXPORT_KEY = 'upload'
+
     def __init__(self, extra_exports, **config):
         super(UploadExporter, self).__init__(extra_exports, **config)
         self._upload_options = {}
@@ -31,7 +33,8 @@ class UploadExporter(ExporterBase):
         self._read_scp_config()
         # TODO: other upload options
         if not self._upload_options:
-            raise BlueSkyConfigurationError("Specify at lease one mode of uploads")
+            raise BlueSkyConfigurationError(
+                "Specify at least one mode of uploads")
 
     def _read_scp_config(self):
         c = self.config('scp')
@@ -87,7 +90,6 @@ class UploadExporter(ExporterBase):
             except:
                 r["error"] = "failed to extract {}".format(tarball)
 
-
     def export(self, fires_manager):
         # Note: tempfile.TemporaryDirectory() isn't available until python
         #  3.5, so we need to use tempfile.mkdtemp and delete it manually
@@ -95,13 +97,15 @@ class UploadExporter(ExporterBase):
         #  and cleanup tempdir;  put in common module (maybe even pyairfire?)
         temp_dir = tempfile.mkdtemp()
         try:
-            r = self._bundle(fires_manager, temp_dir, create_tarball=True)
-            tarball = r.pop('tarball')
-            r.update(
-                scp=self._scp(tarball)
+            tarball = self._bundle(fires_manager, temp_dir, create_tarball=True)
+
+            uploads = {
+                'scp': self._scp(tarball)
                 # TODO: implement and call other upload options
-            )
+            }
+
             # Only include uploads that happened
-            return {k: v for k,v in r.items() if v}
+            fires_manager.export['upload'].update(
+                **{k: v for k,v in uploads.items() if v})
         finally:
             shutil.rmtree(temp_dir)

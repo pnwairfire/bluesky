@@ -42,6 +42,7 @@ def run(fires_manager):
             'export', mode, default={})
         exporters.append(exporter_klass(extra_exports, **exporter_config))
 
-    fires_manager.export = {}
+    # Note: export modules update fires_manager with export info, since that
+    # info needs to be in the fires_manager before it's dumped to json
     for exporter in exporters:
-        fires_manager.export[mode] = exporter.export(fires_manager)
+        exporter.export(fires_manager)

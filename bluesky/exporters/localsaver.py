@@ -17,6 +17,8 @@ __version__ = "0.1.0"
 
 class LocalSaveExporter(ExporterBase):
 
+    EXPORT_KEY = 'localsave'
+
     def __init__(self, extra_exports, **config):
         super(LocalSaveExporter, self).__init__(extra_exports, **config)
         self._dest = self.config('dest_dir')
@@ -27,5 +29,5 @@ class LocalSaveExporter(ExporterBase):
 
     def export(self, fires_manager):
         logging.info('Saving locally to %s', self._dest)
-        return self._bundle(fires_manager, self._dest)
+        self._bundle(fires_manager, self._dest)
 

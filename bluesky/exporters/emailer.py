@@ -48,6 +48,7 @@ class EmailExporter(ExporterBase):
 
     def export(self, fires_manager):
         logging.info('Sending Email to %s', self._recipients)
+        fires_manager.export = fires_manager.export or {}
         try:
             msg = MIMEMultipart('alternative')
             msg['From'] = self._sender
@@ -81,12 +82,10 @@ class EmailExporter(ExporterBase):
 
             s.sendmail(msg['from'], self._recipients, msg.as_string())
             s.quit()
-            return {
-                "sent_to": self._recipients
-            }
+            fires_manager.export['email'] = {"sent_to": self._recipients}
 
         except Exception, e:
             msg = 'Failed to send email to {} - {}'.format(
                 ', '.join(self._recipients), e.message)
             logging.error(msg)
-            return {"error": msg}
+            fires_manager.export['email'] = {"error": msg}
