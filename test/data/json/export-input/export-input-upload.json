@@ -3,7 +3,7 @@
     "config": {
         "export": {
             "modes": ["upload"],
-            "extra_exports": ["dispersion"],
+            "extra_exports": ["dispersion", "visualization"],
             "upload": {
                 "scp": {
                     "user": "vagrant",
@@ -25,6 +25,11 @@
             "parameters": {
                 "pm25": "PM25"
             }
+        }
+    },
+    "visualization": {
+        "output": {
+            "directory": "/bluesky/bsp-visualization-ouput/example-2hr/"
         }
     },
     "fire_information": [
