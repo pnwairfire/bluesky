@@ -107,6 +107,8 @@ class ExporterBase(object):
             else:
                 r['dispersion']['netCDF'] = netcdfs[0]
 
+        # TODO: list other hysplit output files; maybe make this configurable
+
     KMZ_PATTERN = '*.kmz'
     IMAGE_PATTERN = '*.png'
     SMOKE_KMZ_MATCHER = re.compile('.*smoke.*kmz')
