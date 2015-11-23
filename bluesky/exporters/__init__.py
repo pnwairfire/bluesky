@@ -50,21 +50,25 @@ class ExporterBase(object):
         with open(os.path.join(output_dir, json_output_filename), 'w') as f:
             fires_manager.dumps(output_stream=f)
 
-        copied = {}
+        r = {
+            'output_json': json_output_filename
+        }
+
+        dirs_to_copy = {}
         for k in self._extra_exports:
             d = getattr(fires_manager, k)
             if d and d.get('output', {}).get('directory'):
-                if d['output']['directory'] in copied:
-                    # It was already copied, so rename directory to include
-                    # this module's name, and updaed 'copied'
-                    new_dirname = "{}-{}".format(
-                        copied[d['output']['directory']], k)
-                    os.rename(copied[d['output']['directory']], new_dirname)
-                    copied[d['output']['directory']] = new_dirname
-                else:
-                    dirname = os.path.join(output_dir, k)
-                    shutil.copytree(d['output']['directory'], dirname)
-                    copied[d['output']['directory']] = dirname
+                dirs_to_copy[d['output']['directory']] = dirs_to_copy.get(
+                    d['output']['directory'], [])
+                dirs_to_copy[d['output']['directory']].append(k)
+        for directory, extra_imports in dirs_to_copy.items():
+            new_dirname = '-'.join(extra_imports)
+            shutil.copytree(directory, os.path.join(output_dir, new_dirname))
+            for k in extra_imports:
+                r[k] = {'sub_dir': new_dirname}
+                processor = getattr(self, '_process_{}'.format(k), None)
+                if processor:
+                    processor(getattr(fires_manager, k), r)
 
         if create_tarball:
             tarball_name = self.config('tarball_name')
@@ -74,6 +78,21 @@ class ExporterBase(object):
                 os.remove(tarball)
             with tarfile.open(tarball, "w:gz") as tar:
                 tar.add(output_dir, arcname=os.path.basename(output_dir))
-            return tarball
+            r['tarball'] = tarball
+        else:
+            r['directory'] = output_dir
 
-        return output_dir
+        return r
+
+    def _process_dispersion_(self, d, r):
+        # TODO: update r with relative location of nc file, etc.)
+        # TODO: look in 'd' to see what model of dispersion was run, what files
+        #   exist, etc.; it won't necessarily say - so that's why we need
+        #   the back-up logic of looking for specific files
+        # TODO: glob r['dispersion']['sub_dir'] for .nc file
+        # TODO: Support option to rename nc file; other files too?
+        pass
+
+    def _process_visualization(self, d, r):
+        # TODO: update r with relative location of kmz, images, etc.
+        pass

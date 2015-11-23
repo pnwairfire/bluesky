@@ -89,9 +89,10 @@ class UploadExporter(ExporterBase):
         #  and cleanup tempdir;  put in common module (maybe even pyairfire?)
         temp_dir = tempfile.mkdtemp()
         try:
-            tarball = self._bundle(fires_manager, temp_dir, create_tarball=True)
-            r = {
-                'scp': self._scp(tarball)
+            r = self._bundle(fires_manager, temp_dir, create_tarball=True)
+            tarball = r.pop('tarball')
+            r .update(
+                scp=self._scp(tarball)
                 # TODO: implement and call other upload options
             }
             # Only include uploads that happened
