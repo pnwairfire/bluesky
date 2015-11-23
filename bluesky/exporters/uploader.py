@@ -103,13 +103,15 @@ class UploadExporter(ExporterBase):
         try:
             tarball = self._bundle(fires_manager, temp_dir, create_tarball=True)
 
-            uploads = {
-                'scp': self._scp(tarball)
-                # TODO: implement and call other upload options
-            }
+            # TODO: implement and call other upload options
+            for u in ['scp']:
+                try:
+                    r = getattr(self,'_{}'.format(u))(tarball)
+                    if r:
+                        # Only include upload if it actually happened
+                        fires_manager.export['upload'][u] = r
+                except Exception, e:
+                    logging.error("Failed to %s tarball - %s", u, e.message)
 
-            # Only include uploads that happened
-            fires_manager.export['upload'].update(
-                **{k: v for k,v in uploads.items() if v})
         finally:
             shutil.rmtree(temp_dir)
