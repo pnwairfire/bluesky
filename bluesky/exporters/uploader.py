@@ -97,7 +97,7 @@ class UploadExporter(ExporterBase):
         try:
             r = self._bundle(fires_manager, temp_dir, create_tarball=True)
             tarball = r.pop('tarball')
-            r .update(
+            r.update(
                 scp=self._scp(tarball)
                 # TODO: implement and call other upload options
             )
