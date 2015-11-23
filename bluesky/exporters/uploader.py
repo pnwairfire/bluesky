@@ -43,6 +43,12 @@ class UploadExporter(ExporterBase):
 
     def _scp(self, tarball):
         if self._upload_options['scp']:
+            # TODO: check if host is in fact this server; if so,
+            #   simply move tarball and unpack it rather than scp it;
+            #   if host matches 'localhost', 127.0.0.1, or other loopback
+            #   address (ex. 'localhsot:8888'), that should also trigger move
+            #   instead of scp (thought this should never really happen except
+            #   maybe in dev test)
             port = self._upload_options['scp']['port'] or DEFAULT_SCP_PORT
             remote_server = "{}@{}".format(
                 self._upload_options['scp']['user'] or DEFAULT_SCP_USER,

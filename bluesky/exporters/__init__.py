@@ -52,6 +52,9 @@ class ExporterBase(object):
         with open(os.path.join(output_dir, json_output_filename), 'w') as f:
             fires_manager.dumps(output_stream=f)
 
+        # TODO: support options to dump fire and emissions information to csv
+        #   (i.e. fire_locations.csv, fire_events.csv, and fire_emissions.csv)
+
         r = {
             'output_json': json_output_filename
         }
@@ -71,6 +74,10 @@ class ExporterBase(object):
                 processor = getattr(self, '_process_{}'.format(k), None)
                 if processor:
                     processor(getattr(fires_manager, k), r)
+
+        # TODO: support option to create symlinks (like link in root of bundle
+        #  to KMZ, to images, etc.);  sym-links are preserved by tarball;
+        #  add sym link information to r
 
         if create_tarball:
             tarball_name = self.config('tarball_name')
