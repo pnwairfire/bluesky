@@ -46,7 +46,7 @@ def run(fires_manager):
         'met_root_dir')
     if not met_root_dir:
         raise BlueSkyConfigurationError("Config setting 'met_root_dir' "
-            "required by findmetdata module".format(e.message))
+            "required by findmetdata module")
 
     met_format = fires_manager.get_config_value('findmetdata', 'met_format',
         default="arl").lower()
