@@ -237,7 +237,13 @@ class FiresManager(object):
         return self.load(data)
 
     def run(self): #, module_names):
+        failed = False
         for i in range(len(self._modules)):
+            # if one of the modules already failed, then the only thing
+            # we'll run from here on is the export module
+            if failed and 'export' != self._module_names[i]:
+                continue
+
             try:
                 # initialize processing recotd
                 self.processing = self.processing or []
@@ -248,9 +254,12 @@ class FiresManager(object):
                 # 'run' modifies fires in place
                 self._modules[i].run(self)
             except Exception, e:
-                # when there's an error running modules, don't bail; raise
-                # BlueSkyModuleError so that the calling code can decide what to do
-                # (which, in the case of bsp and bsp-web, is to dump the data as is)
+                failed = True
+                # when there's an error running modules, don't bail; continue
+                # iterating through requested modules, executing only exports
+                # and then raise BlueSkyModuleError, below, so that the calling
+                # code can decide what to do (which, in the case of bsp and
+                # bsp-web, is to dump the data as is)
                 logging.error(e)
                 tb = traceback.format_exc()
                 logging.debug(tb)
@@ -259,7 +268,10 @@ class FiresManager(object):
                     "message": str(e),
                     "traceback": str(tb)
                 }
-                raise BlueSkyModuleError(e)
+
+        if failed:
+            # If there was a failure
+            raise BlueSkyModuleError
 
     ## Filtering data
 
