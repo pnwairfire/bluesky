@@ -1058,7 +1058,7 @@ the fire data, each module has its own set of required and optional fields.
  - ***'config' > 'dispersion' > 'start'*** -- *required* -- modeling start time (ex. "2015-01-21T00:00:00Z")
  - ***'config' > 'dispersion' > 'num_hours'*** -- *required* -- number of hours in model run
  - ***'config' > 'dispersion' > 'dest_dir'*** -- *required* -- destination directory to contain output dir
- - ***'config' > 'dispersion' > 'dest_dir'*** -- *optional* -- name of output directory; defaults to run_id, which is generated if not defined
+ - ***'config' > 'dispersion' > 'output_dir_name'*** -- *optional* -- name of output directory; defaults to run_id, which is generated if not defined
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
 
 ###### if running hysplit dispersion:
