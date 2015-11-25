@@ -114,37 +114,23 @@ class ExporterBase(object):
 
     KMZ_PATTERN = '*.kmz'
     IMAGE_PATTERN = '*.png'
+    CSV_PATTERN = '*.csv'
     SMOKE_KMZ_MATCHER = re.compile('.*smoke.*kmz')
     FIRE_KMZ_MATCHER = re.compile('.*fire.*kmz')
     HOURLY_IMG_MATCHER = re.compile('.*/hourly_.*')
     THREE_HOUR_IMG_MATCHER = re.compile('.*/three_hour_.*')
     DAILY_AVG_IMG_MATCHER = re.compile('.*/daily_average_.*')
     DAILY_MAX_IMG_MATCHER = re.compile('.*/daily_maximum_.*')
+    FIRE_LOCATIONS_CSV_MATCHER = re.compile('.*/fire_locations.*')
+    FIRE_EVENTS_CSV_MATCHER = re.compile('.*/fire_events.*')
+    FIRE_EMISSIONS_CSV_MATCHER = re.compile('.*/fire_emissions.*')
     def _process_visualization(self, d, r):
         # TODO: look in 'd' to see the target of visualization, what files
         #   exist, etc.; it won't necessarily say - so that's why we need
         #   the back-up logic of looking for specific files
-        # Note:  glob.glob introduced recursive option in python 3.5. So,
-        #  we just need to recursively walk the directory
-        kmzs = set(self._find_files(d['output']['directory'], self.KMZ_PATTERN))
-        smoke_kmz = fire_kmz = None
-        for kmz in list(kmzs): # cast to list to allow discarding in loop
-            if smoke_kmz and fire_kmz:
-                break
-            if not smoke_kmz and self.SMOKE_KMZ_MATCHER.match(kmz):
-                smoke_kmz = kmz
-                kmzs.discard(kmz)
-                continue
-            if not fire_kmz and self.FIRE_KMZ_MATCHER.match(kmz):
-                fire_kmz = kmz
-                kmzs.discard(kmz)
-                continue
-        r['visualization']['kmzs'] = {
-            "smoke": smoke_kmz,
-            "fire": fire_kmz
-        }
-        if kmzs:
-            r['visualization']['kmzs']['other'] = list(kmzs)
+        kmzs = self._find_files(d['output']['directory'], self.KMZ_PATTERN)
+        r['visualization']['kmzs'] = self._pick_out_files(kmzs,
+            smoke=self.SMOKE_KMZ_MATCHER, fire=self.FIRE_KMZ_MATCHER)
 
         images = self._find_files(d['output']['directory'], self.IMAGE_PATTERN)
         hourly = [e for e in images if self.HOURLY_IMG_MATCHER.match(e)]
@@ -162,12 +148,41 @@ class ExporterBase(object):
                 - set(daily_max) - set(daily_avg)),
         }
 
+        csvs = self._find_files(d['output']['directory'], self.CSV_PATTERN)
+        r['visualization']['csvs'] = self._pick_out_files(csvs,
+            fire_locations=self.FIRE_LOCATIONS_CSV_MATCHER,
+            fire_events=self.FIRE_EVENTS_CSV_MATCHER,
+            fire_emissions=self.FIRE_EMISSIONS_CSV_MATCHER)
+
+    def _pick_out_files(self, found_files, **patterns):
+        found_files = set(found_files)
+        selected = {}
+        smoke_kmz = fire_kmz = None
+        for f in list(found_files): # cast to list to allow discarding in loop
+            if not any([not selected.get(p) for p in patterns]):
+                break
+            for p in patterns:
+                if not selected.get(p) and patterns[p].match(f):
+                    selected[p] = f
+                    found_files.discard(f)
+                    break
+
+        if found_files:
+            selected['other'] = list(found_files)
+
+        return selected
+
+
+
     def _find_files(self, directory, pattern):
         """Recursively walks directory looking for files whose name match pattern
 
         args
          - directory -- root directory to walk
          - pattern -- string filename pattern
+
+        Note:  glob.glob introduced recursive option in python 3.5. So,
+         we need to recursively walk the directory with os.walk
         """
         matches = []
         for root, dirnames, filenames in os.walk(directory):
