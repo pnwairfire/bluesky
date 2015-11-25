@@ -958,12 +958,12 @@ on and fuelbeds is defined
 
 ###### if running hysplit dispersion:
 
- - ***'met' > 'grid' > 'grid' > 'spacing'*** -- *reqiured* if not specified in config (see below) --
- - ***'met' > 'grid' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *reqiured* if not specified in config (see below) --
- - ***'met' > 'grid' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *reqiured* if not specified in config (see below) --
- - ***'met' > 'grid' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *reqiured* if not specified in config (see below) --
- - ***'met' > 'grid' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *reqiured* if not specified in config (see below) --
- - ***'met' > 'grid' > 'grid' > 'domain'*** -- *optional* -- default: 'LatLng' (which means the spacing is in degrees)
+ - ***'met' > 'grid' > 'spacing'*** -- *reqiured* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *reqiured* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *reqiured* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *reqiured* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *reqiured* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'domain'*** -- *optional* -- default: 'LatLng' (which means the spacing is in degrees)
  - ***'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, generates new guid
 
 ##### visualization
