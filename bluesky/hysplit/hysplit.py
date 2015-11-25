@@ -133,11 +133,11 @@ class HYSPLITDispersion(object):
         for f in self._files_to_archive:
             shutil.move(f, self._run_output_dir)
 
-    def _execute(self, *args):
+    def _execute(self, *args, **kwargs):
         # TODO: make sure this is the corrrect way to call
         logging.debug('Executing {}'.format(' '.join(args)))
         # Use check_output so that output isn't sent to stdout
-        output = subprocess.check_output(args)
+        output = subprocess.check_output(args, cwd=kwargs.get('working_dir'))
         if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
             logging.debug('Captured {} output:'.format(args[0]))
             for line in output.split('\n'):
@@ -400,12 +400,12 @@ class HYSPLITDispersion(object):
         ncea_args = ["-O","-v","PM25","-y","ttl"]
         ncea_args.extend(["%d/%s" % (i, self.OUTPUT_FILE_NAME) for i in  xrange(num_processes)])
         ncea_args.append(output_file)
-        self._execute(NCEA_EXECUTABLE, *ncea_args)
+        self._execute(NCEA_EXECUTABLE, *ncea_args, working_dir=working_dir)
 
         ncks_args = ["-A","-v","TFLAG"]
         ncks_args.append("0/%s" % (self.OUTPUT_FILE_NAME))
         ncks_args.append(output_file)
-        self._execute(NCKS_EXECUTABLE, *ncks_args)
+        self._execute(NCKS_EXECUTABLE, *ncks_args, working_dir=working_dir)
 
     def _run_process(self, fires, working_dir):
         logging.info("Running one HYSPLIT49 Dispersion model process")
@@ -490,9 +490,9 @@ class HYSPLITDispersion(object):
 
         # Run HYSPLIT
         if self.config("MPI"):
-            self._execute(MPIEXEC, "-n", str(NCPUS), SHYSPLIT_MPI_BINARY)
+            self._execute(MPIEXEC, "-n", str(NCPUS), SHYSPLIT_MPI_BINARY, working_dir=working_dir)
         else:  # standard serial run
-            self._execute(HYSPLIT_BINARY)
+            self._execute(HYSPLIT_BINARY, working_dir=working_dir)
 
         if not os.path.exists(output_conc_file):
             msg = "HYSPLIT failed, check MESSAGE file for details"
@@ -506,8 +506,9 @@ class HYSPLITDispersion(object):
                 "-O" + os.path.basename(output_file),
                 "-X1000000.0",  # Scale factor to convert from grams to micrograms
                 "-D1",  # Debug flag
-                "-L-1"  # Lx is x layers. x=-1 for all layers...breaks KML output for multiple layers
-                )
+                "-L-1",  # Lx is x layers. x=-1 for all layers...breaks KML output for multiple layers
+                working_dir=working_dir
+            )
 
             if not os.path.exists(output_file):
                 msg = "Unable to convert HYSPLIT concentration file to NetCDF format"
