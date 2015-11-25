@@ -9,6 +9,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 __version__ = "0.1.0"
 
+import copy
 import logging
 import math
 import os
@@ -63,7 +64,7 @@ class HYSPLITDispersion(object):
     TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
     def __init__(self, met_info, **config):
-        self._set_met_info(met_info)
+        self._set_met_info(copy.deepcopy(met_info))
         self._config = config
         # TODO: determine which config options we'll support
         # TODO: make sure required executables are available
