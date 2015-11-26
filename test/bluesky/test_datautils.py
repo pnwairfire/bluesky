@@ -3,7 +3,9 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
-#from py.test import raises
+from py.test import raises
+
+import numpy
 
 from bluesky import datautils
 from bluesky.models.fires import Fire
@@ -499,3 +501,51 @@ class TestSummarizeEmissions(object):
         }
         summary = datautils.summarize(fires, 'emissions')
         assert summary == expected_summary
+
+class TestMultiplyNestedData(object):
+
+    def test_scalar(self):
+        with raises(ValueError) as e:
+            datautils.multiply_nested_data(1, 2)
+
+    def test_array(self):
+        d = [1, 1.5, 'sdf']
+        e = [2, 3, 'sdf']
+        datautils.multiply_nested_data(d, 2)
+
+    def test_ndarray(self):
+        # Note: if you include 'sdf' in d, as in test_array, all
+        # values in d become cast to numpy.string_
+        d = numpy.array([1, 1.5])
+        e = numpy.array([2, 3])
+        datautils.multiply_nested_data(d, 2)
+        for i in range(len(d)):
+            assert d[i] == e[i]
+
+    def test_dict(self):
+        d = dict(a=1, b=1.5, c='sdf')
+        e = dict(a=2, b=3, c='sdf')
+        datautils.multiply_nested_data(d, 2)
+        assert d == e
+
+    def test_multi(self):
+        d = {
+            "a": 1,
+            "b": [1.5, 5],
+            "c": 'sdf',
+            "d": {
+                "e": '234',
+                "f": 3.4
+            }
+        }
+        e = {
+            "a": 2,
+            "b": [3, 10],
+            "c": 'sdf',
+            "d": {
+                "e": '234',
+                "f": 6.8
+            }
+        }
+        datautils.multiply_nested_data(d, 2)
+        assert d == e

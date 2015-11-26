@@ -3,9 +3,12 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import numpy
+
 __all__ = [
     'deepmerge',
-    'summarize'
+    'summarize',
+    'multiply_nested_data'
 ]
 
 def deepmerge(a, b):
@@ -51,3 +54,30 @@ def summarize(fires, subdata_key):
         for fb in fire.fuelbeds:
             summary = _summarize(fb[subdata_key], summary)
     return summary
+
+def multiply_nested_data(nested_data, multiplier):
+
+    def _is_num(v):
+        return isinstance(v, (int, float, long))
+
+    def _is_array(v):
+        return isinstance(v, (list, numpy.ndarray))
+
+    def _is_dict(v):
+        return isinstance(v, dict) # TODO: catch other dict types?
+
+    if _is_array(nested_data):
+        for i in range(len(nested_data)):
+            if _is_num(nested_data[i]):
+                nested_data[i] = nested_data[i] * multiplier
+
+    elif _is_dict(nested_data):
+        for k in nested_data:
+            if _is_dict(nested_data[k]) or _is_array(nested_data[k]):
+                multiply_nested_data(nested_data[k], multiplier)
+
+            elif _is_num(nested_data[k]):
+                nested_data[k] = nested_data[k] * multiplier
+
+    else:
+        raise ValueError("Not nested data: {}".format(nested_data))

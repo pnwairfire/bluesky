@@ -258,7 +258,11 @@ def run(fires_manager):
 
             # Note: if we end up running fc on all fuelbeds at once, use lists
             # for the rest
-            fc.fuelbed_area_acres = [(fb['pct'] / 100.0) * fire.location['area']]
+            # Note: consume expects area, but disregards it when computing
+            #  consumption values - it produces tons per unit area (acre?), not
+            #  total tons; the consumption values will be multiplied by area, below
+            area = (fb['pct'] / 100.0) * fire.location['area']
+            fc.fuelbed_area_acres = [area]
             fc.fuelbed_ecoregion = [fire.location['ecoregion']]
 
             for k, default in valid_settings:
@@ -270,6 +274,10 @@ def run(fires_manager):
             if fc.results():
                 fb['consumption'] = fc.results()['consumption']
                 fb['consumption'].pop('debug', None)
+
+                # multiple each consumption value by area
+                datautils.multiply_nested_data(fb["consumption"], area)
+
             else:
                 logging.error("Failed to calculate consumption for fire %s / %s fuelbed %s" % (
                     fire.id, fire.name, fb['fccs_id']
