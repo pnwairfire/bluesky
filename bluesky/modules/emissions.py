@@ -61,12 +61,14 @@ def _run_feps(fires_manager, species, include_emissions_details):
                 raise ValueError(
                     "Missing consumption data required for computing emissions")
             _calculate(calculator, fb, include_emissions_details)
+            # TODO: Figure out if we should indeed convert from lbs to tons;
+            #   if so, uncomment the following
             # Note: According to BSF, FEPS emissions are in lbs/ton consumed.  Since
             # consumption is in tons, and since we want emissions in tons, we need
             # to divide each value by 2000.0
-            datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
-            if include_emissions_details:
-                datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
+            # datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
+            # if include_emissions_details:
+            #     datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
 
 def _run_urbanski(fires_manager, species, include_emissions_details):
     logging.debug("Running emissions module with Urbanski EFs")
