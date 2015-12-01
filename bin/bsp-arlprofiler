@@ -89,6 +89,10 @@ OPTIONAL_ARGS = [
         'help': 'Time step',
         'action': 'store',
         'type': int
+    },
+    {
+        'long': '--index-filename-pattern',
+        'help': "index filename pattern; default 'arl12hrindex.csv'"
     }
 ]
 
