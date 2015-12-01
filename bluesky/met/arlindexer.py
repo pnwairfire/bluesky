@@ -11,19 +11,12 @@ import json
 import re
 import sys
 
+from bluesky import datautils
 from .arlfinder import ArlFinder
 
 __all__ = [
     'ArlIndexer'
 ]
-
-
-class DatetimeJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if hasattr(obj, isoformat):
-            return obj.isoformat()
-        else:
-            return super(DatetimeJSONEncoder, self).default(obj)
 
 class ArlIndexer(ArlFinder):
 
@@ -61,17 +54,20 @@ class ArlIndexer(ArlFinder):
 
     def _analyse(self, files_per_hour, files):
         # TODO: implement desired logic
-        return dict(files_per_hour, **files)
+        return dict(files_per_hour, files=files)
 
     ##
     ## Writing results to db, file, or stdout
     ##
 
     def _write(self, index_data):
+        # Note: using datautils.format_datetimes instead of defining
+        #  a datetime encoder for json.dumps because datautils.format_datetimes
+        #  handles formating both keys and values
+        index_data = datautils.format_datetimes(index_data)
         if (not self._config.get('mongodb_url')
                 and not self._config.get('output_file')):
-            sys.stdout.write(json.dumps(index_data,
-                encoder=DatetimeJSONEncoder))
+            sys.stdout.write(json.dumps(index_data))
         else:
             succeeded = False
 

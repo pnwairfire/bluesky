@@ -84,6 +84,7 @@ import logging
 import os
 import re
 
+from bluesky import datautils
 from bluesky.datetimeutils import parse_datetimes, parse_utc_offset
 from bluesky.io import CSV2JSON
 
@@ -185,6 +186,8 @@ class ArlFinder(object):
         arl_files = self._parse_index_files(index_files)
         files_per_hour = self._determine_files_per_hour(arl_files)
         files = self._determine_file_time_windows(files_per_hour)
+        files = self._filter_files(files, start, end)
+        files = datautils.format_datetimes(files)
 
         return {'files': files}
 
@@ -259,7 +262,8 @@ class ArlFinder(object):
             tw = parse_datetimes(row, 'start', 'end')
             f = self._get_file_pathname(index_file, row['filename'])
             if f:
-                arl_files.append(dict(file=f, **tw))
+                arl_files.append(
+                    dict(file=f, first_hour=tw['start'], last_hour=tw['end']))
         return arl_files
 
     def _get_file_pathname(self, index_file, name):
@@ -293,8 +297,8 @@ class ArlFinder(object):
         """
         files_per_hour = {}
         for f_dict in arl_files:
-            dt = f_dict['start']
-            while dt <= f_dict['end']:
+            dt = f_dict['first_hour']
+            while dt <= f_dict['last_hour']:
                 if not files_per_hour.get(dt) or files_per_hour[dt] < f_dict['file']:
                     files_per_hour[dt] = f_dict['file']
                 dt += ONE_HOUR
@@ -312,14 +316,15 @@ class ArlFinder(object):
                 files.append({'file': f, 'first_hour':dt, 'last_hour': dt})
             else:
                 files[-1]['last_hour'] = dt
+        return files
 
-        files = [
+    ##
+    ## Filtering and Formating
+    ##
+
+    def _filter_files(self, files, start, end):
+        return [
             f for f in files if
                 (f['first_hour'] >= start and f['first_hour'] <= end) or
                 (f['last_hour'] >= start and f['last_hour'] <= end)
         ]
-
-        for f in files:
-            f["first_hour"] = f['first_hour'].isoformat()
-            f["last_hour"] = f['last_hour'].isoformat()
-        return files
