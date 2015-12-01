@@ -246,7 +246,7 @@ class ArlFinder(object):
             arl_files.extend(self._parse_index_file(f))
         return arl_files
 
-    def _parse_index_file(self, files_per_hour, index_file):
+    def _parse_index_file(self, index_file):
         """Parses arl index files, extracting each arl file with its start
         hour and last our
 
@@ -279,6 +279,10 @@ class ArlFinder(object):
 
         # raise ValueError("Can't find arl file {} listed in {}".format(
         #     name, index_file))
+
+    ##
+    ## Mapping hours to arl files and vice versa
+    ##
 
     def _determine_files_per_hour(self, arl_files):
         """Determines which arl file has the most recent data for each hour
