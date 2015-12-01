@@ -275,4 +275,5 @@ class ArlFinder(object):
                     if self._index_filename_matcher.match(f): #(os.path.basename(f)):
                         logging.debug('found index file: {}'.format(f))
                         index_files.append(os.path.join(root, f))
+        logging.debug('Found {} index files'.format(len(index_files)))
         return index_files
