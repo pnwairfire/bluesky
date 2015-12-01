@@ -69,7 +69,7 @@ OPTIONAL_ARGS = [
         'short': '-p',
         'long': '--index-filename-pattern',
         'help': "index filename pattern; default 'arl12hrindex.csv'"
-    }    # TODO: option '' (to pass into arlfinder)
+    }
 ]
 
 EXAMPLES_STR = """Examples:
