@@ -8,7 +8,8 @@ import numpy
 __all__ = [
     'deepmerge',
     'summarize',
-    'multiply_nested_data'
+    'multiply_nested_data',
+    'format_datetimes'
 ]
 
 def deepmerge(a, b):
@@ -55,16 +56,17 @@ def summarize(fires, subdata_key):
             summary = _summarize(fb[subdata_key], summary)
     return summary
 
+def _is_num(v):
+    return isinstance(v, (int, float, long))
+
+def _is_array(v):
+    return isinstance(v, (list, numpy.ndarray))
+
+def _is_dict(v):
+    return isinstance(v, dict) # TODO: catch other dict types?
+
 def multiply_nested_data(nested_data, multiplier):
 
-    def _is_num(v):
-        return isinstance(v, (int, float, long))
-
-    def _is_array(v):
-        return isinstance(v, (list, numpy.ndarray))
-
-    def _is_dict(v):
-        return isinstance(v, dict) # TODO: catch other dict types?
 
     if _is_array(nested_data):
         for i in range(len(nested_data)):
@@ -81,3 +83,30 @@ def multiply_nested_data(nested_data, multiplier):
 
     else:
         raise ValueError("Not nested data: {}".format(nested_data))
+
+def _is_datetime(v):
+    return hasattr(v, 'isoformat')
+
+def format_datetimes(data):
+    """Formats all datetimes (keys and values) in ISO8601 format
+
+    This function could also go in bluesky.datetimeutils
+    """
+    if _is_datetime(data):
+        data = data.isoformat()
+
+    elif _is_array(data):
+        for i in range(len(data)):
+            data[i] = format_datetimes(data[i])
+
+    elif _is_dict(data):
+        for k in data:
+            # first, format key if it's a datetime
+            if _is_datetime(k):
+                v = data.pop(k)
+                k = k.isoformat()
+                data[k] = v
+
+            data[k] = format_datetimes(data[k])
+
+    return data
