@@ -879,6 +879,7 @@ while the following is an example of the latter:
 
 the bluesky package includes three other executables:
 
+ - bsp-arlindexer - indexes available arl met data
  - bsp-arlprofiler - extracts local met data from an arl met data file for a specific location
  - bsp-csv2json - converts csv formated fire data to json format, as expcted by ```bsp```
 

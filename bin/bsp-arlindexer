@@ -1,0 +1,94 @@
+#! /usr/bin/env python
+
+
+
+# TODO: option to save in mongodb; option specifies mongodb-url (and dbname?
+#   or make db name optional, and fill it in with default if not specified);
+# TODO: option to save in flat json-formatted file(s) (multiple files,
+#   each representing different index hierarchry); option specifies
+#   pathname prefix?
+# TODO: require mongodb and/or flat file *vs* just write to stdout
+# TODO: option to set server name/identifier (default to whatever 'uname'
+#   returns? or is there a some python module for returning data)....or maybe
+#   make this a required arg (or required when storing in mongodb)
+# TODO: possible data hierarchies:
+#   - met > server > date
+#   - met > date > server
+#   - server > met > date
+#   - server > date > met
+#   - date > met > server
+#   - date > server > met
+# TODO: come up with good strategy to replace/update existing index (since
+#   files will be reomved, and thus need to be dissappeared from index; but
+#   since index is accross multiple servers, we only want to replace data
+#   representing current server)
+
+
+
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2015, AirFire, PNW, USFS"
+
+import logging
+import traceback
+
+from pyairfire import scripting
+
+try:
+    from bluesky.met import arlindexer
+except:
+    import os
+    import sys
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
+    sys.path.insert(0, root_dir)
+    from bluesky.met import arlprofiler
+
+REQUIRED_ARGS = [
+    {
+        'short': '-d',
+        'long': '--domain',
+        'help': "domain identifier (e.g. 'DRI2km')"
+    },
+    {
+        'short': '-r',
+        'long': '--root-dir',
+        'help': "domain root directory (e.g. '/DRI_2km/')"
+    }
+]
+OPTIONAL_ARGS = [
+    {
+        'short': '-m',
+        'long': '--mongodb-url',
+        'help': "mongodb url: format 'mongodb://[username:password@]host[:port][/[database][?options]]'"
+    },
+    {
+        'short': '-o',
+        'long': '--output-file', # TODO: or --output-file-prefix?
+        'help': "output file to dump index json"
+    },
+    {
+        'short': '-p',
+        'long': '--index-filename-pattern',
+        'help': "index filename pattern; default 'arl12hrindex.csv'"
+    }    # TODO: option '' (to pass into arlfinder)
+]
+
+EXAMPLES_STR = """Examples:
+  $ ./bin/bsp-arlindexer -d DRI2km -r /DRI_6km/
+"""
+
+if __name__ == "__main__":
+    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+        epilog=EXAMPLES_STR)
+    try:
+        indexer = arlindexer.ArlIndexer(
+            # Pop reqired args so that they're not passed in as 'config'
+            # TODO: not really necessary, so maybe just use
+            #   `args.domain` and `args.root_dir`
+            args.__dict__.pop('domain'),
+            args.__dict__.pop('root_dir'),
+            **args.__dict__)
+        indexer.index()
+    except Exception, e:
+        logging.error(e)
+        logging.debug(traceback.format_exc())
+        scripting.utils.exit_with_msg(e)
