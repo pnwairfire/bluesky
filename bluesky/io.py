@@ -5,12 +5,22 @@ import json
 import sys
 
 class Stream(object):
+
     def __init__(self, file_name, flag):
         self._file_name = file_name
         self._flag = flag
+
+    def _open_file(self):
+        """Opens the imput file.
+
+        This method exists soley for the purpose of monkeypatching the opening
+        of the file (since you can't monkeypatch 'open' directly with py.test)
+        """
+        return open(self._file_name, self._flag)
+
     def __enter__(self):
         if self._file_name:
-            self._file =  open(self._file_name, self._flag)
+            self._file = self._open_file()
             return self._file
         else:
             if self._flag == 'r':
