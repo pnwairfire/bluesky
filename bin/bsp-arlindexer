@@ -40,7 +40,7 @@ except:
     import sys
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from bluesky.met import arlprofiler
+    from bluesky.met import arlindexer
 
 REQUIRED_ARGS = [
     {

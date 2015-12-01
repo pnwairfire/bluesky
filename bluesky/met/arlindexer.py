@@ -6,6 +6,8 @@ This module indexes met data
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import datetime
+import json
 import re
 import sys
 
