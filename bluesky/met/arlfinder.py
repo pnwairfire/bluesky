@@ -48,6 +48,8 @@ class ArlFinder(object):
         self._index_filename_matcher = re.compile(
             config.get("index_filename_pattern") or
             self.DEFAULT_INDEX_FILENAME_PATTERN)
+        logging.debug("Looking for index filenames mathing pattern '%s'",
+            self._index_filename_matcher.pattern)
         self._max_days_out = int(config.get("max_days_out",
             self.DEFAULT_MAX_DAYS_OUT))
 
