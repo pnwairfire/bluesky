@@ -1,13 +1,5 @@
 #!/usr/bin/env python
 
-"""bsp-csv2json: Converts csv formatted fire data to json.
-
-Example calls:
- > bsp-csv2json -i fires.cvs -o fires.json
- > cat fires.csv | bsp-csv2json > fires.json
- > bsp-csv2json < fires.csv > fires.json
-"""
-
 from pyairfire import scripting
 
 try:
@@ -47,8 +39,17 @@ OPTIONAL_ARGS = [
     }
 ]
 
+EXAMPLES_STR = """Converts csv formatted fire data to json.
+
+Example calls:
+ > bsp-csv2json -i fires.cvs -o fires.json
+ > cat fires.csv | bsp-csv2json > fires.json
+ > bsp-csv2json < fires.csv > fires.json
+ """
+
 def main():
-    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS)
+    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+        epilog=EXAMPLES_STR)
     io.CSV2JSON(args.input_file, args.output_file,
         'id' if args.merge_fires else None, 'fire_information').convert()
 
