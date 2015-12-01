@@ -46,8 +46,8 @@ class ArlFinder(object):
             raise ValueError("{} is not a valid directory".format(met_root_dir))
         self._met_root_dir = met_root_dir
         self._index_filename_matcher = re.compile(
-            config.get("index_filename_pattern",
-            self.DEFAULT_INDEX_FILENAME_PATTERN))
+            config.get("index_filename_pattern") or
+            self.DEFAULT_INDEX_FILENAME_PATTERN)
         self._max_days_out = int(config.get("max_days_out",
             self.DEFAULT_MAX_DAYS_OUT))
 
