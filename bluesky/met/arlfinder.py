@@ -107,7 +107,7 @@ class ArlFinder(object):
             raise ValueError('Start and end times must be defined to find arl data')
 
         date_matcher = self._create_date_matcher(start, end)
-        index_files = self._find_index_files(self._met_root_dir, date_matcher)
+        index_files = self._find_index_files(date_matcher)
 
         #files_per_hour = reduce(lambda r, e: self._parse_index_file(r, e), index_files, {})
         files_per_hour = {}
@@ -252,7 +252,7 @@ class ArlFinder(object):
         # raise ValueError("Can't find arl file {} listed in {}".format(
         #     name, index_file))
 
-    def _find_index_files(self, dir, date_matcher):
+    def _find_index_files(self, date_matcher):
         """Searches for index files under dir
 
         Example index file locations:
@@ -268,7 +268,7 @@ class ArlFinder(object):
             /storage/NWRMC/4km/2015110300/arl12hrindex.csv
         """
         index_files = []
-        for root, dirs, files in os.walk(dir):
+        for root, dirs, files in os.walk(self._met_root_dir):
             #logging.debug('Root: {}'.format(root))
             if date_matcher.match(root):
                 for f in files:
