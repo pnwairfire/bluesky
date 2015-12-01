@@ -1,6 +1,78 @@
 """bluesky.met.arlfinder
 
 This module finds arl met data files for a particular domain and time window.
+
+Arl index files have a fairly standard format, but do differ in some ways.
+For example, sometimes the list files are names only, sometimes they're
+abslute paths, and sometimes they're filenames with a leading '/' (where
+the leading '/' should be ignored.)
+
+Example index file contents
+
+$ cat /DRI_2km/2015110300/arl12hrindex.csv
+filename,start,end,interval
+wrfout_d3.2015110300.f00-11_12hr01.arl,2015-11-03 00:00:00,2015-11-03 11:00:00,12
+wrfout_d3.2015110300.f12-23_12hr02.arl,2015-11-03 12:00:00,2015-11-03 23:00:00,12
+wrfout_d3.2015110300.f24-35_12hr03.arl,2015-11-04 00:00:00,2015-11-04 11:00:00,12
+wrfout_d3.2015110300.f36-47_12hr04.arl,2015-11-04 12:00:00,2015-11-04 23:00:00,12
+wrfout_d3.2015110300.f48-59_12hr05.arl,2015-11-05 00:00:00,2015-11-05 11:00:00,12
+wrfout_d3.2015110300.f60-71_12hr06.arl,2015-11-05 12:00:00,2015-11-05 23:00:00,12
+
+$ cat /DRI_6km/2015110300/arl12hrindex.csv
+filename,start,end,interval
+wrfout_d2.2015110300.f00-11_12hr01.arl,2015-11-03 00:00:00,2015-11-03 11:00:00,12
+wrfout_d2.2015110300.f12-23_12hr02.arl,2015-11-03 12:00:00,2015-11-03 23:00:00,12
+wrfout_d2.2015110300.f24-35_12hr03.arl,2015-11-04 00:00:00,2015-11-04 11:00:00,12
+wrfout_d2.2015110300.f36-47_12hr04.arl,2015-11-04 12:00:00,2015-11-04 23:00:00,12
+wrfout_d2.2015110300.f48-59_12hr05.arl,2015-11-05 00:00:00,2015-11-05 11:00:00,12
+wrfout_d2.2015110300.f60-71_12hr06.arl,2015-11-05 12:00:00,2015-11-05 23:00:00,12
+
+$ cat /bluesky/data/NAM/2015110300/NAM36_ARL_2015110300_index.csv
+filename,start,end,interval
+/bluesky/met/NAM/ARL/2015/11/nam_forecast-2015110300_00-36hr.arl,2015-11-03 00:00:00,2015-11-04 12:00:00,36
+
+$ cat /bluesky/data/NAM/2015110300/NAM84_ARL_2015110300_index.csv
+filename,start,end,interval
+/bluesky/met/NAM/ARL/2015/11/nam_forecast-2015110300_00-84hr.arl,2015-11-03 00:00:00,2015-11-06 12:00:00,84
+
+$ cat /bluesky/data/GFS/2015110300/GFS192_ARL_index.csv
+filename,start,end,interval
+/bluesky/data/gfs/2015110300/gfs_forecast-2015110300_000-192hr.arl,2015-11-03 00:00:00,2015-11-11 00:00:00,192
+
+$ cat /bluesky/data/NAM4km/2015110300/nam4km_arlindex.csv
+filename,start,end,interval
+/hysplit.t00z.namsf00.CONUS,2015-11-03 01:00:00,2015-11-03 06:00:00,6
+/hysplit.t00z.namsf06.CONUS,2015-11-03 07:00:00,2015-11-03 12:00:00,6
+/hysplit.t00z.namsf12.CONUS,2015-11-03 13:00:00,2015-11-03 18:00:00,6
+/hysplit.t00z.namsf18.CONUS,2015-11-03 19:00:00,2015-11-04 00:00:00,6
+
+$ cat /storage/NWRMC/4km/2015102900/arl12hrindex.csv
+filename,start,end,interval
+/storage/NWRMC/4km/2015102900/wrfout_d3.2015102800.f24-35_12hr02.arl,2015-10-29 00:00:00,2015-10-29 11:00:00,12
+/storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f12-23_12hr01.arl,2015-10-29 12:00:00,2015-10-29 23:00:00,12
+/storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f24-35_12hr02.arl,2015-10-30 00:00:00,2015-10-30 11:00:00,12
+/storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f36-47_12hr03.arl,2015-10-30 12:00:00,2015-10-30 23:00:00,12
+/storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f48-59_12hr04.arl,2015-10-31 00:00:00,2015-10-31 11:00:00,12
+/storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f60-71_12hr05.arl,2015-10-31 12:00:00,2015-10-31 23:00:00,12
+/storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f72-83_12hr06.arl,2015-11-01 00:00:00,2015-11-01 11:00:00,12
+
+$ cat /storage/NWRMC/1.33km/2015110300/arl12hrindex.csv
+filename,start,end,interval
+/storage/NWRMC/1.33km/2015110300/wrfout_d4.2015110200.f24-35_12hr02.arl,2015-11-03 00:00:00,2015-11-03 11:00:00,12
+/storage/NWRMC/1.33km/2015110300/wrfout_d4.2015110300.f12-23_12hr01.arl,2015-11-03 12:00:00,2015-11-03 23:00:00,12
+/storage/NWRMC/1.33km/2015110300/wrfout_d4.2015110300.f24-35_12hr02.arl,2015-11-04 00:00:00,2015-11-04 11:00:00,12
+/storage/NWRMC/1.33km/2015110300/wrfout_d4.2015110300.f36-47_12hr03.arl,2015-11-04 12:00:00,2015-11-04 23:00:00,12
+/storage/NWRMC/1.33km/2015110300/wrfout_d4.2015110300.f48-59_12hr04.arl,2015-11-05 00:00:00,2015-11-05 11:00:00,12
+
+$ cat /storage/NWRMC/4km/2015110300/arl12hrindex.csv
+filename,start,end,interval
+/storage/NWRMC/4km/2015110300/wrfout_d3.2015110200.f24-35_12hr02.arl,2015-11-03 00:00:00,2015-11-03 11:00:00,12
+/storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f12-23_12hr01.arl,2015-11-03 12:00:00,2015-11-03 23:00:00,12
+/storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f24-35_12hr02.arl,2015-11-04 00:00:00,2015-11-04 11:00:00,12
+/storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f36-47_12hr03.arl,2015-11-04 12:00:00,2015-11-04 23:00:00,12
+/storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f48-59_12hr04.arl,2015-11-05 00:00:00,2015-11-05 11:00:00,12
+/storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f60-71_12hr05.arl,2015-11-05 12:00:00,2015-11-05 23:00:00,12
+/storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f72-83_12hr06.arl,2015-11-06 00:00:00,2015-11-06 11:00:00,12
 """
 
 __author__      = "Joel Dubowy"
@@ -110,32 +182,15 @@ class ArlFinder(object):
 
         date_matcher = self._create_date_matcher(start, end)
         index_files = self._find_index_files(date_matcher)
-
-        #files_per_hour = reduce(lambda r, e: self._parse_index_file(r, e), index_files, {})
-        files_per_hour = {}
-        for f in index_files:
-            #logging.debug(files_per_hour)
-            self._parse_index_file(files_per_hour, f)
-
-        files = []
-        for dt, f in sorted(files_per_hour.items(), key=lambda e: e[0]):
-            if (not files or (dt - files[-1]['last_hour']) > ONE_HOUR or
-                    files[-1]['file'] != f):
-                files.append({'file': f, 'first_hour':dt, 'last_hour': dt})
-            else:
-                files[-1]['last_hour'] = dt
-
-        files = [
-            f for f in files if
-                (f['first_hour'] >= start and f['first_hour'] <= end) or
-                (f['last_hour'] >= start and f['last_hour'] <= end)
-        ]
-
-        for f in files:
-            f["first_hour"] = f['first_hour'].isoformat()
-            f["last_hour"] = f['last_hour'].isoformat()
+        arl_files = self._parse_index_files(index_files)
+        files_per_hour = self._determine_files_per_hour(arl_files)
+        files = self._determine_file_time_windows(files_per_hour)
 
         return {'files': files}
+
+    ##
+    ## Finding Index Files
+    ##
 
     def _create_date_matcher(self, start, end):
         """Returns a compiled regex object that matches %Y%m%d date strings
@@ -148,111 +203,6 @@ class ArlFinder(object):
             for i in range(-self._max_days_out, num_days+1)]
         return re.compile(".*({}).*".format(
             '|'.join([dt.strftime('%Y%m%d') for dt in dates_to_match])))
-
-    def _parse_index_file(self, files_per_hour, index_file):
-        """Parses arl index file for files to use for each hour, and updates
-        the current
-
-        args:
-         - files_per_hour -- lists which met file to use for each hour
-         -
-
-
-
-        Arl index files have a fairly standard format, but do differ in some ways.
-        For example, sometimes the list files are names only, sometimes they're
-        abslute paths, and sometimes they're filenames with a leading '/' (where
-        the leading '/' should be ignored.)
-
-        Example index file contents
-
-        $ cat /DRI_2km/2015110300/arl12hrindex.csv
-        filename,start,end,interval
-        wrfout_d3.2015110300.f00-11_12hr01.arl,2015-11-03 00:00:00,2015-11-03 11:00:00,12
-        wrfout_d3.2015110300.f12-23_12hr02.arl,2015-11-03 12:00:00,2015-11-03 23:00:00,12
-        wrfout_d3.2015110300.f24-35_12hr03.arl,2015-11-04 00:00:00,2015-11-04 11:00:00,12
-        wrfout_d3.2015110300.f36-47_12hr04.arl,2015-11-04 12:00:00,2015-11-04 23:00:00,12
-        wrfout_d3.2015110300.f48-59_12hr05.arl,2015-11-05 00:00:00,2015-11-05 11:00:00,12
-        wrfout_d3.2015110300.f60-71_12hr06.arl,2015-11-05 12:00:00,2015-11-05 23:00:00,12
-
-        $ cat /DRI_6km/2015110300/arl12hrindex.csv
-        filename,start,end,interval
-        wrfout_d2.2015110300.f00-11_12hr01.arl,2015-11-03 00:00:00,2015-11-03 11:00:00,12
-        wrfout_d2.2015110300.f12-23_12hr02.arl,2015-11-03 12:00:00,2015-11-03 23:00:00,12
-        wrfout_d2.2015110300.f24-35_12hr03.arl,2015-11-04 00:00:00,2015-11-04 11:00:00,12
-        wrfout_d2.2015110300.f36-47_12hr04.arl,2015-11-04 12:00:00,2015-11-04 23:00:00,12
-        wrfout_d2.2015110300.f48-59_12hr05.arl,2015-11-05 00:00:00,2015-11-05 11:00:00,12
-        wrfout_d2.2015110300.f60-71_12hr06.arl,2015-11-05 12:00:00,2015-11-05 23:00:00,12
-
-        $ cat /bluesky/data/NAM/2015110300/NAM36_ARL_2015110300_index.csv
-        filename,start,end,interval
-        /bluesky/met/NAM/ARL/2015/11/nam_forecast-2015110300_00-36hr.arl,2015-11-03 00:00:00,2015-11-04 12:00:00,36
-
-        $ cat /bluesky/data/NAM/2015110300/NAM84_ARL_2015110300_index.csv
-        filename,start,end,interval
-        /bluesky/met/NAM/ARL/2015/11/nam_forecast-2015110300_00-84hr.arl,2015-11-03 00:00:00,2015-11-06 12:00:00,84
-
-        $ cat /bluesky/data/GFS/2015110300/GFS192_ARL_index.csv
-        filename,start,end,interval
-        /bluesky/data/gfs/2015110300/gfs_forecast-2015110300_000-192hr.arl,2015-11-03 00:00:00,2015-11-11 00:00:00,192
-
-        $ cat /bluesky/data/NAM4km/2015110300/nam4km_arlindex.csv
-        filename,start,end,interval
-        /hysplit.t00z.namsf00.CONUS,2015-11-03 01:00:00,2015-11-03 06:00:00,6
-        /hysplit.t00z.namsf06.CONUS,2015-11-03 07:00:00,2015-11-03 12:00:00,6
-        /hysplit.t00z.namsf12.CONUS,2015-11-03 13:00:00,2015-11-03 18:00:00,6
-        /hysplit.t00z.namsf18.CONUS,2015-11-03 19:00:00,2015-11-04 00:00:00,6
-
-        $ cat /storage/NWRMC/4km/2015102900/arl12hrindex.csv
-        filename,start,end,interval
-        /storage/NWRMC/4km/2015102900/wrfout_d3.2015102800.f24-35_12hr02.arl,2015-10-29 00:00:00,2015-10-29 11:00:00,12
-        /storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f12-23_12hr01.arl,2015-10-29 12:00:00,2015-10-29 23:00:00,12
-        /storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f24-35_12hr02.arl,2015-10-30 00:00:00,2015-10-30 11:00:00,12
-        /storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f36-47_12hr03.arl,2015-10-30 12:00:00,2015-10-30 23:00:00,12
-        /storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f48-59_12hr04.arl,2015-10-31 00:00:00,2015-10-31 11:00:00,12
-        /storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f60-71_12hr05.arl,2015-10-31 12:00:00,2015-10-31 23:00:00,12
-        /storage/NWRMC/4km/2015102900/wrfout_d3.2015102900.f72-83_12hr06.arl,2015-11-01 00:00:00,2015-11-01 11:00:00,12
-
-        $ cat /storage/NWRMC/1.33km/2015110300/arl12hrindex.csv
-        filename,start,end,interval
-        /storage/NWRMC/1.33km/2015110300/wrfout_d4.2015110200.f24-35_12hr02.arl,2015-11-03 00:00:00,2015-11-03 11:00:00,12
-        /storage/NWRMC/1.33km/2015110300/wrfout_d4.2015110300.f12-23_12hr01.arl,2015-11-03 12:00:00,2015-11-03 23:00:00,12
-        /storage/NWRMC/1.33km/2015110300/wrfout_d4.2015110300.f24-35_12hr02.arl,2015-11-04 00:00:00,2015-11-04 11:00:00,12
-        /storage/NWRMC/1.33km/2015110300/wrfout_d4.2015110300.f36-47_12hr03.arl,2015-11-04 12:00:00,2015-11-04 23:00:00,12
-        /storage/NWRMC/1.33km/2015110300/wrfout_d4.2015110300.f48-59_12hr04.arl,2015-11-05 00:00:00,2015-11-05 11:00:00,12
-
-        $ cat /storage/NWRMC/4km/2015110300/arl12hrindex.csv
-        filename,start,end,interval
-        /storage/NWRMC/4km/2015110300/wrfout_d3.2015110200.f24-35_12hr02.arl,2015-11-03 00:00:00,2015-11-03 11:00:00,12
-        /storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f12-23_12hr01.arl,2015-11-03 12:00:00,2015-11-03 23:00:00,12
-        /storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f24-35_12hr02.arl,2015-11-04 00:00:00,2015-11-04 11:00:00,12
-        /storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f36-47_12hr03.arl,2015-11-04 12:00:00,2015-11-04 23:00:00,12
-        /storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f48-59_12hr04.arl,2015-11-05 00:00:00,2015-11-05 11:00:00,12
-        /storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f60-71_12hr05.arl,2015-11-05 12:00:00,2015-11-05 23:00:00,12
-        /storage/NWRMC/4km/2015110300/wrfout_d3.2015110300.f72-83_12hr06.arl,2015-11-06 00:00:00,2015-11-06 11:00:00,12
-
-        """
-        for row in CSV2JSON(input_file=index_file)._load():
-            tw = parse_datetimes(row, 'start', 'end')
-            f = self._get_file_pathname(index_file, row['filename'])
-            if f:
-                dt = tw['start']
-                while dt <= tw['end']:
-                    if not files_per_hour.get(dt) or files_per_hour[dt] < f:
-                        files_per_hour[dt] = f
-                    dt += ONE_HOUR
-
-    def _get_file_pathname(self, index_file, name):
-        f = os.path.abspath(name)
-        if os.path.isfile(f):
-            return f
-
-        f = os.path.join(os.path.dirname(index_file), name.strip('/'))
-        if os.path.isfile(f):
-            return f
-
-        # raise ValueError("Can't find arl file {} listed in {}".format(
-        #     name, index_file))
 
     def _find_index_files(self, date_matcher):
         """Searches for index files under dir
@@ -279,3 +229,89 @@ class ArlFinder(object):
                         index_files.append(os.path.join(root, f))
         logging.debug('Found {} index files'.format(len(index_files)))
         return index_files
+
+    ##
+    ## Parsing Index Files
+    ##
+
+    def _parse_index_files(self, index_files):
+        """Iterates through arl index files, iterating each
+
+        args:
+         - index_files -- list of index file names
+        """
+        arl_files = []
+        for f in index_files:
+            #logging.debug(files_per_hour)
+            arl_files.extend(self._parse_index_file(f))
+        return arl_files
+
+    def _parse_index_file(self, files_per_hour, index_file):
+        """Parses arl index files, extracting each arl file with its start
+        hour and last our
+
+        args:
+         - files_per_hour -- lists which met file to use for each hour
+         - index_file -- pathname of index file to parse
+        """
+        arl_files = []
+        for row in CSV2JSON(input_file=index_file)._load():
+            tw = parse_datetimes(row, 'start', 'end')
+            f = self._get_file_pathname(index_file, row['filename'])
+            if f:
+                arl_files.append(dict(file=f, **tw))
+        return arl_files
+
+    def _get_file_pathname(self, index_file, name):
+        """Returns absolute pathname of arl file listed in the index file
+
+        args:
+         - index_file -- index file listing arl file
+         - name -- name of arl file, as listed in index file
+        """
+        f = os.path.abspath(name)
+        if os.path.isfile(f):
+            return f
+
+        f = os.path.join(os.path.dirname(index_file), name.strip('/'))
+        if os.path.isfile(f):
+            return f
+
+        # raise ValueError("Can't find arl file {} listed in {}".format(
+        #     name, index_file))
+
+    def _determine_files_per_hour(self, arl_files):
+        """Determines which arl file has the most recent data for each hour
+        """
+        files_per_hour = {}
+        for f_dict in arl_files:
+            dt = tw['start']
+            while dt <= tw['end']:
+                if not files_per_hour.get(dt) or files_per_hour[dt] < f:
+                    files_per_hour[dt] = f
+                dt += ONE_HOUR
+        return files_per_hour
+
+    def _determine_file_time_windows(self, files_per_hour):
+        """Determines time windows for which each arl file should be used.
+
+        Note: Assumes ...
+        """
+        files = []
+        for dt, f in sorted(files_per_hour.items(), key=lambda e: e[0]):
+            if (not files or (dt - files[-1]['last_hour']) > ONE_HOUR or
+                    files[-1]['file'] != f):
+                files.append({'file': f, 'first_hour':dt, 'last_hour': dt})
+            else:
+                files[-1]['last_hour'] = dt
+
+        files = [
+            f for f in files if
+                (f['first_hour'] >= start and f['first_hour'] <= end) or
+                (f['last_hour'] >= start and f['last_hour'] <= end)
+        ]
+
+        for f in files:
+            f["first_hour"] = f['first_hour'].isoformat()
+            f["last_hour"] = f['last_hour'].isoformat()
+        return files
