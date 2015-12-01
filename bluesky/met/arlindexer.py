@@ -18,7 +18,14 @@ __all__ = [
 ]
 
 
-class ArlIndexer(object):
+class DatetimeJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, isoformat):
+            return obj.isoformat()
+        else:
+            return super(DatetimeJSONEncoder, self).default(obj)
+
+class ArlIndexer(ArlFinder):
 
     def __init__(self, domain, met_root_dir, **config):
         """Constructor
@@ -33,42 +40,61 @@ class ArlIndexer(object):
          - index_filename_pattern -- default 'arl12hrindex.csv'
         """
         # ArlFinder takes care of making sure met_root_dir exists
-        self._arl_finder = ArlFinder(met_root_dir, **config)
+        super(ArlIndexer, self).__init__(met_root_dir, **config)
+        self._domain = domain
         self._config = config
 
+    # TODO: add '$' after date?
+    ALL_DATE_MATCHER = re.compile('.*\d{10}')
+
     def index(self):
-        self._find_index_files()
-        self._analyse()
-        self._write()
+        index_files = self._find_index_files(self.ALL_DATE_MATCHER)
+        arl_files = self._parse_index_files(index_files)
+        files_per_hour = self._determine_files_per_hour(arl_files)
+        files = self._determine_file_time_windows(files_per_hour)
+        index_data = self._analyse(files_per_hour, files)
+        self._write(index_data)
 
-    ALL_DATE_MATCHER = re.compile('\d{8}')
-    def _find_index_files(self):
-        self._index_files = self._arl_finder._find_index_files(
-            self.ALL_DATE_MATCHER)
+    ##
+    ## Reorganizing data for index
+    ##
 
-    def _analyse(self):
-        # TODO: ...
-        pass
+    def _analyse(self, files_per_hour, files):
+        # TODO: implement desired logic
+        return dict(files_per_hour, **files)
 
-    def _write(self):
+    ##
+    ## Writing results to db, file, or stdout
+    ##
+
+    def _write(self, index_data):
         if (not self._config.get('mongodb_url')
                 and not self._config.get('output_file')):
-            # TODO: use sys.stdout.write()
-            pass
-
+            sys.stdout.write(json.dumps(index_data,
+                encoder=DatetimeJSONEncoder))
         else:
-            if self._config.get('mongodb_url'):
-                self._write_to_mongodb(self._config['mongodb_url'])
-            if self._config.get('output_file'):
-                self._write_to_file(self._config['output_file'])
+            succeeded = False
 
-    def _write_to_mongodb(self, mongodb_url):
+            for k in ('mongodb_url', 'output_file'):
+                if self._config.get(k):
+                    try:
+                        m = getattr(self, '_write_to_{}'.format(k))
+                        m(self._config[k])
+                        succeeded = True
+                    except Exception, e:
+                        logging.error("Failed to write to {}: {}".format(
+                            ' '.join(k.split('_')), e.message))
+            if not succeeded:
+                raise RuntimeError("Failed to record")
+
+
+    def _write_to_mongodb_url(self, mongodb_url):
         # TODO: insert default database name to url if not already defined
         # TODO: write to db; log error, but don't fail?  or raise exception and
         #   let _write deal with it (like, if none of selected writes succeed,
         #   then raise exception, else just log error about failed write)
-        pass
+        raise NotImplementedError
 
-    def _write_to_file(self, file_name):
+    def _write_to_output_file(self, file_name):
         # TODO: write to file
-        pass
+        raise NotImplementedError
