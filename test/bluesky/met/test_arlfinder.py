@@ -67,38 +67,75 @@ class TestARLFinder(object):
         expected = [
             {
                 'file': '/storage/NWRMC/4km/2015110200/wrfout_d3.2015110100.f24-35_12hr02.arl',
-                'start': datetime.datetime(2015,11,02,00,00,00),
-                'end': datetime.datetime(2015,11,02,11,00,00)
+                'start': datetime.datetime(2015,11,2,0,0,0),
+                'end': datetime.datetime(2015,11,2,11,0,0)
             },
             {
                 'file': '/storage/NWRMC/4km/2015110200/wrfout_d3.2015110200.f12-23_12hr01.arl',
-                'start': datetime.datetime(2015,11,02,12,00,00),
-                'end': datetime.datetime(2015,11,02,23,00,00)
+                'start': datetime.datetime(2015,11,2,12,0,0),
+                'end': datetime.datetime(2015,11,2,23,0,0)
             },
             {
                 'file': '/storage/NWRMC/4km/2015110200/wrfout_d3.2015110200.f24-35_12hr02.arl',
-                'start': datetime.datetime(2015,11,03,00,00,00),
-                'end': datetime.datetime(2015,11,03,11,00,00)
+                'start': datetime.datetime(2015,11,3,0,0,0),
+                'end': datetime.datetime(2015,11,3,11,0,0)
             },
             {
                 'file': '/storage/NWRMC/4km/2015110200/wrfout_d3.2015110200.f36-47_12hr03.arl',
-                'start': datetime.datetime(2015,11,03,12,00,00),
-                'end': datetime.datetime(2015,11,03,23,00,00)
+                'start': datetime.datetime(2015,11,3,12,0,0),
+                'end': datetime.datetime(2015,11,3,23,0,0)
             },
             {
                 'file': '/storage/NWRMC/4km/2015110200/wrfout_d3.2015110200.f48-59_12hr04.arl',
-                'start': datetime.datetime(2015,11,04,00,00,00),
-                'end': datetime.datetime(2015,11,04,11,00,00)
+                'start': datetime.datetime(2015,11,4,0,0,0),
+                'end': datetime.datetime(2015,11,4,11,0,0)
             },
             {
                 'file': '/storage/NWRMC/4km/2015110200/wrfout_d3.2015110200.f60-71_12hr05.arl',
-                'start': datetime.datetime(2015,11,04,12,00,00),
-                'end': datetime.datetime(2015,11,04,23,00,00)
+                'start': datetime.datetime(2015,11,4,12,0,0),
+                'end': datetime.datetime(2015,11,4,23,0,0)
             },
             {
                 'file': '/storage/NWRMC/4km/2015110200/wrfout_d3.2015110200.f72-83_12hr06.arl',
-                'start': datetime.datetime(2015,11,05,00,00,00),
-                'end': datetime.datetime(2015,11,05,11,00,00)
+                'start': datetime.datetime(2015,11,5,0,0,0),
+                'end': datetime.datetime(2015,11,5,11,0,0)
             }
         ]
         assert expected == self.arl_finder._parse_index_file('foo')
+
+    def test_determine_files_per_hour(self):
+        arl_files = [
+            {
+                'file': 'b',
+                'start': datetime.datetime(2015,1,2,0,0,0),
+                'end': datetime.datetime(2015,1,2,3,0,0)
+            },
+            {
+                'file': 'c',
+                'start': datetime.datetime(2015,1,2,3,0,0),
+                'end': datetime.datetime(2015,1,2,5,0,0)
+            },
+            {
+                'file': 'd',
+                'start': datetime.datetime(2015,1,2,4,0,0),
+                'end':  datetime.datetime(2015,1,2,6,0,0)
+            },
+            {
+                'file': 'a',
+                'start': datetime.datetime(2015,1,1,23,0,0),
+                'end': datetime.datetime(2015,1,2,1,0,0)
+            }
+        ]
+
+        expected = {
+            datetime.datetime(2015,1,1,23,0,0): 'a',
+            datetime.datetime(2015,1,2,0,0,0): 'b',
+            datetime.datetime(2015,1,2,1,0,0): 'b',
+            datetime.datetime(2015,1,2,2,0,0): 'b',
+            datetime.datetime(2015,1,2,3,0,0): 'c',
+            datetime.datetime(2015,1,2,4,0,0): 'd',
+            datetime.datetime(2015,1,2,5,0,0): 'd',
+            datetime.datetime(2015,1,2,6,0,0): 'd'
+        }
+
+        assert expected == self.arl_finder._determine_files_per_hour(arl_files)

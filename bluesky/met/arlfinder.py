@@ -286,13 +286,17 @@ class ArlFinder(object):
 
     def _determine_files_per_hour(self, arl_files):
         """Determines which arl file has the most recent data for each hour
+
+        Note: This method assumes that the files, when listed chronolofically,
+        are also ordered alphabetically, since the pathnames should be
+        identical other than datetime information embedded in them.
         """
         files_per_hour = {}
         for f_dict in arl_files:
-            dt = tw['start']
-            while dt <= tw['end']:
-                if not files_per_hour.get(dt) or files_per_hour[dt] < f:
-                    files_per_hour[dt] = f
+            dt = f_dict['start']
+            while dt <= f_dict['end']:
+                if not files_per_hour.get(dt) or files_per_hour[dt] < f_dict['file']:
+                    files_per_hour[dt] = f_dict['file']
                 dt += ONE_HOUR
         return files_per_hour
 
