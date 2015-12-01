@@ -7,7 +7,6 @@ import json
 import logging
 import sys
 import traceback
-import tornado.ioloop
 
 from pyairfire import scripting
 
@@ -15,7 +14,6 @@ try:
     from bluesky.met import arlprofiler
 except:
     import os
-    import sys
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
     from bluesky.met import arlprofiler
