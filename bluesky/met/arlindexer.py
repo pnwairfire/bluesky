@@ -68,13 +68,13 @@ class ArlIndexer(ArlFinder):
         if start and end:
             # need to filter files and files_per_hour separately
             # because some files may cross the start and/or end times
-            logging.debug("files (BEFORE): %s", files)
-            logging.debug("files_per_hour (BEFORE): %s", files_per_hour)
+            #logging.debug("files (BEFORE): %s", files)
+            #logging.debug("files_per_hour (BEFORE): %s", files_per_hour)
             files = self._filter_files(files, start, end)
             files_per_hour = {k:v for k, v in files_per_hour.items()
                 if k >= start and k <= end}
-            logging.debug("files (AFTER): %s", files)
-            logging.debug("files_per_hour (AFTER): %s", files_per_hour)
+            #logging.debug("files (AFTER): %s", files)
+            #logging.debug("files_per_hour (AFTER): %s", files_per_hour)
         return files_per_hour, files
 
     ##
