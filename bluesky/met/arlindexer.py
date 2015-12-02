@@ -11,6 +11,7 @@ import json
 import logging
 import re
 import sys
+from collections import defaultdict
 
 from bluesky import datautils
 from .arlfinder import ArlFinder
@@ -56,8 +57,21 @@ class ArlIndexer(ArlFinder):
     ##
 
     def _analyse(self, files_per_hour, files):
-        # TODO: implement desired logic
-        return dict(files_per_hour, files=files)
+        # Note: reduce will be removed from py 3.0 standard library; though it
+        # will be available in functools, use explicit loop instead
+        dates = defaultdict(lambda: [])
+        for dt in sorted(files_per_hour.keys()):
+            dates[dt.date()].append(dt.hour)
+        complete_dates = [d for d in dates if len(dates[d]) == 24]
+        partial_dates = list(set(dates) - set(complete_dates))
+        data = {
+            'complete_dates': sorted(complete_dates),
+            'partial_dates': sorted(partial_dates),
+            'files': files
+        }
+
+        # TODO: slice and dice data in another way?
+        return {self._domain: data}
 
     ##
     ## Writing results to db, file, or stdout
