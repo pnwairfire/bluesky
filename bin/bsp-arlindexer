@@ -69,6 +69,11 @@ OPTIONAL_ARGS = [
         'short': '-p',
         'long': '--index-filename-pattern',
         'help': "index filename pattern; default 'arl12hrindex.csv'"
+    },
+    {
+        'short': '-i',
+        'long': '--ignore-pattern',
+        'help': "pattern of dirs/files to ignore; e.g. '/MOVED/'"
     }
 ]
 

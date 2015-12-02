@@ -125,6 +125,8 @@ class ArlFinder(object):
             self._index_filename_matcher.pattern)
         self._max_days_out = int(config.get("max_days_out",
             self.DEFAULT_MAX_DAYS_OUT))
+        self._ignore_matcher = (config.get('ignore_pattern')
+            and re.compile('.*{}.*'.format(config['ignore_pattern'])))
 
     def find(self, start, end):
         """finds met data spanning start/end time window
@@ -225,7 +227,8 @@ class ArlFinder(object):
         index_files = []
         for root, dirs, files in os.walk(self._met_root_dir):
             #logging.debug('Root: {}'.format(root))
-            if date_matcher.match(root):
+            if date_matcher.match(root) and (not self._ignore_matcher or
+                    not self._ignore_matcher.match(root)):
                 for f in files:
                     if self._index_filename_matcher.match(f): #(os.path.basename(f)):
                         logging.debug('found index file: {}'.format(f))
