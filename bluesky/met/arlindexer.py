@@ -8,6 +8,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import datetime
 import json
+import logging
 import re
 import sys
 
@@ -77,7 +78,7 @@ class ArlIndexer(ArlFinder):
                 if self._config.get(k):
                     try:
                         m = getattr(self, '_write_to_{}'.format(k))
-                        m(self._config[k])
+                        m(self._config[k], index_data)
                         succeeded = True
                     except Exception, e:
                         logging.error("Failed to write to {}: {}".format(
@@ -85,14 +86,13 @@ class ArlIndexer(ArlFinder):
             if not succeeded:
                 raise RuntimeError("Failed to record")
 
-
-    def _write_to_mongodb_url(self, mongodb_url):
+    def _write_to_mongodb_url(self, mongodb_url, index_data):
         # TODO: insert default database name to url if not already defined
         # TODO: write to db; log error, but don't fail?  or raise exception and
         #   let _write deal with it (like, if none of selected writes succeed,
         #   then raise exception, else just log error about failed write)
         raise NotImplementedError
 
-    def _write_to_output_file(self, file_name):
-        # TODO: write to file
-        raise NotImplementedError
+    def _write_to_output_file(self, file_name, index_data):
+        with open(file_name, 'w') as f:
+            f.write(json.dumps(index_data))
