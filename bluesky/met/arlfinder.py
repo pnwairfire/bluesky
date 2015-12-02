@@ -212,7 +212,7 @@ class ArlFinder(object):
         num_days = (end.date()-start.date()).days
         dates_to_match = [start + ONE_DAY*i
             for i in range(-self._max_days_out, num_days+1)]
-        return re.compile(".*({}).*".format(
+        return re.compile(".*({})".format(
             '|'.join([dt.strftime('%Y%m%d') for dt in dates_to_match])))
 
     def _find_index_files(self, date_matcher):
