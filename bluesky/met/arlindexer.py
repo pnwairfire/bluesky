@@ -147,11 +147,21 @@ class ArlIndexer(ArlFinder):
                 raise RuntimeError("Failed to record")
 
     def _write_to_mongodb_url(self, mongodb_url, index_data):
-        # TODO: insert default database name to url if not already defined
-        # TODO: write to db; log error, but don't fail?  or raise exception and
-        #   let _write deal with it (like, if none of selected writes succeed,
-        #   then raise exception, else just log error about failed write)
-        raise NotImplementedError
+        # TODO: come up with good strategy to replace/update existing index (since
+        #   files will be reomved, and thus need to be dissappeared from index; but
+        #   since index is accross multiple servers, we only want to replace data
+        #   representing current server).... <-- store in db under server as top key
+        #   and matain alternate hierarchies with triggers???
+        # TODO: possible data hierarchies to be stored in mongodb (possibly
+        #   maintaining some via triggers?):
+        #   - met > server > date
+        #   - met > date > server
+        #   - server > met > date
+        #   - server > date > met
+        #   - date > met > server
+        #   - date > server > met
+        server_name = self._config.get('server_name') or socket.gethostname()
+        ArlIndexDB(mongodb_url).update(server_name, self._domain, index_data)
 
     def _write_to_output_file(self, file_name, index_data):
         with open(file_name, 'w') as f:
