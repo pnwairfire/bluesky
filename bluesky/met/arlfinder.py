@@ -350,7 +350,7 @@ class ArlFinder(object):
 
     def _filter_files(self, files, start, end):
         # By this point start and end will either both be defined or not
-        if not start and not end:
+        if not (start and end):
             return files
 
         def in_tw(t):
