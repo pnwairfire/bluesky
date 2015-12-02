@@ -24,13 +24,15 @@ class ArlIndexer(ArlFinder):
         """Constructor
 
         args:
-         - domain -- Domain identifier (ex. 'DRI2km)
-         - met_root_dir -- pattern that matches index files
+         - domain -- domain identifier (ex. 'DRI2km')
+         - met_root_dir -- root directory to search under
 
         config options:
-         - mongodb_url -- format 'mongodb://[username:password@]host[:port][/[database][?options]]'"
-         - output_file --
-         - index_filename_pattern -- default 'arl12hrindex.csv'
+         - mongodb_url -- format:
+            'mongodb://[username:password@]host[:port][/[database][?options]]'"
+         - output_file -- pathname (relative of absolute) of output file to
+            save index data
+        (see ArlFinder for it's config options)
         """
         # ArlFinder takes care of making sure met_root_dir exists
         super(ArlIndexer, self).__init__(met_root_dir, **config)

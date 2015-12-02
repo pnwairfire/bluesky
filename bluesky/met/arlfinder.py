@@ -105,7 +105,13 @@ class ArlFinder(object):
 
         args:
          - met_root_dir -- restrict search to files under this dir
-         - arl_index_filename_pattern -- pattern that matches index files
+
+        config options:
+         - index_filename_pattern -- index file name pattern to search for;
+            default: 'arl12hrindex.csv'
+         - max_days_out --
+         - ignore_pattern -- path pattern to ignore when looking for arl
+            index files; e.g. '/MOVED/'
         """
         # make sure met_root_dir is an existing directory
         try:
