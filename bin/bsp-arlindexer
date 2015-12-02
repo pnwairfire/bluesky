@@ -74,6 +74,18 @@ OPTIONAL_ARGS = [
         'short': '-i',
         'long': '--ignore-pattern',
         'help': "pattern of dirs/files to ignore; e.g. '/MOVED/'"
+    },
+    {
+        'short': '-s',
+        'long': '--start',
+        'help': "Ignore all data before this time",
+        'action': scripting.args.ParseDatetimeAction
+    },
+    {
+        'short': '-e',
+        'long': '--end',
+        'help': "Ignore all data after this time",
+        'action': scripting.args.ParseDatetimeAction
     }
 ]
 
@@ -85,6 +97,8 @@ if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
     try:
+        start = args.__dict__.pop('start')
+        end = args.__dict__.pop('end')
         indexer = arlindexer.ArlIndexer(
             # Pop reqired args so that they're not passed in as 'config'
             # TODO: not really necessary, so maybe just use
@@ -92,7 +106,7 @@ if __name__ == "__main__":
             args.__dict__.pop('domain'),
             args.__dict__.pop('root_dir'),
             **args.__dict__)
-        indexer.index()
+        indexer.index(start, end)
     except Exception, e:
         logging.error(e)
         logging.debug(traceback.format_exc())

@@ -109,7 +109,7 @@ class ArlFinder(object):
         config options:
          - index_filename_pattern -- index file name pattern to search for;
             default: 'arl12hrindex.csv'
-         - max_days_out --
+         - max_days_out -- max number of days out predicted in met data
          - ignore_pattern -- path pattern to ignore when looking for arl
             index files; e.g. '/MOVED/'
         """
@@ -187,7 +187,8 @@ class ArlFinder(object):
           where 'domain' would be set to 'LatLon' if spacing is in degrees
         """
         if not start or not end:
-            raise ValueError('Start and end times must be defined to find arl data')
+            raise ValueError(
+                'Start and end times must be defined to find arl data')
 
         date_matcher = self._create_date_matcher(start, end)
         index_files = self._find_index_files(date_matcher)
@@ -203,17 +204,32 @@ class ArlFinder(object):
     ## Finding Index Files
     ##
 
+    # TODO: add '$' after date?
+    ALL_DATE_MATCHER = re.compile('.*\d{10}')
+
     def _create_date_matcher(self, start, end):
         """Returns a compiled regex object that matches %Y%m%d date strings
-        for all dates between start and end, plus 4 days prior
+        for all dates between start and end, plus N days prior.  If neither
+        start nor end is specified, all dates will be matched
 
-        The 4 days prior are included in since
+        The N days prior are included because met data timestamped with any
+        particular date actually predicts N days out, where N varies by domain.
+        The default is 4 days out, and is customizeable with this class'
+        'max_days_out' config setting.
         """
-        num_days = (end.date()-start.date()).days
-        dates_to_match = [start + ONE_DAY*i
-            for i in range(-self._max_days_out, num_days+1)]
-        return re.compile(".*({})".format(
-            '|'.join([dt.strftime('%Y%m%d') for dt in dates_to_match])))
+        # By this point start and end will either both be defined or not
+        if start and end:
+            num_days = (end.date()-start.date()).days
+            dates_to_match = [start + ONE_DAY*i
+                for i in range(-self._max_days_out, num_days+1)]
+            date_matcher = re.compile(".*({})".format(
+                '|'.join([dt.strftime('%Y%m%d') for dt in dates_to_match])))
+
+        else:
+            date_matcher = self.ALL_DATE_MATCHER
+
+        logging.debug('date matcher pattern: {}'.format(date_matcher.pattern))
+        return date_matcher
 
     def _find_index_files(self, date_matcher):
         """Searches for index files under dir
@@ -333,8 +349,13 @@ class ArlFinder(object):
     ##
 
     def _filter_files(self, files, start, end):
+        # By this point start and end will either both be defined or not
+        if not start and not end:
+            return files
+
+        def in_tw(t):
+            return t >= start and t <= end
+
         return [
-            f for f in files if
-                (f['first_hour'] >= start and f['first_hour'] <= end) or
-                (f['last_hour'] >= start and f['last_hour'] <= end)
+            f for f in files if in_tw(f['first_hour']) or in_tw(f['last_hour'])
         ]

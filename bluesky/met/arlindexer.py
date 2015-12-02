@@ -40,17 +40,63 @@ class ArlIndexer(ArlFinder):
         super(ArlIndexer, self).__init__(met_root_dir, **config)
         self._domain = domain
         self._config = config
+        # TODO: In case 'start' and/or 'end' are specified in index,
+        #   set self._max_days_out to 0 to ignore directories timestamped
+        #   before 'start'?  (prob not, since ultimately we're concerned
+        #   with the dates represented in the met files, not what's indicated
+        #   in the directory names.)
+        #self._max_days_out = 0
 
-    # TODO: add '$' after date?
-    ALL_DATE_MATCHER = re.compile('.*\d{10}')
+    def index(self, start=None, end=None):
+        """
 
-    def index(self):
-        index_files = self._find_index_files(self.ALL_DATE_MATCHER)
+        kwargs:
+         - start -- only consider met data after this date
+         - end -- only consider met data before this date
+        """
+        start, end = self._fill_in_start_end(start, end)
+        date_matcher = self._create_date_matcher(start, end)
+        index_files = self._find_index_files(date_matcher)
         arl_files = self._parse_index_files(index_files)
         files_per_hour = self._determine_files_per_hour(arl_files)
         files = self._determine_file_time_windows(files_per_hour)
+        files_per_hour, files = self._filter(files_per_hour, files, start, end)
         index_data = self._analyse(files_per_hour, files)
         self._write(index_data)
+
+    def _filter(self, files_per_hour, files, start, end):
+        if start and end:
+            # need to filter files and files_per_hour separately
+            # because some files may cross the start and/or end times
+            logging.debug("files (BEFORE): %s", files)
+            logging.debug("files_per_hour (BEFORE): %s", files_per_hour)
+            files = self._filter_files(files, start, end)
+            files_per_hour = {k:v for k, v in files_per_hour.items()
+                if k >= start and k <= end}
+            logging.debug("files (AFTER): %s", files)
+            logging.debug("files_per_hour (AFTER): %s", files_per_hour)
+        return files_per_hour, files
+
+    ##
+    ## start/end validation and filling in
+    ##
+
+    def _fill_in_start_end(self, start, end):
+        if start or end:
+            # Start can be specified without end (which would default to
+            # today), but not vice versa
+            if not start:
+                raise ValueError("End date can't be specified without start")
+            end = end or datetime.datetime.utcnow()
+            if start > end:
+                raise ValueError("'start' must be before 'end'")
+            logging.debug('start: {}'.format(start.isoformat()))
+            logging.debug('end: {}'.format(end.isoformat()))
+
+        # else: both as undefined
+
+        return start, end
+
 
     ##
     ## Reorganizing data for index
