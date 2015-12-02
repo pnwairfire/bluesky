@@ -51,6 +51,13 @@ class TestARLFinder(object):
         m = self.arl_finder._create_date_matcher(s,e)
         assert m.pattern == '.*(20141231|20150101|20150102|20150103|20150104).*'
 
+        assert ArlFinder.ALL_DATE_MATCHER == self.arl_finder._create_date_matcher(None, e)
+        assert ArlFinder.ALL_DATE_MATCHER == self.arl_finder._create_date_matcher(s, None)
+        assert ArlFinder.ALL_DATE_MATCHER == self.arl_finder._create_date_matcher(None, None)
+
+    # TODO: somehow test _find_index_files, monkeypatching os.walk, etc.
+    #   appropriately
+
     def test_parse_index_files(self, monkeypatch):
         # _parse_index_files simply concatenates the lists returned by
         # _parse_index_file
@@ -103,6 +110,9 @@ class TestARLFinder(object):
         ]
         assert expected == self.arl_finder._parse_index_file('foo')
 
+    # TODO: test _get_file_pathnam, monkeypatching os.path.abspath,
+    #    os.path.isfile, etc. appropriately
+
     def test_determine_files_per_hour(self):
         arl_files = [
             {
@@ -139,3 +149,113 @@ class TestARLFinder(object):
         }
 
         assert expected == self.arl_finder._determine_files_per_hour(arl_files)
+
+    def test_determine_file_time_windows(self):
+        files_per_hour = {
+            datetime.datetime(2015,1,1,23,0,0): 'a',
+            datetime.datetime(2015,1,2,0,0,0): 'b',
+            datetime.datetime(2015,1,2,1,0,0): 'b',
+            datetime.datetime(2015,1,2,2,0,0): 'b',
+            datetime.datetime(2015,1,2,3,0,0): 'c',
+            datetime.datetime(2015,1,2,4,0,0): 'd',
+            datetime.datetime(2015,1,2,5,0,0): 'd',
+            datetime.datetime(2015,1,2,6,0,0): 'd'
+        }
+
+        expected = [
+            {
+                'file': 'a',
+                'first_hour': datetime.datetime(2015,1,1,23,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': 'b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,2,0,0)
+            },
+            {
+                'file': 'c',
+                'first_hour': datetime.datetime(2015,1,2,3,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+            },
+            {
+                'file': 'd',
+                'first_hour': datetime.datetime(2015,1,2,4,0,0),
+                'last_hour': datetime.datetime(2015,1,2,6,0,0)
+            }
+        ]
+
+        assert expected == self.arl_finder._determine_file_time_windows(
+            files_per_hour)
+
+    def test_filter_files(self):
+        files = [
+            {
+                'file': 'a',
+                'first_hour': datetime.datetime(2015,1,1,23,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': 'b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,2,0,0)
+            },
+            {
+                'file': 'c',
+                'first_hour': datetime.datetime(2015,1,2,3,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+            },
+            {
+                'file': 'd',
+                'first_hour': datetime.datetime(2015,1,2,4,0,0),
+                'last_hour': datetime.datetime(2015,1,2,6,0,0)
+            }
+        ]
+
+        n = datetime.datetime.utcnow()
+        assert files == self.arl_finder._filter_files(files, None, None)
+        assert files == self.arl_finder._filter_files(files, n, None)
+        assert files == self.arl_finder._filter_files(files, None, n)
+
+        expected = [
+            {
+                'file': 'b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,2,0,0)
+            },
+            {
+                'file': 'c',
+                'first_hour': datetime.datetime(2015,1,2,3,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+            }
+        ]
+        assert expected == self.arl_finder._filter_files(files,
+            datetime.datetime(2015,1,2,1,0,0), datetime.datetime(2015,1,2,3,0,0))
+
+        expected = [
+            {
+                'file': 'b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,2,0,0)
+            },
+            {
+                'file': 'c',
+                'first_hour': datetime.datetime(2015,1,2,3,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+            },
+            {
+                'file': 'd',
+                'first_hour': datetime.datetime(2015,1,2,4,0,0),
+                'last_hour': datetime.datetime(2015,1,2,6,0,0)
+            }
+        ]
+        assert expected == self.arl_finder._filter_files(files,
+            datetime.datetime(2015,1,2,1,0,0),
+            datetime.datetime(2015,1,2,5,0,0))
+
+
+        assert files == self.arl_finder._filter_files(files,
+            datetime.datetime(2015,1,1,20,0,0),
+            datetime.datetime(2015,1,2,10,0,0))
+
+        # TODO: other cases ...
