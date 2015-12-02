@@ -3,6 +3,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import datetime
 from py.test import raises
 
 import numpy
@@ -508,7 +509,7 @@ class TestMultiplyNestedData(object):
         with raises(ValueError) as e:
             datautils.multiply_nested_data(1, 2)
 
-    def test_array(self):
+    def test_list(self):
         d = [1, 1.5, 'sdf']
         e = [2, 3, 'sdf']
         datautils.multiply_nested_data(d, 2)
@@ -549,3 +550,60 @@ class TestMultiplyNestedData(object):
         }
         datautils.multiply_nested_data(d, 2)
         assert d == e
+
+class TestFormatDatetimes(object):
+
+    def test_scalar(self):
+        assert 'sdf' == datautils.format_datetimes('sdf')
+        assert 1 == datautils.format_datetimes(1)
+        assert '2015-01-02T03:02:01' == datautils.format_datetimes(
+            datetime.datetime(2015, 1,2,3,2,1))
+
+    def test_list(self):
+        d = ['sdf', 1, datetime.datetime(2015, 1,2,3,2,1)]
+        e = ['sdf', 1, '2015-01-02T03:02:01']
+        # formated data is returned...
+        assert e == datautils.format_datetimes(d)
+        # ...and modified inplace as well
+        assert e == d
+
+    def test_dict(self):
+        d = {
+            'a': 'sdf',
+            datetime.datetime(2015,2,2,3,2,1): 1,
+            'c': datetime.datetime(2015,1,2,3,2,1)
+        }
+        e = {
+            'a': 'sdf',
+            '2015-02-02T03:02:01': 1,
+            'c': '2015-01-02T03:02:01'
+        }
+
+        # formated data is returned...
+        assert e == datautils.format_datetimes(d)
+        # ...and modified inplace as well
+        assert e == d
+
+    def test_multi(self):
+        d = {
+            "a": 1,
+            "b": [1.5, datetime.datetime(2015, 1,2,3,2,1)],
+            datetime.datetime(2015, 3,2,3,2,1): 'sdf',
+            "d": {
+                "e": '234',
+                "f": datetime.datetime(2015, 2,2,3,2,1)
+            }
+        }
+        e = {
+            "a": 1,
+            "b": [1.5, '2015-01-02T03:02:01'],
+            '2015-03-02T03:02:01': 'sdf',
+            "d": {
+                "e": '234',
+                "f": '2015-02-02T03:02:01'
+            }
+        }
+        # formated data is returned...
+        assert e == datautils.format_datetimes(d)
+        # ...and modified inplace as well
+        assert e == d
