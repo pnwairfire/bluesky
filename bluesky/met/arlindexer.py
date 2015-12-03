@@ -113,14 +113,18 @@ class ArlIndexer(ArlFinder):
             dates[dt.date()].append(dt.hour)
         complete_dates = [d for d in dates if len(dates[d]) == 24]
         partial_dates = list(set(dates) - set(complete_dates))
+        server_name = self._config.get('server_name') or socket.gethostname()
         data = {
+            'server': server_name,
+            'domain': self._domain,
             'complete_dates': sorted(complete_dates),
             'partial_dates': sorted(partial_dates),
+            'root_dir': self._met_root_dir,
             'files': files
         }
 
         # TODO: slice and dice data in another way?
-        return {self._domain: data}
+        return data
 
     ##
     ## Writing results to db, file, or stdout
@@ -163,7 +167,6 @@ class ArlIndexer(ArlFinder):
         #   - server > date > met
         #   - date > met > server
         #   - date > server > met
-        server_name = self._config.get('server_name') or socket.gethostname()
         ArlIndexDB(mongodb_url).update(server_name, self._domain, index_data)
 
     def _write_to_output_file(self, file_name, index_data):
