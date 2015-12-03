@@ -5,8 +5,8 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import datetime
 import tempfile
-
 import StringIO # for monkeypatching
+
 from py.test import raises
 from numpy.testing import assert_approx_equal
 

@@ -110,7 +110,63 @@ class TestARLIndexer(object):
             assert s, e == self.arl_indexer._fill_in_start_end(s, None)
 
     def test_analyse(self):
-        pass
+        files_per_hour = {
+            datetime.datetime(2015,1,1,23,0,0): 'a',
+            datetime.datetime(2015,1,2,0,0,0): 'b',
+            datetime.datetime(2015,1,2,1,0,0): 'b',
+            datetime.datetime(2015,1,2,2,0,0): 'b',
+            datetime.datetime(2015,1,2,3,0,0): 'c',
+            datetime.datetime(2015,1,2,4,0,0): 'd',
+            datetime.datetime(2015,1,2,5,0,0): 'd',
+            datetime.datetime(2015,1,2,6,0,0): 'd',
+            datetime.datetime(2015,1,2,7,0,0): 'd',
+            datetime.datetime(2015,1,2,8,0,0): 'd',
+            datetime.datetime(2015,1,2,9,0,0): 'd',
+            datetime.datetime(2015,1,2,10,0,0): 'd',
+            datetime.datetime(2015,1,2,11,0,0): 'd',
+            datetime.datetime(2015,1,2,12,0,0): 'd',
+            datetime.datetime(2015,1,2,13,0,0): 'd',
+            datetime.datetime(2015,1,2,14,0,0): 'd',
+            datetime.datetime(2015,1,2,15,0,0): 'd',
+            datetime.datetime(2015,1,2,16,0,0): 'd',
+            datetime.datetime(2015,1,2,17,0,0): 'd',
+            datetime.datetime(2015,1,2,18,0,0): 'd',
+            datetime.datetime(2015,1,2,19,0,0): 'd',
+            datetime.datetime(2015,1,2,20,0,0): 'd',
+            datetime.datetime(2015,1,2,21,0,0): 'd',
+            datetime.datetime(2015,1,2,22,0,0): 'd',
+            datetime.datetime(2015,1,2,23,0,0): 'd'
+        }
+
+        files = [
+            {
+                'file': 'a',
+                'first_hour': datetime.datetime(2015,1,1,23,0,0),
+                'last_hour': datetime.datetime(2015,1,1,23,0,0)
+            },
+            {
+                'file': 'b',
+                'first_hour': datetime.datetime(2015,1,2,0,0,0),
+                'last_hour': datetime.datetime(2015,1,2,2,0,0)
+            },
+            {
+                'file': 'c',
+                'first_hour': datetime.datetime(2015,1,2,3,0,0),
+                'last_hour': datetime.datetime(2015,1,2,3,0,0)
+            },
+            {
+                'file': 'd',
+                'first_hour': datetime.datetime(2015,1,2,4,0,0),
+                'last_hour': datetime.datetime(2015,1,2,23,0,0)
+            }
+        ]
+
+        expected = {
+            'complete_dates': [datetime.date(2015,1,2)],
+            'partial_dates': [datetime.date(2015,1,1)],
+            'root_dir': self.arl_indexer._met_root_dir,
+            'files': files
+        }
 
     # TODO: test _write
     # TODO: test _write_to_mongodb_url
