@@ -45,15 +45,15 @@ class TestARLFinder(object):
         s = datetime.datetime(2015, 1, 1, 14)
         e = datetime.datetime(2015, 1, 4, 2)
         m = self.arl_finder._create_date_matcher(s,e)
-        assert m.pattern == '.*(20141228|20141229|20141230|20141231|20150101|20150102|20150103|20150104).*'
+        assert m.pattern == '.*(20141228|20141229|20141230|20141231|20150101|20150102|20150103|20150104)'
 
         self.arl_finder._max_days_out = 1
         m = self.arl_finder._create_date_matcher(s,e)
-        assert m.pattern == '.*(20141231|20150101|20150102|20150103|20150104).*'
+        assert m.pattern == '.*(20141231|20150101|20150102|20150103|20150104)'
 
-        assert ArlFinder.ALL_DATE_MATCHER == self.arl_finder._create_date_matcher(None, e)
-        assert ArlFinder.ALL_DATE_MATCHER == self.arl_finder._create_date_matcher(s, None)
-        assert ArlFinder.ALL_DATE_MATCHER == self.arl_finder._create_date_matcher(None, None)
+        assert arlfinder.ArlFinder.ALL_DATE_MATCHER == self.arl_finder._create_date_matcher(None, e)
+        assert arlfinder.ArlFinder.ALL_DATE_MATCHER == self.arl_finder._create_date_matcher(s, None)
+        assert arlfinder.ArlFinder.ALL_DATE_MATCHER == self.arl_finder._create_date_matcher(None, None)
 
     # TODO: somehow test _find_index_files, monkeypatching os.walk, etc.
     #   appropriately
