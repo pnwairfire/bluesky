@@ -61,10 +61,11 @@ OPTIONAL_ARGS = [
         'long': '--end',
         'help': "Ignore all data after this time",
         'action': scripting.args.ParseDatetimeAction
+    },
+    {
+        'long': '--server-name',
+        'help': "name to identify server in index data"
     }
-    # TODO: option to set server name/identifier (default to whatever 'uname'
-    #   returns? or is there a some python module for returning data)....or maybe
-    #   make this a required arg (or required when storing in mongodb)
     # TODO: option to query mongodb instead of update it...or should
     #   that be in a different script ???
 ]
