@@ -10,14 +10,19 @@ import datetime
 import json
 import logging
 import re
+import socket
 import sys
 from collections import defaultdict
+
+import pymongo
 
 from bluesky import datautils
 from .arlfinder import ArlFinder
 
 __all__ = [
-    'ArlIndexer'
+    'ArlIndexer',
+    'MetFilesCollection',
+    'MetDatesCollection'
 ]
 
 class ArlIndexer(ArlFinder):
@@ -172,3 +177,105 @@ class ArlIndexer(ArlFinder):
     def _write_to_output_file(self, file_name, index_data):
         with open(file_name, 'w') as f:
             f.write(json.dumps(index_data))
+
+
+class ArlIndexDB(object):
+    DB_NAME_EXTRACTOR_RE = re.compile('/([^/]*)$')
+    DEFAULT_DB_NAME = 'arlindex'
+
+    def __init__(self, mongodb_url='localhost'):
+        """Constructor:
+
+        args
+         - mongodb_url -- mongodb url
+            format 'mongodb://[username:password@]host[:port][/[database][?options]]'"
+        """
+        # TODO: insert default database name to url if not already defined
+        db_name = self.DB_NAME_EXTRACTOR_RE.search(MONGO_URI).group(1)
+        if not db_name:
+            db_name = self.DEFAULT_DB_NAME
+            mongodb_url = os.path.join(mongodb_url, db_name)
+        logging.debug('mongodb url: %s', mongodb_url)
+        logging.debug('db name: %s', db_name)
+        self.client = pymongo.MongoClient(mongodb_url)
+        self.db = self.client[db_name]
+        # 'met_files' collection list available met files per server per domain
+        self.met_files = self.client[db_name]['met_files']
+        self.dates = self.client[db_name]['dates']
+
+    def _ensure_indices(self):
+        # handle 'INDEXED_FIELDS' not being defined for a collection
+        fields = getattr(self, 'INDEXED_FIELDS', [])
+        for f in fields:
+            self.status_logs_collection.ensure_index(f)
+
+class MetFilesCollection(ArlIndexDB):
+
+    INDEXED_FIELDS = ['server', 'domain']
+
+    # TODO: mplement init to call self._ensure_indices ?
+    # def __init__(self, mongodb_url='localhost'):
+    #     super(MetFilesCollection, self).__init__(mongodb_url)
+    #     self._ensure_indices
+
+    def update(self, index_data):
+        if not index_data.get('server') or not index_data.get('domain'):
+            raise ValueError("Index data must define 'server' and 'domain'")
+
+        self._ensure_indices()  # TODO: call this in the init?
+
+        # we want to update or insert
+        query = {'server': index_data['server'], 'domain': index_data['domain']}
+        self.met_files.update(query, index_data, upsert=True)
+
+    def find(self, filter=query):
+        return self.met_files.find(query)
+
+class MetDatesCollection(ArlIndexDB):
+
+    INDEXED_FIELDS = ['domain']
+
+    # TODO: mplement init to call self._ensure_indices ?
+    # def __init__(self, mongodb_url='localhost'):
+    #     super(MetDatesCollection, self).__init__(mongodb_url)
+    #     self._ensure_indices
+
+    # TODO: build aggregation into the db as a trigger
+    def compute(self):
+        dates_by_domain = defaultdict(lambda: defaultdict(lambda: []))
+        for d in self.met_files.find():
+            dates_by_domain[d['domain']]['complete_dates'].extends(
+                d['complete_dates'])
+            dates_by_domain[d['domain']]['partial_dates'].extends(
+                d['partial_dates'])
+
+        # iterate through domains, removing from partial_dates any dates
+        # that are in complete_dates, and create record for domain
+        to_save = []
+        for domain, data in dates_by_domain.items():
+            partial_dates = list(
+                set(data['partial_dates']) - set(data['complete_dates']))
+            to_save.append({
+                'domain': domain,
+                'complete_dates': data['complete_dates'],
+                'partial_dates': partial_dates
+            })
+        return to_save
+
+    def compute_and_save(self):
+        to_save = self.compute()
+        self._ensure_indices()  # TODO: call this in the init?
+        # TODO: is there a way to do a bulk write, opting for upsert
+        #  on each item in to_save?
+        for d in to_save:
+            self.dates.update({'domain': d['domain']}, d, upsert=True)
+        return to_save
+
+    def find(self, domain=None):
+        """Find available dates, by domain or across all dates
+
+        ex.
+         > MetDatesCollection
+        """
+        query = {'domain': domain} if domain else {}
+        return self.dates.find(filter=query)
