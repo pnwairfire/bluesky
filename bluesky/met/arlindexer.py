@@ -81,15 +81,18 @@ class ArlIndexer(ArlFinder):
     ## start/end validation and filling in
     ##
 
+    # Error messages defined as constants in part for testing purposes
+    END_WITHOUT_START_ERR_MSG = "End datetime can't be specified without start"
+    START_AFTER_END_ERR_MSG = "Start datetime must be before end"
     def _fill_in_start_end(self, start, end):
         if start or end:
             # Start can be specified without end (which would default to
             # today), but not vice versa
             if not start:
-                raise ValueError("End date can't be specified without start")
+                raise ValueError(self.END_WITHOUT_START_ERR_MSG)
             end = end or datetime.datetime.utcnow()
             if start > end:
-                raise ValueError("'start' must be before 'end'")
+                raise ValueError(self.START_AFTER_END_ERR_MSG)
             logging.debug('start: {}'.format(start.isoformat()))
             logging.debug('end: {}'.format(end.isoformat()))
 

@@ -93,7 +93,7 @@ class TestARLIndexer(object):
         e = datetime.datetime.utcnow()
         with raises(ValueError) as e_info:
             self.arl_indexer._fill_in_start_end(s, e)
-        assert arlindexer.ArlIndexer.END_WTHOUT_START_ERR_MSG == e_info.value.message
+        assert arlindexer.ArlIndexer.END_WITHOUT_START_ERR_MSG == e_info.value.message
 
         # case where start is after end (invalid); exception raised
         s = e + datetime.timedelta(1)
