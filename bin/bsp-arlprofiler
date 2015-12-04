@@ -65,6 +65,18 @@ REQUIRED_ARGS = [
         'type': float
     },
     {
+        'short': '-s',
+        'long': '--start',
+        'help': "start of time window to profile (local time)",
+        'action': scripting.args.ParseDatetimeAction
+    },
+    {
+        'short': '-e',
+        'long': '--end',
+        'help': "end of time window to profile (local time)",
+        'action': scripting.args.ParseDatetimeAction
+    },
+    {
         'short': '-o',
         'long': '--utc-offset',
         'dest': 'utc_offset',
@@ -72,8 +84,8 @@ REQUIRED_ARGS = [
         'action': 'store',
         'type': float
     }
-
 ]
+
 OPTIONAL_ARGS = [
     {
         'short': '-p',
@@ -103,11 +115,11 @@ Examples:
      bsp-arlprofiler \\
      -f "/DRI_6km/2014052912/wrfout_d2.2014052912.f00-11_12hr01.arl;2014-05-29T12:00:00;2014-05-29T23:00:00" \\
      -f "/DRI_6km/2014053000/wrfout_d2.2014053000.f00-11_12hr01.arl;2014-05-30T00:00:00;2014-05-30T11:00:00" \\
-     -l 37 -g -121 -o -8
+     -l 37 -g -121 -o -8 -s 2014-05-29T12:00:00 -e 2014-05-30T00:00:00
   $ PATH=~/path/to/profile/exe/dir/:$PATH \\
      bsp-arlprofiler  \\
      -f "/DRI_6km/2014053000/wrfout_d2.2014053000.f00-11_12hr01.arl;2014-05-30T00:00:00;2014-05-30T11:00:00" \\
-     -l 37 -g -121 -o -8 -t 2
+     -l 37 -g -121 -o -8 -t 2 -s 2014-05-30T00:00:00 -e 2014-05-30T02:00:00
  """
 
 if __name__ == "__main__":
@@ -116,8 +128,8 @@ if __name__ == "__main__":
     try:
         profiler = arlprofiler.ArlProfiler(args.met_files,
             profile_exe=args.profile_exe)
-        arl_profile = profiler.profile(args.lat, args.lng, args.utc_offset,
-            time_step=args.time_step)
+        arl_profile = profiler.profile(args.lat, args.lng, args.start,
+            arts.end, args.utc_offset, time_step=args.time_step)
         sys.stdout.write(json.dumps(arl_profile))
     except Exception, e:
         logging.error(e)
