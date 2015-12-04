@@ -241,7 +241,10 @@ class MetFilesCollection(ArlIndexDB):
         self.met_files.update(query, index_data, upsert=True)
 
     def find(self, **query):
-        return self.met_files.find(filter=query)
+        """Find available files, by server and domain
+        """
+        r = self.met_files.find(filter=query)
+        return [e.pop('_id') and e for e in r]
 
 class MetDatesCollection(ArlIndexDB):
 
@@ -283,9 +286,8 @@ class MetDatesCollection(ArlIndexDB):
 
     def find(self, domain=None):
         """Find available dates, by domain or across all dates
-
-        ex.
-         > MetDatesCollection
         """
         query = {'domain': domain} if domain else {}
-        return self.dates.find(filter=query)
+        r = self.dates.find(filter=query)
+        return [e.pop('_id') and e for e in r]
+

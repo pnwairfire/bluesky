@@ -3,7 +3,9 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2015, AirFire, PNW, USFS"
 
+import json
 import logging
+import sys
 import traceback
 
 from pyairfire import scripting
@@ -12,20 +14,19 @@ try:
     from bluesky.met import arlindexer
 except:
     import os
-    import sys
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
     from bluesky.met import arlindexer
 
-REQUIRED_ARGS = [
+REQUIRED_ARGS = []
+
+OPTIONAL_ARGS = [
     {
         'short': '-m',
         'long': '--mongodb-url',
-        'help': "mongodb url: format 'mongodb://[username:password@]host[:port][/[database][?options]]'"
-    }
-]
-
-OPTIONAL_ARGS = [
+        'help': "mongodb url: format 'mongodb://[username:password@]host[:port][/[database][?options]]'",
+        'default': 'mongodb://localhost'
+    },
     {
         'short': '-q',
         'long': '--query',
@@ -45,9 +46,9 @@ if __name__ == "__main__":
         epilog=EXAMPLES_STR)
 
     try:
-        files = arlindexer.MetFilesCollection.find(**args.query)
-        dates = arlindexer.MetDatesCollection.find(**args.query)
-        sys.write(json.dumps({
+        files = arlindexer.MetFilesCollection(args.mongodb_url).find(**args.query)
+        dates = arlindexer.MetDatesCollection(args.mongodb_url).find(**args.query)
+        sys.stdout.write(json.dumps({
            'files': files,
            'dates': dates
         }))
