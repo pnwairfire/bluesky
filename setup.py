@@ -13,7 +13,11 @@ setup(
     author_email='jdubowy@gmail.com',
     packages=find_packages(),
     scripts=[
-        'bin/bsp'
+        'bin/bsp',
+        'bin/bsp-arlindexer',
+        'bin/bsp-arlprofiler',
+        'bin/bsp-arlquery',
+        'bin/bsp-csv2json'
     ],
     package_data={
         # TODO: not sure how to specify package data for nested package.
