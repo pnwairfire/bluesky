@@ -254,9 +254,9 @@ class MetDatesCollection(ArlIndexDB):
     def compute(self):
         dates_by_domain = defaultdict(lambda: defaultdict(lambda: []))
         for d in self.met_files.find():
-            dates_by_domain[d['domain']]['complete_dates'].extends(
+            dates_by_domain[d['domain']]['complete_dates'].extend(
                 d['complete_dates'])
-            dates_by_domain[d['domain']]['partial_dates'].extends(
+            dates_by_domain[d['domain']]['partial_dates'].extend(
                 d['partial_dates'])
 
         # iterate through domains, removing from partial_dates any dates
