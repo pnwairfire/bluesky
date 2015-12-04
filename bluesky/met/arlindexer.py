@@ -68,6 +68,9 @@ class ArlIndexer(ArlFinder):
         files = self._determine_file_time_windows(files_per_hour)
         files_per_hour, files = self._filter(files_per_hour, files, start, end)
         index_data = self._analyse(files_per_hour, files)
+        # TODO: if there's a way to get domain boundaries, do it here.
+        #   (it can change, so would need ot get boundaries for each set
+        #   of met files....probably too much pain to be worth it)
         self._write(index_data)
 
     def _filter(self, files_per_hour, files, start, end):
