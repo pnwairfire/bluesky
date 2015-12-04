@@ -129,7 +129,7 @@ if __name__ == "__main__":
         profiler = arlprofiler.ArlProfiler(args.met_files,
             profile_exe=args.profile_exe)
         arl_profile = profiler.profile(args.lat, args.lng, args.start,
-            arts.end, args.utc_offset, time_step=args.time_step)
+            args.end, args.utc_offset, time_step=args.time_step)
         sys.stdout.write(json.dumps(arl_profile))
     except Exception, e:
         logging.error(e)
