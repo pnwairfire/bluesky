@@ -163,20 +163,18 @@ class ArlIndexer(ArlFinder):
                 raise RuntimeError("Failed to record")
 
     def _write_to_mongodb_url(self, mongodb_url, index_data):
-        # TODO: come up with good strategy to replace/update existing index (since
-        #   files will be reomved, and thus need to be dissappeared from index; but
-        #   since index is accross multiple servers, we only want to replace data
-        #   representing current server).... <-- store in db under server as top key
-        #   and matain alternate hierarchies with triggers???
-        # TODO: possible data hierarchies to be stored in mongodb (possibly
-        #   maintaining some via triggers?):
+        MetFilesCollection(mongodb_url).update(index_data)
+        # TODO: instead of manually invoking update of dates collection
+        #   here, use a trigger or have MetFilesCollection.update invoke it
+        MetDatesCollection(mongodb_url).compute_and_save()
+        # TODO: other hierarchies to be stored in mongodb (possibly
+        #   maintained via triggers?):
         #   - met > server > date
         #   - met > date > server
         #   - server > met > date
         #   - server > date > met
         #   - date > met > server
         #   - date > server > met
-        MetFilesCollection(mongodb_url).update(index_data)
 
     def _write_to_output_file(self, file_name, index_data):
         with open(file_name, 'w') as f:
