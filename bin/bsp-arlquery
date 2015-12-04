@@ -1,0 +1,58 @@
+#! /usr/bin/env python
+
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2015, AirFire, PNW, USFS"
+
+import logging
+import traceback
+
+from pyairfire import scripting
+
+try:
+    from bluesky.met import arlindexer
+except:
+    import os
+    import sys
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
+    sys.path.insert(0, root_dir)
+    from bluesky.met import arlindexer
+
+REQUIRED_ARGS = [
+    {
+        'short': '-m',
+        'long': '--mongodb-url',
+        'help': "mongodb url: format 'mongodb://[username:password@]host[:port][/[database][?options]]'"
+    }
+]
+
+OPTIONAL_ARGS = [
+    {
+        'short': '-q',
+        'long': '--query',
+        'help': "query",
+        'action': scripting.args.ExtractAndSetKeyValueAction,
+        'default': {}
+    }
+]
+
+EXAMPLES_STR = """Examples:
+  $ bsp-arlquery -m mongodb://localhost:27017/arlindex
+  $ bsp-arlqyert -m mongodb://localhost:27017/arlindex -q domain=DRI2km
+ """
+
+if __name__ == "__main__":
+    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+        epilog=EXAMPLES_STR)
+
+    try:
+        files = arlindexer.MetFilesCollection.find(**args.query)
+        dates = arlindexer.MetDatesCollection.find(**args.query)
+        sys.write(json.dumps({
+           'files': files,
+           'dates': dates
+        }))
+
+    except Exception, e:
+        logging.error(e)
+        logging.debug(traceback.format_exc())
+        scripting.utils.exit_with_msg(e)
