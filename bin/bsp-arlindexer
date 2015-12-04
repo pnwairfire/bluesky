@@ -69,7 +69,10 @@ OPTIONAL_ARGS = [
     }
 ]
 
-EXAMPLES_STR = """Examples:
+EXAMPLES_STR = """This script updates the arl index with the availability of
+a particular domain on the current server.
+
+Examples:
   $ bsp-arlindexer -d DRI2km -r /DRI_6km/
   $ bsp-arlindexer -d DRI2km -r /DRI_6km/ \\
       -m mongodb://localhost:27017/arlindex
@@ -90,7 +93,6 @@ if __name__ == "__main__":
             args.__dict__.pop('root_dir'),
             **args.__dict__)
         indexer.index(start, end)
-        # TODO: call MetDatesCollection().compute_and_sace here
 
     except Exception, e:
         logging.error(e)

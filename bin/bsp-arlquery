@@ -36,7 +36,10 @@ OPTIONAL_ARGS = [
     }
 ]
 
-EXAMPLES_STR = """Examples:
+EXAMPLES_STR = """This script queries the arl index for the availability
+of arl files and the dates represented by them.
+
+Examples:
   $ bsp-arlquery -m mongodb://localhost:27017/arlindex
   $ bsp-arlqyert -m mongodb://localhost:27017/arlindex -q domain=DRI2km
  """
