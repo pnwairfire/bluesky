@@ -9,6 +9,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 import datetime
 import json
 import logging
+import os
 import re
 import socket
 import sys
