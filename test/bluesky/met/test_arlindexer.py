@@ -171,3 +171,74 @@ class TestARLIndexer(object):
     # TODO: test _write
     # TODO: test _write_to_mongodb_url
     # TODO: test _write_to_output_file
+
+
+class TestArlIndexDB(object):
+
+    def test_parse_mongodb_url(self):
+        # aliases to make code less verbose
+        call = arlindexer.ArlIndexDB._parse_mongodb_url
+        invalid_error_msg = arlindexer.ArlIndexDB.INVALID_MONGODB_URL_ERR_MSG
+        default_db = arlindexer.ArlIndexDB.DEFAULT_DB_NAME
+        # mongodb url format: "mongodb://[username:password@]host[:port][/[database][?options]]"
+
+        with raises(ValueError) as e_info:
+            call("localhost")
+        assert e_info.value.message == invalid_error_msg
+
+        with raises(ValueError) as e_info:
+            call("sdfmongodb://localhost")
+        assert e_info.value.message == invalid_error_msg
+
+        with raises(ValueError) as e_info:
+            call("mongodb://:sdf@localhost")
+        assert e_info.value.message == invalid_error_msg
+
+        ## using default db name
+
+        e = ("mongodb://localhost/{}".format(default_db), default_db)
+        assert e == call("mongodb://localhost")
+        assert e == call("mongodb://localhost/")
+
+        e = ("mongodb://foo:bar@localhost/{}".format(default_db), default_db)
+        assert e == call("mongodb://foo:bar@localhost")
+        assert e == call("mongodb://foo:bar@localhost/")
+
+        e = ("mongodb://localhost:2222/{}".format(default_db), default_db)
+        assert e == call("mongodb://localhost:2222")
+        assert e == call("mongodb://localhost:2222/")
+
+        e = ("mongodb://localhost/{}?foo=bar".format(default_db), default_db)
+        assert e == call("mongodb://localhost?foo=bar")
+        assert e == call("mongodb://localhost/?foo=bar")
+
+        e = ("mongodb://u:p@localhost:2323/{}?foo=bar".format(default_db), default_db)
+        assert e == call("mongodb://u:p@localhost:2323?foo=bar")
+        assert e == call("mongodb://u:p@localhost:2323/?foo=bar")
+
+        ## custom db name
+
+        e = ("mongodb://localhost/sdf", "sdf")
+        assert e == call("mongodb://localhost/sdf")
+        e = ("mongodb://localhost/sdf/", "sdf")
+        assert e == call("mongodb://localhost/sdf/")
+
+        e = ("mongodb://foo:bar@localhost/sdf", "sdf")
+        assert e == call("mongodb://foo:bar@localhost/sdf")
+        e = ("mongodb://foo:bar@localhost/sdf/", "sdf")
+        assert e == call("mongodb://foo:bar@localhost/sdf/")
+
+        e = ("mongodb://localhost:2000/sdf", "sdf")
+        assert e == call("mongodb://localhost:2000/sdf")
+        e = ("mongodb://localhost:2000/sdf/", "sdf")
+        assert e == call("mongodb://localhost:2000/sdf/")
+
+        e = ("mongodb://localhost/sdf?foo=bar", "sdf")
+        assert e == call("mongodb://localhost/sdf?foo=bar")
+        e = ("mongodb://localhost/sdf/?foo=bar", "sdf")
+        assert e == call("mongodb://localhost/sdf/?foo=bar")
+
+        e = ("mongodb://u:p@localhost:34343/sdf?foo=bar", "sdf")
+        assert e == call("mongodb://u:p@localhost:34343/sdf?foo=bar")
+        e = ("mongodb://u:p@localhost:34343/sdf/?foo=bar", "sdf")
+        assert e == call("mongodb://u:p@localhost:34343/sdf/?foo=bar")

@@ -182,7 +182,7 @@ class ArlIndexer(ArlFinder):
 
 
 class ArlIndexDB(object):
-    DB_NAME_EXTRACTOR_RE = re.compile('/([^/]*)$')
+
     DEFAULT_DB_NAME = 'arlindex'
 
     def __init__(self, mongodb_url='localhost'):
@@ -194,15 +194,7 @@ class ArlIndexDB(object):
         """
         # TODO: raise exception if self.__class__.__name__ == 'ArlIndexDB' ???
 
-        # insert default database name to url if not already defined
-        m = self.DB_NAME_EXTRACTOR_RE.search(mongodb_url)
-        if m and m.group(1):
-            db_name = m.group(1)
-        else:
-            db_name = self.DEFAULT_DB_NAME
-            mongodb_url = os.path.join(mongodb_url, db_name)
-        logging.debug('mongodb url: %s', mongodb_url)
-        logging.debug('db name: %s', db_name)
+        mongodb_url, db_name = self._parse_mongodb_url(mongodb_url)
 
         self.client = pymongo.MongoClient(mongodb_url)
         self.db = self.client[db_name]
@@ -217,6 +209,37 @@ class ArlIndexDB(object):
         # TODO: call _ensure_indices here?
         # self._ensure_indices(self.met_files)
         # self._ensure_indices(self.dates)
+
+    MONGODB_URL_MATCHER = re.compile(
+        "^mongodb://((?P<username>[^:/]+):(?P<password>[^:/]+)@)?"
+        "(?P<host>[^/@]+)(:(?P<port>[0-9]+))?(/(?P<db_name>[^?/]+)?)?"
+        "/?(\?(?P<query_string>.+)?)?$")
+    INVALID_MONGODB_URL_ERR_MSG = "Invalid mongodb url"
+    @classmethod
+    def _parse_mongodb_url(cls, mongodb_url):
+        """Parses db name out of mongodb url and sets db name if not defined
+        in the url.
+
+        Implemented as a classmethod in part for testability
+        TODO: implement at module level function?  maybe move to pyairfire?
+        """
+        # insert default database name to url if not already defined
+        m = cls.MONGODB_URL_MATCHER.match(mongodb_url)
+        if not m:
+            raise ValueError(cls.INVALID_MONGODB_URL_ERR_MSG)
+
+        db_name = m.group('db_name')
+        if not db_name:
+            db_name = cls.DEFAULT_DB_NAME
+            # Hacky but simple way to insert db_name
+            parts = mongodb_url.split('?')
+            mongodb_url = os.path.join(parts[0], db_name)
+            if len(parts) > 1:
+                mongodb_url = '?'.join([mongodb_url] + parts[1:])
+        logging.debug('mongodb url: %s', mongodb_url)
+        logging.debug('db name: %s', db_name)
+
+        return mongodb_url, db_name
 
     def _ensure_indices(self, collection):
         # handle 'INDEXED_FIELDS' not being defined for a collection
