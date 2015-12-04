@@ -183,9 +183,7 @@ class ArlIndexer(ArlFinder):
 
 class ArlIndexDB(object):
 
-    DEFAULT_DB_NAME = 'arlindex'
-
-    def __init__(self, mongodb_url='localhost'):
+    def __init__(self, mongodb_url=None):
         """Constructor:
 
         args
@@ -210,6 +208,8 @@ class ArlIndexDB(object):
         # self._ensure_indices(self.met_files)
         # self._ensure_indices(self.dates)
 
+    DEFAULT_DB_NAME = 'arlindex'
+    DEFAULT_DB_URL = 'mongodb://localhost/{}'.format(DEFAULT_DB_NAME)
     MONGODB_URL_MATCHER = re.compile(
         "^mongodb://((?P<username>[^:/]+):(?P<password>[^:/]+)@)?"
         "(?P<host>[^/@]+)(:(?P<port>[0-9]+))?(/(?P<db_name>[^?/]+)?)?"
@@ -223,21 +223,26 @@ class ArlIndexDB(object):
         Implemented as a classmethod in part for testability
         TODO: implement at module level function?  maybe move to pyairfire?
         """
-        # insert default database name to url if not already defined
-        m = cls.MONGODB_URL_MATCHER.match(mongodb_url)
-        if not m:
-            raise ValueError(cls.INVALID_MONGODB_URL_ERR_MSG)
-
-        db_name = m.group('db_name')
-        if not db_name:
+        if not mongodb_url:
+            mongodb_url = cls.DEFAULT_DB_URL
             db_name = cls.DEFAULT_DB_NAME
-            # Hacky but simple way to insert db_name
-            parts = mongodb_url.split('?')
-            mongodb_url = os.path.join(parts[0], db_name)
-            if len(parts) > 1:
-                mongodb_url = '?'.join([mongodb_url] + parts[1:])
-        logging.debug('mongodb url: %s', mongodb_url)
-        logging.debug('db name: %s', db_name)
+
+        else:
+            # insert default database name to url if not already defined
+            m = cls.MONGODB_URL_MATCHER.match(mongodb_url)
+            if not m:
+                raise ValueError(cls.INVALID_MONGODB_URL_ERR_MSG)
+
+            db_name = m.group('db_name')
+            if not db_name:
+                db_name = cls.DEFAULT_DB_NAME
+                # Hacky but simple way to insert db_name
+                parts = mongodb_url.split('?')
+                mongodb_url = os.path.join(parts[0], db_name)
+                if len(parts) > 1:
+                    mongodb_url = '?'.join([mongodb_url] + parts[1:])
+            logging.debug('mongodb url: %s', mongodb_url)
+            logging.debug('db name: %s', db_name)
 
         return mongodb_url, db_name
 
