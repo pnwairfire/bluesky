@@ -23,8 +23,8 @@ from pyairfire.datetime import parsing as datetime_parsing
 from bluesky.datetimeutils import parse_utc_offset
 from bluesky.models.fires import Fire
 import hysplit_utils
-import defaults
 
+from . import defaults
 from .. import DispersionBase, working_dir
 
 __all__ = [
@@ -54,15 +54,10 @@ class HYSPLITDispersion(DispersionBase):
         'MPI': "mpiexec",
         'HYSPLIT2NETCDF': "hysplit2netcdf"
     }
+    DEFAULTS = defaults
 
     PHASES = ['flaming', 'smoldering', 'residual']
     TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
-
-    def config(self, key):
-        # check if key is defined, in order, a) in the config as is, b) in
-        # the config as lower case, c) in the hardcoded defaults
-        return self._config.get(key,
-            self._config.get(key.lower(), getattr(defaults, key, None)))
 
     def run(self, fires, start, num_hours, dest_dir, output_dir_name):
         """Runs hysplit

@@ -26,6 +26,14 @@ class DispersionBase(object):
 
     __metaclass__ = abc.ABCMeta
 
+    # 'BINARIES' dict should be defined by each subclass which depend on
+    # external binaries
+    BINARIES = {}
+
+    # 'DEFAULTS' object should be defined by each subclass that has default
+    # configuration settings (such as in a defaults module)
+    DEFAULTS = None
+
     def __init__(self, met_info, **config):
         self._set_met_info(copy.deepcopy(met_info))
         self._config = config
@@ -35,6 +43,13 @@ class DispersionBase(object):
         # TODO: define and call method (which should rely on constant defined
         #   in model-specific classes) which makes sure all required config
         #   options are defined
+
+    def config(self, key):
+        # check if key is defined, in order, a) in the config as is, b) in
+        # the config as lower case, c) in the hardcoded defaults
+        return self._config.get(key,
+            self._config.get(key.lower(),
+                getattr(self.DEFAULTS, key, None)))
 
     @abc.abstractmethod
     def run(self, fires, start, num_hours, dest_dir, output_dir_name):
