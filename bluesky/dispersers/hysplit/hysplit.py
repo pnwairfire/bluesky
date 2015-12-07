@@ -32,13 +32,6 @@ __all__ = [
     'HYSPLITDispersion'
 ]
 
-HYSPLIT_BINARY = "hycs_std"
-HYSPLIT_MPI_BINARY = "hycm_std"
-NCEA_EXECUTABLE = "ncea"
-NCKS_EXECUTABLE = "ncks"
-MPIEXEC = "mpiexec"
-HYSPLIT2NETCDF_BINARY = "hysplit2netcdf"
-
 # Note: HYSPLIT can accept concentrations in any units, but for
 # consistency with CALPUFF and other dispersion models, we convert to
 # grams in the emissions file.
@@ -52,6 +45,14 @@ class HYSPLITDispersion(DispersionBase):
 
     HYSPLIT Concentration model version 4.9
     """
+    BINARIES = {
+        'HYSPLIT': "hycs_std",
+        'HYSPLIT_MPI': "hycm_std",
+        'NCEA': "ncea",
+        'NCKS': "ncks",
+        'MPI': "mpiexec",
+        'HYSPLIT2NETCDF': "hysplit2netcdf"
+    }
 
     PHASES = ['flaming', 'smoldering', 'residual']
     TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
@@ -393,12 +394,12 @@ class HYSPLITDispersion(DispersionBase):
         ncea_args = ["-O","-v","PM25","-y","ttl"]
         ncea_args.extend(["%d/%s" % (i, self.OUTPUT_FILE_NAME) for i in  xrange(num_processes)])
         ncea_args.append(output_file)
-        self._execute(NCEA_EXECUTABLE, *ncea_args, working_dir=working_dir)
+        self._execute(self.BINARIES['NCEA'], *ncea_args, working_dir=working_dir)
 
         ncks_args = ["-A","-v","TFLAG"]
         ncks_args.append("0/%s" % (self.OUTPUT_FILE_NAME))
         ncks_args.append(output_file)
-        self._execute(NCKS_EXECUTABLE, *ncks_args, working_dir=working_dir)
+        self._execute(self.BINARIES['NCKS'], *ncks_args, working_dir=working_dir)
 
     def _run_process(self, fires, working_dir):
         logging.info("Running one HYSPLIT49 Dispersion model process")
@@ -451,14 +452,14 @@ class HYSPLITDispersion(DispersionBase):
 
             message_files = ["MESSAGE.%3.3i" % (i+1) for i in range(NCPUS)]
             pardumpFiles = ["PARDUMP.%3.3i" % (i+1) for i in range(NCPUS)]
-            # TODO: either update the following checks for MPIEXEC and
-            # SHYSPLIT_MPI_BINARY to try running with -v or -h option or
+            # TODO: either update the following checks for self.BINARIES['MPI'] and
+            # self.BINARIES['HYSPLIT_MPI'] to try running with -v or -h option or
             # something similar,  or remove them
-            # if not os.path.isfile(MPIEXEC):
-            #     msg = "Failed to find %s. Check MPIEXEC setting and/or your MPICH2 installation." % mpiexec
+            # if not os.path.isfile(self.BINARIES['MPI']):
+            #     msg = "Failed to find %s. Check self.BINARIES['MPI'] setting and/or your MPICH2 installation." % mpiexec
             #     raise AssertionError(msg)
-            # if not os.path.isfile(SHYSPLIT_MPI_BINARY):
-            #     msg = "HYSPLIT MPI executable %s not found." % SHYSPLIT_MPI_BINARY
+            # if not os.path.isfile(self.BINARIES['HYSPLIT_MPI']):
+            #     msg = "HYSPLIT MPI executable %s not found." % self.BINARIES['HYSPLIT_MPI']
             #     raise AssertionError(msg)
             if self.config("READ_INIT_FILE"): # TODO: Finish MPI support for particle initialization
                 logging.warn("Particile initialization in BlueSky module not currently supported for MPI runs.")
@@ -483,9 +484,9 @@ class HYSPLITDispersion(DispersionBase):
 
         # Run HYSPLIT
         if self.config("MPI"):
-            self._execute(MPIEXEC, "-n", str(NCPUS), SHYSPLIT_MPI_BINARY, working_dir=working_dir)
+            self._execute(self.BINARIES['MPI'], "-n", str(NCPUS), self.BINARIES['HYSPLIT_MPI'], working_dir=working_dir)
         else:  # standard serial run
-            self._execute(HYSPLIT_BINARY, working_dir=working_dir)
+            self._execute(self.BINARIES['HYSPLIT'], working_dir=working_dir)
 
         if not os.path.exists(output_conc_file):
             msg = "HYSPLIT failed, check MESSAGE file for details"
@@ -494,7 +495,7 @@ class HYSPLITDispersion(DispersionBase):
 
         if self.config('CONVERT_HYSPLIT2NETCDF'):
             logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (output_conc_file, output_file))
-            self._execute(HYSPLIT2NETCDF_BINARY,
+            self._execute(self.BINARIES['HYSPLIT2NETCDF'],
                 "-I" + output_conc_file,
                 "-O" + os.path.basename(output_file),
                 "-X1000000.0",  # Scale factor to convert from grams to micrograms
