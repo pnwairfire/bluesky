@@ -16,7 +16,6 @@ import os
 import shutil
 import subprocess
 # import tarfile
-import tempfile
 import threading
 from datetime import timedelta
 
@@ -26,6 +25,8 @@ from bluesky.datetimeutils import parse_utc_offset
 from bluesky.models.fires import Fire
 import hysplit_utils
 import defaults
+
+from .. import DispersionBase, working_dir
 
 __all__ = [
     'HYSPLITDispersion'
@@ -46,19 +47,7 @@ GRAMS_PER_TON = 907184.74
 # Conversion factor for fire size
 SQUARE_METERS_PER_ACRE = 4046.8726
 
-class working_dir(object):
-    def __enter__(self):
-        self._original_dir = os.getcwd()
-        self._working_dir = tempfile.mkdtemp()
-        logging.debug('Running hysplit in {}'.format(self._working_dir))
-        os.chdir(self._working_dir)
-        return self._working_dir
-
-    def __exit__(self, type, value, traceback):
-        os.chdir(self._original_dir)
-        # TODO: delete self._working_dir or just let os clean it up ?
-
-class HYSPLITDispersion(object):
+class HYSPLITDispersion(DispersionBase):
     """ HYSPLIT Dispersion model
 
     HYSPLIT Concentration model version 4.9
