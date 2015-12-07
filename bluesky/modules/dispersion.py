@@ -8,6 +8,7 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import consume
+import importlib
 import logging
 
 from bluesky import datetimeutils
@@ -30,15 +31,30 @@ def run(fires_manager):
         default='hysplit').lower()
     processed_kwargs = {}
     try:
-        # TODO: support VSMOKE as well
-        if model == 'hysplit':
-            hysplit_config = fires_manager.get_config_value('dispersion', 'hysplit',
-                default={})
-            disperser = hysplit.HYSPLITDispersion(fires_manager.met, **hysplit_config)
-            processed_kwargs.update(hysplit_version=hysplit.__version__)
-        else:
+        module_name = "bluesky.dispersers.{}".format(model)
+        logging.debug("Importing %s", module_name)
+        try:
+            module = importlib.import_module(module_name)
+        except ImportError:
             raise BlueSkyConfigurationError(
                 "Invalid dispersion model: '{}'".format(model))
+
+        klass_name = "{}Dispersion".format(model.upper())
+        logging.debug("Loading class %s", klass_name)
+        try:
+            klass = getattr(module, klass_name)
+        except:
+            # TODO: use more appropriate exception class
+            raise RuntimeError("{} does not define class {}".format(
+                module_name, klass_name))
+
+        model_config = fires_manager.get_config_value(
+            'dispersion', model, default={})
+
+        disperser = klass(fires_manager.met, **model_config)
+        processed_kwargs.update({
+            "{}_version".format(model): module.__version__
+        })
 
         start_str = fires_manager.get_config_value('dispersion', 'start')
         num_hours = fires_manager.get_config_value('dispersion', 'num_hours')
@@ -54,10 +70,9 @@ def run(fires_manager):
         output_dir_name = (fires_manager.get_config_value('dispersion',
             'output_dir_name') or fires_manager.run_id)
 
-        # further validation of start and num_hours done in
-        # HYSPLITDispersion.run
-        dispersion_info = disperser.run(fires_manager.fires, start, num_hours,
-            dest_dir, output_dir_name)
+        # further validation of start and num_hours done in 'run'
+        dispersion_info = disperser.run(fires_manager.fires, start,
+            num_hours, dest_dir, output_dir_name)
         dispersion_info.update(model=model)
         # TODO: store dispersion into in summary?
         #   > fires_manager.summarize(disperion=disperser.run(...))

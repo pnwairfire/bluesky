@@ -27,6 +27,10 @@ from bluesky.models.fires import Fire
 import hysplit_utils
 import defaults
 
+__all__ = [
+    'HYSPLITDispersion'
+]
+
 HYSPLIT_BINARY = "hycs_std"
 HYSPLIT_MPI_BINARY = "hycm_std"
 NCEA_EXECUTABLE = "ncea"
