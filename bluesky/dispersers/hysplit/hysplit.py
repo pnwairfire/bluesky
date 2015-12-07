@@ -9,7 +9,6 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 __version__ = "0.1.0"
 
-import copy
 import logging
 import math
 import os
@@ -44,6 +43,8 @@ class HYSPLITDispersion(DispersionBase):
     """ HYSPLIT Dispersion model
 
     HYSPLIT Concentration model version 4.9
+
+    TODO: determine which config options we'll support
     """
     BINARIES = {
         'HYSPLIT': "hycs_std",
@@ -56,13 +57,6 @@ class HYSPLITDispersion(DispersionBase):
 
     PHASES = ['flaming', 'smoldering', 'residual']
     TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
-
-    def __init__(self, met_info, **config):
-        self._set_met_info(copy.deepcopy(met_info))
-        self._config = config
-        # TODO: determine which config options we'll support
-        # TODO: make sure required executables are available
-        # TODO: make sure all required config options are defined
 
     def config(self, key):
         # check if key is defined, in order, a) in the config as is, b) in

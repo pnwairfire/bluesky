@@ -4,6 +4,7 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import abc
+import copy
 import logging
 import os
 import tempfile
@@ -24,6 +25,16 @@ class working_dir(object):
 class DispersionBase(object):
 
     __metaclass__ = abc.ABCMeta
+
+    def __init__(self, met_info, **config):
+        self._set_met_info(copy.deepcopy(met_info))
+        self._config = config
+        # TODO: iterate through self.BINARIES.values() making sure each
+        #   exists (though maybe only log warning if doesn't exist, since
+        #   they might not all be called for each run
+        # TODO: define and call method (which should rely on constant defined
+        #   in model-specific classes) which makes sure all required config
+        #   options are defined
 
     @abc.abstractmethod
     def run(self, fires, start, num_hours, dest_dir, output_dir_name):
