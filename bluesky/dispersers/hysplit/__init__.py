@@ -1,4 +1,4 @@
-"""bluesky.hysplit
+"""bluesky.dispersers.hysplit
 
 TODO: Move this package into it's own repo.  One thing that would need to be
 done first is to remove the dependence on bluesky.models.fires.Fire.

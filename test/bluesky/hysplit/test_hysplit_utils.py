@@ -9,7 +9,7 @@ import datetime
 import time
 import timecop
 
-from bluesky.hysplit import hysplit_utils
+from bluesky.dispersers.hysplit import hysplit_utils
 
 class MockFireLocationData(object):
     def __init__(self, location_id):

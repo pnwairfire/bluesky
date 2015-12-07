@@ -12,7 +12,7 @@ import logging
 
 from bluesky import datetimeutils
 from bluesky.exceptions import BlueSkyConfigurationError
-from bluesky.hysplit import hysplit
+from bluesky.dispersers.hysplit import hysplit
 
 __all__ = [
     'run'

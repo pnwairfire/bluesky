@@ -1,4 +1,4 @@
-"""bluesky.hysplit.hysplit
+"""bluesky.dispersers.hysplit.hysplit
 
 The code in this module was copied from BlueSky Framework, and modified
 significantly.  It was originally written by Sonoma Technology, Inc.
