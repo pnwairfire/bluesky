@@ -32,7 +32,8 @@ def run(fires_manager):
     if not fires_manager.met:
         raise ValueError("Specify met files to use in localmet")
 
-    arl_profiler = ArlProfiler(fires_manager.met.get('files'))
+    arl_profiler = ArlProfiler(fires_manager.met.get('files'),
+        time_step=fires_manager.get_config_value('localmet', 'time_step'))
     for fire in fires_manager.fires:
         lat,lng = _fire_lat_lng(fire)
         # parse_utc_offset makes sure utc offset is defined and valid

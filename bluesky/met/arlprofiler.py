@@ -29,7 +29,7 @@ __all__ = [
 ONE_HOUR = timedelta(hours=1)
 
 class ArlProfiler(object):
-    def __init__(self, met_files, profile_exe=None):
+    def __init__(self, met_files, profile_exe=None, time_step=None):
         """Constructor
 
         Carries out initialization and validation
@@ -38,6 +38,7 @@ class ArlProfiler(object):
          - met_files
         kwargs:
          - profile_exe
+         - time_step -- time step of arl file; defaults to 1
 
         met_files is expected to be a list of dicts, each dict specifying an
         arl met file along with a 'first', 'start', and 'end' datetimes. For
@@ -66,11 +67,13 @@ class ArlProfiler(object):
                 "{} is not an existing/valid profile executable".format(profile_exe))
         self._profile_exe = profile_exe
 
+        self._time_step = time_step or 1
+
     # TODO: is there a way to tell 'profile' to write profile.txt and MESSAGE
     #  to an alternate dir (e.g. to a /tmp/ dir)
     PROFILE_OUTPUT_FILE = './profile.txt'
 
-    def profile(self, lat, lng, local_start, local_end, utc_offset, time_step=None):
+    def profile(self, lat, lng, local_start, local_end, utc_offset):
         """Returns local met profile for specific location and timewindow
 
         args:
@@ -79,9 +82,6 @@ class ArlProfiler(object):
          - local_start -- local datetime object representing beginning of time window
          - local_end -- local datetime object representing end of time window
          - utc_offset -- hours ahead of or behind UTC
-
-        kwargs:
-         - time_step -- time step of arl file; defaults to 1
         """
         # TODO: validate utc_offset?
         if local_start > local_end:
@@ -99,9 +99,6 @@ class ArlProfiler(object):
         if utc_end == utc_end_hour:
             utc_end_hour -= ONE_HOUR
 
-        time_step = time_step or 1
-        # TODO: make sure time_step is integer
-
         full_path_profile_txt = os.path.abspath(self.PROFILE_OUTPUT_FILE)
         local_met_data = {}
         for met_file in self._met_files:
@@ -117,7 +114,7 @@ class ArlProfiler(object):
             # split returns dir without trailing slash, which is required by profile
             d = d + '/'
 
-            self._call(d, f, lat, lng, time_step)
+            self._call(d, f, lat, lng)
             lmd = self._load(full_path_profile_txt, met_file['first_hour'],
                 start, end, utc_offset, lat, lng)
             local_met_data.update(lmd)
@@ -154,7 +151,7 @@ class ArlProfiler(object):
         return _met_files
 
 
-    def _call(self, d, f, lat, lng, time_step):
+    def _call(self, d, f, lat, lng):
         # TODO: cd into tmp dir before calling, or somehow specify
         # custom tmp file name for profile.txt
         # TODO: add another method for calling profile?
@@ -162,7 +159,7 @@ class ArlProfiler(object):
         # Note: '-w2' indicates wind direction, instead of components
         cmd = "{exe} -d{dir} -f{file} -y{lat} -x{lng} -w2 -t{time_step}".format(
             exe=self._profile_exe, dir=d, file=f, lat=lat,
-            lng=lng, time_step=time_step)
+            lng=lng, time_step=self._time_step)
         logging.debug("Calling '{}'".format(cmd))
         # Note: if we need the stdout/stderr output, we can use:
         #  > output = subprocess.check_output(cmd.split(' '),

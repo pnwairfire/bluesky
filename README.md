@@ -1040,7 +1040,7 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### localmet
 
-(None)
+- ***'config' > 'localmet' > 'time_step'*** -- *optional* -- hour per arl file time step; defaults to 1
 
 ##### timeprofiling
 
