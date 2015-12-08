@@ -4,7 +4,7 @@
             "met_root_dir": "/DRI_6km/",
             "met_format": "arl",
             "arl": {
-                "index_filename": "arl12hrindex.csv"
+                "index_filename_pattern": "arl12hrindex.csv"
             }
         }
     },
