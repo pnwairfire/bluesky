@@ -143,15 +143,15 @@ First, install pip (with sudo if necessary):
     apt-get install python-pip
     pip install --upgrade pip
 
-Then, to install, for example, v0.7.2, use the following (with sudo if necessary):
+Then, to install, for example, v0.7.3, use the following (with sudo if necessary):
 
-    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==0.7.2
+    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==0.7.3
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
     -i http://pypi.smoke.airfire.org/simple/
-    bluesky==0.7.2
+    bluesky==0.7.3
 
 See the Development > Install Dependencies > Notes section, above, for
 notes on resolving pip and gdal issues.
