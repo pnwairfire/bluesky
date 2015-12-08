@@ -298,15 +298,57 @@ class ArlFinder(object):
         args:
          - index_file -- index file listing arl file
          - name -- name of arl file, as listed in index file
+
+        There are various possibilties for 'name':
+         - it's simply the name (no path) of a file
+             -> see if exists in the dir containing the index file
+         - it's a relative path
+             -> see if it exists relative to the dir containing the index file
+         - it's an absolute path
+             -> see if it exists in the specified dir, or
+             -> see if it exists in the dir containing the index file
+                (If the met dir is on a drive mounted from another server,
+                it's possible that its absolute path is different on the
+                remote server. If so, it's worth checking if the arl file
+                is in the same dir as the index file, since it's likely
+                in that dir.)
         """
-        f = os.path.abspath(name)
-        if os.path.isfile(f):
-            return f
+        logging.debug('Checking existence of arl file %s', name)
+        index_file_dir = os.path.dirname(index_file)
+        arl_dir, arl_name = os.path.split(name)
+        if arl_dir:
+            # See if 'name' is an an absolute pathname that exists
+            if os.path.isfile(name):
+                logging.debug('Found arl file (abs path) %s', name)
+                return name
 
-        f = os.path.join(os.path.dirname(index_file), name.strip('/'))
-        if os.path.isfile(f):
-            return f
+            # At this point, 'name' is either an absolute pathname that
+            # does not exist, or it's a relative pathname.  If it's an
+            # absolute path, the following call to os.path.join will
+            # return 'name' itself (not the concatenation of
+            # index_file_dir and name).  If that's the case (i.e. if
+            # new_name == name), then we'll skip the subsequent call
+            # call to os.path.isfile, which would be redundant.
+            new_name = os.path.join(index_file_dir, name)
+            if new_name != name and os.path.isfile(new_name):
+                logging.debug('Found arl file (rel path) %s', new_name)
+                return new_name
 
+            # At this point, 'name' does not exist, either as an absolute
+            # or relative pathname. So, we'll see if the
+            # file exists in the dir containing the index file
+            name = arl_name
+
+        # At this point, either no path was specified, or the file
+        # doesn't exist in the path. Check if the file is in the dir
+        # containing the index file
+        name = os.path.join(index_file_dir, name)
+        if os.path.isfile(name):
+            logging.debug('Found arl file (name) %s', name)
+            return name
+
+        # TODO: should we raise an exception, or just let the returned
+        # None value indicate that the file wasn't found?
         # raise ValueError("Can't find arl file {} listed in {}".format(
         #     name, index_file))
 
