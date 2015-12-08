@@ -1,0 +1,44 @@
+{
+    "config": {
+        "localmet": {
+            "time_step": 3
+        }
+    },
+    "met": {
+        "files": [
+            {
+                "file": "/NAM84/2015120800/nam_forecast-2015120800_00-84hr.arl",
+                "first_hour": "2015-12-08T00:00:00",
+                "last_hour": "2015-12-08T11:00:00"
+            },
+            {
+                "file": "/NAM84/2015120812/nam_forecast-2015120812_00-84hr.arl",
+                "first_hour": "2015-12-08T12:00:00",
+                "last_hour": "2015-12-12T00:00:00"
+            }
+        ]
+    },
+    "fire_information": [
+        {
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Fire in NAM84 domain"
+            },
+            "growth": [
+                {
+                    "start": "2015-12-08T06:00:00",
+                    "end": "2015-12-08T12:00:00",
+                    "pct": 50.0
+                }
+            ],
+            "id": "SF11C14225236095807750",
+            "location": {
+                "area": 200,
+                "ecoregion": "southern",
+                "latitude": 37.4316976,
+                "longitude": -120.3990506,
+                "utc_offset": "-08:00"
+            }
+        }
+    ]
+}
