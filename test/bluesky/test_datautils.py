@@ -605,6 +605,17 @@ class TestSumNestedData(object):
         e = {'a': 11, 'b': 3, 'c': 6}
         assert e == datautils.sum_nested_data(d)
 
+    def test_array_of_nested_dicts_with_scalars_and_arrays(self):
+        d = {
+            'foo': {'a': [2, 3], 'b': 3},
+            'bar': {'a':6, 'c': [3, 2, 1]}
+        }
+        d2 = {
+            'a': 2, 'sdfsdf':[2, 5]
+        }
+        e = {'a': 13, 'b': 3, 'c': 6, 'sdfsdf': 7}
+        assert e == datautils.sum_nested_data([d, d2])
+
     def test_nested_dict_scalars_and_arrays_with_skip_keys(self):
         d = {
             'foo': {'a': [2, 3], 'b': 3},

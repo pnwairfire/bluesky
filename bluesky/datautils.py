@@ -88,13 +88,10 @@ def sum_nested_data(nested_data, *skip_keys):
     """Sums nested data, grouped by innermost keys
 
     args
-     - nested_data -- dict containing nested numerical data; can be of
-         any depth, and can contain scalars or arrays
+     - nested_data -- dict or array of dicts containing nested numerical
+         data; can be of any depth, and can contain scalars or arrays
      - skip_keys -- keys to skip, effectively ignoring
     """
-    if not _is_dict(nested_data):
-        raise ValueError("Nested data must be a dict")
-
     summed_data = {}
     def _sum(nested_data):
         for k, v in nested_data.items():
@@ -109,7 +106,20 @@ def sum_nested_data(nested_data, *skip_keys):
                 else:
                     raise ValueError("Nested data must contain number values")
 
-    _sum(nested_data)
+    if _is_dict(nested_data):
+        _sum(nested_data)
+
+    elif _is_array(nested_data):
+        # use separate iteration to check for dicts to avoid summing
+        # anything if any element in nested_data isn't a dict
+        if any([not _is_dict(e) for e in nested_data]):
+            raise ValueError("Nested data must be a dict or an array of dicts")
+        for e in nested_data:
+            _sum(e)
+
+    else:
+        raise ValueError("Nested data must be a dict or an array of dicts")
+
     return summed_data
 
 def _is_datetime(v):
