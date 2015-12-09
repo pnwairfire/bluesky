@@ -230,6 +230,9 @@ class TestIngester(object):
                     "pct": 100.0
                 }
             ],
+            "meta": {
+                "foo": "bar"
+            },
             "utc_offset": "-07:00"
         }
         expected = {
@@ -262,7 +265,10 @@ class TestIngester(object):
                     "end": "20150120",
                     "pct": 100.0
                 }
-            ]
+            ],
+            "meta": {
+                "foo": "bar"
+            }
         }
         expected_parsed_input = copy.deepcopy(f)
         parsed_input = self.ingester.ingest(f)

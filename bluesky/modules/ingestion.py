@@ -3,6 +3,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import copy
 import consume
 import logging
 
@@ -63,7 +64,7 @@ class FireIngester(object):
         "id"
     }
     NESTED_FIELDS = {
-        "location", "growth", "event_of", "fuelbeds"
+        "location", "growth", "event_of", "fuelbeds", "meta"
     }
 
     ##
@@ -242,3 +243,8 @@ class FireIngester(object):
 
             if fuelbeds:
                 fire['fuelbeds'] = fuelbeds
+
+    def _ingest_meta(self, fire):
+        # just copy all of 'meta', if it's defined
+        if self._parsed_input.get('meta'):
+            fire['meta'] = copy.deepcopy(self._parsed_input['meta'])
