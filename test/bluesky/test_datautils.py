@@ -551,6 +551,60 @@ class TestMultiplyNestedData(object):
         datautils.multiply_nested_data(d, 2)
         assert d == e
 
+class TestSumNestedData(object):
+
+    def test_string(self):
+        with raises(ValueError) as e_info:
+            datautils.sum_nested_data("sdf")
+
+    def test_scalar(self):
+        with raises(ValueError) as e_info:
+            datautils.sum_nested_data(1)
+
+    def test_array(self):
+        with raises(ValueError) as e_info:
+            datautils.sum_nested_data([1,2])
+
+    def test_dict_strings(self):
+        with raises(ValueError) as e_info:
+            datautils.sum_nested_data({'a': 'sdf','b':2})
+
+    def test_empty_dict(self):
+        assert {} == datautils.sum_nested_data({})
+
+    def test_flat_dict_scalars(self):
+        d = {'a': 12, 'b': 33}
+        assert d == datautils.sum_nested_data(d)
+
+    def test_flat_dict_arrays(self):
+        d = {'a': [2], 'b': [1, 2, 3]}
+        e = {'a': 2, 'b': 6}
+        assert e == datautils.sum_nested_data(d)
+
+    def test_nested_dict_scalars(self):
+        d = {
+            'foo': {'a': 12, 'b': 6},
+            'bar': {'a': 23, 'c': 4}
+        }
+        e = {'a': 35, 'b': 6, 'c': 4}
+        assert e == datautils.sum_nested_data(d)
+
+    def test_nested_dict_arrays(self):
+        d = {
+            'foo': {'a': [2, 3], 'b': [2, 2]},
+            'bar': {'a':[3], 'c': [3,2,1]}
+        }
+        e = {'a': 8, 'b': 4, 'c': 6}
+        assert e == datautils.sum_nested_data(d)
+
+    def test_nested_dict_scalars_and_arrays(self):
+        d = {
+            'foo': {'a': [2, 3], 'b': 3},
+            'bar': {'a':6, 'c': [3,2,1]}
+        }
+        e = {'a': 11, 'b': 3, 'c': 6}
+        assert e == datautils.sum_nested_data(d)
+
 class TestFormatDatetimes(object):
 
     def test_scalar(self):
