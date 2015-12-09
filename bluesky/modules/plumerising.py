@@ -40,13 +40,17 @@ def run(fires_manager):
         if not fire.location.get('area'):
             raise ValueError(
                 "Missing fire area required for computing plumerise")
+        frp = fire.get('meta', {}).get('frp')
         for g in fire.growth:
             if not g.get('localmet'):
                 raise ValueError(
                     "Missing localmet data required for computing plumerise")
-            g['plumerise'] = pr.compute(g['localmet'], fire.location['area'])['hours']
-    # TODO: spread out emissions over plume and set in growth or fuelbed objects ???
-    #   (be consistent with profiled emissions, setting in same place or not setting at all)
+            plumerise_data = pr.compute(g['localmet'], fire.location['area'],
+                frp=frp)
+            g['plumerise'] = plumerise_data['hours']
+    # TODO: spread out emissions over plume and set in growth or fuelbed
+    #   objects ??? (be consistent with profiled emissions, setting in
+    #   same place or not setting at all)
 
     # TODO: set summary?
     # fires_manager.summarize(plumerise=...)
