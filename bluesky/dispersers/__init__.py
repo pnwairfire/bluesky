@@ -18,7 +18,7 @@ import os
 import tempfile
 
 # TODO: move this to common/reusable module
-class working_dir(object):
+class create_working_dir(object):
     def __enter__(self):
         self._original_dir = os.getcwd()
         self._working_dir = tempfile.mkdtemp()
@@ -84,7 +84,7 @@ class DispersionBase(object):
         self._files_to_archive = []
 
 
-        with working_dir() as wdir:
+        with create_working_dir() as wdir:
             r = self._run(fires, wdir)
             self._move_files()
 
