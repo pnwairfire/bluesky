@@ -18,6 +18,10 @@ def deepmerge(a, b):
 
     Updates a in place, but returns new value as well
 
+    args
+     - a -- dict to merge data into
+     - b -- data to merge into 'a'
+
     Note: adapted from http://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge
 
     TODO: move to pyairfire?
@@ -37,6 +41,13 @@ def deepmerge(a, b):
     return a
 
 def summarize(fires, subdata_key):
+    """Summarizes data within fuelbed objects across all fires
+
+    args
+     - fires -- array of fire objects with fuelbed objecting containing
+        data to summarize
+     - subdata_key -- fuelbed keys to summarize; e.g. 'emissions'
+    """
 
     def _summarize(nested_data, summary):
         if isinstance(nested_data, dict):
@@ -66,8 +77,12 @@ def _is_dict(v):
     return isinstance(v, dict) # TODO: catch other dict types?
 
 def multiply_nested_data(nested_data, multiplier):
+    """Multiplies nested numerical values by a given multiplier
 
-
+    args
+     - nested_data -- numerical data nested in dicts and/or arrays
+     - multiplier -- value to multiply each nested numerical value
+    """
     if _is_array(nested_data):
         for i in range(len(nested_data)):
             if _is_num(nested_data[i]):
@@ -127,6 +142,9 @@ def _is_datetime(v):
 
 def format_datetimes(data):
     """Formats all datetimes (keys and values) in ISO8601 format
+
+    args
+     - data -- data (possibly nested) containing datatimes to format
 
     This function could also go in bluesky.datetimeutils
     """
