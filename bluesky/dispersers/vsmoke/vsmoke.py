@@ -1,7 +1,8 @@
 """bluesky.dispersers.vsmoke
 
 The code in this module was copied from BlueSky Framework, and modified
-significantly.  It was originally written by Sonoma Technology, Inc.
+significantly (mostly in VSMOKEDispersion).  It was originally written
+by Sonoma Technology, Inc.
 """
 
 __author__      = "Joel Dubowy and Sonoma Technology, Inc."
@@ -9,19 +10,18 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 __version__ = "0.1.0"
 
-# import math
-# import os
-# import tempfile
-# import zipfile
-# from datetime import datetime,timedelta
-# from dispersion import Dispersion
-# from emissions import Emissions
-# from kernel.bs_datetime import BSDateTime
-# from kernel.core import Process
-# from kernel.log import OUTPUT
-# from kernel.types import construct_type
+import logging
+import math
+import os
+import zipfile
+import shutil
+from datetime import timedelta
 
-from .. import DispersionBase, working_dir
+from pyairfire.datetime import parsing as datetime_parsing
+
+from bluesky.datetimeutils import parse_utc_offset
+
+from .. import DispersionBase
 
 __all__ = [
     'VSMOKEDispersion'
@@ -40,6 +40,35 @@ class VSMOKEDispersion(DispersionBase):
     }
     DEFAULTS = defaults
 
+    def __init__(self, met_info, **config):
+        super(VSMOKEDispersion, self).__init__(met_info, **config)
+        self._create_json = self.config("CREATE_JSON")
+        self._set_input_file_vars()
+        self._set_kml_vars()
+        self.log.debug("PM Isopleths =%s" % self.ISOPLETHS)
+        self.log.debug("PM Isopleths Names =%s" % self.ISONAMES)
+        self.log.debug("PM Isopleths Colors =%s" % self.ISOCOLORS)
+
+    def _set_input_file_vars(self):
+        self._input_file = os.path.join(wdir, "VSMOKE.IPT")
+        self._iso_input_file = os.path.join(wdir, "vsmkgs.ipt")
+
+    def _set_kml_vars(self):
+        # Define variables to make KML and KMZ files
+        doc_kml = os.path.join(wdir, "doc.kml")
+        self.log.debug("Fire kmz = %s" % doc_kml)
+        self._kmz_files = [doc_kml]
+
+        self._kmz_filename = os.path.join(self._run_output_dir, self.config("KMZ_FILE"))
+        # The following will fill start date time into kmz file name if the
+        # filename has an embedded datetime pattern
+        self._kmz_filename = self._model_start.strftime(self._kmz_filename)
+        self.log.debug("Creating KMZ file " + os.path.basename(self._kmz_filename))
+
+        # Make KMZ object for fire
+        self._legend_image = self.config("LEGEND_IMAGE")
+        my_kmz = KMZAnimation(doc_kml, self.config("OVERLAY_TITLE"), legend_image)
+
     def _run(self, fires, wdir):
         """Runs hysplit
 
@@ -47,34 +76,6 @@ class VSMOKEDispersion(DispersionBase):
          - fires -- list of fires to run through VSMOKE
          - wdir -- working directory
         """
-        overlay_title = self.config("OVERLAY_TITLE")
-        legend_image = self.config("LEGEND_IMAGE")
-        date = self.config("DATE", BSDateTime)
-
-        self.log.debug("PM Isopleths =%s" % self.ISOPLETHS)
-        self.log.debug("PM Isopleths Names =%s" % self.ISONAMES)
-        self.log.debug("PM Isopleths Colors =%s" % self.ISOCOLORS)
-
-        input_file = os.path.join(wdir, "VSMOKE.IPT")
-        iso_input_file = os.path.join(wdir, "vsmkgs.ipt")
-
-        # Define variables to make KML and KMZ files
-        doc_kml = os.path.join(wdir, "doc.kml")
-        self.log.debug("Fire kmz = %s" % doc_kml)
-        kmz_files = [doc_kml]
-
-        kmz_filename = os.path.join(self.config("OUTPUT_DIR"), (self.config("KMZ_FILE")))
-        kmz_filename = date.strftime(kmz_filename)
-        self.log.debug("Creating KMZ file " + os.path.basename(kmz_filename))
-
-        # Make KMZ object for fire
-        my_kmz = KMZAnimation(doc_kml, overlay_title, legend_image)
-
-        # Define variables to decide if a GeoJSON will be created
-        create_json = self.config("CREATE_JSON").upper() == "TRUE"
-        if create_json:
-            json = GeoJSON()
-
         # For each fire run VSMOKE and VSMOKEGIS
         for fire in fires:
             # TODO: check to make sure start+num_hours is within fire's
@@ -88,7 +89,7 @@ class VSMOKEDispersion(DispersionBase):
             timezone = utc_offset
 
             # Get emissions for fire
-            cons = fireLoc["consumption"]
+            cons = datautils.sum_nested_data(fireLoc["consumption"]
             emis = fireLoc["emissions"]
             if not cons or not emis:
                 continue
@@ -98,7 +99,7 @@ class VSMOKEDispersion(DispersionBase):
             # Run VSMOKE GIS for each hour
             for hr in xrange(npriod):
                 # Make input file to be used by VSMOKEGIS
-                self._write_iso_input(emis, hr, in_var, iso_input_file)
+                self._write_iso_input(emis, hr, in_var)
 
                 # Run VSMOKEGIS
                 context.execute(BINARIES['VSMOKEGIS'])
@@ -119,15 +120,13 @@ class VSMOKEDispersion(DispersionBase):
                 kml_name = in_var.fireID + "_" + str(hr+1) + ".kml"
                 kml_path = os.path.join(temp_dir, kml_name)
                 self._build_kml(kml_path, in_var, iso_file)
-                kmz_files.append(kml_path)
+                self._kmz_files.append(kml_path)
                 my_kmz.add_kml(kml_name, fireLoc, hr)
 
-                # Add data to GeoJSON file
-                if create_json:
-                    self._build_json(json, in_var, iso_file, fireLoc['id'], timezone, hr)
+                self._add_geo_json(in_var, iso_file, fireLoc['id'], timezone, hr)
 
             # Write input files
-            self._write_input(emis, cons, npriod, in_var, input_file, timezone)
+            self._write_input(emis, cons, npriod, in_var, timezone)
             # Run VSMOKE for fire
             context.execute(self.BINARIES['VSMOKE'])
 
@@ -141,35 +140,29 @@ class VSMOKEDispersion(DispersionBase):
 
         # Make KMZ file
         my_kmz.write()
-        z = zipfile.ZipFile(kmz_filename, 'w', zipfile.ZIP_DEFLATED)
-        for kml in kmz_files:
+        z = zipfile.ZipFile(self._kmz_filename, 'w', zipfile.ZIP_DEFLATED)
+        for kml in self._kmz_files:
             if os.path.exists(kml):
                 z.write(kml, os.path.basename(kml))
             else:
                 self.log.error('Failure while trying to write KMZ file -- KML file does not exist')
                 self.log.debug('File "%s" does not exist', kml)
-        z.write(os.path.join(self.config('PACKAGE_DIR'), legend_image), legend_image)
+        z.write(os.path.join(self.config('PACKAGE_DIR'), self._legend_image), self._legend_image)
         z.close()
-
-        # If necessary, create the GeoJSON output file
-        if create_json:
-            temp_json = context.full_path(self.config('JSON_FILE'))
-            json.write(temp_json)
-            final_json = os.path.join(self.config("OUTPUT_DIR"), self.config('JSON_FILE'))
-            context.copy_file(temp_json, final_json)
 
         r = {
             "output": {
-                "directory": ,
-                "kmz_filename": kmz_filename
+                "kmz_filename": self._kmz_filename
             }
         }
-        if create_json:
-            r['output']['json_file_name'] = final_json
+
+        json_file_name = self._create_geo_json()
+        if json_file_name:
+            r['output']['json_file_name'] = json_file_name
         # TODO: anytheing else to include in response
         return r
 
-    def _write_input(self, emissions, cons, npriod, in_var, input_file, tz):
+    def _write_input(self, emissions, cons, npriod, in_var, tz):
         """
         This function will create the input file needed to run VSMOKE.
         These parameters are fixed or are not used since user should provide stability.
@@ -225,7 +218,7 @@ class VSMOKEDispersion(DispersionBase):
         if warn:
             self.log.warn("For fire " + in_var.fireID + ", used default values for the parameters: " + ', '.join(warn))
 
-        with open(input_file, "w") as f:
+        with open(self._input_file, "w") as f:
             f.write("60\n")
             f.write("%s\n" % in_var.title)
             f.write("%f %f %f %d %d %d %d %f %f %s %s %s %f %s\n" % (in_var.alat, in_var.along, tz,
@@ -248,7 +241,7 @@ class VSMOKEDispersion(DispersionBase):
                 emtqco = (emissions["co"][hour].sum()) * 251.99576    # tons/hr to g/s
                 f.write("%d %f %f %f %f\n" % (nhour, emtqpm, emtqco, emtqh, emtqr))
 
-    def _write_iso_input(self, emissions, hour, in_var, input_file):
+    def _write_iso_input(self, emissions, hour, in_var):
         """ Create the input file needed to run VSMOKEGIS. """
         # Plume rise characteristics
         grad_rise = self.config("GRAD_RISE")
@@ -293,7 +286,7 @@ class VSMOKEDispersion(DispersionBase):
         if warn and (hour == 0):
             self.log.warn("For fire " + in_var.fireID + ", used default values for these parameters: " + ', '.join(warn))
 
-        with open(input_file, "w") as f:
+        with open(self._iso_input_file, "w") as f:
             emtqh = (emissions["heat"][hour]) / 3414425.94972     # Btu to MW
             emtqpm = (emissions["pm25"][hour].sum()) * 251.99576  # tons/hr to g/s
 
@@ -359,15 +352,29 @@ class VSMOKEDispersion(DispersionBase):
         mykml.close()
         mykml.write()
 
-    def _build_json(self, json, in_var, iso_file, fire_id, timezone, hr):
+    def _add_geo_json(self, json, in_var, iso_file, fire_id, timezone, hr):
+        if not self._create_json:
+            return
+
+        if not self._geo_json:
+            self._geo_json = GeoJSON()
+
         isopleths = self._build_isopleths(in_var, iso_file)
 
         for c, interval in enumerate(self.ISOPLETHS):
             name = str(interval)
-            json.add_linestring(fire_id, self.ISONAMES[c], self.ISOCOLORS[c], hr, isopleths[name], timezone)
+            self._geo_json.add_linestring(fire_id, self.ISONAMES[c], self.ISOCOLORS[c], hr, isopleths[name], timezone)
 
+    def _create_geo_json(self, wdir):
+        if self._create_json and self._geo_json:
+            temp_json = os.path.join(wdir, self.config('JSON_FILE'))
+            self._geo_json.write(temp_json)
+            final_json = os.path.join(self._run_output_dir,
+                self.config('JSON_FILE'))
+            context.copy_file(temp_json, final_json)
+            return final_json
 
-class GeoJSON:
+class GeoJSON(object):
     """ Used to create GeoJSON outputs """
 
     def __init__(self):
@@ -440,7 +447,7 @@ class GeoJSON:
         return self.__str__()
 
 
-class KMLFile:
+class KMLFile(object):
     """ Used to create KML files """
 
     def __init__(self, filename='test.kml'):
@@ -477,7 +484,7 @@ class KMLFile:
         self.content += '''</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>'''
 
 
-class KMZAnimation:
+class KMZAnimation(object):
     """For creating a KMZ file used for Google Earth"""
 
     def __init__(self, filename='doc.kml', overlay_title=" ", legend_image=" "):
@@ -567,7 +574,7 @@ class KMZAnimation:
         output.close()
 
 
-class INPUTVariables:
+class INPUTVariables(object):
     """ Defines input variables from Fire Location """
     MIN_STAB = 1
     MAX_STAB = 7
@@ -579,12 +586,12 @@ class INPUTVariables:
     def __init__(self, fireLoc):
         # Basic fire info
         self.fireID = fireLoc['id']
-        self.alat = float(fireLoc['latitude'])
-        self.along = float(fireLoc['longitude'])
-        self.acres = fireLoc['area']
+        self.alat = float(fireLoc['location']['latitude'])
+        self.along = float(fireLoc['location']['longitude'])
+        self.acres = fireLoc['location']['area']
 
         # Fire Date and time information
-        fire_dt = fireLoc['date_time']
+        fire_dt = datetime_parsing.parse(fireLoc['growth'][0]['start'])
         self.iyear = fire_dt.year
         self.imo = fire_dt.month
         self.iday = fire_dt.day

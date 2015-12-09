@@ -282,6 +282,7 @@ def run(fires_manager):
                 logging.error(
                     "Failed to calculate consumption for fire %s fuelbed %s",
                     fire.id, fb['fccs_id'])
+
     fires_manager.summarize(
         consumption=datautils.summarize(fires_manager.fires, 'consumption'))
 
