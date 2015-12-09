@@ -40,41 +40,29 @@ class VSMOKEDispersion(DispersionBase):
     }
     DEFAULTS = defaults
 
-    def run(self, fires, start, num_hours, dest_dir, output_dir_name):
+    def _run(self, fires, wdir):
         """Runs hysplit
 
         args:
-         - fires - list of fires to run through hysplit
-         - start - model run start hour
-         - num_hours - number of hours in model run
-         - dest_dir - directory to contain output dir
-         - output_dir_name - name of output dir
+         - fires -- list of fires to run through VSMOKE
+         - wdir -- working directory
         """
-
-        fireInfo = self.get_input("fires")
-
-        with working_dir() as wdir:
-            input_file = os.path.join(wdir, "VSMOKE.IPT")
-            iso_input_file = os.path.join(wdir, "vsmkgs.ipt")
-
-        # Define variables for making KML and KMZ files
-
-        contour_names = VSMOKEDispersion.ISONAMES
-        contour_colors = VSMOKEDispersion.ISOCOLORS
-
         overlay_title = self.config("OVERLAY_TITLE")
         legend_image = self.config("LEGEND_IMAGE")
+        date = self.config("DATE", BSDateTime)
 
         self.log.debug("PM Isopleths =%s" % self.ISOPLETHS)
-        self.log.debug("PM Isopleths Names =%s" % contour_names)
-        self.log.debug("PM Isopleths Colors =%s" % contour_colors)
+        self.log.debug("PM Isopleths Names =%s" % self.ISONAMES)
+        self.log.debug("PM Isopleths Colors =%s" % self.ISOCOLORS)
+
+        input_file = os.path.join(wdir, "VSMOKE.IPT")
+        iso_input_file = os.path.join(wdir, "vsmkgs.ipt")
 
         # Define variables to make KML and KMZ files
-        temp_dir = tempfile.gettempdir()
-        doc_kml = os.path.join(temp_dir, "doc.kml")
+        doc_kml = os.path.join(wdir, "doc.kml")
         self.log.debug("Fire kmz = %s" % doc_kml)
         kmz_files = [doc_kml]
-        date = self.config("DATE", BSDateTime)
+
         kmz_filename = os.path.join(self.config("OUTPUT_DIR"), (self.config("KMZ_FILE")))
         kmz_filename = date.strftime(kmz_filename)
         self.log.debug("Creating KMZ file " + os.path.basename(kmz_filename))
@@ -88,11 +76,16 @@ class VSMOKEDispersion(DispersionBase):
             json = GeoJSON()
 
         # For each fire run VSMOKE and VSMOKEGIS
-        for fireLoc in fires:
+        for fire in fires:
+            # TODO: check to make sure start+num_hours is within fire's
+            #   growth windows
             in_var = INPUTVariables(fireLoc)
 
-            date_time_str = fireLoc['date_time'].bs_strftime()
-            timezone = int(date_time_str[-6:-3]) # Get '-zz' from YYYYmmddHHMM-zz:zz
+            utc_offset = fire.get('location', {}).get('utc_offset')
+            utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
+            # TODO: remove following line nad just rename 'timezone' to
+            #  'utc_offset' in all subsequent code
+            timezone = utc_offset
 
             # Get emissions for fire
             cons = fireLoc["consumption"]
@@ -117,21 +110,21 @@ class VSMOKEDispersion(DispersionBase):
                 context.copy_file("vsmkgs.iso", iso_output)
                 context.copy_file("vsmkgs.opt", gis_output)
                 context.copy_file("vsmkgs.ipt", iso_input)
-                context.archive_file(iso_input)
-                context.archive_file(gis_output)
-                context.archive_file(iso_output)
+                self._save_file(iso_input)
+                self._save_file(gis_output)
+                self._save_file(iso_output)
                 iso_file = context.full_path("vsmkgs.iso")
 
                 # Make KML file
                 kml_name = in_var.fireID + "_" + str(hr+1) + ".kml"
                 kml_path = os.path.join(temp_dir, kml_name)
-                self._build_kml(kml_path, in_var, iso_file, contour_names, contour_colors)
+                self._build_kml(kml_path, in_var, iso_file)
                 kmz_files.append(kml_path)
                 my_kmz.add_kml(kml_name, fireLoc, hr)
 
                 # Add data to GeoJSON file
                 if create_json:
-                    self._build_json(json, in_var, iso_file, contour_names, contour_colors, fireLoc['id'], timezone, hr)
+                    self._build_json(json, in_var, iso_file, fireLoc['id'], timezone, hr)
 
             # Write input files
             self._write_input(emis, cons, npriod, in_var, input_file, timezone)
@@ -143,8 +136,8 @@ class VSMOKEDispersion(DispersionBase):
             fire_output = "VSMOKE_" + fireLoc["id"] + ".OUT"
             context.copy_file("VSMOKE.IPT", fire_input)
             context.copy_file("VSMOKE.OUT", fire_output)
-            context.archive_file(fire_input)
-            context.archive_file(fire_output)
+            self._save_file(fire_input)
+            self._save_file(fire_output)
 
         # Make KMZ file
         my_kmz.write()
@@ -346,7 +339,7 @@ class VSMOKEDispersion(DispersionBase):
 
         return isopleths
 
-    def _build_kml(self, kml_file, in_var, iso_file, contour_names, contour_colors):
+    def _build_kml(self, kml_file, in_var, iso_file):
         """
         Make a KML file.
         Based on runvsmoke.py code used to run VSMOKEGIS
@@ -354,24 +347,24 @@ class VSMOKEDispersion(DispersionBase):
         smoke_color = '2caaaaaa'
         mykml = KMLFile(kml_file)
         for k, interval in enumerate(self.ISOPLETHS):
-            mykml.add_style(name=contour_names[k], line_color=contour_colors[k], fill_color=smoke_color)
+            mykml.add_style(name=self.ISONAMES[k], line_color=self.ISOCOLORS[k], fill_color=smoke_color)
 
         isopleths = self._build_isopleths(in_var, iso_file)
 
         mykml.open_folder('Potential Health Impacts', Open=True)
         for c, interval in enumerate(self.ISOPLETHS):
             name = str(interval)
-            mykml.add_placemarker(isopleths[name], name=contour_names[c], TurnOn=1)
+            mykml.add_placemarker(isopleths[name], name=self.ISONAMES[c], TurnOn=1)
         mykml.close_folder()
         mykml.close()
         mykml.write()
 
-    def _build_json(self, json, in_var, iso_file, contour_names, contour_colors, fire_id, timezone, hr):
+    def _build_json(self, json, in_var, iso_file, fire_id, timezone, hr):
         isopleths = self._build_isopleths(in_var, iso_file)
 
         for c, interval in enumerate(self.ISOPLETHS):
             name = str(interval)
-            json.add_linestring(fire_id, contour_names[c], contour_colors[c], hr, isopleths[name], timezone)
+            json.add_linestring(fire_id, self.ISONAMES[c], self.ISOCOLORS[c], hr, isopleths[name], timezone)
 
 
 class GeoJSON:
