@@ -40,6 +40,14 @@ path. As a security measure, to avoid security vulnerabilities when hsyplit is
 invoked by web service requests, these executables may not be configured to
 point to relative or absolute paths.
 
+#### vsmoke
+
+If running vsmoke dispersion, you'll need to obtain vsmoke from the US
+Forest Service.  You can download it
+[here](http://webcam.srs.fs.fed.us/tools/vsmoke/download.shtml).
+As with the hysplit executables, the vsmoke binaries (```vsmoke``` and
+```vsmkgs```) are assumed to reside in a directory in the search path.
+
 ## Development
 
 ### Clone Repo
@@ -976,6 +984,10 @@ on and fuelbeds is defined
  - ***'met' > 'grid' > 'domain'*** -- *optional* -- default: 'LatLng' (which means the spacing is in degrees)
  - ***'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, generates new guid
 
+###### if running vsmoke dispersion:
+
+ -
+
 ##### visualization
 
 ###### if visualizing hysplit dispersion:
@@ -1122,6 +1134,10 @@ user defined grid settings ('CENTER_LATITUDE', 'CENTER_LONGITUDE',
 'hysplit' > 'grid' for 'boundary', 'spacing', and 'domain' fields.  If not
 defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 'met' object.
+
+###### if running vsmoke dispersion:
+
+ -
 
 ##### visualization
 
