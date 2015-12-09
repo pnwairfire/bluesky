@@ -80,10 +80,6 @@ EMTQR = -.75
 # OUTPUT SETTINGS
 #
 
-# Paths to VSMOKE binary files
-VSMOKE_BINARY = ${PACKAGE_DIR}/vsmoke
-VSMOKEGIS_BINARY = ${PACKAGE_DIR}/vsmkgs
-
 # KMZ Output settings
 KMZ_FILE = smoke_dispersion.kmz
 OVERLAY_TITLE = "Peak Hourly PM2.5"
