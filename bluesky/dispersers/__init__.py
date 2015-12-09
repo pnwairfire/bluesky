@@ -59,7 +59,6 @@ class DispersionBase(object):
             self._config.get(key.lower(),
                 getattr(self.DEFAULTS, key, None)))
 
-    @abc.abstractmethod
     def run(self, fires, start, num_hours, dest_dir, output_dir_name):
         """Runs hysplit
 
@@ -70,4 +69,45 @@ class DispersionBase(object):
          - dest_dir - directory to contain output dir
          - output_dir_name - name of output dir
         """
+        logging.info("Running %s", self.__class__.__name__)
+        if start.minute or start.second or start.microsecond:
+            raise ValueError("Dispersion start time must be on the hour.")
+        if type(num_hours) != int:
+            raise ValueError("Dispersion num_hours must be an integer.")
+        self._model_start = start
+        self._num_hours = num_hours
+
+        self._run_output_dir = os.path.join(os.path.abspath(dest_dir),
+            output_dir_name)
+        os.makedirs(self._run_output_dir)
+
+        self._files_to_archive = []
+
+
+        with working_dir() as wdir:
+            r = self._run(fires, wdir)
+            self._move_files()
+
+        r.update({
+            "directory": self._run_output_dir,
+            "start_time": self._model_start.isoformat(),
+            "num_hours": self._num_hours
+        })
+        return r
+
+    @abc.abstractmethod
+    def _run(fires, wdir):
+        """Underlying run method to be implemented by subclasses
+
+        args:
+         - fires - list of fires to run through hysplit
+        """
         pass
+
+
+    def _save_file(self, file):
+        self._files_to_archive.append(file)
+
+    def _move_files(self):
+        for f in self._files_to_archive:
+            shutil.move(f, self._run_output_dir)

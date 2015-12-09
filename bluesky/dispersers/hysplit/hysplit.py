@@ -59,62 +59,35 @@ class HYSPLITDispersion(DispersionBase):
     PHASES = ['flaming', 'smoldering', 'residual']
     TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
-    def run(self, fires, start, num_hours, dest_dir, output_dir_name):
+    def _run(self, fires, wdir):
         """Runs hysplit
 
         args:
-         - fires - list of fires to run through hysplit
-         - start - model run start hour
-         - num_hours - number of hours in model run
-         - dest_dir - directory to contain output dir
-         - output_dir_name - name of output dir
+         - fires -- list of fires to run through hysplit
+         - wdir -- working directory
         """
-        logging.info("Running the HYSPLIT49 Dispersion model")
-        if start.minute or start.second or start.microsecond:
-            raise ValueError("Dispersion start time must be on the hour.")
-        if type(num_hours) != int:
-            raise ValueError("Dispersion num_hours must be an integer.")
-
-        self._run_output_dir = os.path.join(os.path.abspath(dest_dir),
-            output_dir_name)
-        os.makedirs(self._run_output_dir)
-
-        self._files_to_archive = []
-        self._model_start = start
-        self._num_hours = num_hours
         self._set_fire_data(fires)
         self._create_dummy_fire_if_necessary()
         self._set_reduction_factor()
         fire_sets, num_processes  = self._compute_tranches()
 
-        with working_dir() as wdir:
-            if 1 < num_processes:
-                    # hysplit_utils.create_fire_tranches will log number of processes
-                    # and number of fires each
-                    self._run_parallel(num_processes, fire_sets, wdir)
-            else:
-                self._run_process(self._fires, wdir)
+        if 1 < num_processes:
+                # hysplit_utils.create_fire_tranches will log number of processes
+                # and number of fires each
+                self._run_parallel(num_processes, fire_sets, wdir)
+        else:
+            self._run_process(self._fires, wdir)
 
-            self._move_files()
-
+        # Note: DispersionBase.run will add directory, start_time,
+        #  and num_hours to the response dict
         return {
             "output": {
-                "directory": self._run_output_dir,
                 "grid_filetype": "NETCDF",
                 "grid_filename": self.OUTPUT_FILE_NAME,
                 "parameters": {"pm25": "PM25"},
-                "start_time": self._model_start.isoformat(),
-                "num_hours": self._num_hours,
             },
             "met_info": self._met_info
         }
-
-    def _save_file(self, file):
-        self._files_to_archive.append(file)
-
-    def _move_files(self):
-        for f in self._files_to_archive:
-            shutil.move(f, self._run_output_dir)
 
     def _execute(self, *args, **kwargs):
         # TODO: make sure this is the corrrect way to call
