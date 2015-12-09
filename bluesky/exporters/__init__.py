@@ -13,6 +13,11 @@ import tempfile
 
 from bluesky import configuration
 
+
+# TODO: Support exporting VSMOKE dispersion, which would include KMLs
+#   and not have separate visualization section
+
+
 class ExporterBase(object):
 
     def __init__(self, extra_exports, **config):
