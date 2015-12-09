@@ -84,22 +84,30 @@ def multiply_nested_data(nested_data, multiplier):
     else:
         raise ValueError("Not nested data: {}".format(nested_data))
 
-def sum_nested_data(nested_data):
+def sum_nested_data(nested_data, *skip_keys):
+    """Sums nested data, grouped by innermost keys
+
+    args
+     - nested_data -- dict containing nested numerical data; can be of
+         any depth, and can contain scalars or arrays
+     - skip_keys -- keys to skip, effectively ignoring
+    """
     if not _is_dict(nested_data):
         raise ValueError("Nested data must be a dict")
 
     summed_data = {}
     def _sum(nested_data):
         for k, v in nested_data.items():
-            if _is_num(v):
-                summed_data[k] = summed_data.get(k, 0.0) + v
-            elif _is_array(v):
-                # we're assuming it's an array of number values
-                summed_data[k] = summed_data.get(k, 0.0) + sum(v)
-            elif _is_dict(v):
-                _sum(v)
-            else:
-                raise ValueError("Nested data must contain number values")
+            if not skip_keys or k not in skip_keys:
+                if _is_num(v):
+                    summed_data[k] = summed_data.get(k, 0.0) + v
+                elif _is_array(v):
+                    # we're assuming it's an array of number values
+                    summed_data[k] = summed_data.get(k, 0.0) + sum(v)
+                elif _is_dict(v):
+                    _sum(v)
+                else:
+                    raise ValueError("Nested data must contain number values")
 
     _sum(nested_data)
     return summed_data
