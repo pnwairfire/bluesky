@@ -44,7 +44,7 @@ def summarize(fires, subdata_key):
     """Summarizes data within fuelbed objects across all fires
 
     args
-     - fires -- array of fire objects with fuelbed objecting containing
+     - fires -- array of fire objects with fuelbed objects containing
         data to summarize
      - subdata_key -- fuelbed keys to summarize; e.g. 'emissions'
     """

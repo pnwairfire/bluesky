@@ -89,8 +89,10 @@ class VSMOKEDispersion(DispersionBase):
             timezone = utc_offset
 
             # Get emissions for fire
-            cons = datautils.sum_nested_data(fireLoc["consumption"]
-            emis = fireLoc["emissions"]
+            cons = datautils.sum_nested_data(
+                [fb["consumption"] for fb in fire['fuelbeds']], 'summary', 'total')
+            emis = datautils.sum_nested_data(
+                [fb["emissions"] for fb in fire['fuelbeds']], 'summary', 'total')
             if not cons or not emis:
                 continue
             npriod = len(emis.time)
