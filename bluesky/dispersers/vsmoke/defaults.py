@@ -9,7 +9,7 @@ PRES = 1013.25
 IRHA = 25
 
 # Is fire before sunset?
-LTOFDY = TRUE
+LTOFDY = True
 
 # Period instability class
 # 1 = extremely unstable
@@ -68,7 +68,7 @@ VISCRT = 0.125
 #
 
 # Plume rise: TRUE = gradual to final ht, FALSE = immediately attain final ht
-GRAD_RISE = TRUE
+GRAD_RISE = True
 
 # Proportion of emissions subject to plume rise
 RFRC = -.75
@@ -81,13 +81,13 @@ EMTQR = -.75
 #
 
 # KMZ Output settings
-KMZ_FILE = smoke_dispersion.kmz
+KMZ_FILE = "smoke_dispersion.kmz"
 OVERLAY_TITLE = "Peak Hourly PM2.5"
-LEGEND_IMAGE = aqi_legend.png
+LEGEND_IMAGE = "aqi_legend.png"
 
 # GeoJSON Output settings
-JSON_FILE = smoke_dispersion.json
-CREATE_JSON = TRUE
+JSON_FILE = "smoke_dispersion.json"
+CREATE_JSON = True
 
 # UTM displacement of fire east of reference point
 DUTMFE = 0
