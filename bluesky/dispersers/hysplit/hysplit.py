@@ -25,7 +25,7 @@ from bluesky.models.fires import Fire
 import hysplit_utils
 
 from . import defaults
-from .. import DispersionBase, working_dir
+from .. import DispersionBase
 
 __all__ = [
     'HYSPLITDispersion'
