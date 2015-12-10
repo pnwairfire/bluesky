@@ -106,7 +106,7 @@ class VSMOKEDispersion(DispersionBase):
                 self._execute(BINARIES['VSMOKEGIS'], working_dir=wdir)
                 self._rename_intput_and_output_files()
 
-                iso_file = context.full_path("vsmkgs.iso")
+                iso_file = os.path.join(wdir, "vsmkgs.iso")
 
                 # Make KML file
                 kml_name = in_var.fireID + "_" + str(hr+1) + ".kml"
@@ -120,15 +120,16 @@ class VSMOKEDispersion(DispersionBase):
             # Write input files
             self._write_input(emis, cons, npriod, in_var, timezone)
             # Run VSMOKE for fire
-            context.execute(self.BINARIES['VSMOKE'])
+            self._execute(self.BINARIES['VSMOKE'], working_dir=wdir)
 
             # Rename input and output files and archive
-            fire_input = "VSMOKE_" + fireLoc["id"] + ".IPT"
-            fire_output = "VSMOKE_" + fireLoc["id"] + ".OUT"
-            context.copy_file("VSMOKE.IPT", fire_input)
-            context.copy_file("VSMOKE.OUT", fire_output)
-            self._save_file(fire_input)
-            self._save_file(fire_output)
+            fire_input = os.path.join(self._run_output_dir,
+                "VSMOKE_" + fireLoc["id"] + ".IPT")
+            fire_output = os.path.join(self._run_output_dir,
+                "VSMOKE_" + fireLoc["id"] + ".OUT")
+            shutil.copy(os.path.join(wdir, "VSMOKE.IPT"), fire_input)
+            shutil.copy(os.path.join(wdir, "VSMOKE.OUT"), fire_output)
+            # Note: no need to call _save_file, since we just moved them
 
         # Make KMZ file
         self._my_kmz.write()
@@ -155,16 +156,17 @@ class VSMOKEDispersion(DispersionBase):
         return r
 
     def _rename_intput_and_output_files(self, fire):
-        iso_output = "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".iso"
-        gis_output = "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".opt"
-        iso_input = "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".ipt"
+        iso_output = os.path.join(self._run_output_dir,
+            "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".iso")
+        gis_output = os.path.join(self._run_output_dir,
+            "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".opt")
+        iso_input = os.path.join(self._run_output_dir,
+            "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".ipt")
         # TODO: use shutil
-        context.copy_file("vsmkgs.iso", iso_output)
-        context.copy_file("vsmkgs.opt", gis_output)
-        context.copy_file("vsmkgs.ipt", iso_input)
-        self._save_file(iso_input)
-        self._save_file(gis_output)
-        self._save_file(iso_output)
+        shutil.copy(os.path.join(wdir, "vsmkgs.iso"), iso_output)
+        shutil.copy(os.path.join(wdir, "vsmkgs.opt"), gis_output)
+        shutil.copy(os.path.join(wdir, "vsmkgs.ipt"), iso_input)
+        # Note: no need to call _save_file, since we just moved them
 
     def _write_input(self, emissions, cons, npriod, in_var, tz):
         """

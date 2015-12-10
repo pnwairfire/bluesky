@@ -83,7 +83,6 @@ class DispersionBase(object):
 
         self._files_to_archive = []
 
-
         with create_working_dir() as wdir:
             r = self._run(fires, wdir)
             self._move_files()
