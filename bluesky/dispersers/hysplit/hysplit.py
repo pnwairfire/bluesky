@@ -25,19 +25,13 @@ from bluesky.models.fires import Fire
 import hysplit_utils
 
 from . import defaults
-from .. import DispersionBase
+from .. import (
+    DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE
+)
 
 __all__ = [
     'HYSPLITDispersion'
 ]
-
-# Note: HYSPLIT can accept concentrations in any units, but for
-# consistency with CALPUFF and other dispersion models, we convert to
-# grams in the emissions file.
-GRAMS_PER_TON = 907184.74
-
-# Conversion factor for fire size
-SQUARE_METERS_PER_ACRE = 4046.8726
 
 class HYSPLITDispersion(DispersionBase):
     """ HYSPLIT Dispersion model
@@ -56,17 +50,15 @@ class HYSPLITDispersion(DispersionBase):
     }
     DEFAULTS = defaults
 
-    PHASES = ['flaming', 'smoldering', 'residual']
+    # Note: 'PHASES' is defined in HYSPLITDispersion
     TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
-    def _run(self, fires, wdir):
+    def _run(self, wdir):
         """Runs hysplit
 
         args:
-         - fires -- list of fires to run through hysplit
          - wdir -- working directory
         """
-        self._set_fire_data(fires)
         self._create_dummy_fire_if_necessary()
         self._set_reduction_factor()
         fire_sets, num_processes  = self._compute_tranches()
@@ -111,88 +103,6 @@ class HYSPLITDispersion(DispersionBase):
                     met_file['file']))
             self._met_info['files'].add(met_file['file'])
         self._met_info['files'] = list(self._met_info['files'])
-
-    # TODO: set these to None, and let _write_emissions using it's logic to
-    #  handle missing data?
-    # TODO: is this an appropriate fill-in plumerise hour?
-    # MISSING_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.0 for e in range(21)},
-    #     smolder_fraction=0.0)
-    # # TODO: is this an appropriate fill-in timeprofile hour?
-    # MISSING_TIMEPROFILE_HOUR = {p: 0.0 for p in PHASES }
-
-    def _set_fire_data(self, fires):
-        self._fires = []
-
-        # TODO: aggreagating over all fires (if psossible)
-        #  use self.model_start and self.model_end
-        #  as disperion time window, and then look at
-        #  growth window(s) of each fire to fill in emissions for each
-        #  fire spanning hysplit time window
-        # TODO: determine set of arl fires by aggregating arl files
-        #  specified per growth per fire, or expect global arl files
-        #  specifications?  (if aggregating over fires, make sure they're
-        #  conistent with met domain; if not, raise exception or run them
-        #  separately...raising exception would be easier for now)
-        # Make sure met files span dispersion time window
-        for fire in fires:
-            try:
-                if 'growth' not in fire:
-                    raise ValueError(
-                        "Missing timeprofile and plumerise data required for computing dispersion")
-                for g in fire.growth:
-                    if any([not g.get(f) for f in ('timeprofile', 'plumerise')]):
-                        raise ValueError("Each growth window must have "
-                            "timeprofile and plumerise in order to compute hysplit")
-                if ('fuelbeds' not in fire or
-                        any([not fb.get('emissions') for fb in fire.fuelbeds])):
-                    raise ValueError(
-                        "Missing emissions data required for computing dispersion")
-                # TODO: figure out what to do with heat????  here's the check from
-                # BSF's hysplit.py
-                # if fire.emissions.sum("heat") < 1.0e-6:
-                #     logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fire.id)
-                #     continue
-
-                utc_offset = fire.get('location', {}).get('utc_offset')
-                utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
-
-                # TODO: only include plumerise and timeprofile keys within model run
-                # time window; and somehow fill in gaps (is this possible?)
-                all_plumerise = self._convert_keys_to_datetime(
-                    reduce(lambda r, g: r.update(g['plumerise']) or r, fire.growth, {}))
-                all_timeprofile = self._convert_keys_to_datetime(
-                    reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {}))
-                plumerise = {}
-                timeprofile = {}
-                for i in range(self._num_hours):
-                    local_dt = self._model_start + timedelta(hours=(i + utc_offset))
-                    plumerise[local_dt] = all_plumerise.get(local_dt) # or self.MISSING_PLUMERISE_HOUR
-                    timeprofile[local_dt] = all_timeprofile.get(local_dt) #or self.MISSING_TIMEPROFILE_HOUR
-
-                # sum the emissions across all fuelbeds, but keep them separate by phase
-                emissions = {p: {} for p in self.PHASES}
-                for fb in fire.fuelbeds:
-                    for p in self.PHASES:
-                        for s in fb['emissions'][p]:
-                            emissions[p][s] = emissions[p].get(s, 0.0) + sum(fb['emissions'][p][s])
-
-                f = Fire(
-                    id=fire.id,
-                    area=fire.location['area'],
-                    latitude=fire.latitude,
-                    longitude=fire.longitude,
-                    utc_offset=utc_offset,
-                    plumerise=plumerise,
-                    timeprofile=timeprofile,
-                    emissions=emissions
-                )
-                self._fires.append(f)
-
-            except:
-                if self.config('skip_invalid_fires'):
-                    continue
-                else:
-                    raise
 
     def _convert_keys_to_datetime(self, d):
         return { datetime_parsing.parse(k): v for k, v in d.items() }
@@ -443,7 +353,7 @@ class HYSPLITDispersion(DispersionBase):
         if not os.path.exists(output_conc_file):
             msg = "HYSPLIT failed, check MESSAGE file for details"
             raise AssertionError(msg)
-        self._save_file(output_conc_file)
+        self._archive_file(output_conc_file)
 
         if self.config('CONVERT_HYSPLIT2NETCDF'):
             logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (output_conc_file, output_file))
@@ -459,22 +369,22 @@ class HYSPLITDispersion(DispersionBase):
             if not os.path.exists(output_file):
                 msg = "Unable to convert HYSPLIT concentration file to NetCDF format"
                 raise AssertionError(msg)
-        self._save_file(output_file)
+        self._archive_file(output_file)
 
         # Archive data files
-        self._save_file(emissions_file)
-        self._save_file(control_file)
-        self._save_file(setup_file)
+        self._archive_file(emissions_file)
+        self._archive_file(control_file)
+        self._archive_file(setup_file)
         for f in message_files:
-            self._save_file(f)
+            self._archive_file(f)
         if self.config("MAKE_INIT_FILE"):
             if self.config("MPI"):
                 for f in pardumpFiles:
-                    self._save_file(f)
+                    self._archive_file(f)
                     #shutil.copy2(os.path.join(working_dir, f), self._run_output_dir)
             else:
                 pardump_file = os.path.join(working_dir, "PARDUMP")
-                self._save_file(pardump_file)
+                self._archive_file(pardump_file)
                 #shutil.copy2(pardump_file, self._run_output_dir + "/PARDUMP_"+ self.config("DATE"))
 
     def _write_emissions(self, emissions_file):

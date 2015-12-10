@@ -21,7 +21,9 @@ from pyairfire.datetime import parsing as datetime_parsing
 
 from bluesky.datetimeutils import parse_utc_offset
 
-from .. import DispersionBase
+from .. import (
+    DispersionBase, TONS_PER_HR_TO_GRAMS_PER_SEC, BTU_TO_MW
+)
 
 __all__ = [
     'VSMOKEDispersion'
@@ -69,18 +71,17 @@ class VSMOKEDispersion(DispersionBase):
         self._legend_image = self.config("LEGEND_IMAGE")
         self._my_kmz = KMZAnimation(doc_kml, self.config("OVERLAY_TITLE"), legend_image)
 
-    def _run(self, fires, wdir):
-        """Runs hysplit
+    def _run(self):
+        """Runs vsmoke
 
         args:
-         - fires -- list of fires to run through VSMOKE
          - wdir -- working directory
         """
         # For each fire run VSMOKE and VSMOKEGIS
-        for fire in fires:
+        for fire in self._fires:
             # TODO: check to make sure start+num_hours is within fire's
             #   growth windows
-            in_var = INPUTVariables(fireLoc)
+            in_var = INPUTVariables(fire)
 
             utc_offset = fire.get('location', {}).get('utc_offset')
             utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
@@ -89,25 +90,25 @@ class VSMOKEDispersion(DispersionBase):
             timezone = utc_offset
 
             # Get emissions for fire
-            cons = datautils.sum_nested_data(
-                [fb["consumption"] for fb in fire['fuelbeds']], 'summary', 'total')
-            emis = datautils.sum_nested_data(
-                [fb["emissions"] for fb in fire['fuelbeds']], 'summary', 'total')
-            if not cons or not emis:
+            if not fire.emissions or not fire.consumption:
                 continue
-            npriod = len(emis.time)
-            self.log.debug("%d hour run time for fireID %s" % (npriod, fireLoc["id"]))
+
+            self.log.debug("%d hour run time for fireID %s",
+                self._num_hours, fire["id"])
 
             # Run VSMOKE GIS for each hour
-            for hr in xrange(npriod):
-                self._write_iso_input(emis, hr, in_var)
+            for hr in range(self._num_hours):
+                dt = self._model_start + timedelta(hours=hour)
+                local_dt = dt + timedelta(hours=fire.utc_offset)
+                self._write_iso_input(fire, local_dt, in_var)
 
                 self._execute(BINARIES['VSMOKEGIS'], working_dir=wdir)
 
+                # TODO: replace 'hr' with 'local_dt.isoformat()'
                 suffix = "{}_hour{}".format(fire.id, str(hr+1))
-                self._archive_file(wdir, "vsmkgs.iso", suffix)
-                self._archive_file(wdir, "vsmkgs.opt", suffix)
-                self._archive_file(wdir, "vsmkgs.ipt", suffix)
+                self._archive_file("vsmkgs.iso", src_dir=wdir, suffix=suffix)
+                self._archive_file("vsmkgs.opt", src_dir=wdir, suffix=suffix)
+                self._archive_file("vsmkgs.ipt", src_dir=wdir, suffix=suffix)
 
                 iso_file = os.path.join(wdir, "vsmkgs.iso")
 
@@ -116,18 +117,18 @@ class VSMOKEDispersion(DispersionBase):
                 kml_path = os.path.join(temp_dir, kml_name)
                 self._build_kml(kml_path, in_var, iso_file)
                 self._kmz_files.append(kml_path)
-                self._my_kmz.add_kml(kml_name, fireLoc, hr)
+                self._my_kmz.add_kml(kml_name, fire, hr)
 
-                self._add_geo_json(in_var, iso_file, fireLoc['id'], timezone, hr)
+                self._add_geo_json(in_var, iso_file, fire['id'], timezone, hr)
 
             # Write input files
-            self._write_input(emis, cons, npriod, in_var, timezone)
+            self._write_input(fire, in_var)
             # Run VSMOKE for fire
             self._execute(self.BINARIES['VSMOKE'], working_dir=wdir)
 
             # Rename input and output files and archive
-            self._archive_file(wdir, "VSMOKE.IPT", fire.id)
-            self._archive_file(wdir, "VSMOKE.OUT", fire.id)
+            self._archive_file("VSMOKE.IPT", src_dir=wdir, suffix=fire.id)
+            self._archive_file("VSMOKE.OUT", src_dir=wdir, suffix=fire.id)
 
         # Make KMZ file
         self._my_kmz.write()
@@ -153,7 +154,7 @@ class VSMOKEDispersion(DispersionBase):
         # TODO: anytheing else to include in response
         return r
 
-    def _write_input(self, emissions, cons, npriod, in_var, tz):
+    def _write_input(self, fire, in_var):
         """
         This function will create the input file needed to run VSMOKE.
         These parameters are fixed or are not used since user should provide stability.
@@ -173,7 +174,8 @@ class VSMOKEDispersion(DispersionBase):
         rfrc = self.config("RFRC", float)
         emtqr = self.config("EMTQR", float)
 
-        tons = npriod * (cons["flaming"] + cons["smoldering"] + cons["residual"] + cons["duff"])
+        #tons = npriod * (cons["flaming"] + cons["smoldering"] + cons["residual"] + cons["duff"])
+        tons = sum([fire.consumption[p] for p in self.PHASES]))
 
         warn = []
         if in_var.temp_fire is None:
@@ -212,27 +214,45 @@ class VSMOKEDispersion(DispersionBase):
         with open(self._input_file, "w") as f:
             f.write("60\n")
             f.write("%s\n" % in_var.title)
-            f.write("%f %f %f %d %d %d %d %f %f %s %s %s %f %s\n" % (in_var.alat, in_var.along, tz,
-                                                                     in_var.iyear, in_var.imo, in_var.iday, npriod,
-                                                                     in_var.hrstrt, hrntvl, lstbdy, lqread, lsight,
-                                                                     cc0crt, viscrt))
-            f.write("%f %f %f %f %f %f %f %f %s %f\n" % (in_var.acres, tons, efpm, efco, in_var.tfire, thot, tconst,
-                                                         tdecay, grad_rise, rfrc))
-            for hour in xrange(npriod):
-                nhour = hour + 1
-                f.write("%d %f %f %d %s %d %f %f %f %f %f %f\n" % (nhour, in_var.temp_fire, in_var.pres, in_var.irha,
-                                                                   in_var.ltofdy, in_var.stability, in_var.mix_ht,
-                                                                   in_var.ua, in_var.oyinta, in_var.ozinta,
-                                                                   in_var.bkgpma, in_var.bkgcoa))
+            f.write("%f %f %f %d %d %d %d %f %f %s %s %s %f %s\n" % (
+                in_var.alat, in_var.along, fire.utc_offset,
+                in_var.iyear, in_var.imo, in_var.iday, self._num_hours,
+                in_var.hrstrt, hrntvl, lstbdy, lqread, lsight,
+                cc0crt, viscrt)
+            )
+            f.write("%f %f %f %f %f %f %f %f %s %f\n" % (
+                in_var.acres, tons, efpm, efco, in_var.tfire, thot, tconst,
+                tdecay, grad_rise, rfrc)
+            )
+            for hour in xrange(self._num_hours):
 
-            for hour in xrange(npriod):
-                nhour = hour + 1
-                emtqh = (emissions["heat"][hour]) / 3414425.94972     # Btu to MW
-                emtqpm = (emissions["pm25"][hour].sum()) * 251.99576  # tons/hr to g/s
-                emtqco = (emissions["co"][hour].sum()) * 251.99576    # tons/hr to g/s
-                f.write("%d %f %f %f %f\n" % (nhour, emtqpm, emtqco, emtqh, emtqr))
+                f.write("%d %f %f %d %s %d %f %f %f %f %f %f\n" % (
+                    hour + 1, in_var.temp_fire, in_var.pres, in_var.irha,
+                    in_var.ltofdy, in_var.stability, in_var.mix_ht,
+                    in_var.ua, in_var.oyinta, in_var.ozinta,
+                    in_var.bkgpma, in_var.bkgcoa)
+                )
 
-    def _write_iso_input(self, emissions, hour, in_var):
+            for hour in xrange(self._num_hours):
+                dt = self._model_start + timedelta(hours=hour)
+                local_dt = dt + timedelta(hours=fire.utc_offset)
+                timeprofile_hour = fire.timeprofile.get(local_dt)
+                pm25_emitted = sum([
+                    timeprofile_hour[p]*fire.emissions[p].get('PM25', 0.0)
+                        for p in self.PHASES
+                ])
+                co_emitted = sum([
+                    timeprofile_hour[p]*fire.emissions[p].get('CO', 0.0)
+                        for p in self.PHASES
+                ])
+                heat = 0.0 # TODO: update pipeline to compute heat
+
+                emtqh = (heat) / 3414425.94972     # Btu to MW
+                emtqpm = (pm25_emitted) * TONS_PER_HR_TO_GRAMS_PER_SEC  # tons/hr to g/s
+                emtqco = (co_emitted) * TONS_PER_HR_TO_GRAMS_PER_SEC    # tons/hr to g/s
+                f.write("%d %f %f %f %f\n" % (hour + 1, emtqpm, emtqco, emtqh, emtqr))
+
+    def _write_iso_input(self, fire, local_dt, in_var):
         """ Create the input file needed to run VSMOKEGIS. """
         # Plume rise characteristics
         grad_rise = self.config("GRAD_RISE")
@@ -274,18 +294,29 @@ class VSMOKEDispersion(DispersionBase):
         if in_var.bkgpma is None:
             in_var.bkgpma = self.config("BKGPMA", float)
             warn.append('background PM2.5')
-        if warn and (hour == 0):
-            self.log.warn("For fire " + in_var.fireID + ", used default values for these parameters: " + ', '.join(warn))
+        if warn: # this should only happen the first time through this method
+            self.log.warn("For fire " + in_var.fireID +
+                ", used default values for these parameters: " + ', '.join(warn))
 
         with open(self._iso_input_file, "w") as f:
-            emtqh = (emissions["heat"][hour]) / 3414425.94972     # Btu to MW
-            emtqpm = (emissions["pm25"][hour].sum()) * 251.99576  # tons/hr to g/s
+            timeprofile_hour = fire.timeprofile.get(local_dt)
+            pm25_emitted = sum([
+                timeprofile_hour[p]*fire.emissions[p].get('PM25', 0.0)
+                    for p in self.PHASES
+            ])
+            heat = 0.0 # TODO: update pipeline to compute heat
+
+            emtqh = (heat) / 3414425.94972     # Btu to MW
+            emtqpm = (pm25_emitted) * TONS_PER_HR_TO_GRAMS_PER_SEC  # tons/hr to g/s
 
             f.write("%s\n" % in_var.title)
-            f.write("%s %f %f %f %f\n" % (grad_rise, in_var.acres, emtqpm, emtqh, emtqr))
-            f.write("%s %d %f %f %f %f %f %f\n" % (in_var.ltofdy, in_var.stability, in_var.mix_ht, in_var.ua,
-                                                   in_var.wdir, in_var.oyinta, in_var.ozinta, in_var.bkgpma))
-            f.write("%f %f %f %f %f %d\n" % (utm_e, utm_n, xbgn, xend, xntvl, niso))
+            f.write("%s %f %f %f %f\n" % (
+                grad_rise, in_var.acres, emtqpm, emtqh, emtqr))
+            f.write("%s %d %f %f %f %f %f %f\n" % (
+                in_var.ltofdy, in_var.stability, in_var.mix_ht, in_var.ua,
+                in_var.wdir, in_var.oyinta, in_var.ozinta, in_var.bkgpma))
+            f.write("%f %f %f %f %f %d\n" % (
+                utm_e, utm_n, xbgn, xend, xntvl, niso))
             for interval in self.ISOPLETHS:
                 f.write("%d %f\n" % (interval, chitol))
 
@@ -510,11 +541,12 @@ class KMZAnimation(object):
                 </ScreenOverlay>
         ''' % (self.overlay_title, self.min_time.isoformat(), self.max_time.isoformat(), self.legend_image)
 
-    def add_kml(self, kmlfile, fireLoc, hour):
-        if fireLoc['id'] not in self.fires:
-            self.fires[fireLoc['id']] = []
+    def add_kml(self, kmlfile, fire, hour):
+        if fire['id'] not in self.fires:
+            self.fires[fire['id']] = []
 
-        fire_dt = fireLoc["date_time"]
+        # TODO: pass in and use model start time instead ?
+        fire_dt = datetime_parsing.parse(fireLoc['growth'][0]['start'])
         hour_delta = timedelta(hours=1)
         dt = fire_dt + hour_delta * hour
         content = '''
@@ -585,6 +617,7 @@ class INPUTVariables(object):
         self.acres = fireLoc['location']['area']
 
         # Fire Date and time information
+        # TODO: pass in and use model start time instead ?
         fire_dt = datetime_parsing.parse(fireLoc['growth'][0]['start'])
         self.iyear = fire_dt.year
         self.imo = fire_dt.month
@@ -596,8 +629,10 @@ class INPUTVariables(object):
         # Title for input files
         self.title = ("'VSMOKE input for fire ID %s'" % fireLoc['id'])
 
+        vsmoke_meta = fireLoc.meta.get('vsmoke', {})
+
         # Stability
-        self.stability = fireLoc["meta"]["vsmoke"].get("stability", None)
+        self.stability = vsmoke_meta.get("stability", None)
         if self.stability:
             self.stability = int(self.stability)
             if self.stability < INPUTVariables.MIN_STAB:
@@ -606,21 +641,21 @@ class INPUTVariables(object):
                 self.stability = INPUTVariables.MAX_STAB
 
         # Mixing Height
-        self.mix_ht = fireLoc["meta"]["vsmoke"].get('mixht', None)
+        self.mix_ht = vsmoke_meta.get('mixht', None)
         if self.mix_ht:
             self.mix_ht = float(self.mix_ht)
             if self.mix_ht > INPUTVariables.MAX_MIXHT:
                 self.mix_ht = INPUTVariables.MAX_MIXHT
 
         # Wind speed
-        self.ua = fireLoc["meta"]["vsmoke"].get('ws', None)
+        self.ua = vsmoke_meta.get('ws', None)
         if self.ua:
             self.ua = float(self.ua)
             if self.ua <= INPUTVariables.MIN_WS:
                 self.ua = INPUTVariables.MIN_WS + 0.001
 
         # Wind direction
-        self.wdir = fireLoc["meta"]["vsmoke"].get("wd", None)
+        self.wdir = vsmoke_meta.get("wd", None)
         if self.wdir:
             self.wdir = float(self.wdir)
             if self.wdir <= INPUTVariables.MIN_DIR:
@@ -629,41 +664,41 @@ class INPUTVariables(object):
                 self.wdir = INPUTVariables.MAX_DIR
 
         # Surface temperature
-        self.temp_fire = fireLoc["meta"]["vsmoke"].get("temp", None)
+        self.temp_fire = vsmoke_meta.get("temp", None)
         if self.temp_fire:
             self.temp_fire = float(self.temp_fire)
 
         # Surface pressure
-        self.pres = fireLoc["meta"]["vsmoke"].get("pressure", None)
+        self.pres = vsmoke_meta.get("pressure", None)
         if self.pres:
             self.pres = float(self.pres)
 
         # Surface relative humidity
-        self.irha = fireLoc["meta"]["vsmoke"].get("rh", None)
+        self.irha = vsmoke_meta.get("rh", None)
         if self.irha:
             self.irha = int(self.irha)
 
         # Is fire during daylight hours or nighttime
-        self.ltofdy = fireLoc["meta"]["vsmoke"].get("sun", None)
+        self.ltofdy = vsmoke_meta.get("sun", None)
         if self.ltofdy:
             self.ltofdy = str(self.ltofdy)
 
         # Initial horizontal dispersion
-        self.oyinta = fireLoc["meta"]["vsmoke"].get("oyinta", None)
+        self.oyinta = vsmoke_meta.get("oyinta", None)
         if self.oyinta:
             self.oyinta = float(self.oyinta)
 
         # Initial vertical dispersion
-        self.ozinta = fireLoc["meta"]["vsmoke"].get("ozinta", None)
+        self.ozinta = vsmoke_meta.get("ozinta", None)
         if self.ozinta:
             self.ozinta = float(self.ozinta)
 
         # Background PM 2.5
-        self.bkgpma = fireLoc["meta"]["vsmoke"].get("bkgpm", None)
+        self.bkgpma = vsmoke_meta.get("bkgpm", None)
         if self.bkgpma:
             self.bkgpma = float(self.bkgpma)
 
         # Background CO
-        self.bkgcoa = fireLoc["meta"]["vsmoke"].get("bkgco", None)
+        self.bkgcoa = vsmoke_meta.get("bkgco", None)
         if self.bkgcoa:
             self.bkgcoa = float(self.bkgcoa)

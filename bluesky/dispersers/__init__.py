@@ -31,6 +31,17 @@ class create_working_dir(object):
         os.chdir(self._original_dir)
         # TODO: delete self._working_dir or just let os clean it up ?
 
+# Note: HYSPLIT can accept concentrations in any units, but for
+# consistency with CALPUFF and other dispersion models, we convert to
+# grams in the emissions file.
+GRAMS_PER_TON = 907184.74
+SECONDS_PER_HR = 60 * 60
+TONS_PER_HR_TO_GRAMS_PER_SEC = GRAMS_PER_TON / SECONDS_PER_HR
+BTU_TO_MW = 3414425.94972     # Btu to MW
+
+# Conversion factor for fire size
+SQUARE_METERS_PER_ACRE = 4046.8726
+
 class DispersionBase(object):
 
     __metaclass__ = abc.ABCMeta
@@ -42,6 +53,8 @@ class DispersionBase(object):
     # 'DEFAULTS' object should be defined by each subclass that has default
     # configuration settings (such as in a defaults module)
     DEFAULTS = None
+
+    PHASES = ['flaming', 'smoldering', 'residual']
 
     def __init__(self, met_info, **config):
         self._set_met_info(copy.deepcopy(met_info))
@@ -82,6 +95,8 @@ class DispersionBase(object):
             output_dir_name)
         os.makedirs(self._run_output_dir)
 
+        self._set_fire_data(fires)
+
         self._files_to_archive = []
 
         with create_working_dir() as wdir:
@@ -96,13 +111,98 @@ class DispersionBase(object):
         return r
 
     @abc.abstractmethod
-    def _run(fires, wdir):
+    def _run(wdir):
         """Underlying run method to be implemented by subclasses
-
-        args:
-         - fires - list of fires to run through hysplit
         """
         pass
+
+
+    # TODO: set these to None, and let _write_emissions using it's logic to
+    #  handle missing data?
+    # TODO: is this an appropriate fill-in plumerise hour?
+    # MISSING_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.0 for e in range(21)},
+    #     smolder_fraction=0.0)
+    # # TODO: is this an appropriate fill-in timeprofile hour?
+    # MISSING_TIMEPROFILE_HOUR = {p: 0.0 for p in PHASES }
+
+    def _set_fire_data(self, fires):
+        self._fires = []
+
+        # TODO: aggreagating over all fires (if psossible)
+        #  use self.model_start and self.model_end
+        #  as disperion time window, and then look at
+        #  growth window(s) of each fire to fill in emissions for each
+        #  fire spanning hysplit time window
+        # TODO: determine set of arl fires by aggregating arl files
+        #  specified per growth per fire, or expect global arl files
+        #  specifications?  (if aggregating over fires, make sure they're
+        #  conistent with met domain; if not, raise exception or run them
+        #  separately...raising exception would be easier for now)
+        # Make sure met files span dispersion time window
+        for fire in fires:
+            try:
+                if 'growth' not in fire:
+                    raise ValueError(
+                        "Missing timeprofile and plumerise data required for computing dispersion")
+                for g in fire.growth:
+                    if any([not g.get(f) for f in ('timeprofile', 'plumerise')]):
+                        raise ValueError("Each growth window must have "
+                            "timeprofile and plumerise in order to compute hysplit")
+                if ('fuelbeds' not in fire or
+                        any([not fb.get('emissions') for fb in fire.fuelbeds])):
+                    raise ValueError(
+                        "Missing emissions data required for computing dispersion")
+                # TODO: figure out what to do with heat????  here's the check from
+                # BSF's hysplit.py
+                # if fire.emissions.sum("heat") < 1.0e-6:
+                #     logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fire.id)
+                #     continue
+
+                utc_offset = fire.get('location', {}).get('utc_offset')
+                utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
+
+                # TODO: only include plumerise and timeprofile keys within model run
+                # time window; and somehow fill in gaps (is this possible?)
+                all_plumerise = self._convert_keys_to_datetime(
+                    reduce(lambda r, g: r.update(g['plumerise']) or r, fire.growth, {}))
+                all_timeprofile = self._convert_keys_to_datetime(
+                    reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {}))
+                plumerise = {}
+                timeprofile = {}
+                for i in range(self._num_hours):
+                    local_dt = self._model_start + timedelta(hours=(i + utc_offset))
+                    plumerise[local_dt] = all_plumerise.get(local_dt) # or self.MISSING_PLUMERISE_HOUR
+                    timeprofile[local_dt] = all_timeprofile.get(local_dt) #or self.MISSING_TIMEPROFILE_HOUR
+
+                # sum the emissions across all fuelbeds, but keep them separate by phase
+                emissions = {p: {} for p in self.PHASES}
+                for fb in fire.fuelbeds:
+                    for p in self.PHASES:
+                        for s in fb['emissions'][p]:
+                            emissions[p][s] = emissions[p].get(s, 0.0) + sum(fb['emissions'][p][s])
+
+                consumption = datautils.sum_nested_data(
+                    [fb["consumption"] for fb in fire['fuelbeds']], 'summary', 'total')
+
+                f = Fire(
+                    id=fire.id,
+                    meta=fire.get('meta', {})
+                    area=fire.location['area'],
+                    latitude=fire.latitude,
+                    longitude=fire.longitude,
+                    utc_offset=utc_offset,
+                    plumerise=plumerise,
+                    timeprofile=timeprofile,
+                    emissions=emissions,
+                    consumption=consumption
+                )
+                self._fires.append(f)
+
+            except:
+                if self.config('skip_invalid_fires'):
+                    continue
+                else:
+                    raise
 
     def _save_file(self, file):
         self._files_to_archive.append(file)
@@ -111,16 +211,19 @@ class DispersionBase(object):
         for f in self._files_to_archive:
             shutil.move(f, self._run_output_dir)
 
-    def _archive_file(self, filename, wdir, suffix=None):
+    def _archive_file(self, filename, src_dir=None, suffix=None):
         if suffix:
             filename_parts = filename.split('.')
             archived_filename = "{}_{}.{}".format(
                 '.'.join(filename_parts[:-1]), suffix, filename_parts[-1])
         else:
             archived_filename = filename
+        archived_filename = os.path.join(self._run_output_dir, archived_filename)
 
-        shutil.copy(os.path.join(wdir, filename),
-            os.path.join(self._run_output_dir, archived_filename))
+        if src_dir:
+            filename = os.path.join(src_dir, filename)
+
+        shutil.copy(filename, archived_filename)
 
     def _execute(self, *args, **kwargs):
         # TODO: make sure this is the corrrect way to call
