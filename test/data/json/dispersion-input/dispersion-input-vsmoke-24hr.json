@@ -2,7 +2,7 @@
     "config": {
         "dispersion": {
             "start": "2014-05-30T05:00:00Z",
-            "num_hours": 2,
+            "num_hours": 24,
             "model": "vsmoke",
             "dest_dir": "/tmp/bsp-output"
         }
