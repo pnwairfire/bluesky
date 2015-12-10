@@ -111,3 +111,13 @@ class DispersionBase(object):
     def _move_files(self):
         for f in self._files_to_archive:
             shutil.move(f, self._run_output_dir)
+
+    def _execute(self, *args, **kwargs):
+        # TODO: make sure this is the corrrect way to call
+        logging.debug('Executing {}'.format(' '.join(args)))
+        # Use check_output so that output isn't sent to stdout
+        output = subprocess.check_output(args, cwd=kwargs.get('working_dir'))
+        if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+            logging.debug('Captured {} output:'.format(args[0]))
+            for line in output.split('\n'):
+                logging.debug('{}: {}'.format(args[0], line))

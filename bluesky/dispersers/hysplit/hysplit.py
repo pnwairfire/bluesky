@@ -89,16 +89,6 @@ class HYSPLITDispersion(DispersionBase):
             "met_info": self._met_info
         }
 
-    def _execute(self, *args, **kwargs):
-        # TODO: make sure this is the corrrect way to call
-        logging.debug('Executing {}'.format(' '.join(args)))
-        # Use check_output so that output isn't sent to stdout
-        output = subprocess.check_output(args, cwd=kwargs.get('working_dir'))
-        if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
-            logging.debug('Captured {} output:'.format(args[0]))
-            for line in output.split('\n'):
-                logging.debug('{}: {}'.format(args[0], line))
-
     def _set_met_info(self, met_info):
         # TODO: move validation code into common module bluesky.met.validation ?
         self._met_info = {}
