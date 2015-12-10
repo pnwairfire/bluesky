@@ -100,11 +100,14 @@ class VSMOKEDispersion(DispersionBase):
 
             # Run VSMOKE GIS for each hour
             for hr in xrange(npriod):
-                # Make input file to be used by VSMOKEGIS
                 self._write_iso_input(emis, hr, in_var)
 
                 self._execute(BINARIES['VSMOKEGIS'], working_dir=wdir)
-                self._rename_intput_and_output_files()
+
+                suffix = "{}_hour{}".format(fire.id, str(hr+1))
+                self._archive_file(wdir, "vsmkgs.iso", suffix)
+                self._archive_file(wdir, "vsmkgs.opt", suffix)
+                self._archive_file(wdir, "vsmkgs.ipt", suffix)
 
                 iso_file = os.path.join(wdir, "vsmkgs.iso")
 
@@ -123,13 +126,8 @@ class VSMOKEDispersion(DispersionBase):
             self._execute(self.BINARIES['VSMOKE'], working_dir=wdir)
 
             # Rename input and output files and archive
-            fire_input = os.path.join(self._run_output_dir,
-                "VSMOKE_" + fireLoc["id"] + ".IPT")
-            fire_output = os.path.join(self._run_output_dir,
-                "VSMOKE_" + fireLoc["id"] + ".OUT")
-            shutil.copy(os.path.join(wdir, "VSMOKE.IPT"), fire_input)
-            shutil.copy(os.path.join(wdir, "VSMOKE.OUT"), fire_output)
-            # Note: no need to call _save_file, since we just moved them
+            self._archive_file(wdir, "VSMOKE.IPT", fire.id)
+            self._archive_file(wdir, "VSMOKE.OUT", fire.id)
 
         # Make KMZ file
         self._my_kmz.write()
@@ -154,19 +152,6 @@ class VSMOKEDispersion(DispersionBase):
             r['output']['json_file_name'] = json_file_name
         # TODO: anytheing else to include in response
         return r
-
-    def _rename_intput_and_output_files(self, fire):
-        iso_output = os.path.join(self._run_output_dir,
-            "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".iso")
-        gis_output = os.path.join(self._run_output_dir,
-            "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".opt")
-        iso_input = os.path.join(self._run_output_dir,
-            "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".ipt")
-        # TODO: use shutil
-        shutil.copy(os.path.join(wdir, "vsmkgs.iso"), iso_output)
-        shutil.copy(os.path.join(wdir, "vsmkgs.opt"), gis_output)
-        shutil.copy(os.path.join(wdir, "vsmkgs.ipt"), iso_input)
-        # Note: no need to call _save_file, since we just moved them
 
     def _write_input(self, emissions, cons, npriod, in_var, tz):
         """

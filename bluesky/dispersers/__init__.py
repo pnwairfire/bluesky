@@ -15,6 +15,7 @@ import abc
 import copy
 import logging
 import os
+import shutil
 import tempfile
 
 # TODO: move this to common/reusable module
@@ -103,13 +104,23 @@ class DispersionBase(object):
         """
         pass
 
-
     def _save_file(self, file):
         self._files_to_archive.append(file)
 
     def _move_files(self):
         for f in self._files_to_archive:
             shutil.move(f, self._run_output_dir)
+
+    def _archive_file(self, filename, wdir, suffix=None):
+        if suffix:
+            filename_parts = filename.split('.')
+            archived_filename = "{}_{}.{}".format(
+                '.'.join(filename_parts[:-1]), suffix, filename_parts[-1])
+        else:
+            archived_filename = filename
+
+        shutil.copy(os.path.join(wdir, filename),
+            os.path.join(self._run_output_dir, archived_filename))
 
     def _execute(self, *args, **kwargs):
         # TODO: make sure this is the corrrect way to call
