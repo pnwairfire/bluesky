@@ -236,21 +236,17 @@ class VSMOKEDispersion(DispersionBase):
             for hour in xrange(self._num_hours):
                 dt = self._model_start + timedelta(hours=hour)
                 local_dt = dt + timedelta(hours=fire.utc_offset)
-                timeprofile_hour = fire.timeprofile.get(local_dt)
-                pm25_emitted = sum([
-                    timeprofile_hour[p]*fire.emissions[p].get('PM25', 0.0)
-                        for p in self.PHASES
-                ])
-                co_emitted = sum([
-                    timeprofile_hour[p]*fire.emissions[p].get('CO', 0.0)
-                        for p in self.PHASES
-                ])
-                heat = 0.0 # TODO: update pipeline to compute heat
 
+                # !!! TODO: update pipeline to compute heat !!!
+                heat = 0.0
                 emtqh = (heat) / 3414425.94972     # Btu to MW
-                emtqpm = (pm25_emitted) * TONS_PER_HR_TO_GRAMS_PER_SEC  # tons/hr to g/s
-                emtqco = (co_emitted) * TONS_PER_HR_TO_GRAMS_PER_SEC    # tons/hr to g/s
-                f.write("%d %f %f %f %f\n" % (hour + 1, emtqpm, emtqco, emtqh, emtqr))
+
+                emtqpm = (fire.timeprofied_emissions[local_dt]['PM25']
+                    * TONS_PER_HR_TO_GRAMS_PER_SEC)  # tons/hr to g/s
+                emtqco = (fire.timeprofied_emissions[local_dt]['CO'])
+                    * TONS_PER_HR_TO_GRAMS_PER_SEC)    # tons/hr to g/s
+                f.write("%d %f %f %f %f\n" % (
+                    hour + 1, emtqpm, emtqco, emtqh, emtqr))
 
     def _write_iso_input(self, fire, local_dt, in_var):
         """ Create the input file needed to run VSMOKEGIS. """
@@ -299,15 +295,12 @@ class VSMOKEDispersion(DispersionBase):
                 ", used default values for these parameters: " + ', '.join(warn))
 
         with open(self._iso_input_file, "w") as f:
-            timeprofile_hour = fire.timeprofile.get(local_dt)
-            pm25_emitted = sum([
-                timeprofile_hour[p]*fire.emissions[p].get('PM25', 0.0)
-                    for p in self.PHASES
-            ])
-            heat = 0.0 # TODO: update pipeline to compute heat
-
+            # !!! TODO: update pipeline to compute heat !!!
+            heat = 0.0
             emtqh = (heat) / 3414425.94972     # Btu to MW
-            emtqpm = (pm25_emitted) * TONS_PER_HR_TO_GRAMS_PER_SEC  # tons/hr to g/s
+
+            emtqpm = (fire.timeprofied_emissions[local_dt]['PM25']
+                * TONS_PER_HR_TO_GRAMS_PER_SEC)  # tons/hr to g/s
 
             f.write("%s\n" % in_var.title)
             f.write("%s %f %f %f %f\n" % (

@@ -179,7 +179,17 @@ class DispersionBase(object):
                 for fb in fire.fuelbeds:
                     for p in self.PHASES:
                         for s in fb['emissions'][p]:
-                            emissions[p][s] = emissions[p].get(s, 0.0) + sum(fb['emissions'][p][s])
+                            emissions[p][s] = (emissions[p].get(s, 0.0)
+                                + sum(fb['emissions'][p][s]))
+
+                timeprofiled_emissions = {}
+                for dt in timeprofile:
+                    timeprofiled_emissions[dt] = {}
+                    for e in ('PM25', 'CO'):
+                        timeprofiled_emissions[dt][e] = sum([
+                            timeprofile[dt][p]*fire.emissions[p].get('PM25', 0.0)
+                                for p in self.PHASES
+                        ])
 
                 consumption = datautils.sum_nested_data(
                     [fb["consumption"] for fb in fire['fuelbeds']], 'summary', 'total')
@@ -194,6 +204,7 @@ class DispersionBase(object):
                     plumerise=plumerise,
                     timeprofile=timeprofile,
                     emissions=emissions,
+                    timeprofiled_emissions=timeprofiled_emissions,
                     consumption=consumption
                 )
                 self._fires.append(f)
