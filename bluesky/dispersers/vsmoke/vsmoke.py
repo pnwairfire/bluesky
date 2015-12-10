@@ -358,11 +358,14 @@ class VSMOKEDispersion(DispersionBase):
 
     def _create_geo_json(self, wdir):
         if self._create_json and self._geo_json:
-            temp_json = os.path.join(wdir, self.config('JSON_FILE'))
-            self._geo_json.write(temp_json)
+            # TODO: remove commented out lines once I confirm that
+            #   writing directly to run output dir works
+            #temp_json = os.path.join(wdir, self.config('JSON_FILE'))
+            #self._geo_json.write(temp_json)
             final_json = os.path.join(self._run_output_dir,
                 self.config('JSON_FILE'))
-            context.copy_file(temp_json, final_json)
+            #shutil.copy(temp_json, final_json)
+            self._geo_json.write(temp_json)
             return final_json
 
 class GeoJSON(object):
