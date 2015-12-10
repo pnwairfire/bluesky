@@ -607,7 +607,7 @@ class INPUTVariables(object):
         self.title = ("'VSMOKE input for fire ID %s'" % fireLoc['id'])
 
         # Stability
-        self.stability = fireLoc["metadata"].get("vsmoke_stability", None)
+        self.stability = fireLoc["meta"]["vsmoke"].get("stability", None)
         if self.stability:
             self.stability = int(self.stability)
             if self.stability < INPUTVariables.MIN_STAB:
@@ -616,21 +616,21 @@ class INPUTVariables(object):
                 self.stability = INPUTVariables.MAX_STAB
 
         # Mixing Height
-        self.mix_ht = fireLoc['metadata'].get('vsmoke_mixht', None)
+        self.mix_ht = fireLoc["meta"]["vsmoke"].get('mixht', None)
         if self.mix_ht:
             self.mix_ht = float(self.mix_ht)
             if self.mix_ht > INPUTVariables.MAX_MIXHT:
                 self.mix_ht = INPUTVariables.MAX_MIXHT
 
         # Wind speed
-        self.ua = fireLoc['metadata'].get('vsmoke_ws', None)
+        self.ua = fireLoc["meta"]["vsmoke"].get('ws', None)
         if self.ua:
             self.ua = float(self.ua)
             if self.ua <= INPUTVariables.MIN_WS:
                 self.ua = INPUTVariables.MIN_WS + 0.001
 
         # Wind direction
-        self.wdir = fireLoc["metadata"].get("vsmoke_wd", None)
+        self.wdir = fireLoc["meta"]["vsmoke"].get("wd", None)
         if self.wdir:
             self.wdir = float(self.wdir)
             if self.wdir <= INPUTVariables.MIN_DIR:
@@ -639,41 +639,41 @@ class INPUTVariables(object):
                 self.wdir = INPUTVariables.MAX_DIR
 
         # Surface temperature
-        self.temp_fire = fireLoc["metadata"].get("vsmoke_temp", None)
+        self.temp_fire = fireLoc["meta"]["vsmoke"].get("temp", None)
         if self.temp_fire:
             self.temp_fire = float(self.temp_fire)
 
         # Surface pressure
-        self.pres = fireLoc["metadata"].get("vsmoke_pressure", None)
+        self.pres = fireLoc["meta"]["vsmoke"].get("pressure", None)
         if self.pres:
             self.pres = float(self.pres)
 
         # Surface relative humidity
-        self.irha = fireLoc["metadata"].get("vsmoke_rh", None)
+        self.irha = fireLoc["meta"]["vsmoke"].get("rh", None)
         if self.irha:
             self.irha = int(self.irha)
 
         # Is fire during daylight hours or nighttime
-        self.ltofdy = fireLoc["metadata"].get("vsmoke_sun", None)
+        self.ltofdy = fireLoc["meta"]["vsmoke"].get("sun", None)
         if self.ltofdy:
             self.ltofdy = str(self.ltofdy)
 
         # Initial horizontal dispersion
-        self.oyinta = fireLoc["metadata"].get("vsmoke_oyinta", None)
+        self.oyinta = fireLoc["meta"]["vsmoke"].get("oyinta", None)
         if self.oyinta:
             self.oyinta = float(self.oyinta)
 
         # Initial vertical dispersion
-        self.ozinta = fireLoc["metadata"].get("vsmoke_ozinta", None)
+        self.ozinta = fireLoc["meta"]["vsmoke"].get("ozinta", None)
         if self.ozinta:
             self.ozinta = float(self.ozinta)
 
         # Background PM 2.5
-        self.bkgpma = fireLoc["metadata"].get("vsmoke_bkgpm", None)
+        self.bkgpma = fireLoc["meta"]["vsmoke"].get("bkgpm", None)
         if self.bkgpma:
             self.bkgpma = float(self.bkgpma)
 
         # Background CO
-        self.bkgcoa = fireLoc["metadata"].get("vsmoke_bkgco", None)
+        self.bkgcoa = fireLoc["meta"]["vsmoke"].get("bkgco", None)
         if self.bkgcoa:
             self.bkgcoa = float(self.bkgcoa)

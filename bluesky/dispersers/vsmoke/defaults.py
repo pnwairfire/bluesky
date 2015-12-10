@@ -1,4 +1,3 @@
-
 # Temperature of fire (F)
 TEMP_FIRE = 59.0
 
