@@ -67,7 +67,7 @@ class VSMOKEDispersion(DispersionBase):
 
         # Make KMZ object for fire
         self._legend_image = self.config("LEGEND_IMAGE")
-        my_kmz = KMZAnimation(doc_kml, self.config("OVERLAY_TITLE"), legend_image)
+        self._my_kmz = KMZAnimation(doc_kml, self.config("OVERLAY_TITLE"), legend_image)
 
     def _run(self, fires, wdir):
         """Runs hysplit
@@ -103,19 +103,9 @@ class VSMOKEDispersion(DispersionBase):
                 # Make input file to be used by VSMOKEGIS
                 self._write_iso_input(emis, hr, in_var)
 
-                # Run VSMOKEGIS
-                context.execute(BINARIES['VSMOKEGIS'])
+                self._execute(BINARIES['VSMOKEGIS'], working_dir=wdir)
+                self._rename_intput_and_output_files()
 
-                # Rename input and output files and archive
-                iso_output = "VSMKGS_" + fireLoc["id"] + "_hour" + str(hr+1) + ".iso"
-                gis_output = "VSMKGS_" + fireLoc["id"] + "_hour" + str(hr+1) + ".opt"
-                iso_input = "VSMKGS_" + fireLoc["id"] + "_hour" + str(hr+1) + ".ipt"
-                context.copy_file("vsmkgs.iso", iso_output)
-                context.copy_file("vsmkgs.opt", gis_output)
-                context.copy_file("vsmkgs.ipt", iso_input)
-                self._save_file(iso_input)
-                self._save_file(gis_output)
-                self._save_file(iso_output)
                 iso_file = context.full_path("vsmkgs.iso")
 
                 # Make KML file
@@ -123,7 +113,7 @@ class VSMOKEDispersion(DispersionBase):
                 kml_path = os.path.join(temp_dir, kml_name)
                 self._build_kml(kml_path, in_var, iso_file)
                 self._kmz_files.append(kml_path)
-                my_kmz.add_kml(kml_name, fireLoc, hr)
+                self._my_kmz.add_kml(kml_name, fireLoc, hr)
 
                 self._add_geo_json(in_var, iso_file, fireLoc['id'], timezone, hr)
 
@@ -141,7 +131,7 @@ class VSMOKEDispersion(DispersionBase):
             self._save_file(fire_output)
 
         # Make KMZ file
-        my_kmz.write()
+        self._my_kmz.write()
         z = zipfile.ZipFile(self._kmz_filename, 'w', zipfile.ZIP_DEFLATED)
         for kml in self._kmz_files:
             if os.path.exists(kml):
@@ -163,6 +153,18 @@ class VSMOKEDispersion(DispersionBase):
             r['output']['json_file_name'] = json_file_name
         # TODO: anytheing else to include in response
         return r
+
+    def _rename_intput_and_output_files(self, fire):
+        iso_output = "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".iso"
+        gis_output = "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".opt"
+        iso_input = "VSMKGS_" + fire["id"] + "_hour" + str(hr+1) + ".ipt"
+        # TODO: use shutil
+        context.copy_file("vsmkgs.iso", iso_output)
+        context.copy_file("vsmkgs.opt", gis_output)
+        context.copy_file("vsmkgs.ipt", iso_input)
+        self._save_file(iso_input)
+        self._save_file(gis_output)
+        self._save_file(iso_output)
 
     def _write_input(self, emissions, cons, npriod, in_var, tz):
         """
