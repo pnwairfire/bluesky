@@ -1,0 +1,56 @@
+{
+    "config": {
+        "emissions": {
+            "species": ["PM25"]
+        },
+        "dispersion": {
+            "start": "2014-05-30T00:00:00",
+            "num_hours": 24,
+            "model": "vsmoke",
+            "dest_dir": "/home/vagrant/bsp-dispersion-output/"
+        },
+        "export": {
+            "modes": ["email", "localsave"],
+            "extra_exports": ["dispersion"],
+            "email": {
+                "recipients": ["jdubowy+blueskytest@gmail.com"],
+                "sender": "bsp@airfire.org",
+                "subject": "BSP output",
+                "smtp_server": "127.0.0.1",
+                "smtp_port": 1025
+            },
+            "localsave": {
+                "dest_dir": "/home/vagrant/bsp-local-exports/"
+            }
+        }
+    },
+    "fire_information": [
+        {
+            "meta":{
+                "vsmoke": {
+
+                }
+            },
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Yosemite, CA"
+            },
+            "id": "SF11C14225236095807750",
+            "type": "natural",
+            "location": {
+                "area": 10000,
+                "ecoregion": "western",
+                "latitude": 37.909644,
+                "longitude": -119.7615805,
+                "utc_offset": "-07:00"
+            },
+            "growth": [
+                {
+                    "start": "2014-05-29T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "pct": 100.0
+                }
+            ]
+        }
+    ]
+}
