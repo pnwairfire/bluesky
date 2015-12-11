@@ -71,7 +71,7 @@ class VSMOKEDispersion(DispersionBase):
         self._legend_image = self.config("LEGEND_IMAGE")
         self._my_kmz = KMZAnimation(doc_kml, self.config("OVERLAY_TITLE"), legend_image)
 
-    def _run(self):
+    def _run(self, wdir):
         """Runs vsmoke
 
         args:

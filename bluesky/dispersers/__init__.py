@@ -16,7 +16,13 @@ import copy
 import logging
 import os
 import shutil
+import subprocess
 import tempfile
+from datetime import timedelta
+
+from bluesky import datautils
+from bluesky.datetimeutils import parse_utc_offset
+from bluesky.models.fires import Fire
 
 # TODO: move this to common/reusable module
 class create_working_dir(object):
@@ -55,6 +61,7 @@ class DispersionBase(object):
     DEFAULTS = None
 
     PHASES = ['flaming', 'smoldering', 'residual']
+    TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
     def __init__(self, met_info, **config):
         self._set_met_info(copy.deepcopy(met_info))
@@ -100,7 +107,7 @@ class DispersionBase(object):
         self._files_to_archive = []
 
         with create_working_dir() as wdir:
-            r = self._run(fires, wdir)
+            r = self._run(wdir)
             self._move_files()
 
         r.update({
@@ -187,16 +194,16 @@ class DispersionBase(object):
                     timeprofiled_emissions[dt] = {}
                     for e in ('PM25', 'CO'):
                         timeprofiled_emissions[dt][e] = sum([
-                            timeprofile[dt][p]*fire.emissions[p].get('PM25', 0.0)
+                            timeprofile[dt][p]*emissions[p].get('PM25', 0.0)
                                 for p in self.PHASES
                         ])
 
                 consumption = datautils.sum_nested_data(
-                    [fb["consumption"] for fb in fire['fuelbeds']], 'summary', 'total')
+                    [fb.get("consumption", {}) for fb in fire['fuelbeds']], 'summary', 'total')
 
                 f = Fire(
                     id=fire.id,
-                    meta=fire.get('meta', {})
+                    meta=fire.get('meta', {}),
                     area=fire.location['area'],
                     latitude=fire.latitude,
                     longitude=fire.longitude,

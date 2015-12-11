@@ -13,18 +13,13 @@ import logging
 import math
 import os
 import shutil
-import subprocess
 # import tarfile
 import threading
 from datetime import timedelta
 
 from pyairfire.datetime import parsing as datetime_parsing
 
-from bluesky.datetimeutils import parse_utc_offset
-from bluesky.models.fires import Fire
-import hysplit_utils
-
-from . import defaults
+from . import defaults, hysplit_utils
 from .. import (
     DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE
 )
@@ -50,8 +45,7 @@ class HYSPLITDispersion(DispersionBase):
     }
     DEFAULTS = defaults
 
-    # Note: 'PHASES' is defined in HYSPLITDispersion
-    TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
+    # Note: 'PHASES' and TIMEPROFILE_FIELDS defined in HYSPLITDispersion
 
     def _run(self, wdir):
         """Runs hysplit
