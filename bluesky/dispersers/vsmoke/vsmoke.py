@@ -110,7 +110,7 @@ class VSMOKEDispersion(DispersionBase):
                 local_dt = dt + timedelta(hours=fire.utc_offset)
                 self._write_iso_input(fire, local_dt, in_var)
 
-                self._execute(BINARIES['VSMOKEGIS'], working_dir=wdir)
+                self._execute(self.BINARIES['VSMOKEGIS'], working_dir=wdir)
 
                 # TODO: replace 'hr' with 'local_dt.isoformat()'
                 suffix = "{}_hour{}".format(fire.id, str(hr+1))
