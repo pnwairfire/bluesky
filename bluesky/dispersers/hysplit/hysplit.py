@@ -18,8 +18,6 @@ import shutil
 import threading
 from datetime import timedelta
 
-from pyairfire.datetime import parsing as datetime_parsing
-
 from .. import (
     DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE
 )
