@@ -104,11 +104,8 @@ class DispersionBase(object):
 
         self._set_fire_data(fires)
 
-        self._files_to_archive = []
-
         with create_working_dir() as wdir:
             r = self._run(wdir)
-            self._move_files()
 
         r.update({
             "directory": self._run_output_dir,
@@ -229,12 +226,6 @@ class DispersionBase(object):
                 else:
                     raise
 
-    def _save_file(self, file):
-        self._files_to_archive.append(file)
-
-    def _move_files(self):
-        for f in self._files_to_archive:
-            shutil.move(f, self._run_output_dir)
     def _convert_keys_to_datetime(self, d):
         return { datetime_parsing.parse(k): v for k, v in d.items() }
 
