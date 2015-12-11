@@ -58,13 +58,14 @@ class VSMOKEDispersion(DispersionBase):
         self._input_file = os.path.join(wdir, "VSMOKE.IPT")
         self._iso_input_file = os.path.join(wdir, "vsmkgs.ipt")
 
-    def _set_kml_vars(self):
+    def _set_kml_vars(self, wdir):
         # Define variables to make KML and KMZ files
         doc_kml = os.path.join(wdir, "doc.kml")
         logging.debug("Fire kmz = %s" % doc_kml)
         self._kmz_files = [doc_kml]
 
-        self._kmz_filename = os.path.join(self._run_output_dir, self.config("KMZ_FILE"))
+        self._kmz_filename = os.path.join(self._run_output_dir,
+            self.config("KMZ_FILE"))
         # The following will fill start date time into kmz file name if the
         # filename has an embedded datetime pattern
         self._kmz_filename = self._model_start.strftime(self._kmz_filename)
@@ -72,7 +73,8 @@ class VSMOKEDispersion(DispersionBase):
 
         # Make KMZ object for fire
         self._legend_image = self.config("LEGEND_IMAGE")
-        self._my_kmz = KMZAnimation(doc_kml, self.config("OVERLAY_TITLE"), legend_image)
+        self._my_kmz = KMZAnimation(doc_kml, self.config("OVERLAY_TITLE"),
+            self._legend_image)
 
     def _run(self, wdir):
         """Runs vsmoke
@@ -104,7 +106,7 @@ class VSMOKEDispersion(DispersionBase):
 
             # Run VSMOKE GIS for each hour
             for hr in range(self._num_hours):
-                dt = self._model_start + timedelta(hours=hour)
+                dt = self._model_start + timedelta(hours=hr)
                 local_dt = dt + timedelta(hours=fire.utc_offset)
                 self._write_iso_input(fire, local_dt, in_var)
 
@@ -145,7 +147,8 @@ class VSMOKEDispersion(DispersionBase):
             else:
                 logging.error('Failure while trying to write KMZ file -- KML file does not exist')
                 logging.debug('File "%s" does not exist', kml)
-        z.write(os.path.join(self.config('PACKAGE_DIR'), self._legend_image), self._legend_image)
+        z.write(os.path.join(self.config('PACKAGE_DIR'), self._legend_image),
+            self._legend_image)
         z.close()
 
         r = {
@@ -169,50 +172,50 @@ class VSMOKEDispersion(DispersionBase):
         lstbdy = 'TRUE'   # stability class or daylight data are given
         lqread = 'TRUE'   # emissions are provided
         lsight = 'FALSE'  # we are not calculating crossplume site values
-        cc0crt = self.config("CC0CRT", float)
+        cc0crt = self.config("CC0CRT")
         viscrt = self.config("VISCRT")
-        efpm = self.config("EFPM", float)
-        efco = self.config("EFCO", float)
-        thot = self.config("THOT", float)
-        tconst = self.config("TCONST", float)
-        tdecay = self.config("TDECAY", float)
+        efpm = self.config("EFPM")
+        efco = self.config("EFCO")
+        thot = self.config("THOT")
+        tconst = self.config("TCONST")
+        tdecay = self.config("TDECAY")
         grad_rise = self.config("GRAD_RISE")
-        rfrc = self.config("RFRC", float)
-        emtqr = self.config("EMTQR", float)
+        rfrc = self.config("RFRC")
+        emtqr = self.config("EMTQR")
 
         #tons = npriod * (cons["flaming"] + cons["smoldering"] + cons["residual"] + cons["duff"])
         tons = sum([fire.consumption[p] for p in self.PHASES])
 
         warn = []
         if in_var.temp_fire is None:
-            in_var.temp_fire = self.config("TEMP_FIRE", float)
+            in_var.temp_fire = self.config("TEMP_FIRE")
             warn.append('surface temperature')
         if in_var.pres is None:
-            in_var.pres = self.config("PRES", float)
+            in_var.pres = self.config("PRES")
             warn.append('surface pressure')
         if in_var.irha is None:
-            in_var.irha = self.config("IRHA", int)
+            in_var.irha = self.config("IRHA")
             warn.append('relative humidity')
         if in_var.ltofdy is None:
             in_var.ltofdy = self.config("LTOFDY")
             warn.append('sunrise')
         if in_var.stability is None:
-            in_var.stability = self.config("STABILITY", int)
+            in_var.stability = self.config("STABILITY")
             warn.append('stability')
         if in_var.mix_ht is None:
-            in_var.mix_ht = self.config("MIX_HT", float)
+            in_var.mix_ht = self.config("MIX_HT")
             warn.append('mixing height')
         if in_var.oyinta is None:
-            in_var.oyinta = self.config("OYINTA", float)
+            in_var.oyinta = self.config("OYINTA")
             warn.append('horizontal crosswind dispersion')
         if in_var.ozinta is None:
-            in_var.ozinta = self.config("OZINTA", float)
+            in_var.ozinta = self.config("OZINTA")
             warn.append('vertical crosswind dispersion')
         if in_var.bkgpma is None:
-            in_var.bkgpma = self.config("BKGPMA", float)
+            in_var.bkgpma = self.config("BKGPMA")
             warn.append('background PM2.5')
         if in_var.bkgcoa is None:
-            in_var.bkgcoa = self.config("BKGCOA", float)
+            in_var.bkgcoa = self.config("BKGCOA")
             warn.append('background CO')
         if warn:
             logging.warn("For fire " + in_var.fireID + ", used default values for the parameters: " + ', '.join(warn))
@@ -247,9 +250,9 @@ class VSMOKEDispersion(DispersionBase):
                 heat = 0.0
                 emtqh = (heat) / 3414425.94972     # Btu to MW
 
-                emtqpm = (fire.timeprofied_emissions[local_dt]['PM25']
+                emtqpm = (fire.timeprofiled_emissions[local_dt]['PM25']
                     * TONS_PER_HR_TO_GRAMS_PER_SEC)  # tons/hr to g/s
-                emtqco = (fire.timeprofied_emissions[local_dt]['CO']
+                emtqco = (fire.timeprofiled_emissions[local_dt]['CO']
                     * TONS_PER_HR_TO_GRAMS_PER_SEC)    # tons/hr to g/s
                 f.write("%d %f %f %f %f\n" % (
                     hour + 1, emtqpm, emtqco, emtqh, emtqr))
@@ -258,43 +261,43 @@ class VSMOKEDispersion(DispersionBase):
         """ Create the input file needed to run VSMOKEGIS. """
         # Plume rise characteristics
         grad_rise = self.config("GRAD_RISE")
-        emtqr = self.config("EMTQR", float)
+        emtqr = self.config("EMTQR")
 
         # Starting and ending distance point for centerline concentrations
-        xbgn = self.config("XBGN", float)
-        xend = self.config("XEND", float)
+        xbgn = self.config("XBGN")
+        xend = self.config("XEND")
 
         # self.ISOPLETHS between centerline receptors (0 default is 31 log points)
-        xntvl = self.config("XNTVL", float)
+        xntvl = self.config("XNTVL")
 
         # Tolerance for isolines
-        chitol = self.config("TOL", float)
+        chitol = self.config("TOL")
 
         # Number of isolines
         niso = len(self.ISOPLETHS)
 
         # Displacement of dispersion output from fire start
-        utm_e = self.config("DUTMFE", float)
-        utm_n = self.config("DUTMFN", float)
+        utm_e = self.config("DUTMFE")
+        utm_n = self.config("DUTMFN")
 
         warn = []
         if in_var.ltofdy is None:
             in_var.ltofdy = self.config("LTOFDY")
             warn.append('sunrise')
         if in_var.stability is None:
-            in_var.stability = self.config("STABILITY", int)
+            in_var.stability = self.config("STABILITY")
             warn.append('stability')
         if in_var.mix_ht is None:
-            in_var.mix_ht = self.config("MIX_HT", float)
+            in_var.mix_ht = self.config("MIX_HT")
             warn.append('mixing height')
         if in_var.oyinta is None:
-            in_var.oyinta = self.config("OYINTA", float)
+            in_var.oyinta = self.config("OYINTA")
             warn.append('horizontal crosswind dispersion')
         if in_var.ozinta is None:
-            in_var.ozinta = self.config("OZINTA", float)
+            in_var.ozinta = self.config("OZINTA")
             warn.append('vertical crosswind dispersion')
         if in_var.bkgpma is None:
-            in_var.bkgpma = self.config("BKGPMA", float)
+            in_var.bkgpma = self.config("BKGPMA")
             warn.append('background PM2.5')
         if warn: # this should only happen the first time through this method
             logging.warn("For fire " + in_var.fireID +
@@ -305,7 +308,7 @@ class VSMOKEDispersion(DispersionBase):
             heat = 0.0
             emtqh = (heat) / 3414425.94972     # Btu to MW
 
-            emtqpm = (fire.timeprofied_emissions[local_dt]['PM25']
+            emtqpm = (fire.timeprofiled_emissions[local_dt]['PM25']
                 * TONS_PER_HR_TO_GRAMS_PER_SEC)  # tons/hr to g/s
 
             f.write("%s\n" % in_var.title)
@@ -545,7 +548,7 @@ class KMZAnimation(object):
             self.fires[fire['id']] = []
 
         # TODO: pass in and use model start time instead ?
-        fire_dt = datetime_parsing.parse(fireLoc['growth'][0]['start'])
+        fire_dt = datetime_parsing.parse(fireLoc['start'])
         hour_delta = timedelta(hours=1)
         dt = fire_dt + hour_delta * hour
         content = '''
@@ -611,13 +614,13 @@ class INPUTVariables(object):
     def __init__(self, fireLoc):
         # Basic fire info
         self.fireID = fireLoc['id']
-        self.alat = float(fireLoc['location']['latitude'])
-        self.along = float(fireLoc['location']['longitude'])
-        self.acres = fireLoc['location']['area']
+        self.alat = float(fireLoc['latitude'])
+        self.along = float(fireLoc['longitude'])
+        self.acres = fireLoc['area']
 
         # Fire Date and time information
         # TODO: pass in and use model start time instead ?
-        fire_dt = datetime_parsing.parse(fireLoc['growth'][0]['start'])
+        fire_dt = datetime_parsing.parse(fireLoc['start'])
         self.iyear = fire_dt.year
         self.imo = fire_dt.month
         self.iday = fire_dt.day

@@ -175,7 +175,7 @@ class DispersionBase(object):
                 # TODO: only include plumerise and timeprofile keys within model run
                 # time window; and somehow fill in gaps (is this possible?)
                 all_plumerise = self._convert_keys_to_datetime(
-                    reduce(lambda r, g: r.update(g['plumerise']) or r, fire.growth, {}))
+                    reduce(lambda r, g: r.update(g.get('plumerise', {})) or r, fire.growth, {}))
                 all_timeprofile = self._convert_keys_to_datetime(
                     reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {}))
                 plumerise = {}
@@ -208,6 +208,7 @@ class DispersionBase(object):
                 f = Fire(
                     id=fire.id,
                     meta=fire.get('meta', {}),
+                    start=fire.growth[0]['start'],
                     area=fire.location['area'],
                     latitude=fire.latitude,
                     longitude=fire.longitude,
