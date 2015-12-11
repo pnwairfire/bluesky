@@ -19,6 +19,8 @@ import subprocess
 import tempfile
 from datetime import timedelta
 
+from pyairfire.datetime import parsing as datetime_parsing
+
 from bluesky import datautils
 from bluesky.datetimeutils import parse_utc_offset
 from bluesky.models.fires import Fire
@@ -233,6 +235,8 @@ class DispersionBase(object):
     def _move_files(self):
         for f in self._files_to_archive:
             shutil.move(f, self._run_output_dir)
+    def _convert_keys_to_datetime(self, d):
+        return { datetime_parsing.parse(k): v for k, v in d.items() }
 
     def _archive_file(self, filename, src_dir=None, suffix=None):
         if suffix:

@@ -107,9 +107,6 @@ class HYSPLITDispersion(DispersionBase):
             self._met_info['files'].add(met_file['file'])
         self._met_info['files'] = list(self._met_info['files'])
 
-    def _convert_keys_to_datetime(self, d):
-        return { datetime_parsing.parse(k): v for k, v in d.items() }
-
     def _create_dummy_fire_if_necessary(self):
         if not self._fires:
             self._fires = [self._generate_dummy_fire()]
