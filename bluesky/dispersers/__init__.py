@@ -12,7 +12,6 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import abc
-import copy
 import logging
 import os
 import shutil
@@ -64,7 +63,6 @@ class DispersionBase(object):
     TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
     def __init__(self, met_info, **config):
-        self._set_met_info(copy.deepcopy(met_info))
         self._config = config
         # TODO: iterate through self.BINARIES.values() making sure each
         #   exists (though maybe only log warning if doesn't exist, since

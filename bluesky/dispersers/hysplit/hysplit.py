@@ -9,6 +9,7 @@ __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 __version__ = "0.1.0"
 
+import copy
 import logging
 import math
 import os
@@ -19,10 +20,11 @@ from datetime import timedelta
 
 from pyairfire.datetime import parsing as datetime_parsing
 
-from . import defaults, hysplit_utils
 from .. import (
     DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE
 )
+
+from . import defaults, hysplit_utils
 
 __all__ = [
     'HYSPLITDispersion'
@@ -46,6 +48,10 @@ class HYSPLITDispersion(DispersionBase):
     DEFAULTS = defaults
 
     # Note: 'PHASES' and TIMEPROFILE_FIELDS defined in HYSPLITDispersion
+
+    def __init__(self, met_info, **config):
+        super(HYSPLITDispersion, self).__init__(met_info, **config)
+        self._set_met_info(copy.deepcopy(met_info))
 
     def _run(self, wdir):
         """Runs hysplit
