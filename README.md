@@ -968,25 +968,36 @@ on and fuelbeds is defined
 
 ##### dispersion
 
- - ***'met' > 'files'*** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
  - ***'fire_information' > 'growth' > 'timeprofile'*** -- *required* --
- - ***'fire_information' > 'growth' > 'plumerise'*** -- *required* --
  - ***'fire_information' > 'fuelbeds' > 'emissions'*** -- *required* --
  - ***'fire_information' > 'location' > 'utc_offset'*** -- *optional* -- hours off UTC; default: 0.0
 
 ###### if running hysplit dispersion:
 
- - ***'met' > 'grid' > 'spacing'*** -- *reqiured* if not specified in config (see below) --
- - ***'met' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *reqiured* if not specified in config (see below) --
- - ***'met' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *reqiured* if not specified in config (see below) --
- - ***'met' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *reqiured* if not specified in config (see below) --
- - ***'met' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *reqiured* if not specified in config (see below) --
+- ***'met' > 'files'*** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
+  - ***'fire_information' > 'growth' > 'plumerise'*** -- *required* --
+ - ***'met' > 'grid' > 'spacing'*** -- *required* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *required* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *required* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *required* if not specified in config (see below) --
+ - ***'met' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *required* if not specified in config (see below) --
  - ***'met' > 'grid' > 'domain'*** -- *optional* -- default: 'LatLng' (which means the spacing is in degrees)
  - ***'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, generates new guid
 
 ###### if running vsmoke dispersion:
 
- -
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'ws'*** -- *required* -- wind speed
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'wd'*** -- *required* -- wind direction
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'stability'*** -- *optional* -- stability
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'mixht'*** -- *optional* -- mixing height
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'temp'*** -- *optional* -- surface temperature
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'pressure'*** -- *optional* -- surface pressure
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'rh'*** -- *optional* -- surface relative humidity
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'sun'*** -- *optional* -- is fire during daylight hours or nighttime
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'oyinta'*** -- *optional* -- initial horizontal dispersion
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'ozinta'*** -- *optional* -- initial vertical dispersion
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'bkgpm'*** -- *optional* -- background PM 2.5
+ - ***'fire_information' > 'meta' > 'vsmoke' > 'bkgco'*** -- *optional* -- background CO
 
 ##### visualization
 
@@ -1137,7 +1148,39 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 
 ###### if running vsmoke dispersion:
 
- -
+ - ***'config' > 'dispersion' > 'vsmoke' > 'TEMP_FIRE' -- temperature of fire (F), default: 59.0
+ - ***'config' > 'dispersion' > 'vsmoke' > 'PRES'*** -- *optional* -- Atmospheric pressure at surface (mb); default: 1013.25
+ - ***'config' > 'dispersion' > 'vsmoke' > 'IRHA'*** -- *optional* -- Period relative humidity; default: 25
+ - ***'config' > 'dispersion' > 'vsmoke' > 'LTOFDY'*** -- *optional* -- Is fire before sunset?; default: True
+ - ***'config' > 'dispersion' > 'vsmoke' > 'STABILITY'*** -- *optional* -- Period instability class - 1 -> extremely unstable; 2 -> moderately unstable; 3 -> slightly unstable; 4 -> near neutral; 5 -> slightly stable; 6 -> moderately stable; 7 -> extremely stable; default: 4
+ - ***'config' > 'dispersion' > 'vsmoke' > 'MIX_HT'*** -- *optional* -- Period mixing height (m); default: 1500.0
+ - ***'config' > 'dispersion' > 'vsmoke' > 'OYINTA'*** -- *optional* -- Period's initial horizontal crosswind dispersion at the source (m); default: 0.0
+ - ***'config' > 'dispersion' > 'vsmoke' > 'OZINTA'*** -- *optional* -- Period's initial vertical dispersion at the surface (m); default: 0.0
+ - ***'config' > 'dispersion' > 'vsmoke' > 'BKGPMA'*** -- *optional* -- Period's background PM (ug/m3); default: 0.0
+ - ***'config' > 'dispersion' > 'vsmoke' > 'BKGCOA'*** -- *optional* -- Period's background CO (ppm); default: 0.0
+ - ***'config' > 'dispersion' > 'vsmoke' > 'THOT'*** -- *optional* -- Duration of convective period of fire (decimal hours); default: 4
+ - ***'config' > 'dispersion' > 'vsmoke' > 'TCONST'*** -- *optional* -- Duration of constant emissions period (decimal hours); default: 4
+ - ***'config' > 'dispersion' > 'vsmoke' > 'TDECAY'*** -- *optional* -- Exponential decay constant for smoke emissions (decimal hours); default: 2
+ - ***'config' > 'dispersion' > 'vsmoke' > 'EFPM'*** -- *optional* -- Emission factor for PM2.5 (lbs/ton); default: 30
+ - ***'config' > 'dispersion' > 'vsmoke' > 'EFCO'*** -- *optional* -- Emission factor for CO (lbs/ton); default: 250
+ - ***'config' > 'dispersion' > 'vsmoke' > 'ICOVER'*** -- *optional* -- Period's cloud cover (tenths); default: 0
+ - ***'config' > 'dispersion' > 'vsmoke' > 'CEIL'*** -- *optional* -- Period's cloud ceiling height (feet); default: 99999
+ - ***'config' > 'dispersion' > 'vsmoke' > 'CC0CRT'*** -- *optional* -- Critical contrast ratio for crossplume visibility estimates; default: 0.02
+ - ***'config' > 'dispersion' > 'vsmoke' > 'VISCRT'*** -- *optional* -- Visibility criterion for roadway safety; default: 0.125
+ - ***'config' > 'dispersion' > 'vsmoke' > 'GRAD_RISE'*** -- *optional* -- Plume rise: TRUE -> gradual to final ht; FALSE ->mediately attain final ht; default: True
+ - ***'config' > 'dispersion' > 'vsmoke' > 'RFRC'*** -- *optional* -- Proportion of emissions subject to plume rise; default: -0.75
+ - ***'config' > 'dispersion' > 'vsmoke' > 'EMTQR'*** -- *optional* -- Proportion of emissions subject to plume rise for each period; default: -0.75
+ - ***'config' > 'dispersion' > 'vsmoke' > 'KMZ_FILE'*** -- *optional* -- default: "smoke_dispersion.kmz"
+ - ***'config' > 'dispersion' > 'vsmoke' > 'OVERLAY_TITLE'*** -- *optional* -- default: "Peak Hourly PM2.5"
+ - ***'config' > 'dispersion' > 'vsmoke' > 'LEGEND_IMAGE'*** -- *optional* -- absolute path nem to legend; default: "aqi_legend.png" included in bluesky package
+ - ***'config' > 'dispersion' > 'vsmoke' > 'JSON_FILE'*** -- *optional* -- name of file to write GeoJSON dispersion data; default: "smoke_dispersion.json"
+ - ***'config' > 'dispersion' > 'vsmoke' > 'CREATE_JSON'*** -- *optional* -- whether or not to create the GeoJSON file; default: True
+ - ***'config' > 'dispersion' > 'vsmoke' > 'DUTMFE'*** -- *optional* -- UTM displacement of fire east of reference point; default: 0
+ - ***'config' > 'dispersion' > 'vsmoke' > 'DUTMFN'*** -- *optional* -- UTM displacement of fire north of reference point; default: 100
+ - ***'config' > 'dispersion' > 'vsmoke' > 'XBGN'*** -- *optional* -- What downward distance to start calculations (km); default: 150
+ - ***'config' > 'dispersion' > 'vsmoke' > 'XEND'*** -- *optional* -- What downward distance to end calculation (km) - 200km max; default: 200
+ - ***'config' > 'dispersion' > 'vsmoke' > 'XNTVL'*** -- *optional* -- Downward distance interval (km) - 0 results in default 31 distances; default: 0.05
+ - ***'config' > 'dispersion' > 'vsmoke' > 'TOL'*** -- *optional* -- Tolerance for isopleths; detault: 0.1
 
 ##### visualization
 
