@@ -446,6 +446,7 @@ class HYSPLITDispersion(DispersionBase):
                         # phase-specific hourly fractions for this hour to get the
                         # hourly emissions by phase for this hour, and then summing
                         # the three values to get the total emissions for this hour
+                        # TODO: use fire.timeprofiled_emissions[local_dt]['PM25']
                         pm25_emitted = sum([
                             timeprofile_hour[p]*fire.emissions[p].get('PM25', 0.0)
                                 for p in self.PHASES
