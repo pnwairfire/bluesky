@@ -107,7 +107,7 @@ class DispersionBase(object):
         with create_working_dir() as wdir:
             r = self._run(wdir)
 
-        r.update({
+        r["output"].update({
             "directory": self._run_output_dir,
             "start_time": self._model_start.isoformat(),
             "num_hours": self._num_hours
