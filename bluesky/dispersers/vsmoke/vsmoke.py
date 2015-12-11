@@ -25,6 +25,8 @@ from .. import (
     DispersionBase, TONS_PER_HR_TO_GRAMS_PER_SEC, BTU_TO_MW
 )
 
+from . import defaults
+
 __all__ = [
     'VSMOKEDispersion'
 ]
@@ -45,27 +47,28 @@ class VSMOKEDispersion(DispersionBase):
     def __init__(self, met_info, **config):
         super(VSMOKEDispersion, self).__init__(met_info, **config)
         self._create_json = self.config("CREATE_JSON")
-        self._set_input_file_vars()
-        self._set_kml_vars()
-        self.log.debug("PM Isopleths =%s" % self.ISOPLETHS)
-        self.log.debug("PM Isopleths Names =%s" % self.ISONAMES)
-        self.log.debug("PM Isopleths Colors =%s" % self.ISOCOLORS)
+        logging.debug("PM Isopleths =%s" % self.ISOPLETHS)
+        logging.debug("PM Isopleths Names =%s" % self.ISONAMES)
+        logging.debug("PM Isopleths Colors =%s" % self.ISOCOLORS)
 
-    def _set_input_file_vars(self):
+    def _required_growth_fields(self):
+        return ('timeprofile', ) # this is supposed to return a tuple
+
+    def _set_input_file_vars(self, wdir):
         self._input_file = os.path.join(wdir, "VSMOKE.IPT")
         self._iso_input_file = os.path.join(wdir, "vsmkgs.ipt")
 
     def _set_kml_vars(self):
         # Define variables to make KML and KMZ files
         doc_kml = os.path.join(wdir, "doc.kml")
-        self.log.debug("Fire kmz = %s" % doc_kml)
+        logging.debug("Fire kmz = %s" % doc_kml)
         self._kmz_files = [doc_kml]
 
         self._kmz_filename = os.path.join(self._run_output_dir, self.config("KMZ_FILE"))
         # The following will fill start date time into kmz file name if the
         # filename has an embedded datetime pattern
         self._kmz_filename = self._model_start.strftime(self._kmz_filename)
-        self.log.debug("Creating KMZ file " + os.path.basename(self._kmz_filename))
+        logging.debug("Creating KMZ file " + os.path.basename(self._kmz_filename))
 
         # Make KMZ object for fire
         self._legend_image = self.config("LEGEND_IMAGE")
@@ -77,6 +80,9 @@ class VSMOKEDispersion(DispersionBase):
         args:
          - wdir -- working directory
         """
+        self._set_input_file_vars(wdir)
+        self._set_kml_vars(wdir)
+
         # For each fire run VSMOKE and VSMOKEGIS
         for fire in self._fires:
             # TODO: check to make sure start+num_hours is within fire's
@@ -93,7 +99,7 @@ class VSMOKEDispersion(DispersionBase):
             if not fire.emissions or not fire.consumption:
                 continue
 
-            self.log.debug("%d hour run time for fireID %s",
+            logging.debug("%d hour run time for fireID %s",
                 self._num_hours, fire["id"])
 
             # Run VSMOKE GIS for each hour
@@ -137,8 +143,8 @@ class VSMOKEDispersion(DispersionBase):
             if os.path.exists(kml):
                 z.write(kml, os.path.basename(kml))
             else:
-                self.log.error('Failure while trying to write KMZ file -- KML file does not exist')
-                self.log.debug('File "%s" does not exist', kml)
+                logging.error('Failure while trying to write KMZ file -- KML file does not exist')
+                logging.debug('File "%s" does not exist', kml)
         z.write(os.path.join(self.config('PACKAGE_DIR'), self._legend_image), self._legend_image)
         z.close()
 
@@ -175,7 +181,7 @@ class VSMOKEDispersion(DispersionBase):
         emtqr = self.config("EMTQR", float)
 
         #tons = npriod * (cons["flaming"] + cons["smoldering"] + cons["residual"] + cons["duff"])
-        tons = sum([fire.consumption[p] for p in self.PHASES]))
+        tons = sum([fire.consumption[p] for p in self.PHASES])
 
         warn = []
         if in_var.temp_fire is None:
@@ -209,7 +215,7 @@ class VSMOKEDispersion(DispersionBase):
             in_var.bkgcoa = self.config("BKGCOA", float)
             warn.append('background CO')
         if warn:
-            self.log.warn("For fire " + in_var.fireID + ", used default values for the parameters: " + ', '.join(warn))
+            logging.warn("For fire " + in_var.fireID + ", used default values for the parameters: " + ', '.join(warn))
 
         with open(self._input_file, "w") as f:
             f.write("60\n")
@@ -243,7 +249,7 @@ class VSMOKEDispersion(DispersionBase):
 
                 emtqpm = (fire.timeprofied_emissions[local_dt]['PM25']
                     * TONS_PER_HR_TO_GRAMS_PER_SEC)  # tons/hr to g/s
-                emtqco = (fire.timeprofied_emissions[local_dt]['CO'])
+                emtqco = (fire.timeprofied_emissions[local_dt]['CO']
                     * TONS_PER_HR_TO_GRAMS_PER_SEC)    # tons/hr to g/s
                 f.write("%d %f %f %f %f\n" % (
                     hour + 1, emtqpm, emtqco, emtqh, emtqr))
@@ -291,7 +297,7 @@ class VSMOKEDispersion(DispersionBase):
             in_var.bkgpma = self.config("BKGPMA", float)
             warn.append('background PM2.5')
         if warn: # this should only happen the first time through this method
-            self.log.warn("For fire " + in_var.fireID +
+            logging.warn("For fire " + in_var.fireID +
                 ", used default values for these parameters: " + ', '.join(warn))
 
         with open(self._iso_input_file, "w") as f:

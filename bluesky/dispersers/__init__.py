@@ -115,6 +115,11 @@ class DispersionBase(object):
         })
         return r
 
+
+    @abc.abstractmethod
+    def _required_growth_fields(self):
+        pass
+
     @abc.abstractmethod
     def _run(wdir):
         """Underlying run method to be implemented by subclasses
@@ -149,10 +154,12 @@ class DispersionBase(object):
                 if 'growth' not in fire:
                     raise ValueError(
                         "Missing timeprofile and plumerise data required for computing dispersion")
+                growth_fields = self._required_growth_fields()
                 for g in fire.growth:
-                    if any([not g.get(f) for f in ('timeprofile', 'plumerise')]):
-                        raise ValueError("Each growth window must have "
-                            "timeprofile and plumerise in order to compute hysplit")
+                    if any([not g.get(f) for f in growth_fields]):
+                        raise ValueError("Each growth window must have {} in "
+                            "order to compute {} dispersion".format(
+                            ','.join(growth_fields), self.__class__.__name__))
                 if ('fuelbeds' not in fire or
                         any([not fb.get('emissions') for fb in fire.fuelbeds])):
                     raise ValueError(

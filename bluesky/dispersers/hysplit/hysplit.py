@@ -53,6 +53,9 @@ class HYSPLITDispersion(DispersionBase):
         super(HYSPLITDispersion, self).__init__(met_info, **config)
         self._set_met_info(copy.deepcopy(met_info))
 
+    def _required_growth_fields(self):
+        return ('timeprofile', 'plumerise')
+
     def _run(self, wdir):
         """Runs hysplit
 
