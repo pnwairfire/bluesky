@@ -231,12 +231,11 @@ class DispersionBase(object):
         return { datetime_parsing.parse(k): v for k, v in d.items() }
 
     def _archive_file(self, filename, src_dir=None, suffix=None):
+        archived_filename = os.path.basename(filename)
         if suffix:
-            filename_parts = filename.split('.')
+            filename_parts = archived_filename.split('.')
             archived_filename = "{}_{}.{}".format(
                 '.'.join(filename_parts[:-1]), suffix, filename_parts[-1])
-        else:
-            archived_filename = filename
         archived_filename = os.path.join(self._run_output_dir, archived_filename)
 
         if src_dir:
