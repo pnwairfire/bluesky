@@ -156,7 +156,7 @@ class VSMOKEDispersion(DispersionBase):
             }
         }
 
-        json_file_name = self._create_geo_json()
+        json_file_name = self._create_geo_json(wdir)
         if json_file_name:
             r['output']['json_file_name'] = json_file_name
         # TODO: anytheing else to include in response
@@ -397,7 +397,7 @@ class VSMOKEDispersion(DispersionBase):
             final_json = os.path.join(self._run_output_dir,
                 self.config('JSON_FILE'))
             #shutil.copy(temp_json, final_json)
-            self._geo_json.write(temp_json)
+            self._geo_json.write(final_json)
             return final_json
 
 class GeoJSON(object):
