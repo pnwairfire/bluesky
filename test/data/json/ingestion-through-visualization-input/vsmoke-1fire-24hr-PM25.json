@@ -28,7 +28,8 @@
         {
             "meta":{
                 "vsmoke": {
-
+                    "wd": 30,
+                    "ws": 10
                 }
             },
             "event_of": {

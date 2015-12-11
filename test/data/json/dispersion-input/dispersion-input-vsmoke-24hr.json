@@ -9,6 +9,12 @@
     },
     "fire_information": [
         {
+            "meta":{
+                "vsmoke": {
+                    "wd": 30,
+                    "ws": 10
+                }
+            },
             "event_of": {
                 "id": "SF11E826544",
                 "name": "Natural Fire near Yosemite, CA"

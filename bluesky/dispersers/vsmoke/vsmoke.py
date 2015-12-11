@@ -651,14 +651,20 @@ class INPUTVariables(object):
 
         # Wind speed
         self.ua = vsmoke_meta.get('ws', None)
-        if self.ua:
+        if self.ua is None:
+            raise ValueError("Wind speed ('meta' > 'vsmoke' > 'ws') "
+                "required for each fire")
+        else:
             self.ua = float(self.ua)
             if self.ua <= INPUTVariables.MIN_WS:
                 self.ua = INPUTVariables.MIN_WS + 0.001
 
         # Wind direction
         self.wdir = vsmoke_meta.get("wd", None)
-        if self.wdir:
+        if self.wdir is None:
+            raise ValueError("Wind direction ('meta' > 'vsmoke' > 'wd') "
+                "required for each fire")
+        else:
             self.wdir = float(self.wdir)
             if self.wdir <= INPUTVariables.MIN_DIR:
                 self.wdir = INPUTVariables.MIN_DIR + 0.001
