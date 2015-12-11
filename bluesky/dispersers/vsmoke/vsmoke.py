@@ -122,7 +122,7 @@ class VSMOKEDispersion(DispersionBase):
 
                 # Make KML file
                 kml_name = in_var.fireID + "_" + str(hr+1) + ".kml"
-                kml_path = os.path.join(temp_dir, kml_name)
+                kml_path = os.path.join(wdir, kml_name)
                 self._build_kml(kml_path, in_var, iso_file)
                 self._kmz_files.append(kml_path)
                 self._my_kmz.add_kml(kml_name, fire, hr)
@@ -376,11 +376,11 @@ class VSMOKEDispersion(DispersionBase):
         mykml.close()
         mykml.write()
 
-    def _add_geo_json(self, json, in_var, iso_file, fire_id, timezone, hr):
+    def _add_geo_json(self, in_var, iso_file, fire_id, timezone, hr):
         if not self._create_json:
             return
 
-        if not self._geo_json:
+        if not hasattr(self, '_geo_json'):
             self._geo_json = GeoJSON()
 
         isopleths = self._build_isopleths(in_var, iso_file)
@@ -548,7 +548,7 @@ class KMZAnimation(object):
             self.fires[fire['id']] = []
 
         # TODO: pass in and use model start time instead ?
-        fire_dt = datetime_parsing.parse(fireLoc['start'])
+        fire_dt = datetime_parsing.parse(fire['start'])
         hour_delta = timedelta(hours=1)
         dt = fire_dt + hour_delta * hour
         content = '''
@@ -563,9 +563,9 @@ class KMZAnimation(object):
                     </ListStyle>
                 </Style>
             </NetworkLink>
-            ''' % (fireLoc['id'], dt.strftime('Hour %HZ'), dt.isoformat(), (dt + hour_delta).isoformat(), kmlfile)
+            ''' % (fire['id'], dt.strftime('Hour %HZ'), dt.isoformat(), (dt + hour_delta).isoformat(), kmlfile)
 
-        self.fires[fireLoc['id']].append(content)
+        self.fires[fire['id']].append(content)
 
         if self.min_time == '' or dt < self.min_time:
             self.min_time = dt
