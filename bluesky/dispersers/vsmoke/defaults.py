@@ -72,10 +72,10 @@ VISCRT = 0.125
 GRAD_RISE = True
 
 # Proportion of emissions subject to plume rise
-RFRC = -.75
+RFRC = -0.75
 
 # Proportion of emissions subject to plume rise for each period
-EMTQR = -.75
+EMTQR = -0.75
 
 #
 # OUTPUT SETTINGS
@@ -106,4 +106,4 @@ XEND = 200
 XNTVL = 0.05
 
 # Tolerance for isopleths
-TOL = .1
+TOL = 0.1
