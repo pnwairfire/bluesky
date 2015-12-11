@@ -147,8 +147,7 @@ class VSMOKEDispersion(DispersionBase):
             else:
                 logging.error('Failure while trying to write KMZ file -- KML file does not exist')
                 logging.debug('File "%s" does not exist', kml)
-        z.write(os.path.join(self.config('PACKAGE_DIR'), self._legend_image),
-            self._legend_image)
+        z.write(self._legend_image, os.path.basename(self._legend_image))
         z.close()
 
         r = {

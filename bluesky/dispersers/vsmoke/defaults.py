@@ -1,3 +1,5 @@
+import os
+
 # Temperature of fire (F)
 TEMP_FIRE = 59.0
 
@@ -82,7 +84,7 @@ EMTQR = -.75
 # KMZ Output settings
 KMZ_FILE = "smoke_dispersion.kmz"
 OVERLAY_TITLE = "Peak Hourly PM2.5"
-LEGEND_IMAGE = "aqi_legend.png"
+LEGEND_IMAGE = os.path.join(os.path.dirname(__file__), 'images', "aqi_legend.png")
 
 # GeoJSON Output settings
 JSON_FILE = "smoke_dispersion.json"
