@@ -25,7 +25,8 @@ setup(
         #   b)  {'bluesky': ['hysplit/bdyfiles/*.']}
         #   c)  {'bluesky': {'hysplit': ['bdyfiles/*.']} }
         #   d)  some other way?
-        'hysplit': ['bdyfiles/*.']
+        'hysplit': ['bdyfiles/*.'],
+        'vsmoke': ['images/*.']
     },
     url='https://github.com/pnwairfire/bluesky',
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
