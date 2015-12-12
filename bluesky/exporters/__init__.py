@@ -101,25 +101,49 @@ class ExporterBase(object):
 
         return output_dir
 
-    NETCDF_PATTERN = '*.nc'
     def _process_dispersion(self, d, r):
         # TODO: look in 'd' to see what model of dispersion was run, what files
         #   exist, etc.; it won't necessarily say - so that's why we need
         #   the back-up logic of looking for specific files
         # TODO: Support option to rename nc file; other files too?
-        netcdfs = self._find_files(d['output']['directory'], self.NETCDF_PATTERN)
+        r['dispersion'].update(self._find_netcdfs(d))
+
+        # call sub methhods for model-specific logic
+        model_processor = getattr(self, '_process_{}'.format(d['model']))
+        if model_processor:
+            model_processor(d, r)
+
+    def _process_hysplit(self, d, r):
+        # TODO: list other hysplit output files; maybe make this configurable
+        pass
+
+    def _process_vsmoke(self, d, r):
+        # vsmoke produces KMZs
+        # TODO: list kmzs under 'dispersion'?
+        kmzs = self._find_files(d['output']['directory'], self.KMZ_PATTERN)
+        r['dispersion']['kmzs'] = self._pick_out_files(kmzs,
+            smoke=self.SMOKE_KMZ_MATCHER)
+        json_files = self._find_files(d['output']['directory'],
+            self.JSON_PATTERN)
+        if json_files:
+            r['dispersion']['json'] = json_files
+
+    def _find_netcdfs(self, d):
+        netcdfs = self._find_files(d['output']['directory'],
+            self.NETCDF_PATTERN)
         if netcdfs:
             if len(netcdfs) > 1:
                 # I dont think this should happen
-                r['dispersion']['netcdfs'] = netcdfs
+                return {'netcdfs': netcdfs}
             else:
-                r['dispersion']['netcdf'] = netcdfs[0]
+                return {'netcdf': netcdfs[0]}
+        return {}
 
-        # TODO: list other hysplit output files; maybe make this configurable
-
+    JSON_PATTERN = '*.json'
     KMZ_PATTERN = '*.kmz'
     IMAGE_PATTERN = '*.png'
     CSV_PATTERN = '*.csv'
+    NETCDF_PATTERN = '*.nc'
     SMOKE_KMZ_MATCHER = re.compile('.*smoke.*kmz')
     FIRE_KMZ_MATCHER = re.compile('.*fire.*kmz')
     HOURLY_IMG_MATCHER = re.compile('.*/hourly_.*')
