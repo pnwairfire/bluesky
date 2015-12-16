@@ -582,12 +582,12 @@ class HYSPLITDispersion(DispersionBase):
         logging.info("HYSPLIT grid DIMENSIONS will be %s by %s" % (lon_count, lat_count))
 
         return {
-            "spacingLon": float(spacing_s)/SCALE,
-            "spacingLat": spacingLon,
-            "centerLon": float((lon_min_s + lon_max_s) / 2) / SCALE,
-            "centerLat": float((lat_min_s + lat_max_s) / 2) / SCALE,
-            "widthLon": float(lon_max_s - lon_min_s) / SCALE,
-            "heightLat": float(lat_max_s - lat_min_s) / SCALE
+            "spacing_longitude": float(spacing_s)/SCALE,
+            "spacing_latitude": spacingLon,
+            "center_longitude": float((lon_min_s + lon_max_s) / 2) / SCALE,
+            "center_latitude": float((lat_min_s + lat_max_s) / 2) / SCALE,
+            "width_longitude": float(lon_max_s - lon_min_s) / SCALE,
+            "height_latitude": float(lat_max_s - lat_min_s) / SCALE
         }
 
     def _write_control_file(self, control_file, concFile):
@@ -621,12 +621,12 @@ class HYSPLITDispersion(DispersionBase):
             # User settings that can override the default concentration grid info
             logging.info("User-defined sampling/concentration grid invoked")
             grid_params = {
-                "centerLat": self.config("CENTER_LATITUDE"),
-                "centerLon": self.config("CENTER_LONGITUDE"),
-                "heightLat": self.config("HEIGHT_LATITUDE"),
-                "widthLon": self.config("WIDTH_LONGITUDE"),
-                "spacingLon": self.config("SPACING_LONGITUDE"),
-                "spacingLat": self.config("SPACING_LATITUDE")
+                "center_latitude": self.config("CENTER_LATITUDE"),
+                "center_longitude": self.config("CENTER_LONGITUDE"),
+                "height_latitude": self.config("HEIGHT_LATITUDE"),
+                "width_longitude": self.config("WIDTH_LONGITUDE"),
+                "spacing_longitude": self.config("SPACING_LONGITUDE"),
+                "spacing_latitude": self.config("SPACING_LATITUDE")
             }
 
         elif self.config('grid'):
@@ -653,13 +653,15 @@ class HYSPLITDispersion(DispersionBase):
         else:
             raise BlueSkyConfigurationError("Specify hysplit dispersion grid")
 
+        logging.debug("grid_params: %s", grid_params)
+
         # To minimize change in the following code, set aliases
-        centerLat =  grid_params['centerLat']
-        centerLon = grid_params['centerLon']
-        widthLon = grid_params['widthLon']
-        heightLat = grid_params['heightLat']
-        spacingLon = grid_params['spacingLon']
-        spacingLat = grid_params['spacingLat']
+        centerLat =  grid_params["center_latitude"]
+        centerLon = grid_params["center_longitude"]
+        widthLon = grid_params["width_longitude"]
+        heightLat = grid_params["height_latitude"]
+        spacingLon = grid_params["spacing_longitude"]
+        spacingLat = grid_params["spacing_latitude"]
 
         # Decrease the grid resolution based on number of fires
         if self.config("OPTIMIZE_GRID_RESOLUTION"):
