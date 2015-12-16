@@ -8,7 +8,8 @@
             "hysplit": {
                 "compute_grid": true,
                 "SPACING_LONGITUDE": 0.05,
-                "SPACING_LATITUDE": 0.05
+                "SPACING_LATITUDE": 0.05,
+                "grid_length": 1000
             }
         },
         "visualization": {
