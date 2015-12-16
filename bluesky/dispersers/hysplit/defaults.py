@@ -1,3 +1,6 @@
+"""bluesky.dispersers.hysplit.defaults
+"""
+
 import os
 
 # NOTE: executables are no longer configurable.  It is assumed that any
