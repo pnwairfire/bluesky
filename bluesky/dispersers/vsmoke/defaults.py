@@ -1,3 +1,6 @@
+"""bluesky.dispersers.vsmoke.defaults
+"""
+
 import os
 
 # Temperature of fire (F)
