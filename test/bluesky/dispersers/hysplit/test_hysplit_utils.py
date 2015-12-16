@@ -130,25 +130,30 @@ class TestHysplitUtils(object):
             num_fires_per_process=2, num_processes_max=1)
         assert isinstance(n, int) and n == 1
 
-class TestKmPerLng(self):
+class TestKmPerLng(object):
 
     def test_basic(self):
         assert 111.32 == hysplit_utils.km_per_deg_lng(0)
         assert 78.71512688168647 == hysplit_utils.km_per_deg_lng(45)
-        assert 0 == hysplit_utils.km_per_deg_lng(90)
+        # Note: hysplit_utils.km_per_deg_lng(90) should equal 0
+        #  using assert_approx_equal(0.0, hysplit_utils.km_per_deg_lng(90))
+        #  fails, even thgouh the returned value is something like
+        #  6.8163840840541674e-15.  So, just going to manually check
+        #  that difference is insignificant
+        assert hysplit_utils.km_per_deg_lng(90) < 0.000000000001
 
 class TestSquareGridFromLatLng(object):
 
     def test_basic(self):
         e = {
-            "centerLat": 45.0,
-            "centerLon": -118.0,
-            "heightLat": 0.9009009009009009,
-            "widthLon": 1.2704038469036067,
-            "spacingLon": hysplit_utils.DOMAINS['NAM84']['boundary']['spacing_longitude'],
-            "spacingLat": hysplit_utils.DOMAINS['NAM84']['boundary']['spacing_latitude']
+            "center_latitude": 45.0,
+            "center_longitude": -118.0,
+            "height_latitude": 0.9009009009009009,
+            "width_longitude": 1.2704038469036067,
+            "spacing_longitude": 0.5,
+            "spacing_latitude": 0.5
         }
-        assert e == hysplit_utils.square_grid_from_lat_lng(45.0, -118.0, 100, 'NAM84')
+        assert e == hysplit_utils.square_grid_from_lat_lng(45.0, -118.0, 0.5, 0.5, 100)
 
     # TODO: test location that could cross pole
     # TODO: test location that could equator
