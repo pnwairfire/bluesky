@@ -18,6 +18,8 @@ import shutil
 import threading
 from datetime import timedelta
 
+from bluesky.exceptions import BlueSkyConfigurationError
+
 from .. import (
     DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE
 )
@@ -532,6 +534,62 @@ class HYSPLITDispersion(DispersionBase):
 
         return verticalMethod
 
+    def _calculate_grid_params(self, grid):
+        # Calculate output concentration grid parameters.
+        # Ensure the receptor spacing divides nicely into the grid width and height,
+        # and that the grid center will be a receptor point (i.e., nx, ny will be ODD).
+        logging.info("Automatic sampling/concentration grid invoked")
+
+        grid = self.config('grid') or self._met_info.get('grid')
+        if not grid:
+            raise ValueError("Dispersion grid must be defined either in the "
+                "config or in the top level met object.")
+        projection = grid.get('domain', self._met_info.get('domain'))
+        grid_spacing = grid.get('spacing', self._met_info.get('spacing'))
+        if not grid_spacing:
+            raise ValueError("grid spacing must be defined either in user "
+                "defined grid or in met object.")
+        grid_boundary = grid.get('boundary', self._met_info.get('boundary'))
+        if not grid_boundary:
+            raise ValueError("grid boundary must be defined either in user "
+                "defined grid or in met object.")
+        # TODO: check that sw and ne lat/lng's are defined
+
+        lat_min = grid_boundary['sw']['lat']
+        lat_max = grid_boundary['ne']['lat']
+        lon_min = grid_boundary['sw']['lng']
+        lon_max = grid_boundary['ne']['lng']
+        lat_center = (lat_min + lat_max) / 2
+        spacing = grid_spacing / ( 111.32 * math.cos(lat_center*math.pi/180.0) )
+        if projection == "LatLon":
+            spacing = grid_spacing  # degrees
+
+        # Build sampling grid parameters in scaled integer form
+        SCALE = 100
+        lat_min_s = int(lat_min*SCALE)
+        lat_max_s = int(lat_max*SCALE)
+        lon_min_s = int(lon_min*SCALE)
+        lon_max_s = int(lon_max*SCALE)
+        spacing_s = int(spacing*SCALE)
+
+        lat_count = (lat_max_s - lat_min_s) / spacing_s
+        lat_count += 1 if lat_count % 2 == 0 else 0  # lat_count should be odd
+        lat_max_s = lat_min_s + ((lat_count-1) * spacing_s)
+
+        lon_count = (lon_max_s - lon_min_s) / spacing_s
+        lon_count += 1 if lon_count % 2 == 0 else 0  # lon_count should be odd
+        lon_max_s = lon_min_s + ((lon_count-1) * spacing_s)
+        logging.info("HYSPLIT grid DIMENSIONS will be %s by %s" % (lon_count, lat_count))
+
+        return {
+            "spacingLon": float(spacing_s)/SCALE,
+            "spacingLat": spacingLon,
+            "centerLon": float((lon_min_s + lon_max_s) / 2) / SCALE,
+            "centerLat": float((lat_min_s + lat_max_s) / 2) / SCALE,
+            "widthLon": float(lon_max_s - lon_min_s) / SCALE,
+            "heightLat": float(lat_max_s - lat_min_s) / SCALE
+        }
+
     def _write_control_file(self, control_file, concFile):
         num_fires = len(self._fires)
         num_heights = self.num_output_quantiles + 1  # number of quantiles used, plus ground level
@@ -562,65 +620,46 @@ class HYSPLITDispersion(DispersionBase):
             # This supports BSF config settings
             # User settings that can override the default concentration grid info
             logging.info("User-defined sampling/concentration grid invoked")
-            centerLat = self.config("CENTER_LATITUDE")
-            centerLon = self.config("CENTER_LONGITUDE")
-            widthLon = self.config("WIDTH_LONGITUDE")
-            heightLat = self.config("HEIGHT_LATITUDE")
-            spacingLon = self.config("SPACING_LONGITUDE")
-            spacingLat = self.config("SPACING_LATITUDE")
+            grid_params = {
+                "centerLat": self.config("CENTER_LATITUDE"),
+                "centerLon": self.config("CENTER_LONGITUDE"),
+                "heightLat": self.config("HEIGHT_LATITUDE"),
+                "widthLon": self.config("WIDTH_LONGITUDE"),
+                "spacingLon": self.config("SPACING_LONGITUDE"),
+                "spacingLat": self.config("SPACING_LATITUDE")
+            }
+
+        elif self.config('grid'):
+            grid_params = self._calculate_grid_params(self.config('grid'))
+
+        elif self.config('compute_grid'):
+            if len(self._fires) != 1:
+                # TODO: support multiple fires
+                raise ValueError("Option to compute grid only supported for "
+                    "runs with one fire")
+            if (not self.config('spacing_latitude')
+                    or not self.config('spacing_longitude')):
+                raise BlueSkyConfigurationError("Config settings "
+                    "'spacing_latitude' and 'spacing_longitude' required "
+                    "to compute hysplit grid")
+            grid_params = hysplit_utils.square_grid_from_lat_lng(
+                self._fires[0]['latitude'], self._fires[0]['longitude'],
+                self.config('spacing_latitude'), self.config('spacing_longitude'),
+                self.config('grid_length'))
+
+        elif self._met_info.get('grid'):
+            grid_params = self._calculate_grid_params(self._met_info['grid'])
+
         else:
-            # Calculate output concentration grid parameters.
-            # Ensure the receptor spacing divides nicely into the grid width and height,
-            # and that the grid center will be a receptor point (i.e., nx, ny will be ODD).
-            logging.info("Automatic sampling/concentration grid invoked")
+            raise BlueSkyConfigurationError("Specify hysplit dispersion grid")
 
-            grid = self.config('grid') or self._met_info.get('grid')
-            if not grid:
-                raise ValueError("Dispersion grid must be defined either in the "
-                    "config or in the top level met object.")
-            projection = grid.get('domain', self._met_info.get('domain'))
-            grid_spacing = grid.get('spacing', self._met_info.get('spacing'))
-            if not grid_spacing:
-                raise ValueError("grid spacing must be defined either in user "
-                    "defined grid or in met object.")
-            grid_boundary = grid.get('boundary', self._met_info.get('boundary'))
-            if not grid_boundary:
-                raise ValueError("grid boundary must be defined either in user "
-                    "defined grid or in met object.")
-            # TODO: check that sw and ne lat/lng's are defined
-
-            lat_min = grid_boundary['sw']['lat']
-            lat_max = grid_boundary['ne']['lat']
-            lon_min = grid_boundary['sw']['lng']
-            lon_max = grid_boundary['ne']['lng']
-            lat_center = (lat_min + lat_max) / 2
-            spacing = grid_spacing / ( 111.32 * math.cos(lat_center*math.pi/180.0) )
-            if projection == "LatLon":
-                spacing = grid_spacing  # degrees
-
-            # Build sampling grid parameters in scaled integer form
-            SCALE = 100
-            lat_min_s = int(lat_min*SCALE)
-            lat_max_s = int(lat_max*SCALE)
-            lon_min_s = int(lon_min*SCALE)
-            lon_max_s = int(lon_max*SCALE)
-            spacing_s = int(spacing*SCALE)
-
-            lat_count = (lat_max_s - lat_min_s) / spacing_s
-            lat_count += 1 if lat_count % 2 == 0 else 0  # lat_count should be odd
-            lat_max_s = lat_min_s + ((lat_count-1) * spacing_s)
-
-            lon_count = (lon_max_s - lon_min_s) / spacing_s
-            lon_count += 1 if lon_count % 2 == 0 else 0  # lon_count should be odd
-            lon_max_s = lon_min_s + ((lon_count-1) * spacing_s)
-            logging.info("HYSPLIT grid DIMENSIONS will be %s by %s" % (lon_count, lat_count))
-
-            spacingLon = float(spacing_s)/SCALE
-            spacingLat = spacingLon
-            centerLon = float((lon_min_s + lon_max_s) / 2) / SCALE
-            centerLat = float((lat_min_s + lat_max_s) / 2) / SCALE
-            widthLon = float(lon_max_s - lon_min_s) / SCALE
-            heightLat = float(lat_max_s - lat_min_s) / SCALE
+        # To minimize change in the following code, set aliases
+        centerLat =  grid_params['centerLat']
+        centerLon = grid_params['centerLon']
+        widthLon = grid_params['widthLon']
+        heightLat = grid_params['heightLat']
+        spacingLon = grid_params['spacingLon']
+        spacingLat = grid_params['spacingLat']
 
         # Decrease the grid resolution based on number of fires
         if self.config("OPTIMIZE_GRID_RESOLUTION"):

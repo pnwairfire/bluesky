@@ -93,3 +93,36 @@ def compute_num_processes(num_fire_sets, **config):
         num_processes = 1
 
     return int(num_processes)
+
+
+KM_PER_DEG_LAT = 111
+DEG_LAT_PER_KM = 1.0 / KM_PER_DEG_LAT
+RADIANS_PER_DEG = math.pi / 180
+KM_PER_DEG_LNG_AT_EQUATOR = 111.32
+
+def km_per_deg_lng(lat):
+    return KM_PER_DEG_LNG_AT_EQUATOR * math.cos(RADIANS_PER_DEG * lat)
+
+def square_grid_from_lat_lng(lat, lng, spacing_lat, spacing_lng, length):
+    """
+
+    args
+     - lat -- latitude of grid center
+     - lng -- longitude of grid center
+     - length -- length of each side of grid
+    """
+    logging.debug("calculating {length}x{length} grid with lat/lng "
+        "spacing {sp_lat}/{sp_lng} around {lat},{lng}".format(
+        length=length, sp_lat=spacing_lat, sp_lng=spacing_lng,
+        lat=lat, lng=lng))
+    width_lng = length / km_per_deg_lng(lat)
+    d = {
+        "centerLat": lat,
+        "centerLon": lng,
+        "heightLat": DEG_LAT_PER_KM * length,
+        "widthLon": width_lng,
+        "spacingLon": spacing_lon,
+        "spacingLat": spacing_lat
+    }
+    # TODO: truncate grid to keep from crossing pole? equator?
+    return d

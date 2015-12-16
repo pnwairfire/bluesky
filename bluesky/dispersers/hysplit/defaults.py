@@ -45,6 +45,12 @@ USER_DEFINED_GRID = False
 # SPACING_LONGITUDE = 0.5
 # SPACING_LATITUDE = 0.5
 
+# computing grid around fire
+COMPUTE_GRID = False
+GRID_LENGTH = 2000 # km
+# SPACING_LONGITUDE = 0.5
+# SPACING_LATITUDE = 0.5
+
 # Optimize (i.e. decrease) concentration grid resolution based on number of fires
 OPTIMIZE_GRID_RESOLUTION = False
 MAX_SPACING_LONGITUDE = 0.50

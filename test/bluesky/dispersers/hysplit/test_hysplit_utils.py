@@ -130,5 +130,30 @@ class TestHysplitUtils(object):
             num_fires_per_process=2, num_processes_max=1)
         assert isinstance(n, int) and n == 1
 
+class TestKmPerLng(self):
+
+    def test_basic(self):
+        assert 111.32 == hysplit_utils.km_per_deg_lng(0)
+        assert 78.71512688168647 == hysplit_utils.km_per_deg_lng(45)
+        assert 0 == hysplit_utils.km_per_deg_lng(90)
+
+class TestSquareGridFromLatLng(object):
+
+    def test_basic(self):
+        e = {
+            "centerLat": 45.0,
+            "centerLon": -118.0,
+            "heightLat": 0.9009009009009009,
+            "widthLon": 1.2704038469036067,
+            "spacingLon": hysplit_utils.DOMAINS['NAM84']['boundary']['spacing_longitude'],
+            "spacingLat": hysplit_utils.DOMAINS['NAM84']['boundary']['spacing_latitude']
+        }
+        assert e == hysplit_utils.square_grid_from_lat_lng(45.0, -118.0, 100, 'NAM84')
+
+    # TODO: test location that could cross pole
+    # TODO: test location that could equator
+    # TODO: test any invalid cases
+
+
 if __name__ == '__main__':
     test_main(verbose=True)
