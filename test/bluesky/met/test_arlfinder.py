@@ -8,7 +8,6 @@ import tempfile
 import StringIO # for monkeypatching
 
 from py.test import raises
-from numpy.testing import assert_approx_equal
 
 from bluesky.met import arlfinder
 from bluesky import io # for monkeypatching
