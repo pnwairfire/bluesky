@@ -563,7 +563,7 @@ class HYSPLITDispersion(DispersionBase):
         if projection == "LatLon":
             spacing = grid_spacing  # degrees
         else:
-            spacing = grid_spacing / hysplit_utils.km_per_def_ln(lat_center)
+            spacing = grid_spacing / hysplit_utils.km_per_deg_lng(lat_center)
 
         # Build sampling grid parameters in scaled integer form
         SCALE = 100
