@@ -581,9 +581,10 @@ class HYSPLITDispersion(DispersionBase):
         lon_max_s = lon_min_s + ((lon_count-1) * spacing_s)
         logging.info("HYSPLIT grid DIMENSIONS will be %s by %s" % (lon_count, lat_count))
 
+        spacing_longitude = float(spacing_s)/SCALE
         return {
-            "spacing_longitude": float(spacing_s)/SCALE,
-            "spacing_latitude": spacingLon,
+            "spacing_longitude": spacing_longitude,
+            "spacing_latitude": spacing_longitude,
             "center_longitude": float((lon_min_s + lon_max_s) / 2) / SCALE,
             "center_latitude": float((lat_min_s + lat_max_s) / 2) / SCALE,
             "width_longitude": float(lon_max_s - lon_min_s) / SCALE,
