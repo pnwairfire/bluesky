@@ -74,11 +74,12 @@ class DispersionBase(object):
         #   options are defined
 
     def config(self, key):
-        # check if key is defined, in order, a) in the config as is, b) in
-        # the config as lower case, c) in the hardcoded defaults
-        return self._config.get(key,
+        # check if key is defined, in order, a) in the config as upper case,
+        # b) in the config as lower case, c) in the hardcoded defaults as
+        # upper case
+        return self._config.get(key.upper(),
             self._config.get(key.lower(),
-                getattr(self.DEFAULTS, key, None)))
+                getattr(self.DEFAULTS, key.upper(), None)))
 
     def run(self, fires, start, num_hours, dest_dir, output_dir_name):
         """Runs hysplit
