@@ -97,7 +97,7 @@ def compute_num_processes(num_fire_sets, **config):
 
 KM_PER_DEG_LAT = 111
 DEG_LAT_PER_KM = 1.0 / KM_PER_DEG_LAT
-RADIANS_PER_DEG = math.pi / 180
+RADIANS_PER_DEG = math.pi / 180.0
 KM_PER_DEG_LNG_AT_EQUATOR = 111.32
 
 def km_per_deg_lng(lat):

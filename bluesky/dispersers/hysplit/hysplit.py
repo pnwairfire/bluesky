@@ -560,9 +560,10 @@ class HYSPLITDispersion(DispersionBase):
         lon_min = grid_boundary['sw']['lng']
         lon_max = grid_boundary['ne']['lng']
         lat_center = (lat_min + lat_max) / 2
-        spacing = grid_spacing / ( 111.32 * math.cos(lat_center*math.pi/180.0) )
         if projection == "LatLon":
             spacing = grid_spacing  # degrees
+        else:
+            spacing = grid_spacing / hysplit_utils.km_per_def_ln(lat_center)
 
         # Build sampling grid parameters in scaled integer form
         SCALE = 100
