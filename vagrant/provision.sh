@@ -18,13 +18,15 @@ sudo apt-get install -y libnetcdf-dev
 sudo apt-get install -y proj
 #sudo apt-get install -y proj-bin  # for ubuntu 14.04
 
+sudo apt-get install checkinstall
 sudo pip install numpy==1.8.0
-wget http://download.osgeo.org/gdal/1.11.2/gdal-1.11.2.tar.gz
-tar xvfz gdal-1.11.2.tar.gz
+cd /usr/local/src
+sudo wget http://download.osgeo.org/gdal/1.11.2/gdal-1.11.2.tar.gz
+sudo tar xvfz gdal-1.11.2.tar.gz
 cd gdal-1.11.2
-./configure --with-python --prefix=/usr
-make
-sudo make install
+sudo ./configure --with-python --prefix=/usr/local
+sudo make
+sudo checkinstall  #sudo make install
 sudo ldconfig
 cd ..
 
