@@ -16,10 +16,6 @@ ROUGLEN_FILE = os.path.join(_bdyfiles_path, 'ROUGLEN.ASC')
 # Program to convert raw HYSPLIT output to netCDF
 CONVERT_HYSPLIT2NETCDF = True
 
-# Path to pre-generated version of SETUP.CFG to be used instead of creating
-# that file dynamically.
-#HYSPLIT_SETUP_FILE = ${PACKAGE_DIR}/Example_SETUP.CFG
-
 # Height in meters where smoldering emissions should be injected into the model
 SMOLDER_HEIGHT = 10.0
 
@@ -56,32 +52,90 @@ OPTIMIZE_GRID_RESOLUTION = False
 MAX_SPACING_LONGITUDE = 0.50
 MAX_SPACING_LATITUDE = 0.50
 FIRE_INTERVALS = [0, 100, 200, 500, 1000]
-#
-# Particle restart options
-#
+
+### HYSPLIT Setup variables
+
+## Particle restart options
+
 #  Location of particle initialization input files
 DISPERSION_FOLDER = "./input/dispersion"
 
-# Read a particle initialization input file
-READ_INIT_FILE = False
+# conversion modules
+#    0 - none
+#    1 - matrix
+#    2 - 10% / hour
+#    3 - PM10 dust storm simulation
+#    4 - Set concentration grid identical to the meteorology grid (not in GUI)
+#    5 - Deposition Probability method
+#    6 - Puff to Particle conversion (not in GUI)
+#    7 - Surface water pollutant transport
+ICHEM = 0
 
-# Make a particle initialization input file
-MAKE_INIT_FILE = False
+# NINIT: Read a particle initialization input file?
+NINIT = 0
 
-# Stop processing if no particle initialization file is found
+# name of the particle initialization input file
+# NOTE: must be limited to 80 chars max (i think, rcs)
+PINPF = "./input/dispersion/PARINIT"
+
+# Stop processing if no particle initialization file is found and
+# NINIT != 0
 STOP_IF_NO_PARINIT = True
 
-#
-# HYSPLIT Setup variables
-#
-# Number of hours from the start of the simulation to write the particle initialization file
-NDUMP = 24
+# Create a particle initialization input file
+MAKE_INIT_FILE = False
 
-# The repeat interval at which the particle initialization file will be written after NDUMP
-NCYCL = 24
+# name of the particle initialization output file
+# NOTES: must be limited to 80 chars max (i think, rcs)
+#        also, MPI runs will append a .NNN at the end
+#        based on the CPU number. subsequent restarts must
+#        use the same number of CPUs as the original that
+#        created the dump files. code will warn if there
+#        are few files than CPUs but will ignore files
+#        for cases when more files than CPUs.
+POUTF = ${BS_DIR}/input/dispersion/PARDUMP
+
+# Number of hours from the start of the simulation to write the particle
+# initialization file (NOTE: unlike the comments in the v7 hysplit module,
+# negative values do not actually appear to be supported as NDUMP must be
+# greater than 0 for this to occur)
+NDUMP = 0
+
+# The repeat interval at which the particle initialization file will be
+# written after NDUMP
+NCYCL = 0
+
+## ADVANCED Setup variable options
+
+# Minimum size in grid units of the meteorological sub-grid
+#         default is 10 (from the hysplit user manual). however,
+#         once hysplit complained and said i need to raise this
+#         variable to some value around 750...leaving w/default
+#         but change if required.
+MGMIN = 10
 
 # Maximum length of a trajectory in hours
 KHMAX = 72
+
+# Number of hours between emission start cycles
+QCYCLE = 1.0
+
+# 0 - horizontal & vertical particle
+# 1 - horizontal gaussian puff, vertical top hat puff
+# 2 - horizontal & vertical top hat puff
+# 3 - horizontal gaussian puff, verticle particle
+# 4 - horizontal top hat puff, verticle particle
+INITD = 0
+
+# used to calculate the time step integration interval
+TRATIO = 0.750
+DELT = 0.0
+
+# particle release limits. if 0 is provided then the values are calculated
+# based on the number of sources: numpar = num_sources = num_fires*num_heights)
+# and maxpar = numpar*1000/ncpus
+NUMPAR = 500
+MAXPAR = 10000
 
 #
 # MPI options
@@ -107,3 +161,35 @@ NPROCESSES_MAX = -1
 # Machines file (TODO: functionality for multiple nodes)
 #MACHINEFILE = machines
 
+#
+# CONTROL vars:
+#
+
+# sampling interval type, hour & min (default 0 1 0)
+# type of 0 gives the average over the interval
+SAMPLING_INTERVAL_TYPE = 0
+SAMPLING_INTERVAL_HOUR = 1
+SAMPLING_INTERVAL_MIN  = 0
+
+# particle stuff (1.0 use default hysplit values)
+# diamater in micrometer, density in g/cc.
+PARTICLE_DIAMETER = 1.0
+PARTICLE_DENSITY = 1.0
+PARTICLE_SHAPE = 1.0
+
+# dry deposition vars (0.0 use default hysplit values)
+# velocity is m/s and weight is g/mol.
+DRY_DEP_VELOCITY = 0.0
+DRY_DEP_MOL_WEIGHT = 0.0
+DRY_DEP_REACTIVITY = 0.0
+DRY_DEP_DIFFUSIVITY = 0.0
+DRY_DEP_EFF_HENRY = 0.0
+
+# wet deposition vars (0.0 use default hysplit values)
+# in-cloud scav is L/L, below cloud is 1/s.
+WET_DEP_ACTUAL_HENRY = 0.0
+WET_DEP_IN_CLOUD_SCAV = 0.0
+WET_DEP_BELOW_CLOUD_SCAV = 0.0
+
+# radioactive decay half live in days (0.0 is default, ie: no decay)
+RADIOACTIVE_HALF_LIVE = 0.0
