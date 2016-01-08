@@ -1349,3 +1349,62 @@ Now you're ready to run bsp:
         ]
     }' > fires.json
     bsp -i fires.json ingestion fuelbeds
+
+## Docker
+
+### Installing Docker
+
+See https://docs.docker.com/engine/installation/ for platform specific
+installation instructions.
+
+## Docker
+
+A Dockerfile is included in this repo to build a docker image for
+running bluesky.
+
+### Installing Docker
+
+See https://docs.docker.com/engine/installation/ for platform specific
+installation instructions.
+
+### Building Docker Image
+
+#### Mac OSX
+
+##### Starting Docker deamon
+
+On a Mac, the docker daemon runs inside a Linux VM. The first time
+you use docker, you'll need to create a vm:
+
+    docker-machine create --driver virtualbox default
+
+Check that it was created:
+
+    docker-machine ls
+
+Set env vars so that your docker knows how to find the docker host:
+
+    eval "$(docker-machine env default)"
+
+#### Ubuntu
+
+...TODO: fill in insructions...
+
+
+### Build Bluesky Docker Image from Docfile
+
+Cd into the bluesky repo's docker/ subdirectory and build the image:
+
+    cd /path/to/bluesky/repo/docker/
+    docker build -t bluesky .
+
+### Run in Docker
+
+If you run the image without a command, i.e.:
+
+    docker run bluesky
+
+it will output the bluesky help image.  To bluesky with input, use
+something like the following:
+
+    docker run bluesky ...TODO: FILL IN COMMAND...

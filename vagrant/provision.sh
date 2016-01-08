@@ -1,34 +1,20 @@
 #!/usr/bin/env bash
 
 sudo apt-get update
-sudo apt-get upgrade
+#sudo apt-get upgrade
 
-sudo apt-get install -y g++ gcc make dkms
-sudo apt-get install -y git git-svn
-sudo apt-get install -y curl
+sudo apt-get install -y g++ gcc make python python-dev python-pip libnetcdf-dev proj
+#sudo apt-get install -y proj-bin  # for ubuntu 14.04
 sudo apt-get install -y tmux emacs
-
-sudo apt-get install -y python
-sudo apt-get install -y python-dev
-sudo apt-get install -y python-pip
 sudo pip install --upgrade pip
 
-#sudo apt-get install libxml2-dev libxslt1-dev
-sudo apt-get install -y libnetcdf-dev
-sudo apt-get install -y proj
-#sudo apt-get install -y proj-bin  # for ubuntu 14.04
-
-sudo apt-get install checkinstall
 sudo pip install numpy==1.8.0
-cd /usr/local/src
-sudo wget http://download.osgeo.org/gdal/1.11.2/gdal-1.11.2.tar.gz
-sudo tar xvfz gdal-1.11.2.tar.gz
-cd gdal-1.11.2
-sudo ./configure --with-python --prefix=/usr/local
-sudo make
-sudo checkinstall  #sudo make install
-sudo ldconfig
-cd ..
+sudo apt-get install -y libgdal1-1.7.0
+sudo apt-get install -y python-gdal libxml2-dev libxslt1-dev
+
+# need to upgrade distribute and install png and freetype libs for matplotlib
+sudo pip install --upgrade distribute
+sudo apt-get install -y libpng12-dev libfreetype6-dev
 
 # # install pyenv / virtualenv
 # if [ ! -d "/home/vagrant/.pyenv" ]; then
@@ -57,7 +43,4 @@ cd ..
 # pyenv global bluesky-2.7.8
 # pip install ipython
 
-sudo apt-get install -y python-gdal
-
-sudo apt-get install libxml2-dev libxslt1-dev
 sudo pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky
