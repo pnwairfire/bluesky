@@ -1391,11 +1391,13 @@ Set env vars so that your docker knows how to find the docker host:
 ...TODO: fill in insructions...
 
 
-### Build Bluesky Docker Image from Docfile
+### Build Bluesky Docker Images from Docfile
 
 Cd into the bluesky repo's docker/ subdirectory and build the image:
 
-    cd /path/to/bluesky/repo/docker/
+    cd /path/to/bluesky/repo/docker/base/
+    docker build -t bluesky-base .
+    cd /path/to/bluesky/repo/docker/full/
     docker build -t bluesky .
 
 ### Run in Docker
@@ -1443,3 +1445,28 @@ something like the following:
             }
         ]
     }' | bsp ingestion fuelbeds consumption emissions
+
+### Using base image for development
+
+The bluesky-base image has everything except the bluesky
+package and it's python dependencies.  You can use it to run bluesky
+from your local repo. First install the python dependencies for your
+current version of the repo
+
+    docker run -v /Users/jdubowy/code/pnwairfire-bluesky:/bluesky/ -w /bluesky/ bluesky-base pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
+
+then commit container changes back to image
+
+    docker commit `docker ps -l|awk 'NR > 1 {print $1}'` bluesky-base
+
+Then run bluesky:
+
+    docker run -v /Users/jdubowy/code/pnwairfire-bluesky:/bluesky/ -w /bluesky/ bluesky-base ./bin/bsp -h
+
+### Executables needing to be manually installed
+
+The Dockerfiles specify everything you need to to run bluesky through
+emissions.  If you want to run localmet and/or dispersion, you'll
+need to manually install the required executables:
+
+    ...TODO: fill in commands to install extra executables...

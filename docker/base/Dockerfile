@@ -1,4 +1,12 @@
-# A server to run bluesky
+# Server containing all of bluesky's dependencies, to be used
+# as dev environment and as base for container in which bluesky
+# is to be installed.
+#
+# Example of how to use in dev environment, assuming image is called
+# bluesky-base:
+#   docker run -v /path/to/repo/:/path/to/repo/ \
+#      bluesky-base /path/to/repo/bin/bluesky
+
 FROM ubuntu:12.04
 
 MAINTAINER Joel Dubowy
@@ -14,10 +22,3 @@ RUN apt-get install -y python-gdal libxml2-dev libxslt1-dev
 # need to upgrade distribute and install png and freetype libs for matplotlib
 RUN pip install --upgrade distribute
 RUN apt-get install -y libpng12-dev libfreetype6-dev
-
-RUN pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky
-
-### To install from github instead of from AirFire's pypi server
-#RUN pip install --no-binary gdal  --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple   https://github.com/pnwairfire/bluesky/archive/branch-name.tar.gz
-
-CMD ["bsp", "-h"]
