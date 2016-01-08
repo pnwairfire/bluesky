@@ -1453,15 +1453,18 @@ package and it's python dependencies.  You can use it to run bluesky
 from your local repo. First install the python dependencies for your
 current version of the repo
 
-    docker run -v /Users/jdubowy/code/pnwairfire-bluesky:/bluesky/ -w /bluesky/ bluesky-base pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
+    docker run --name bluesky-base \
+        -v /path/to/bluesky/repo:/bluesky/ -w /bluesky/ \
+        bluesky-base pip install --no-binary gdal \
+        --trusted-host pypi.smoke.airfire.org -r requirements.txt
 
 then commit container changes back to image
 
-    docker commit `docker ps -l|awk 'NR > 1 {print $1}'` bluesky-base
+    docker commit bluesky-base bluesky-base
 
 Then run bluesky:
 
-    docker run -v /Users/jdubowy/code/pnwairfire-bluesky:/bluesky/ -w /bluesky/ bluesky-base ./bin/bsp -h
+    docker run -v /path/to/bluesky/repo:/bluesky/ -w /bluesky/ bluesky-base ./bin/bsp -h
 
 ### Executables needing to be manually installed
 

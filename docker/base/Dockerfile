@@ -2,10 +2,16 @@
 # as dev environment and as base for container in which bluesky
 # is to be installed.
 #
-# Example of how to use in dev environment, assuming image is called
-# bluesky-base:
-#   docker run -v /path/to/repo/:/path/to/repo/ \
-#      bluesky-base /path/to/repo/bin/bluesky
+# Example of how to use in dev environment, assuming you've built the
+# image is called with tag 'bluesky-base':
+#
+#   docker run --name bluesky-base \
+#      -v /path/to/bluesky/repo/:/bluesky/ -w /bluesky/ \
+#      bluesky-base pip install --no-binary gdal \
+#      --trusted-host pypi.smoke.airfire.org -r requirements.txt
+#   docker commit bluesky-base bluesky-base
+#   docker run -v /path/to/bluesky/repo/:/bluesky/ \
+#      bluesky-base /bluesky/bin/bsp ...
 
 FROM ubuntu:12.04
 
