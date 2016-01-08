@@ -1,9 +1,9 @@
-# Server containing all of bluesky's dependencies, to be used
+# Container with all of bluesky's dependencies, to be used
 # as dev environment and as base for container in which bluesky
 # is to be installed.
 #
 # Example of how to use in dev environment, assuming you've built the
-# image is called with tag 'bluesky-base':
+# image with tag 'bluesky-base':
 #
 #   docker run --name bluesky-base \
 #      -v /path/to/bluesky/repo/:/bluesky/ -w /bluesky/ \

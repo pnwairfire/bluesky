@@ -1359,19 +1359,18 @@ installation instructions.
 
 ## Docker
 
-A Dockerfile is included in this repo to build a docker image for
-running bluesky.
+Two Dockerfiles are included in this repo - one for running bluesky
+out of the box, and the other for use as a base environment for
+development.
 
-### Installing Docker
+### Install Docker
 
 See https://docs.docker.com/engine/installation/ for platform specific
 installation instructions.
 
-### Building Docker Image
+### Start Docker
 
 #### Mac OSX
-
-##### Starting Docker deamon
 
 On a Mac, the docker daemon runs inside a Linux VM. The first time
 you use docker, you'll need to create a vm:
@@ -1391,22 +1390,19 @@ Set env vars so that your docker knows how to find the docker host:
 ...TODO: fill in insructions...
 
 
-### Build Bluesky Docker Images from Docfile
+### Build Bluesky Docker Images from Dockerfile
 
-Cd into the bluesky repo's docker/ subdirectory and build the image:
+    cd /path/to/bluesky/repo/
+    docker build -t bluesky-base docker/base/
+    docker build -t bluesky docker/complete/
 
-    cd /path/to/bluesky/repo/docker/base/
-    docker build -t bluesky-base .
-    cd /path/to/bluesky/repo/docker/full/
-    docker build -t bluesky .
-
-### Run in Docker
+### Run Complete Container
 
 If you run the image without a command, i.e.:
 
     docker run bluesky
 
-it will output the bluesky help image.  To bluesky with input, use
+it will output the bluesky help image.  To run bluesky with input, use
 something like the following:
 
     docker run bluesky echo '{
@@ -1454,7 +1450,7 @@ from your local repo. First install the python dependencies for your
 current version of the repo
 
     docker run --name bluesky-base \
-        -v /path/to/bluesky/repo:/bluesky/ -w /bluesky/ \
+        -v /path/to/bluesky/repo/:/bluesky/ -w /bluesky/ \
         bluesky-base pip install --no-binary gdal \
         --trusted-host pypi.smoke.airfire.org -r requirements.txt
 

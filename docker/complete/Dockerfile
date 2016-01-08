@@ -1,4 +1,4 @@
-# Container to run
+# Container to run bluesky
 FROM bluesky-base
 
 RUN pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky
