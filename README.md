@@ -1459,7 +1459,7 @@ current version of the repo
         bluesky-base pip install --no-binary gdal \
         --trusted-host pypi.smoke.airfire.org -r requirements.txt
 
-then commit container changes back to image
+then commit the container changes back to image
 
     docker commit bluesky-base bluesky-base
 
@@ -1471,6 +1471,37 @@ Then run bluesky:
 
 The Dockerfiles specify everything you need to to run bluesky through
 emissions.  If you want to run localmet and/or dispersion, you'll
-need to manually install the required executables:
+need to manually install the required executables.
 
-    ...TODO: fill in commands to install extra executables...
+First create the base and complete containers, if not already created:
+
+    docker create --name bluesky bluesky
+    docker create --name bluesky-base bluesky-base
+
+Copy the required executables to the bluesky container
+
+    docker cp /path/to/profile bluesky:/usr/local/bin/profile
+    docker cp /path/to/mpiexec bluesky:/usr/local/bin/mpiexec
+    docker cp /path/to/hycm_std bluesky:/usr/local/bin/hycm_std
+    docker cp /path/to/hysplit2netcdf bluesky:/usr/local/bin/hysplit2netcdf
+    docker cp /path/to/vsmoke bluesky:/usr/local/bin/vsmoke
+    docker cp /path/to/vsmkgs bluesky:/usr/local/bin/vsmkgs
+
+Copy the required executables to the bluesky-base container
+
+    docker cp /path/to/profile bluesky-base:/usr/local/bin/profile
+    docker cp /path/to/mpiexec bluesky-base:/usr/local/bin/mpiexec
+    docker cp /path/to/hycm_std bluesky-base:/usr/local/bin/hycm_std
+    docker cp /path/to/hysplit2netcdf bluesky-base:/usr/local/bin/hysplit2netcdf
+    docker cp /path/to/vsmoke bluesky-base:/usr/local/bin/vsmoke
+    docker cp /path/to/vsmkgs bluesky-base:/usr/local/bin/vsmkgs
+
+Once you've installed the executables, commit the containers' changes
+back to the images
+
+    docker commit bluesky bluesky
+    docker commit bluesky-base bluesky-base
+
+Now, you can run commands relying on these executables. For example:
+
+     docker run -v /DRI_6km/:/DRI_6km/ bluesky bsp-arlprofiler -f '/DRI_6km/2014052900/wrfout_d2.2014052900.f00-11_12hr01.arl;2014-05-29T00:00:00;2014-05-29T02:00:00' -l 37 -g -119 -s 2014-05-29T00:00:00 -e 2014-05-29T02:00:00 -o -7
