@@ -1402,45 +1402,50 @@ If you run the image without a command, i.e.:
 
     docker run bluesky
 
-it will output the bluesky help image.  To run bluesky with input, use
-something like the following:
+it will output the bluesky help image.  To run bluesky with piped input,
+use something like the following:
 
-    docker run bluesky echo '{
-        "fire_information": [
-            {
-                "id": "SF11C14225236095807750",
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Snoqualmie Pass, WA"
-                },
-                "location": {
-                    "perimeter": {
-                        "type": "MultiPolygon",
-                        "coordinates": [
+    echo '{
+        "fire_information": [{
+            "id": "SF11C14225236095807750",
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "location": {
+                "perimeter": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                        [
                             [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
-                                ]
+                                [-121.4522115, 47.4316976],
+                                [-121.3990506, 47.4316976],
+                                [-121.3990506, 47.4099293],
+                                [-121.4522115, 47.4099293],
+                                [-121.4522115, 47.4316976]
                             ]
                         ]
-                    },
-                    "ecoregion": "southern",
-                    "utc_offset": "-09:00"
+                    ]
                 },
-                "growth": [
-                    {
-                        "pct": 100,
-                        "start": "20150120",
-                        "end": "20150120"
-                    }
-                ]
-            }
-        ]
-    }' | bsp ingestion fuelbeds consumption emissions
+                "ecoregion": "southern",
+                "utc_offset": "-09:00"
+            },
+            "growth": [{
+                "pct": 100,
+                "start": "20150120",
+                "end": "20150120"
+            }]
+        }]
+    }' | docker run -i bluesky bsp ingestion fuelbeds consumption emissions
+
+To run bluesky with file input, you'll need to use the '-v' option to
+mount host machine directories in your container.  For example, suppose
+you've got fire json input data in /foo/bar/fires.json, you could run
+something like the following:
+
+    docker run -v /foo/bar/:/input/ bluesky \
+        bsp -i /input/fires.json \
+        ingestion fuelbeds consumption emissions
 
 ### Using base image for development
 
