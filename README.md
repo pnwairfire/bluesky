@@ -1512,6 +1512,8 @@ Now, you can run commands relying on these executables. For example:
 
      docker run -v /DRI_6km/:/DRI_6km/ bluesky bsp-arlprofiler -f '/DRI_6km/2014052900/wrfout_d2.2014052900.f00-11_12hr01.arl;2014-05-29T00:00:00;2014-05-29T02:00:00' -l 37 -g -119 -s 2014-05-29T00:00:00 -e 2014-05-29T02:00:00 -o -7
 
+Another example, running through vsmoke dispersion:
+
      echo '{
         "config": {
             "emissions": {
@@ -1522,13 +1524,6 @@ Now, you can run commands relying on these executables. For example:
                 "num_hours": 24,
                 "model": "vsmoke",
                 "dest_dir": "/bluesky-output/bsp-dispersion-output/"
-            },
-            "export": {
-                "modes": ["localsave"],
-                "extra_exports": ["dispersion"],
-                "localsave": {
-                    "dest_dir": "/bluesky-output/bsp-local-exports/"
-                }
             }
         },
         "fire_information": [
@@ -1562,6 +1557,11 @@ Now, you can run commands relying on these executables. For example:
             }
         ]
     }' | docker run -i -v $HOME:/bluesky-output/ bluesky bsp  ingestion fuelbeds consumption emissions timeprofiling dispersion | python -m json.tool > out.json
+
+Remember that the vsmoke output will be under $HOME/bsp-dispersion-output/ on your
+host machine, not under /bluesky-output/bsp-dispersion-output/.
+
+Another example, running through hysplit dispersion:
 
     echo '{
         "config": {
@@ -1631,4 +1631,7 @@ Now, you can run commands relying on these executables. For example:
                 ]
             }
         ]
-    }' | docker run -i -v $HOME:/bluesky-output/ -v /DRI_6km/:/DRI_6km/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization | python -m json.tool > out.json
+    }' | docker run -i -v $HOME:/bluesky-output/ -v /DRI_6km/:/DRI_6km/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
+
+Again, the dispersion output will be under $HOME/bsp-dispersion-output/ on your
+host machine, and the export directory will be under $HOME/bsp-local-exports.
