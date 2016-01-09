@@ -1496,6 +1496,12 @@ Copy the required executables to the bluesky-base container
     docker cp /path/to/vsmoke bluesky-base:/usr/local/bin/vsmoke
     docker cp /path/to/vsmkgs bluesky-base:/usr/local/bin/vsmkgs
 
+There's a bug in the bluesky installation that results in missing
+auxliary files.  Manually copy these into the bluesky image:
+
+    docker cp /path/to/bluesky/repo/dispersers/vsmoke/images/ bluesky:/usr/local/lib/python2.7/dist-packages/bluesky/dispersers/vsmoke/images/
+    docker cp /path/to/bluesky/repo/dispersers/hysplit/bdyfiles/ bluesky:/usr/local/lib/python2.7/dist-packages/bluesky/dispersers/hysplit/bdyfiles/
+
 Once you've installed the executables, commit the containers' changes
 back to the images
 
@@ -1505,3 +1511,124 @@ back to the images
 Now, you can run commands relying on these executables. For example:
 
      docker run -v /DRI_6km/:/DRI_6km/ bluesky bsp-arlprofiler -f '/DRI_6km/2014052900/wrfout_d2.2014052900.f00-11_12hr01.arl;2014-05-29T00:00:00;2014-05-29T02:00:00' -l 37 -g -119 -s 2014-05-29T00:00:00 -e 2014-05-29T02:00:00 -o -7
+
+     echo '{
+        "config": {
+            "emissions": {
+                "species": ["PM25"]
+            },
+            "dispersion": {
+                "start": "2014-05-30T00:00:00",
+                "num_hours": 24,
+                "model": "vsmoke",
+                "dest_dir": "/bluesky-output/bsp-dispersion-output/"
+            },
+            "export": {
+                "modes": ["localsave"],
+                "extra_exports": ["dispersion"],
+                "localsave": {
+                    "dest_dir": "/bluesky-output/bsp-local-exports/"
+                }
+            }
+        },
+        "fire_information": [
+            {
+                "meta":{
+                    "vsmoke": {
+                        "wd": 30,
+                        "ws": 10
+                    }
+                },
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Fire Near Wolf Creek, Winthrop, WA"
+                },
+                "id": "SF11C14225236095807750",
+                "type": "natural",
+                "location": {
+                    "area": 10000,
+                    "ecoregion": "western",
+                    "latitude": 48.4956218,
+                    "longitude": -120.2663579,
+                    "utc_offset": "-07:00"
+                },
+                "growth": [
+                    {
+                        "start": "2014-05-29T17:00:00",
+                        "end": "2014-05-30T17:00:00",
+                        "pct": 100.0
+                    }
+                ]
+            }
+        ]
+    }' | docker run -i -v $HOME:/bluesky-output/ bluesky bsp  ingestion fuelbeds consumption emissions timeprofiling dispersion | python -m json.tool > out.json
+
+    echo '{
+        "config": {
+            "emissions": {
+                "species": ["PM25"]
+            },
+            "findmetdata": {
+                "met_root_dir": "/DRI_6km/"
+            },
+            "dispersion": {
+                "start": "2014-05-30T00:00:00",
+                "num_hours": 24,
+                "model": "hysplit",
+                "dest_dir": "/bluesky-output/bsp-dispersion-output/",
+                "hysplit": {
+                    "grid": {
+                        "spacing": 6.0,
+                        "boundary": {
+                            "ne": {
+                                "lat": 45.25,
+                                "lng": -106.5
+                            },
+                            "sw": {
+                                "lat": 27.75,
+                                "lng": -131.5
+                            }
+                        }
+                    }
+                }
+            },
+            "visualization": {
+                "target": "dispersion",
+                "hysplit": {
+                    "images_dir": "images/",
+                    "data_dir": "data/"
+                }
+            },
+            "export": {
+                "modes": ["localsave"],
+                "extra_exports": ["dispersion", "visualization"],
+                "localsave": {
+                    "dest_dir": "/bluesky-output/bsp-local-exports/"
+                }
+            }
+        },
+        "fire_information": [
+            {
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Yosemite, CA"
+                },
+                "id": "SF11C14225236095807750",
+                "type": "natural",
+                "location": {
+                    "area": 10000,
+                    "ecoregion": "western",
+                    "latitude": 37.909644,
+                    "longitude": -119.7615805,
+                    "utc_offset": "-07:00"
+                },
+                "growth": [
+                    {
+                        "start": "2014-05-29T17:00:00",
+                        "end": "2014-05-30T17:00:00",
+                        "pct": 100.0
+                    }
+                ]
+            }
+        ]
+    }' | docker run -i -v $HOME:/bluesky-output/ -v /DRI_6km/:/DRI_6km/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization | python -m json.tool > out.json
