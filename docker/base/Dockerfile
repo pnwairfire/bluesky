@@ -18,7 +18,7 @@ FROM ubuntu:12.04
 MAINTAINER Joel Dubowy
 
 RUN apt-get update
-RUN apt-get install -y g++ gcc make python python-dev python-pip libnetcdf-dev proj
+RUN apt-get install -y g++ gcc make python python-dev python-pip libnetcdf-dev proj nco
 RUN pip install --upgrade pip
 RUN pip install numpy==1.8.0
 RUN apt-get install -y libgdal1-1.7.0

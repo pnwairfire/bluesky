@@ -3,7 +3,7 @@
 sudo apt-get update
 #sudo apt-get upgrade
 
-sudo apt-get install -y g++ gcc make python python-dev python-pip libnetcdf-dev proj
+sudo apt-get install -y g++ gcc make python python-dev python-pip libnetcdf-dev proj nco
 #sudo apt-get install -y proj-bin  # for ubuntu 14.04
 sudo apt-get install -y tmux emacs
 sudo pip install --upgrade pip
