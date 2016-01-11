@@ -1375,7 +1375,7 @@ installation instructions.
 On a Mac, the docker daemon runs inside a Linux VM. The first time
 you use docker, you'll need to create a vm:
 
-    docker-machine create --driver virtualbox default
+    docker-machine create --driver virtualbox docker-default
 
 Check that it was created:
 
@@ -1383,7 +1383,7 @@ Check that it was created:
 
 Set env vars so that your docker knows how to find the docker host:
 
-    eval "$(docker-machine env default)"
+    eval "$(docker-machine env docker-default)"
 
 #### Ubuntu
 
