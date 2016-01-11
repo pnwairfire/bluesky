@@ -17,13 +17,35 @@ FROM ubuntu:12.04
 
 MAINTAINER Joel Dubowy
 
+# Install base dependencies
 # Note: upgrade distribute and install png and freetype libs for
 #   matplotlib, which is needed by bluesky kml
-RUN apt-get update && apt-get install -y g++ gcc make python python-dev python-pip libnetcdf-dev proj nco libpng12-dev libfreetype6-dev
-RUN pip install --upgrade pip distribute
+RUN apt-get update \
+    && apt-get install -y \
+        g++ \
+        gcc \
+        libfreetype6-dev \
+        libpng12-dev \
+        make \
+        nco \
+        python \
+        python-dev \
+        python-pip \
+    && apt-get install -y \
+        libnetcdf-dev \
+        proj \
+    && pip install --upgrade \
+        pip \
+        distribute
 
-# numpy 1.8.0 needs to be installed before libgdal
-RUN pip install numpy==1.8.0
-RUN apt-get install -y libgdal1-1.7.0
-RUN apt-get install -y python-gdal libxml2-dev libxslt1-dev
-
+# Install numpy and gdal
+# Note: numpy 1.8.0 needs to be installed before libgdal
+RUN pip install \
+        numpy==1.8.0 \
+    && apt-get install -y \
+        libgdal1-1.7.0 \
+    && apt-get install -y \
+        python-gdal \
+    && apt-get install -y \
+        libxml2-dev \
+        libxslt1-dev
