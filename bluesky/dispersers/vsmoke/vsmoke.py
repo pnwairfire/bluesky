@@ -245,8 +245,7 @@ class VSMOKEDispersion(DispersionBase):
                 dt = self._model_start + timedelta(hours=hour)
                 local_dt = dt + timedelta(hours=fire.utc_offset)
 
-                # !!! TODO: update pipeline to compute heat !!!
-                heat = 0.0
+                heat = fire.get('heat', 0.0)
                 emtqh = (heat) / 3414425.94972     # Btu to MW
 
                 emtqpm = (fire.timeprofiled_emissions[local_dt]['PM25']
@@ -303,8 +302,7 @@ class VSMOKEDispersion(DispersionBase):
                 ", used default values for these parameters: " + ', '.join(warn))
 
         with open(self._iso_input_file, "w") as f:
-            # !!! TODO: update pipeline to compute heat !!!
-            heat = 0.0
+            heat = fire.get('heat', 0.0)
             emtqh = (heat) / 3414425.94972     # Btu to MW
 
             emtqpm = (fire.timeprofiled_emissions[local_dt]['PM25']
