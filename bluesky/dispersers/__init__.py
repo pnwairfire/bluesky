@@ -12,6 +12,7 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import abc
+import itertools
 import logging
 import os
 import shutil
@@ -164,11 +165,18 @@ class DispersionBase(object):
                         any([not fb.get('emissions') for fb in fire.fuelbeds])):
                     raise ValueError(
                         "Missing emissions data required for computing dispersion")
-                # TODO: figure out what to do with heat????  here's the check from
-                # BSF's hysplit.py
-                # if fire.emissions.sum("heat") < 1.0e-6:
-                #     logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fire.id)
-                #     continue
+
+                # TDOO: handle case where heat is defined by phase, but not total
+                #   (just make sure each phase is defined, and set total to sum)
+                heat = None
+                heat_values = list(itertools.chain.from_iterable(
+                    [fb.get('heat', {}).get('total') for fb in fire.fuelbeds]))
+                if not any([v is None for v in heat_values]):
+                    heat = sum(heat_values)
+                    if heat < 1.0e-6:
+                        logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fire.id)
+                        continue
+                # else, just forget about heat
 
                 utc_offset = fire.get('location', {}).get('utc_offset')
                 utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
@@ -220,6 +228,8 @@ class DispersionBase(object):
                     timeprofiled_emissions=timeprofiled_emissions,
                     consumption=consumption
                 )
+                if heat:
+                    f['heat'] = heat
                 self._fires.append(f)
 
             except:
