@@ -36,7 +36,14 @@ REQUIRED_ARGS = [
         'default': '$HOME'
     }
 ]
+
 OPTIONAL_ARGS = [
+    {
+        'short': '-p',
+        'long': '--pretty-format',
+        'help': "format json output",
+        'action': 'store_true'
+    }
     # TODO: add --met-dir (to mount)
 ]
 
@@ -59,7 +66,6 @@ if __name__ == "__main__":
 
     try:
         input_file = os.path.abspath(args.input_file)
-        #cat_process = subprocess.Popen(('cat', input_file), stdout=subprocess.PIPE)
 
         # TODO: mount met dir if args.met_dir is defined
         cmd_args = [
@@ -72,16 +78,15 @@ if __name__ == "__main__":
             './bin/bsp'
         ]
         cmd_args.extend(args.modules)
+        if args.pretty_format:
+            cmd_args.extend(('|', 'python', '-m', 'json.tool'))
         cmd = ' '.join(cmd_args)
         logging.debug('Command: {}'.format(cmd))
-        subprocess.call(cmd, shell=True) #stdin=cat_process.stdout)
-        #cat_process.wait()
-        #sys.stdout.write(r)
+        # Note: there are security vulnerabilitys with using shell=True,
+        #  but it's not an issue for a test script like this
+        subprocess.call(cmd, shell=True)
 
     except Exception, e:
         logging.error(e)
         logging.debug(traceback.format_exc())
         scripting.utils.exit_with_msg(e)
-
-
-
