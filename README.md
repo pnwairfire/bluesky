@@ -1499,8 +1499,8 @@ Copy the required executables to the bluesky-base container
 There's a bug in the bluesky installation that results in missing
 auxliary files.  Manually copy these into the bluesky image:
 
-    docker cp /path/to/bluesky/repo/dispersers/vsmoke/images/ bluesky:/usr/local/lib/python2.7/dist-packages/bluesky/dispersers/vsmoke/images/
-    docker cp /path/to/bluesky/repo/dispersers/hysplit/bdyfiles/ bluesky:/usr/local/lib/python2.7/dist-packages/bluesky/dispersers/hysplit/bdyfiles/
+    docker cp /path/to/bluesky/repo/bluesky/dispersers/vsmoke/images/ bluesky:/usr/local/lib/python2.7/dist-packages/bluesky/dispersers/vsmoke/images/
+    docker cp /path/to/bluesky/repo/bluesky/dispersers/hysplit/bdyfiles/ bluesky:/usr/local/lib/python2.7/dist-packages/bluesky/dispersers/hysplit/bdyfiles/
 
 Once you've installed the executables, commit the containers' changes
 back to the images
@@ -1556,7 +1556,7 @@ Another example, running through vsmoke dispersion:
                 ]
             }
         ]
-    }' | docker run -i -v $HOME:/bluesky-output/ bluesky bsp  ingestion fuelbeds consumption emissions timeprofiling dispersion | python -m json.tool > out.json
+    }' | docker run -i -v $HOME:/bluesky-output/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling dispersion | python -m json.tool > out.json
 
 Remember that the vsmoke output will be under $HOME/bsp-dispersion-output/ on your
 host machine, not under /bluesky-output/bsp-dispersion-output/.
