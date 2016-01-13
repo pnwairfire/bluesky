@@ -1514,7 +1514,7 @@ Now, you can run commands relying on these executables. For example:
 
 Another example, running through vsmoke dispersion:
 
-     echo '{
+    echo '{
         "config": {
             "emissions": {
                 "species": ["PM25"]

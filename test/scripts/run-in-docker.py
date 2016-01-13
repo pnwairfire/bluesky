@@ -1,12 +1,21 @@
 #!/usr/bin/env python
 
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2015, AirFire, PNW, USFS"
+
+import logging
+import os
+import subprocess
+import sys
+import traceback
+
 from pyairfire import scripting
 
 REQUIRED_ARGS = [
     {
         'short': '-i',
         'long': '--input-file',
-        'help': "json input file, relative to repo root"
+        'help': "json input file"
     },
     {
         'short': '-r',
@@ -19,15 +28,15 @@ REQUIRED_ARGS = [
         'help': 'modules to run',
         'action': 'append',
         'default': []
-    }
-]
-OPTIONAL_ARGS = [
+    },
     {
         'short': '-o',
         'long': '--output-dir',
         'help': "where to record output (if modules produce any); default: $HOME",
         'default': '$HOME'
-    },
+    }
+]
+OPTIONAL_ARGS = [
     # TODO: add --met-dir (to mount)
 ]
 
@@ -36,7 +45,7 @@ EXAMPLES_STR = """This script updates the arl index with the availability of
 a particular domain on the current server.
 
 Examples:
-  $ ./test/scripts/run-in-docker.py -i rel/path/to/fire.json \\
+  $ ./test/scripts/run-in-docker.py -i /path/to/fire.json \\
       -r /path/to/bluesky/repo/ \\
       -m ingestion fuelbeds consumption emissions
  """
@@ -49,20 +58,25 @@ if __name__ == "__main__":
     # TODO: if repo root is in args.input_file, replace it with ''
 
     try:
+        input_file = os.path.abspath(args.input_file)
+        #cat_process = subprocess.Popen(('cat', input_file), stdout=subprocess.PIPE)
 
         # TODO: mount met dir if args.met_dir is defined
         cmd_args = [
+            'cat', input_file,'|',
             'docker', 'run', '-i',
-            '-v', '{}:/bluesky/'.format(args.repo_root),
-            '-w' '/bluesky/',
-            '-v' '{}:/bluesky-output/'.format(args.output_dir),
+            '-v', '{}:/bluesky-repo/'.format(args.repo_root),
+            '-w', '/bluesky-repo/',
+            '-v', '{output_dir}:{output_dir}'.format(output_dir=args.output_dir),
             'bluesky-base',
-            './bin/bsp/',
-            '-i', args.input_file
+            './bin/bsp'
         ]
         cmd_args.extend(args.modules)
-        r = subprocess.check_output(cmd_args)
-        sys.stdout.write(r)
+        cmd = ' '.join(cmd_args)
+        logging.debug('Command: {}'.format(cmd))
+        subprocess.call(cmd, shell=True) #stdin=cat_process.stdout)
+        #cat_process.wait()
+        #sys.stdout.write(r)
 
     except Exception, e:
         logging.error(e)
