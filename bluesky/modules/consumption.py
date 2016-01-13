@@ -274,9 +274,13 @@ def run(fires_manager):
             if fc.results():
                 fb['consumption'] = fc.results()['consumption']
                 fb['consumption'].pop('debug', None)
+                fb['heat'] = fc.results()['heat release']
 
-                # multiple each consumption value by area
+                # multiple each consumption and heat value by area
+                # (changes in fc.fuelbed_area_acres don't affect consumption
+                # or heat values; output is per unit area)
                 datautils.multiply_nested_data(fb["consumption"], area)
+                datautils.multiply_nested_data(fb["heat"], area)
 
             else:
                 logging.error(
