@@ -96,7 +96,8 @@ if __name__ == "__main__":
             ])
         cmd_args.extend([
             'bluesky-base',
-            './bin/bsp'
+            './bin/bsp',
+            '--log-level', args.log_level
         ])
         cmd_args.extend(args.modules)
         if args.pretty_format:
