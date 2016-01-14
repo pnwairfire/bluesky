@@ -80,6 +80,13 @@ def _pick_representative_fuelbed(fire):
     if sorted_fuelbeds:
         return sorted_fuelbeds[0]['fccs_id']
 
+def _get_heat(fire):
+    if fire.get('fuelbeds'):
+        heat = [fb.get('heat', {}).get('total') for fb in fire['fuelbeds']]
+        # non-None value will be returned if species is defined for all fuelbeds
+        if not any([v is None for v in heat]):
+            return sum(heat)
+
 def _get_emissions_species(species):
     def f(fire):
         if fire.get('fuelbeds'):
@@ -115,6 +122,7 @@ FIRE_LOCATIONS_CSV_FIELDS = [
     ('fccs_number', _pick_representative_fuelbed),
     # TDOO: add 'VEG' ?
     # TODO: Add other fields if user's want them
+    ('heat', _get_heat)
 ] + [(s.lower(), _get_emissions_species(s)) for s in BLUESKYKML_SPECIES_LIST]
 """List of fire location csv fields, with function to extract from fire object"""
 
@@ -135,6 +143,15 @@ def _update_event_area(event, fire, new_fire):
         raise ValueError("Fire {} lacks area".format(fire.get('id')))
     event['total_area'] = event.get('total_area', 0.0) + fire['location']['area']
 
+def _update_total_heat(event, fire, new_fire):
+    if 'total_heat' in event and event['total_heat'] is None:
+        # previous fire didn't have heat defined; abort so
+        # that we don't end up with misleading partial heat
+        return
+    logging.debug("total fire heat: %s", new_fire.get('heat'))
+    if new_fire.get('heat'):
+        return event.get('total_heat', 0.0) + new_fire['heat']
+
 def _update_total_emissions_species(species):
     key = 'total_{}'.format(species)
     def f(event, fire, new_fire):
@@ -154,7 +171,7 @@ def _update_total_emissions_species(species):
 #  total_tpc,total_tpm
 FIRE_EVENTS_CSV_FIELDS = [
     ('event_name', _assign_event_name),
-    ('total_heat', lambda event, fire, new_fire: 0.0),
+    ('total_heat', _update_total_heat),
     ('total_area', _update_event_area),
     ('total_nmhc', _update_total_emissions_species('nmhc'))
 ] + [
@@ -289,7 +306,6 @@ class HysplitVisualizer(object):
             "pathname": os.path.join(directory, name)
         }
 
-
     def _collect_csv_fields(self):
         # As we iterate through fires, collecting necessary fields, collect
         # events information as well
@@ -302,6 +318,7 @@ class HysplitVisualizer(object):
                 events[event_id] = events.get(event_id, {})
                 for k, l in FIRE_EVENTS_CSV_FIELDS:
                     events[event_id][k] = l(events[event_id], fire, fires[-1])
+        logging.debug("events: %s", events)
         return fires, events
 
     def _generate_fire_csv_files(self, fire_locations_csv_pathname,
