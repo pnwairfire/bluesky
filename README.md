@@ -31,6 +31,7 @@ Additionally, you'll need the following executables:
 
  - ```ncea```:  ...
  - ```ncks```:  ...
+ - ```hycs_std```: hysplit executable
  - ```mpiexec```: this is only needed if opting to run multi-processor hysplit; to obtain ...
  - ```hycm_std```: this is only needed if opting to run multi-processor hysplit; to obtain ...
  - ```hysplit2netcdf```: this is only needed if opting to convert hysplit output to netcdf; to obtain, ...
@@ -1483,6 +1484,7 @@ Copy the required executables to the bluesky container
     docker cp /path/to/profile bluesky:/usr/local/bin/profile
     docker cp /path/to/mpiexec bluesky:/usr/local/bin/mpiexec
     docker cp /path/to/hycm_std bluesky:/usr/local/bin/hycm_std
+    docker cp /path/to/hycs_std bluesky:/usr/local/bin/hycs_std
     docker cp /path/to/hysplit2netcdf bluesky:/usr/local/bin/hysplit2netcdf
     docker cp /path/to/vsmoke bluesky:/usr/local/bin/vsmoke
     docker cp /path/to/vsmkgs bluesky:/usr/local/bin/vsmkgs
@@ -1492,6 +1494,7 @@ Copy the required executables to the bluesky-base container
     docker cp /path/to/profile bluesky-base:/usr/local/bin/profile
     docker cp /path/to/mpiexec bluesky-base:/usr/local/bin/mpiexec
     docker cp /path/to/hycm_std bluesky-base:/usr/local/bin/hycm_std
+    docker cp /path/to/hycs_std bluesky-base:/usr/local/bin/hycs_std
     docker cp /path/to/hysplit2netcdf bluesky-base:/usr/local/bin/hysplit2netcdf
     docker cp /path/to/vsmoke bluesky-base:/usr/local/bin/vsmoke
     docker cp /path/to/vsmkgs bluesky-base:/usr/local/bin/vsmkgs
