@@ -43,6 +43,13 @@ OPTIONAL_ARGS = [
         'long': '--pretty-format',
         'help': "format json output",
         'action': 'store_true'
+    },
+    {
+        'short': '-d',
+        'long': '--mount-dir',
+        'help': "extra directories to mount in container",
+        'action': 'append',
+        'default': []
     }
     # TODO: add --met-dir (to mount)
 ]
@@ -55,6 +62,12 @@ Examples:
   $ ./test/scripts/run-in-docker.py -i /path/to/fire.json \\
       -r /path/to/bluesky/repo/ \\
       -m ingestion fuelbeds consumption emissions
+
+Note about volumes and mounting: mounting directories outside of home
+directory seems to results in the directories appearing empty in the container.
+Whether this is by design or not, you apparantly need to mount directories
+under your home directory.  Sym links don't mount either, so you have to
+cp or mv directories under your home dir in order to mount them.
  """
 
 
@@ -73,13 +86,21 @@ if __name__ == "__main__":
             'docker', 'run', '-i',
             '-v', '{}:/bluesky-repo/'.format(args.repo_root),
             '-w', '/bluesky-repo/',
-            '-v', '{output_dir}:{output_dir}'.format(output_dir=args.output_dir),
+            '-v', '{output_dir}:{output_dir}'.format(output_dir=args.output_dir)
+        ]
+        for d in args.mount_args:
+            dirs = d.split(':')
+            h, c = (dirs[0], dirs[1]) if len(dirs) == 2 else (dirs, dirs)
+            cmd_args.extend([
+                '-v', '{}:{}'.format(h, c)
+            ])
+        cmd_args.extend([
             'bluesky-base',
             './bin/bsp'
-        ]
+        ])
         cmd_args.extend(args.modules)
         if args.pretty_format:
-            cmd_args.extend(('|', 'python', '-m', 'json.tool'))
+            cmd_args.extend(['|', 'python', '-m', 'json.tool'])
         cmd = ' '.join(cmd_args)
         logging.debug('Command: {}'.format(cmd))
         # Note: there are security vulnerabilitys with using shell=True,
