@@ -1353,13 +1353,6 @@ Now you're ready to run bsp:
 
 ## Docker
 
-### Installing Docker
-
-See https://docs.docker.com/engine/installation/ for platform specific
-installation instructions.
-
-## Docker
-
 Two Dockerfiles are included in this repo - one for running bluesky
 out of the box, and the other for use as a base environment for
 development.
@@ -1447,13 +1440,6 @@ something like the following:
     docker run -v /home/foo/bar/:/input/ bluesky \
         bsp -i /input/fires.json \
         ingestion fuelbeds consumption emissions
-
-*Note about mounted volumes*: mounting directories outside of your home
-directory seems to result in the directories appearing empty in the
-docker container. Whether this is by design or not, you apparently need to
-mount directories under your home directory.  Sym links don't mount either, so
-you have to cp or mv directories under your home dir in order to mount them.
-
 
 ### Using base image for development
 
@@ -1645,3 +1631,32 @@ Another example, running through hysplit dispersion:
 
 Again, the dispersion output will be under $HOME/bsp-dispersion-output/ on your
 host machine, and the export directory will be under $HOME/bsp-local-exports.
+
+### Docker wrapper script
+
+This repo contains a script, test/scripts/run-in-docker.py, for running bsp in
+the base docker container.  Use its '-h' option for usage and options.
+
+    cd /path/to/bluesky/repo/
+    ./test/scripts/run-in-docker.py -h
+
+### Notes about using Docker
+
+#### Mounted volumes
+
+Mounting directories outside of your home
+directory seems to result in the directories appearing empty in the
+docker container. Whether this is by design or not, you apparently need to
+mount directories under your home directory.  Sym links don't mount either, so
+you have to cp or mv directories under your home dir in order to mount them.
+
+#### Cleanup
+
+Docker leaves behind partial images during the build process, and it leaves behind
+containers after they've been used.  To clean up, you can use the following:
+
+    # remove all stopped containers
+    docker ps -a | awk 'NR > 1 {print $1}' | xargs docker rm
+
+    # remove all untagged images:
+    docker images | grep "<none>" | awk '{print $3}' | xargs docker rmi
