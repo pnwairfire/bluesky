@@ -1444,9 +1444,16 @@ mount host machine directories in your container.  For example, suppose
 you've got fire json input data in /foo/bar/fires.json, you could run
 something like the following:
 
-    docker run -v /foo/bar/:/input/ bluesky \
+    docker run -v /home/foo/bar/:/input/ bluesky \
         bsp -i /input/fires.json \
         ingestion fuelbeds consumption emissions
+
+*Note about mounted volumes*: mounting directories outside of your home
+directory seems to result in the directories appearing empty in the
+docker container. Whether this is by design or not, you apparently need to
+mount directories under your home directory.  Sym links don't mount either, so
+you have to cp or mv directories under your home dir in order to mount them.
+
 
 ### Using base image for development
 
@@ -1456,7 +1463,7 @@ from your local repo. First install the python dependencies for your
 current version of the repo
 
     docker run --name bluesky-base \
-        -v /path/to/bluesky/repo/:/bluesky/ -w /bluesky/ \
+        -v /home/foo/path/to/bluesky/repo/:/bluesky/ -w /bluesky/ \
         bluesky-base pip install --no-binary gdal \
         --trusted-host pypi.smoke.airfire.org -r requirements.txt
 
@@ -1466,7 +1473,7 @@ then commit the container changes back to image
 
 Then run bluesky:
 
-    docker run -v /path/to/bluesky/repo:/bluesky/ -w /bluesky/ bluesky-base ./bin/bsp -h
+    docker run -v /home/foo/path/to/bluesky/repo:/bluesky/ -w /bluesky/ bluesky-base ./bin/bsp -h
 
 ### Executables needing to be manually installed
 
@@ -1513,7 +1520,7 @@ back to the images
 
 Now, you can run commands relying on these executables. For example:
 
-     docker run -v /DRI_6km/:/DRI_6km/ bluesky bsp-arlprofiler -f '/DRI_6km/2014052900/wrfout_d2.2014052900.f00-11_12hr01.arl;2014-05-29T00:00:00;2014-05-29T02:00:00' -l 37 -g -119 -s 2014-05-29T00:00:00 -e 2014-05-29T02:00:00 -o -7
+     docker run -v /home/foo/DRI_6km/:/DRI_6km/ bluesky bsp-arlprofiler -f '/DRI_6km/2014052900/wrfout_d2.2014052900.f00-11_12hr01.arl;2014-05-29T00:00:00;2014-05-29T02:00:00' -l 37 -g -119 -s 2014-05-29T00:00:00 -e 2014-05-29T02:00:00 -o -7
 
 Another example, running through vsmoke dispersion:
 
@@ -1634,7 +1641,7 @@ Another example, running through hysplit dispersion:
                 ]
             }
         ]
-    }' | docker run -i -v $HOME:/bluesky-output/ -v /DRI_6km/:/DRI_6km/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
+    }' | docker run -i -v $HOME:/bluesky-output/ -v /home/foo/DRI_6km/:/DRI_6km/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
 
 Again, the dispersion output will be under $HOME/bsp-dispersion-output/ on your
 host machine, and the export directory will be under $HOME/bsp-local-exports.

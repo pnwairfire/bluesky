@@ -24,16 +24,11 @@ REQUIRED_ARGS = [
     },
     {
         'short': '-m',
-        'long': '--modules',
-        'help': 'modules to run',
+        'long': '--module',
+        'dest': 'modules',
+        'help': 'module to run',
         'action': 'append',
         'default': []
-    },
-    {
-        'short': '-o',
-        'long': '--output-dir',
-        'help': "where to record output (if modules produce any); default: $HOME",
-        'default': '$HOME'
     }
 ]
 
@@ -47,6 +42,7 @@ OPTIONAL_ARGS = [
     {
         'short': '-d',
         'long': '--mount-dir',
+        'dest': 'mount_dirs',
         'help': "extra directories to mount in container",
         'action': 'append',
         'default': []
@@ -59,15 +55,20 @@ EXAMPLES_STR = """This script updates the arl index with the availability of
 a particular domain on the current server.
 
 Examples:
-  $ ./test/scripts/run-in-docker.py -i /path/to/fire.json \\
+  $ ./test/scripts/run-in-docker.py \\
+      -i /path/to/fire.json \\
       -r /path/to/bluesky/repo/ \\
-      -m ingestion fuelbeds consumption emissions
+      -d /path/to/met/:/met/ \\
+      -d /path/to/output/dir/ \\
+      -m ingestion -m fuelbeds -m consumption -m emissions \\
+      -m timeprofiling -m findmetdata -m localmet \\
 
-Note about volumes and mounting: mounting directories outside of home
-directory seems to results in the directories appearing empty in the container.
-Whether this is by design or not, you apparantly need to mount directories
-under your home directory.  Sym links don't mount either, so you have to
-cp or mv directories under your home dir in order to mount them.
+
+Note about volumes and mounting: mounting directories outside of your home
+directory seems to result in the directories appearing empty in the
+docker container. Whether this is by design or not, you apparently need to
+mount directories under your home directory.  Sym links don't mount either, so
+you have to cp or mv directories under your home dir in order to mount them.
  """
 
 
@@ -85,10 +86,9 @@ if __name__ == "__main__":
             'cat', input_file,'|',
             'docker', 'run', '-i',
             '-v', '{}:/bluesky-repo/'.format(args.repo_root),
-            '-w', '/bluesky-repo/',
-            '-v', '{output_dir}:{output_dir}'.format(output_dir=args.output_dir)
+            '-w', '/bluesky-repo/'
         ]
-        for d in args.mount_args:
+        for d in args.mount_dirs:
             dirs = d.split(':')
             h, c = (dirs[0], dirs[1]) if len(dirs) == 2 else (dirs, dirs)
             cmd_args.extend([
