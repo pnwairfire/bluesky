@@ -158,7 +158,12 @@ def _run_consume(fires_manager, species, include_emissions_detail):
                 if k != 'stratum' and (not species or k in species):
                     for f in r[k]:
                         fb['emissions'][f][k] = r[k][f]
-            datautils.multiply_nested_data(fb["emissions"], area)
+
+            # Note: We don't need to call
+            #   datautils.multiply_nested_data(fb["emissions"], area)
+            # because the consumption and heat data set in fc were assumed to
+            # have been multiplied by area.
+
             # TODO: act on 'include_emissions_details'?  consume emissions
             #   doesn't provide as detailed emissions as FEPS and Urbanski;
             #   it lists per-category emissions, not per-sub-category

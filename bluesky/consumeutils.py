@@ -12,7 +12,6 @@ import tempfile
 import numpy
 import consume
 
-from bluesky import datautils
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
@@ -256,8 +255,8 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
             location, fccs_file=None):
         fccs_file = fccs_file or ""
         super(FuelConsumptionForEmissions, self).__init__(fccs_file=fccs_file)
-        self._set_consumption_data(consumption_data, area)
-        self._set_heat_data(heat_data, area)
+        self._set_consumption_data(consumption_data)
+        self._set_heat_data(heat_data)
         self.burn_type = burn_type
         self.fuelbed_fccs_ids = [fccs_id]
         self.fuelbed_area_acres = [area]
@@ -282,10 +281,7 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
         self._cons_data_piles = consume.con_calc_natural.ccon_piles(
             self._settings.get('pile_black_pct'), loadings)
 
-    def _set_consumption_data(self, consumption_data, area):
-        # TODO: not sure if we should be dividing by area
-        datautils.multiply_nested_data(consumption_data, 1 / area)
-
+    def _set_consumption_data(self, consumption_data):
         # This is a reverse of what's done in
         #  consume.FuelConsumption.make_dictionary_of_lists
         cons_data = []
@@ -297,9 +293,6 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
                 ])
         self._cons_data = numpy.array(cons_data)
 
-    def _set_heat_data(self, heat_data, area):
-        # TODO: not sure if we should be dividing by area
-        datautils.multiply_nested_data(heat_data, 1 / area)
-
+    def _set_heat_data(self, heat_data):
         # _heat_data is indeed supposed to be an array with a single nested array
         self._heat_data = numpy.array([[heat_data[f] for f in CONSUME_FIELDS]])
