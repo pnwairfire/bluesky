@@ -1,7 +1,8 @@
 {
     "config": {
         "emissions":{
-            "efs": "consume"
+            "efs": "consume",
+            "species": ["co", "pm25"]
         }
     },
     "fire_information": [

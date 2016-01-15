@@ -11,8 +11,13 @@ from eflookup import __version__ as eflookup_version
 from eflookup.fccs2ef.lookup import Fccs2Ef
 from eflookup.fepsef import FepsEFLookup
 
+import consume
+
 from bluesky import datautils
 from bluesky.exceptions import BlueSkyConfigurationError
+
+# TODO: move _apply_settings into common module
+from bluesky.modules.consumption import _apply_settings #, FuelLoadingsManager
 
 __all__ = [
     'run'
@@ -140,7 +145,15 @@ CONSUME_FUEL_CATEGORIES = {
 CONSUME_FIELDS = ["flaming", "smoldering", "residual", "total"]
 
 def _run_consume(fires_manager, species, include_emissions_detail):
-    logging.debug("Running emissions module with CONSUME"):
+    logging.debug("Running emissions module with CONSUME")
+
+    # all_fuel_loadings = fires_manager.get_config_value(
+    #     'consumption','fuel_loadings')
+    # all_fuel_loadings = all_fuel_loadings or fires_manager.get_config_value(
+    #     'emissions','fuel_loadings')
+    # fuel_loadings_manager = FuelLoadingsManager(
+    #     all_fuel_loadings=all_fuel_loadings)
+
     for fire in fires_manager.fires:
         if 'fuelbeds' not in fire:
             raise ValueError(
@@ -154,7 +167,9 @@ def _run_consume(fires_manager, species, include_emissions_detail):
                 raise ValueError(
                     "Missing heat data required for computing emissions")
 
-            fc = consume.FuelConsumption()
+            # fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
+            #     fb['fccs_id'])
+            fc = consume.FuelConsumption() #fccs_file=fuel_loadings_csv_filename)
 
             #fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
             fc.burn_type = burn_type
@@ -163,6 +178,8 @@ def _run_consume(fires_manager, species, include_emissions_detail):
             area = (fb['pct'] / 100.0) * fire.location['area']
             fc.fuelbed_area_acres = [area]
             fc.fuelbed_ecoregion = [fire.location['ecoregion']]
+
+            _apply_settings(fc, fire, burn_type)
 
             # This is a reverse of what's done in
             # consume.FuelConsumption.make_dictionary_of_lists
@@ -179,9 +196,16 @@ def _run_consume(fires_manager, species, include_emissions_detail):
             fc._heat_data = [[fb['heat'][f] for f in CONSUME_FIELDS]]
             e = consume.Emissions(fuel_consumption_object=fc)
 
-            fb['emissions'] = e.results()['emissions']
-            # TODO: modify/prune/transform emissions as necessary
-            # TODO: act on 'include_emissions_details'
+            r = e.results()['emissions']
+            fb['emissions'] = {f: {} for f in CONSUME_FIELDS}
+            # r's key hierarchy is species > phase; we want phase > species
+            for k in r:
+                if k != 'stratum' and (not species or k in species):
+                    for f in r[k]:
+                        fb['emissions'][f][k] = r[k][f]
+            # TODO: act on 'include_emissions_details'?  consume emissions
+            #   doesn't provide as detailed emissions as FEPS and Urbanski;
+            #   it lists per-category emissions, not per-sub-category
 
 
 def _calculate(calculator, fb, include_emissions_details):
