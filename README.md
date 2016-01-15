@@ -1047,9 +1047,15 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### emissions
 
- - ***'config' > 'emissions' > 'efs'*** -- *optional* -- emissions factors set; 'urbanski' or 'feps'; default 'feps'
+ - ***'config' > 'emissions' > 'efs'*** -- *optional* -- emissions factors set; 'urbanski', 'feps', or 'consume'; default 'feps'
  - ***'config' > 'emissions' > 'species'*** -- *optional* -- whitelist of species to compute emissions levels for
  - ***'config' > 'emissions' > 'include_emissions_details'*** -- *optional* -- whether or not to include emissions levels by fuel category; default: false
+
+###### If running consume emissions:
+
+- ***'config' > 'emissions' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings, used for piles; Note that the code looks in
+'config' > 'consumption' > 'fuel_loadings' if it doesn't find them in the
+emissions config
 
 ##### findmetdata
 
