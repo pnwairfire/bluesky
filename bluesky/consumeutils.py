@@ -12,6 +12,7 @@ import tempfile
 import numpy
 import consume
 
+from bluesky import datautils
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
@@ -41,11 +42,11 @@ SETTINGS = {
         ('pile_blackened_pct', 0)
     ]
 }
-def _apply_settings(fc, fire, burn_type):
+def _apply_settings(fc, location, burn_type):
     valid_settings = SETTINGS[burn_type] + SETTINGS['all']
     for k, default in valid_settings:
-        if fire.location.has_key(k):
-            setattr(fc, k, fire.location[k])
+        if location.has_key(k):
+            setattr(fc, k, location[k])
         elif default is not None:
             setattr(fc, k, default)
 
@@ -251,15 +252,29 @@ CONSUME_FUEL_CATEGORIES = {
 CONSUME_FIELDS = ["flaming", "smoldering", "residual", "total"]
 
 class FuelConsumptionForEmissions(consume.FuelConsumption):
-    def __init__(self, consumption_data, heat_data, fccs_file=None):
+    def __init__(self, consumption_data, heat_data, area, burn_type, fccs_id,
+            location, fccs_file=None):
         fccs_file = fccs_file or ""
         super(FuelConsumptionForEmissions, self).__init__(fccs_file=fccs_file)
-        self._set_consumption_data(consumption_data)
-        self._set_heat_data(heat_data)
+        self._set_consumption_data(consumption_data, area)
+        self._set_heat_data(heat_data, area)
+        self.burn_type = burn_type
+        self.fuelbed_fccs_ids = [fccs_id]
+        self.fuelbed_area_acres = [area]
+        self.fuelbed_ecoregion = [location['ecoregion']]
+
+        _apply_settings(self, location, burn_type)
+
 
     def _calculate(self):
-        """Overrides consume.FuelConsumption._calculate so that it doesn't recalculate
-        _cons_data and _heat_data when it's called by consume.Emissions._calculate
+        """Overrides consume.FuelConsumption._calculate so that it doesn't
+        recalculate _cons_data and _heat_data when it's called by
+        consume.Emissions._calculate
+
+        Note:  We could have _calculate skipped altogether by setting
+            consume.Emissions._have_cons_data = len(
+                FuelConsumptionForEmissions._cons_data[0][0])
+        but we need calcualte to be called in order to set self._cons_data_piles
         """
         loadings = self._get_loadings_for_specified_files(
             self._settings.get('fuelbeds'))
@@ -267,7 +282,10 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
         self._cons_data_piles = consume.con_calc_natural.ccon_piles(
             self._settings.get('pile_black_pct'), loadings)
 
-    def _set_consumption_data(self, consumption_data):
+    def _set_consumption_data(self, consumption_data, area):
+        # TODO: not sure if we should be dividing by area
+        datautils.multiply_nested_data(consumption_data, 1 / area)
+
         # This is a reverse of what's done in
         #  consume.FuelConsumption.make_dictionary_of_lists
         cons_data = []
@@ -279,6 +297,9 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
                 ])
         self._cons_data = numpy.array(cons_data)
 
-    def _set_heat_data(self, heat_data):
+    def _set_heat_data(self, heat_data, area):
+        # TODO: not sure if we should be dividing by area
+        datautils.multiply_nested_data(heat_data, 1 / area)
+
         # _heat_data is indeed supposed to be an array with a single nested array
         self._heat_data = numpy.array([[heat_data[f] for f in CONSUME_FIELDS]])

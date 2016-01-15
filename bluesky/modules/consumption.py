@@ -72,7 +72,7 @@ def run(fires_manager):
             fc.fuelbed_area_acres = [area]
             fc.fuelbed_ecoregion = [fire.location['ecoregion']]
 
-            _apply_settings(fc, fire, burn_type)
+            _apply_settings(fc, fire['location'], burn_type)
 
             if fc.results():
                 fb['consumption'] = fc.results()['consumption']

@@ -143,19 +143,12 @@ def _run_consume(fires_manager, species, include_emissions_detail):
 
             fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
                  fb['fccs_id'])
+            area = (fb['pct'] / 100.0) * fire.location['area']
             fc = FuelConsumptionForEmissions(fb["consumption"], fb['heat'],
+                area, burn_type, fb['fccs_id'], fire['location'],
                 fccs_file=fuel_loadings_csv_filename)
 
-            #fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
-            fc.burn_type = burn_type
-            fc.fuelbed_fccs_ids = [fb['fccs_id']]
-
-            area = (fb['pct'] / 100.0) * fire.location['area']
-            fc.fuelbed_area_acres = [area]
-            fc.fuelbed_ecoregion = [fire.location['ecoregion']]
-
-            _apply_settings(fc, fire, burn_type)
-
+            fb['emissions_fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
             e = consume.Emissions(fuel_consumption_object=fc)
 
             r = e.results()['emissions']
@@ -165,6 +158,7 @@ def _run_consume(fires_manager, species, include_emissions_detail):
                 if k != 'stratum' and (not species or k in species):
                     for f in r[k]:
                         fb['emissions'][f][k] = r[k][f]
+            datautils.multiply_nested_data(fb["emissions"], area)
             # TODO: act on 'include_emissions_details'?  consume emissions
             #   doesn't provide as detailed emissions as FEPS and Urbanski;
             #   it lists per-category emissions, not per-sub-category
