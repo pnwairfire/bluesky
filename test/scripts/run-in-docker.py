@@ -81,7 +81,6 @@ if __name__ == "__main__":
     try:
         input_file = os.path.abspath(args.input_file)
 
-        # TODO: mount met dir if args.met_dir is defined
         cmd_args = [
             'cat', input_file,'|',
             'docker', 'run', '-i',

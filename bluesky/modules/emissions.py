@@ -37,6 +37,8 @@ def run(fires_manager):
         _run_urbanski(fires_manager, species, include_emissions_details)
     elif efs == 'feps':
         _run_feps(fires_manager, species, include_emissions_details)
+    elif efs == 'consume':
+        _run_consume(fires_manager, species, include_emissions_details)
     else:
         raise BlueSkyConfigurationError(
             "Invalid emissions factors set: '{}'".format(efs))
@@ -46,6 +48,10 @@ def run(fires_manager):
         summary.update(emissions_details=datautils.summarize(
             fires_manager.fires, 'emissions_details'))
     fires_manager.summarize(**summary)
+
+##
+## FEPS
+##
 
 def _run_feps(fires_manager, species, include_emissions_details):
     logging.debug("Running emissions module FEPS EFs")
@@ -70,6 +76,10 @@ def _run_feps(fires_manager, species, include_emissions_details):
             # if include_emissions_details:
             #     datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
 
+##
+## Urbanski
+##
+
 def _run_urbanski(fires_manager, species, include_emissions_details):
     logging.debug("Running emissions module with Urbanski EFs")
 
@@ -92,6 +102,87 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
             # TODO: are these emissions factors in something other than tons
             #  per tons consumed?  if so, we need to multiply to convert
             #  values to tons
+
+##
+## CONSUME
+##
+
+# consume internall stores consumption data in arrays; order matters
+CONSUME_FUEL_CATEGORIES = {
+    'summary' : [
+        'total', 'canopy', 'shrub', 'nonwoody', 'litter-lichen-moss',
+        'ground fuels', 'woody fuels'
+    ],
+    'canopy' : [
+        'overstory', 'midstory', 'understory', 'snags class 1 foliage',
+        'snags class 1 wood', 'snags class 1 no foliage', 'snags class 2',
+        'snags class 3', 'ladder fuels'
+    ],
+    'shrub': [
+        'primary live', 'primary dead', 'secondary live', 'secondary dead'
+    ],
+    'nonwoody': [
+        'primary live', 'primary dead', 'secondary live', 'secondary dead'
+    ],
+    'litter-lichen-moss': [
+        'litter', 'lichen', 'moss'
+    ],
+    'ground fuels': [
+        'duff upper', 'duff lower', 'basal accumulations', 'squirrel middens'
+    ],
+    'woody fuels': [
+        'piles', 'stumps sound', 'stumps rotten', 'stumps lightered',
+        '1-hr fuels', '10-hr fuels', '100-hr fuels', '1000-hr fuels sound',
+        '1000-hr fuels rotten', '10000-hr fuels sound',
+        '10000-hr fuels rotten', '10k+-hr fuels sound', '10k+-hr fuels rotten'
+    ]
+}
+CONSUME_FIELDS = ["flaming", "smoldering", "residual", "total"]
+
+def _run_consume(fires_manager, species, include_emissions_detail):
+    logging.debug("Running emissions module with CONSUME"):
+    for fire in fires_manager.fires:
+        if 'fuelbeds' not in fire:
+            raise ValueError(
+                "Missing fuelbed data required for computing emissions")
+        burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
+        for fb in fire.fuelbeds:
+            if 'consumption' not in fb:
+                raise ValueError(
+                    "Missing consumption data required for computing emissions")
+            if 'heat' not in fb:
+                raise ValueError(
+                    "Missing heat data required for computing emissions")
+
+            fc = consume.FuelConsumption()
+
+            #fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
+            fc.burn_type = burn_type
+            fc.fuelbed_fccs_ids = [fb['fccs_id']]
+
+            area = (fb['pct'] / 100.0) * fire.location['area']
+            fc.fuelbed_area_acres = [area]
+            fc.fuelbed_ecoregion = [fire.location['ecoregion']]
+
+            # This is a reverse of what's done in
+            # consume.FuelConsumption.make_dictionary_of_lists
+
+            cons_data = []
+            for c, subc in CONSUME_FUEL_CATEGORIES.items():
+                for sc in subc:
+                    cons_data.append([
+                        # TODO: use get's and default missing values to 0
+                        fb["consumption"][c][sc][f] for f in CONSUME_FIELDS
+                    ])
+            fc._cons_data = cons_data
+            # _heat_data is supposed to be an array with a single nested array
+            fc._heat_data = [[fb['heat'][f] for f in CONSUME_FIELDS]]
+            e = consume.Emissions(fuel_consumption_object=fc)
+
+            fb['emissions'] = e.results()['emissions']
+            # TODO: modify/prune/transform emissions as necessary
+            # TODO: act on 'include_emissions_details'
+
 
 def _calculate(calculator, fb, include_emissions_details):
     emissions_details = calculator.calculate(fb["consumption"])
