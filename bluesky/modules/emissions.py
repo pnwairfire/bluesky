@@ -119,12 +119,12 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
 def _run_consume(fires_manager, species, include_emissions_detail):
     logging.debug("Running emissions module with CONSUME")
 
-    # look for custom fuel loadings first in the consumption config and then
-    # in the emissions config
+    # look for custom fuel loadings first in the emissions config and then
+    # in the consumption config
     all_fuel_loadings = fires_manager.get_config_value(
-        'consumption','fuel_loadings')
-    all_fuel_loadings = all_fuel_loadings or fires_manager.get_config_value(
         'emissions','fuel_loadings')
+    all_fuel_loadings = all_fuel_loadings or fires_manager.get_config_value(
+        'consumption','fuel_loadings')
     fuel_loadings_manager = FuelLoadingsManager(
         all_fuel_loadings=all_fuel_loadings)
 
