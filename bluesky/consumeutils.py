@@ -9,7 +9,16 @@ __copyright__   = "Copyright 2016, AirFire, PNW, USFS"
 import copy
 import tempfile
 
+import numpy
+import consume
+
 from bluesky.exceptions import BlueSkyConfigurationError
+
+__all__ = [
+    "_apply_settings",
+    "FuelLoadingsManager",
+    "FuelConsumptionForEmissions"
+]
 
 # TODO: These burn-type pecific settings sets might not be correct
 # TODO: Check with Susan P, Susan O, Kjell, etc. to make sure defaults are correct
@@ -206,3 +215,70 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
             self._custom[fccs_id] = f
 
         return self._custom[fccs_id].name
+
+
+# consume internall stores consumption data in arrays; order matters
+CONSUME_FUEL_CATEGORIES = {
+    'summary' : [
+        'total', 'canopy', 'shrub', 'nonwoody', 'litter-lichen-moss',
+        'ground fuels', 'woody fuels'
+    ],
+    'canopy' : [
+        'overstory', 'midstory', 'understory', 'snags class 1 foliage',
+        'snags class 1 wood', 'snags class 1 no foliage', 'snags class 2',
+        'snags class 3', 'ladder fuels'
+    ],
+    'shrub': [
+        'primary live', 'primary dead', 'secondary live', 'secondary dead'
+    ],
+    'nonwoody': [
+        'primary live', 'primary dead', 'secondary live', 'secondary dead'
+    ],
+    'litter-lichen-moss': [
+        'litter', 'lichen', 'moss'
+    ],
+    'ground fuels': [
+        'duff upper', 'duff lower', 'basal accumulations', 'squirrel middens'
+    ],
+    'woody fuels': [
+        'piles', 'stumps sound', 'stumps rotten', 'stumps lightered',
+        '1-hr fuels', '10-hr fuels', '100-hr fuels', '1000-hr fuels sound',
+        '1000-hr fuels rotten', '10000-hr fuels sound',
+        '10000-hr fuels rotten', '10k+-hr fuels sound', '10k+-hr fuels rotten'
+    ]
+}
+
+CONSUME_FIELDS = ["flaming", "smoldering", "residual", "total"]
+
+class FuelConsumptionForEmissions(consume.FuelConsumption):
+    def __init__(self, consumption_data, heat_data, fccs_file=None):
+        fccs_file = fccs_file or ""
+        super(FuelConsumptionForEmissions, self).__init__(fccs_file=fccs_file)
+        self._set_consumption_data(consumption_data)
+        self._set_heat_data(heat_data)
+
+    def _calculate(self):
+        """Overrides consume.FuelConsumption._calculate so that it doesn't recalculate
+        _cons_data and _heat_data when it's called by consume.Emissions._calculate
+        """
+        loadings = self._get_loadings_for_specified_files(
+            self._settings.get('fuelbeds'))
+
+        self._cons_data_piles = consume.con_calc_natural.ccon_piles(
+            self._settings.get('pile_black_pct'), loadings)
+
+    def _set_consumption_data(self, consumption_data):
+        # This is a reverse of what's done in
+        #  consume.FuelConsumption.make_dictionary_of_lists
+        cons_data = []
+        for c, subc in CONSUME_FUEL_CATEGORIES.items():
+            for sc in subc:
+                cons_data.append([
+                    # TODO: use get's and default missing values to 0
+                    consumption_data[c][sc][f] for f in CONSUME_FIELDS
+                ])
+        self._cons_data = numpy.array(cons_data)
+
+    def _set_heat_data(self, heat_data):
+        # _heat_data is indeed supposed to be an array with a single nested array
+        self._heat_data = numpy.array([[heat_data[f] for f in CONSUME_FIELDS]])
