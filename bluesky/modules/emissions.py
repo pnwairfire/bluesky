@@ -16,8 +16,7 @@ import consume
 from bluesky import datautils
 from bluesky.exceptions import BlueSkyConfigurationError
 
-# TODO: move _apply_settings into common module
-from bluesky.modules.consumption import _apply_settings #, FuelLoadingsManager
+from bluesky.consumeutils import _apply_settings #, FuelLoadingsManager
 
 __all__ = [
     'run'
