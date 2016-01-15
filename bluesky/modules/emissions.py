@@ -16,7 +16,7 @@ import consume
 from bluesky import datautils
 from bluesky.exceptions import BlueSkyConfigurationError
 
-from bluesky.consumeutils import _apply_settings #, FuelLoadingsManager
+from bluesky.consumeutils import _apply_settings, FuelLoadingsManager
 
 __all__ = [
     'run'
@@ -146,12 +146,14 @@ CONSUME_FIELDS = ["flaming", "smoldering", "residual", "total"]
 def _run_consume(fires_manager, species, include_emissions_detail):
     logging.debug("Running emissions module with CONSUME")
 
-    # all_fuel_loadings = fires_manager.get_config_value(
-    #     'consumption','fuel_loadings')
-    # all_fuel_loadings = all_fuel_loadings or fires_manager.get_config_value(
-    #     'emissions','fuel_loadings')
-    # fuel_loadings_manager = FuelLoadingsManager(
-    #     all_fuel_loadings=all_fuel_loadings)
+    # look for custom fuel loadings first in the consumption config and then
+    # in the emissions config
+    all_fuel_loadings = fires_manager.get_config_value(
+        'consumption','fuel_loadings')
+    all_fuel_loadings = all_fuel_loadings or fires_manager.get_config_value(
+        'emissions','fuel_loadings')
+    fuel_loadings_manager = FuelLoadingsManager(
+        all_fuel_loadings=all_fuel_loadings)
 
     for fire in fires_manager.fires:
         if 'fuelbeds' not in fire:
@@ -166,9 +168,9 @@ def _run_consume(fires_manager, species, include_emissions_detail):
                 raise ValueError(
                     "Missing heat data required for computing emissions")
 
-            # fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
-            #     fb['fccs_id'])
-            fc = consume.FuelConsumption() #fccs_file=fuel_loadings_csv_filename)
+            fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
+                 fb['fccs_id'])
+            fc = consume.FuelConsumption(fccs_file=fuel_loadings_csv_filename)
 
             #fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
             fc.burn_type = burn_type
@@ -180,19 +182,30 @@ def _run_consume(fires_manager, species, include_emissions_detail):
 
             _apply_settings(fc, fire, burn_type)
 
-            # This is a reverse of what's done in
-            # consume.FuelConsumption.make_dictionary_of_lists
+            # TODO: Make sure consume doesn't recompute consumption and
+            #   heat data if they're already defined in fb.
+            #   The whole point of manually setting fc._cons_data and
+            #   fc._heat_data (if consumption and heat are defined)
+            #   is to avoid avoid having them recomputed (especially since
+            #   the already computed values may in fact differ from what
+            #   consume would compute).  It doesn't seem as though this is
+            #   working, though - altering the input consuption data doesn't
+            #   seem to result in a corresponding change in the emissions data
+            if fb.get('consuption'):
+                # This is a reverse of what's done in
+                #  consume.FuelConsumption.make_dictionary_of_lists
+                cons_data = []
+                for c, subc in CONSUME_FUEL_CATEGORIES.items():
+                    for sc in subc:
+                        cons_data.append([
+                            # TODO: use get's and default missing values to 0
+                            fb["consumption"][c][sc][f] for f in CONSUME_FIELDS
+                        ])
+                fc._cons_data = cons_data
+            if fb.get('heat'):
+                # _heat_data is indeed supposed to be an array with a single nested array
+                fc._heat_data = [[fb['heat'][f] for f in CONSUME_FIELDS]]
 
-            cons_data = []
-            for c, subc in CONSUME_FUEL_CATEGORIES.items():
-                for sc in subc:
-                    cons_data.append([
-                        # TODO: use get's and default missing values to 0
-                        fb["consumption"][c][sc][f] for f in CONSUME_FIELDS
-                    ])
-            fc._cons_data = cons_data
-            # _heat_data is supposed to be an array with a single nested array
-            fc._heat_data = [[fb['heat'][f] for f in CONSUME_FIELDS]]
             e = consume.Emissions(fuel_consumption_object=fc)
 
             r = e.results()['emissions']
