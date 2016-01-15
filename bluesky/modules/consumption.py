@@ -40,6 +40,13 @@ SETTINGS = {
         ('pile_blackened_pct', 0)
     ]
 }
+def _apply_settings(fc, fire, burn_type):
+    valid_settings = SETTINGS[burn_type] + SETTINGS['all']
+    for k, default in valid_settings:
+        if fire.location.has_key(k):
+            setattr(fc, k, fire.location[k])
+        elif default is not None:
+            setattr(fc, k, default)
 
 class FuelLoadingsManager(object):
 
@@ -239,7 +246,6 @@ def run(fires_manager):
     for fire in fires_manager.fires:
 
         burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
-        valid_settings = SETTINGS[burn_type] + SETTINGS['all']
 
         # TODO: can I run consume on all fuelbeds at once and get per-fuelbed
         # results?  If it is simply a matter of parsing separated values from
@@ -265,11 +271,7 @@ def run(fires_manager):
             fc.fuelbed_area_acres = [area]
             fc.fuelbed_ecoregion = [fire.location['ecoregion']]
 
-            for k, default in valid_settings:
-                if fire.location.has_key(k):
-                    setattr(fc, k, fire.location[k])
-                elif default is not None:
-                    setattr(fc, k, default)
+            _apply_settings(fc, fire, burn_type)
 
             if fc.results():
                 fb['consumption'] = fc.results()['consumption']
