@@ -243,10 +243,10 @@ CONSUPTION_OUTPUT_HEADER_TRANSLATIONS = {
 #     "PM25_ground": ["stratum_pm25_ground_fuels", "total"]
 # }
 HEAT_OUTPUT_HEADER_TRANSLATIONS = {
-    "Total Heat Release": ["heat", "total"],
-    "Flaming Heat Release": ["heat", "flaming"],
-    "Smoldering Heat Release": ["heat", "smoldering"],
-    "Residual Heat Release": ["heat", "residual"]
+    "Total Heat Release": "total",
+    "Flaming Heat Release": "flaming",
+    "Smoldering Heat Release": "smoldering",
+    "Residual Heat Release": "residual"
 }
 def load_output(input_filename):
     # Consumption + emissions by fuelbed and fuel category
@@ -259,20 +259,19 @@ def load_output(input_filename):
         for k in r:
             if k in CONSUPTION_OUTPUT_HEADER_TRANSLATIONS:
                 c, sc, p = CONSUPTION_OUTPUT_HEADER_TRANSLATIONS[k]
-                expected_partials['consumption'][c] = expected_partials.get(c, {})
-                expected_partials['consumption'][c][sc] = expected_partials[c].get(sc, {})
-                expected_partials['consumption'][c][sc] = expected_partials[c].get(sc, {})
-                expected_partials['consumption'][c][sc][p] = r[k]
+                expected_partials['consumption'][c] = expected_partials['consumption'].get(c, {})
+                expected_partials['consumption'][c][sc] = expected_partials['consumption'][c].get(sc, {})
+                expected_partials['consumption'][c][sc][p] = [float(r[k])]
             elif k in HEAT_OUTPUT_HEADER_TRANSLATIONS:
                 p = HEAT_OUTPUT_HEADER_TRANSLATIONS[k]
-                expected_partials['heat'][p] = r[k]
+                expected_partials['heat'][p] = [float(r[k])]
 
     # total Emissions
     input_dir, input_filename = os.path.split(input_filename)
     emissions_output_filename = os.path.join(input_dir,
         "feps_input_em_{}".format(input_filename))
     expected_total_emissions =  {
-        PHASE_TRANSLATIONS[r.pop('Phase')]: {k: [v] for k, v in r.items()}
+        PHASE_TRANSLATIONS[r.pop('Phase')]: {k.lower(): [float(v)] for k, v in r.items()}
             for r in load_csv(emissions_output_filename)
     }
     # TODO: delete the following if the above works
@@ -284,16 +283,22 @@ def load_output(input_filename):
 
 def check(actual, expected_partials, expected_total_emissions):
     for phase in expected_total_emissions:
-        for species in expected_emissions[phase]:
+        for species in expected_total_emissions[phase]:
             # TODO: add asserts
-            #import pdb;pdb.set_trace()
-            pass
+            logging.debug('actual vs. expected ({}, {}):  {} vs {}'.format(phase, species,
+                actual['summary']['emissions'][phase].get(species, '???'),
+                expected_total_emissions[phase][species]))
+
+    # TODO: check consumption and heat values in expected_partials
 
 def run(args):
     pattern = '{}/data/scen_{}.csv'.format(
         os.path.abspath(os.path.dirname(__file__)),
         args.scenario_id or '[0-9]')
-    for input_filename in glob.glob(pattern):
+    input_filenames = glob.glob(pattern)
+    logging.debug("Scanarios: {}".format(', '.join(
+        [os.path.basename(n) for n in input_filenames])))
+    for input_filename in input_filenames:
         fires_manager = load_scenario(input_filename)
         fires_manager.set_config_value('consume', 'emissions', 'efs')
         fires_manager.modules = ['consumption', 'emissions']
