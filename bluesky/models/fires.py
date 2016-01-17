@@ -101,7 +101,7 @@ class FiresManager(object):
 
     ## Importing
 
-    def _add_fire(self, fire):
+    def add_fire(self, fire):
         self._fires = self._fires or {}
         if not self._fires.has_key(fire.id):
             self._fires[fire.id] = (fire)
@@ -136,7 +136,7 @@ class FiresManager(object):
         self._fires = {}
         self._fire_ids = []
         for fire in fires_list:
-            self._add_fire(Fire(fire))
+            self.add_fire(Fire(fire))
 
     @property
     def modules(self):
