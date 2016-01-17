@@ -168,36 +168,36 @@ CONSUPTION_OUTPUT_HEADER_TRANSLATIONS = {
     "C_basal_accum": ["ground_fuels", "basal_accumulations", "total"],
     "C_squirrel": ["ground_fuels", "squirrel_middens", "total"]
 }
-EMISSIONS_OUTPUT_HEADER_TRANSLATIONS = {
-    "CH4 Emissions": ["ch4", "total"],
-    "CO Emissions": ["co", "total"],
-    "CO2 Emissions": ["co2", "total"],
-    "NMHC Emissions": ["nmhc", "total"],
-    "PM Emissions": ["pm", "total"],
-    "PM10 Emissions": ["pm10", "total"],
-    "PM25 Emissions": ["pm25", "total"],
-    "E_ch4_F": ["ch4", "flaming"],
-    "E_co_F": ["co", "flaming"],
-    "E_co2_F": ["co2", "flaming"],
-    "E_nmhc_F": ["nmhc", "flaming"],
-    "E_pm_F": ["pm", "flaming"],
-    "E_pm10_F": ["pm10", "flaming"],
-    "E_pm25_F": ["pm25", "flaming"],
-    "E_ch4_S": ["ch4", "smoldering"],
-    "E_co_S": ["co", "smoldering"],
-    "E_co2_S": ["co2", "smoldering"],
-    "E_nmhc_S": ["nmhc", "smoldering"],
-    "E_pm_S": ["pm", "smoldering"],
-    "E_pm10_S": ["pm10", "smoldering"],
-    "E_pm25_S": ["pm25", "smoldering"],
-    "E_ch4_R": ["ch4", "residual"],
-    "E_co_R": ["co", "residual"],
-    "E_co2_R": ["co2", "residual"],
-    "E_nmhc_R": ["nmhc", "residual"],
-    "E_pm_R": ["pm", "residual"],
-    "E_pm10_R": ["pm10", "residual"],
-    "E_pm25_R": ["pm25", "residual"]
-}
+# EMISSIONS_OUTPUT_HEADER_TRANSLATIONS = {
+#     "CH4 Emissions": ["ch4", "total"],
+#     "CO Emissions": ["co", "total"],
+#     "CO2 Emissions": ["co2", "total"],
+#     "NMHC Emissions": ["nmhc", "total"],
+#     "PM Emissions": ["pm", "total"],
+#     "PM10 Emissions": ["pm10", "total"],
+#     "PM25 Emissions": ["pm25", "total"],
+#     "E_ch4_F": ["ch4", "flaming"],
+#     "E_co_F": ["co", "flaming"],
+#     "E_co2_F": ["co2", "flaming"],
+#     "E_nmhc_F": ["nmhc", "flaming"],
+#     "E_pm_F": ["pm", "flaming"],
+#     "E_pm10_F": ["pm10", "flaming"],
+#     "E_pm25_F": ["pm25", "flaming"],
+#     "E_ch4_S": ["ch4", "smoldering"],
+#     "E_co_S": ["co", "smoldering"],
+#     "E_co2_S": ["co2", "smoldering"],
+#     "E_nmhc_S": ["nmhc", "smoldering"],
+#     "E_pm_S": ["pm", "smoldering"],
+#     "E_pm10_S": ["pm10", "smoldering"],
+#     "E_pm25_S": ["pm25", "smoldering"],
+#     "E_ch4_R": ["ch4", "residual"],
+#     "E_co_R": ["co", "residual"],
+#     "E_co2_R": ["co2", "residual"],
+#     "E_nmhc_R": ["nmhc", "residual"],
+#     "E_pm_R": ["pm", "residual"],
+#     "E_pm10_R": ["pm10", "residual"],
+#     "E_pm25_R": ["pm25", "residual"]
+# }
 # EMISSIONS_STRATUM_OUTPUT_HEADER_TRANSLATIONS
 #     "CH4_canopy": ["stratum_ch4_canopy", "total"],
 #     "CH4_shrub": ["stratum_ch4_shrub", "total"],
@@ -251,15 +251,21 @@ HEAT_OUTPUT_HEADER_TRANSLATIONS = {
 def load_output(input_filename):
     # Consumption + emissions by fuelbed and fuel category
     consumption_output_filename = input_filename.replace('.csv', '_out.csv')
-    expected_partials = {}
+    expected_partials = {
+        "consumption": {},
+        "heat": {}
+    }
     for r in load_csv(consumption_output_filename):
         for k in r:
             if k in CONSUPTION_OUTPUT_HEADER_TRANSLATIONS:
                 c, sc, p = CONSUPTION_OUTPUT_HEADER_TRANSLATIONS[k]
-                expected_partials[c] = expected_partials.get(c, {})
-                expected_partials[c][sc] = expected_partials[c].get(sc, {})
-                expected_partials[c][sc] = expected_partials[c].get(sc, {})
-                expected_partials[c][sc][p] = r[k]
+                expected_partials['consumption'][c] = expected_partials.get(c, {})
+                expected_partials['consumption'][c][sc] = expected_partials[c].get(sc, {})
+                expected_partials['consumption'][c][sc] = expected_partials[c].get(sc, {})
+                expected_partials['consumption'][c][sc][p] = r[k]
+            elif k in HEAT_OUTPUT_HEADER_TRANSLATIONS:
+                p = HEAT_OUTPUT_HEADER_TRANSLATIONS[k]
+                expected_partials['heat'][p] = r[k]
 
     # total Emissions
     input_dir, input_filename = os.path.split(input_filename)
@@ -276,8 +282,8 @@ def load_output(input_filename):
 
     return expected_partials, expected_total_emissions
 
-def check(actual, expected_emissions):
-    for phase in expected_emissions:
+def check(actual, expected_partials, expected_total_emissions):
+    for phase in expected_total_emissions:
         for species in expected_emissions[phase]:
             # TODO: add asserts
             #import pdb;pdb.set_trace()
@@ -293,8 +299,8 @@ def run(args):
         fires_manager.modules = ['consumption', 'emissions']
         fires_manager.run()
         actual = fires_manager.dump()
-        expected_emissions = load_output(input_filename)
-        check(actual, expected_emissions)
+        expected_partials, expected_total_emissions = load_output(input_filename)
+        check(actual, expected_partials, expected_total_emissions)
 
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
