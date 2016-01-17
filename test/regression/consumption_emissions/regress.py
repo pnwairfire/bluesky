@@ -270,14 +270,12 @@ def load_output(input_filename):
     input_dir, input_filename = os.path.split(input_filename)
     emissions_output_filename = os.path.join(input_dir,
         "feps_input_em_{}".format(input_filename))
-    expected_total_emissions =  {
-        PHASE_TRANSLATIONS[r.pop('Phase')]: {k.lower(): [float(v)] for k, v in r.items()}
-            for r in load_csv(emissions_output_filename)
-    }
-    # TODO: delete the following if the above works
-    # expected_emissions = {}
-    # for r in load_csv(emissions_output_filename):
-    #     expected_emissions[r.pop('Phase')] = {k: [v] for k, v in r.items()}
+    expected_total_emissions =  {}
+    for r in load_csv(emissions_output_filename):
+        p = PHASE_TRANSLATIONS[r.pop('Phase')]
+        expected_total_emissions[p] = {
+            k.lower(): [float(v)] for k, v in r.items()
+        }
 
     return expected_partials, expected_total_emissions
 
