@@ -45,6 +45,7 @@ def run(fires_manager):
     # use it across all fires, or at lesat accross all fuelbeds within
     # a single fire?
     for fire in fires_manager.fires:
+        logging.debug("Consume emissions - fire {}".format(fire.id))
 
         burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
 

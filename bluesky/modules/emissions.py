@@ -129,9 +129,12 @@ def _run_consume(fires_manager, species, include_emissions_detail):
         all_fuel_loadings=all_fuel_loadings)
 
     for fire in fires_manager.fires:
+        logging.debug("Consume emissions - fire {}".format(fire.id))
+
         if 'fuelbeds' not in fire:
             raise ValueError(
                 "Missing fuelbed data required for computing emissions")
+
         burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
         for fb in fire.fuelbeds:
             if 'consumption' not in fb:
