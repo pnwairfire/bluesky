@@ -9,8 +9,12 @@ from py.test import raises
 
 from bluesky.configuration import (
     config_parser_to_dict,
-    get_config_value
+    get_config_value,
+    set_config_value,
+    INVALID_CONFIG_ERR_MSG,
+    MISSING_KEYS_ERR_MSG
 )
+from bluesky.exceptions import BlueSkyConfigurationError
 
 
 class TestConfigParserToDict(object):
@@ -91,3 +95,34 @@ class TestGetConfigValue(object):
         assert 'sdf' == get_config_value(config['a'], 'aa', default=1)
         assert 'SDF' == get_config_value(config, 'b', 'cc', 'ccc')
         assert 'SDF' == get_config_value(config, 'b', 'cc', 'ccc', default=1)
+
+class TestSetConfigValue(object):
+
+    def test_invalid_config(self):
+        with raises(BlueSkyConfigurationError) as e_info:
+            set_config_value(12, 3, '123')
+            assert e_info.value.message == INVALID_CONFIG_ERR_MSG
+
+    def test_no_keys(self):
+        with raises(BlueSkyConfigurationError) as e_info:
+            set_config_value({}, 32)
+            assert e_info.value.message == MISSING_KEYS_ERR_MSG
+
+    def test_basic(self):
+        config = {}
+        set_config_value(config, 123, 'a')
+        assert config == {'a': 123}
+        set_config_value(config, 321, 'b', 'c', 'd')
+        assert config == {'a': 123, 'b': {'c': {'d': 321}}}
+
+    def test_override_existing_value(self):
+        config = {'a': 123, 'b': {'c': {'d': 321}}}
+        set_config_value(config, 34, 'a')
+        assert config == {'a': 34, 'b': {'c': {'d': 321}}}
+        set_config_value(config, 123123, 'b', 'c', 'd')
+        assert config == {'a': 34, 'b': {'c': {'d': 123123}}}
+
+    def test_override_existing_dict(self):
+        config = {'a': 123, 'b': {'c': {'d': 321}}}
+        set_config_value(config, 34, 'b', 'c')
+        assert config == {'a': 123, 'b': {'c': 34}}

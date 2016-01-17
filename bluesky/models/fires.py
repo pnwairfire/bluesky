@@ -169,6 +169,10 @@ class FiresManager(object):
     def get_config_value(self, *keys, **kwargs):
         return configuration.get_config_value(self.config, *keys, **kwargs)
 
+    def set_config_value(self, value, *keys):
+        self.config = self.config or dict()
+        configuration.set_config_value(self.config, value, *keys)
+
     # @property(self):
     # def meta(self):
     #     return self._meta
