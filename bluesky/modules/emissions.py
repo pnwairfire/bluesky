@@ -127,6 +127,8 @@ def _run_consume(fires_manager, species, include_emissions_detail):
         'consumption','fuel_loadings')
     fuel_loadings_manager = FuelLoadingsManager(
         all_fuel_loadings=all_fuel_loadings)
+    if species:
+        species = [e.upper() for e in species]
 
     for fire in fires_manager.fires:
         logging.debug("Consume emissions - fire {}".format(fire.id))
@@ -158,9 +160,10 @@ def _run_consume(fires_manager, species, include_emissions_detail):
             fb['emissions'] = {f: {} for f in CONSUME_FIELDS}
             # r's key hierarchy is species > phase; we want phase > species
             for k in r:
-                if k != 'stratum' and (not species or k in species):
+                upper_k = k.upper()
+                if k != 'stratum' and (not species or upper_k in species):
                     for f in r[k]:
-                        fb['emissions'][f][k] = r[k][f]
+                        fb['emissions'][f][upper_k] = r[k][f]
 
             # Note: We don't need to call
             #   datautils.multiply_nested_data(fb["emissions"], area)
