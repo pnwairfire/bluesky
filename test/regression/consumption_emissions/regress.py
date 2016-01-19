@@ -85,7 +85,10 @@ def load_scenario(input_filename):
     """
     fires_manager = models.fires.FiresManager()
     rows = load_csv(input_filename)
-    total_area = sum([int(r['area']) for r in rows])
+    # compute total_area and use it to compute fuelbed pct *only it*
+    # we switch to having one fire with N fuelbeds (instead of
+    # N fires with 1 fuelbed each, which we're currently using)
+    #total_area = sum([int(r['area']) for r in rows])
     for row_dict in rows:
         fire = models.fires.Fire(copy.deepcopy(BASE_FIRE))
         fire.event_of["id"] = str(uuid.uuid1())
@@ -99,7 +102,9 @@ def load_scenario(input_filename):
         fire.location['pile_blackened_pct'] = int(row_dict['pile_black_pct'])
         fire.location['output_units'] = row_dict['units']
         fire.fuelbeds[0]['fccs_id'] = row_dict['fuelbeds']
-        fire.fuelbeds[0]['pct'] = float(area) / float(total_area)
+        # See note above about 1 fire + N fuelbeds vs N fires + 1 fuelbed each
+        #fire.fuelbeds[0]['pct'] = float(area) / float(total_area)
+        fire.fuelbeds[0]['pct'] = 100.0
         fires_manager.add_fire(fire)
     return fires_manager
 
