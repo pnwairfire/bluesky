@@ -45,7 +45,7 @@ def run(fires_manager):
     # use it across all fires, or at lesat accross all fuelbeds within
     # a single fire?
     for fire in fires_manager.fires:
-        logging.debug("Consume emissions - fire {}".format(fire.id))
+        logging.debug("Consume consumption - fire {}".format(fire.id))
 
         burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
 
@@ -80,11 +80,14 @@ def run(fires_manager):
                 fb['consumption'].pop('debug', None)
                 fb['heat'] = fc.results()['heat release']
 
-                # multiple each consumption and heat value by area
-                # (changes in fc.fuelbed_area_acres don't affect consumption
-                # or heat values; output is per unit area)
-                datautils.multiply_nested_data(fb["consumption"], area)
-                datautils.multiply_nested_data(fb["heat"], area)
+                # Note: We no longer multiply each consumption and heat value
+                # by area, because we're using default unit 'tons', not
+                # 'tons_ac'. So, consume multiplies by area for us, using the
+                # values in fc.fuelbed_area_acres. If bsp input data explicitly
+                # specifies 'tons_ac', then all values downstream will be left
+                # as per-acre.
+                # datautils.multiply_nested_data(fb["consumption"], area)
+                # datautils.multiply_nested_data(fb["heat"], area)
 
             else:
                 logging.error(
