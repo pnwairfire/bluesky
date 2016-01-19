@@ -37,6 +37,12 @@ OPTIONAL_ARGS = [
         'short': '-i',
         'long': '--scenario-id',
         'help': 'to run just one of the scenarios'
+    },
+    {
+        'short': '-e',
+        'long': '--emissions-model',
+        'help': '"feps", "urbanski", or "consume"; default "consume"',
+        'default': 'consume'
     }
 ]
 
@@ -298,7 +304,7 @@ def run(args):
         [os.path.basename(n) for n in input_filenames])))
     for input_filename in input_filenames:
         fires_manager = load_scenario(input_filename)
-        fires_manager.set_config_value('consume', 'emissions', 'efs')
+        fires_manager.set_config_value(args.emissions_model, 'emissions', 'efs')
         fires_manager.modules = ['consumption', 'emissions']
         fires_manager.run()
         actual = fires_manager.dump()
