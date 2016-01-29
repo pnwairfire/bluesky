@@ -9,6 +9,9 @@
                 "index_filename_pattern": "NAM84_ARL_index.csv"
             }
         },
+        "localmet":{
+            "time_step": 3
+        },
         "dispersion": {
             "start": "2015-08-05T00:00:00",
             "num_hours": 24,
