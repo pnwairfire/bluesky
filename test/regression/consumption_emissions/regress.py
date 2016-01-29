@@ -285,7 +285,7 @@ def load_output(input_filename):
     for r in load_csv(emissions_output_filename):
         p = PHASE_TRANSLATIONS[r.pop('Phase')]
         expected_total_emissions[p] = {
-            k.lower(): [float(v)] for k, v in r.items()
+            k.upper(): [float(v)] for k, v in r.items()
         }
 
     return expected_partials, expected_total_emissions
