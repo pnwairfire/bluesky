@@ -1682,7 +1682,7 @@ Note that the above command, with the '-w /pnwairfire-bluesky/' option, puts
 you in the bluesky repo root directory. Now, you can run bsp and step into
 the code as you normally would in development. E.g.:
 
-    ./bin/bsp -i ./test/data/json/ingestion-through-visualization-input/NAM84-2015080500-1fire-24hr-PM25.json ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
+    ./bin/bsp --log-level=DEBUG -i ./test/data/json/ingestion-through-visualization-input/NAM84-2015080500-1fire-24hr-PM25.json ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
 
 ### Notes about using Docker
 
