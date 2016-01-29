@@ -471,7 +471,7 @@ class ARLProfile(object):
                     'T02M', 'U10M', 'V10M', 'PRSS', 'SHGT', 'TPPA',
                     'pressure_at_surface',]:
                 self.list_to_scalar(hp, k, lambda: None)
-            self.list_to_scalar(hp, 'HBPL',
+            self.list_to_scalar(hp, 'HPBL',
                 lambda: default_pbl(hr, sunrise, sunset))
 
     def list_to_scalar(self, hourly_profile, k, default):
