@@ -291,6 +291,22 @@ def load_output(input_filename):
     return expected_partials, expected_total_emissions
 
 def check(actual, expected_partials, expected_total_emissions):
+
+
+    # TODO: multiply expected by area ???
+    #   (I'm seeing values like:
+    #     2016-01-17 06:56:28,054 DEBUG: actual vs. expected (flaming, pm25):  [27743.094436046558] vs [14.491]
+    #     2016-01-17 06:56:28,054 DEBUG: actual vs. expected (residual, co2):  [14269215.486186512] vs [3926.008]
+    #     2016-01-17 06:56:28,054 DEBUG: actual vs. expected (residual, co):  [1335240.064130065] vs [360.048]
+    #     2016-01-17 06:56:28,054 DEBUG: actual vs. expected (residual, pm10):  [160496.519555684] vs [44.202]
+    #     2016-01-17 06:56:28,055 DEBUG: actual vs. expected (residual, nmhc):  [46592.137014784814] vs [12.542]
+    #   )
+    #  Also play around with other pending changes to see how they affect values
+    #  (like tons vs tons_ac, rerunnig consumption vs not doing so, etc..)
+
+    #import pdb;pdb.set_trace()
+
+
     for phase in expected_total_emissions:
         for species in expected_total_emissions[phase]:
             # TODO: add asserts
