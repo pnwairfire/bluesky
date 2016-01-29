@@ -255,8 +255,15 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
             location, fccs_file=None):
         fccs_file = fccs_file or ""
         super(FuelConsumptionForEmissions, self).__init__(fccs_file=fccs_file)
-        self._set_consumption_data(consumption_data)
-        self._set_heat_data(heat_data)
+
+        # TODO:  figure out how to avoid re-computing consumption and still
+        #  compute emissions correctly; for now, let it recompute, since
+        #  consumption was most likely produced with consume using the same
+        #  conifguration as this emissions run (which means this is wasted
+        #  computation, but shouldn't be changing the consumption values)
+
+        # self._set_consumption_data(consumption_data)
+        # self._set_heat_data(heat_data)
         self.burn_type = burn_type
         self.fuelbed_fccs_ids = [fccs_id]
         self.fuelbed_area_acres = [area]
@@ -264,35 +271,34 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
 
         _apply_settings(self, location, burn_type)
 
+    # def _calculate(self):
+    #     """Overrides consume.FuelConsumption._calculate so that it doesn't
+    #     recalculate _cons_data and _heat_data when it's called by
+    #     consume.Emissions._calculate
 
-    def _calculate(self):
-        """Overrides consume.FuelConsumption._calculate so that it doesn't
-        recalculate _cons_data and _heat_data when it's called by
-        consume.Emissions._calculate
+    #     Note:  We could have _calculate skipped altogether by setting
+    #         consume.Emissions._have_cons_data = len(
+    #             FuelConsumptionForEmissions._cons_data[0][0])
+    #     but we need calcualte to be called in order to set self._cons_data_piles
+    #     """
+    #     loadings = self._get_loadings_for_specified_files(
+    #         self._settings.get('fuelbeds'))
 
-        Note:  We could have _calculate skipped altogether by setting
-            consume.Emissions._have_cons_data = len(
-                FuelConsumptionForEmissions._cons_data[0][0])
-        but we need calcualte to be called in order to set self._cons_data_piles
-        """
-        loadings = self._get_loadings_for_specified_files(
-            self._settings.get('fuelbeds'))
+    #     self._cons_data_piles = consume.con_calc_natural.ccon_piles(
+    #         self._settings.get('pile_black_pct'), loadings)
 
-        self._cons_data_piles = consume.con_calc_natural.ccon_piles(
-            self._settings.get('pile_black_pct'), loadings)
+    # def _set_consumption_data(self, consumption_data):
+    #     # This is a reverse of what's done in
+    #     #  consume.FuelConsumption.make_dictionary_of_lists
+    #     cons_data = []
+    #     for c, subc in CONSUME_FUEL_CATEGORIES.items():
+    #         for sc in subc:
+    #             cons_data.append([
+    #                 # TODO: use get's and default missing values to 0
+    #                 consumption_data[c][sc][f] for f in CONSUME_FIELDS
+    #             ])
+    #     self._cons_data = numpy.array(cons_data)
 
-    def _set_consumption_data(self, consumption_data):
-        # This is a reverse of what's done in
-        #  consume.FuelConsumption.make_dictionary_of_lists
-        cons_data = []
-        for c, subc in CONSUME_FUEL_CATEGORIES.items():
-            for sc in subc:
-                cons_data.append([
-                    # TODO: use get's and default missing values to 0
-                    consumption_data[c][sc][f] for f in CONSUME_FIELDS
-                ])
-        self._cons_data = numpy.array(cons_data)
-
-    def _set_heat_data(self, heat_data):
-        # _heat_data is indeed supposed to be an array with a single nested array
-        self._heat_data = numpy.array([[heat_data[f] for f in CONSUME_FIELDS]])
+    # def _set_heat_data(self, heat_data):
+    #     # _heat_data is indeed supposed to be an array with a single nested array
+    #     self._heat_data = numpy.array([[heat_data[f] for f in CONSUME_FIELDS]])
