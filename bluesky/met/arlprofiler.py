@@ -467,6 +467,23 @@ class ARLProfile(object):
             hp['dew_point'] = self.calc_dew_point(hp['RELH'], hp['TEMP'])
             hp['sunrise_hour'] = sunrise
             hp['sunset_hour'] = sunset
+            # Note: Based on what they stand for and on looking at the SEV
+            #  plumerise logic, it appears that 'PBLH' and 'HPBL' are aliases
+            #  for one anohther. ('Planetary Boundary Layer Height' vs 'Height
+            #  of Planetary Boundary Layer'.) If so, I don't see why the two
+            #  values aren't consolidated into a single variable here, as opposed
+            #  to storing them as separate values and only defaulting 'HPBL' to
+            #  `default_pbl(hr, sunrise, sunset)` (which is the current logic
+            #  that was taken from BSF).  The logic could be replace with
+            #  something like:
+            #    _pblh = self.list_to_scalar(hp, pblh, lambda: None)
+            #    _hpbl = self.list_to_scalar(hp, hpbl, lambda: None)
+            #    if _pblh is not None:
+            #        hp['pblh'] = _pblh
+            #    elif _hpbl is not None:
+            #        hp['pblh'] = _pblh
+            #    else:
+            #        hp['pblh'] = default_pbl(hr, sunrise, sunset)
             for k in ['TO2M', 'RH2M', 'TPP3', 'TPP6', 'PBLH',
                     'T02M', 'U10M', 'V10M', 'PRSS', 'SHGT', 'TPPA',
                     'pressure_at_surface',]:
