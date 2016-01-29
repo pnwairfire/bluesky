@@ -1381,7 +1381,12 @@ Check that it was created:
 
     docker-machine ls
 
-Set env vars so that your docker knows how to find the docker host:
+Subsequently, you'll need to start the vm with:
+
+    docker-machine start docker-default
+
+Once it's running, set env vars so that your docker knows how to find
+the docker host:
 
     eval "$(docker-machine env docker-default)"
 
@@ -1396,11 +1401,21 @@ Set env vars so that your docker knows how to find the docker host:
     docker build -t bluesky-base docker/base/
     docker build -t bluesky docker/complete/
 
+### Obtain pre-built docker images
+
+As an alternative to building the image yourself, you can use the pre-built
+complete image.
+
+    docker pull pnwairfire/bluesky
+
+See the [bluesky docker hub page](https://hub.docker.com/r/pnwairfire/bluesky/)
+for more information.
+
 ### Run Complete Container
 
 If you run the image without a command, i.e.:
 
-    docker run bluesky
+    docker run bsp
 
 it will output the bluesky help image.  To run bluesky with piped input,
 use something like the following:
@@ -1467,7 +1482,7 @@ Then run bluesky:
 
     docker run -v /home/foo/path/to/bluesky/repo:/bluesky/ -w /bluesky/ bluesky-base ./bin/bsp -h
 
-### Executables needing to be manually installed
+#### Executables needing to be manually installed
 
 The Dockerfiles specify everything you need to to run bluesky through
 emissions.  If you want to run localmet and/or dispersion, you'll
@@ -1525,7 +1540,7 @@ Another example, running through vsmoke dispersion:
                 "start": "2014-05-30T00:00:00",
                 "num_hours": 24,
                 "model": "vsmoke",
-                "dest_dir": "/bluesky-output/bsp-dispersion-output/"
+                "dest_dir": "/bsp-output/bsp-dispersion-output/"
             }
         },
         "fire_information": [
@@ -1558,10 +1573,11 @@ Another example, running through vsmoke dispersion:
                 ]
             }
         ]
-    }' | docker run -i -v $HOME:/bluesky-output/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling dispersion | python -m json.tool > out.json
+    }' | docker run -i -v $HOME/docker-bsp-output:/bsp-output/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling dispersion | python -m json.tool > out.json
 
-Remember that the vsmoke output will be under $HOME/bsp-dispersion-output/ on your
-host machine, not under /bluesky-output/bsp-dispersion-output/.
+Remember that the vsmoke output will be under
+$HOME/docker-bsp-output/bsp-dispersion-output/ on your host machine, not under
+/bsp-output/bsp-dispersion-output/.
 
 Another example, running through hysplit dispersion:
 
@@ -1577,7 +1593,7 @@ Another example, running through hysplit dispersion:
                 "start": "2014-05-30T00:00:00",
                 "num_hours": 24,
                 "model": "hysplit",
-                "dest_dir": "/bluesky-output/bsp-dispersion-output/",
+                "dest_dir": "/bsp-output/bsp-dispersion-output/",
                 "hysplit": {
                     "grid": {
                         "spacing": 6.0,
@@ -1605,7 +1621,7 @@ Another example, running through hysplit dispersion:
                 "modes": ["localsave"],
                 "extra_exports": ["dispersion", "visualization"],
                 "localsave": {
-                    "dest_dir": "/bluesky-output/bsp-local-exports/"
+                    "dest_dir": "/bsp-output/bsp-local-exports/"
                 }
             }
         },
@@ -1633,18 +1649,40 @@ Another example, running through hysplit dispersion:
                 ]
             }
         ]
-    }' | docker run -i -v $HOME:/bluesky-output/ -v /home/foo/DRI_6km/:/DRI_6km/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
+    }' | docker run -i -v $HOME/docker-bsp-output/:/bsp-output/ -v /home/foo/DRI_6km/:/DRI_6km/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
 
 Again, the dispersion output will be under $HOME/bsp-dispersion-output/ on your
 host machine, and the export directory will be under $HOME/bsp-local-exports.
 
-### Docker wrapper script
+#### Docker wrapper script
 
 This repo contains a script, test/scripts/run-in-docker.py, for running bsp in
 the base docker container.  Use its '-h' option for usage and options.
 
     cd /path/to/bluesky/repo/
     ./test/scripts/run-in-docker.py -h
+
+#### Running docker in interactive mode
+
+Sometimes, it's useful to open a terminal within the docker container. For
+example, you may want to use pdb to debug your code.  To do so, use the '-t'
+and '-i' options and run bash. The follosing example assumes that your bluesky
+repo is in $HOME/code/pnwairfire-bluesky/, you've got NAM84 met data in
+$HOME/NAM84, and you want your bsp ouput in $HOME/docker-bsp-output/
+
+
+    docker run -ti \
+        -v $HOME/code/pnwairfire-bluesky/:/pnwairfire-bluesky/  \
+        -v $HOME/NAM84/:/NAM84/ \
+        -v $HOME/docker-bsp-output/:/bsp-output/ \
+        -w /pnwairfire-bluesky/ \
+        bluesky-base bash
+
+Note that the above command, with the '-w /pnwairfire-bluesky/' option, puts
+you in the bluesky repo root directory. Now, you can run bsp and step into
+the code as you normally would in development. E.g.:
+
+    ./bin/bsp -i ./test/data/json/ingestion-through-visualization-input/NAM84-2015080500-1fire-24hr-PM25.json ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
 
 ### Notes about using Docker
 
