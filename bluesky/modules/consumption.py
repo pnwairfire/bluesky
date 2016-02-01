@@ -96,6 +96,8 @@ def run(fires_manager):
 
     fires_manager.summarize(
         consumption=datautils.summarize(fires_manager.fires, 'consumption'))
+    fires_manager.summarize(
+        heat=datautils.summarize(fires_manager.fires, 'heat'))
 
 REQUIRED_LOCATION_FIELDS = ['area', 'ecoregion']
 def _validate_input(fires_manager):
