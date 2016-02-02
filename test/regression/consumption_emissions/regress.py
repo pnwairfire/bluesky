@@ -51,7 +51,8 @@ EXAMPLES_STR = """
 
 BASE_FIRE = {
     "event_of": {
-        "name": "regression test fire"
+        "name": "regression test fire",
+        "type": "natural"
         # "id" to be filled in
     },
     "fuelbeds": [{
