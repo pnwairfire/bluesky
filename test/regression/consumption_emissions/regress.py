@@ -180,37 +180,37 @@ CONSUMPTION_OUTPUT_HEADER_TRANSLATIONS = {
     "C_basal_accum": ["ground fuels", "basal accumulations", "total"],
     "C_squirrel": ["ground fuels", "squirrel middens", "total"]
 }
-# EMISSIONS_OUTPUT_HEADER_TRANSLATIONS = {
+EMISSIONS_OUTPUT_HEADER_TRANSLATIONS = {
 #     "CH4 Emissions": ["ch4", "total"],
 #     "CO Emissions": ["co", "total"],
 #     "CO2 Emissions": ["co2", "total"],
 #     "NMHC Emissions": ["nmhc", "total"],
 #     "PM Emissions": ["pm", "total"],
 #     "PM10 Emissions": ["pm10", "total"],
-#     "PM25 Emissions": ["pm25", "total"],
+     "PM25 Emissions": ["total", "pm25"],
 #     "E_ch4_F": ["ch4", "flaming"],
 #     "E_co_F": ["co", "flaming"],
 #     "E_co2_F": ["co2", "flaming"],
 #     "E_nmhc_F": ["nmhc", "flaming"],
 #     "E_pm_F": ["pm", "flaming"],
 #     "E_pm10_F": ["pm10", "flaming"],
-#     "E_pm25_F": ["pm25", "flaming"],
+     "E_pm25_F": ["flaming", "pm25"],
 #     "E_ch4_S": ["ch4", "smoldering"],
 #     "E_co_S": ["co", "smoldering"],
 #     "E_co2_S": ["co2", "smoldering"],
 #     "E_nmhc_S": ["nmhc", "smoldering"],
 #     "E_pm_S": ["pm", "smoldering"],
 #     "E_pm10_S": ["pm10", "smoldering"],
-#     "E_pm25_S": ["pm25", "smoldering"],
+     "E_pm25_S": ["smoldering", "pm25"],
 #     "E_ch4_R": ["ch4", "residual"],
 #     "E_co_R": ["co", "residual"],
 #     "E_co2_R": ["co2", "residual"],
 #     "E_nmhc_R": ["nmhc", "residual"],
 #     "E_pm_R": ["pm", "residual"],
 #     "E_pm10_R": ["pm10", "residual"],
-#     "E_pm25_R": ["pm25", "residual"]
-# }
-# EMISSIONS_STRATUM_OUTPUT_HEADER_TRANSLATIONS
+     "E_pm25_R": ["residual", "pm25"]
+}
+# EMISSIONS_STRATUM_OUTPUT_HEADER_TRANSLATIONS = {
 #     "CH4_canopy": ["stratum_ch4_canopy", "total"],
 #     "CH4_shrub": ["stratum_ch4_shrub", "total"],
 #     "CH4_herb": ["stratum_ch4_nonwoody", "total"],
@@ -263,20 +263,31 @@ HEAT_OUTPUT_HEADER_TRANSLATIONS = {
 def load_output(input_filename):
     # Consumption + emissions by fuelbed and fuel category
     consumption_output_filename = input_filename.replace('.csv', '_out.csv')
-    expected_partials = {
-        "consumption": {},
-        "heat": {}
-    }
+    expected_partials = {}
     for r in load_csv(consumption_output_filename):
+        fb_c = {}
+        fb_h = {}
+        fb_e = {}
         for k in r:
             if k in CONSUMPTION_OUTPUT_HEADER_TRANSLATIONS:
                 c, sc, p = CONSUMPTION_OUTPUT_HEADER_TRANSLATIONS[k]
-                expected_partials['consumption'][c] = expected_partials['consumption'].get(c, {})
-                expected_partials['consumption'][c][sc] = expected_partials['consumption'][c].get(sc, {})
-                expected_partials['consumption'][c][sc][p] = [float(r[k])]
+                fb_c[c] = fb_c.get(c, {})
+                fb_c[c][sc] = fb_c[c].get(sc, {})
+                fb_c[c][sc][p] = [float(r[k])]
             elif k in HEAT_OUTPUT_HEADER_TRANSLATIONS:
                 p = HEAT_OUTPUT_HEADER_TRANSLATIONS[k]
-                expected_partials['heat'][p] = [float(r[k])]
+                fb_h[p] = [float(r[k])]
+            elif k in EMISSIONS_OUTPUT_HEADER_TRANSLATIONS:
+                p, s = EMISSIONS_OUTPUT_HEADER_TRANSLATIONS[k]
+                fb_e[p] = fb_e.get(p, {})
+                fb_e[p][s] = [float(r[k])]
+
+        fccs_id = r['Fuelbeds']
+        expected_partials[fccs_id] = {
+            'consumption': fb_c,
+            'heat': fb_h,
+            'emissions': fb_e
+        }
 
     # total Emissions
     input_dir, input_filename = os.path.split(input_filename)
@@ -304,20 +315,31 @@ def check(actual, expected_partials, expected_total_emissions):
     #  Also play around with other pending changes to see how they affect values
     #  (like tons vs tons_ac, rerunnig consumption vs not doing so, etc..)
 
-    for c in expected_partials['consumption']:
-        for s in expected_partials['consumption'][c]:
-            #logging.debug('{} {}'.format (c, s))
-            for p in expected_partials['consumption'][c][s]:
-                # TODO: add asserts
-                logging.debug("CONSUMPTION: actual vs. expected ({}, {}, {}): {} vs {}".format(
-                    c, s, p, actual['summary']['consumption'].get(c, {}).get(s, {}).get(p, '???'),
-                    expected_partials['consumption'][c][s][p]))
+    for fire in actual['fire_information']:
+        fb = fire['fuelbeds'][0]
+        fccs_id = fb['fccs_id']
+        fb_e = expected_partials[fccs_id]
 
-    for p in expected_partials['heat']:
-        # TODO: add asserts
-        logging.debug("HEAT: actual vs. expected ({}): {} vs {}".format(
-            p, actual['summary']['heat'].get(p, '???'),
-            expected_partials['heat'][p]))
+        for c in  fb_e['consumption']:
+            for s in  fb_e['consumption'][c]:
+                #logging.debug('{} {}'.format (c, s))
+                for p in  fb_e['consumption'][c][s]:
+                    # TODO: add asserts
+                    logging.debug("CONSUMPTION: actual vs. expected ({}, {}, {}): {} vs {}".format(
+                        c, s, p, fb['consumption'].get(c, {}).get(s, {}).get(p, '???'),
+                        fb_e['consumption'][c][s][p]))
+
+        for p in fb_e['heat']:
+            # TODO: add asserts
+            logging.debug("HEAT: actual vs. expected ({}): {} vs {}".format(
+                p, fb['heat'].get(p, '???'), fb_e['heat'][p]))
+
+        for p in fb_e['emissions']:
+            for s in fb_e['emissions'][p]:
+                # TODO: add asserts
+                logging.debug("EMISSIONS: actual vs. expected ({}, {}): {} vs {}".format(
+                    p, s, fb['emissions'].get(p, {}).get(s, '???'),
+                    fb_e['emissions'][p][s]))
 
     for phase in expected_total_emissions:
         for species in expected_total_emissions[phase]:
