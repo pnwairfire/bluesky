@@ -304,17 +304,27 @@ def check(actual, expected_partials, expected_total_emissions):
     #  Also play around with other pending changes to see how they affect values
     #  (like tons vs tons_ac, rerunnig consumption vs not doing so, etc..)
 
-    #import pdb;pdb.set_trace()
+    for c in expected_partials['consumption']:
+        for s in expected_partials['consumption'][c]:
+            #logging.debug('{} {}'.format (c, s))
+            for p in expected_partials['consumption'][c][s]:
+                # TODO: add asserts
+                logging.debug("CONSUMPTION: actual vs. expected ({}, {}, {}): {} vs {}".format(
+                    c, s, p, actual['summary']['consumption'].get(c, {}).get(s, {}).get(p, '???'),
+                    expected_partials['consumption'][c][s][p]))
 
+    for p in expected_partials['heat']:
+        # TODO: add asserts
+        logging.debug("HEAT: actual vs. expected ({}): {} vs {}".format(
+            p, actual['summary']['heat'].get(p, '???'),
+            expected_partials['heat'][p]))
 
     for phase in expected_total_emissions:
         for species in expected_total_emissions[phase]:
             # TODO: add asserts
-            logging.debug('actual vs. expected ({}, {}):  {} vs {}'.format(phase, species,
+            logging.debug('EMISSION: actual vs. expected ({}, {}):  {} vs {}'.format(phase, species,
                 actual['summary']['emissions'][phase].get(species, '???'),
                 expected_total_emissions[phase][species]))
-
-    # TODO: check consumption and heat values in expected_partials
 
 def run(args):
     pattern = '{}/data/scen_{}.csv'.format(
