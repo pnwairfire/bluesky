@@ -114,71 +114,71 @@ PHASE_TRANSLATIONS = {
     "Smold": "smoldering",
     "Resid": "residual"
 }
-CONSUPTION_OUTPUT_HEADER_TRANSLATIONS = {
+CONSUMPTION_OUTPUT_HEADER_TRANSLATIONS = {
     #"Fuelbeds": [],
     # ignore "Filename"
     "Total Consumption": ["summary", "total", "total"],
     "Canopy Consumption": ["summary", "canopy", "total"],
     "Shrub Consumption": ["summary", "shrub", "total"],
     "Herb Consumption": ["summary", "nonwoody", "total"],
-    "Wood Consumption": ["summary", "woody_fuels", "total"],
+    "Wood Consumption": ["summary", "woody fuels", "total"],
     "LLM Consumption": ["summary", "litter-lichen-moss", "total"],
-    "Ground Consumption": ["summary", "ground_fuels", "total"],
+    "Ground Consumption": ["summary", "ground fuels", "total"],
     "C_total_F": ["summary", "total", "flaming"],
     "C_canopy_F": ["summary", "canopy", "flaming"],
     "C_shrub_F": ["summary", "shrub", "flaming"],
     "C_herb_F": ["summary", "nonwoody", "flaming"],
-    "C_wood_F": ["summary", "woody_fuels", "flaming"],
+    "C_wood_F": ["summary", "woody fuels", "flaming"],
     "C_llm_F": ["summary", "litter-lichen-moss", "flaming"],
-    "C_ground_F": ["summary", "ground_fuels", "flaming"],
+    "C_ground_F": ["summary", "ground fuels", "flaming"],
     "C_total_S": ["summary", "total", "smoldering"],
     "C_canopy_S": ["summary", "canopy", "smoldering"],
     "C_shrub_S": ["summary", "shrub", "smoldering"],
     "C_herb_S": ["summary", "nonwoody", "smoldering"],
-    "C_wood_S": ["summary", "woody_fuels", "smoldering"],
+    "C_wood_S": ["summary", "woody fuels", "smoldering"],
     "C_llm_S": ["summary", "litter-lichen-moss", "smoldering"],
-    "C_ground_S": ["summary", "ground_fuels", "smoldering"],
+    "C_ground_S": ["summary", "ground fuels", "smoldering"],
     "C_total_R": ["summary", "total", "residual"],
     "C_canopy_R": ["summary", "canopy", "residual"],
-    "C_wood_R": ["summary", "woody_fuels", "residual"],
+    "C_wood_R": ["summary", "woody fuels", "residual"],
     "C_llm_R": ["summary", "litter-lichen-moss", "residual"],
-    "C_ground_R": ["summary", "ground_fuels", "residual"],
+    "C_ground_R": ["summary", "ground fuels", "residual"],
     "C_overstory_crown": ["canopy", "overstory", "total"],
     "C_midstory_crown": ["canopy", "midstory", "total"],
     "C_understory_crown": ["canopy", "understory", "total"],
-    "C_snagC1F_crown": ["canopy", "snags_class_1_foliage", "total"],
-    "C_snagC1F_wood": ["canopy", "snags_class_1_no_foliage", "total"],
-    "C_snagC1_wood": ["canopy", "snags_class_1_wood", "total"],
-    "C_snagC2_wood": ["canopy", "snags_class_2", "total"],
-    "C_snagC3_wood": ["canopy", "snags_class_3", "total"],
-    "C_ladder": ["canopy", "ladder_fuels", "total"],
-    "C_shrub_1live": ["shrub", "primary_dead", "total"],
-    "C_shrub_1dead": ["shrub", "primary_live", "total"],
-    "C_shrub_2live": ["shrub", "secondary_dead", "total"],
-    "C_shrub_2dead": ["shrub", "secondary_live", "total"],
-    "C_herb_1live": ["nonwoody", "primary_dead", "total"],
-    "C_herb_1dead": ["nonwoody", "primary_live", "total"],
-    "C_herb_2live": ["nonwoody", "secondary_dead", "total"],
-    "C_herb_2dead": ["nonwoody", "secondary_live", "total"],
-    "C_wood_1hr": ["woody_fuels", "1-hr_fuels", "total"],
-    "C_wood_10hr": ["woody_fuels", "10-hr_fuels", "total"],
-    "C_wood_100hr": ["woody_fuels", "100-hr_fuels", "total"],
-    "C_wood_S1000hr": ["woody_fuels", "1000-hr_fuels_sound", "total"],
-    "C_wood_R1000hr": ["woody_fuels", "1000-hr_fuels_rotten", "total"],
-    "C_wood_S10khr": ["woody_fuels", "10000-hr_fuels_sound", "total"],
-    "C_wood_R10khr": ["woody_fuels", "10000-hr_fuels_rotten", "total"],
-    "C_wood_S+10khr": ["woody_fuels", "10k+-hr_fuels_sound", "total"],
-    "C_wood_R+10khr": ["woody_fuels", "10k+-hr_fuels_rotten", "total"],
-    "C_stump_sound": ["woody_fuels", "stumps_sound", "total"],
-    "C_stump_rotten": ["woody_fuels", "stumps_rotten", "total"],
-    "C_stump_lightered": ["woody_fuels", "stumps_lightered", "total"],
+    "C_snagC1F_crown": ["canopy", "snags class 1 foliage", "total"],
+    "C_snagC1F_wood": ["canopy", "snags class 1 no foliage", "total"],
+    "C_snagC1_wood": ["canopy", "snags class 1 wood", "total"],
+    "C_snagC2_wood": ["canopy", "snags class 2", "total"],
+    "C_snagC3_wood": ["canopy", "snags class 3", "total"],
+    "C_ladder": ["canopy", "ladder fuels", "total"],
+    "C_shrub_1live": ["shrub", "primary dead", "total"],
+    "C_shrub_1dead": ["shrub", "primary live", "total"],
+    "C_shrub_2live": ["shrub", "secondary dead", "total"],
+    "C_shrub_2dead": ["shrub", "secondary live", "total"],
+    "C_herb_1live": ["nonwoody", "primary dead", "total"],
+    "C_herb_1dead": ["nonwoody", "primary live", "total"],
+    "C_herb_2live": ["nonwoody", "secondary dead", "total"],
+    "C_herb_2dead": ["nonwoody", "secondary live", "total"],
+    "C_wood_1hr": ["woody fuels", "1-hr fuels", "total"],
+    "C_wood_10hr": ["woody fuels", "10-hr fuels", "total"],
+    "C_wood_100hr": ["woody fuels", "100-hr fuels", "total"],
+    "C_wood_S1000hr": ["woody fuels", "1000-hr fuels sound", "total"],
+    "C_wood_R1000hr": ["woody fuels", "1000-hr fuels rotten", "total"],
+    "C_wood_S10khr": ["woody fuels", "10000-hr fuels sound", "total"],
+    "C_wood_R10khr": ["woody fuels", "10000-hr fuels rotten", "total"],
+    "C_wood_S+10khr": ["woody fuels", "10k+-hr fuels sound", "total"],
+    "C_wood_R+10khr": ["woody fuels", "10k+-hr fuels rotten", "total"],
+    "C_stump_sound": ["woody fuels", "stumps sound", "total"],
+    "C_stump_rotten": ["woody fuels", "stumps rotten", "total"],
+    "C_stump_lightered": ["woody fuels", "stumps lightered", "total"],
     "C_litter": ["litter-lichen-moss", "litter", "total"],
     "C_lichen": ["litter-lichen-moss", "lichen", "total"],
     "C_moss": ["litter-lichen-moss", "moss", "total"],
-    "C_upperduff": ["ground_fuels", "duff_upper", "total"],
-    "C_lowerduff": ["ground_fuels", "duff_lower", "total"],
-    "C_basal_accum": ["ground_fuels", "basal_accumulations", "total"],
-    "C_squirrel": ["ground_fuels", "squirrel_middens", "total"]
+    "C_upperduff": ["ground fuels", "duff upper", "total"],
+    "C_lowerduff": ["ground fuels", "duff lower", "total"],
+    "C_basal_accum": ["ground fuels", "basal accumulations", "total"],
+    "C_squirrel": ["ground fuels", "squirrel middens", "total"]
 }
 # EMISSIONS_OUTPUT_HEADER_TRANSLATIONS = {
 #     "CH4 Emissions": ["ch4", "total"],
@@ -269,8 +269,8 @@ def load_output(input_filename):
     }
     for r in load_csv(consumption_output_filename):
         for k in r:
-            if k in CONSUPTION_OUTPUT_HEADER_TRANSLATIONS:
-                c, sc, p = CONSUPTION_OUTPUT_HEADER_TRANSLATIONS[k]
+            if k in CONSUMPTION_OUTPUT_HEADER_TRANSLATIONS:
+                c, sc, p = CONSUMPTION_OUTPUT_HEADER_TRANSLATIONS[k]
                 expected_partials['consumption'][c] = expected_partials['consumption'].get(c, {})
                 expected_partials['consumption'][c][sc] = expected_partials['consumption'][c].get(sc, {})
                 expected_partials['consumption'][c][sc][p] = [float(r[k])]
@@ -292,7 +292,6 @@ def load_output(input_filename):
     return expected_partials, expected_total_emissions
 
 def check(actual, expected_partials, expected_total_emissions):
-
 
     # TODO: multiply expected by area ???
     #   (I'm seeing values like:
