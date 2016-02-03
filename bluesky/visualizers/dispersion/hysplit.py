@@ -85,7 +85,8 @@ def _get_heat(fire):
         heat = [fb.get('heat', {}).get('total') for fb in fire['fuelbeds']]
         # non-None value will be returned if species is defined for all fuelbeds
         if not any([v is None for v in heat]):
-            return sum(heat)
+            # heat is array of arrays
+            return sum([sum(h) for h in heat])
 
 def _get_emissions_species(species):
     def f(fire):
