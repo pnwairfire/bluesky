@@ -139,34 +139,27 @@ class ExporterBase(object):
                 return {'netcdf': netcdfs[0]}
         return {}
 
-    JSON_PATTERN = '*.json'
-    KMZ_PATTERN = '*.kmz'
+
     IMAGE_PATTERN = '*.png'
-    CSV_PATTERN = '*.csv'
-    NETCDF_PATTERN = '*.nc'
-    SMOKE_KMZ_MATCHER = re.compile('.*smoke.*kmz')
-    FIRE_KMZ_MATCHER = re.compile('.*fire.*kmz')
+
+    ## ******************** TO DELETE - BEGIN
+
     HOURLY_IMG_MATCHER = re.compile('.*/hourly_.*')
     THREE_HOUR_IMG_MATCHER = re.compile('.*/three_hour_.*')
     DAILY_AVG_IMG_MATCHER = re.compile('.*/daily_average_.*')
     DAILY_MAX_IMG_MATCHER = re.compile('.*/daily_maximum_.*')
-    FIRE_LOCATIONS_CSV_MATCHER = re.compile('.*/fire_locations.*')
-    FIRE_EVENTS_CSV_MATCHER = re.compile('.*/fire_events.*')
-    FIRE_EMISSIONS_CSV_MATCHER = re.compile('.*/fire_emissions.*')
-    def _process_visualization(self, d, r):
-        # TODO: look in 'd' to see the target of visualization, what files
-        #   exist, etc.; it won't necessarily say - so that's why we need
-        #   the back-up logic of looking for specific files
-        kmzs = self._find_files(d['output']['directory'], self.KMZ_PATTERN)
-        r['visualization']['kmzs'] = self._pick_out_files(kmzs,
-            smoke=self.SMOKE_KMZ_MATCHER, fire=self.FIRE_KMZ_MATCHER)
 
+    def _process_images_v1(self, d):
+        """Produces original image results json structure
+
+        TODO: delete once v2 has been adopted.
+        """
         images = self._find_files(d['output']['directory'], self.IMAGE_PATTERN)
         hourly = [e for e in images if self.HOURLY_IMG_MATCHER.match(e)]
         three_hour = [e for e in images if self.THREE_HOUR_IMG_MATCHER.match(e)]
         daily_max = [e for e in images if self.DAILY_MAX_IMG_MATCHER.match(e)]
         daily_avg = [e for e in images if self.DAILY_AVG_IMG_MATCHER.match(e)]
-        r['visualization']['images'] = {
+        return {
             "hourly": hourly,
             "three_hour": three_hour,
             "daily": {
@@ -176,6 +169,74 @@ class ExporterBase(object):
             "other": list(set(images) - set(hourly) - set(three_hour)
                 - set(daily_max) - set(daily_avg)),
         }
+
+    ## ******************** TO DELETE - END
+
+    SERIES_IMG_MATCHER = re.compile('.*_\d+.png')
+    LEGEND_IMG_MATCHER = re.compile('.*colorbar_.*.png')
+
+    def _process_images_v2(self, d):
+        """Produces new image results json structure
+
+        TODO: update README and other examples with new structure
+        """
+        images = {}
+        for i in self._find_files(d['output']['directory'], self.IMAGE_PATTERN):
+            directory, image_name = os.path.split(i)
+            _, color_scheme = os.path.split(directory)
+            _, time_series = os.path.split(_)
+            images[time_series] = images.get(time_series, {})
+            images[time_series][color_scheme] = images[time_series].get(
+                color_scheme, {"directory": directory, "legend": None,
+                "series": [], "other_images": []})
+            if images[time_series][color_scheme]['directory'] != directory:
+                # TODO: somehow handle this; e.g. we could have 'images'
+                #   reference an array of image directory group objects, and
+                #   add 'time_series' and 'color_scheme' keys to each object
+                #   (though these extra keys wouldn't really be necessary
+                #   since their values can be extracted from the directory)
+                raise RuntimeError("Multiple image directories with the same "
+                    "time series and color scheme identifiers - {} vs. {}".format(
+                    images[time_series][color_scheme]['directory'], directory))
+
+            if self.SERIES_IMG_MATCHER.match(image_name):
+                images[time_series][color_scheme]['series'].append(image_name)
+            elif (images[time_series][color_scheme]['legend'] is None and
+                    self.LEGEND_IMG_MATCHER.match(image_name)):
+                images[time_series][color_scheme]['legend'] = image_name
+            else:
+                images[time_series][color_scheme]['other_images'].append(image_name)
+        images[time_series][color_scheme]['series'].sort()
+        images[time_series][color_scheme]['other_images'].sort()
+        return images
+
+    JSON_PATTERN = '*.json'
+    KMZ_PATTERN = '*.kmz'
+    CSV_PATTERN = '*.csv'
+    NETCDF_PATTERN = '*.nc'
+    SMOKE_KMZ_MATCHER = re.compile('.*smoke.*kmz')
+    FIRE_KMZ_MATCHER = re.compile('.*fire.*kmz')
+    FIRE_LOCATIONS_CSV_MATCHER = re.compile('.*/fire_locations.*')
+    FIRE_EVENTS_CSV_MATCHER = re.compile('.*/fire_events.*')
+    FIRE_EMISSIONS_CSV_MATCHER = re.compile('.*/fire_emissions.*')
+
+    def _process_visualization(self, d, r):
+        # TODO: look in 'd' to see the target of visualization, what files
+        #   exist, etc.; it won't necessarily say - so that's why we need
+        #   the back-up logic of looking for specific files
+        kmzs = self._find_files(d['output']['directory'], self.KMZ_PATTERN)
+        r['visualization']['kmzs'] = self._pick_out_files(kmzs,
+            smoke=self.SMOKE_KMZ_MATCHER, fire=self.FIRE_KMZ_MATCHER)
+
+        # TODO: remove v1 once v2 has been adopted, and replace the following
+        #   code with:
+        #     r['visualization']['images'] = self._process_images(d)
+        img_ver = self.config('image_results_version') or 'v1'
+        _f = getattr(self, '_process_images_{}'.format(img_ver), None)
+        if not _f:
+            raise RuntimeError("Invalid image_results_version: {}".format(img_ver))
+        r['visualization']['images'] = _f(d)
+
 
         csvs = self._find_files(d['output']['directory'], self.CSV_PATTERN)
         r['visualization']['csvs'] = self._pick_out_files(csvs,
