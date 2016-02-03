@@ -1207,6 +1207,7 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
  - ***'config' > 'visualization' >  'hysplit' > 'output_dir_name' -- *optional* --name of output directory to create in dest_dir; only used if dest_dir is defined; defaults to run_id, which is generated if not defined
  - ***'config' > 'visualization' >  'hysplit' > 'images_dir' -- *optional* -- sub-directory to contain images (relative to output direcotry); default is 'graphics/''
  - ***'config' > 'visualization' >  'hysplit' > 'data_dir' -- *optional* -- sub-directory to contain data files (relative to output direcotry); default is output directory root
+ - ***'config' > 'visualization' >  'hysplit' > 'blueskykml_config' -- *optional* -- sub-directory to contain configuration to pass directly into blueskykml; expected to be nested with top level section keys and second level option keys
 
 ##### export
 

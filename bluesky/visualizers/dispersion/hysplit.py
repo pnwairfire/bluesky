@@ -253,6 +253,7 @@ class HysplitVisualizer(object):
                     self._config.get('images_dir') or ''))
             }
         }
+        config_options.update(self._config.get('blueskykml_config') or {})
         layer = self._config.get('layer')
         args = BlueskyKmlArgs(
             output_directory=str(output_directory),
