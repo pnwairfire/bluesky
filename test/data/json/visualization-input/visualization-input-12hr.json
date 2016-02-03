@@ -7,7 +7,7 @@
                 "is_aquipt": false,
                 "images_dir": "images/",
                 "data_dir": "data/",
-                "dest_dir": "/tmp/bsp-visualizations"
+                "dest_dir": "/bsp-output/bsp-visualization-output"
             }
         }
     },
@@ -16,7 +16,7 @@
         "output": {
             "start_time": "2014-05-29T12:00:00",
             "num_hours": 12,
-            "directory": "/bluesky/bsp-dispersion-ouput/example-12hr/",
+            "directory": "/bsp-output/bsp-dispersion-output/example-12hr/",
             "grid_filename": "hysplit_conc.nc",
             "grid_filetype": "NETCDF",
             "parameters": {

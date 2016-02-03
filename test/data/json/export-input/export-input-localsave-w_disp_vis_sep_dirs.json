@@ -5,18 +5,18 @@
             "modes": ["localsave"],
             "extra_exports": ["dispersion", "visualization"],
             "localsave": {
-                "dest_dir": "/tmp/bsp-local-exports/"
+                "dest_dir": "/bsp-output/bsp-local-exports/"
             }
         }
     },
     "dispersion": {
         "output": {
-            "directory": "/bluesky/bsp-dispersion-ouput/example-2hr/"
+            "directory": "/bsp-output/bsp-dispersion-output/example-2hr/"
         }
     },
     "visualization": {
         "output": {
-            "directory": "/bluesky/bsp-visualization-ouput/example-2hr/"
+            "directory": "/bsp-output/bsp-visualization-output/example-2hr/"
         }
     },
     "fire_information": [

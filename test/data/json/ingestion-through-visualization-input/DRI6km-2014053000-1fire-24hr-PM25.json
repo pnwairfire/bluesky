@@ -10,7 +10,7 @@
             "start": "2014-05-30T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
-            "dest_dir": "/home/vagrant/bsp-dispersion-output/",
+            "dest_dir": "/bsp-output/bsp-dispersion-output/",
             "hysplit": {
                 "grid": {
                     "spacing": 6.0,
@@ -45,7 +45,7 @@
                 "smtp_port": 1025
             },
             "localsave": {
-                "dest_dir": "/home/vagrant/bsp-local-exports/"
+                "dest_dir": "/bsp-output/bsp-local-exports/"
             }
         }
     },

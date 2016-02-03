@@ -18,7 +18,7 @@
         "output": {
             "start_time": "2014-05-29T12:00:00",
             "num_hours": 2,
-            "directory": "/bluesky/bsp-dispersion-ouput/example-2hr/",
+            "directory": "/bsp-output/bsp-dispersion-output/example-2hr/",
             "grid_filename": "hysplit_conc.nc",
             "grid_filetype": "NETCDF",
             "parameters": {
