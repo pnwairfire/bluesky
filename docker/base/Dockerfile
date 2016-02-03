@@ -49,3 +49,7 @@ RUN pip install \
     && apt-get install -y \
         libxml2-dev \
         libxslt1-dev
+
+# install gdal-bin for gdalwarp and gdal_translate
+RUN apt-get install -y \
+    gdal-bin
