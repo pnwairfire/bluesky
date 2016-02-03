@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+docker run -ti \
+       -v $HOME/code/:/code/ \
+       -v $HOME/NAM84/:/NAM84/ \
+       -v $HOME/DRI_6km/:/DRI_6km/  \
+       -v $HOME/docker-bsp-output/:/bsp-output/ \
+       -w /code/pnwairfire-bluesky/ \
+       bluesky-base bash
+
