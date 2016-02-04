@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# TODO: make '$HOME/bin' and '$HOME/code/pnwairfire-bluesky/' overridable
+#   with script args or env vars
+
 ## bluesky-base:
 # copy exe's
 docker cp $HOME/bin/profile bluesky-base:/usr/local/bin/profile
