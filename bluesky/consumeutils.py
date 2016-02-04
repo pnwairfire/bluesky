@@ -37,7 +37,7 @@ SETTINGS = {
         ('fuel_moisture_duff_pct', 50), # default from consume package
         ('canopy_consumption_pct', 0),
         ('shrub_blackened_pct', 50),
-        ('output_units', "tons"),  # default in consume package is 'tons_ac'
+        ('output_units', "tons_ac"),  # default in consume package is 'tons_ac'
         ('pile_blackened_pct', 0)
     ]
 }

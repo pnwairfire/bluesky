@@ -80,14 +80,14 @@ def run(fires_manager):
                 fb['consumption'].pop('debug', None)
                 fb['heat'] = fc.results()['heat release']
 
-                # Note: We no longer multiply each consumption and heat value
-                # by area, because we're using default unit 'tons', not
-                # 'tons_ac'. So, consume multiplies by area for us, using the
-                # values in fc.fuelbed_area_acres. If bsp input data explicitly
-                # specifies 'tons_ac', then all values downstream will be left
-                # as per-acre.
-                # datautils.multiply_nested_data(fb["consumption"], area)
-                # datautils.multiply_nested_data(fb["heat"], area)
+                # multiply each consumption and heat value by area if
+                # output_inits is 'tons_ac',
+                # TODO: multiple by area even if user sets output_units to 'tons',
+                #   because consume doesn't seem to be multiplying by area for us
+                #   even when 'tons' is specified
+                if fc.output_units == 'tons_ac':
+                    datautils.multiply_nested_data(fb["consumption"], area)
+                    datautils.multiply_nested_data(fb["heat"], area)
 
             else:
                 logging.error(
