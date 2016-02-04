@@ -1,0 +1,142 @@
+{
+    "config": {
+        "emissions": {
+            "species": ["PM25"]
+        },
+        "findmetdata": {
+            "met_root_dir": "/DRI_6km/"
+        },
+        "dispersion": {
+            "start": "2014-05-30T00:00:00",
+            "num_hours": 24,
+            "model": "hysplit",
+            "dest_dir": "/bsp-output/bsp-dispersion-output/",
+            "hysplit": {
+                "grid": {
+                    "spacing": 6.0,
+                    "boundary": {
+                        "ne": {
+                            "lat": 45.25,
+                            "lng": -106.5
+                        },
+                        "sw": {
+                            "lat": 27.75,
+                            "lng": -131.5
+                        }
+                    }
+                }
+            }
+        },
+        "visualization": {
+            "target": "dispersion",
+            "hysplit": {
+                "images_dir": "images/",
+                "data_dir": "data/"
+            }
+        },
+        "export": {
+            "modes": ["email", "localsave"],
+            "extra_exports": ["dispersion", "visualization"],
+            "email": {
+                "recipients": ["jdubowy+blueskytest@gmail.com"],
+                "sender": "bsp@airfire.org",
+                "subject": "BSP output",
+                "smtp_server": "127.0.0.1",
+                "smtp_port": 1025
+            },
+            "localsave": {
+                "dest_dir": "/bsp-output/bsp-local-exports/"
+            }
+        }
+    },
+    "fire_information": [
+        {
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Yosemite, CA"
+            },
+            "id": "SF11C14225236095807750",
+            "type": "natural",
+            "location": {
+                "area": 10000.0,
+                "ecoregion": "western",
+                "latitude": 37.909644,
+                "longitude": -119.7615805,
+                "utc_offset": "-07:00"
+            },
+            "growth": [
+                {
+                    "start": "2014-05-29T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "pct": 100.0
+                }
+            ]
+        },
+        {
+            "event_of": {
+                "id": "sdfkj234kljfd",
+                "name": "Natural Fire in North Tahoe"
+            },
+            "id": "sdk2risodijfdsf",
+            "type": "natural",
+            "location": {
+                "area": 20000.0,
+                "ecoregion": "western",
+                "latitude":  39.3,
+                "longitude": -120.0,
+                "utc_offset": "-07:00"
+            },
+            "growth": [
+                {
+                    "start": "2014-05-29T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "pct": 100.0
+                }
+            ]
+        },
+        {
+            "event_of": {
+                "id": "sdfkj234kljfd",
+                "name": "Natural Fire new Placerville"
+            },
+            "id": "sdf342klsfjfsdf",
+            "type": "natural",
+            "location": {
+                "area": 40000.0,
+                "ecoregion": "western",
+                "latitude":  38.6966432,
+                "longitude": -120.7576061,
+                "utc_offset": "-07:00"
+            },
+            "growth": [
+                {
+                    "start": "2014-05-29T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "pct": 100.0
+                }
+            ]
+        },
+        {
+            "event_of": {
+                "id": "sdfkj234kljfd",
+                "name": "Natural Fire near Mt Shasta"
+            },
+            "id": "weru24oir",
+            "type": "natural",
+            "location": {
+                "area": 20000.0,
+                "ecoregion": "western",
+                "latitude":  41.3,
+                "longitude": -122.0,
+                "utc_offset": "-07:00"
+            },
+            "growth": [
+                {
+                    "start": "2014-05-29T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "pct": 100.0
+                }
+            ]
+        }
+    ]
+}
