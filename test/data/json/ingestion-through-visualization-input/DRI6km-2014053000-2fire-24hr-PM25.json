@@ -75,15 +75,15 @@
         {
             "event_of": {
                 "id": "sdfkj234kljfd",
-                "name": "Another Natural Fire near Yosemite, CA"
+                "name": "Natural Fire in North Tahoe"
             },
             "id": "sdk2risodijfdsf",
             "type": "natural",
             "location": {
-                "area": 8000,
+                "area": 20000.0,
                 "ecoregion": "western",
-                "latitude":  37.8830747,
-                "longitude": -119.6867393,
+                "latitude":  39.3,
+                "longitude": -120.0,
                 "utc_offset": "-07:00"
             },
             "growth": [
