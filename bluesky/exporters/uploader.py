@@ -54,7 +54,7 @@ class UploadExporter(ExporterBase):
             #   address (ex. 'localhsot:8888'), that should also trigger move
             #   instead of scp (thought this should never really happen except
             #   maybe in dev test)
-            port = self._upload_options['scp']['port'] or DEFAULT_SCP_PORT
+            port = str(self._upload_options['scp']['port'] or DEFAULT_SCP_PORT)
             remote_server = "{}@{}".format(
                 self._upload_options['scp']['user'] or DEFAULT_SCP_USER,
                 self._upload_options['scp']['host'])
