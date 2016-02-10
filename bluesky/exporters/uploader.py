@@ -141,11 +141,19 @@ class UploadExporter(ExporterBase):
         }
 
     def _scp_unpack(self, tarball):
+        remote_server = "{}@{}".format(
+            self._upload_options['scp']['user'],
+            self._upload_options['scp']['host'])
+        port = str(self._upload_options['scp']['port'] or DEFAULT_SCP_PORT)
         tarball_filename = os.path.basename(tarball)
-        logging.info("Extracting {}".format(tarball))
-        subprocess.check_output(['ssh', remote_server, '-p', port,
-            'cd', self._upload_options['scp']['dest_dir'], '&&',
-            'tar', 'xzf', tarball_filename], stderr=subprocess.STDOUT)
+        logging.info("Extracting {} on {} in {}".format(tarball,
+            remote_server, self._upload_options['scp']['dest_dir']))
+
+        # Note: due to need to quote remote command, I couldn't figure out
+        #  away to avoid using shell=True in check_output call
+        cmd = "ssh {} -p {} 'cd {} && tar xzf {}'".format(remote_server,
+            port, self._upload_options['scp']['dest_dir'], tarball_filename)
+        subprocess.check_output([cmd], shell=True, stderr=subprocess.STDOUT)
 
     def _scp(self, tarball):
         # Note: don't catch and exceptions here. Let calling method, 'export',
