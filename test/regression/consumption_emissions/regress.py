@@ -318,18 +318,23 @@ def load_output(input_filename):
 
     return expected_partials, expected_totals
 
-def check_value(actual, expected, *keys):
+def check_value(counts, counts_key, actual, expected, *keys):
     for k in keys[:-1]:
         actual = actual.get(k, {})
         expected = expected.get(k, {})
+    valid_comparison = keys[-1] in actual and keys[-1] in expected
     actual = actual.get(keys[-1], '???')
     expected = expected.get(keys[-1], '???')
     # TODO: check equality with allowable difference instead of just '=='
-    match = actual == expected
-    _log = logging.debug if match else logging.error
-    _log("%s: actual vs. expected (%s): %s vs %s", keys[0].upper(),
-        ', '.join(keys[1:]), actual, expected)
-    return match
+    log_args = ("%s - %s: actual vs. expected (%s): %s vs %s", counts_key.upper(),
+        keys[0].upper(), ', '.join(keys[1:]), actual, expected)
+    if valid_comparison:
+        match = actual == expected
+        counts[counts_key][keys[0]]['total'] += 1
+        counts[counts_key][keys[0]]['matches'] += int(match)
+        (logging.debug if match else logging.error)(*log_args)
+    else:
+        logging.debug(*log_args)
 
 def check(actual, expected_partials, expected_totals):
 
@@ -344,10 +349,11 @@ def check(actual, expected_partials, expected_totals):
     #  Also play around with other pending changes to see how they affect values
     #  (like tons vs tons_ac, rerunnig consumption vs not doing so, etc..)
 
-    counts = {k: {'matches': 0, 'total': 0} for k in [
-        'consumption', 'heat', 'emissions',
-        'emissions_details', 'total_emissions'
-    ]}
+    counts = {
+        "partials": {k: {'matches': 0, 'total': 0} for k in [
+            'consumption', 'heat', 'emissions', 'emissions_details']},
+        "totals": {k: {'matches': 0, 'total': 0} for k in ['emissions']}
+    }
 
     for fire in actual['fire_information']:
         fb = fire['fuelbeds'][0]
@@ -358,44 +364,36 @@ def check(actual, expected_partials, expected_totals):
             for s in  fb_e['consumption'][c]:
                 #logging.debug('{} {}'.format (c, s))
                 for p in  fb_e['consumption'][c][s]:
-                    counts['consumption']['total'] += 1
-                    counts['consumption']['matches'] += int(
-                        check_value(fb, fb_e, 'consumption', c, s, p))
+                    check_value(counts, 'partials', fb, fb_e, 'consumption', c, s, p)
 
         for p in fb_e['heat']:
-            counts['heat']['total'] += 1
-            counts['heat']['matches'] += int(
-                check_value(fb, fb_e, 'heat', p))
+            check_value(counts, 'partials', fb, fb_e, 'heat', p)
 
         for p in fb_e['emissions']:
             for s in fb_e['emissions'][p]:
-                counts['emissions']['total'] += 1
-                counts['emissions']['matches'] += int(
-                    check_value(fb, fb_e, 'emissions', p, s))
+                check_value(counts, 'partials', fb, fb_e, 'emissions', p, s)
 
         if 'emissions_details' in fb:
             for a in  fb_e['emissions_details']:
                 for b in  fb_e['emissions_details'][a]:
                     for c in  fb_e['emissions_details'][a][b]:
                         for d in  fb_e['emissions_details'][a][b][c]:
-                            counts['emissions_details']['total'] += 1
-                            counts['emissions_details']['matches'] += int(check_value(
-                                fb, fb_e, 'emissions_details', a, b, c, d))
+                            check_value(counts, 'partials', fb, fb_e, 'emissions_details', a, b, c, d)
 
     for phase in expected_totals['emissions']:
         for species in expected_totals['emissions'][phase]:
-            counts['total_emissions']['total'] += 1
-            counts['total_emissions']['matches'] += int(
-                check_value(actual['summary'], expected_totals, 'emissions',
-                    phase, species))
+            check_value(counts, 'totals', actual['summary'], expected_totals,
+                'emissions', phase, species)
 
     success = True
     logging.info('Final counts')
     for k in counts:
-        logging.info(' %s: %s out of %s correct - %s', k.upper(),
-            counts[k]['matches'], counts[k]['total'],
-            'PASS' if counts[k]['matches'] == counts[k]['total'] else 'FAIL')
-        success = success and counts[k]['matches'] == counts[k]['total']
+        logging.info('  %s:', k.upper())
+        for l in counts[k]:
+            logging.info('    %s: %s out of %s correct - %s', l.upper(),
+                counts[k][l]['matches'], counts[k][l]['total'],
+                'PASS' if counts[k][l]['matches'] == counts[k][l]['total'] else 'FAIL')
+            success = success and counts[k][l]['matches'] == counts[k][l]['total']
     return success
 
 def run(args):
