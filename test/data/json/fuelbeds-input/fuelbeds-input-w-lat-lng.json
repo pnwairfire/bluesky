@@ -6,12 +6,13 @@
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
             "id": "SF11C14225236095807750",
+            "type": "wildfire",
             "location": {
-                "area": 200,
-                "ecoregion": "southern",
-                "latitude": 47.4316976,
-                "longitude": -121.3990506,
-                "utc_offset": "-09:00"
+                "area": 500,
+                "ecoregion": "western",
+                "latitude": 45.0,
+                "longitude": -115.0,
+                "utc_offset": "-07:00"
             }
         }
     ]
