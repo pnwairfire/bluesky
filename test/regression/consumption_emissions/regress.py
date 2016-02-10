@@ -293,16 +293,29 @@ def load_output(input_filename):
     input_dir, input_filename = os.path.split(input_filename)
     emissions_output_filename = os.path.join(input_dir,
         "feps_input_em_{}".format(input_filename))
-    expected_total_emissions =  {}
+    expected_totals =  {
+        'emissions': {}
+    }
     for r in load_csv(emissions_output_filename):
         p = PHASE_TRANSLATIONS[r.pop('Phase')]
-        expected_total_emissions[p] = {
+        expected_totals['emissions'][p] = {
             k.upper(): [float(v)] for k, v in r.items()
         }
 
-    return expected_partials, expected_total_emissions
+    return expected_partials, expected_totals
 
-def check(actual, expected_partials, expected_total_emissions):
+def check_value(actual, expected, *keys):
+    for k in keys[:-1]:
+        actual = actual.get(k, {})
+        expected = expected.get(k, {})
+    actual = actual.get(keys[-1], '???')
+    expected = expected.get(keys[-1], '???')
+    # TODO: check equality with allowable difference instead of just '=='
+    _log = logging.debug if actual == expected else logging.error
+    _log("{}: actual vs. expected ({}): {} vs {}".format(
+        keys[0].upper(), ', '.join(keys[1:]), actual, expected))
+
+def check(actual, expected_partials, expected_totals):
 
     # TODO: multiply expected by area ???
     #   (I'm seeing values like:
@@ -324,29 +337,19 @@ def check(actual, expected_partials, expected_total_emissions):
             for s in  fb_e['consumption'][c]:
                 #logging.debug('{} {}'.format (c, s))
                 for p in  fb_e['consumption'][c][s]:
-                    # TODO: add asserts
-                    logging.debug("CONSUMPTION: actual vs. expected ({}, {}, {}): {} vs {}".format(
-                        c, s, p, fb['consumption'].get(c, {}).get(s, {}).get(p, '???'),
-                        fb_e['consumption'][c][s][p]))
+                    check_value(fb, fb_e, 'consumption', c, s, p)
 
         for p in fb_e['heat']:
-            # TODO: add asserts
-            logging.debug("HEAT: actual vs. expected ({}): {} vs {}".format(
-                p, fb['heat'].get(p, '???'), fb_e['heat'][p]))
+            check_value(fb, fb_e, 'heat', p)
 
         for p in fb_e['emissions']:
             for s in fb_e['emissions'][p]:
-                # TODO: add asserts
-                logging.debug("EMISSIONS: actual vs. expected ({}, {}): {} vs {}".format(
-                    p, s, fb['emissions'].get(p, {}).get(s, '???'),
-                    fb_e['emissions'][p][s]))
+                check_value(fb, fb_e, 'emissions', p, s)
 
-    for phase in expected_total_emissions:
-        for species in expected_total_emissions[phase]:
-            # TODO: add asserts
-            logging.debug('EMISSION: actual vs. expected ({}, {}):  {} vs {}'.format(phase, species,
-                actual['summary']['emissions'][phase].get(species, '???'),
-                expected_total_emissions[phase][species]))
+    for phase in expected_totals['emissions']:
+        for species in expected_totals['emissions'][phase]:
+            check_value(actual['summary'], expected_totals, 'emissions',
+                phase, species)
 
 def run(args):
     pattern = '{}/data/scen_{}.csv'.format(
@@ -357,12 +360,14 @@ def run(args):
         [os.path.basename(n) for n in input_filenames])))
     for input_filename in input_filenames:
         fires_manager = load_scenario(input_filename)
-        fires_manager.set_config_value(args.emissions_model, 'emissions', 'efs')
+        fires_manager.set_config_value(args.emissions_model, 'emissions',
+            'efs')
         fires_manager.modules = ['consumption', 'emissions']
         fires_manager.run()
         actual = fires_manager.dump()
-        expected_partials, expected_total_emissions = load_output(input_filename)
-        check(actual, expected_partials, expected_total_emissions)
+        expected_partials, expected_totals = load_output(
+            input_filename)
+        check(actual, expected_partials, expected_totals)
 
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
