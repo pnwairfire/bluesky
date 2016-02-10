@@ -192,8 +192,8 @@ class UploadExporter(ExporterBase):
                         self._upload_options[u]['host'])
                     try:
                         if is_local:
-                            r  = self._local_cp(tarball,
-                                self._upload_options['scp']['dest_dir'])
+                            r = self._local_cp(tarball,
+                                self._upload_options[u]['dest_dir'])
                         else:
                             r = getattr(self,'_{}'.format(u))(tarball)
                         if r:
