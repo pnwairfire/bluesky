@@ -43,6 +43,12 @@ OPTIONAL_ARGS = [
         'long': '--emissions-model',
         'help': '"feps", "urbanski", or "consume"; default "consume"',
         'default': 'consume'
+    },
+    {
+        'long': '--include-emissions-details',
+        'help': 'compare emissions details values',
+        'default': False,
+        'action': 'store_true'
     }
 ]
 
@@ -210,50 +216,50 @@ EMISSIONS_OUTPUT_HEADER_TRANSLATIONS = {
 #     "E_pm10_R": ["pm10", "residual"],
      "E_pm25_R": ["residual", "pm25"]
 }
-# EMISSIONS_STRATUM_OUTPUT_HEADER_TRANSLATIONS = {
-#     "CH4_canopy": ["stratum_ch4_canopy", "total"],
-#     "CH4_shrub": ["stratum_ch4_shrub", "total"],
-#     "CH4_herb": ["stratum_ch4_nonwoody", "total"],
-#     "CH4_wood": ["stratum_ch4_woody_fuels", "total"],
-#     "CH4_llm": ["stratum_ch4_litter-lichen-moss", "total"],
-#     "CH4_ground": ["stratum_ch4_ground_fuels", "total"],
-#     "CO_canopy": ["stratum_co_canopy", "total"],
-#     "CO_shrub": ["stratum_co_shrub", "total"],
-#     "CO_herb": ["stratum_co_nonwoody", "total"],
-#     "CO_wood": ["stratum_co_woody_fuels", "total"],
-#     "CO_llm": ["stratum_co_litter-lichen-moss", "total"],
-#     "CO_ground": ["stratum_co_ground_fuels", "total"],
-#     "CO2_canopy": ["stratum_co2_canopy", "total"],
-#     "CO2_shrub": ["stratum_co2_shrub", "total"],
-#     "CO2_herb": ["stratum_co2_nonwoody", "total"],
-#     "CO2_wood": ["stratum_co2_woody_fuels", "total"],
-#     "CO2_llm": ["stratum_co2_litter-lichen-moss", "total"],
-#     "CO2_ground": ["stratum_co2_ground_fuels", "total"],
-#     "NMHC_canopy": ["stratum_nmhc_canopy", "total"],
-#     "NMHC_shrub": ["stratum_nmhc_shrub", "total"],
-#     "NMHC_herb": ["stratum_nmhc_nonwoody", "total"],
-#     "NMHC_wood": ["stratum_nmhc_woody_fuels", "total"],
-#     "NMHC_llm": ["stratum_nmhc_litter-lichen-moss", "total"],
-#     "NMHC_ground": ["stratum_nmhc_ground_fuels", "total"],
-#     "PM_canopy": ["stratum_pm_canopy", "total"],
-#     "PM_shrub": ["stratum_pm_shrub", "total"],
-#     "PM_herb": ["stratum_pm_nonwoody", "total"],
-#     "PM_wood": ["stratum_pm_woody_fuels", "total"],
-#     "PM_llm": ["stratum_pm_litter-lichen-moss", "total"],
-#     "PM_ground": ["stratum_pm_ground_fuels", "total"],
-#     "PM10_canopy": ["stratum_pm10_canopy", "total"],
-#     "PM10_shrub": ["stratum_pm10_shrub", "total"],
-#     "PM10_herb": ["stratum_pm10_nonwoody", "total"],
-#     "PM10_wood": ["stratum_pm10_woody_fuels", "total"],
-#     "PM10_llm": ["stratum_pm10_litter-lichen-moss", "total"],
-#     "PM10_ground": ["stratum_pm10_ground_fuels", "total"],
-#     "PM25_canopy": ["stratum_pm25_canopy", "total"],
-#     "PM25_shrub": ["stratum_pm25_shrub", "total"],
-#     "PM25_herb": ["stratum_pm25_nonwoody", "total"],
-#     "PM25_wood": ["stratum_pm25_woody_fuels", "total"],
-#     "PM25_llm": ["stratum_pm25_litter-lichen-moss", "total"],
-#     "PM25_ground": ["stratum_pm25_ground_fuels", "total"]
-# }
+EMISSIONS_DETAILS_OUTPUT_HEADER_TRANSLATIONS = {
+    "CH4_canopy": ["summary", "canopy", "total", "CH4"],
+    "CH4_shrub": ["summary", "shrub", "total", "CH4"],
+    "CH4_herb": ["summary", "nonwoody", "total", "CH4"],
+    "CH4_wood": ["summary", "woody fuels", "total", "CH4"],
+    "CH4_llm": ["summary", "litter-lichen-moss", "total", "CH4"],
+    "CH4_ground": ["summary", "ground fuels", "total", "CH4"],
+    "CO_canopy": ["summary", "canopy", "total", "CO"],
+    "CO_shrub": ["summary", "shrub", "total", "CO"],
+    "CO_herb": ["summary", "nonwoody", "total", "CO"],
+    "CO_wood": ["summary", "woody fuels", "total", "CO"],
+    "CO_llm": ["summary", "litter-lichen-moss", "total", "CO"],
+    "CO_ground": ["summary", "ground fuels", "total", "CO"],
+    "CO2_canopy": ["summary", "canopy", "total", "CO2"],
+    "CO2_shrub": ["summary", "shrub", "total", "CO2"],
+    "CO2_herb": ["summary", "nonwoody", "total", "CO2"],
+    "CO2_wood": ["summary", "woody fuels", "total", "CO2"],
+    "CO2_llm": ["summary", "litter-lichen-moss", "total", "CO2"],
+    "CO2_ground": ["summary", "ground fuels", "total", "CO2"],
+    "NMHC_canopy": ["summary", "canopy", "total", "NMHC"],
+    "NMHC_shrub": ["summary", "shrub", "total", "NMHC"],
+    "NMHC_herb": ["summary", "nonwoody", "total", "NMHC"],
+    "NMHC_wood": ["summary", "woody fuels", "total", "NMHC"],
+    "NMHC_llm": ["summary", "litter-lichen-moss", "total", "NMHC"],
+    "NMHC_ground": ["summary", "ground fuels", "total", "NMHC"],
+    "PM_canopy": ["summary", "canopy", "total", "PM"],
+    "PM_shrub": ["summary", "shrub", "total", "PM"],
+    "PM_herb": ["summary", "nonwoody", "total", "PM"],
+    "PM_wood": ["summary", "woody fuels", "total", "PM"],
+    "PM_llm": ["summary", "litter-lichen-moss", "total", "PM"],
+    "PM_ground": ["summary", "ground fuels", "total", "PM"],
+    "PM10_canopy": ["summary", "canopy", "total", "PM10"],
+    "PM10_shrub": ["summary", "shrub", "total", "PM10"],
+    "PM10_herb": ["summary", "nonwoody", "total", "PM10"],
+    "PM10_wood": ["summary", "woody fuels", "total", "PM10"],
+    "PM10_llm": ["summary", "litter-lichen-moss", "total", "PM10"],
+    "PM10_ground": ["summary", "ground fuels", "total", "PM10"],
+    "PM25_canopy": ["summary", "canopy", "total", "PM25"],
+    "PM25_shrub": ["summary", "shrub", "total", "PM25"],
+    "PM25_herb": ["summary", "nonwoody", "total", "PM25"],
+    "PM25_wood": ["summary", "woody fuels", "total", "PM25"],
+    "PM25_llm": ["summary", "litter-lichen-moss", "total", "PM25"],
+    "PM25_ground": ["summary", "ground fuels", "total", "PM25"]
+}
 HEAT_OUTPUT_HEADER_TRANSLATIONS = {
     "Total Heat Release": "total",
     "Flaming Heat Release": "flaming",
@@ -268,6 +274,7 @@ def load_output(input_filename):
         fb_c = {}
         fb_h = {}
         fb_e = {}
+        fb_ed = {}
         for k in r:
             if k in CONSUMPTION_OUTPUT_HEADER_TRANSLATIONS:
                 c, sc, p = CONSUMPTION_OUTPUT_HEADER_TRANSLATIONS[k]
@@ -281,12 +288,19 @@ def load_output(input_filename):
                 p, s = EMISSIONS_OUTPUT_HEADER_TRANSLATIONS[k]
                 fb_e[p] = fb_e.get(p, {})
                 fb_e[p][s] = [float(r[k])]
+            elif k in EMISSIONS_DETAILS_OUTPUT_HEADER_TRANSLATIONS:
+                a, b, c, d = EMISSIONS_DETAILS_OUTPUT_HEADER_TRANSLATIONS[k]
+                fb_ed[a] = fb_ed.get(a, {})
+                fb_ed[a][b] = fb_ed[a].get(b, {})
+                fb_ed[a][b][c] = fb_ed[a][b].get(c, {})
+                fb_ed[a][b][c][d] = [float(r[k])]
 
         fccs_id = r['Fuelbeds']
         expected_partials[fccs_id] = {
             'consumption': fb_c,
             'heat': fb_h,
-            'emissions': fb_e
+            'emissions': fb_e,
+            'emissions_details': fb_ed
         }
 
     # total Emissions
@@ -346,6 +360,14 @@ def check(actual, expected_partials, expected_totals):
             for s in fb_e['emissions'][p]:
                 check_value(fb, fb_e, 'emissions', p, s)
 
+        if 'emissions_details' in fb:
+            for a in  fb_e['emissions_details']:
+                for b in  fb_e['emissions_details'][a]:
+                    for c in  fb_e['emissions_details'][a][b]:
+                        for d in  fb_e['emissions_details'][a][b][c]:
+                            check_value(fb, fb_e, 'emissions_details',
+                                a, b, c, d)
+
     for phase in expected_totals['emissions']:
         for species in expected_totals['emissions'][phase]:
             check_value(actual['summary'], expected_totals, 'emissions',
@@ -362,6 +384,8 @@ def run(args):
         fires_manager = load_scenario(input_filename)
         fires_manager.set_config_value(args.emissions_model, 'emissions',
             'efs')
+        fires_manager.set_config_value(args.include_emissions_details,
+            'emissions','include_emissions_details')
         fires_manager.modules = ['consumption', 'emissions']
         fires_manager.run()
         actual = fires_manager.dump()
