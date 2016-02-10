@@ -98,11 +98,12 @@ class UploadExporter(ExporterBase):
         if not os.path.isdir(dest_dir):
             os.makedirs(dest_dir)
 
+        # TODO: do we need to copy tarball too?
         shutil.copy(tarball, dest_dir)
 
         # TODO: use tarfile module
-        subprocess.check_output(['cd', dest_dir, '&&', 'tar', 'xzf',
-            os.path.basename(tarball)], stderr=subprocess.STDOUT)
+        subprocess.check_output(['tar', 'xzf', tarball, '-C',
+            dest_dir], stderr=subprocess.STDOUT)
 
     ##
     ## SCP
