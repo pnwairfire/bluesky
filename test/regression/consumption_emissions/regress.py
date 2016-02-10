@@ -312,8 +312,8 @@ def check_value(actual, expected, *keys):
     expected = expected.get(keys[-1], '???')
     # TODO: check equality with allowable difference instead of just '=='
     _log = logging.debug if actual == expected else logging.error
-    _log("{}: actual vs. expected ({}): {} vs {}".format(
-        keys[0].upper(), ', '.join(keys[1:]), actual, expected))
+    _log("%s: actual vs. expected (%s): %s vs %s", keys[0].upper(),
+        ', '.join(keys[1:]), actual, expected)
 
 def check(actual, expected_partials, expected_totals):
 
