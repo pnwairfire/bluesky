@@ -3,6 +3,7 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import copy
 import getpass
 import logging
 import os
@@ -46,7 +47,7 @@ class UploadExporter(ExporterBase):
             if any([not c.get(k) for k in ['host', 'dest_dir']]):
                 raise BlueSkyConfigurationError(
                     "Specify host and dest_dir for scp'ing")
-            self._upload_options['scp'] = c
+            self._upload_options['scp'] = copy.deepcopy(c)
             if not self._upload_options['scp'].get('user'):
                 self._upload_options['scp']['user'] = self._current_user
 
