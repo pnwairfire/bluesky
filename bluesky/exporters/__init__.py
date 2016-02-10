@@ -109,9 +109,10 @@ class ExporterBase(object):
         r['dispersion'].update(self._find_netcdfs(d))
 
         # call sub methhods for model-specific logic
-        model_processor = getattr(self, '_process_{}'.format(d['model']))
-        if model_processor:
-            model_processor(d, r)
+        if 'model' in d:
+            model_processor = getattr(self, '_process_{}'.format(d['model']), None)
+            if model_processor:
+                model_processor(d, r)
 
     def _process_hysplit(self, d, r):
         # TODO: list other hysplit output files; maybe make this configurable
