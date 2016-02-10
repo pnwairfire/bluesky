@@ -200,8 +200,10 @@ class UploadExporter(ExporterBase):
                             # Only include upload if it actually happened
                             fires_manager.export['upload'][u].update(r)
                     except Exception, e:
-                        logging.error("Failed to %s tarball - %s",
+                        msg = "Failed to {} tarball - {}".format(
                             'cp' if is_local else u, e.message)
+                        fires_manager.export['upload'][u]["error"] = msg
+                        logging.error(msg)
                 else:
                     logging.warning("Missing configuration for %s export", u)
 
