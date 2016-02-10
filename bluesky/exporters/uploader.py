@@ -173,6 +173,8 @@ class UploadExporter(ExporterBase):
         # TODO: create context manager with __enter__/__exit__ to create
         #  and cleanup tempdir;  put in common module (maybe even pyairfire?)
         temp_dir = tempfile.mkdtemp()
+        fires_manager.export = fires_manager.export or {}
+        fires_manager.export['upload'] = {}
         try:
             tarball = self._bundle(fires_manager, temp_dir, create_tarball=True)
 
@@ -182,6 +184,9 @@ class UploadExporter(ExporterBase):
             #   repetitive/redundant code)
             for u in ['scp']:
                 if self._upload_options.get(u):
+                    fires_manager.export['upload'][u] = {
+                        'options': self._upload_options[u]
+                    }
                     is_local = self._is_same_host(
                         self._upload_options[u]['user'],
                         self._upload_options[u]['host'])
@@ -191,9 +196,9 @@ class UploadExporter(ExporterBase):
                                 self._upload_options['scp']['dest_dir'])
                         else:
                             r = getattr(self,'_{}'.format(u))(tarball)
-                            if r:
-                                # Only include upload if it actually happened
-                                fires_manager.export['upload'][u] = r
+                        if r:
+                            # Only include upload if it actually happened
+                            fires_manager.export['upload'][u].update(r)
                     except Exception, e:
                         logging.error("Failed to %s tarball - %s",
                             'cp' if is_local else u, e.message)
