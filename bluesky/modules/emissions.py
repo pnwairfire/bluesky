@@ -116,7 +116,7 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
 ## CONSUME
 ##
 
-def _run_consume(fires_manager, species, include_emissions_detail):
+def _run_consume(fires_manager, species, include_emissions_details):
     logging.debug("Running emissions module with CONSUME")
 
     # look for custom fuel loadings first in the emissions config and then
@@ -162,8 +162,25 @@ def _run_consume(fires_manager, species, include_emissions_detail):
             for k in r:
                 upper_k = k.upper()
                 if k != 'stratum' and (not species or upper_k in species):
-                    for f in r[k]:
-                        fb['emissions'][f][upper_k] = r[k][f]
+                    for p in r[k]:
+                        fb['emissions'][p][upper_k] = r[k][p]
+            if include_emissions_details:
+                # Note: consume gives details per fuel category, not per
+                #  subcategory; to match what feps and urbanski calculators
+                #  produce, put all per-category details under'summary'
+                # The details are under key 'stratum'. the key hierarchy is:
+                #    'stratum' > species > fuel category > phase
+                #   we want phase > species:
+                #     'summary' > fuel category > phase > species
+                fb['emissions_details'] = { "summary": {} }
+                for k in r.get('stratum', {}):
+                    upper_k = k.upper()
+                    if not species or upper_k in species:
+                        for c in r['stratum'][k]:
+                            fb['emissions_details']['summary'][c] = fb['emissions_details']['summary'].get(c, {})
+                            for p in r['stratum'][k][c]:
+                                fb['emissions_details']['summary'][c][p] = fb['emissions_details']['summary'][c].get(p, {})
+                                fb['emissions_details']['summary'][c][p][upper_k] = r['stratum'][k][c][p]
 
             # Note: We don't need to call
             #   datautils.multiply_nested_data(fb["emissions"], area)
@@ -174,6 +191,9 @@ def _run_consume(fires_manager, species, include_emissions_detail):
             #   doesn't provide as detailed emissions as FEPS and Urbanski;
             #   it lists per-category emissions, not per-sub-category
 
+##
+## Helpers
+##
 
 def _calculate(calculator, fb, include_emissions_details):
     emissions_details = calculator.calculate(fb["consumption"])
