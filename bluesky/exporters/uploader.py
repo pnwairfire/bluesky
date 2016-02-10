@@ -21,7 +21,6 @@ __all__ = [
 
 __version__ = "0.1.0"
 
-DEFAULT_SCP_USER = "bluesky"
 DEFAULT_SCP_PORT = 22
 
 class UploadExporter(ExporterBase):
@@ -114,7 +113,7 @@ class UploadExporter(ExporterBase):
         #   simply move tarball and unpack it rather than scp it;
         port = str(self._upload_options['scp']['port'] or DEFAULT_SCP_PORT)
         remote_server = "{}@{}".format(
-            self._upload_options['scp']['user'] or DEFAULT_SCP_USER,
+            self._upload_options['scp']['user'],
             self._upload_options['scp']['host'])
         destination = "{}:{}".format(remote_server,
             self._upload_options['scp']['dest_dir'])
