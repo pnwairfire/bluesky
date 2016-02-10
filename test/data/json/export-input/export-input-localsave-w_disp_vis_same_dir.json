@@ -10,6 +10,7 @@
         }
     },
     "dispersion": {
+        "model": "hysplit",
         "output": {
             "directory": "/bsp-output/bsp-dispersion-output/example-2hr-with-visualization/"
         }
