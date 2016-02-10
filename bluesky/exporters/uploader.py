@@ -96,15 +96,14 @@ class UploadExporter(ExporterBase):
     ##
 
     def _local_cp(self, tarball, dest_dir):
-        d, n = os.path.split(tarball)
-        if not os.path.isdir(d):
-            os.path.mkdirs(d)
+        if not os.path.isdir(dest_dir):
+            os.makedirs(dest_dir)
 
         shutil.copy(tarball, dest_dir)
 
         # TODO: use tarfile module
         subprocess.check_call(['cd', dest_dir, '&&', 'tar', 'xzf',
-            tarball_filename])
+            os.path.basename(tarball)])
 
     ##
     ## SCP
