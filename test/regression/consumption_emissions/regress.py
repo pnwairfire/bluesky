@@ -325,9 +325,11 @@ def check_value(actual, expected, *keys):
     actual = actual.get(keys[-1], '???')
     expected = expected.get(keys[-1], '???')
     # TODO: check equality with allowable difference instead of just '=='
-    _log = logging.debug if actual == expected else logging.error
+    match = actual == expected
+    _log = logging.debug if match else logging.error
     _log("%s: actual vs. expected (%s): %s vs %s", keys[0].upper(),
         ', '.join(keys[1:]), actual, expected)
+    return match
 
 def check(actual, expected_partials, expected_totals):
 
@@ -342,6 +344,11 @@ def check(actual, expected_partials, expected_totals):
     #  Also play around with other pending changes to see how they affect values
     #  (like tons vs tons_ac, rerunnig consumption vs not doing so, etc..)
 
+    counts = {k: {'matches': 0, 'total': 0} for k in [
+        'consumption', 'heat', 'emissions',
+        'emissions_details', 'total_emissions'
+    ]}
+
     for fire in actual['fire_information']:
         fb = fire['fuelbeds'][0]
         fccs_id = fb['fccs_id']
@@ -351,27 +358,45 @@ def check(actual, expected_partials, expected_totals):
             for s in  fb_e['consumption'][c]:
                 #logging.debug('{} {}'.format (c, s))
                 for p in  fb_e['consumption'][c][s]:
-                    check_value(fb, fb_e, 'consumption', c, s, p)
+                    counts['consumption']['total'] += 1
+                    counts['consumption']['matches'] += int(
+                        check_value(fb, fb_e, 'consumption', c, s, p))
 
         for p in fb_e['heat']:
-            check_value(fb, fb_e, 'heat', p)
+            counts['heat']['total'] += 1
+            counts['heat']['matches'] += int(
+                check_value(fb, fb_e, 'heat', p))
 
         for p in fb_e['emissions']:
             for s in fb_e['emissions'][p]:
-                check_value(fb, fb_e, 'emissions', p, s)
+                counts['emissions']['total'] += 1
+                counts['emissions']['matches'] += int(
+                    check_value(fb, fb_e, 'emissions', p, s))
 
         if 'emissions_details' in fb:
             for a in  fb_e['emissions_details']:
                 for b in  fb_e['emissions_details'][a]:
                     for c in  fb_e['emissions_details'][a][b]:
                         for d in  fb_e['emissions_details'][a][b][c]:
-                            check_value(fb, fb_e, 'emissions_details',
-                                a, b, c, d)
+                            counts['emissions_details']['total'] += 1
+                            counts['emissions_details']['matches'] += int(check_value(
+                                fb, fb_e, 'emissions_details', a, b, c, d))
 
     for phase in expected_totals['emissions']:
         for species in expected_totals['emissions'][phase]:
-            check_value(actual['summary'], expected_totals, 'emissions',
-                phase, species)
+            counts['total_emissions']['total'] += 1
+            counts['total_emissions']['matches'] += int(
+                check_value(actual['summary'], expected_totals, 'emissions',
+                    phase, species))
+
+    success = True
+    logging.info('Final counts')
+    for k in counts:
+        logging.info(' %s: %s out of %s correct - %s', k.upper(),
+            counts[k]['matches'], counts[k]['total'],
+            'PASS' if counts[k]['matches'] == counts[k]['total'] else 'FAIL')
+        success = success and counts[k]['matches'] == counts[k]['total']
+    return success
 
 def run(args):
     pattern = '{}/data/scen_{}.csv'.format(
@@ -391,16 +416,18 @@ def run(args):
         actual = fires_manager.dump()
         expected_partials, expected_totals = load_output(
             input_filename)
-        check(actual, expected_partials, expected_totals)
+        return check(actual, expected_partials, expected_totals)
 
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
 
     try:
-        run(args)
+        success = run(args)
 
     except Exception, e:
         logging.error(e)
         logging.debug(traceback.format_exc())
         scripting.utils.exit_with_msg(e)
+
+    sys.exit(int(not success))
