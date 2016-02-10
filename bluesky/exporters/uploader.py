@@ -102,8 +102,8 @@ class UploadExporter(ExporterBase):
         shutil.copy(tarball, dest_dir)
 
         # TODO: use tarfile module
-        subprocess.check_call(['cd', dest_dir, '&&', 'tar', 'xzf',
-            os.path.basename(tarball)])
+        subprocess.check_output(['cd', dest_dir, '&&', 'tar', 'xzf',
+            os.path.basename(tarball)], stderr=subprocess.STDOUT)
 
     ##
     ## SCP
@@ -123,16 +123,18 @@ class UploadExporter(ExporterBase):
         #  b) use paramiko, c) use fabric, d) etc.....
         #  See http://stackoverflow.com/questions/68335/how-do-i-copy-a-file-to-a-remote-server-in-python-using-scp-or-ssh
         #  for examples
-        # TODO: capture ssh/scp error output (ex.
-        #   'ssh: connect to host 127.0.0.1 port 2222: Connection refused')
+        # Note: ssh/scp error output (ex.
+        #    'ssh: connect to host 127.0.0.1 port 2222: Connection refused')
+        #   is captured by piping stderr to stdout in each check_output call
         logging.info("Creating remote destination {}".format(
             self._upload_options['scp']['dest_dir']))
-        subprocess.check_call(['ssh', '-o', 'StrictHostKeyChecking=no',
+        subprocess.check_output(['ssh', '-o', 'StrictHostKeyChecking=no',
             remote_server, '-p', port,
-            'mkdir', '-p', self._upload_options['scp']['dest_dir']])
+            'mkdir', '-p', self._upload_options['scp']['dest_dir']],
+            stderr=subprocess.STDOUT)
         logging.info("Uploading {} via scp".format(tarball))
-        subprocess.check_call(['scp', '-o', 'StrictHostKeyChecking=no',
-            '-P', port, tarball, destination])
+        subprocess.check_output(['scp', '-o', 'StrictHostKeyChecking=no',
+            '-P', port, tarball, destination], stderr=subprocess.STDOUT)
 
         return {
             "destination": destination,
@@ -142,9 +144,9 @@ class UploadExporter(ExporterBase):
     def _scp_unpack(self, tarball):
         tarball_filename = os.path.basename(tarball)
         logging.info("Extracting {}".format(tarball))
-        subprocess.check_call(['ssh', remote_server, '-p', port,
+        subprocess.check_output(['ssh', remote_server, '-p', port,
             'cd', self._upload_options['scp']['dest_dir'], '&&',
-            'tar', 'xzf', tarball_filename])
+            'tar', 'xzf', tarball_filename], stderr=subprocess.STDOUT)
 
     def _scp(self, tarball):
         # Note: don't catch and exceptions here. Let calling method, 'export',
