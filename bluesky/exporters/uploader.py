@@ -30,6 +30,8 @@ class UploadExporter(ExporterBase):
     def __init__(self, extra_exports, **config):
         super(UploadExporter, self).__init__(extra_exports, **config)
         self._upload_options = {}
+        self._current_user = getpass.getuser()
+
         # TODO: don't assume scp? maybe look for 'scp' > 'host' & 'user' & ...,
         #  and/or 'ftp' > ..., etc., and upload to all specified
         self._read_scp_config()
@@ -41,15 +43,18 @@ class UploadExporter(ExporterBase):
     def _read_scp_config(self):
         c = self.config('scp')
         if c:
-            if any([not c.get(k) for k in ['user', 'host', 'dest_dir']]):
+            if any([not c.get(k) for k in ['host', 'dest_dir']]):
                 raise BlueSkyConfigurationError(
-                    "Specify user, host, and dest_dir for scp'ing")
+                    "Specify host and dest_dir for scp'ing")
             self._upload_options['scp'] = c
+            if not self._upload_options['scp'].get('user'):
+                self._upload_options['scp']['user'] = self._current_user
 
     LOCAL_HOSTS = set(['localhost', '127.0.0.1'])
     PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')
     def _is_same_host(self, upload_user, upload_host):
-        """Checks to see if the upload host is the same as the current server
+        """Checks if the upload user and host are the same as the local user
+        and server.
 
         If they are local, the run status and output APIS can carry out their
         checks more efficiently and quickly.
@@ -59,7 +64,8 @@ class UploadExporter(ExporterBase):
         don't affect the correctness of the calling APIs - it just means they
         don't take advantage of working with local files.)
         """
-        if upload_user and upload_user != getpass.getuser():
+        # If different users, then
+        if upload_user and upload_user != self._current_user:
             return False
 
         # if host matches loopback address ('localhost', 127.0.0.1, etc.),
@@ -177,7 +183,7 @@ class UploadExporter(ExporterBase):
             for u in ['scp']:
                 if self._upload_options.get(u):
                     is_local = self._is_same_host(
-                        self._upload_options[u].get('user'),
+                        self._upload_options[u]['user'],
                         self._upload_options[u]['host'])
                     try:
                         if is_local:
