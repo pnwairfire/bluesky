@@ -20,6 +20,7 @@ from datetime import date, datetime, time, timedelta
 from math import acos, asin, cos, sin, tan, exp, log, pow
 from math import degrees as deg, radians as rad
 
+from bluesky import osutils
 from bluesky.datetimeutils import parse_datetimes
 
 __all__ = [
@@ -71,7 +72,7 @@ class ArlProfiler(object):
 
     # TODO: is there a way to tell 'profile' to write profile.txt and MESSAGE
     #  to an alternate dir (e.g. to a /tmp/ dir)
-    PROFILE_OUTPUT_FILE = './profile.txt'
+    PROFILE_OUTPUT_FILE = 'profile.txt'
 
     def profile(self, lat, lng, local_start, local_end, utc_offset):
         """Returns local met profile for specific location and timewindow
@@ -99,7 +100,6 @@ class ArlProfiler(object):
         if utc_end == utc_end_hour:
             utc_end_hour -= ONE_HOUR
 
-        full_path_profile_txt = os.path.abspath(self.PROFILE_OUTPUT_FILE)
         local_met_data = {}
         for met_file in self._met_files:
             if (met_file['first_hour'] > utc_end_hour or
@@ -114,9 +114,11 @@ class ArlProfiler(object):
             # split returns dir without trailing slash, which is required by profile
             d = d + '/'
 
-            self._call(d, f, lat, lng)
-            lmd = self._load(full_path_profile_txt, met_file['first_hour'],
-                start, end, utc_offset, lat, lng)
+            with osutils.create_working_dir() as wdir:
+              self._call(d, f, lat, lng)
+              full_path_profile_txt = os.path.join(wdir, self.PROFILE_OUTPUT_FILE)
+              lmd = self._load(full_path_profile_txt, met_file['first_hour'],
+                  start, end, utc_offset, lat, lng)
             local_met_data.update(lmd)
         return local_met_data
 
