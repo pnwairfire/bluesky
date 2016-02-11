@@ -23,6 +23,7 @@ from blueskykml import (
     makedispersionkml, makeaquiptdispersionkml, configuration,
     smokedispersionkml, __version__ as blueskykml_version
 )
+from bluesky import osutils
 from bluesky.exceptions import BlueSkyConfigurationError
 
 ###
@@ -279,12 +280,13 @@ class HysplitVisualizer(object):
         )
 
         try:
-            # TODO: clean up any outputs created?  Should this be toggleable
-            #   via config setting
-            if self._config.get('is_aquipt'):
-                makeaquiptdispersionkml.main(args)
-            else:
-                makedispersionkml.main(args)
+            # Note: using create_working_dir effectively marks any
+            #  intermediate outputs for cleanup
+            with osutils.create_working_dir() as wdir:
+                if self._config.get('is_aquipt'):
+                    makeaquiptdispersionkml.main(args)
+                else:
+                    makedispersionkml.main(args)
         except configuration.ConfigurationError, e:
             raise BlueSkyConfigurationError(".....")
 
