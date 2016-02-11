@@ -80,6 +80,7 @@ class HYSPLITDispersion(DispersionBase):
                 "grid_filetype": "NETCDF",
                 "grid_filename": self.OUTPUT_FILE_NAME,
                 "parameters": {"pm25": "PM25"},
+                "grid_parameters": self._grid_params
             },
             "met_info": self._met_info
         }
@@ -656,6 +657,8 @@ class HYSPLITDispersion(DispersionBase):
             raise BlueSkyConfigurationError("Specify hysplit dispersion grid")
 
         logging.debug("grid_params: %s", grid_params)
+
+        self._grid_params = grid_params # to include in self._run's return data
 
         # To minimize change in the following code, set aliases
         centerLat =  grid_params["center_latitude"]
