@@ -17,27 +17,14 @@ import logging
 import os
 import shutil
 import subprocess
-import tempfile
 from datetime import timedelta
 
 from pyairfire.datetime import parsing as datetime_parsing
 
-from bluesky import datautils
+from bluesky import datautils, osutils
 from bluesky.datetimeutils import parse_utc_offset
 from bluesky.models.fires import Fire
 
-# TODO: move this to common/reusable module
-class create_working_dir(object):
-    def __enter__(self):
-        self._original_dir = os.getcwd()
-        self._working_dir = tempfile.mkdtemp()
-        logging.debug('Running hysplit in {}'.format(self._working_dir))
-        os.chdir(self._working_dir)
-        return self._working_dir
-
-    def __exit__(self, type, value, traceback):
-        os.chdir(self._original_dir)
-        # TODO: delete self._working_dir or just let os clean it up ?
 
 # Note: HYSPLIT can accept concentrations in any units, but for
 # consistency with CALPUFF and other dispersion models, we convert to
@@ -106,7 +93,7 @@ class DispersionBase(object):
 
         self._set_fire_data(fires)
 
-        with create_working_dir() as wdir:
+        with osutils.create_working_dir() as wdir:
             r = self._run(wdir)
 
         r["output"].update({
