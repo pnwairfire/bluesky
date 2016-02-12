@@ -433,6 +433,9 @@ def run(args):
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
+    if args.data_dir not in DATA_DIRS:
+        logging.error("Invalid data directory: %s", args.data_dir)
+        sys.exit(1)
 
     try:
         success = run(args)
