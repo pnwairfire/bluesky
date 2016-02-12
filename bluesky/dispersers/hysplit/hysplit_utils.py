@@ -104,28 +104,35 @@ def km_per_deg_lng(lat):
     return KM_PER_DEG_LNG_AT_EQUATOR * math.cos(RADIANS_PER_DEG * lat)
 
 def square_grid_from_lat_lng(lat, lng, spacing_latitude,
-        spacing_longitude, length):
+        spacing_longitude, length, input_spacing_in_degrees=False):
     """Computes
 
     args
      - lat -- latitude of grid center
      - lng -- longitude of grid center
-     - spacing_latitude -- degrees latitude per grid cell
-     - spacing_longitude -- degrees longitude per grid cell
-     - length -- length of each side of grid
+     - spacing_latitude -- height of grid cell, in km or degrees lat
+     - spacing_longitude -- width of grid cell, in km or degrees lon
+     - length -- length of each side of grid, in km
+     - input_spacing_in_degrees -- by default, assumes spacing is in km
     """
     logging.debug("calculating {length}x{length} grid with lat/lng "
-        "spacing {sp_lat}/{sp_lng} around {lat},{lng}".format(
+        "spacing {sp_lat}/{sp_lng} {spacing_unit} around {lat},{lng}".format(
         length=length, sp_lat=spacing_latitude, sp_lng=spacing_longitude,
+        spacing_unit='degrees' if input_spacing_in_degrees else 'km',
         lat=lat, lng=lng))
-    width_lng = length / km_per_deg_lng(lat)
+    k_p_lng = km_per_deg_lng(lat)
+    if not input_spacing_in_degrees:
+        # convert from km to lat/lng; all other projections
+        # are assumed to be spaced in km
+        spacing_latitude /= KM_PER_DEG_LAT
+        spacing_longitude /= k_p_lng
     d = {
         "center_latitude": lat,
         "center_longitude": lng,
-        "height_latitude": DEG_LAT_PER_KM * length,
-        "width_longitude": width_lng,
-        "spacing_longitude": spacing_longitude,
-        "spacing_latitude": spacing_latitude
+        "height_latitude": DEG_LAT_PER_KM * length, # height in degrees
+        "width_longitude": length / k_p_lng,  # width in degrees
+        "spacing_longitude": spacing_longitude, # grid width in degrees
+        "spacing_latitude": spacing_latitude # grid height in degrees
     }
     # TODO: truncate grid to keep from crossing pole? equator?
     return d
@@ -140,8 +147,8 @@ def grid_params_from_grid(grid, met_info={}):
         raise ValueError("Dispersion grid must be defined either in the "
             "config or in the top level met object.")
     projection = grid.get('projection', met_info.get('projection'))
-    grid_spacing = grid.get('spacing', met_info.get('spacing'))
-    if not grid_spacing:
+    spacing = grid.get('spacing', met_info.get('spacing'))
+    if not spacing:
         raise ValueError("grid spacing must be defined either in user "
             "defined grid or in met object.")
     grid_boundary = grid.get('boundary', met_info.get('boundary'))
@@ -155,10 +162,8 @@ def grid_params_from_grid(grid, met_info={}):
     lon_min = grid_boundary['sw']['lng']
     lon_max = grid_boundary['ne']['lng']
     lat_center = (lat_min + lat_max) / 2
-    if projection == "LatLon":
-        spacing = grid_spacing  # degrees
-    else:
-        spacing = grid_spacing / hysplit_utils.km_per_deg_lng(lat_center)
+    if projection != "LatLon":
+        spacing = spacing / hysplit_utils.km_per_deg_lng(lat_center)
 
     # Build sampling grid parameters in scaled integer form
     SCALE = 100

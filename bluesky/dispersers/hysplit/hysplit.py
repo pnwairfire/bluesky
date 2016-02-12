@@ -573,6 +573,11 @@ class HYSPLITDispersion(DispersionBase):
                 "spacing_longitude": self.config("SPACING_LONGITUDE"),
                 "spacing_latitude": self.config("SPACING_LATITUDE")
             }
+            # BSF assumed lat/lng if USER_DEFINED_GRID; this support km spacing
+            if self.config('PROJECTION') != 'LatLon':
+                grid_params["spacing_longitude"] /= hysplit_utils.km_per_deg_lng(
+                    grid_params["center_latitude"])
+                grid_params["spacing_latitude"] /= hysplit_utils.KM_PER_DEG_LAT
 
         elif self.config('grid'):
             grid_params = hysplit_utils.grid_params_from_grid(
@@ -588,10 +593,11 @@ class HYSPLITDispersion(DispersionBase):
                 raise BlueSkyConfigurationError("Config settings "
                     "'spacing_latitude' and 'spacing_longitude' required "
                     "to compute hysplit grid")
+            is_deg = self.config('projection') == 'LatLon'
             grid_params = hysplit_utils.square_grid_from_lat_lng(
                 self._fires[0]['latitude'], self._fires[0]['longitude'],
                 self.config('spacing_latitude'), self.config('spacing_longitude'),
-                self.config('grid_length'))
+                self.config('grid_length'), input_spacing_in_degrees=is_deg)
 
         elif self._met_info.get('grid'):
             grid_params = hysplit_utils.grid_params_from_grid(
