@@ -16,7 +16,7 @@
                 "compute_grid": true,
                 "spacing_longitude": 0.06831430989396985,
                 "spacing_latitude": 0.05405405405405406,
-                "domain": "LatLon"
+                "projection": "LatLon"
             }
         },
         "visualization": {
