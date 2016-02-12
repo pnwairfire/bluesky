@@ -110,6 +110,8 @@ def square_grid_from_lat_lng(lat, lng, spacing_latitude,
     args
      - lat -- latitude of grid center
      - lng -- longitude of grid center
+     - spacing_latitude -- degrees latitude per grid cell
+     - spacing_longitude -- degrees longitude per grid cell
      - length -- length of each side of grid
     """
     logging.debug("calculating {length}x{length} grid with lat/lng "
