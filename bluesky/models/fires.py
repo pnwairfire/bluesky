@@ -245,8 +245,9 @@ class FiresManager(object):
 
         self._meta = input_dict
 
-        # HACK: access run id simply to trigger replacement of wildcars
-        self.run_id
+        if 'run_id' in self._meta:
+            # HACK: access run id simply to trigger replacement of wildcars
+            self.run_id
 
     def loads(self, input_stream=None, input_file=None):
         """Loads json-formatted fire data, creating list of Fire objects and
