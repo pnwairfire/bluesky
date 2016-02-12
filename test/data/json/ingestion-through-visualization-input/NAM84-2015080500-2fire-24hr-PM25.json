@@ -1,4 +1,5 @@
 {
+    "run_id": "NAM84-2015080500-2fire-24hr-PM25",
     "config": {
         "emissions": {
             "species": ["PM25"]

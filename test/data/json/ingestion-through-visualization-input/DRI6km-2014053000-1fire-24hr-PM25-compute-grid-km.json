@@ -1,4 +1,5 @@
 {
+    "run_id": "DRI6km-2014053000-1fire-24hr-PM25-compute-grid-km",
     "config": {
         "emissions": {
             "species": ["PM25"]
