@@ -245,8 +245,11 @@ class FiresManager(object):
 
         self._meta = input_dict
 
+        # HACK: access run id simply to trigger replacement of wildcars
+        # Note: the check for 'run_id' in self._meta prevents it from being
+        #  generated unnecessarily
+        # TODO: always generate a run id (by removing the check)?
         if 'run_id' in self._meta:
-            # HACK: access run id simply to trigger replacement of wildcars
             self.run_id
 
     def loads(self, input_stream=None, input_file=None):
