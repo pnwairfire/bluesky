@@ -1,11 +1,12 @@
-#
-# hysplit_utils.py
-#
-# Generic hysplit utility module created mostly for testability
-#
-# @todo: refactor this as a class
+"""bluesky.dispersers.hysplit.hysplit_utils
 
-_bluesky_version_ = "3.5.1"
+Generic hysplit utility module created in large part for ease of testing
+
+TODO: refactor this as a class
+"""
+
+__author__      = "Joel Dubowy and Sonoma Technology, Inc."
+__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import logging
 import math
