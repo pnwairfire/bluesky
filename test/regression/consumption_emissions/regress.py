@@ -414,6 +414,8 @@ def run(args):
         sys.exit(1)
     logging.info("Scanarios: {}".format(', '.join(
         [os.path.basename(n) for n in input_filenames])))
+
+    success = True
     for input_filename in input_filenames:
         fires_manager = load_scenario(input_filename)
         fires_manager.set_config_value(args.emissions_model, 'emissions',
@@ -425,7 +427,8 @@ def run(args):
         actual = fires_manager.dump()
         expected_partials, expected_totals = load_output(
             input_filename)
-        return check(actual, expected_partials, expected_totals)
+        success = success and check(actual, expected_partials, expected_totals)
+    return success
 
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
