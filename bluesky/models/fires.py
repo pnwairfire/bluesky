@@ -3,9 +3,11 @@
 __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
+import datetime
 import importlib
 import json
 import logging
+import re
 import sys
 import traceback
 import uuid
@@ -98,6 +100,7 @@ class FiresManager(object):
         self._meta = {}
         self.modules = []
         self.fires = []
+        self._processed_run_id_wildcards = False
 
     ## Importing
 
@@ -142,10 +145,23 @@ class FiresManager(object):
     def modules(self):
         return self._module_names
 
+    RUN_ID_WILDCARDS = [
+        (re.compile('{timestamp}'),
+            lambda: datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S'))
+        # TDOO: any other?
+    ]
+
     @property
     def run_id(self):
         if not self._meta.get('run_id'):
             self._meta['run_id'] = str(uuid.uuid1())
+        elif not self._processed_run_id_wildcards:
+            logging.debug('filling in run_id wildcards')
+            for m, f in self.RUN_ID_WILDCARDS:
+                if m.search(self._meta['run_id']):
+                    self._meta['run_id'] = self._meta['run_id'].replace(
+                        m.pattern, f())
+            self._processed_run_id_wildcards = True
         return self._meta['run_id']
 
     @modules.setter
@@ -228,6 +244,9 @@ class FiresManager(object):
         self.fires = input_dict.pop('fire_information', [])
 
         self._meta = input_dict
+
+        # HACK: access run id simply to trigger replacement of wildcars
+        self.run_id
 
     def loads(self, input_stream=None, input_file=None):
         """Loads json-formatted fire data, creating list of Fire objects and

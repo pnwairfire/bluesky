@@ -1,5 +1,5 @@
 {
-    "run_id": "DRI6km-2014053000-4fire-24hr-PM25",
+    "run_id": "DRI6km-2014053000-4fire-24hr-PM25-{timestamp}",
     "config": {
         "emissions": {
             "species": ["PM25"]

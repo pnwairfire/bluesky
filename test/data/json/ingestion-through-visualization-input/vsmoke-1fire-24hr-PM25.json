@@ -1,5 +1,5 @@
 {
-    "run_id": "vsmoke-1fire-24hr-PM25",
+    "run_id": "vsmoke-1fire-24hr-PM25-{timestamp}",
     "config": {
         "emissions": {
             "species": ["PM25"]
