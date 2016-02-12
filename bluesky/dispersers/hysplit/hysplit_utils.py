@@ -164,7 +164,7 @@ def grid_params_from_grid(grid, met_info={}):
     lon_max = grid_boundary['ne']['lng']
     lat_center = (lat_min + lat_max) / 2
     if projection != "LatLon":
-        spacing = spacing / hysplit_utils.km_per_deg_lng(lat_center)
+        spacing = spacing / km_per_deg_lng(lat_center)
 
     # Build sampling grid parameters in scaled integer form
     SCALE = 100
