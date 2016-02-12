@@ -129,3 +129,60 @@ def square_grid_from_lat_lng(lat, lng, spacing_latitude,
     }
     # TODO: truncate grid to keep from crossing pole? equator?
     return d
+
+def grid_params_from_grid(grid, met_info={}):
+    # Calculate output concentration grid parameters.
+    # Ensure the receptor spacing divides nicely into the grid width and height,
+    # and that the grid center will be a receptor point (i.e., nx, ny will be ODD).
+    logging.info("Automatic sampling/concentration grid invoked")
+
+    if not grid:
+        raise ValueError("Dispersion grid must be defined either in the "
+            "config or in the top level met object.")
+    projection = grid.get('projection', met_info.get('projection'))
+    grid_spacing = grid.get('spacing', met_info.get('spacing'))
+    if not grid_spacing:
+        raise ValueError("grid spacing must be defined either in user "
+            "defined grid or in met object.")
+    grid_boundary = grid.get('boundary', met_info.get('boundary'))
+    if not grid_boundary:
+        raise ValueError("grid boundary must be defined either in user "
+            "defined grid or in met object.")
+    # TODO: check that sw and ne lat/lng's are defined
+
+    lat_min = grid_boundary['sw']['lat']
+    lat_max = grid_boundary['ne']['lat']
+    lon_min = grid_boundary['sw']['lng']
+    lon_max = grid_boundary['ne']['lng']
+    lat_center = (lat_min + lat_max) / 2
+    if projection == "LatLon":
+        spacing = grid_spacing  # degrees
+    else:
+        spacing = grid_spacing / hysplit_utils.km_per_deg_lng(lat_center)
+
+    # Build sampling grid parameters in scaled integer form
+    SCALE = 100
+    lat_min_s = int(lat_min*SCALE)
+    lat_max_s = int(lat_max*SCALE)
+    lon_min_s = int(lon_min*SCALE)
+    lon_max_s = int(lon_max*SCALE)
+    spacing_s = int(spacing*SCALE)
+
+    lat_count = (lat_max_s - lat_min_s) / spacing_s
+    lat_count += 1 if lat_count % 2 == 0 else 0  # lat_count should be odd
+    lat_max_s = lat_min_s + ((lat_count-1) * spacing_s)
+
+    lon_count = (lon_max_s - lon_min_s) / spacing_s
+    lon_count += 1 if lon_count % 2 == 0 else 0  # lon_count should be odd
+    lon_max_s = lon_min_s + ((lon_count-1) * spacing_s)
+    logging.info("HYSPLIT grid DIMENSIONS will be %s by %s" % (lon_count, lat_count))
+
+    spacing_longitude = float(spacing_s)/SCALE
+    return {
+        "spacing_longitude": spacing_longitude,
+        "spacing_latitude": spacing_longitude,
+        "center_longitude": float((lon_min_s + lon_max_s) / 2) / SCALE,
+        "center_latitude": float((lat_min_s + lat_max_s) / 2) / SCALE,
+        "width_longitude": float(lon_max_s - lon_min_s) / SCALE,
+        "height_latitude": float(lat_max_s - lat_min_s) / SCALE
+    }
