@@ -150,15 +150,31 @@ class TestSquareGridFromLatLng(object):
             "center_longitude": -118.0,
             "height_latitude": 0.9009009009009009,
             "width_longitude": 1.2704038469036067,
-            "spacing_longitude": 0.5,
-            "spacing_latitude": 0.5
+            "spacing_longitude": 0.0762242308142164,
+            "spacing_latitude": 0.05405405405405406
         }
-        assert e == hysplit_utils.square_grid_from_lat_lng(45.0, -118.0, 0.5, 0.5, 100)
+        assert e == hysplit_utils.square_grid_from_lat_lng(
+            45.0, -118.0, 6.0, 6.0, 100, input_spacing_in_degrees=False)
+
+        # lat/lon projection
+        e = {
+            "center_latitude": 45.0,
+            "center_longitude": -118.0,
+            "height_latitude": 0.9009009009009009,
+            "width_longitude": 1.2704038469036067,
+            "spacing_longitude": 0.05,
+            "spacing_latitude": 0.05
+        }
+        assert e == hysplit_utils.square_grid_from_lat_lng(
+            45.0, -118.0, 0.05, 0.05, 100, input_spacing_in_degrees=True)
 
     # TODO: test location that could cross pole
     # TODO: test location that could equator
     # TODO: test any invalid cases
 
+class TestGridParamsFromGrid(object):
+    # TODO: add tests
+    pass
 
 if __name__ == '__main__':
     test_main(verbose=True)
