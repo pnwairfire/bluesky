@@ -29,7 +29,15 @@ from bluesky import models
 
 # TODO: use a regression testing framework?
 
+DATA_DIRS = [ os.path.basename(d.rstrip('/'))
+    for d in glob.glob(os.path.join(os.path.dirname(__file__), 'data/*'))]
+
 REQUIRED_ARGS = [
+    {
+        'short': '-d',
+        'long': '--data-dir',
+        'help': 'options "{}"'.format(" or ".join(DATA_DIRS))
+    }
 ]
 
 OPTIONAL_ARGS = [
@@ -397,9 +405,9 @@ def check(actual, expected_partials, expected_totals):
     return success
 
 def run(args):
-    pattern = '{}/data/scen_{}.csv'.format(
+    pattern = '{}/data/{}/scen_{}.csv'.format(
         os.path.abspath(os.path.dirname(__file__)),
-        args.scenario_id or '[0-9]')
+        args.data_dir, args.scenario_id or '[0-9]')
     input_filenames = glob.glob(pattern)
     logging.debug("Scanarios: {}".format(', '.join(
         [os.path.basename(n) for n in input_filenames])))
