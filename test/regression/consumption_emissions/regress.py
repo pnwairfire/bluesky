@@ -409,7 +409,10 @@ def run(args):
         os.path.abspath(os.path.dirname(__file__)),
         args.data_dir, args.scenario_id or '[0-9]')
     input_filenames = glob.glob(pattern)
-    logging.debug("Scanarios: {}".format(', '.join(
+    if not input_filenames:
+        logging.error("No matching scnarios")
+        sys.exit(1)
+    logging.info("Scanarios: {}".format(', '.join(
         [os.path.basename(n) for n in input_filenames])))
     for input_filename in input_filenames:
         fires_manager = load_scenario(input_filename)
