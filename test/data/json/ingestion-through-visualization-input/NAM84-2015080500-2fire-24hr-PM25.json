@@ -20,7 +20,8 @@
             "dest_dir": "/bsp-output/bsp-dispersion-output/",
             "hysplit": {
                 "grid": {
-                    "spacing": 6.0,
+                    "spacing": 0.15,
+                    "projection": "LatLon",
                     "boundary": {
                         "ne": {
                             "lat": 45.25,
