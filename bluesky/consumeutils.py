@@ -48,6 +48,9 @@ def _apply_settings(fc, location, burn_type):
             setattr(fc, k, location[k])
         elif default is not None:
             setattr(fc, k, default)
+        else:
+            raise BlueSkyConfigurationError("Specify {} for {} burns".format(
+                k, burn_type))
 
 class FuelLoadingsManager(object):
 
