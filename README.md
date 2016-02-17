@@ -943,7 +943,22 @@ on and fuelbeds is defined
  - ***'fire_information' > 'fuelbeds'*** -- *required* -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
  - ***'fire_information' > 'location' > 'area'*** -- *required* -- fire's total area
  - ***'fire_information' > 'location' > 'ecoregion'*** -- *required*
+ - ***'fire_information' > 'location' > 'fuel_moisture_1000hr_pct'*** -- *optional* -- default: 50
+ - ***'fire_information' > 'location' > 'fuel_moisture_duff_pct'*** -- *optional* -- default: 50
+ - ***'fire_information' > 'location' > 'canopy_consumption_pct'*** -- *optional* -- default: 0
+ - ***'fire_information' > 'location' > 'shrub_blackened_pct'*** -- *optional* -- default: 50
+ - ***'fire_information' > 'location' > 'output_units'*** -- *optional* -- default: "tons_ac"
+ - ***'fire_information' > 'location' > 'pile_blackened_pct'*** -- *optional* -- default: 0
  - ***'fire_information' > 'type'*** -- *optional* -- fire type (defaults to 'natural' unless set to 'rx');
+
+###### if an 'rx' burn:
+
+ - ***'fire_information' > 'location' > 'days_since_rain'*** -- *required* -- default: 1
+ - ***'fire_information' > 'location' > 'length_of_ignition'*** -- *required* -- default: 1
+ - ***'fire_information' > 'location' > 'slope'*** -- *optional* -- default: 5
+ - ***'fire_information' > 'location' > 'windspeed'*** -- *optional* -- default: 5
+ - ***'fire_information' > 'location' > 'fuel_moisture_10hr_pct'*** -- *optional* -- default: 50
+ - ***'fire_information' > 'location' > 'fm_type'*** -- *optional* -- default: "MEAS-Th"
 
 ##### emissions
 
