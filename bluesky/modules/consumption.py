@@ -91,9 +91,16 @@ def run(fires_manager):
                     datautils.multiply_nested_data(fb["heat"], area)
 
             else:
-                logging.error(
-                    "Failed to calculate consumption for fire %s fuelbed %s",
-                    fire.id, fb['fccs_id'])
+                # TODO: somehow get error information from fc object; when
+                #   you call fc.results() in an error situation, it writes to
+                #   stdout or stderr (?), something like:
+                #
+                #     !!! Error settings problem, the following are required:
+                #            fm_type
+                #   it would be nice to access that error message here and
+                #   include it in the exception message
+                raise RuntimeError("Failed to calculate consumption for fire "
+                    "{} fuelbed {}".format(fire.id, fb['fccs_id']))
 
     fires_manager.summarize(
         consumption=datautils.summarize(fires_manager.fires, 'consumption'))
