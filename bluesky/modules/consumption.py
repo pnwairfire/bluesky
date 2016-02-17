@@ -56,6 +56,7 @@ def run(fires_manager):
         for fb in fire.fuelbeds:
             fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
                 fb['fccs_id'])
+
             fc = consume.FuelConsumption(
                 fccs_file=fuel_loadings_csv_filename) #msg_level=msg_level)
 
@@ -74,11 +75,11 @@ def run(fires_manager):
             fc.fuelbed_ecoregion = [fire.location['ecoregion']]
 
             _apply_settings(fc, fire['location'], burn_type)
-
-            if fc.results():
-                fb['consumption'] = fc.results()['consumption']
+            _results = fc.results()
+            if _results:
+                fb['consumption'] = _results['consumption']
                 fb['consumption'].pop('debug', None)
-                fb['heat'] = fc.results()['heat release']
+                fb['heat'] = _results['heat release']
 
                 # multiply each consumption and heat value by area if
                 # output_inits is 'tons_ac',
