@@ -4,8 +4,9 @@ __author__      = "Joel Dubowy"
 __copyright__   = "Copyright 2015, AirFire, PNW, USFS"
 
 import copy
-import consume
 import logging
+
+from bluesky import consumeutils
 
 __all__ = [
     'run'
@@ -151,6 +152,8 @@ class FireIngester(object):
         "utc_offset" # utc_offest is only required by modules using met data
         # TODO: fill in others
     ]
+    for _s in consumeutils.SETTINGS.values():
+        OPTIONAL_LOCATION_FIELDS.extend([e[0] for e in _s])
 
     def _ingest_location(self, fire):
         # TODO: validate fields
