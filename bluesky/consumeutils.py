@@ -25,12 +25,12 @@ __all__ = [
 SETTINGS = {
     'natural': [],
     'activity': [
-        ('slope', None),
-        ('windspeed', None),
+        ('slope', 5), # default from consume package
+        ('windspeed', 5),  # default from consume package
         ('days_since_rain', None),
         ('fuel_moisture_10hr_pct', 50), # default from consume package
         ('length_of_ignition', None),
-        ('fm_type', None),
+        ('fm_type', "MEAS-Th") # default from consume package
     ],
     'all': [
         ('fuel_moisture_1000hr_pct', 50), # default from consume package
