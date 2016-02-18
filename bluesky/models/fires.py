@@ -25,12 +25,30 @@ __all__ = [
 
 class Fire(dict):
 
+    DEFAULT_TYPE = 'wildfire'
+    VALID_TYPES = ('wildfire', 'rx')
+    INVALID_TYPE_MSG = "Invalid fire 'type': {}"
+    DEFAULT_FUEL_TYPE = 'natural'
+    VALID_FUEL_TYPES = ('natural', 'activity', 'piles')
+    INVALID_FUEL_TYPE_MSG = "Invalid fire 'fuel_type': {}"
+
     def __init__(self, *args, **kwargs):
         super(Fire, self).__init__(*args, **kwargs)
 
         # if id isn't specified, set to new guid
         if not self.get('id'):
             self['id'] = str(uuid.uuid1())[:8]
+
+        if not self.get('type'):
+            self['type'] = self.DEFAULT_TYPE
+        elif self['type'] not in self.VALID_TYPES:
+            raise ValueError(self.INVALID_TYPE_MSG.format(self['type']))
+
+        if not self.get('fuel_type'):
+            self['fuel_type'] = self.DEFAULT_FUEL_TYPE
+        elif self['fuel_type'] not in self.VALID_FUEL_TYPES:
+            raise ValueError(self.INVALID_FUEL_TYPE_MSG.format(
+                self['fuel_type']))
 
     @property
     def latitude(self):

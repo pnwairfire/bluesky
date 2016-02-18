@@ -20,11 +20,11 @@ class TestFire:
 
     def test_fills_in_id(self, monkeypatch):
         monkeypatch.setattr(uuid, "uuid1", lambda: "abcd1234")
-        # if start, end, and id are all missing, sets id to guid
+        # if id is missing, the id is set to generated guid.
+        # Note: id used to integrate start and/or end, if specified;
+        #   this is no longer the case
         f = fires.Fire({"a": 123, "b": "sdf"})
         assert "abcd1234" == f["id"]
-        # if start and/or end are specified but id is missing, sets id to guid
-        # combined with start and/or end
         f = fires.Fire({"a": 123, "b": "sdf", "start": "20120202 10:20:32"})
         assert "abcd1234" == f["id"]
         f = fires.Fire({"a": 123, "b": "sdf", "end": "20120922 10:20:32"})
@@ -39,6 +39,26 @@ class TestFire:
             "start": "20120202 10:20:32", "end": "20120922T10:20:32",
             "id": "sdkjfh2rkjhsdf"})
         assert "sdkjfh2rkjhsdf" == f["id"]
+
+    def test_fills_in_or_validates_type_and_fuel_type(self):
+        f = fires.Fire({"a": 123, "b": "sdf"})
+        assert f['type'] == fires.Fire.DEFAULT_TYPE
+        assert f['fuel_type'] == fires.Fire.DEFAULT_FUEL_TYPE
+
+        f = fires.Fire({"a": 123, "b": "sdf",
+            "type": 'rx', 'fuel_type': 'piles'})
+        assert f['type'] == 'rx'
+        assert f['fuel_type'] == 'piles'
+
+        with raises(ValueError) as e_info:
+            f = fires.Fire({"a": 123, "b": "sdf",
+                "type": 'foo', 'fuel_type': 'piles'})
+        assert e_info.value.message == fires.Fire.INVALID_TYPE_MSG.format('foo')
+
+        with raises(ValueError) as e_info:
+            f = fires.Fire({"a": 123, "b": "sdf",
+                "type": 'rx', 'fuel_type': 'bar'})
+        assert e_info.value.message == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
 
     def test_accessing_attributes(self):
         f = fires.Fire({'a': 123, 'b': 'sdf'})

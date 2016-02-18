@@ -949,7 +949,8 @@ on and fuelbeds is defined
  - ***'fire_information' > 'location' > 'shrub_blackened_pct'*** -- *optional* -- default: 50
  - ***'fire_information' > 'location' > 'output_units'*** -- *optional* -- default: "tons_ac"
  - ***'fire_information' > 'location' > 'pile_blackened_pct'*** -- *optional* -- default: 0
- - ***'fire_information' > 'type'*** -- *optional* -- fire type (defaults to 'natural' unless set to 'rx');
+ - ***'fire_information' > 'type'*** -- *optional* -- fire type ('rx' vs. 'wildfire'); default: 'wildfire'
+ - ***'fire_information' > 'fuel_type'*** -- *optional* -- fuel type ('natural', 'activity', or 'piles'); default: 'natural'
 
 ###### if an 'rx' burn:
 
