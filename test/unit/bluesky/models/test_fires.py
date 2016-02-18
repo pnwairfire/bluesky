@@ -41,23 +41,49 @@ class TestFire:
         assert "sdkjfh2rkjhsdf" == f["id"]
 
     def test_fills_in_or_validates_type_and_fuel_type(self):
+        # defaults 'type' and 'fuel_type
         f = fires.Fire({"a": 123, "b": "sdf"})
         assert f['type'] == fires.Fire.DEFAULT_TYPE
         assert f['fuel_type'] == fires.Fire.DEFAULT_FUEL_TYPE
 
+        # accepts 'type' and 'fuel_type values if specified and valid
         f = fires.Fire({"a": 123, "b": "sdf",
             "type": 'rx', 'fuel_type': 'piles'})
         assert f['type'] == 'rx'
         assert f['fuel_type'] == 'piles'
 
+        # validates 'type' on instantiation
         with raises(ValueError) as e_info:
             f = fires.Fire({"a": 123, "b": "sdf",
                 "type": 'foo', 'fuel_type': 'piles'})
         assert e_info.value.message == fires.Fire.INVALID_TYPE_MSG.format('foo')
 
+        f = fires.Fire()
+
+        # validates 'type' on setattr
+        with raises(ValueError) as e_info:
+            f.type = 'foo'
+        assert e_info.value.message == fires.Fire.INVALID_TYPE_MSG.format('foo')
+
+        # validates 'type' on dict set
+        with raises(ValueError) as e_info:
+            f['type'] = 'foo'
+        assert e_info.value.message == fires.Fire.INVALID_TYPE_MSG.format('foo')
+
+        # validates 'fuel_type' on instantiation
         with raises(ValueError) as e_info:
             f = fires.Fire({"a": 123, "b": "sdf",
                 "type": 'rx', 'fuel_type': 'bar'})
+        assert e_info.value.message == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
+
+        # validates 'fuel_type' on setattr
+        with raises(ValueError) as e_info:
+            f.fuel_type = 'bar'
+        assert e_info.value.message == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
+
+        # validates 'fuel_type' on dict set
+        with raises(ValueError) as e_info:
+            f['fuel_type'] = 'bar'
         assert e_info.value.message == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
 
     def test_accessing_attributes(self):

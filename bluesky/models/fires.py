@@ -26,11 +26,7 @@ __all__ = [
 class Fire(dict):
 
     DEFAULT_TYPE = 'wildfire'
-    VALID_TYPES = ('wildfire', 'rx')
-    INVALID_TYPE_MSG = "Invalid fire 'type': {}"
     DEFAULT_FUEL_TYPE = 'natural'
-    VALID_FUEL_TYPES = ('natural', 'activity', 'piles')
-    INVALID_FUEL_TYPE_MSG = "Invalid fire 'fuel_type': {}"
 
     def __init__(self, *args, **kwargs):
         super(Fire, self).__init__(*args, **kwargs)
@@ -41,14 +37,17 @@ class Fire(dict):
 
         if not self.get('type'):
             self['type'] = self.DEFAULT_TYPE
-        elif self['type'] not in self.VALID_TYPES:
-            raise ValueError(self.INVALID_TYPE_MSG.format(self['type']))
+        # TODO: figure out how to not have to explicitly call _validate_type here
+        else:
+            self._validate_type(self['type'])
 
         if not self.get('fuel_type'):
             self['fuel_type'] = self.DEFAULT_FUEL_TYPE
-        elif self['fuel_type'] not in self.VALID_FUEL_TYPES:
-            raise ValueError(self.INVALID_FUEL_TYPE_MSG.format(
-                self['fuel_type']))
+        # TODO: figure out how to not have to explicitly call _validate_fuel_type here
+        else:
+            self._validate_fuel_type(self['fuel_type'])
+
+    ## Properties
 
     @property
     def latitude(self):
@@ -94,6 +93,30 @@ class Fire(dict):
                     "determining single lat/lng for fire")
         return self._longitude
 
+    ## Validation
+
+    VALID_TYPES = ('wildfire', 'rx')
+    INVALID_TYPE_MSG = "Invalid fire 'type': {}"
+
+    def _validate_type(self, val):
+        if val not in self.VALID_TYPES:
+            raise ValueError(self.INVALID_TYPE_MSG.format(val))
+
+    VALID_FUEL_TYPES = ('natural', 'activity', 'piles')
+    INVALID_FUEL_TYPE_MSG = "Invalid fire 'fuel_type': {}"
+
+    def _validate_fuel_type(self, val):
+        if val not in self.VALID_FUEL_TYPES:
+            raise ValueError(self.INVALID_FUEL_TYPE_MSG.format(val))
+
+    ## Getters and Setters
+
+    def __setitem__(self, attr, val):
+        k = '_validate_{}'.format(attr)
+        if hasattr(self, k):
+            getattr(self, k)(val)
+        super(Fire, self).__setitem__(attr, val)
+
     def __getattr__(self, attr):
         if attr in self.keys():
             return self[attr]
@@ -105,12 +128,14 @@ class Fire(dict):
         else:
             super(Fire, self).__setattr__(attr, val)
 
+
 class FireEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, 'tolist'):
             return obj.tolist()
 
         return json.JSONEncoder.default(self, obj)
+
 
 class FiresManager(object):
 
