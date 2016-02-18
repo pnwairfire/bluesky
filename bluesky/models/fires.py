@@ -39,13 +39,13 @@ class Fire(dict):
             self['type'] = self.DEFAULT_TYPE
         # TODO: figure out how to not have to explicitly call _validate_type here
         else:
-            self._validate_type(self['type'])
+            self['type'] = self._validate_type(self['type'])
 
         if not self.get('fuel_type'):
             self['fuel_type'] = self.DEFAULT_FUEL_TYPE
         # TODO: figure out how to not have to explicitly call _validate_fuel_type here
         else:
-            self._validate_fuel_type(self['fuel_type'])
+            self['fuel_type'] =self._validate_fuel_type(self['fuel_type'])
 
     ## Properties
 
@@ -99,22 +99,26 @@ class Fire(dict):
     INVALID_TYPE_MSG = "Invalid fire 'type': {}"
 
     def _validate_type(self, val):
+        val = val.lower()
         if val not in self.VALID_TYPES:
             raise ValueError(self.INVALID_TYPE_MSG.format(val))
+        return val
 
     VALID_FUEL_TYPES = ('natural', 'activity', 'piles')
     INVALID_FUEL_TYPE_MSG = "Invalid fire 'fuel_type': {}"
 
     def _validate_fuel_type(self, val):
+        val = val.lower()
         if val not in self.VALID_FUEL_TYPES:
             raise ValueError(self.INVALID_FUEL_TYPE_MSG.format(val))
+        return val
 
     ## Getters and Setters
 
     def __setitem__(self, attr, val):
         k = '_validate_{}'.format(attr)
         if hasattr(self, k):
-            getattr(self, k)(val)
+            val = getattr(self, k)(val)
         super(Fire, self).__setitem__(attr, val)
 
     def __getattr__(self, attr):

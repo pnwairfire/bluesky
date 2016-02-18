@@ -52,6 +52,13 @@ class TestFire:
         assert f['type'] == 'rx'
         assert f['fuel_type'] == 'piles'
 
+        # converts to lowercase
+        f = fires.Fire({"a": 123, "b": "sdf",
+            "type": 'Rx', 'fuel_type': 'PILES'})
+        assert f['type'] == 'rx'
+        assert f['fuel_type'] == 'piles'
+
+
         # validates 'type' on instantiation
         with raises(ValueError) as e_info:
             f = fires.Fire({"a": 123, "b": "sdf",
