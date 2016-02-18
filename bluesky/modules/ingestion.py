@@ -62,7 +62,7 @@ class FireIngester(object):
     # and do so recursively to get nested objects under fire object
 
     SCALAR_FIELDS = {
-        "id", "type"
+        "id", "type", "fuel_type"
     }
     NESTED_FIELDS = {
         "location", "growth", "event_of", "fuelbeds", "meta"
