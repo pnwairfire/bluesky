@@ -100,7 +100,7 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
         if 'fuelbeds' not in fire:
             raise ValueError(
                 "Missing fuelbed data required for computing emissions")
-        fccs2ef = fccs2ef_rx if fire.get('type') == "rx" else fccs2ef_wf
+        fccs2ef = fccs2ef_rx if fire.type == "rx" else fccs2ef_wf
         for fb in fire.fuelbeds:
             if 'consumption' not in fb:
                 raise ValueError(
