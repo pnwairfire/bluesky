@@ -137,7 +137,11 @@ def _run_consume(fires_manager, species, include_emissions_details):
             raise ValueError(
                 "Missing fuelbed data required for computing emissions")
 
-        burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
+        # TODO: set burn type to 'activity' if fire.fuel_type == 'piles' ?
+        if fire.fuel_type == 'piles':
+            raise ValueError("Consume can't be used for fuel type 'piles'")
+        burn_type = fire.fuel_type
+
         for fb in fire.fuelbeds:
             if 'consumption' not in fb:
                 raise ValueError(

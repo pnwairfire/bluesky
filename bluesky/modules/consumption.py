@@ -47,7 +47,10 @@ def run(fires_manager):
     for fire in fires_manager.fires:
         logging.debug("Consume consumption - fire {}".format(fire.id))
 
-        burn_type = 'activity' if fire.get('type') == "rx" else 'natural'
+        # TODO: set burn type to 'activity' if fire.fuel_type == 'piles' ?
+        if fire.fuel_type == 'piles':
+            raise ValueError("Consume can't be used for fuel type 'piles'")
+        burn_type = fire.fuel_type
 
         # TODO: can I run consume on all fuelbeds at once and get per-fuelbed
         # results?  If it is simply a matter of parsing separated values from
