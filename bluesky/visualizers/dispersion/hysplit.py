@@ -145,7 +145,7 @@ def _assign_event_name(event, fire, new_fire):
 def _update_event_area(event, fire, new_fire):
     if not fire.get('location', {}).get('area'):
         raise ValueError("Fire {} lacks area".format(fire.get('id')))
-    event['total_area'] = event.get('total_area', 0.0) + fire['location']['area']
+    return event.get('total_area', 0.0) + fire['location']['area']
 
 def _update_total_heat(event, fire, new_fire):
     if 'total_heat' in event and event['total_heat'] is None:
