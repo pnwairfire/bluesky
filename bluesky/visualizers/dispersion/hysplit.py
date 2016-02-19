@@ -139,7 +139,7 @@ def _assign_event_name(event, fire, new_fire):
     if name:
         if event.get('name') and name != event['name']:
             logging.warn("Fire {} event name conflict: '{}' != '{}'".format(
-                name, event['name']))
+                fire.id, name, event['name']))
         event['name'] = name
 
 def _update_event_area(event, fire, new_fire):
