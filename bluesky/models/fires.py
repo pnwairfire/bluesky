@@ -362,6 +362,54 @@ class FiresManager(object):
                 return not hasattr(fire, attr) or getattr(fire, attr) not in blacklist
         self.fires = [f for f in self.fires if _filter(f, attr)]
 
+    ## Failures
+
+    @property
+    def fire_failure_handler(self):
+        """Context manager that moves failed fires
+
+        The reason for defining a method that returns a context manager class,
+        is that the closure allows the call to not have to pass in the
+        fires_manager object itself.
+
+            for fire in fires_manager.fires:
+                with fires_manager.fire_failure_handler(fire):
+                    ....
+
+        as opposed to:
+
+            for fire in fires_manager.fires:
+                with fires_manager.fire_failure_handler(fires_manager, fire):
+                    ....
+        """
+        fires_manager = self
+        class klass(object):
+            def __init__(self, fire):
+                self._fire_id = fire.id
+
+            def __enter__(self):
+                pass
+
+            def __exit__(self, e_type, value, tb):
+                if e_type and fires_manager.skip_failed_fires:
+                    fires_manager.skip_failed_fire(self._fire_id)
+                    return True
+                # else, let exception, if any, be raised
+        return klass
+
+    @property
+    def skip_failed_fires(self):
+        return not not self.get_config_value('skip_failed_fires')
+
+    def skip_failed_fire(self, fire_id):
+        """Moves fire to failed list, excluding it from future processing
+        """
+        self.failed_fires = self.failed_fires or []
+        f = self._fires.pop(fire_id, None)
+        if f:
+            self._fire_ids.remove(fire_id)
+            self.failed_fires.append(f)
+
     ## Dumping data
 
     def dump(self):

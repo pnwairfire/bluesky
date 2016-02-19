@@ -322,3 +322,50 @@ class TestFiresManager:
         assert expected == fires_manager.fires
 
     # TODO: test instantiating with fires, dump, adding more with loads, dump, etc.
+
+    ## Failures
+
+    def test_fire_failure_handler(self):
+        def go(fire):
+            if fire.id == '2':
+                raise RuntimeError("oops")
+
+        # Skip
+        fires_manager = fires.FiresManager()
+        fires_manager.fires = [
+            fires.Fire({'id': '1', 'name': 'n1'}),
+            fires.Fire({'id': '2', 'name': 'n2'})
+        ]
+        fires_manager.config = {"skip_failed_fires": True}
+        assert fires_manager.skip_failed_fires
+        for fire in fires_manager.fires:
+            with fires_manager.fire_failure_handler(fire):
+                go(fire)
+        assert fires_manager.fires == [
+            fires.Fire({'id': '1', 'name': 'n1'})
+        ]
+        assert fires_manager.failed_fires == [
+            fires.Fire({'id': '2', 'name': 'n2'})
+        ]
+
+        # Don't Skip
+        fires_manager = fires.FiresManager()
+        fires_manager.fires = [
+            fires.Fire({'id': '1', 'name': 'n1'}),
+            fires.Fire({'id': '2', 'name': 'n2'})
+        ]
+        fires_manager.config = {"skip_failed_fires": False}
+        assert not fires_manager.skip_failed_fires
+        for fire in fires_manager.fires:
+            if fire.id == '1':
+                with fires_manager.fire_failure_handler(fire):
+                    go(fire)
+            else:
+                with raises(RuntimeError) as e_info:
+                    with fires_manager.fire_failure_handler(fire):
+                        go(fire)
+        assert fires_manager.fires == [
+            fires.Fire({'id': '1', 'name': 'n1'}),
+            fires.Fire({'id': '2', 'name': 'n2'})
+        ]
+        assert fires_manager.failed_fires is None
