@@ -1,6 +1,6 @@
 """bluesky"""
 
-__version_info__ = (0,7,18)
+__version_info__ = (0,7,19)
 __version__ = '.'.join([str(n) for n in __version_info__])
 
 __author__      = "Joel Dubowy"
