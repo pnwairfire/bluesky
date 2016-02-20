@@ -33,7 +33,9 @@ def run(fires_manager):
         parsed_input = []
         fire_ingester = FireIngester()
         for fire in fires_manager.fires:
-            parsed_input.append(fire_ingester.ingest(fire))
+            with fires_manager.fire_failure_handler(fire):
+                parsed_input.append(fire_ingester.ingest(fire))
+
         fires_manager.processed(__name__, __version__, parsed_input=parsed_input)
     except:
         # just record what module was run; the error will be inserted
