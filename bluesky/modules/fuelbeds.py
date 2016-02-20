@@ -28,12 +28,13 @@ def run(fires_manager):
     fires_manager.processed(__name__, __version__,
         fccsmap_version=fccsmap.__version__)
     for fire in fires_manager.fires:
-        # TODO: instead of instantiating a new FccsLookUp and Estimator for
-        # each fire, create AK and non-AK lookup and estimator objects that
-        # are reused, and set reference to correct one here
-        lookup = FccsLookUp(is_alaska=fire['location'].get('state')=='AK',
-            fccs_version=FCCS_VERSION)
-        Estimator(lookup).estimate(fire)
+        with fires_manager.fire_failure_handler(fire):
+            # TODO: instead of instantiating a new FccsLookUp and Estimator for
+            # each fire, create AK and non-AK lookup and estimator objects that
+            # are reused, and set reference to correct one here
+            lookup = FccsLookUp(is_alaska=fire['location'].get('state')=='AK',
+                fccs_version=FCCS_VERSION)
+            Estimator(lookup).estimate(fire)
 
     # TODO: Add fuel loadings data to each fuelbed object (????)
     #  If we do so here, use bluesky.modules.consumption.FuelLoadingsManager
