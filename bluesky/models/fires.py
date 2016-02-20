@@ -160,6 +160,12 @@ class FiresManager(object):
             # TODO: merge into existing (updateing start/end/size/etc appropriately)
             pass
 
+    def remove_fire(self, fire_id):
+        if self._fires.has_key(fire_id):
+            self._fires.pop(fire_id)
+            self._fire_ids.remove(fire_id)
+        # TODO: else, raise exception?
+
     ## IO
 
     # TODO: Remove this method and use bluesky.io.Stream in code below instead
@@ -176,6 +182,9 @@ class FiresManager(object):
     ##
     ## 'Public' Methods
     ##
+
+    def fire_by_id(self, fire_id):
+        return self._fires.get(fire_id)
 
     @property
     def fires(self):
@@ -391,24 +400,42 @@ class FiresManager(object):
                 pass
 
             def __exit__(self, e_type, value, tb):
-                if e_type and fires_manager.skip_failed_fires:
-                    fires_manager.skip_failed_fire(self._fire_id)
-                    return True
-                # else, let exception, if any, be raised
+                if e_type:
+                    # there was a failure; first see if fire is in fact
+                    # managed by fires_manager
+                    f = fires_manager.fire_by_id(self._fire_id)
+                    if f:
+                        # Add error infromation to fire object.
+                        # Note that error information will also be added to
+                        # top level if skip_failed_fires == False
+                        f.error = {
+                            "type": value.__class__.__name__,
+                            "message": value.message,
+                            "traceback": str(traceback.format_exc(tb))
+                        }
+                        if fires_manager.skip_failed_fires:
+                            # move fire to failed list, excluding it from
+                            # future processing
+                            if fires_manager.failed_fires is None:
+                                fires_manager.failed_fires  = []
+                            fires_manager.failed_fires.append(f)
+                            # remove fire from good fires list
+                            fires_manager.remove_fire(f.id)
+                            return True
+                        # else, let exception, if any, be raised
+                    else:
+                        # fire was not one of fires_manager's
+                        # TODO: don't raise exception if configured not to
+                        #  (maybe also controlled by
+                        #   fires_manager.skip_failed_fires?)
+                        raise RuntimeError("Fire {} not managed by "
+                            "fires_manager".format(self._fire_id))
+
         return klass
 
     @property
     def skip_failed_fires(self):
         return not not self.get_config_value('skip_failed_fires')
-
-    def skip_failed_fire(self, fire_id):
-        """Moves fire to failed list, excluding it from future processing
-        """
-        self.failed_fires = self.failed_fires or []
-        f = self._fires.pop(fire_id, None)
-        if f:
-            self._fire_ids.remove(fire_id)
-            self.failed_fires.append(f)
 
     ## Dumping data
 

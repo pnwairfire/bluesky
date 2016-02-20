@@ -344,9 +344,11 @@ class TestFiresManager:
         assert fires_manager.fires == [
             fires.Fire({'id': '1', 'name': 'n1'})
         ]
-        assert fires_manager.failed_fires == [
-            fires.Fire({'id': '2', 'name': 'n2'})
-        ]
+        assert len(fires_manager.failed_fires) == 1
+        assert fires_manager.failed_fires[0].id == '2'
+        assert fires_manager.failed_fires[0].name == 'n2'
+        assert fires_manager.failed_fires[0]['error']['message'] == 'oops'
+        assert fires_manager.failed_fires[0]['error']['traceback']
 
         # Don't Skip
         fires_manager = fires.FiresManager()
@@ -364,8 +366,10 @@ class TestFiresManager:
                 with raises(RuntimeError) as e_info:
                     with fires_manager.fire_failure_handler(fire):
                         go(fire)
-        assert fires_manager.fires == [
-            fires.Fire({'id': '1', 'name': 'n1'}),
-            fires.Fire({'id': '2', 'name': 'n2'})
-        ]
+        assert len(fires_manager.fires) == 2
+        assert fires_manager.fires[0] == fires.Fire({'id': '1', 'name': 'n1'})
+        assert fires_manager.fires[1].id == '2'
+        assert fires_manager.fires[1].name == 'n2'
+        assert fires_manager.fires[1]['error']['message'] == 'oops'
+        assert fires_manager.fires[1]['error']['traceback']
         assert fires_manager.failed_fires is None
