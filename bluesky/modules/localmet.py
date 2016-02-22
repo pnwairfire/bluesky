@@ -35,13 +35,14 @@ def run(fires_manager):
     arl_profiler = ArlProfiler(fires_manager.met.get('files'),
         time_step=fires_manager.get_config_value('localmet', 'time_step'))
     for fire in fires_manager.fires:
-        lat,lng = _fire_lat_lng(fire)
-        # parse_utc_offset makes sure utc offset is defined and valid
-        utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
-        for g in fire.growth:
-            tw = parse_datetimes(g, 'start', 'end')
-            g['localmet'] = arl_profiler.profile(lat, lng, tw['start'],
-                tw['end'], utc_offset)
+        with fires_manager.fire_failure_handler(fire):
+            lat,lng = _fire_lat_lng(fire)
+            # parse_utc_offset makes sure utc offset is defined and valid
+            utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
+            for g in fire.growth:
+                tw = parse_datetimes(g, 'start', 'end')
+                g['localmet'] = arl_profiler.profile(lat, lng, tw['start'],
+                    tw['end'], utc_offset)
 
     # fires_manager.summarize(...)
 
