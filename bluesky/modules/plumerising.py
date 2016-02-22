@@ -41,6 +41,8 @@ def run(fires_manager):
             if not fire.location.get('area'):
                 raise ValueError(
                     "Missing fire area required for computing plumerise")
+            if 'growth' not in fire:
+                raise ValueError("Missing growth data required for plumerise")
             frp = fire.get('meta', {}).get('frp')
             for g in fire.growth:
                 if not g.get('localmet'):
