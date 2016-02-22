@@ -80,6 +80,8 @@ def run(fires_manager):
         time_window = {}
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
+                if 'growth' not in fire:
+                    raise ValueError("Missing growth data required for findmetdata")
                 # parse_utc_offset makes sure utc offset is defined and valid
                 utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
                 offset = datetime.timedelta(hours=utc_offset)
