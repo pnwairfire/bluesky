@@ -30,41 +30,44 @@ def run(fires_manager):
 
     fires_manager.processed(__name__, __version__,
         timeprofile_version=timeprofile.__version__)
-    try:
-        for fire in fires_manager.fires:
+    for fire in fires_manager.fires:
+        with fires_manager.fire_failure_handler(fire):
+            try:
+                _run_fire(hourly_fractions, fire)
+            except InvalidHourlyFractionsError, e:
+                raise BlueSkyConfigurationError(
+                    "Invalid timeprofiling hourly fractions: '{}'".format(e.message))
+            except InvalidStartEndTimesError, e:
+                raise BlueSkyConfigurationError(
+                    "Invalid timeprofiling start end times: '{}'".format(e.message))
+            # except InvalidEmissionsDataError, e:
+            #     TODO: do anything with InvalidEmissionsDataError?
+            #     raise
 
-            if (hourly_fractions and len(fire.growth) > 1 and
-                    set([len(e) for p,e in hourly_fractions.items()]) != set([24])):
-                # TODO: Support this scenario, but make sure
-                # len(hourly_fractions) equals the total number of hours
-                # represented by all growth objects, and pass the appropriate
-                # slice into each instantiation of StaticTimeProfiler
-                # (or build this into StaticProfiler???)
-                raise BlueSkyConfigurationError("Only 24-hour repeatable time "
-                    "profiles supported for fires with multiple growth windows")
+def _run_fire(hourly_fractions, fire):
+    if (hourly_fractions and len(fire.growth) > 1 and
+            set([len(e) for p,e in hourly_fractions.items()]) != set([24])):
+        # TODO: Support this scenario, but make sure
+        # len(hourly_fractions) equals the total number of hours
+        # represented by all growth objects, and pass the appropriate
+        # slice into each instantiation of StaticTimeProfiler
+        # (or build this into StaticProfiler???)
+        raise BlueSkyConfigurationError("Only 24-hour repeatable time "
+            "profiles supported for fires with multiple growth windows")
 
-            _validate_fire(fire)
-            for g in fire.growth:
-                tw = parse_datetimes(g, 'start', 'end')
-                profiler = StaticTimeProfiler(tw['start'], tw['end'],
-                    hourly_fractions=hourly_fractions)
-                # convert timeprofile to dict with dt keys
-                g['timeprofile'] = {}
-                fields = profiler.hourly_fractions.keys()
-                for i in range(len(profiler.hourly_fractions.values()[0])): # each phase should have same len
-                    hr = profiler.start_hour + (i * profiler.ONE_HOUR)
-                    g['timeprofile'][hr.isoformat()] = {
-                        p: profiler.hourly_fractions[p][i] for p in fields }
+    _validate_fire(fire)
+    for g in fire.growth:
+        tw = parse_datetimes(g, 'start', 'end')
+        profiler = StaticTimeProfiler(tw['start'], tw['end'],
+            hourly_fractions=hourly_fractions)
+        # convert timeprofile to dict with dt keys
+        g['timeprofile'] = {}
+        fields = profiler.hourly_fractions.keys()
+        for i in range(len(profiler.hourly_fractions.values()[0])): # each phase should have same len
+            hr = profiler.start_hour + (i * profiler.ONE_HOUR)
+            g['timeprofile'][hr.isoformat()] = {
+                p: profiler.hourly_fractions[p][i] for p in fields }
 
-    except InvalidHourlyFractionsError, e:
-        raise BlueSkyConfigurationError(
-            "Invalid timeprofiling hourly fractions: '{}'".format(e.message))
-    except InvalidStartEndTimesError, e:
-        raise BlueSkyConfigurationError(
-            "Invalid timeprofiling start end times: '{}'".format(e.message))
-    # except InvalidEmissionsDataError, e:
-    #     TODO: do anything with InvalidEmissionsDataError?
-    #     raise
 
 def _scale_emissions(data, pct):
     for k in data:
