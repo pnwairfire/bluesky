@@ -68,22 +68,23 @@ def _run_feps(fires_manager, species, include_emissions_details):
     # The same lookup object is used for both Rx and WF
     calculator = EmissionsCalculator(FepsEFLookup(), species=species)
     for fire in fires_manager.fires:
-        if 'fuelbeds' not in fire:
-            raise ValueError(
-                "Missing fuelbed data required for computing emissions")
-        for fb in fire.fuelbeds:
-            if 'consumption' not in fb:
+        with fires_manager.fire_failure_handler(fire):
+            if 'fuelbeds' not in fire:
                 raise ValueError(
-                    "Missing consumption data required for computing emissions")
-            _calculate(calculator, fb, include_emissions_details)
-            # TODO: Figure out if we should indeed convert from lbs to tons;
-            #   if so, uncomment the following
-            # Note: According to BSF, FEPS emissions are in lbs/ton consumed.  Since
-            # consumption is in tons, and since we want emissions in tons, we need
-            # to divide each value by 2000.0
-            # datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
-            # if include_emissions_details:
-            #     datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
+                    "Missing fuelbed data required for computing emissions")
+            for fb in fire.fuelbeds:
+                if 'consumption' not in fb:
+                    raise ValueError(
+                        "Missing consumption data required for computing emissions")
+                _calculate(calculator, fb, include_emissions_details)
+                # TODO: Figure out if we should indeed convert from lbs to tons;
+                #   if so, uncomment the following
+                # Note: According to BSF, FEPS emissions are in lbs/ton consumed.  Since
+                # consumption is in tons, and since we want emissions in tons, we need
+                # to divide each value by 2000.0
+                # datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
+                # if include_emissions_details:
+                #     datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
 
 ##
 ## Urbanski
@@ -97,20 +98,21 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
     fccs2ef_rx = Fccs2Ef(is_rx=True)
 
     for fire in fires_manager.fires:
-        if 'fuelbeds' not in fire:
-            raise ValueError(
-                "Missing fuelbed data required for computing emissions")
-        fccs2ef = fccs2ef_rx if fire.type == "rx" else fccs2ef_wf
-        for fb in fire.fuelbeds:
-            if 'consumption' not in fb:
+        with fires_manager.fire_failure_handler(fire):
+            if 'fuelbeds' not in fire:
                 raise ValueError(
-                    "Missing consumption data required for computing emissions")
-            calculator = EmissionsCalculator([fccs2ef[fb["fccs_id"]]],
-                species=species)
-            _calculate(calculator, fb, include_emissions_details)
-            # TODO: are these emissions factors in something other than tons
-            #  per tons consumed?  if so, we need to multiply to convert
-            #  values to tons
+                    "Missing fuelbed data required for computing emissions")
+            fccs2ef = fccs2ef_rx if fire.type == "rx" else fccs2ef_wf
+            for fb in fire.fuelbeds:
+                if 'consumption' not in fb:
+                    raise ValueError(
+                        "Missing consumption data required for computing emissions")
+                calculator = EmissionsCalculator([fccs2ef[fb["fccs_id"]]],
+                    species=species)
+                _calculate(calculator, fb, include_emissions_details)
+                # TODO: are these emissions factors in something other than tons
+                #  per tons consumed?  if so, we need to multiply to convert
+                #  values to tons
 
 ##
 ## CONSUME
@@ -131,69 +133,75 @@ def _run_consume(fires_manager, species, include_emissions_details):
         species = [e.upper() for e in species]
 
     for fire in fires_manager.fires:
-        logging.debug("Consume emissions - fire {}".format(fire.id))
+        with fires_manager.fire_failure_handler(fire):
+            _run_consume_on_fire(fuel_loadings_manager, species,
+                include_emissions_details, fire)
 
-        if 'fuelbeds' not in fire:
+def _run_consume_on_fire(fuel_loadings_manager, species,
+        include_emissions_details, fire):
+    logging.debug("Consume emissions - fire {}".format(fire.id))
+
+    if 'fuelbeds' not in fire:
+        raise ValueError(
+            "Missing fuelbed data required for computing emissions")
+
+    # TODO: set burn type to 'activity' if fire.fuel_type == 'piles' ?
+    if fire.fuel_type == 'piles':
+        raise ValueError("Consume can't be used for fuel type 'piles'")
+    burn_type = fire.fuel_type
+
+    for fb in fire.fuelbeds:
+        if 'consumption' not in fb:
             raise ValueError(
-                "Missing fuelbed data required for computing emissions")
+                "Missing consumption data required for computing emissions")
+        if 'heat' not in fb:
+            raise ValueError(
+                "Missing heat data required for computing emissions")
 
-        # TODO: set burn type to 'activity' if fire.fuel_type == 'piles' ?
-        if fire.fuel_type == 'piles':
-            raise ValueError("Consume can't be used for fuel type 'piles'")
-        burn_type = fire.fuel_type
+        fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
+             fb['fccs_id'])
+        area = (fb['pct'] / 100.0) * fire.location['area']
+        fc = FuelConsumptionForEmissions(fb["consumption"], fb['heat'],
+            area, burn_type, fb['fccs_id'], fire['location'],
+            fccs_file=fuel_loadings_csv_filename)
 
-        for fb in fire.fuelbeds:
-            if 'consumption' not in fb:
-                raise ValueError(
-                    "Missing consumption data required for computing emissions")
-            if 'heat' not in fb:
-                raise ValueError(
-                    "Missing heat data required for computing emissions")
+        fb['emissions_fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
+        e = consume.Emissions(fuel_consumption_object=fc)
 
-            fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
-                 fb['fccs_id'])
-            area = (fb['pct'] / 100.0) * fire.location['area']
-            fc = FuelConsumptionForEmissions(fb["consumption"], fb['heat'],
-                area, burn_type, fb['fccs_id'], fire['location'],
-                fccs_file=fuel_loadings_csv_filename)
-
-            fb['emissions_fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
-            e = consume.Emissions(fuel_consumption_object=fc)
-
-            r = e.results()['emissions']
-            fb['emissions'] = {f: {} for f in CONSUME_FIELDS}
-            # r's key hierarchy is species > phase; we want phase > species
-            for k in r:
+        r = e.results()['emissions']
+        fb['emissions'] = {f: {} for f in CONSUME_FIELDS}
+        # r's key hierarchy is species > phase; we want phase > species
+        for k in r:
+            upper_k = k.upper()
+            if k != 'stratum' and (not species or upper_k in species):
+                for p in r[k]:
+                    fb['emissions'][p][upper_k] = r[k][p]
+        if include_emissions_details:
+            # Note: consume gives details per fuel category, not per
+            #  subcategory; to match what feps and urbanski calculators
+            #  produce, put all per-category details under'summary'
+            # The details are under key 'stratum'. the key hierarchy is:
+            #    'stratum' > species > fuel category > phase
+            #   we want phase > species:
+            #     'summary' > fuel category > phase > species
+            fb['emissions_details'] = { "summary": {} }
+            for k in r.get('stratum', {}):
                 upper_k = k.upper()
-                if k != 'stratum' and (not species or upper_k in species):
-                    for p in r[k]:
-                        fb['emissions'][p][upper_k] = r[k][p]
-            if include_emissions_details:
-                # Note: consume gives details per fuel category, not per
-                #  subcategory; to match what feps and urbanski calculators
-                #  produce, put all per-category details under'summary'
-                # The details are under key 'stratum'. the key hierarchy is:
-                #    'stratum' > species > fuel category > phase
-                #   we want phase > species:
-                #     'summary' > fuel category > phase > species
-                fb['emissions_details'] = { "summary": {} }
-                for k in r.get('stratum', {}):
-                    upper_k = k.upper()
-                    if not species or upper_k in species:
-                        for c in r['stratum'][k]:
-                            fb['emissions_details']['summary'][c] = fb['emissions_details']['summary'].get(c, {})
-                            for p in r['stratum'][k][c]:
-                                fb['emissions_details']['summary'][c][p] = fb['emissions_details']['summary'][c].get(p, {})
-                                fb['emissions_details']['summary'][c][p][upper_k] = r['stratum'][k][c][p]
+                if not species or upper_k in species:
+                    for c in r['stratum'][k]:
+                        fb['emissions_details']['summary'][c] = fb['emissions_details']['summary'].get(c, {})
+                        for p in r['stratum'][k][c]:
+                            fb['emissions_details']['summary'][c][p] = fb['emissions_details']['summary'][c].get(p, {})
+                            fb['emissions_details']['summary'][c][p][upper_k] = r['stratum'][k][c][p]
 
-            # Note: We don't need to call
-            #   datautils.multiply_nested_data(fb["emissions"], area)
-            # because the consumption and heat data set in fc were assumed to
-            # have been multiplied by area.
+        # Note: We don't need to call
+        #   datautils.multiply_nested_data(fb["emissions"], area)
+        # because the consumption and heat data set in fc were assumed to
+        # have been multiplied by area.
 
-            # TODO: act on 'include_emissions_details'?  consume emissions
-            #   doesn't provide as detailed emissions as FEPS and Urbanski;
-            #   it lists per-category emissions, not per-sub-category
+        # TODO: act on 'include_emissions_details'?  consume emissions
+        #   doesn't provide as detailed emissions as FEPS and Urbanski;
+        #   it lists per-category emissions, not per-sub-category
 
 ##
 ## Helpers

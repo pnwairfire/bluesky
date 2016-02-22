@@ -1,5 +1,6 @@
 {
     "config": {
+        "skip_failed_fires": true,
         "emissions":{
             "efs": "consume",
             "include_emissions_details": true,
@@ -7,6 +8,26 @@
         }
     },
     "fire_information": [
+        {
+            "event_of": {
+                "id": "ssdlfjsldfj",
+                "name": "Activity Fire missing consumption"
+            },
+            "fuelbeds": [
+                {
+                    "fccs_id": "41",
+                    "pct": 45.0
+                }
+            ],
+            "id": "slijlfdsljfsdkljf",
+            "location": {
+                "area": 200,
+                "ecoregion": "southern",
+                "latitude": 47.4316976,
+                "longitude": -121.3990506,
+                "utc_offset": "-09:00"
+            }
+        },
         {
             "event_of": {
                 "id": "SF11E826544",
