@@ -79,22 +79,23 @@ def run(fires_manager):
         #  when no fire is growing are excluded ?
         time_window = {}
         for fire in fires_manager.fires:
-            # parse_utc_offset makes sure utc offset is defined and valid
-            utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
-            offset = datetime.timedelta(hours=utc_offset)
-            for g in fire.growth:
-                tw = parse_datetimes(g, 'start', 'end')
-                if tw['start'] > tw['end']:
-                    raise ValueError("Invalid growth time window - start: {}, end: {}".format(
-                        tw['start'], tw['end']))
-                start = tw['start'] - offset
-                end = tw['end'] - offset
-                if not time_window:
-                    time_window = {'start': start, 'end': end}
-                else:
-                    time_window['start'] = min(time_window['start'], start)
-                    # TODO: round end down to previous hour if it's a round hour
-                    time_window['end'] = max(time_window['end'], end)
+            with fires_manager.fire_failure_handler(fire):
+                # parse_utc_offset makes sure utc offset is defined and valid
+                utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
+                offset = datetime.timedelta(hours=utc_offset)
+                for g in fire.growth:
+                    tw = parse_datetimes(g, 'start', 'end')
+                    if tw['start'] > tw['end']:
+                        raise ValueError("Invalid growth time window - start: {}, end: {}".format(
+                            tw['start'], tw['end']))
+                    start = tw['start'] - offset
+                    end = tw['end'] - offset
+                    if not time_window:
+                        time_window = {'start': start, 'end': end}
+                    else:
+                        time_window['start'] = min(time_window['start'], start)
+                        # TODO: round end down to previous hour if it's a round hour
+                        time_window['end'] = max(time_window['end'], end)
 
     if not time_window or not time_window.get('start') or not time_window.get('end'):
         raise BlueSkyConfigurationError(
