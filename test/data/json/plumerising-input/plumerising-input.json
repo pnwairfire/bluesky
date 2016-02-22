@@ -1,5 +1,22 @@
 {
+    "config": {
+        "skip_failed_fires": true
+    },
     "fire_information": [
+        {
+            "event_of": {
+                "id": "ssdlfjsldfj",
+                "name": "Activity Fire missing growth"
+            },
+            "id": "slijlfdsljfsdkljf",
+            "location": {
+                "area": 200,
+                "ecoregion": "southern",
+                "latitude": 47.4316976,
+                "longitude": -121.3990506,
+                "utc_offset": "-09:00"
+            }
+        },
         {
             "event_of": {
                 "id": "SF11E826544",
