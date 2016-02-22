@@ -3,8 +3,8 @@
 Requires time profiled emissions and localmet data.
 """
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import consume
 import logging

@@ -5,8 +5,8 @@ significantly (mostly in VSMOKEDispersion).  It was originally written
 by Sonoma Technology, Inc.
 """
 
-__author__      = "Joel Dubowy and Sonoma Technology, Inc."
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy and Sonoma Technology, Inc."
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 __version__ = "0.1.0"
 

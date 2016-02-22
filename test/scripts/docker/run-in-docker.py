@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 __author__ = "Joel Dubowy"
-__copyright__ = "Copyright 2015, AirFire, PNW, USFS"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import logging
 import os

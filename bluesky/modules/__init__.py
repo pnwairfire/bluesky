@@ -13,8 +13,8 @@ If implemented as a subpackage, the __init__.py just needs to define a run
 method or import it from one of it's modules.)
 """
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import pkgutil
 

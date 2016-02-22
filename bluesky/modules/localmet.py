@@ -6,8 +6,8 @@ relative or absolute paths to profile, to eliminiate security vulnerabilities
 when invoked by web service request.) To obtain profile, contact NOAA.
 """
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import logging
 import os

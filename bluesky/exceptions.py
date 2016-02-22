@@ -3,8 +3,8 @@
 Defines exception classes to let calling code handle errors differently
 """
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2016, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 __all__ = [
     "BlueSkyImportError",

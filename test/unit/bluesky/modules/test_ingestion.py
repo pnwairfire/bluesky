@@ -1,7 +1,7 @@
 """Unit tests for bluesky.modules.ingestion"""
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import copy
 

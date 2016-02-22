@@ -8,8 +8,8 @@ access, and the logic in Fire.latitude and Fire.longitude would need to be
 moved into hysplit.py.
 """
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import abc
 import itertools

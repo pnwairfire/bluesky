@@ -4,8 +4,8 @@ This module finds met data files to use for a particular domain and time window
 spanning all fire growth periods.
 """
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import datetime
 import logging

@@ -4,8 +4,8 @@ If running hysplit dispersion, you'll need to obtain hysplit and various other
 Executables. See the repo README.md for more information.
 """
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import consume
 import importlib

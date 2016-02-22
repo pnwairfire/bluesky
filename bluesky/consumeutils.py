@@ -3,8 +3,8 @@
 TODO: move this (and other top level utility modules?) into nested package ?
 """
 
-__author__      = "Joel Dubowy"
-__copyright__   = "Copyright 2016, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import copy
 import tempfile

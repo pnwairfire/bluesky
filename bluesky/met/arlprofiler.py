@@ -10,8 +10,8 @@ contact NOAA.
 TODO: move this to pyairfire or into it's own repo (arl-profile[r]) ?
 """
 
-__author__      = "Joel Dubowy and others (unknown)"
-__copyright__   = "Copyright 2015, AirFire, PNW, USFS"
+__author__ = "Joel Dubowy and others (unknown)"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import logging
 import os
