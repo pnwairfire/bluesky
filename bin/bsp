@@ -88,10 +88,26 @@ POSITIONAL_ARGS = [
 # Note: the trailing space seems to be the only way to add an extra trailing line
 EPILOG_STR = """\
 Available Modules:
+
     {}
 
 Configuration:
-....ADD NOTE About how yu can configure, and order of override/precedence
+
+    Config settings can be specified in the input data, in separate config
+    file(s), and as command line options.  First the input data is loaded,
+    then the file files are applied, and finally the comand line settings
+    are applied.  If multiple config files are specified, they will be applied
+    in the order they are specified. The same holds true for settings
+    specified on the command line.
+
+    For example if input.json specifies foo=foo, config1.json specifies
+    foo=bar, and config2.json specifies foo=baz, and if bsp is invoked like:
+
+     $ bsp -i input.json -c config1.json -c config2.json
+
+    then foo will be set to 'baz'.  If you add '-C foo=bsdf' to the command,
+    then regardless of where it is specified in the command, foo will be
+    'bsdf'.
  """.format('\n    '.join(modules.AVAILABLE_MODULES))
 
 def validate_args(args):
