@@ -8,9 +8,6 @@ Example calls:
  > bsp < fires-before.json > fires-after.json
 """
 
-__author__ = "Joel Dubowy"
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
-
 import json
 import importlib
 import logging
@@ -26,6 +23,9 @@ except:
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
     from bluesky import exceptions, configuration, modules, models, process, __version__
+
+__author__ = "Joel Dubowy"
+__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 REQUIRED_ARGS = []
 
@@ -54,27 +54,20 @@ OPTIONAL_ARGS = [
         'action': "append",
         'default': []
     },
-    # If we resurrect loading config settings from file, consider accepting json,
-    # instead of or in addition to ConfigParser ini format, in order to accept
-    # values other than just strings (e.g. numeric values)
-    # {
-    #     'short': '-c',
-    #     'long': '--config-file',
-    #     'dest': 'config_file',
-    #     'help': 'config file comtaining overrides for default config values',
-    #     'action': "store",
-    #     'default': None
-    # },
-    # If we resurrect loading config settings from command line option, accept
-    # any nesting (ex. foo=1, foo.bar=1, foo.bar.baz=2), and load into dict
-    # instead of ConfigParser object
-    # {
-    #     'short': "-D",
-    #     'long': '--config-option',
-    #     'dest': 'config_options',
-    #     'help': "Config option override, formatted like 'Section.Option=value'",
-    #     'action': scripting.args.SetConfigOptionAction
-    # },
+    {
+        'short': "-C",
+        'long': '--config-option',
+        'dest': 'config_options',
+        'help': "Config option override, formatted like 'section.*.key=value'",
+        'action': configuration.ConfigOptionAction
+    },
+    {
+        'short': '-c',
+        'long': '--config-file',
+        'dest': 'config_file_options',
+        'help': 'config file comtaining JSON formatted overrides for default config values',
+        'action': configuration.ConfigFileAction
+    },
     {
         #'short': "-v",
         'long': '--version',
@@ -93,9 +86,12 @@ POSITIONAL_ARGS = [
 ]
 
 # Note: the trailing space seems to be the only way to add an extra trailing line
-AVAILABLE_MODULES_STR = """\
+EPILOG_STR = """\
 Available Modules:
     {}
+
+Configuration:
+....ADD NOTE About how yu can configure, and order of override/precedence
  """.format('\n    '.join(modules.AVAILABLE_MODULES))
 
 def validate_args(args):
@@ -123,7 +119,7 @@ def load_fires(args):
 
 def main():
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
-        positional_args=POSITIONAL_ARGS, epilog=AVAILABLE_MODULES_STR,
+        positional_args=POSITIONAL_ARGS, epilog=EPILOG_STR,
         pre_validation=output_version)
     validate_args(args)
     #scripting.utils.log_config(args.config_options)
@@ -146,6 +142,10 @@ def main():
         #  ConfigParser object, convert that object into a dict, and merge that
         #  dict into config.  Make sure output json contains merged config
         #  (with tests)
+
+        # merge loaded file options
+        fires_manager.merge_config(args.config_file_options)
+        fires_manager.merge_config(args.config_options)
 
         fires_manager.run()
     except exceptions.BlueSkyModuleError, e:
