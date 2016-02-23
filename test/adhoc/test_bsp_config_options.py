@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
 """Tests bsp's -c' and '-C' options
+
+TODO: test error cases ('-c' set to non-existent file; invalid values for
+    '--bool-config-value', '--int-config-value', '--float-config-value';
+    config conflicts; etc.)
 """
 
 import json
@@ -54,7 +58,10 @@ CONFIG_2 = {
     }
 }
 
-# Note: "-C foo.d=444444 -C foo.dd=dd -C boo.d=d -C d=d" will be specified on the command line
+# Note: "-C foo.d=444444 -C foo.dd=dd -C boo.d=d -C d=d "
+#  and "-B dbt=true -B dbf=0 -I di=23 -F df=123.23"
+#  and "-C dci=23 -C dcf=123.23"
+#  will be specified on the command line
 
 EXPECTED = {
     "config": {
@@ -78,7 +85,13 @@ EXPECTED = {
         },
         "b": "b",
         "c": "c",
-        "d": "d"
+        "d": "d",
+        "dbt": True,
+        "dbf": False,
+        "di": 23,
+        "df": 123.23,
+        "dci": "23",
+        "dcf": "123.23"
     },
     "fire_information": []
 }
@@ -99,7 +112,10 @@ cmd_args = [
     BSP, '-i', input_file.name,
     '-c', config_1_file.name, '-c', config_2_file.name,
     '-C', 'foo.d=444444', '-C', 'foo.dd=dd',
-    '-C', 'boo.d=d', '-C', 'd=d'
+    '-C', 'boo.d=d', '-C', 'd=d',
+    '-B', 'dbt=true', '-B', 'dbf=0',
+    '-I', 'di=23', '-F', 'df=123.23',
+    '-C', 'dci=23', '-C', 'dcf=123.23'
 ]
 output = subprocess.check_output(cmd_args)
 logging.basicConfig(level=logging.INFO)
