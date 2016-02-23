@@ -9,7 +9,9 @@ from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
     'config_parser_to_dict',
-    'get_config_value'
+    'get_config_value',
+    'set_config_value',
+    'merge_configs'
 ]
 
 ##
@@ -56,3 +58,22 @@ def set_config_value(config, value, *keys):
         if not isinstance(config.get(keys[0]), dict):
             config[keys[0]] = dict()
         set_config_value(config[keys[0]], value, *keys[1:])
+
+CONFIG_CONFLICT = "Conflicting config dicts. Can't be merged."
+
+def merge_configs(config, to_be_merged_config):
+    if not isinstance(config, dict) or not isinstance(to_be_merged_config, dict):
+        raise BlueSkyConfigurationError(INVALID_CONFIG_ERR_MSG)
+
+    # Merge in place
+    for k, v in to_be_merged_config.items():
+        if k not in config or (
+                not isinstance(config[k], dict) and not isinstance(v, dict)):
+            config[k] = v
+        elif isinstance(config[k], dict) and isinstance(v, dict):
+            merge_configs(config[k], v)
+        else:
+            raise BlueSkyConfigurationError(CONFIG_CONFLICT)
+
+    # return reference to config, even though it was merged in place
+    return config

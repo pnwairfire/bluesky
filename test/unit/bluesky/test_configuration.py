@@ -11,8 +11,10 @@ from bluesky.configuration import (
     config_parser_to_dict,
     get_config_value,
     set_config_value,
+    merge_configs,
     INVALID_CONFIG_ERR_MSG,
-    MISSING_KEYS_ERR_MSG
+    MISSING_KEYS_ERR_MSG,
+    CONFIG_CONFLICT
 )
 from bluesky.exceptions import BlueSkyConfigurationError
 
@@ -101,12 +103,12 @@ class TestSetConfigValue(object):
     def test_invalid_config(self):
         with raises(BlueSkyConfigurationError) as e_info:
             set_config_value(12, 3, '123')
-            assert e_info.value.message == INVALID_CONFIG_ERR_MSG
+        assert e_info.value.message == INVALID_CONFIG_ERR_MSG
 
     def test_no_keys(self):
         with raises(BlueSkyConfigurationError) as e_info:
             set_config_value({}, 32)
-            assert e_info.value.message == MISSING_KEYS_ERR_MSG
+        assert e_info.value.message == MISSING_KEYS_ERR_MSG
 
     def test_basic(self):
         config = {}
@@ -126,3 +128,51 @@ class TestSetConfigValue(object):
         config = {'a': 123, 'b': {'c': {'d': 321}}}
         set_config_value(config, 34, 'b', 'c')
         assert config == {'a': 123, 'b': {'c': 34}}
+
+class TestMergeConfigs(object):
+
+    def test_invalid_configs(self):
+        with raises(BlueSkyConfigurationError) as e_info:
+            merge_configs(12, {'a': 1})
+        assert e_info.value.message == INVALID_CONFIG_ERR_MSG
+
+        with raises(BlueSkyConfigurationError) as e_info:
+            merge_configs({'a': 1}, 12)
+        assert e_info.value.message == INVALID_CONFIG_ERR_MSG
+
+        with raises(BlueSkyConfigurationError) as e_info:
+            merge_configs(12, 12)
+        assert e_info.value.message == INVALID_CONFIG_ERR_MSG
+
+    def test_conflicting_configs(self):
+        with raises(BlueSkyConfigurationError) as e_info:
+            merge_configs({'a': 'a'}, {'a': {'b': 'c'}})
+        assert e_info.value.message == CONFIG_CONFLICT
+
+        with raises(BlueSkyConfigurationError) as e_info:
+            merge_configs({'a': {'b': 'c'}}, {'a': 'a'})
+        assert e_info.value.message == CONFIG_CONFLICT
+
+    def test_empty_both_configs(self):
+        a = {}
+        b = merge_configs(a, {})
+        assert a == b == {}
+
+    def test_empty_config(self):
+        a = {}
+        b = merge_configs(a, {'a': 123})
+        assert a == b == {'a': 123}
+
+    def test_empty_to_be_merged_config(self):
+        a = {'a': 123}
+        b = merge_configs(a, {})
+        assert a == b == {'a': 123}
+
+    def test_all(self):
+        a = {'a': 123}
+        b = merge_configs(a, {'b': {'c': 3}})
+        assert a == b == {'a': 123, 'b': {'c': 3}}
+        b = merge_configs(a, {'b': {'d': 5}})
+        assert a == b == {'a': 123, 'b': {'c': 3, 'd': 5}}
+        b = merge_configs(a, {'b': {'d': 19, 'e': 10}, 'f': 321})
+        assert a == b == {'a': 123, 'b': {'c': 3, 'd': 19, 'e': 10}, 'f': 321}

@@ -245,6 +245,11 @@ class FiresManager(object):
         self.config = self.config or dict()
         configuration.set_config_value(self.config, value, *keys)
 
+    def merge_config(self, config_dict):
+        self.config = self.config or dict()
+        if config_dict:
+            configuration.merge_configs(self.config, config_dict)
+
     # @property(self):
     # def meta(self):
     #     return self._meta
