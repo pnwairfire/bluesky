@@ -120,7 +120,7 @@ class ConfigOptionAction(argparse.Action):
         m = self.EXTRACTER.search(value.strip())
         if not m:
             msg = ("Invalid value '{}' for option '{}' - value must be of the "
-                "form 'section.*.key=value'".format(value, opt))
+                "form 'section.*.key=value'".format(value, option_string))
             raise argparse.ArgumentTypeError(msg)
 
         config_dict = getattr(namespace, self.dest)
