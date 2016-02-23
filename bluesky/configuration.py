@@ -20,7 +20,11 @@ __all__ = [
     'get_config_value',
     'set_config_value',
     'merge_configs',
-    'ConfigOptionAction'
+    'ConfigOptionAction',
+    'BooleanConfigOptionAction',
+    'IntegerConfigOptionAction',
+    'FloatConfigOptionAction',
+    'ConfigFileAction'
 ]
 
 ##
@@ -91,11 +95,15 @@ def merge_configs(config, to_be_merged_config):
 ## Parsing config options from the command line
 ##
 
-# TODO: move Config*Action classes to pyairfire ?
+# TODO: move *Config*Action classes to pyairfire ?
 
 class ConfigOptionAction(argparse.Action):
 
     EXTRACTER = re.compile('^([^=]+)=([^=]+)$')
+
+    def _cast_value(self, val):
+        # default is to return as is (as str)
+        return val
 
     def __call__(self, parser, namespace, value, option_string=None):
         """Set individual config option in config dict
@@ -120,7 +128,37 @@ class ConfigOptionAction(argparse.Action):
             config_dict = dict()
             setattr(namespace, self.dest, config_dict)
 
-        set_config_value(config_dict, m.group(2), *m.group(1).split('.'))
+        val = self._cast_value(m.group(2))
+        set_config_value(config_dict, val, *m.group(1).split('.'))
+
+class BooleanConfigOptionAction(ConfigOptionAction):
+    TRUE_VALS = set(['true', "1"])
+    FALSE_VALS = set(['false', "0"])
+    def _cast_value(self, val):
+        val = val.lower()
+        if val in self.TRUE_VALS:
+            return True
+        elif val in self.FALSE_VALS:
+            return False
+        else:
+            raise argparse.ArgumentTypeError(
+                "Invalid boolean value: {}".format(val))
+
+class IntegerConfigOptionAction(ConfigOptionAction):
+    def _cast_value(self, val):
+        try:
+            return int(val)
+        except ValueError:
+            raise argparse.ArgumentTypeError(
+                "Invalid integer value: {}".format(val))
+
+class FloatConfigOptionAction(ConfigOptionAction):
+    def _cast_value(self, val):
+        try:
+            return float(val)
+        except ValueError:
+            raise argparse.ArgumentTypeError(
+                "Invalid float value: {}".format(val))
 
 class ConfigFileAction(argparse.Action):
     def __call__(self, parser, namespace, value, option_string=None):

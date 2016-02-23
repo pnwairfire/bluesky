@@ -62,6 +62,27 @@ OPTIONAL_ARGS = [
         'action': configuration.ConfigOptionAction
     },
     {
+        'short': "-B",
+        'long': '--boolean-config-option',
+        'dest': 'config_options',
+        'help': "Config option override, formatted like 'section.*.key=boolvalue'",
+        'action': configuration.BooleanConfigOptionAction
+    },
+    {
+        'short': "-I",
+        'long': '--integer-config-option',
+        'dest': 'config_options',
+        'help': "Config option override, formatted like 'section.*.key=intvalue'",
+        'action': configuration.IntegerConfigOptionAction
+    },
+    {
+        'short': "-F",
+        'long': '--float-config-option',
+        'dest': 'config_options',
+        'help': "Config option override, formatted like 'section.*.key=floatvalue'",
+        'action': configuration.FloatConfigOptionAction
+    },
+    {
         'short': '-c',
         'long': '--config-file',
         'dest': 'config_file_options',
