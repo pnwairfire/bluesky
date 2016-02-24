@@ -183,6 +183,18 @@ class FireIngester(object):
 
         fire['location'].update(self._get_fields('location',
             self.OPTIONAL_LOCATION_FIELDS))
+        if not fire['location'].get('utc_offset'):
+            date_time = self._parsed_input.get('date_time')
+            if date_time:
+                try:
+                    m = self.DATE_TIME_MATCHER.match(date_time)
+                    if m:
+                        fire['location']['utc_offset'] = m.group(2)
+                except Exception, e:
+                    logging.warn("Failed to extract utc offset from "
+                        "'date_time' value %s", date_time)
+
+
 
     def _ingest_event_of(self, fire):
         event_of_fields = [
@@ -240,8 +252,8 @@ class FireIngester(object):
                             'pct': 100.0
                         })
                 except Exception, e:
-                    logging.warn("Failed to process 'date_time' value %s",
-                        date_time)
+                    logging.warn("Failed to extract growth information "
+                        "from 'date_time' value %s", date_time)
 
         else:
             for g in self._parsed_input['growth']:
