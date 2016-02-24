@@ -95,14 +95,18 @@ class Fire(dict):
 
     ## Validation
 
-    VALID_TYPES = ('wildfire', 'rx')
+    VALID_TYPES = {
+        'wildfire': 'wildfire',
+        'wf': 'wildfire',
+        'rx':'rx'
+    }
     INVALID_TYPE_MSG = "Invalid fire 'type': {}"
 
     def _validate_type(self, val):
         val = val.lower()
         if val not in self.VALID_TYPES:
             raise ValueError(self.INVALID_TYPE_MSG.format(val))
-        return val
+        return self.VALID_TYPES[val]
 
     VALID_FUEL_TYPES = ('natural', 'activity', 'piles')
     INVALID_FUEL_TYPE_MSG = "Invalid fire 'fuel_type': {}"
