@@ -4,7 +4,9 @@ __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import copy
+import datetime
 import logging
+import re
 
 from bluesky import consumeutils
 
@@ -149,6 +151,8 @@ class FireIngester(object):
     ## Field-Specific Ingest Methods
     ##
 
+    DATE_TIME_MATCHER = re.compile('^(\d{12,14})([+-]\d{2}\:\d{2})$')
+
     OPTIONAL_LOCATION_FIELDS = [
         "ecoregion",
         "utc_offset" # utc_offest is only required by modules using met data
@@ -203,6 +207,8 @@ class FireIngester(object):
             if v:
                 growth[-1][f] = v
 
+    DATE_TIME_FMT = "%Y%m%d%H%M"
+    GROWTH_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
     def _ingest_growth(self, fire):
         # Note: can't use _get_field[s] as is because 'growth' is an array,
         # not a nested object
@@ -211,9 +217,32 @@ class FireIngester(object):
             # no growth array - look for 'start'/'end' in top level
             start = self._parsed_input.get('start')
             end = self._parsed_input.get('end')
+            date_time = self._parsed_input.get('date_time')
             if start and end:
                 growth.append({'start': start, 'end': end, 'pct': 100.0})
                 self._ingest_optional_growth_fields(growth, self._parsed_input)
+            elif date_time:
+                # this supports fires from bluesky daily runs
+                # formatted like: "201508040000-04:00"
+                # Note: timezone will be parsed, if necessary, in
+                #  _ingest_location
+                try:
+                    m = self.DATE_TIME_MATCHER.match(date_time)
+                    if m:
+                        start = datetime.datetime.strptime(m.group(1),
+                            self.DATE_TIME_FMT)
+                        # As assume 24-hour
+                        end = start + datetime.timedelta(hours=24)
+                        # Note: this assumes time is local
+                        growth.append({
+                            'start': start.strftime(self.GROWTH_TIME_FORMAT),
+                            'end': end.strftime(self.GROWTH_TIME_FORMAT),
+                            'pct': 100.0
+                        })
+                except Exception, e:
+                    logging.warn("Failed to process 'date_time' value %s",
+                        date_time)
+
         else:
             for g in self._parsed_input['growth']:
                 growth.append({})
