@@ -68,9 +68,7 @@ class FireIngester(object):
     SCALAR_FIELDS = {
         "id", "type", "fuel_type"
     }
-    NESTED_FIELDS = {
-        "location", "growth", "event_of", "fuelbeds", "meta"
-    }
+    NESTED_FIELD_METHOD_PREFIX = '_ingest_nested_field_'
 
     ##
     ## Public Interface
@@ -91,9 +89,9 @@ class FireIngester(object):
                 fire[k] = self._parsed_input[k]
 
         # Call separate ingest methods for each nested object
-        for k in self.NESTED_FIELDS:
-            key_ingester = getattr(self, '_ingest_%s' % (k), None)
-            key_ingester(fire)
+        for k in dir(self):
+            if k.startswith(self.NESTED_FIELD_METHOD_PREFIX):
+                getattr(self, k)(fire)
 
         self._ingest_custom_fields(fire)
         self._set_defaults(fire)
@@ -148,7 +146,7 @@ class FireIngester(object):
         return fields
 
     ##
-    ## Field-Specific Ingest Methods
+    ## Nested Field Specific Ingest Methods
     ##
 
     DATE_TIME_MATCHER = re.compile('^(\d{12,14})([+-]\d{2}\:\d{2})$')
@@ -161,7 +159,7 @@ class FireIngester(object):
     for _s in consumeutils.SETTINGS.values():
         OPTIONAL_LOCATION_FIELDS.extend([e[0] for e in _s])
 
-    def _ingest_location(self, fire):
+    def _ingest_nested_field_location(self, fire):
         # TODO: validate fields
         # TODO: look for fields either in 'location' key or at top level
         perimeter = self._get_field('perimeter', 'location')
@@ -196,7 +194,7 @@ class FireIngester(object):
 
 
 
-    def _ingest_event_of(self, fire):
+    def _ingest_nested_field_event_of(self, fire):
         event_of_fields = [
             # 'name' can be defined at the top level as well as under 'event_of'
             ("name", self._get_field("name", 'event_of')),
@@ -221,7 +219,7 @@ class FireIngester(object):
 
     DATE_TIME_FMT = "%Y%m%d%H%M"
     GROWTH_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
-    def _ingest_growth(self, fire):
+    def _ingest_nested_field_growth(self, fire):
         # Note: can't use _get_field[s] as is because 'growth' is an array,
         # not a nested object
         growth = []
@@ -275,7 +273,7 @@ class FireIngester(object):
         'consumption', 'emissions', 'emissions_details'
     ]
 
-    def _ingest_fuelbeds(self, fire):
+    def _ingest_nested_field_fuelbeds(self, fire):
         if self._parsed_input.get('fuelbeds'):
             fuelbeds = []
             for fb in self._parsed_input['fuelbeds']:
