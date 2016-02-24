@@ -69,6 +69,7 @@ class FireIngester(object):
         "id", "type", "fuel_type"
     }
     NESTED_FIELD_METHOD_PREFIX = '_ingest_nested_field_'
+    SPECIAL_FIELD_METHOD_PREFIX = '_ingest_special_field_'
 
     ##
     ## Public Interface
@@ -91,6 +92,12 @@ class FireIngester(object):
         # Call separate ingest methods for each nested object
         for k in dir(self):
             if k.startswith(self.NESTED_FIELD_METHOD_PREFIX):
+                getattr(self, k)(fire)
+
+        # Ingest special fields; it's important that this happens after
+        # the above ingest method calls
+        for k in dir(self):
+            if k.startswith(self.SPECIAL_FIELD_METHOD_PREFIX):
                 getattr(self, k)(fire)
 
         self._ingest_custom_fields(fire)
@@ -149,7 +156,7 @@ class FireIngester(object):
     ## Nested Field Specific Ingest Methods
     ##
 
-    DATE_TIME_MATCHER = re.compile('^(\d{12,14})([+-]\d{2}\:\d{2})$')
+    ## 'location'
 
     OPTIONAL_LOCATION_FIELDS = [
         "ecoregion",
@@ -181,18 +188,8 @@ class FireIngester(object):
 
         fire['location'].update(self._get_fields('location',
             self.OPTIONAL_LOCATION_FIELDS))
-        if not fire['location'].get('utc_offset'):
-            date_time = self._parsed_input.get('date_time')
-            if date_time:
-                try:
-                    m = self.DATE_TIME_MATCHER.match(date_time)
-                    if m:
-                        fire['location']['utc_offset'] = m.group(2)
-                except Exception, e:
-                    logging.warn("Failed to extract utc offset from "
-                        "'date_time' value %s", date_time)
 
-
+    ## 'event_of'
 
     def _ingest_nested_field_event_of(self, fire):
         event_of_fields = [
@@ -211,14 +208,14 @@ class FireIngester(object):
     GROWTH_FIELDS = ['start','end', 'pct']
     OPTIONAL_GROWTH_FIELDS = ['localmet', 'timeprofile', 'plumerise']
 
+    ## 'growth'
+
     def _ingest_optional_growth_fields(self, growth, src):
         for f in self.OPTIONAL_GROWTH_FIELDS:
             v = src.get(f)
             if v:
                 growth[-1][f] = v
 
-    DATE_TIME_FMT = "%Y%m%d%H%M"
-    GROWTH_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
     def _ingest_nested_field_growth(self, fire):
         # Note: can't use _get_field[s] as is because 'growth' is an array,
         # not a nested object
@@ -227,31 +224,9 @@ class FireIngester(object):
             # no growth array - look for 'start'/'end' in top level
             start = self._parsed_input.get('start')
             end = self._parsed_input.get('end')
-            date_time = self._parsed_input.get('date_time')
             if start and end:
                 growth.append({'start': start, 'end': end, 'pct': 100.0})
                 self._ingest_optional_growth_fields(growth, self._parsed_input)
-            elif date_time:
-                # this supports fires from bluesky daily runs
-                # formatted like: "201508040000-04:00"
-                # Note: timezone will be parsed, if necessary, in
-                #  _ingest_location
-                try:
-                    m = self.DATE_TIME_MATCHER.match(date_time)
-                    if m:
-                        start = datetime.datetime.strptime(m.group(1),
-                            self.DATE_TIME_FMT)
-                        # As assume 24-hour
-                        end = start + datetime.timedelta(hours=24)
-                        # Note: this assumes time is local
-                        growth.append({
-                            'start': start.strftime(self.GROWTH_TIME_FORMAT),
-                            'end': end.strftime(self.GROWTH_TIME_FORMAT),
-                            'pct': 100.0
-                        })
-                except Exception, e:
-                    logging.warn("Failed to extract growth information "
-                        "from 'date_time' value %s", date_time)
 
         else:
             for g in self._parsed_input['growth']:
@@ -267,6 +242,8 @@ class FireIngester(object):
                 growth[0] = 100.0
             # TODO: make sure percentages add up to 100.0, with allowable error
             fire['growth'] = growth
+
+    ## 'fuelbeds'
 
     OPTIONAL_FUELBED_FIELDS = [
         'fccs_id', 'pct', 'fuel_loadings',
@@ -288,7 +265,47 @@ class FireIngester(object):
             if fuelbeds:
                 fire['fuelbeds'] = fuelbeds
 
-    def _ingest_meta(self, fire):
+    ## 'meta'
+
+    def _ingest_nested_field_meta(self, fire):
         # just copy all of 'meta', if it's defined
         if self._parsed_input.get('meta'):
             fire['meta'] = copy.deepcopy(self._parsed_input['meta'])
+
+    ##
+    ## Special Field Ingest Methods
+    ##
+
+    ## 'date_time'
+
+    DATE_TIME_MATCHER = re.compile('^(\d{12,14})([+-]\d{2}\:\d{2})$')
+    DATE_TIME_FMT = "%Y%m%d%H%M"
+    GROWTH_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
+    def _ingest_special_field_date_time(self, fire):
+        """Ingests .....mention from sf2
+        """
+        if not fire['location'].get('utc_offset') or not fire.get('growth'):
+            date_time = self._parsed_input.get('date_time')
+            if date_time:
+                # this supports fires from bluesky daily runs;
+                # 'date_time' is formatted like: '201508040000-04:00'
+                try:
+                    m = self.DATE_TIME_MATCHER.match(date_time)
+                    if m:
+                        if not fire.get('growth'):
+                            start = datetime.datetime.strptime(m.group(1),
+                                self.DATE_TIME_FMT)
+                            # As assume 24-hour
+                            end = start + datetime.timedelta(hours=24)
+                            # Note: this assumes time is local
+                            fire['growth'] =[{
+                                'start': start.strftime(self.GROWTH_TIME_FORMAT),
+                                'end': end.strftime(self.GROWTH_TIME_FORMAT),
+                                'pct': 100.0
+                            }]
+
+                        if not fire['location'].get('utc_offset'):
+                            fire['location']['utc_offset'] = m.group(2)
+                except Exception, e:
+                    logging.warn("Failed to parse 'date_time' value %s",
+                        date_time)
