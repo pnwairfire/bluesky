@@ -114,17 +114,27 @@ def _run_fire(msg_level, fuel_loadings_manager, fire):
             raise RuntimeError("Failed to calculate consumption for fire "
                 "{} fuelbed {}".format(fire.id, fb['fccs_id']))
 
-REQUIRED_LOCATION_FIELDS = ['area', 'ecoregion']
+REQUIRED_TOP_LEVEL_FIELDS = ['fuelbeds', 'location']
+REQUIRED_LOCATION_FIELDS = ['area']
 def _validate_input(fires_manager):
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            if not fire.get('fuelbeds'):
-                raise ValueError("Missing fuelbed data required for computing consumption")
-            if not fire.get('location'):
-                raise ValueError("Missing location data required for computing consumption")
-            if any([not fire.location.get(k) for k in REQUIRED_LOCATION_FIELDS]):
-                raise ValueError("Fire location data must define 'area' and "
-                    "'ecoregion' for computing consumption")
+            for k in REQUIRED_TOP_LEVEL_FIELDS:
+                if not fire.get(k):
+                    raise ValueError("Missing '{}' data required for "
+                        "computing consumption".format(k))
+            # location fields
+            for k in REQUIRED_LOCATION_FIELDS:
+                if not fire.location.get(k):
+                    raise ValueError("Fire location data must define '{}' "
+                    "for computing consumption".format(k))
+            if not fire.location.get('ecoregion'):
+                # import EcoregionLookup here so that, if fires do have
+                # ecoregion defined, consumption can be run without mapscript
+                # and other dependencies installed
+                from bluesky.ecoregion.lookup import EcoregionLookup
+                fire.location['ecoregion'] = EcoregionLookup().lookup(
+                    fire.latitude, fire.longitude)
             for fb in fire.fuelbeds:
                 if not fb.get('fccs_id') or not fb.get('pct'):
                     raise ValueError("Each fuelbed must define 'id' and 'pct'")
