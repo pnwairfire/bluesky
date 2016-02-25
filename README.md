@@ -1072,6 +1072,10 @@ The 'config' object has sub-objects specific to the modules to be run, as
 well as top level fields that apply to multiple modules. As with
 the fire data, each module has its own set of required and optional fields.
 
+##### Top Level Fields
+
+ - ***'config' > 'skip_failed_fires'*** -- *optional* -- exclude failed fire rather than abort entire run; default false; applies to various modules
+
 ##### ingestion
 
 (None)
@@ -1082,7 +1086,7 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### consumption
 
-- ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
+ - ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
 
 ##### emissions
 
