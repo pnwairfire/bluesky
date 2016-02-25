@@ -53,3 +53,8 @@ RUN pip install \
 # install gdal-bin for gdalwarp and gdal_translate
 RUN apt-get install -y \
     gdal-bin
+
+# mapserver and mapscript are needed to lookup ecoregion in consume
+RUN apt-get install -y \
+     mapserver-bin \
+     python-mapscript
