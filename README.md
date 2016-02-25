@@ -1558,6 +1558,7 @@ auxliary files.  Manually copy these into the bluesky image:
 
     docker cp /path/to/bluesky/repo/bluesky/dispersers/vsmoke/images/ bluesky:/usr/local/lib/python2.7/dist-packages/bluesky/dispersers/vsmoke/images/
     docker cp /path/to/bluesky/repo/bluesky/dispersers/hysplit/bdyfiles/ bluesky:/usr/local/lib/python2.7/dist-packages/bluesky/dispersers/hysplit/bdyfiles/
+    docker cp /path/to/bluesky/repo/bluesky/ecoregion/data/ bluesky:/usr/local/lib/python2.7/dist-packages/bluesky/ecoregion/data/
 
 Once you've installed the executables, commit the containers' changes
 back to the images
