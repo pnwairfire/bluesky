@@ -177,6 +177,61 @@ class FiresManager(object):
                 self._fire_ids.remove(fire_id)
                 self._fires.pop(fire_id)
 
+    ## Merging Fires
+
+    # TODO: maybe eventually be able to merge post-consumption, emissions,
+    #   etc., but for now only support merging just-ingested fire data
+    REQUIRED_MERGE_FIELDS = set(['location'])
+    ALL_MERGEABLE_FIELDS = REQUIRED_MERGE_FIELDS.union(
+        ["event_of", "fuel_type", "growth", "id", "type"])
+
+    def merge_fires(self):
+        """Merges fires that have the same id.
+        """
+        skip_failures = not not self.get_config_value('merge', 'skip_failures')
+        for fire_id in self._fire_ids:
+            if len(self._fires[fire_id]) > 1:
+                num_combined = 0
+                combined_fire = None
+                # For simplicity, iterate once through fires, in order
+                # This might miss potential merges (e.g. if all but the
+                # first fire have the same location), but those should be
+                # edge cases
+                for fire in self._fires[fire_id]:
+                    keys = set(fire.keys())
+                    if (not self.REQUIRED_MERGE_FIELDS.ussubset(keys) or
+                            not keys.issubset(self.ALL_MERGEABLE_FIELDS):
+                        if not skip_failures:
+                            raise ValueError("Can't merge fire {} ({}): {}".format(
+                                fire.id, fire._private_id, "invalid data set"))
+                    # TODO: be more intelligent about comparing location; the
+                    #   following could return false positive (e.g. if one
+                    #   fire specifies single coordinate and another specifies
+                    #   polygon starting at that coord)
+                    elif combined_fire and (
+                            fire.latitude != combined_fire.latitude or
+                            fire.longitude != combined_fire.longitude):
+                        if not skip_failures:
+                            raise ValueError("Can't merge fire {} ({}): {}".format(
+                                fire.id, fire._private_id, "location doesn't match"))
+                        # else: add location info to name (to differentiate) ?
+                    else:
+                        if not combined_fire:
+                            combined_fire = combined_fire or Fire(fire)
+                            # TODO: confirm that combined_fire has it's own, unique
+                            #   _private_id
+                        else:
+                            new_area = combined_fire.location.area + fire.location.area
+
+                            # TODO:
+                            # TODO: successful cases:
+                            # TODO: add areas
+                            # TODO: merge growth (adjusting percentages appropriately)
+                            # TODO: if failed to ingest, or just can't ingest, then keep as separate
+                            #   fires and move on (or maybe have config setting to abort on merge failure)
+                            pass
+                        num_combined += 1
+
     ## IO
 
     # TODO: Remove this method and use bluesky.io.Stream in code below instead

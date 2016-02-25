@@ -271,9 +271,9 @@ Use the '-h' option to see more usage information for ```bsp-csv2json```.
 
 As fire data flow through the modules within ```bsp```, the modules add to the
 data without modifying what's already defined (with the exception of the
-ingestion module, described below, which does modify the data).  Modules
-further downstream generally work with data produced by upstream modules,
-which means that order of module execution does matter.
+ingestion and merge modules, described below, which do modify the data).
+Modules further downstream generally work with data produced by upstream
+modules, which means that order of module execution does matter.
 
 You can run fires through a series of modules, capture the output, and
 then run the output back into ```bsp``` as long as you start with a module
@@ -836,6 +836,10 @@ Notice:
  - "foo" and "bar" were ignored (though left in the recorded raw input)
  - "ecoregion" got moved under "location"
 
+#### Merge
+
+TODO: fill in this section...
+
 #### Notes About Input Fire Data
 
 ##### Perimeter vs. Lat + Lng + Area
@@ -955,6 +959,10 @@ the 'start' and 'end' values and 'pct' set to 100.0
 
 Note about fuelbeds: no fuelbed data is required, but ingestion will pass
 on and fuelbeds is defined
+
+##### merge
+
+TODO: fill in this section...
 
 ##### fuelbeds
 
@@ -1079,6 +1087,10 @@ the fire data, each module has its own set of required and optional fields.
 ##### ingestion
 
 (None)
+
+##### merge
+
+ - ***'config' > 'merge' > 'skip_failures'*** -- *optional* -- if fires fail to merge, keep separate and move on; default: false
 
 ##### fuelbeds
 

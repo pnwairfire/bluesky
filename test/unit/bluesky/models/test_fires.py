@@ -373,3 +373,51 @@ class TestFiresManager:
         assert fires_manager.fires[1]['error']['message'] == 'oops'
         assert fires_manager.fires[1]['error']['traceback']
         assert fires_manager.failed_fires is None
+
+
+
+class TestFiresManagerMergeFires(object):
+
+    def test_no_fires(self):
+        fm = fires.FiresManager()
+        assert fm.fires == []
+        fm.merge_fires()
+        assert fm.fires == []
+
+    def test_one_fire(self):
+        fm = fires.FiresManager()
+        f = fires.Fire({'id': '1'})
+        fm.fires = [f]
+        assert fm.fires == [f]
+        fm.merge_fires()
+        assert fm.fires == [f]
+
+    def test_none_to_merge(self):
+        fm = fires.FiresManager()
+        f = fires.Fire({'id': '1'})
+        f2 = fires.Fire({'id': '2'})
+        fm.fires = [f, f2]
+        assert fm.fires == [f, f2]
+        fm.merge_fires()
+        assert fm.fires == [f, f2]
+
+    def test_none_to_merge(self):
+        fm = fires.FiresManager()
+        f = fires.Fire({'id': '1', 'location': 'n1'})
+        f2 = fires.Fire({'id': '2', 'name': 'n1'})
+        fm.fires = [f, f2]
+        assert fm.fires == [f, f2]
+        fm.merge_fires()
+        assert fm.fires == [f, f2]
+
+    def test_differing_locations(self):
+        pass
+
+    def test_empty_fires(self):
+        pass
+
+    def test_merge_real_example(self):
+        pass
+
+    def test_merge_post_fuelbeds(self):
+        pass
