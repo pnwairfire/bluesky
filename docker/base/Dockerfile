@@ -56,5 +56,9 @@ RUN apt-get install -y \
 
 # mapserver and mapscript are needed to lookup ecoregion in consume
 RUN apt-get install -y \
-     mapserver-bin \
-     python-mapscript
+        mapserver-bin \
+        python-mapscript
+
+RUN apt-get install -y \
+        dialog \
+        less
