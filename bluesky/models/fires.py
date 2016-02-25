@@ -169,13 +169,13 @@ class FiresManager(object):
 
     def remove_fire(self, fire):
         # TODO: raise exception if fire doesn't exist ?
-        if self._fires.has_key(fire_id):
-            self._fires[fire_id] = [f for f in self._fires[fire_id]
+        if self._fires.has_key(fire.id):
+            self._fires[fire.id] = [f for f in self._fires[fire.id]
                 if f._private_id != fire._private_id]
-            if len(self._fires[fire_id]) == 0:
+            if len(self._fires[fire.id]) == 0:
                 # that was last fire with that id
-                self._fire_ids.remove(fire_id)
-                self._fires.pop(fire_id)
+                self._fire_ids.remove(fire.id)
+                self._fires.pop(fire.id)
 
     ## Merging Fires
 
@@ -187,6 +187,9 @@ class FiresManager(object):
 
     def merge_fires(self):
         """Merges fires that have the same id.
+
+        TODO: refactor inner loop logic into submethods
+        TODO: refactor all merging code into separate class?
         """
         skip_failures = not not self.get_config_value('merge', 'skip_failures')
         for fire_id in self._fire_ids:
@@ -199,11 +202,12 @@ class FiresManager(object):
                 # edge cases
                 for fire in self._fires[fire_id]:
                     keys = set(fire.keys())
-                    if (not self.REQUIRED_MERGE_FIELDS.ussubset(keys) or
-                            not keys.issubset(self.ALL_MERGEABLE_FIELDS):
+                    if (not self.REQUIRED_MERGE_FIELDS.issubset(keys) or
+                            not keys.issubset(self.ALL_MERGEABLE_FIELDS)):
                         if not skip_failures:
                             raise ValueError("Can't merge fire {} ({}): {}".format(
                                 fire.id, fire._private_id, "invalid data set"))
+
                     # TODO: be more intelligent about comparing location; the
                     #   following could return false positive (e.g. if one
                     #   fire specifies single coordinate and another specifies
@@ -215,21 +219,34 @@ class FiresManager(object):
                             raise ValueError("Can't merge fire {} ({}): {}".format(
                                 fire.id, fire._private_id, "location doesn't match"))
                         # else: add location info to name (to differentiate) ?
+
+                    # TODO: check for overlapping growth windows (not handling,
+                    #  at least for now)
+                    # elif combined_fire and ....
+
                     else:
                         if not combined_fire:
                             combined_fire = combined_fire or Fire(fire)
                             # TODO: confirm that combined_fire has it's own, unique
                             #   _private_id
                         else:
-                            new_area = combined_fire.location.area + fire.location.area
+                            new_combined_fire = Fire(combined_fire)
+                            try:
+                                new_combined_fire.location['area'] += fire.location['area']
+                                # TODO: merge growth, adjusting percentages appropriately
+                                # TODO: merge anything else?
+                                self.remove_fire(fire)
+                                combined_fire = new_combined_fire
 
-                            # TODO:
-                            # TODO: successful cases:
-                            # TODO: add areas
-                            # TODO: merge growth (adjusting percentages appropriately)
-                            # TODO: if failed to ingest, or just can't ingest, then keep as separate
+                            except Exception, e:
+                                if not skip_failures:
+                                    raise RuntimeError("Failed to merge fire {} ({}): {}".format(
+                                        fire.id, fire._private_id, e))
+
+                            # TODO: if failure, make sure combined_fire stays as is and fire
+                            #   isn't removed from
                             #   fires and move on (or maybe have config setting to abort on merge failure)
-                            pass
+
                         num_combined += 1
 
     ## IO
@@ -250,7 +267,7 @@ class FiresManager(object):
     ##
 
     def _get_fire(self, fire):
-        fires_with_id = self._fires.get(fire_id)
+        fires_with_id = self._fires.get(fire.id)
         if fires_with_id:
             fires_with_p_id = [f for f in fires_with_id
                 if f._private_id == fire._private_id]
