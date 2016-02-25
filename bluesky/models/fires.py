@@ -31,6 +31,10 @@ class Fire(dict):
     def __init__(self, *args, **kwargs):
         super(Fire, self).__init__(*args, **kwargs)
 
+        # private id used to identify fire from possibly multiple fires with
+        # the same public 'id' (e.g. in FiresManager's failure handler)
+        self._private_id = str(uuid.uuid1())
+
         # if id isn't specified, set to new guid
         if not self.get('id'):
             self['id'] = str(uuid.uuid1())[:8]
@@ -150,7 +154,7 @@ class FiresManager(object):
     def __init__(self):
         self._meta = {}
         self.modules = []
-        self.fires = []
+        self.fires = [] # this intitializes self._fires and self_fire_ids
         self._processed_run_id_wildcards = False
 
     ## Importing
@@ -158,17 +162,20 @@ class FiresManager(object):
     def add_fire(self, fire):
         self._fires = self._fires or {}
         if not self._fires.has_key(fire.id):
-            self._fires[fire.id] = (fire)
-            self._fire_ids.append(fire.id)
-        else:
-            # TODO: merge into existing (updateing start/end/size/etc appropriately)
-            pass
+            self._fires[fire.id] = []
+            self._fire_ids.add(fire.id)
+        self._fires[fire.id].append(fire)
 
-    def remove_fire(self, fire_id):
+
+    def remove_fire(self, fire):
+        # TODO: raise exception if fire doesn't exist ?
         if self._fires.has_key(fire_id):
-            self._fires.pop(fire_id)
-            self._fire_ids.remove(fire_id)
-        # TODO: else, raise exception?
+            self._fires[fire_id] = [f for f in self._fires[fire_id]
+                if f._private_id != fire._private_id]
+            if len(self._fires[fire_id]) == 0:
+                # that was last fire with that id
+                self._fire_ids.remove(fire_id)
+                self._fires.pop(fire_id)
 
     ## IO
 
@@ -187,17 +194,23 @@ class FiresManager(object):
     ## 'Public' Methods
     ##
 
-    def fire_by_id(self, fire_id):
-        return self._fires.get(fire_id)
+    def _get_fire(self, fire):
+        fires_with_id = self._fires.get(fire_id)
+        if fires_with_id:
+            fires_with_p_id = [f for f in fires_with_id
+                if f._private_id == fire._private_id]
+            if fires_with_p_id:
+                # will be len == 1
+                return fires_with_p_id[0]
 
     @property
     def fires(self):
-        return [self._fires[i] for i in self._fire_ids]
+        return [f for fire_id in self._fire_ids for f in self._fires[fire_id]]
 
     @fires.setter
     def fires(self, fires_list):
         self._fires = {}
-        self._fire_ids = []
+        self._fire_ids = set()
         for fire in fires_list:
             self.add_fire(Fire(fire))
 
@@ -403,7 +416,7 @@ class FiresManager(object):
         fires_manager = self
         class klass(object):
             def __init__(self, fire):
-                self._fire_id = fire.id
+                self._fire = fire
 
             def __enter__(self):
                 pass
@@ -412,7 +425,7 @@ class FiresManager(object):
                 if e_type:
                     # there was a failure; first see if fire is in fact
                     # managed by fires_manager
-                    f = fires_manager.fire_by_id(self._fire_id)
+                    f = fires_manager._get_fire(self._fire)
                     if f:
                         # Add error infromation to fire object.
                         # Note that error information will also be added to
@@ -429,7 +442,7 @@ class FiresManager(object):
                                 fires_manager.failed_fires  = []
                             fires_manager.failed_fires.append(f)
                             # remove fire from good fires list
-                            fires_manager.remove_fire(f.id)
+                            fires_manager.remove_fire(f)
                             return True
                         # else, let exception, if any, be raised
                     else:
@@ -437,8 +450,9 @@ class FiresManager(object):
                         # TODO: don't raise exception if configured not to
                         #  (maybe also controlled by
                         #   fires_manager.skip_failed_fires?)
-                        raise RuntimeError("Fire {} not managed by "
-                            "fires_manager".format(self._fire_id))
+                        raise RuntimeError("Fire {} ({}) not managed by "
+                            "fires_manager".format(self._fire.id,
+                            self._fire._private_id))
 
         return klass
 
