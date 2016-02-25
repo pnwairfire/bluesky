@@ -13,7 +13,7 @@ try:
 except ImportError, e:
     from bluesky import exceptions
     raise exceptions.MissingDependencyError(
-        "Missing dependencies required for ecoregion lookup")
+        "Missing dependencies required for ecoregion lookup - {}".format(e))
 
 __author__ = "Joel Dubowy and Sonoma Technology, Inc."
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
