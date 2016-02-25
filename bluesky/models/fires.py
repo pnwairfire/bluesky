@@ -183,7 +183,7 @@ class FiresManager(object):
     #   etc., but for now only support merging just-ingested fire data
     REQUIRED_MERGE_FIELDS = set(['location'])
     ALL_MERGEABLE_FIELDS = REQUIRED_MERGE_FIELDS.union(
-        ["event_of", "fuel_type", "growth", "id", "type"])
+        ["id", "event_of", "type", "fuel_type", "growth"])
 
     def merge_fires(self):
         """Merges fires that have the same id.
@@ -194,7 +194,6 @@ class FiresManager(object):
         skip_failures = not not self.get_config_value('merge', 'skip_failures')
         for fire_id in self._fire_ids:
             if len(self._fires[fire_id]) > 1:
-                num_combined = 0
                 combined_fire = None
                 # For simplicity, iterate once through fires, in order
                 # This might miss potential merges (e.g. if all but the
@@ -224,17 +223,27 @@ class FiresManager(object):
                     #  at least for now)
                     # elif combined_fire and ....
 
+                    # TODO: make sure 'event_of' data don't conflict
+                    #    (maybe just check event ids)
+
+                    # TODO: make sure 'fuel_type' and 'type' match
+
                     else:
                         if not combined_fire:
                             combined_fire = combined_fire or Fire(fire)
+                            self.remove_fire(fire)
                             # TODO: confirm that combined_fire has it's own, unique
                             #   _private_id
                         else:
                             new_combined_fire = Fire(combined_fire)
                             try:
                                 new_combined_fire.location['area'] += fire.location['area']
+
                                 # TODO: merge growth, adjusting percentages appropriately
                                 # TODO: merge anything else?
+
+                                # make sure remove_fire succeeds before
+                                # updating combined_fire
                                 self.remove_fire(fire)
                                 combined_fire = new_combined_fire
 
@@ -243,11 +252,11 @@ class FiresManager(object):
                                     raise RuntimeError("Failed to merge fire {} ({}): {}".format(
                                         fire.id, fire._private_id, e))
 
-                            # TODO: if failure, make sure combined_fire stays as is and fire
-                            #   isn't removed from
-                            #   fires and move on (or maybe have config setting to abort on merge failure)
-
-                        num_combined += 1
+                if combined_fire:
+                    # add_fire will take care of creating new list
+                    # and adding fire id in the case where all fires
+                    # were combined and thus all removed
+                    self.add_fire(combined_fire)
 
     ## IO
 
