@@ -1,9 +1,19 @@
 """bluesky.ecoregion.lookup
 
 Note: Code copied from BlueSky Framework and modified significantly.
+
+TODO: refactor code to not be in a class, or use classmethods ?
 """
 
 import os
+
+try:
+    import mapscript
+    from osgeo import ogr
+except ImportError, e:
+    from bluesky import exceptions
+    raise exceptions.MissingDependencyError(
+        "Missing dependencies required for ecoregion lookup")
 
 __author__ = "Joel Dubowy and Sonoma Technology, Inc."
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
@@ -11,11 +21,8 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 class EcoregionLookup(object):
 
-    # TODO: Handle exceptions here or in calling code ?
-    # TODO: always default to western ?
-
     ECOREGION_SHAPEFILE = os.path.join(os.path.dirname(__file__), 'data', '3ecoregions.shp')
-    EXCEPTED_VALUES = ["western","southern","boreal"]
+    ACCEPTED_VALUES = ["western","southern","boreal"]
 
     def lookup(self, lat, lng):
         """Looks up ecoregion from lat/lng
@@ -23,22 +30,21 @@ class EcoregionLookup(object):
         Note: If a fire's location is defined as a polygon, it's the calling
           code's responsibility to pick a representative lat/lng.
         """
+        # TODO: Handle exceptions here or in calling code ?
 
-        # A separate algorithm is needed to fill the ecoregion variable.
-
-        ecoregion = self.locate_ecoregion(fireLoc["latitude"], fireLoc["longitude"])
-
-        if ecoregion not in self.EXCEPTED_VALUES:
+        ecoregion = self._locate_ecoregion(lat, lng)
+        if ecoregion not in self.ACCEPTED_VALUES:
             # TODO: is this appropriate?
             ecoregion = "western"
         return ecoregion
 
 
-    #Return the ecoregion for this location (as an int)
-    #Returns the string "Unknown" if the time zone could not be determined.
-    #Raises an exception if the time zone data file could not be opened.
-    def locate_ecoregion(self, latitude, longitude):
+    def _locate_ecoregion(self, latitude, longitude):
+        """Returns the ecoregion for given location (as an int)
 
+        Returns the string "Unknown" if the time zone could not be determined.
+        Raises an exception if the time zone data file could not be opened.
+        """
         # Instantiate mapscript shapefileObj
         # will later be used to read features in the shapefile
         shpfile = mapscript.shapefileObj(self.ECOREGION_SHAPEFILE, -1)     # -1 indicates file already exists

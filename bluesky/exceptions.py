@@ -8,7 +8,10 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 __all__ = [
     "BlueSkyImportError",
-    "BlueSkyModuleError"
+    "BlueSkyConfigurationError",
+    "BlueSkyModuleError",
+    "InvalidFilterError",
+    "MissingDependencyError"
 ]
 
 class BlueSkyImportError(ImportError):
@@ -21,4 +24,7 @@ class BlueSkyModuleError(Exception):
     pass
 
 class InvalidFilterError(ValueError):
+    pass
+
+class MissingDependencyError(ValueError):
     pass
