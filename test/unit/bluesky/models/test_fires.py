@@ -421,3 +421,6 @@ class TestFiresManagerMergeFires(object):
 
     def test_merge_post_fuelbeds(self):
         pass
+
+
+# TODO: unit test FiresMerger directly

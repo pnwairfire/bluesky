@@ -501,6 +501,9 @@ class FiresMerger(object):
     the FiresManager class, but this prevented breaking out
     """
 
+    class MergeError(Exception):
+        pass
+
     def __init__(self, fires_manager):
         """Constructor
 
@@ -511,12 +514,9 @@ class FiresMerger(object):
         self._skip_failures = not not self._fires_manager.get_config_value(
             'merge', 'skip_failures')
 
-
-    # TODO: maybe eventually be able to merge post-consumption, emissions,
-    #   etc., but for now only support merging just-ingested fire data
-    REQUIRED_MERGE_FIELDS = set(['location'])
-    ALL_MERGEABLE_FIELDS = REQUIRED_MERGE_FIELDS.union(
-        ["id", "event_of", "type", "fuel_type", "growth"])
+    ##
+    ## Public API
+    ##
 
     def merge(self):
         """Merges fires that have the same id.
@@ -524,6 +524,10 @@ class FiresMerger(object):
         for fire_id in self._fires_manager._fire_ids:
             if len(self._fires_manager._fires[fire_id]) > 1:
                 self._merge_fire_id(fire_id)
+
+    ##
+    ## Merge Methods
+    ##
 
     def _merge_fire_id(self, fire_id):
         """Actually does the merging of fires with a given id
@@ -539,50 +543,19 @@ class FiresMerger(object):
         # first fire have the same location), but those should be
         # edge cases
         for fire in self._fires_manager._fires[fire_id]:
-            keys = set(fire.keys())
-            if (not self.REQUIRED_MERGE_FIELDS.issubset(keys) or
-                    not keys.issubset(self.ALL_MERGEABLE_FIELDS)):
-                self._fail(fire, "invalid data set")
+            try:
+                self._check_keys(fire)
+                self._check_location(fire, combined_fire)
+                self._check_growth_windows(fire, combined_fire)
+                self._check_event_of(fire, combined_fire)
+                self._check_fire_and_fuel_types(fire, combined_fire)
 
-            # TODO: be more intelligent about comparing location; the
-            #   following could return false positive (e.g. if one
-            #   fire specifies single coordinate and another specifies
-            #   polygon starting at that coord)
-            elif combined_fire and (
-                    fire.latitude != combined_fire.latitude or
-                    fire.longitude != combined_fire.longitude):
-                self._fail(fire, "location doesn't match")
+                combined_fire = self._merge_into_combined_fire(fire,
+                    combined_fire)
 
-            # TODO: check for overlapping growth windows (not handling,
-            #  at least for now)
-            # elif combined_fire and ....
-
-            # TODO: make sure 'event_of' data don't conflict
-            #    (maybe just check event ids)
-
-            # TODO: make sure 'fuel_type' and 'type' match
-
-            else:
-                if not combined_fire:
-                    combined_fire = combined_fire or Fire(fire)
-                    self._fires_manager.remove_fire(fire)
-                    # TODO: confirm that combined_fire has it's own, unique
-                    #   _private_id
-                else:
-                    new_combined_fire = Fire(combined_fire)
-                    try:
-                        new_combined_fire.location['area'] += fire.location['area']
-
-                        # TODO: merge growth, adjusting percentages appropriately
-                        # TODO: merge anything else?
-
-                        # make sure remove_fire succeeds before
-                        # updating combined_fire
-                        self._fires_manager.remove_fire(fire)
-                        combined_fire = new_combined_fire
-
-                    except Exception, e:
-                        self._fail(fire, e)
+            except FiresMerger.MergeError, e:
+                if not self._skip_failures:
+                    raise ValueError(e.message)
 
         if combined_fire:
             # add_fire will take care of creating new list
@@ -590,10 +563,78 @@ class FiresMerger(object):
             # were combined and thus all removed
             self._fires_manager.add_fire(combined_fire)
 
+
+    def _merge_into_combined_fire(self, fire, combined_fire):
+        """Merges fires into in-progress combined fire
+
+        args:
+         - fire -- fire to merge
+         - combined_fire -- in-progress combined fire (which could be None)
+        """
+        if not combined_fire:
+            new_combined_fire = Fire(fire)
+            self._fires_manager.remove_fire(fire)
+            # TODO: confirm that combined_fire has it's own, unique
+            #   _private_id
+        else:
+            new_combined_fire = Fire(combined_fire)
+            try:
+                new_combined_fire.location['area'] += fire.location['area']
+
+                # TODO: merge growth, adjusting percentages appropriately
+                # TODO: merge anything else?
+
+                # make sure remove_fire succeeds before
+                # updating combined_fire
+                self._fires_manager.remove_fire(fire)
+
+            except Exception, e:
+                self._fail(fire, e)
+
+        return new_combined_fire
+
+    ##
+    ## Validation / Check Methods
+    ##
+
+    # TODO: maybe eventually be able to merge post-consumption, emissions,
+    #   etc., but for now only support merging just-ingested fire data
+    REQUIRED_MERGE_FIELDS = set(['location'])
+    ALL_MERGEABLE_FIELDS = REQUIRED_MERGE_FIELDS.union(
+        ["id", "event_of", "type", "fuel_type", "growth"])
+
+    def _check_keys(self, fire):
+        keys = set(fire.keys())
+        if (not self.REQUIRED_MERGE_FIELDS.issubset(keys) or
+                not keys.issubset(self.ALL_MERGEABLE_FIELDS)):
+            self._fail(fire, "invalid data set")
+
+    def _check_location(self, fire, combined_fire):
+        # TODO: be more intelligent about comparing location; the
+        #   following could return false positive (e.g. if one
+        #   fire specifies single coordinate and another specifies
+        #   polygon starting at that coord)
+        if combined_fire and (
+                fire.latitude != combined_fire.latitude or
+                fire.longitude != combined_fire.longitude):
+            self._fail(fire, "location doesn't match")
+
+    def _check_growth_windows(self, fire, combined_fire):
+        # TODO: check for overlapping growth windows (not handling,
+        #  at least for now)
+        # elif combined_fire and ....
+        pass
+
+    def _check_event_of(self, fire, combined_fire):
+        # TODO: make sure 'event_of' data don't conflict
+        #    (maybe just check event ids)
+        pass
+
+    def _check_fire_and_fuel_types(self, fire, combined_fire):
+        # TODO: make sure 'fuel_type' and 'type' match
+        pass
+
     def _fail(self, fire, sub_msg):
         msg = "Failed to merge fire {} ({}): {}".format(
             fire.id, fire._private_id, sub_msg)
-        if not self._skip_failures:
-            raise ValueError(msg)
-        else:
-            logging.warn(msg)
+        raise FiresMerger.MergeError(msg)
