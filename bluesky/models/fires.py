@@ -203,9 +203,12 @@ class FiresManager(object):
                     keys = set(fire.keys())
                     if (not self.REQUIRED_MERGE_FIELDS.issubset(keys) or
                             not keys.issubset(self.ALL_MERGEABLE_FIELDS)):
+                        msg = "Can't merge fire {} ({}): {}".format(
+                            fire.id, fire._private_id, "invalid data set")
                         if not skip_failures:
-                            raise ValueError("Can't merge fire {} ({}): {}".format(
-                                fire.id, fire._private_id, "invalid data set"))
+                            raise ValueError(msg)
+                        else:
+                            logging.warn(msg)
 
                     # TODO: be more intelligent about comparing location; the
                     #   following could return false positive (e.g. if one
@@ -214,9 +217,12 @@ class FiresManager(object):
                     elif combined_fire and (
                             fire.latitude != combined_fire.latitude or
                             fire.longitude != combined_fire.longitude):
+                        msg = "Can't merge fire {} ({}): {}".format(
+                            fire.id, fire._private_id, "location doesn't match")
                         if not skip_failures:
-                            raise ValueError("Can't merge fire {} ({}): {}".format(
-                                fire.id, fire._private_id, "location doesn't match"))
+                            raise ValueError(msg)
+                        else:
+                            logging.warn(msg)
                         # else: add location info to name (to differentiate) ?
 
                     # TODO: check for overlapping growth windows (not handling,
@@ -248,9 +254,12 @@ class FiresManager(object):
                                 combined_fire = new_combined_fire
 
                             except Exception, e:
+                                msg = "Failed to merge fire {} ({}): {}".format(
+                                    fire.id, fire._private_id, e)
                                 if not skip_failures:
-                                    raise RuntimeError("Failed to merge fire {} ({}): {}".format(
-                                        fire.id, fire._private_id, e))
+                                    raise RuntimeError(msg)
+                                else:
+                                    logging.warn(msg)
 
                 if combined_fire:
                     # add_fire will take care of creating new list
