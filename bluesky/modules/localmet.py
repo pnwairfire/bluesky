@@ -34,6 +34,8 @@ def run(fires_manager):
 
     arl_profiler = ArlProfiler(fires_manager.met.get('files'),
         time_step=fires_manager.get_config_value('localmet', 'time_step'))
+    logging.debug("Extracting localmet data for %d fires",
+        len(fires_manager.fires))
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             if 'growth' not in fire:
