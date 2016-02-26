@@ -403,26 +403,203 @@ class TestFiresManagerMergeFires(object):
         fm.merge_fires()
         assert fm.fires == [f, f2]
 
-    def test_none_to_merge(self):
+    def test_pre_ingestion(self):
+        # i.e. insufficient data to merge
         fm = fires.FiresManager()
-        f = fires.Fire({'id': '1', 'location': 'n1'})
-        f2 = fires.Fire({'id': '2', 'name': 'n1'})
+        f = fires.Fire({'id': '1'})
+        f2 = fires.Fire({'id': '1'})
         fm.fires = [f, f2]
-        assert fm.fires == [f, f2]
-        fm.merge_fires()
-        assert fm.fires == [f, f2]
+        with raises(ValueError) as e_info:
+            fm.merge_fires()
+        assert e_info.value.message.index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
+
+    def test_post_fuelbeds(self):
+        # i.e. too much data to merge
+        fm = fires.FiresManager()
+        f = fires.Fire({'id': '1', 'location': {'area': 132}, 'fuelbeds': {}})
+        f2 = fires.Fire({'id': '1', 'location': {'area': 132}, 'fuelbeds': {}})
+        fm.fires = [f, f2]
+        with raises(ValueError) as e_info:
+            fm.merge_fires()
+        assert e_info.value.message.index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
 
     def test_differing_locations(self):
-        pass
+        fm = fires.FiresManager()
+        f = fires.Fire({
+            'id': '1',
+            'location': {
+                'area': 132,
+                'latitude': 45.0,
+                'longitude': -120.0
+            }
+        })
+        f2 = fires.Fire({
+            'id': '1',
+            'location': {
+                'area': 132,
+                'latitude': 47.0,
+                'longitude': -120.0
+            }
+        })
+        fm.fires = [f, f2]
+        with raises(ValueError) as e_info:
+            fm.merge_fires()
+        assert e_info.value.message.index(fires.FiresMerger.LOCATION_MISMATCH_MSG) > 0
 
-    def test_empty_fires(self):
-        pass
+    def test_different_event_ids(self):
+        fm = fires.FiresManager()
+        f = fires.Fire({
+            'id': '1',
+            "event_of":{
+                "id": "ABC"
+            },
+            'location': {
+                'area': 132,
+                'latitude': 45.0,
+                'longitude': -120.0
+            }
+        })
+        f2 = fires.Fire({
+            'id': '1',
+            "event_of":{
+                "id": "SDF"
+            },
+            'location': {
+                'area': 132,
+                'latitude': 45.0,
+                'longitude': -120.0
+            }
+        })
+        fm.fires = [f, f2]
+        with raises(ValueError) as e_info:
+            fm.merge_fires()
+        assert e_info.value.message.index(fires.FiresMerger.EVENT_MISMATCH_MSG) > 0
 
-    def test_merge_real_example(self):
-        pass
 
-    def test_merge_post_fuelbeds(self):
-        pass
+    def test_different_fire_and_fuel_type(self):
+        fm = fires.FiresManager()
+        f = fires.Fire({
+            'id': '1',
+            "type": "rx",
+            "fuel_type": "natural",
+            'location': {
+                'area': 132,
+                'latitude': 45.0,
+                'longitude': -120.0
+            }
+        })
+        f2 = fires.Fire({
+            'id': '1',
+            "type": "wf",
+            "fuel_type": "natural",
+            'location': {
+                'area': 132,
+                'latitude': 45.0,
+                'longitude': -120.0
+            }
+        })
+        fm.fires = [f, f2]
+
+        with raises(ValueError) as e_info:
+            fm.merge_fires()
+        assert e_info.value.message.index(fires.FiresMerger.FIRE_TYPE_MISMATCH_MSG) > 0
+
+        f2.type = f.type
+        f2.fuel_type = "activity"
+        with raises(ValueError) as e_info:
+            fm.merge_fires()
+        assert e_info.value.message.index(fires.FiresMerger.FUEL_TYPE_MISMATCH_MSG) > 0
+
+    def test_merge_mixed_success_no_growth(self):
+        fm = fires.FiresManager()
+        fm.set_config_value('merge', 'skip_failures')
+        f = fires.Fire({
+            'id': '1',
+            "type": "rx",
+            "fuel_type": "natural",
+            'location': {
+                'area': 50,
+                'latitude': 45.0,
+                'longitude': -120.0
+            }
+        })
+        f2 = fires.Fire({
+            'id': '1',
+            "type": "rx",
+            "fuel_type": "natural",
+            'location': {
+                'area': 132,
+                'latitude': 45.0,
+                'longitude': -120.0
+            }
+        })
+        fm.fires = [f, f2]
+        fm.merge_fires()
+        # TODO: add asserts
+
+    def test_merge_mixed_success(self):
+        fm = fires.FiresManager()
+        fm.set_config_value('merge', 'skip_failures')
+        f = fires.Fire({
+            'id': '1',
+            "type": "rx",
+            "fuel_type": "natural",
+            'location': {
+                'area': 50,
+                'latitude': 45.0,
+                'longitude': -120.0
+            },
+            "growth": [
+                {
+                    "start": "2014-05-28T17:00:00",
+                    "end": "2014-05-29T17:00:00",
+                    "pct": 60.0
+                },
+                {
+                    "start": "2014-05-29T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "pct": 40.0
+                }
+            ]
+        })
+        f2 = fires.Fire({
+            'id': '1',
+            "type": "rx",
+            "fuel_type": "natural",
+            'location': {
+                'area': 132,
+                'latitude': 45.0,
+                'longitude': -120.0
+            },
+            "growth": [
+                {
+                    "start": "2014-05-27T17:00:00",
+                    "end": "2014-05-28T17:00:00",
+                    "pct": 100.0
+                }
+            ]
+        })
+        f3 = fires.Fire({
+            'id': '2',
+            "type": "rx",
+            "fuel_type": "natural",
+            'location': {
+                'area': 132,
+                'latitude': 45.0,
+                'longitude': -120.0
+            },
+            "growth": [
+                {
+                    "start": "2014-05-27T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "pct": 100.0
+                }
+            ]
+        })
+        fm.fires = [f, f2]
+        fm.add_fire(f3)
+        fm.merge_fires()
+        # TODO: add asserts
 
 
-# TODO: unit test FiresMerger directly
+# TODO: unit test fires.FiresMerger directly
