@@ -3,6 +3,7 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
+import copy
 import datetime
 import importlib
 import json
@@ -544,6 +545,9 @@ class FiresMerger(object):
         # edge cases
         for fire in self._fires_manager._fires[fire_id]:
             try:
+                # TODO: iterate through and call all methods starting
+                #   with '_check_'; would need to change _check_keys'
+                #   signature to match the others
                 self._check_keys(fire)
                 self._check_location(fire, combined_fire)
                 self._check_growth_windows(fire, combined_fire)
@@ -572,16 +576,35 @@ class FiresMerger(object):
          - combined_fire -- in-progress combined fire (which could be None)
         """
         if not combined_fire:
-            new_combined_fire = Fire(fire)
+            # We need to instantiate a dict from fire in order to deepcopy id.
+            # We need to deepcopy so that that modifications to
+            # new_combined_fire don't modify fire
+            new_combined_fire = Fire(copy.deepcopy(dict(fire)))
             self._fires_manager.remove_fire(fire)
             # TODO: confirm that combined_fire has it's own, unique
             #   _private_id
         else:
-            new_combined_fire = Fire(combined_fire)
+            # See note, above, regarding instantiating dict and then deep copying
+            new_combined_fire = Fire(copy.deepcopy(dict(combined_fire)))
             try:
                 new_combined_fire.location['area'] += fire.location['area']
 
-                # TODO: merge growth, adjusting percentages appropriately
+                # factor by which we need to multiple combined_fire's growth pcts
+                c_growth_factor = float(combined_fire.location['area']) / float(
+                    new_combined_fire.location['area'])
+                for g in new_combined_fire.growth:
+                    g['pct'] *= c_growth_factor
+
+                # copy it to preserve old fire, in case theres a failure
+                # downstream and we abort this merge
+                new_growth = copy.deepcopy(fire.growth)
+                # factor by which we need to multiple to-merge fire's growth pcts
+                f_growth_factor = 1.0 - c_growth_factor
+                for g in new_growth:
+                    g['pct'] *= f_growth_factor
+
+                new_combined_fire.growth.extend(new_growth)
+
                 # TODO: merge anything else?
 
                 # make sure remove_fire succeeds before

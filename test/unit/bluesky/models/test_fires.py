@@ -378,6 +378,8 @@ class TestFiresManager:
 
 class TestFiresManagerMergeFires(object):
 
+    # TODO: test with and without skipping failures
+
     def test_no_fires(self):
         fm = fires.FiresManager()
         assert fm.fires == []
