@@ -581,8 +581,7 @@ class FiresMerger(object):
             # new_combined_fire don't modify fire
             new_combined_fire = Fire(copy.deepcopy(dict(fire)))
             self._fires_manager.remove_fire(fire)
-            # TODO: confirm that combined_fire has it's own, unique
-            #   _private_id
+
         else:
             # See note, above, regarding instantiating dict and then deep copying
             new_combined_fire = Fire(copy.deepcopy(dict(combined_fire)))
