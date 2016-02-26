@@ -536,13 +536,16 @@ class FiresMerger(object):
         args:
          - fire_id -- common fire id
 
+        For simplicity, the logic iterates once through the fires, in
+        order. This might miss potential merges (e.g. if all but the
+        first fire have the same location), but those should be
+        edge cases.  So, it seems that it would be overengineering and not
+        worth the hit to performance to check every pair of fires for
+        mergeability.
+
         TODO: refactor inner loop logic into submethods
         """
         combined_fire = None
-        # For simplicity, iterate once through fires, in order
-        # This might miss potential merges (e.g. if all but the
-        # first fire have the same location), but those should be
-        # edge cases
         for fire in self._fires_manager._fires[fire_id]:
             try:
                 # TODO: iterate through and call all methods starting
@@ -632,29 +635,43 @@ class FiresMerger(object):
             self._fail(fire, "invalid data set")
 
     def _check_location(self, fire, combined_fire):
-        # TODO: be more intelligent about comparing location; the
-        #   following could return false positive (e.g. if one
-        #   fire specifies single coordinate and another specifies
-        #   polygon starting at that coord)
+        """Makes sure the locations are the same
+
+        TODO: be more intelligent about comparing location; the
+          current logic could return false positives (e.g. if one
+          fire specifies a single coordinate and the other specifies
+          a polygon starting at that coord)
+        """
         if combined_fire and (
                 fire.latitude != combined_fire.latitude or
                 fire.longitude != combined_fire.longitude):
-            self._fail(fire, "location doesn't match")
+            self._fail(fire, "locations don't match")
 
     def _check_growth_windows(self, fire, combined_fire):
-        # TODO: check for overlapping growth windows (not handling,
-        #  at least for now)
-        # elif combined_fire and ....
+        """Makes sure growth windows don't overlapping
+
+        Ultimately, overlapping growth windows could be handled,
+        but at this point it would be overengineering.
+        """
+        # TODO: implement....
         pass
 
     def _check_event_of(self, fire, combined_fire):
-        # TODO: make sure 'event_of' data don't conflict
-        #    (maybe just check event ids)
-        pass
+        """Makes sure event ids, if both defined, are the same
+        """
+        c_event_id = combined_fire and combined_fire.get(
+            'event_of', {}).get('id')
+        f_event_id = fire.get('event_of', {}).get('id')
+        if c_event_id and f_event_id and c_event_id != f_event_id:
+            self._fail(fire, "fire event ids don't match")
 
     def _check_fire_and_fuel_types(self, fire, combined_fire):
-        # TODO: make sure 'fuel_type' and 'type' match
-        pass
+        """Makes sure fire and fuel types are the same
+        """
+        if combined_fire and (
+                fire.fuel_type != combined_fire.fuel_type or
+                fire.type != combined_fire.type):
+            self._fail(fire, "Fire and/or fuel types don't match")
 
     def _fail(self, fire, sub_msg):
         msg = "Failed to merge fire {} ({}): {}".format(
