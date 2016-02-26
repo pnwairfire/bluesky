@@ -627,13 +627,14 @@ class FiresMerger(object):
     REQUIRED_MERGE_FIELDS = set(['location'])
     ALL_MERGEABLE_FIELDS = REQUIRED_MERGE_FIELDS.union(
         ["id", "event_of", "type", "fuel_type", "growth"])
-
+    INVALID_KEYS_MSG =  "invalid data set"
     def _check_keys(self, fire):
         keys = set(fire.keys())
         if (not self.REQUIRED_MERGE_FIELDS.issubset(keys) or
                 not keys.issubset(self.ALL_MERGEABLE_FIELDS)):
-            self._fail(fire, "invalid data set")
+            self._fail(fire, self.INVALID_KEYS_MSG)
 
+    LOCATION_MISMATCH_MSG = "locations don't match"
     def _check_location(self, fire, combined_fire):
         """Makes sure the locations are the same
 
@@ -645,7 +646,7 @@ class FiresMerger(object):
         if combined_fire and (
                 fire.latitude != combined_fire.latitude or
                 fire.longitude != combined_fire.longitude):
-            self._fail(fire, "locations don't match")
+            self._fail(fire, self.LOCATION_MISMATCH_MSG)
 
     def _check_growth_windows(self, fire, combined_fire):
         """Makes sure growth windows don't overlapping
@@ -656,6 +657,7 @@ class FiresMerger(object):
         # TODO: implement....
         pass
 
+    EVENT_MISMATCH_MSG = "fire event ids don't match"
     def _check_event_of(self, fire, combined_fire):
         """Makes sure event ids, if both defined, are the same
         """
@@ -663,15 +665,18 @@ class FiresMerger(object):
             'event_of', {}).get('id')
         f_event_id = fire.get('event_of', {}).get('id')
         if c_event_id and f_event_id and c_event_id != f_event_id:
-            self._fail(fire, "fire event ids don't match")
+            self._fail(fire, self.EVENT_MISMATCH_MSG)
 
+    FIRE_TYPE_MISMATCH_MSG = "Fire types don't match"
+    FUEL_TYPE_MISMATCH_MSG = "Fuel types don't match"
     def _check_fire_and_fuel_types(self, fire, combined_fire):
         """Makes sure fire and fuel types are the same
         """
-        if combined_fire and (
-                fire.fuel_type != combined_fire.fuel_type or
-                fire.type != combined_fire.type):
-            self._fail(fire, "Fire and/or fuel types don't match")
+        if combined_fire:
+            if fire.type != combined_fire.type:
+                self._fail(fire, self.FIRE_TYPE_MISMATCH_MSG)
+            if fire.fuel_type != combined_fire.fuel_type:
+                self._fail(fire, self.FUEL_TYPE_MISMATCH_MSG)
 
     def _fail(self, fire, sub_msg):
         msg = "Failed to merge fire {} ({}): {}".format(
