@@ -648,14 +648,21 @@ class FiresMerger(object):
                 fire.longitude != combined_fire.longitude):
             self._fail(fire, self.LOCATION_MISMATCH_MSG)
 
+    GROWTH_FOR_BOTH_OR_NONE_MSG = ("growth windows must be defined for both "
+        "fires or neither in order to merge")
+    OVERLAPPING_GROWTH_WINDOWS = "growth windows overlap"
     def _check_growth_windows(self, fire, combined_fire):
-        """Makes sure growth windows don't overlapping
+        """Makes sure growth windows are defined for all or none,
+        and if defined, make sure they don't overlap
 
         Ultimately, overlapping growth windows could be handled,
         but at this point it would be overengineering.
         """
-        # TODO: implement....
-        pass
+        if combined_fire and (
+                bool(combined_fire.get('growth')) != bool(fire.get('growth'))):
+            self._fail(fire, self.GROWTH_FOR_BOTH_OR_NONE_MSG)
+
+        # TODO: check for overlaps
 
     EVENT_MISMATCH_MSG = "fire event ids don't match"
     def _check_event_of(self, fire, combined_fire):

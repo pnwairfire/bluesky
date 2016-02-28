@@ -446,6 +446,41 @@ class TestFiresManagerMergeFires(object):
             fm.merge_fires()
         assert e_info.value.message.index(fires.FiresMerger.LOCATION_MISMATCH_MSG) > 0
 
+    def test_growth_for_only_one_fire(self):
+        fm = fires.FiresManager()
+        f = fires.Fire({
+            'id': '1',
+            'location': {
+                'area': 132,
+                'latitude': 45.0,
+                'longitude': -120.0
+            }
+        })
+        f2 = fires.Fire({
+            'id': '1',
+            "growth":[
+                {
+                    "start": "2014-05-27T17:00:00",
+                    "end": "2014-05-28T17:00:00",
+                    "pct": 100.0
+                }
+            ],
+            'location': {
+                'area': 132,
+                'latitude': 45.0,
+                'longitude': -120.0
+            }
+        })
+        fm.fires = [f, f2]
+        with raises(ValueError) as e_info:
+            fm.merge_fires()
+        assert e_info.value.message.index(
+            fires.FiresMerger.GROWTH_FOR_BOTH_OR_NONE_MSG) > 0
+
+    def test_overlapping_growth(self):
+        # TODO: implemented once check is in place
+        pass
+
     def test_different_event_ids(self):
         fm = fires.FiresManager()
         f = fires.Fire({
