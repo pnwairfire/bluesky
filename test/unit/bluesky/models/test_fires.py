@@ -119,8 +119,8 @@ class TestFiresManager:
             fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'})
         ]
         fires_manager._fires = {
-            '1': fire_objects[0],
-            '2': fire_objects[1]
+            '1': [fire_objects[0]],
+            '2': [fire_objects[1]]
         }
         fires_manager._fire_ids = ['1','2']
         fires_manager._meta = {'a':1, 'b':{'c':2}}
@@ -143,8 +143,8 @@ class TestFiresManager:
         # you can also set meta data directly
         fires_manager.meta['d'] = 123
 
-        assert ['1','2'] == fires_manager._fire_ids
-        assert {'1': fire_objects[0],'2': fire_objects[1]} == fires_manager._fires
+        assert set(['1','2']) == fires_manager._fire_ids
+        assert {'1': [fire_objects[0]],'2': [fire_objects[1]]} == fires_manager._fires
         assert {'a':1, 'b':{'c':2}, 'd': 123} == fires_manager._meta == fires_manager.meta
 
     ## Loading
@@ -241,8 +241,8 @@ class TestFiresManager:
             fires.Fire({'id':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
         ]
         fires_manager._fires = {
-            '1': fire_objects[0],
-            '2': fire_objects[1]
+            '1': [fire_objects[0]],
+            '2': [fire_objects[1]]
         }
         fires_manager._fire_ids = ['1','2']
         fires_manager._meta = {"foo": {"bar": "baz"}}
@@ -285,7 +285,7 @@ class TestFiresManager:
             fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
             fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
         ]
-        assert expected == fires_manager.fires
+        assert expected == sorted(fires_manager.fires, key=lambda e: int(e.id))
 
         fires_manager.filter('country', whitelist=["USA", "CA", "UK", "BZ"])
         expected = [
@@ -296,7 +296,7 @@ class TestFiresManager:
             fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
             fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
         ]
-        assert expected == fires_manager.fires
+        assert expected == sorted(fires_manager.fires, key=lambda e: int(e.id))
 
         fires_manager.filter('country', blacklist=["USA"])
         expected = [
@@ -305,7 +305,7 @@ class TestFiresManager:
             fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
             fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
         ]
-        assert expected == fires_manager.fires
+        assert expected == sorted(fires_manager.fires, key=lambda e: int(e.id))
 
         fires_manager.filter('country', whitelist=["USA", "CA", "UK"])
         expected = [
@@ -313,7 +313,7 @@ class TestFiresManager:
             fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
             fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'})
         ]
-        assert expected == fires_manager.fires
+        assert expected == sorted(fires_manager.fires, key=lambda e: int(e.id))
 
         fires_manager.filter('country', blacklist=["USA", "CA"])
         expected = [
@@ -475,7 +475,6 @@ class TestFiresManagerMergeFires(object):
             fm.merge_fires()
         assert e_info.value.message.index(fires.FiresMerger.EVENT_MISMATCH_MSG) > 0
 
-
     def test_different_fire_and_fuel_type(self):
         fm = fires.FiresManager()
         f = fires.Fire({
@@ -506,13 +505,14 @@ class TestFiresManagerMergeFires(object):
 
         f2.type = f.type
         f2.fuel_type = "activity"
+        fm.fires = [f, f2]
         with raises(ValueError) as e_info:
             fm.merge_fires()
         assert e_info.value.message.index(fires.FiresMerger.FUEL_TYPE_MISMATCH_MSG) > 0
 
     def test_merge_mixed_success_no_growth(self):
         fm = fires.FiresManager()
-        fm.set_config_value('merge', 'skip_failures')
+        fm.set_config_value(True, 'merge', 'skip_failures')
         f = fires.Fire({
             'id': '1',
             "type": "rx",
@@ -533,13 +533,23 @@ class TestFiresManagerMergeFires(object):
                 'longitude': -120.0
             }
         })
-        fm.fires = [f, f2]
+        f3 = fires.Fire({
+            'id': '2',
+            "type": "rx",
+            "fuel_type": "natural",
+            'location': {
+                'area': 132,
+                'latitude': 45.0,
+                'longitude': -120.0
+            }
+        })
+        fm.fires = [f, f2, f3]
         fm.merge_fires()
-        # TODO: add asserts
+        expected = fm.fires
 
     def test_merge_mixed_success(self):
         fm = fires.FiresManager()
-        fm.set_config_value('merge', 'skip_failures')
+        fm.set_config_value(True, 'merge', 'skip_failures')
         f = fires.Fire({
             'id': '1',
             "type": "rx",
