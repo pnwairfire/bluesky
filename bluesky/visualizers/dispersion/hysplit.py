@@ -54,6 +54,9 @@ if 'NOX' in BLUESKYKML_SPECIES_LIST:
 ##
 ## Functions for extracting fire *location * information to write to csv files
 ##
+## Note: The growth object (arg 'g') is ignored in most of these methods.
+##  It's only needed for the start time and area calculation
+##
 
 def _pick_representative_fuelbed(fire, g):
     sorted_fuelbeds = sorted(fire.get('fuelbeds', []),
