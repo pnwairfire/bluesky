@@ -1613,7 +1613,7 @@ Another example, running through vsmoke dispersion:
                     "name": "Fire Near Wolf Creek, Winthrop, WA"
                 },
                 "id": "SF11C14225236095807750",
-                "type": "natural",
+                "type": "wildfire",
                 "location": {
                     "area": 10000,
                     "ecoregion": "western",
@@ -1689,7 +1689,7 @@ Another example, running through hysplit dispersion:
                     "name": "Natural Fire near Yosemite, CA"
                 },
                 "id": "SF11C14225236095807750",
-                "type": "natural",
+                "type": "wildfire",
                 "location": {
                     "area": 10000,
                     "ecoregion": "western",

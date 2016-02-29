@@ -57,7 +57,7 @@
                 "name": "Unnamed fire in Wasco County, Oregon"
             },
             "id": "SF11C2457577860647680",
-            "type": "natural",
+            "type": "wildfire",
             "location": {
                 "area": 10000,
                 "ecoregion": "western",

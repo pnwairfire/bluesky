@@ -57,7 +57,7 @@
                 "name": "Natural Fire near Yosemite, CA"
             },
             "id": "SF11C14225236095807750",
-            "type": "natural",
+            "type": "wildfire",
             "location": {
                 "area": 10000.0,
                 "ecoregion": "western",
@@ -79,7 +79,7 @@
                 "name": "Natural Fire in North Tahoe"
             },
             "id": "sdk2risodijfdsf",
-            "type": "natural",
+            "type": "wildfire",
             "location": {
                 "area": 20000.0,
                 "ecoregion": "western",
@@ -101,7 +101,7 @@
                 "name": "Natural Fire new Placerville"
             },
             "id": "sdf342klsfjfsdf",
-            "type": "natural",
+            "type": "wildfire",
             "location": {
                 "area": 40000.0,
                 "ecoregion": "western",
@@ -123,7 +123,7 @@
                 "name": "Natural Fire near Mt Shasta"
             },
             "id": "weru24oir",
-            "type": "natural",
+            "type": "wildfire",
             "location": {
                 "area": 20000.0,
                 "ecoregion": "western",

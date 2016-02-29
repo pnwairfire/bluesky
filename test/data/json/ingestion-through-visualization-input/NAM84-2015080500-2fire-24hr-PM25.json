@@ -64,7 +64,7 @@
                 "name": "Natural Fire near Yosemite, CA"
             },
             "id": "SF11C14225236095807750",
-            "type": "natural",
+            "type": "wildfire",
             "location": {
                 "area": 10000,
                 "ecoregion": "western",
@@ -88,7 +88,7 @@
                 "name": "activity burn Fire in North Tahoe"
             },
             "id": "sdk2risodijfdsf",
-            "type": "natural",
+            "type": "wildfire",
             "location": {
                 "area": 20000.0,
                 "ecoregion": "western",
