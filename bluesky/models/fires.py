@@ -591,21 +591,7 @@ class FiresMerger(object):
             try:
                 new_combined_fire.location['area'] += fire.location['area']
 
-                # factor by which we need to multiple combined_fire's growth pcts
-                c_growth_factor = float(combined_fire.location['area']) / float(
-                    new_combined_fire.location['area'])
-                for g in new_combined_fire.growth:
-                    g['pct'] *= c_growth_factor
-
-                # copy it to preserve old fire, in case theres a failure
-                # downstream and we abort this merge
-                new_growth = copy.deepcopy(fire.growth)
-                # factor by which we need to multiple to-merge fire's growth pcts
-                f_growth_factor = 1.0 - c_growth_factor
-                for g in new_growth:
-                    g['pct'] *= f_growth_factor
-
-                new_combined_fire.growth.extend(new_growth)
+                self._merge_growth_into_combined_fire(fire, combined_fire, new_combined_fire)
 
                 # TODO: merge anything else?
 
@@ -617,6 +603,28 @@ class FiresMerger(object):
                 self._fail(fire, e)
 
         return new_combined_fire
+
+    def _merge_growth_into_combined_fire(self, fire, combined_fire,
+            new_combined_fire):
+        # factor by which we need to multiple combined_fire's growth pcts
+        # (at this point, growth windows are defined or not defined for
+        #  both fires)
+        if combined_fire.get('growth'):
+            c_growth_factor = float(combined_fire.location['area']) / float(
+                new_combined_fire.location['area'])
+            for g in new_combined_fire.growth:
+                g['pct'] *= c_growth_factor
+
+            # copy it to preserve old fire, in case theres a failure
+            # downstream and we abort this merge
+            new_growth = copy.deepcopy(fire.growth)
+            # factor by which we need to multiple to-merge fire's growth pcts
+            f_growth_factor = 1.0 - c_growth_factor
+            for g in new_growth:
+                g['pct'] *= f_growth_factor
+
+            new_combined_fire.growth.extend(new_growth)
+            new_combined_fire.growth.sort(key=lambda e: e['start'])
 
     ##
     ## Validation / Check Methods

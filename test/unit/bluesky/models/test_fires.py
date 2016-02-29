@@ -9,6 +9,7 @@ import StringIO
 import uuid
 
 from py.test import raises
+from numpy.testing import assert_approx_equal
 
 from bluesky.models import fires
 
@@ -547,14 +548,14 @@ class TestFiresManagerMergeFires(object):
 
     def test_merge_mixed_success_no_growth(self):
         fm = fires.FiresManager()
-        fm.set_config_value(True, 'merge', 'skip_failures')
+        #fm.set_config_value(True, 'merge', 'skip_failures')
         f = fires.Fire({
             'id': '1',
             "type": "rx",
             "fuel_type": "natural",
             'location': {
                 'area': 50,
-                'latitude': 45.0,
+                'latitude': 45.2,
                 'longitude': -120.0
             }
         })
@@ -564,7 +565,7 @@ class TestFiresManagerMergeFires(object):
             "fuel_type": "natural",
             'location': {
                 'area': 132,
-                'latitude': 45.0,
+                'latitude': 45.2,
                 'longitude': -120.0
             }
         })
@@ -573,24 +574,46 @@ class TestFiresManagerMergeFires(object):
             "type": "rx",
             "fuel_type": "natural",
             'location': {
-                'area': 132,
+                'area': 136,
                 'latitude': 45.0,
                 'longitude': -120.0
             }
         })
         fm.fires = [f, f2, f3]
         fm.merge_fires()
-        expected = fm.fires
+        expected = [
+            fires.Fire({
+                'id': '1',
+                "type": "rx",
+                "fuel_type": "natural",
+                'location': {
+                    'area': 182.0,
+                    'latitude': 45.2,
+                    'longitude': -120.0
+                }
+            }),
+            fires.Fire({
+                'id': '2',
+                "type": "rx",
+                "fuel_type": "natural",
+                'location': {
+                    'area': 136,
+                    'latitude': 45.0,
+                    'longitude': -120.0
+                }
+            })
+        ]
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
     def test_merge_mixed_success(self):
         fm = fires.FiresManager()
-        fm.set_config_value(True, 'merge', 'skip_failures')
+        #fm.set_config_value(True, 'merge', 'skip_failures')
         f = fires.Fire({
             'id': '1',
             "type": "rx",
             "fuel_type": "natural",
             'location': {
-                'area': 50,
+                'area': 90,
                 'latitude': 45.0,
                 'longitude': -120.0
             },
@@ -612,7 +635,7 @@ class TestFiresManagerMergeFires(object):
             "type": "rx",
             "fuel_type": "natural",
             'location': {
-                'area': 132,
+                'area': 10,
                 'latitude': 45.0,
                 'longitude': -120.0
             },
@@ -641,10 +664,61 @@ class TestFiresManagerMergeFires(object):
                 }
             ]
         })
-        fm.fires = [f, f2]
-        fm.add_fire(f3)
+        fm.fires = [f, f2, f3]
         fm.merge_fires()
-        # TODO: add asserts
-
+        expected = [
+            fires.Fire({
+                'id': '1',
+                "type": "rx",
+                "fuel_type": "natural",
+                'location': {
+                    'area': 100,
+                    'latitude': 45.0,
+                    'longitude': -120.0
+                },
+                "growth": [
+                    {
+                        "start": "2014-05-27T17:00:00",
+                        "end": "2014-05-28T17:00:00",
+                        "pct": 10.0
+                    },
+                    {
+                        "start": "2014-05-28T17:00:00",
+                        "end": "2014-05-29T17:00:00",
+                        "pct": 54.0
+                    },
+                    {
+                        "start": "2014-05-29T17:00:00",
+                        "end": "2014-05-30T17:00:00",
+                        "pct": 36.0
+                    }
+                ]
+            }),
+            fires.Fire({
+                'id': '2',
+                "type": "rx",
+                "fuel_type": "natural",
+                'location': {
+                    'area': 132,
+                    'latitude': 45.0,
+                    'longitude': -120.0
+                },
+                "growth": [
+                    {
+                        "start": "2014-05-27T17:00:00",
+                        "end": "2014-05-30T17:00:00",
+                        "pct": 100.0
+                    }
+                ]
+            })
+        ]
+        actual = sorted(fm.fires, key=lambda e: int(e.id))
+        # assert growth precentages for fire id 1 separately, using
+        # numpy's assert_approx_equal, to handle rounding errors
+        for i in range(3):
+            assert_approx_equal(
+                expected[0].growth[i].pop('pct'),
+                actual[0].growth[i].pop('pct'))
+        assert expected == actual
 
 # TODO: unit test fires.FiresMerger directly
