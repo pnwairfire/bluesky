@@ -405,146 +405,193 @@ class TestFiresManagerMergeFires(object):
         assert fm.fires == [f, f2]
 
     def test_pre_ingestion(self):
-        # i.e. insufficient data to merge
-        fm = fires.FiresManager()
-        f = fires.Fire({'id': '1'})
-        f2 = fires.Fire({'id': '1'})
-        fm.fires = [f, f2]
-        with raises(ValueError) as e_info:
-            fm.merge_fires()
-        assert e_info.value.message.index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
+        # test in both skip and no-skip modes
+        for s in (True, False):
+            # i.e. insufficient data to merge
+            fm = fires.FiresManager()
+            fm.set_config_value(s, 'merge', 'skip_failures')
+            f = fires.Fire({'id': '1'})
+            f2 = fires.Fire({'id': '1'})
+            fm.fires = [f, f2]
+            if not s:
+                with raises(ValueError) as e_info:
+                    fm.merge_fires()
+                assert e_info.value.message.index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
+            else:
+                fm.merge_fires()
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.id))
 
     def test_post_fuelbeds(self):
-        # i.e. too much data to merge
-        fm = fires.FiresManager()
-        f = fires.Fire({'id': '1', 'location': {'area': 132}, 'fuelbeds': {}})
-        f2 = fires.Fire({'id': '1', 'location': {'area': 132}, 'fuelbeds': {}})
-        fm.fires = [f, f2]
-        with raises(ValueError) as e_info:
-            fm.merge_fires()
-        assert e_info.value.message.index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
+        # test in both skip and no-skip modes
+        for s in (True, False):
+            # i.e. too much data to merge
+            fm = fires.FiresManager()
+            fm.set_config_value(s, 'merge', 'skip_failures')
+            f = fires.Fire({'id': '1', 'location': {'area': 132}, 'fuelbeds': {}})
+            f2 = fires.Fire({'id': '1', 'location': {'area': 132}, 'fuelbeds': {}})
+            fm.fires = [f, f2]
+            if not s:
+                with raises(ValueError) as e_info:
+                    fm.merge_fires()
+                assert e_info.value.message.index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
+            else:
+                fm.merge_fires()
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.id))
 
     def test_differing_locations(self):
-        fm = fires.FiresManager()
-        f = fires.Fire({
-            'id': '1',
-            'location': {
-                'area': 132,
-                'latitude': 45.0,
-                'longitude': -120.0
-            }
-        })
-        f2 = fires.Fire({
-            'id': '1',
-            'location': {
-                'area': 132,
-                'latitude': 47.0,
-                'longitude': -120.0
-            }
-        })
-        fm.fires = [f, f2]
-        with raises(ValueError) as e_info:
-            fm.merge_fires()
-        assert e_info.value.message.index(fires.FiresMerger.LOCATION_MISMATCH_MSG) > 0
+        # test in both skip and no-skip modes
+        for s in (True, False):
+            fm = fires.FiresManager()
+            fm.set_config_value(s, 'merge', 'skip_failures')
+            f = fires.Fire({
+                'id': '1',
+                'location': {
+                    'area': 12,
+                    'latitude': 45.0,
+                    'longitude': -120.0
+                }
+            })
+            f2 = fires.Fire({
+                'id': '1',
+                'location': {
+                    'area': 132,
+                    'latitude': 47.0,
+                    'longitude': -120.0
+                }
+            })
+            fm.fires = [f, f2]
+            if not s:
+                with raises(ValueError) as e_info:
+                    fm.merge_fires()
+                assert e_info.value.message.index(fires.FiresMerger.LOCATION_MISMATCH_MSG) > 0
+            else:
+                fm.merge_fires()
+                # Sort by area since ids are the same
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
 
     def test_growth_for_only_one_fire(self):
-        fm = fires.FiresManager()
-        f = fires.Fire({
-            'id': '1',
-            'location': {
-                'area': 132,
-                'latitude': 45.0,
-                'longitude': -120.0
-            }
-        })
-        f2 = fires.Fire({
-            'id': '1',
-            "growth":[
-                {
-                    "start": "2014-05-27T17:00:00",
-                    "end": "2014-05-28T17:00:00",
-                    "pct": 100.0
+        # test in both skip and no-skip modes
+        for s in (True, False):
+            fm = fires.FiresManager()
+            fm.set_config_value(s, 'merge', 'skip_failures')
+            f = fires.Fire({
+                'id': '1',
+                'location': {
+                    'area': 34,
+                    'latitude': 45.0,
+                    'longitude': -120.0
                 }
-            ],
-            'location': {
-                'area': 132,
-                'latitude': 45.0,
-                'longitude': -120.0
-            }
-        })
-        fm.fires = [f, f2]
-        with raises(ValueError) as e_info:
-            fm.merge_fires()
-        assert e_info.value.message.index(
-            fires.FiresMerger.GROWTH_FOR_BOTH_OR_NONE_MSG) > 0
+            })
+            f2 = fires.Fire({
+                'id': '1',
+                "growth":[
+                    {
+                        "start": "2014-05-27T17:00:00",
+                        "end": "2014-05-28T17:00:00",
+                        "pct": 100.0
+                    }
+                ],
+                'location': {
+                    'area': 132,
+                    'latitude': 45.0,
+                    'longitude': -120.0
+                }
+            })
+            fm.fires = [f, f2]
+            if not s:
+                with raises(ValueError) as e_info:
+                    fm.merge_fires()
+                assert e_info.value.message.index(
+                    fires.FiresMerger.GROWTH_FOR_BOTH_OR_NONE_MSG) > 0
+            else:
+                fm.merge_fires()
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
 
     def test_overlapping_growth(self):
         # TODO: implemented once check is in place
         pass
 
     def test_different_event_ids(self):
-        fm = fires.FiresManager()
-        f = fires.Fire({
-            'id': '1',
-            "event_of":{
-                "id": "ABC"
-            },
-            'location': {
-                'area': 132,
-                'latitude': 45.0,
-                'longitude': -120.0
-            }
-        })
-        f2 = fires.Fire({
-            'id': '1',
-            "event_of":{
-                "id": "SDF"
-            },
-            'location': {
-                'area': 132,
-                'latitude': 45.0,
-                'longitude': -120.0
-            }
-        })
-        fm.fires = [f, f2]
-        with raises(ValueError) as e_info:
-            fm.merge_fires()
-        assert e_info.value.message.index(fires.FiresMerger.EVENT_MISMATCH_MSG) > 0
+        # test in both skip and no-skip modes
+        for s in (True, False):
+            fm = fires.FiresManager()
+            fm.set_config_value(s, 'merge', 'skip_failures')
+            f = fires.Fire({
+                'id': '1',
+                "event_of":{
+                    "id": "ABC"
+                },
+                'location': {
+                    'area': 32,
+                    'latitude': 45.0,
+                    'longitude': -120.0
+                }
+            })
+            f2 = fires.Fire({
+                'id': '1',
+                "event_of":{
+                    "id": "SDF"
+                },
+                'location': {
+                    'area': 132,
+                    'latitude': 45.0,
+                    'longitude': -120.0
+                }
+            })
+            fm.fires = [f, f2]
+            if not s:
+                with raises(ValueError) as e_info:
+                    fm.merge_fires()
+                assert e_info.value.message.index(fires.FiresMerger.EVENT_MISMATCH_MSG) > 0
+            else:
+                fm.merge_fires()
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
 
     def test_different_fire_and_fuel_type(self):
-        fm = fires.FiresManager()
-        f = fires.Fire({
-            'id': '1',
-            "type": "rx",
-            "fuel_type": "natural",
-            'location': {
-                'area': 132,
-                'latitude': 45.0,
-                'longitude': -120.0
-            }
-        })
-        f2 = fires.Fire({
-            'id': '1',
-            "type": "wf",
-            "fuel_type": "natural",
-            'location': {
-                'area': 132,
-                'latitude': 45.0,
-                'longitude': -120.0
-            }
-        })
-        fm.fires = [f, f2]
+        # test in both skip and no-skip modes
+        for s in (True, False):
+            fm = fires.FiresManager()
+            fm.set_config_value(s, 'merge', 'skip_failures')
+            f = fires.Fire({
+                'id': '1',
+                "type": "rx",
+                "fuel_type": "natural",
+                'location': {
+                    'area': 23,
+                    'latitude': 45.0,
+                    'longitude': -120.0
+                }
+            })
+            f2 = fires.Fire({
+                'id': '1',
+                "type": "wf",
+                "fuel_type": "natural",
+                'location': {
+                    'area': 132,
+                    'latitude': 45.0,
+                    'longitude': -120.0
+                }
+            })
+            fm.fires = [f, f2]
 
-        with raises(ValueError) as e_info:
-            fm.merge_fires()
-        assert e_info.value.message.index(fires.FiresMerger.FIRE_TYPE_MISMATCH_MSG) > 0
+            if not s:
+                with raises(ValueError) as e_info:
+                    fm.merge_fires()
+                assert e_info.value.message.index(fires.FiresMerger.FIRE_TYPE_MISMATCH_MSG) > 0
+            else:
+                fm.merge_fires()
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
 
-        f2.type = f.type
-        f2.fuel_type = "activity"
-        fm.fires = [f, f2]
-        with raises(ValueError) as e_info:
-            fm.merge_fires()
-        assert e_info.value.message.index(fires.FiresMerger.FUEL_TYPE_MISMATCH_MSG) > 0
+            f2.type = f.type
+            f2.fuel_type = "activity"
+            fm.fires = [f, f2]
+            if not s:
+                with raises(ValueError) as e_info:
+                    fm.merge_fires()
+                assert e_info.value.message.index(fires.FiresMerger.FUEL_TYPE_MISMATCH_MSG) > 0
+            else:
+                fm.merge_fires()
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
 
     def test_merge_mixed_success_no_growth(self):
         fm = fires.FiresManager()
