@@ -797,17 +797,17 @@ class FiresFilter(FiresActionBase):
     ## Unterlying filter methods
     ##
 
-    SPECIFY_WHITELIST_OR_BLACKLIST = "Specify whitelist or blacklist - not both"
-    SPECIFY_FILTER_FIELD = "Specify attribute to filter on"
+    SPECIFY_WHITELIST_OR_BLACKLIST_MSG = "Specify whitelist or blacklist - not both"
+    SPECIFY_FILTER_FIELD_MSG = "Specify field to filter on"
     def _get_filter(self, **kwargs):
         whitelist = kwargs.get('whitelist')
         blacklist = kwargs.get('blacklist')
         if (not whitelist and not blacklist) or (whitelist and blacklist):
-            raise self.FilterError(self.SPECIFY_WHITELIST_OR_BLACKLIST)
+            raise self.FilterError(self.SPECIFY_WHITELIST_OR_BLACKLIST_MSG)
         filter_field = kwargs.get('filter_field')
         if not filter_field:
             # This will never happen if called internally
-            raise self.FilterError(self.SPECIFY_FILTER_FIELD)
+            raise self.FilterError(self.SPECIFY_FILTER_FIELD_MSG)
 
         def _filter(fire):
             if whitelist:
