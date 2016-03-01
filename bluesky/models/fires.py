@@ -604,6 +604,9 @@ class FiresMerger(FiresActionBase):
 
             except FiresMerger.MergeError, e:
                 if not self._skip_failures:
+                    if combined_fire:
+                        # add back what was merge in progress
+                        self._fires_manager.add_fire(combined_fire)
                     raise ValueError(e.message)
 
         if combined_fire:
@@ -632,13 +635,10 @@ class FiresMerger(FiresActionBase):
             new_combined_fire = Fire(copy.deepcopy(dict(combined_fire)))
             try:
                 new_combined_fire.location['area'] += fire.location['area']
-
                 self._merge_growth_into_combined_fire(fire, combined_fire, new_combined_fire)
-
                 # TODO: merge anything else?
 
-                # make sure remove_fire succeeds before
-                # updating combined_fire
+                # if remove_fire fails, combined_fire won't be updated
                 self._fires_manager.remove_fire(fire)
 
             except Exception, e:
