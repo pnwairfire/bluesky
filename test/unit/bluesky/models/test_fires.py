@@ -255,73 +255,6 @@ class TestFiresManager:
         }
         assert expected == json.loads(self._output.getvalue())
 
-    ## Filtering
-
-    def test_filter(self):
-        fires_manager = fires.FiresManager()
-        fires_manager.fires = [
-            fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '3', 'name': 'n3', 'country': "ZZ", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '5', 'name': 'n5', 'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '6', 'name': 'n6', 'country': '', 'bar1': 1 , 'baz':'baz1'}),
-            fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
-            fires.Fire({'id': '9', 'name': 'n9', 'country': 'Unknown', 'bar2': 2 , 'baz':'baz2'}),
-            fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
-            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
-        ]
-
-        fires_manager.filter('country', blacklist=["ZZ"])
-        expected = [
-            fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '5', 'name': 'n5', 'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '6', 'name': 'n6', 'country': '', 'bar1': 1 , 'baz':'baz1'}),
-            fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
-            fires.Fire({'id': '9', 'name': 'n9', 'country': 'Unknown', 'bar2': 2 , 'baz':'baz2'}),
-            fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
-            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
-        ]
-        assert expected == sorted(fires_manager.fires, key=lambda e: int(e.id))
-
-        fires_manager.filter('country', whitelist=["USA", "CA", "UK", "BZ"])
-        expected = [
-            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '5', 'name': 'n5', 'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
-            fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
-            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
-        ]
-        assert expected == sorted(fires_manager.fires, key=lambda e: int(e.id))
-
-        fires_manager.filter('country', blacklist=["USA"])
-        expected = [
-            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
-            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
-        ]
-        assert expected == sorted(fires_manager.fires, key=lambda e: int(e.id))
-
-        fires_manager.filter('country', whitelist=["USA", "CA", "UK"])
-        expected = [
-            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'})
-        ]
-        assert expected == sorted(fires_manager.fires, key=lambda e: int(e.id))
-
-        fires_manager.filter('country', blacklist=["USA", "CA"])
-        expected = [
-            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
-        ]
-        assert expected == fires_manager.fires
-
     # TODO: test instantiating with fires, dump, adding more with loads, dump, etc.
 
     ## Failures
@@ -377,9 +310,13 @@ class TestFiresManager:
 
 
 
-class TestFiresManagerMergeFires(object):
+##
+## Tests for Merging
+##
+## TODO: unit test fires.FiresMerger directly
+##
 
-    # TODO: test with and without skipping failures
+class TestFiresManagerMergeFires(object):
 
     def test_no_fires(self):
         fm = fires.FiresManager()
@@ -768,4 +705,124 @@ class TestFiresManagerMergeFires(object):
                 actual[0].growth[i].pop('pct'))
         assert expected == actual
 
-# TODO: unit test fires.FiresMerger directly
+
+##
+## Tests for Filtering
+##
+## TODO: unit test fires.FiresFilter directly
+##
+
+class TestFiresManagerFilterFires(object):
+
+    ## Filtering
+
+    def test_no_filters_specified(self):
+        # TODO: implement
+        pass
+
+    def test_filter_by_country(self):
+        fm = fires.FiresManager()
+        fm.fires = [
+            fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '3', 'name': 'n3', 'country': "ZZ", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '5', 'name': 'n5', 'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '6', 'name': 'n6', 'country': '', 'bar1': 1 , 'baz':'baz1'}),
+            fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
+            fires.Fire({'id': '9', 'name': 'n9', 'country': 'Unknown', 'bar2': 2 , 'baz':'baz2'}),
+            fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
+            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
+        ]
+
+
+        fm.set_config_value([{}], 'filter', 'country')
+        # TODO: assert raises self.FilterError(SPECIFY_WHITELIST_OR_BLACKLIST) if skip_failres == false
+        # TODO: assert noop if skip_failres == true
+
+        fm.set_config_value(["ZZ"], 'filter', 'country', 'blacklist')
+        fm.set_config_value(["YY"], 'filter', 'country', 'whitelist')
+        # TODO: assert raises self.FilterError(SPECIFY_WHITELIST_OR_BLACKLIST)error error if skip_failres == false
+        # TODO: assert noop if skip_failres == true
+
+
+        fm.set_config_value(["ZZ"], 'filter', 'country', 'blacklist')
+        fm.set_config_value(None, 'filter', 'country', 'whitelist')
+        fm.filter_fires()
+        expected = [
+            fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '5', 'name': 'n5', 'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '6', 'name': 'n6', 'country': '', 'bar1': 1 , 'baz':'baz1'}),
+            fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
+            fires.Fire({'id': '9', 'name': 'n9', 'country': 'Unknown', 'bar2': 2 , 'baz':'baz2'}),
+            fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
+            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
+        ]
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+
+        fm.set_config_value(["USA", "CA", "UK", "BZ"],
+            'filter', 'country', 'whitelist')
+        fm.set_config_value(None, 'filter', 'country', 'blacklist')
+        fm.filter_fires()
+        expected = [
+            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '5', 'name': 'n5', 'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
+            fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
+            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
+        ]
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+
+        fm.set_config_value(["USA"], 'filter', 'country', 'blacklist')
+        fm.set_config_value(None, 'filter', 'country', 'whitelist')
+        fm.filter_fires()
+        expected = [
+            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
+            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
+        ]
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+
+        fm.set_config_value(["USA", "CA", "UK"], 'filter', 'country', 'whitelist')
+        fm.set_config_value(None, 'filter', 'country', 'blacklist')
+        fm.filter_fires()
+        expected = [
+            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '7', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
+            fires.Fire({'id': '8', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'})
+        ]
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+
+        fm.set_config_value(["USA", "CA"], 'filter', 'country', 'blacklist')
+        fm.set_config_value(None, 'filter', 'country', 'whitelist')
+        fm.filter_fires()
+        expected = [
+            fires.Fire({'id': '4', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+        ]
+        assert expected == fm.fires
+
+    def test_filter_by_area(self):
+        fm = fires.FiresManager()
+        fm.fires = [
+            fires.Fire({'id': '1', 'location':{'area': 45}}),
+            fires.Fire({'id': '2', 'location':{'area': 85}}),
+            fires.Fire({'id': '3', 'location':{'area': 55}}),
+            fires.Fire({'id': '4', 'location':{'area': 65}}),
+            fires.Fire({'id': '5', 'location':{'area': 85}}),
+            fires.Fire({'id': '6', 'location':{'area': 75}}),
+            fires.Fire({'id': '7', 'location':{'area': 50}}),
+            fires.Fire({'id': '8', 'location':{'area': 30}})
+        ]
+        # TDOD: both min and max
+        # TDOD: min only
+        # TDOD: max only
+
+    def test_filter_by_location(self):
+        # TDOD: ....
+        pass

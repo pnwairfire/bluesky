@@ -10,7 +10,6 @@ __all__ = [
     "BlueSkyImportError",
     "BlueSkyConfigurationError",
     "BlueSkyModuleError",
-    "InvalidFilterError",
     "MissingDependencyError"
 ]
 
@@ -21,9 +20,6 @@ class BlueSkyConfigurationError(ValueError):
     pass
 
 class BlueSkyModuleError(Exception):
-    pass
-
-class InvalidFilterError(ValueError):
     pass
 
 class MissingDependencyError(ValueError):

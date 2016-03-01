@@ -3,6 +3,7 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
+import abc
 import copy
 import datetime
 import importlib
@@ -15,7 +16,7 @@ import uuid
 
 from bluesky import datautils, configuration
 from bluesky.exceptions import (
-    BlueSkyImportError, BlueSkyModuleError, InvalidFilterError
+    BlueSkyImportError, BlueSkyModuleError
 )
 
 __all__ = [
@@ -386,20 +387,10 @@ class FiresManager(object):
             # If there was a failure
             raise BlueSkyModuleError
 
-    ## Filtering data
+    ## Filtering Fires
 
-    def filter(self, attr, **kwargs):
-        whitelist = kwargs.get('whitelist')
-        blacklist = kwargs.get('blacklist')
-        if (not whitelist and not blacklist) or (whitelist and blacklist):
-            raise InvalidFilterError("Specify whitelist or blacklist - not both")
-
-        def _filter(fire, attr):
-            if whitelist:
-                return hasattr(fire, attr) and getattr(fire, attr) in whitelist
-            else:
-                return not hasattr(fire, attr) or getattr(fire, attr) not in blacklist
-        self.fires = [f for f in self.fires if _filter(f, attr)]
+    def filter_fires(self):
+        FiresFilter(self).filter()
 
     ## Failures
 
@@ -492,18 +483,15 @@ class FiresManager(object):
         output_stream.write(fire_json)
 
 
-class FiresMerger(object):
-    """Class for merging fires with the same id.
+##
+## Filtering and Merging Fires
+##
 
-    e.g. For fires that have a separate listing for each day in their duration.
-
-    Note: The logic in this class is organized as a saparate class primarily
-    for maintainability, testibility, and readability.  It was originally in
-    the FiresManager class, but this prevented breaking out
+class FiresActionBase(object):
+    """Base class for merging or filtering fires
     """
 
-    class MergeError(Exception):
-        pass
+    __metaclass__ = abc.ABCMeta
 
     def __init__(self, fires_manager):
         """Constructor
@@ -513,7 +501,52 @@ class FiresMerger(object):
         """
         self._fires_manager = fires_manager
         self._skip_failures = not not self._fires_manager.get_config_value(
-            'merge', 'skip_failures')
+            self.ACTION, 'skip_failures')
+
+    ##
+    ## Abstract methods
+    ##
+
+    @abc.abstractmethod
+    #@property
+    def _action(self):
+        pass
+
+    @abc.abstractmethod
+    #@property
+    def _error_class(self):
+        pass
+
+    ##
+    ## Helper methods
+    ##
+
+    def _fail(self, fire, sub_msg):
+        msg = "Failed to {} fire {} ({}): {}".format(
+            self.ACTION, fire.id, fire._private_id, sub_msg)
+        raise self._error_class(msg)
+
+
+class FiresMerger(FiresActionBase):
+    """Class for merging fires with the same id.
+
+    e.g. For fires that have a separate listing for each day in their duration.
+
+    Note: The logic in this class is organized as a saparate class primarily
+    for maintainability, testibility, and readability.  It was originally in
+    the FiresManager class.
+    """
+
+    ACTION = 'merge'
+    @property
+    def _action(self):
+        return self.ACTION
+
+    class MergeError(Exception):
+        pass
+    @property
+    def _error_class(self):
+        return self.MergeError
 
     ##
     ## Public API
@@ -693,7 +726,112 @@ class FiresMerger(object):
             if fire.fuel_type != combined_fire.fuel_type:
                 self._fail(fire, self.FUEL_TYPE_MISMATCH_MSG)
 
-    def _fail(self, fire, sub_msg):
-        msg = "Failed to merge fire {} ({}): {}".format(
-            fire.id, fire._private_id, sub_msg)
-        raise FiresMerger.MergeError(msg)
+
+##
+## Fires Filter
+##
+
+class FiresFilter(FiresActionBase):
+    """Class for filtering fires by various criteria.
+
+    Note: The logic in this class is organized as a saparate class primarily
+    for maintainability, testibility, and readability.  Some of it was
+    originally in the FiresManager class.
+    """
+
+    ACTION = 'filter'
+    @property
+    def _action(self):
+        return self.ACTION
+
+    class FilterError(Exception):
+        pass
+    @property
+    def _error_class(self):
+        return self.FilterError
+
+    ##
+    ## Public API
+    ##
+
+    NO_FILTERS_MSG = "No filters specified"
+    MISSING_FILTER_CONFIG_MSG = "Specify config for each filter"
+    def filter(self):
+        """Merges fires that have the same id.
+        """
+        filter_config = self._fires_manager.get_config_value('filter')
+        filter_fields = filter_config and [f for f in filter_config
+            if f != 'skip_failures']
+        if not filter_fields:
+            if not self._skip_failures:
+                raise self.FilterError(self.NO_FILTERS_MSG)
+            # else, noop and return
+        else:
+            for f in filter_fields:
+                try:
+                    filter_getter = getattr(self, '_get_{}_filter'.format(f),
+                        self._get_filter)
+                    kwargs = filter_config.get(f)
+                    if not kwargs:
+                        if self._skip_failures:
+                            continue
+                        else:
+                            raise self.FilterError(self.MISSING_FILTER_CONFIG_MSG)
+                    kwargs.update(filter_field=f)
+                    filter_func = filter_getter(**kwargs)
+                except self.FilterError, e:
+                    if self._skip_failures:
+                        continue
+                    else:
+                        raise
+
+                for fire in self._fires_manager.fires:
+                    if filter_func(fire, **kwargs):
+                        self._fires_manager.remove(fire)
+                        if fires_manager.filtered_fires is None:
+                            fires_manager.filtered_fires  = []
+                        # TDOO: add reason for filtering (specify at least filed)
+                        fires_manager.filtered_fires.append(fire)
+
+    ##
+    ## Unterlying filter methods
+    ##
+
+    SPECIFY_WHITELIST_OR_BLACKLIST = "Specify whitelist or blacklist - not both"
+    SPECIFY_FILTER_FIELD = "Specify attribute to filter on"
+    def _get_filter(self, **kwargs):
+        whitelist = kwargs.get('whitelist')
+        blacklist = kwargs.get('blacklist')
+        if (not whitelist and not blacklist) or (whitelist and blacklist):
+            raise self.FilterError(self.SPECIFY_WHITELIST_OR_BLACKLIST)
+        filter_field = kwargs.get('filter_field')
+        if not filter_field:
+            # This will never happen if called internally
+            raise self.FilterError(self.SPECIFY_FILTER_FIELD)
+
+        def _filter(fire):
+            if whitelist:
+                return not hasattr(fire, filter_field) or getattr(fire, filter_field) not in whitelist
+            else:
+                return hasattr(fire, filter_field) and getattr(fire, filter_field) in blacklist
+
+        return _filter
+
+
+    # TODO: specify generic **kwargs in methof signatures instead of specific
+    #   keyword args to avoid TypeError (?) from being raised due to
+    #   recognized keywords ? .... (what's desireable behavior?)
+
+    def _get_location_filter(self, boundary=None):
+        # TODO: Make sure boudary is defined; raise esxception if not
+        # TDOD: return filter function that :
+        #  - returns boolean
+        #  - calls self._fail as necessary
+        pass
+
+    def _get_area_filter(self, min_area=None, max_area=None):
+        # TODO: Make sure min and/or max are defined; raise esxception if not
+        # TDOD: return filter function that :
+        #  - returns boolean
+        #  - calls self._fail as necessary
+        pass
