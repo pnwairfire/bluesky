@@ -848,12 +848,13 @@ class TestFiresManagerFilterFires(object):
         init_fires = [
             fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
             fires.Fire({'id': '2', 'location':{'latitude': 50.0, 'longitude': -80.0}}),
-            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
             fires.Fire({'id': '4', 'location':{'latitude': 70.0, 'longitude': -60.0}}),
             fires.Fire({'id': '5', 'location':{'latitude': 40.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '6', 'location':{'latitude': 50.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '6', 'location':{'latitude': 61.0, 'longitude': -60.0}}),
             fires.Fire({'id': '7', 'location':{'latitude': 60.0, 'longitude': -50.0}}),
-            fires.Fire({'id': '8', 'location':{'latitude': 70.0, 'longitude': -120.0}})
+            fires.Fire({'id': '8', 'location':{'latitude': 70.0, 'longitude': -120.0}}),
+            fires.Fire({'id': '9', 'location':{'latitude': -10.0, 'longitude': 10.0}})
         ]
         fm.fires = init_fires
 
@@ -890,10 +891,85 @@ class TestFiresManagerFilterFires(object):
         # TODO: missing both lat and lng
 
         ## noops
-        # ...
+        fm.set_config_value({"ne": {"lat": 88.12, "lng": 40},
+            "sw": {"lat": -50.75,"lng": -131.5}},
+            'filter', 'location', 'boundary')
+        fm.filter_fires()
+        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## successful filters
-        # ...
+        # squeeze sw lat
+        fm.set_config_value({"ne": {"lat": 88.12, "lng": 40},
+            "sw": {"lat": -5.75,"lng": -131.5}},
+            'filter', 'location', 'boundary')
+        expected = [
+            fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '2', 'location':{'latitude': 50.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
+            fires.Fire({'id': '4', 'location':{'latitude': 70.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '5', 'location':{'latitude': 40.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '6', 'location':{'latitude': 61.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '7', 'location':{'latitude': 60.0, 'longitude': -50.0}}),
+            fires.Fire({'id': '8', 'location':{'latitude': 70.0, 'longitude': -120.0}})
+        ]
+        fm.filter_fires()
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+
+        # squeeze sw lng
+        fm.set_config_value({"ne": {"lat": 88.12, "lng": 40},
+            "sw": {"lat": -5.75,"lng": -110.5}},
+            'filter', 'location', 'boundary')
+        expected = [
+            fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '2', 'location':{'latitude': 50.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
+            fires.Fire({'id': '4', 'location':{'latitude': 70.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '5', 'location':{'latitude': 40.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '6', 'location':{'latitude': 61.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '7', 'location':{'latitude': 60.0, 'longitude': -50.0}})
+        ]
+        fm.filter_fires()
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+
+        # squeeze ne lat
+        fm.set_config_value({"ne": {"lat": 66.12, "lng": 40},
+            "sw": {"lat": -5.75,"lng": -110.5}},
+            'filter', 'location', 'boundary')
+        expected = [
+            fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '2', 'location':{'latitude': 50.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
+            fires.Fire({'id': '5', 'location':{'latitude': 40.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '6', 'location':{'latitude': 61.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '7', 'location':{'latitude': 60.0, 'longitude': -50.0}})
+        ]
+        fm.filter_fires()
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+
+        # squeeze ne lng
+        fm.set_config_value({"ne": {"lat": 66.12, "lng": -55},
+            "sw": {"lat": -5.75,"lng": -110.5}},
+            'filter', 'location', 'boundary')
+        expected = [
+            fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '2', 'location':{'latitude': 50.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
+            fires.Fire({'id': '5', 'location':{'latitude': 40.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '6', 'location':{'latitude': 61.0, 'longitude': -60.0}})
+        ]
+        fm.filter_fires()
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+
+        # squeeze ne lng
+        fm.set_config_value({"ne": {"lat": 63.12, "lng": -61},
+            "sw": {"lat": 58.75,"lng": -62}},
+            'filter', 'location', 'boundary')
+        expected = [
+            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
+        ]
+        fm.filter_fires()
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+
 
     def test_filter_by_area(self):
         fm = fires.FiresManager()
