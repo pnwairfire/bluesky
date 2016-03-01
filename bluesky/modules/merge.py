@@ -19,5 +19,10 @@ def run(fires_manager):
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
     logging.info("Running merge module")
-    fires_manager.processed(__name__, __version__)
+    logging.debug("Number of fires before merging: %s", fires_manager.num_fires)
+    fires_manager.processed(__name__, __version__,
+        num_fires_before=fires_manager.num_fires)
     fires_manager.merge_fires()
+    logging.debug("Number of fires after merging: %s", fires_manager.num_fires)
+    fires_manager.processed(__name__, __version__,
+        num_fires_after=fires_manager.num_fires)

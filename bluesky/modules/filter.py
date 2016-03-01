@@ -19,5 +19,10 @@ def run(fires_manager):
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
     logging.info("Running filter module")
-    fires_manager.processed(__name__, __version__)
+    logging.debug("Number of fires before filtering: %s", fires_manager.num_fires)
+    fires_manager.processed(__name__, __version__,
+        num_fires_before=fires_manager.num_fires)
     fires_manager.filter_fires()
+    logging.debug("Number of fires after filtering: %s", fires_manager.num_fires)
+    fires_manager.processed(__name__, __version__,
+        num_fires_after=fires_manager.num_fires)
