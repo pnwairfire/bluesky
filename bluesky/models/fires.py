@@ -158,6 +158,7 @@ class FiresManager(object):
         self.modules = []
         self.fires = [] # this intitializes self._fires and self_fire_ids
         self._processed_run_id_wildcards = False
+        self._num_fires = 0
 
     ## Importing
 
@@ -167,13 +168,16 @@ class FiresManager(object):
             self._fires[fire.id] = []
             self._fire_ids.add(fire.id)
         self._fires[fire.id].append(fire)
+        self._num_fires += 1
 
 
     def remove_fire(self, fire):
         # TODO: raise exception if fire doesn't exist ?
         if self._fires.has_key(fire.id):
+            _n = len(self._fires[fire.id])
             self._fires[fire.id] = [f for f in self._fires[fire.id]
                 if f._private_id != fire._private_id]
+            self._num_fires -= (_n - len(self._fires[fire.id]))
             if len(self._fires[fire.id]) == 0:
                 # that was last fire with that id
                 self._fire_ids.remove(fire.id)
@@ -216,8 +220,13 @@ class FiresManager(object):
     def fires(self):
         return [f for fire_id in self._fire_ids for f in self._fires[fire_id]]
 
+    @property
+    def num_fires(self):
+        return self._num_fires
+
     @fires.setter
     def fires(self, fires_list):
+        self._num_fires = 0
         self._fires = {}
         self._fire_ids = set()
         for fire in fires_list:
