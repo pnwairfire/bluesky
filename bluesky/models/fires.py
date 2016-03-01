@@ -55,6 +55,10 @@ class Fire(dict):
 
     ## Properties
 
+    # @property
+    # def raw_dict(self):
+    #     return {k: self[k] for k in self}
+
     @property
     def latitude(self):
         # This is if latitude is a true top level key
