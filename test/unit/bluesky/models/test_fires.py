@@ -878,16 +878,16 @@ class TestFiresManagerFilterFires(object):
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## Invalid boundary
-        # Invalid keys
-        # insufficient keys
-        # lat/lng outside of valid range
-        # sw east of ne
-        # sw north of ne
+        # TODO: Invalid keys
+        # TODO: insufficient keys
+        # TODO: lat/lng outside of valid range
+        # TODO: sw east of ne
+        # TODO: sw north of ne
 
         ## Invalid fire
-        # missing lat
-        # missing lng
-        # missing both lat and lng
+        # TODO: missing lat
+        # TODO: missing lng
+        # TODO: missing both lat and lng
 
         ## noops
         # ...
@@ -899,7 +899,7 @@ class TestFiresManagerFilterFires(object):
         fm = fires.FiresManager()
         init_fires = [
             fires.Fire({'id': '1', 'location':{'area': 45}}),
-            fires.Fire({'id': '2', 'location':{'area': 85}}),
+            fires.Fire({'id': '2', 'location':{'area': 95}}),
             fires.Fire({'id': '3', 'location':{'area': 55}}),
             fires.Fire({'id': '4', 'location':{'area': 65}}),
             fires.Fire({'id': '5', 'location':{'area': 85}}),
@@ -930,19 +930,56 @@ class TestFiresManagerFilterFires(object):
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## Invalid min/max
-        # both negative
-        # min is negative
-        # max is negative
-        # min > max
+        # TODO: both negative
+        # TODO: min is negative
+        # TODO: max is negative
+        # TODO: min > max
 
         ## noops
         fm.set_config_value(False, 'filter', 'skip_failures')
-        fm.set_config_value({'foo': 'bar'}, 'filter', 'area')
-        # TDOD: both min and max
-        # TDOD: min only
-        # TDOD: max only
+        # min only
+        fm.set_config_value({'min': 20}, 'filter', 'area')
+        fm.filter_fires()
+        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+        # max only
+        fm.set_config_value({'max': 120}, 'filter', 'area')
+        fm.filter_fires()
+        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+        # both min and max
+        fm.set_config_value({'min': 20, 'max': 120}, 'filter', 'area')
+        fm.filter_fires()
+        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## successful filters
-        # TDOD: both min and max
-        # TDOD: min only
-        # TDOD: max only
+        # min only
+        fm.set_config_value({'min': 47}, 'filter', 'area')
+        expected = [
+            fires.Fire({'id': '2', 'location':{'area': 95}}),
+            fires.Fire({'id': '3', 'location':{'area': 55}}),
+            fires.Fire({'id': '4', 'location':{'area': 65}}),
+            fires.Fire({'id': '5', 'location':{'area': 85}}),
+            fires.Fire({'id': '6', 'location':{'area': 75}}),
+            fires.Fire({'id': '7', 'location':{'area': 50}})
+        ]
+        fm.filter_fires()
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+        # max only
+        fm.set_config_value({'max': 90}, 'filter', 'area')
+        expected = [
+            fires.Fire({'id': '3', 'location':{'area': 55}}),
+            fires.Fire({'id': '4', 'location':{'area': 65}}),
+            fires.Fire({'id': '5', 'location':{'area': 85}}),
+            fires.Fire({'id': '6', 'location':{'area': 75}}),
+            fires.Fire({'id': '7', 'location':{'area': 50}})
+        ]
+        fm.filter_fires()
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+        # both min and max
+        fm.set_config_value({'min': 52, 'max': 77.0}, 'filter', 'area')
+        expected = [
+            fires.Fire({'id': '3', 'location':{'area': 55}}),
+            fires.Fire({'id': '4', 'location':{'area': 65}}),
+            fires.Fire({'id': '6', 'location':{'area': 75}})
+        ]
+        fm.filter_fires()
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))

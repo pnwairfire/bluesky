@@ -877,17 +877,20 @@ class FiresFilter(FiresActionBase):
         """
         min_area = kwargs.get('min')
         max_area = kwargs.get('max')
-        if not min_area and not max_area:
+        if min_area is None and max_area is None:
             raise self.FilterError(self.SPECIFY_MIN_OR_MAX_MSG)
-        elif min_area < 0.0 or max_area < 0.0:
+        elif ((min_area is not None and min_area < 0.0) or
+                (max_area is not None and max_area < 0.0)):
             raise self.FilterError(self.INVALID_MIN_MAX_MUST_BE_POS_MSG)
-        elif min_area > max_area:
+        elif (min_area is not None and max_area is not None and
+                min_area > max_area):
             raise self.FilterError(self.INVALID_MIN_MUST_BE_LTE_MAX_MSG)
 
         def _filter(fire):
             if not fire.location or not fire.location.get('area'):
                 self._fail(fire, self.MISSING_FIRE_AREA)
 
-            return fire.location.area < min_area or fire.location.area > max_area
+            return ((min_area is not None and fire.location['area'] < min_area) or
+                (max_area is not None and fire.location['area'] > max_area))
 
         return _filter
