@@ -271,7 +271,7 @@ Use the '-h' option to see more usage information for ```bsp-csv2json```.
 
 As fire data flow through the modules within ```bsp```, the modules add to the
 data without modifying what's already defined (with the exception of the
-ingestion and merge modules, described below, which do modify the data).
+ingestion, merge, and filter modules, described below, which do modify the data).
 Modules further downstream generally work with data produced by upstream
 modules, which means that order of module execution does matter.
 
@@ -840,6 +840,10 @@ Notice:
 
 TODO: fill in this section...
 
+#### Filter
+
+TODO: fill in this section...
+
 #### Notes About Input Fire Data
 
 ##### Perimeter vs. Lat + Lng + Area
@@ -961,6 +965,10 @@ Note about fuelbeds: no fuelbed data is required, but ingestion will pass
 on and fuelbeds is defined
 
 ##### merge
+
+TODO: fill in this section...
+
+##### filter
 
 TODO: fill in this section...
 
@@ -1091,6 +1099,18 @@ the fire data, each module has its own set of required and optional fields.
 ##### merge
 
  - ***'config' > 'merge' > 'skip_failures'*** -- *optional* -- if fires fail to merge, keep separate and move on; default: false
+
+##### filter
+
+ - ***'config' > 'filter' > 'skip_failures'*** -- *optional* -- if fires filter fails, move on; default: false
+ - ***'config' > 'filter' > 'country' > 'whitelist'*** -- *required* if 'country' section is defined and 'blacklist' array isn't -- whitelist of countries to include
+ - ***'config' > 'filter' > 'country' > 'blacklist'*** -- *required* if 'country' section is defined and 'whiteilst' array isn't -- blacklist of countries to exclude
+ - ***'config' > 'filter' > 'area' > 'min'*** -- *required* if 'area' section is defined and 'max' subfield isn't -- min area threshold
+ - ***'config' > 'filter' > 'area' > 'max'*** -- *required* if 'area' section is defined and 'min' subfield isn't -- max area threshold
+ - ***'config' > 'filter' > 'location' > 'boundary' > 'sw' > 'lat'*** -- *required* if 'location' section is defined --
+ - ***'config' > 'filter' > 'location' > 'boundary' > 'sw' > 'lng'*** -- *required* if 'location' section is defined --
+ - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lat'*** -- *required* if 'location' section is defined --
+ - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lng'*** -- *required* if 'location' section is defined --
 
 ##### fuelbeds
 
