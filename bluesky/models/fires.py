@@ -817,21 +817,77 @@ class FiresFilter(FiresActionBase):
 
         return _filter
 
+    SPECIFY_BOUNDARY_MSG = "Specify boundary to filter by location"
+    INVALID_BOUNDARY_FIELDS = ("Filter boundary must specify 'ne' and 'sw',"
+        " which each must have 'lat' and 'lng'")
+    INVALID_BOUNDARY = "Invalid boundary for filtering"
+    MISSING_FIRE_LAT_LNG = (
+        "Fire must have lat and lng defined to be filtered by location")
+    def _get_location_filter(self, **kwargs):
+        """Returns function that checks if fire is within boundary, which
+        should be of the form:
 
-    # TODO: specify generic **kwargs in methof signatures instead of specific
-    #   keyword args to avoid TypeError (?) from being raised due to
-    #   recognized keywords ? .... (what's desireable behavior?)
+            {
+                "ne": {
+                    "lat": 45.25,
+                    "lng": -106.5
+                },
+                "sw": {
+                    "lat": 27.75,
+                    "lng": -131.5
+                }
+            }
 
-    def _get_location_filter(self, boundary=None):
-        # TODO: Make sure boudary is defined; raise esxception if not
-        # TDOD: return filter function that :
-        #  - returns boolean
-        #  - calls self._fail as necessary
-        pass
+        Note: this function does not support boundaries spanning the
+        international date line.  (i.e. NE lng > SW lng)
+        """
+        b = kwargs.get('boundary')
+        if not b:
+            raise self.FilterError(self.SPECIFY_BOUNDARY_MSG)
+        elif (set(b.keys()) != set(["ne", "sw"]) or
+                any([set(b[k].keys()) != set(["lat", "lng"])
+                    for k in ["ne", "sw"]])):
+            raise self.FilterError(self.INVALID_BOUNDARY_FIELDS)
+        elif (any([abs(b[k]['lat']) > 90.0 for k in ['ne','sw']]) or
+                any([abs(b[k]['lng']) > 180.0 for k in ['ne','sw']]) or
+                any([b['ne'][k] < b['sw'][k] for k in ['lat','lng']])):
+            raise self.FilterError(self.INVALID_BOUNDARY)
 
-    def _get_area_filter(self, min_area=None, max_area=None):
-        # TODO: Make sure min and/or max are defined; raise esxception if not
-        # TDOD: return filter function that :
-        #  - returns boolean
-        #  - calls self._fail as necessary
-        pass
+        def _filter(fire):
+            try:
+                lat = fire.latitude
+                lng = fire.longitude
+            except ValueError, e:
+                self._fail(fire, self.MISSING_FIRE_LAT_LNG)
+            if not lat or not lng:
+                self._fail(fire, self.MISSING_FIRE_LAT_LNG)
+
+            return (lat < b['sw']['lat'] or lat > b['ne']['lat'] or
+                lng < b['sw']['lng'] or lng > b['ne']['lng'])
+
+        return _filter
+
+    SPECIFY_MIN_OR_MAX_MSG = "Specify min and/or max area for filtering"
+    INVALID_MIN_MAX_MUST_BE_POS_MSG = "Min and max areas must be positive for filtering"
+    INVALID_MIN_MUST_BE_LTE_MAX_MSG = "Min area must be LTE max if both are specified"
+    MISSING_FIRE_AREA = "Fire must have area defined to be filtered by area"
+    def _get_area_filter(self, **kwargs):
+        """Returns funciton that checks if a fire is smaller than some
+        max threshold and/or larger than some min threshold.
+        """
+        min_area = kwargs.get('min')
+        max_area = kwargs.get('max')
+        if not min_area and not max_area:
+            raise self.FilterError(self.SPECIFY_MIN_OR_MAX_MSG)
+        elif min_area < 0.0 or max_area < 0.0:
+            raise self.FilterError(self.INVALID_MIN_MAX_MUST_BE_POS_MSG)
+        elif min_area > max_area:
+            raise self.FilterError(self.INVALID_MIN_MUST_BE_LTE_MAX_MSG)
+
+        def _filter(fire):
+            if not fire.location or not fire.location.get('area'):
+                self._fail(fire, self.MISSING_FIRE_AREA)
+
+            return fire.location.area < min_area or fire.location.area > max_area
+
+        return _filter

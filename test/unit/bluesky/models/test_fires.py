@@ -843,9 +843,61 @@ class TestFiresManagerFilterFires(object):
         ]
         assert expected == fm.fires
 
+    def test_filter_by_location(self):
+        fm = fires.FiresManager()
+        init_fires = [
+            fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '2', 'location':{'latitude': 50.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -80.0}}),
+            fires.Fire({'id': '4', 'location':{'latitude': 70.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '5', 'location':{'latitude': 40.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '6', 'location':{'latitude': 50.0, 'longitude': -60.0}}),
+            fires.Fire({'id': '7', 'location':{'latitude': 60.0, 'longitude': -50.0}}),
+            fires.Fire({'id': '8', 'location':{'latitude': 70.0, 'longitude': -120.0}})
+        ]
+        fm.fires = init_fires
+
+        ## empty config
+        fm.set_config_value({}, 'filter', 'location')
+        fm.set_config_value(False, 'filter', 'skip_failures')
+        with raises(fires.FiresFilter.FilterError) as e_info:
+            fm.filter_fires()
+        assert e_info.value.message == fires.FiresFilter.MISSING_FILTER_CONFIG_MSG
+        fm.set_config_value(True, 'filter', 'skip_failures')
+        fm.filter_fires()
+        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+
+        ## Boundary not specified, but invalid 'foo' is
+        fm.set_config_value({'foo': 'bar'}, 'filter', 'location')
+        fm.set_config_value(False, 'filter', 'skip_failures')
+        with raises(fires.FiresFilter.FilterError) as e_info:
+            fm.filter_fires()
+        assert e_info.value.message == fires.FiresFilter.SPECIFY_BOUNDARY_MSG
+        fm.set_config_value(True, 'filter', 'skip_failures')
+        fm.filter_fires()
+        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+
+        ## Invalid boundary
+        # Invalid keys
+        # insufficient keys
+        # lat/lng outside of valid range
+        # sw east of ne
+        # sw north of ne
+
+        ## Invalid fire
+        # missing lat
+        # missing lng
+        # missing both lat and lng
+
+        ## noops
+        # ...
+
+        ## successful filters
+        # ...
+
     def test_filter_by_area(self):
         fm = fires.FiresManager()
-        fm.fires = [
+        init_fires = [
             fires.Fire({'id': '1', 'location':{'area': 45}}),
             fires.Fire({'id': '2', 'location':{'area': 85}}),
             fires.Fire({'id': '3', 'location':{'area': 55}}),
@@ -855,10 +907,42 @@ class TestFiresManagerFilterFires(object):
             fires.Fire({'id': '7', 'location':{'area': 50}}),
             fires.Fire({'id': '8', 'location':{'area': 30}})
         ]
+        fm.fires = init_fires
+
+        ## empty config
+        fm.set_config_value({}, 'filter', 'area')
+        fm.set_config_value(False, 'filter', 'skip_failures')
+        with raises(fires.FiresFilter.FilterError) as e_info:
+            fm.filter_fires()
+        assert e_info.value.message == fires.FiresFilter.MISSING_FILTER_CONFIG_MSG
+        fm.set_config_value(True, 'filter', 'skip_failures')
+        fm.filter_fires()
+        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+
+        ## Neither min nor max is specified, but invalid 'foo' is
+        fm.set_config_value({'foo': 'bar'}, 'filter', 'area')
+        fm.set_config_value(False, 'filter', 'skip_failures')
+        with raises(fires.FiresFilter.FilterError) as e_info:
+            fm.filter_fires()
+        assert e_info.value.message == fires.FiresFilter.SPECIFY_MIN_OR_MAX_MSG
+        fm.set_config_value(True, 'filter', 'skip_failures')
+        fm.filter_fires()
+        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+
+        ## Invalid min/max
+        # both negative
+        # min is negative
+        # max is negative
+        # min > max
+
+        ## noops
+        fm.set_config_value(False, 'filter', 'skip_failures')
+        fm.set_config_value({'foo': 'bar'}, 'filter', 'area')
         # TDOD: both min and max
         # TDOD: min only
         # TDOD: max only
 
-    def test_filter_by_location(self):
-        # TDOD: ....
-        pass
+        ## successful filters
+        # TDOD: both min and max
+        # TDOD: min only
+        # TDOD: max only
