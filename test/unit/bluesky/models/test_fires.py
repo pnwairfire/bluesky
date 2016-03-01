@@ -893,6 +893,17 @@ class TestFiresManagerFilterFires(object):
         assert fm.num_fires == 1
         assert expected == fm.fires
 
+        fm.set_config_value(["UK", "CA"], 'filter', 'country', 'blacklist')
+        fm.set_config_value(None, 'filter', 'country', 'whitelist')
+        fm.filter_fires()
+        assert fm.num_fires == 0
+        assert [] == fm.fires
+
+        # call again with no fires
+        fm.filter_fires()
+        assert fm.num_fires == 0
+        assert [] == fm.fires
+
     def test_filter_by_location(self):
         fm = fires.FiresManager()
         init_fires = [
@@ -1031,6 +1042,18 @@ class TestFiresManagerFilterFires(object):
         assert fm.num_fires == 1
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
+        # squeeze out last fire
+        fm.set_config_value({"ne": {"lat": 63.12, "lng": -61},
+            "sw": {"lat": 60.75,"lng": -62}},
+            'filter', 'location', 'boundary')
+        fm.filter_fires()
+        assert fm.num_fires == 0
+        assert [] == sorted(fm.fires, key=lambda e: int(e.id))
+
+        # call again with no fires
+        fm.filter_fires()
+        assert fm.num_fires == 0
+        assert [] == sorted(fm.fires, key=lambda e: int(e.id))
 
     def test_filter_by_area(self):
         fm = fires.FiresManager()
@@ -1132,3 +1155,14 @@ class TestFiresManagerFilterFires(object):
         fm.filter_fires()
         assert fm.num_fires == 3
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+
+        # filter out the rest
+        fm.set_config_value({'min': 76, 'max': 77.0}, 'filter', 'area')
+        fm.filter_fires()
+        assert fm.num_fires == 0
+        assert [] == sorted(fm.fires, key=lambda e: int(e.id))
+
+        # call again with no fires
+        fm.filter_fires()
+        assert fm.num_fires == 0
+        assert [] == sorted(fm.fires, key=lambda e: int(e.id))
