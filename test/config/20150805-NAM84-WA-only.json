@@ -1,0 +1,71 @@
+{
+    "config": {
+        "skip_failed_fires": true,
+        "filter": {
+            "skip_failures": true,
+            "location": {
+                  "boundary": {
+                        "ne": {
+                              "lat": 49.0,
+                              "lng": -117.5
+                        },
+                        "sw": {
+                              "lat": 45.5,
+                              "lng": -125.0
+                        }
+                  }
+            }
+        },
+        "merge": {
+            "skip_failures": true
+        },
+        "emissions": {
+            "species": ["PM25"]
+        },
+        "findmetdata": {
+            "met_root_dir": "/NAM84/",
+            "arl": {
+                "index_filename_pattern": "NAM84_ARL_index.csv"
+            }
+        },
+        "localmet":{
+            "time_step": 3
+        },
+        "dispersion": {
+            "start": "2015-08-05T00:00:00",
+            "num_hours": 48,
+            "model": "hysplit",
+            "dest_dir": "/bsp-output/bsp-dispersion-output/",
+            "hysplit": {
+                "grid": {
+                    "spacing": 0.15,
+                    "projection": "LatLon",
+                    "boundary": {
+                        "ne": {
+                            "lat": 49.0,
+                            "lng": -117.5
+                        },
+                        "sw": {
+                            "lat": 45.5,
+                            "lng": -125.0
+                        }
+                    }
+                }
+            }
+        },
+        "visualization": {
+            "target": "dispersion",
+            "hysplit": {
+                "images_dir": "images/",
+                "data_dir": "data/"
+            }
+        },
+        "export": {
+            "modes": ["localsave"],
+            "extra_exports": ["dispersion", "visualization"],
+            "localsave": {
+                "dest_dir": "/bsp-output/bsp-local-exports/"
+            }
+        }
+   }
+}
