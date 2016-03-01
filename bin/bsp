@@ -47,14 +47,6 @@ OPTIONAL_ARGS = [
         'default': None
     },
     {
-        'short': '-w',
-        'long': '--country-code-whitelist',
-        'dest': 'country_code_whitelist',
-        'help': 'input file comtaining JSON formatted fire data',
-        'action': "append",
-        'default': []
-    },
-    {
         'short': "-C",
         'long': '--config-option',
         'dest': 'config_options',
@@ -149,9 +141,6 @@ def load_fires(args):
     # Note: Calling code handles exception
     fires_manager = models.fires.FiresManager()
     fires_manager.loads(input_file=args.input_file)
-
-    if args.country_code_whitelist:
-        fires_manager.filter('country', args.country_code_whitelist)
     return fires_manager
 
 def main():
