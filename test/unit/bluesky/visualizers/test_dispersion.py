@@ -14,7 +14,7 @@ class TestHysplitVisualizerPickRepresentativeFuelbed(object):
             "fuelbeds": 'sdf'
         }
         with raises(TypeError) as e_info:
-            hysplit._pick_representative_fuelbed(f)
+            hysplit._pick_representative_fuelbed(f, {})
         # TODO: assert e_info.value.message == '...''
 
         f = {
@@ -23,7 +23,7 @@ class TestHysplitVisualizerPickRepresentativeFuelbed(object):
             ]
         }
         with raises(KeyError) as e_info:
-            hysplit._pick_representative_fuelbed(f)
+            hysplit._pick_representative_fuelbed(f, {})
         # TODO: assert e_info.value.message == '...''
         f = {
             "fuelbeds": [
@@ -31,12 +31,12 @@ class TestHysplitVisualizerPickRepresentativeFuelbed(object):
             ]
         }
         with raises(KeyError) as e_info:
-            hysplit._pick_representative_fuelbed(f)
+            hysplit._pick_representative_fuelbed(f, {})
         # TODO: assert e_info.value.message == '...''
 
     def test_no_fuelbeds(self):
         f = {}
-        assert None == hysplit._pick_representative_fuelbed(f)
+        assert None == hysplit._pick_representative_fuelbed(f, {})
 
     def test_one_fuelbed(self):
         f = {
@@ -44,7 +44,7 @@ class TestHysplitVisualizerPickRepresentativeFuelbed(object):
                 {"fccs_id": "46","pct": 100.0}
             ]
         }
-        assert "46" == hysplit._pick_representative_fuelbed(f)
+        assert "46" == hysplit._pick_representative_fuelbed(f, {})
 
     def test_three_fuelbed(self):
         f = {
@@ -54,7 +54,7 @@ class TestHysplitVisualizerPickRepresentativeFuelbed(object):
                 {"fccs_id": "48","pct": 30.0}
             ]
         }
-        assert "47" == hysplit._pick_representative_fuelbed(f)
+        assert "47" == hysplit._pick_representative_fuelbed(f, {})
 
     def test_two_equal_size_fuelbeds(self):
         f = {
@@ -63,4 +63,4 @@ class TestHysplitVisualizerPickRepresentativeFuelbed(object):
                 {"fccs_id": "44","pct": 100.0}
             ]
         }
-        assert "46" == hysplit._pick_representative_fuelbed(f)
+        assert "46" == hysplit._pick_representative_fuelbed(f, {})
