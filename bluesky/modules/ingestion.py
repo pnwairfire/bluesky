@@ -277,12 +277,24 @@ class FireIngester(object):
     ##
 
     ## 'date_time'
-
-    DATE_TIME_MATCHER = re.compile('^(\d{12,14})([+-]\d{2}\:\d{2})$')
+    OLD_DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?Z$')
+    DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?([+-]\d{2}\:\d{2})$')
     DATE_TIME_FMT = "%Y%m%d%H%M"
     GROWTH_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
     def _ingest_special_field_date_time(self, fire):
-        """Ingests .....mention from sf2
+        """Ingests/parses 'date_time' field, found in sf2 fire data
+
+        Note: older SF2 fire data formatted the date_time field with
+        local timezone information, and mis-representing everything as
+        UTC.  E.g.:
+
+            '201405290000Z'
+
+        Newer (and current) SF2 fire data formats date_time like so:
+
+            '201508040000-04:00'
+
+        With utc offset embedded in the string.
         """
         if not fire['location'].get('utc_offset') or not fire.get('growth'):
             date_time = self._parsed_input.get('date_time')
@@ -290,22 +302,34 @@ class FireIngester(object):
                 # this supports fires from bluesky daily runs;
                 # 'date_time' is formatted like: '201508040000-04:00'
                 try:
+                    start = None
+                    utc_offset = None
                     m = self.DATE_TIME_MATCHER.match(date_time)
                     if m:
-                        if not fire.get('growth'):
-                            start = datetime.datetime.strptime(m.group(1),
-                                self.DATE_TIME_FMT)
-                            # As assume 24-hour
-                            end = start + datetime.timedelta(hours=24)
-                            # Note: this assumes time is local
-                            fire['growth'] =[{
-                                'start': start.strftime(self.GROWTH_TIME_FORMAT),
-                                'end': end.strftime(self.GROWTH_TIME_FORMAT),
-                                'pct': 100.0
-                            }]
+                        start = datetime.datetime.strptime(
+                            m.group(1), self.DATE_TIME_FMT)
+                        utc_offset = m.group(3)
+                    else:
+                        m = self.OLD_DATE_TIME_MATCHER.match(date_time)
+                        if m:
+                            start = datetime.datetime.strptime(
+                                m.group(1), self.DATE_TIME_FMT)
+                            utc_offset = "+00:00"
 
-                        if not fire['location'].get('utc_offset'):
-                            fire['location']['utc_offset'] = m.group(2)
+                    if start is not None and not fire.get('growth'):
+                        # As assume 24-hour
+                        end = start + datetime.timedelta(hours=24)
+                        # Note: this assumes time is local
+                        fire['growth'] =[{
+                            'start': start.strftime(self.GROWTH_TIME_FORMAT),
+                            'end': end.strftime(self.GROWTH_TIME_FORMAT),
+                            'pct': 100.0
+                        }]
+
+                    if utc_offset is not None and not fire['location'].get(
+                            'utc_offset'):
+                        fire['location']['utc_offset'] = utc_offset
+
                 except Exception, e:
                     logging.warn("Failed to parse 'date_time' value %s",
                         date_time)
