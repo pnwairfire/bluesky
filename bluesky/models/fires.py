@@ -834,6 +834,8 @@ class FiresFilter(FiresActionBase):
                         else:
                             raise
 
+                logging.info("Number of fires after running %s filter: %d",
+                    f, self._fires_manager.num_fires)
 
     ##
     ## Unterlying filter methods
