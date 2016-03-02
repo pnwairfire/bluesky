@@ -961,11 +961,6 @@ class TestFiresManagerFilterFires(object):
                 "ne": {"lat": 48.12, "lng": 40},
                 "sw": {"lat": 50.75,"lng": -50.5}}},
                 fires.FiresFilter.INVALID_BOUNDARY)
-
-            ## Invalid fire
-            # TODO: missing lat
-            # TODO: missing lng
-            # TODO: missing both lat and lng
         )
         for config, err_msg in scenarios:
             fm.set_config_value(config, 'filter', 'location')
@@ -980,6 +975,11 @@ class TestFiresManagerFilterFires(object):
             fm.filter_fires()
             assert fm.num_fires == 9
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+
+        ## Invalid fire
+        # TODO: missing lat
+        # TODO: missing lng
+        # TODO: missing both lat and lng
 
         ## noops
         fm.set_config_value({"ne": {"lat": 88.12, "lng": 40},
@@ -1100,16 +1100,25 @@ class TestFiresManagerFilterFires(object):
             # empty config
             ({}, fires.FiresFilter.MISSING_FILTER_CONFIG_MSG),
             # either min nor max is specified
-            ({'foo': 'bar'}, fires.FiresFilter.SPECIFY_MIN_OR_MAX_MSG)
+            ({'foo': 'bar'}, fires.FiresFilter.SPECIFY_MIN_OR_MAX_MSG),
 
             ## Invalid min/max
-            # TODO: both negative
-            # TODO: min is negative
-            # TODO: max is negative
-            # TODO: min > max
-
-            ## Invalid fire
-            # TODO: missing area
+            # both negative
+            ({'min': -20, 'max': -2},
+                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+            # min is negative
+            ({'min': -20, 'max': 2},
+                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+            ({'min': -20},
+                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+            # max is negative
+            ({'min': 20, 'max': -2},
+                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+            ({'max': -2},
+                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+            # min > max
+            ({'min': 20, 'max': 2},
+                fires.FiresFilter.INVALID_MIN_MUST_BE_LTE_MAX_MSG),
         )
         for config, err_msg in scenarios:
             fm.set_config_value(config, 'filter', 'area')
@@ -1124,6 +1133,9 @@ class TestFiresManagerFilterFires(object):
             fm.filter_fires()
             assert fm.num_fires == 8
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+
+        ## Invalid fire
+        # TODO: missing area
 
         ## noops
         fm.set_config_value(False, 'filter', 'skip_failures')
@@ -1179,6 +1191,15 @@ class TestFiresManagerFilterFires(object):
         ]
         fm.filter_fires()
         assert fm.num_fires == 3
+        assert expected == sorted(fm.fires, key=lambda e: int(e.id))
+
+        # both min and max
+        fm.set_config_value({'min': 65, 'max': 65.0}, 'filter', 'area')
+        expected = [
+            fires.Fire({'id': '4', 'location':{'area': 65}}),
+        ]
+        fm.filter_fires()
+        assert fm.num_fires == 1
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # filter out the rest
