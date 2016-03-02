@@ -902,6 +902,8 @@ class FiresFilter(FiresActionBase):
         def _filter(fire):
             if not fire.location or not fire.location.get('area'):
                 self._fail(fire, self.MISSING_FIRE_AREA)
+            elif fire.location['area'] < 0.0:
+                self._fail(fire, self.MISSING_FIRE_AREA)
 
             return ((min_area is not None and fire.location['area'] < min_area) or
                 (max_area is not None and fire.location['area'] > max_area))
