@@ -4,6 +4,8 @@
 #   with script args or env vars
 
 ## bluesky-base:
+# create container
+docker create --name bluesky-base bluesky-base
 # copy exe's
 docker cp $HOME/bin/profile bluesky-base:/usr/local/bin/profile
 docker cp $HOME/bin/mpiexec bluesky-base:/usr/local/bin/mpiexec
@@ -12,10 +14,14 @@ docker cp $HOME/bin/hycs_std bluesky-base:/usr/local/bin/hycs_std
 docker cp $HOME/bin/hysplit2netcdf bluesky-base:/usr/local/bin/hysplit2netcdf
 docker cp $HOME/bin/vsmoke bluesky-base:/usr/local/bin/vsmoke
 docker cp $HOME/bin/vsmkgs bluesky-base:/usr/local/bin/vsmkgs
+docker cp $HOME/bin/feps_plumerise bluesky-base:/usr/local/bin/feps_plumerise
+docker cp $HOME/bin/feps_weather bluesky-base:/usr/local/bin/feps_weather
 # commit changes
 docker commit bluesky-base bluesky-base
 
 ## bluesky:
+# create container
+docker create --name bluesky bluesky
 # copy exe's
 docker cp $HOME/bin/profile bluesky:/usr/local/bin/profile
 docker cp $HOME/bin/mpiexec bluesky:/usr/local/bin/mpiexec
@@ -24,6 +30,8 @@ docker cp $HOME/bin/hycs_std bluesky:/usr/local/bin/hycs_std
 docker cp $HOME/bin/hysplit2netcdf bluesky:/usr/local/bin/hysplit2netcdf
 docker cp $HOME/bin/vsmoke bluesky:/usr/local/bin/vsmoke
 docker cp $HOME/bin/vsmkgs bluesky:/usr/local/bin/vsmkgs
+docker cp $HOME/bin/feps_plumerise bluesky:/usr/local/bin/feps_plumerise
+docker cp $HOME/bin/feps_weather bluesky:/usr/local/bin/feps_weather
 # copy bluesky package data assets
 docker cp $HOME/code/pnwairfire-bluesky/bluesky/dispersers/vsmoke/images/ bluesky:/usr/local/lib/python2.7/dist-packages/bluesky/dispersers/vsmoke/images/
 docker cp $HOME/code/pnwairfire-bluesky/bluesky/dispersers/hysplit/bdyfiles/ bluesky:/usr/local/lib/python2.7/dist-packages/bluesky/dispersers/hysplit/bdyfiles/
