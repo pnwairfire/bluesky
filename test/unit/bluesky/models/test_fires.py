@@ -931,36 +931,36 @@ class TestFiresManagerFilterFires(object):
             ## Invalid boundary
             # Invalid and insufficient keys
             ({'boundary': {"foo": "bar"}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS),
+                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
             # Invalid keys
             ({'boundary': {
                 "sdfsdf": 123,
                 "ne": {"lat": 88.12, "lng": 40},
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS),
+                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
             # insufficient keys
             ({'boundary': {
                 "ne": {"lng": 40},
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS),
+                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
             ({'boundary': {
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS),
+                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
             # lat/lng outside of valid range
             ({'boundary': {
                 "ne": {"lat": 98.12, "lng": 40},
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY),
+                fires.FiresFilter.INVALID_BOUNDARY_MSG),
             # sw east of ne
             ({'boundary': {
                 "ne": {"lat": 68.12, "lng": 40},
                 "sw": {"lat": 50.75,"lng": 50.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY),
+                fires.FiresFilter.INVALID_BOUNDARY_MSG),
             # sw north of ne
             ({'boundary': {
                 "ne": {"lat": 48.12, "lng": 40},
                 "sw": {"lat": 50.75,"lng": -50.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY)
+                fires.FiresFilter.INVALID_BOUNDARY_MSG)
         )
         for config, err_msg in scenarios:
             fm.set_config_value(config, 'filter', 'location')

@@ -839,10 +839,10 @@ class FiresFilter(FiresActionBase):
         return _filter
 
     SPECIFY_BOUNDARY_MSG = "Specify boundary to filter by location"
-    INVALID_BOUNDARY_FIELDS = ("Filter boundary must specify 'ne' and 'sw',"
+    INVALID_BOUNDARY_FIELDS_MSG = ("Filter boundary must specify 'ne' and 'sw',"
         " which each must have 'lat' and 'lng'")
-    INVALID_BOUNDARY = "Invalid boundary for filtering"
-    MISSING_FIRE_LAT_LNG = (
+    INVALID_BOUNDARY_MSG = "Invalid boundary for filtering"
+    MISSING_FIRE_LAT_LNG_MSG = (
         "Fire must have lat and lng defined to be filtered by location")
     def _get_location_filter(self, **kwargs):
         """Returns function that checks if fire is within boundary, which
@@ -868,20 +868,20 @@ class FiresFilter(FiresActionBase):
         elif (set(b.keys()) != set(["ne", "sw"]) or
                 any([set(b[k].keys()) != set(["lat", "lng"])
                     for k in ["ne", "sw"]])):
-            raise self.FilterError(self.INVALID_BOUNDARY_FIELDS)
+            raise self.FilterError(self.INVALID_BOUNDARY_FIELDS_MSG)
         elif (any([abs(b[k]['lat']) > 90.0 for k in ['ne','sw']]) or
                 any([abs(b[k]['lng']) > 180.0 for k in ['ne','sw']]) or
                 any([b['ne'][k] < b['sw'][k] for k in ['lat','lng']])):
-            raise self.FilterError(self.INVALID_BOUNDARY)
+            raise self.FilterError(self.INVALID_BOUNDARY_MSG)
 
         def _filter(fire):
             try:
                 lat = fire.latitude
                 lng = fire.longitude
             except ValueError, e:
-                self._fail(fire, self.MISSING_FIRE_LAT_LNG)
+                self._fail(fire, self.MISSING_FIRE_LAT_LNG_MSG)
             if not lat or not lng:
-                self._fail(fire, self.MISSING_FIRE_LAT_LNG)
+                self._fail(fire, self.MISSING_FIRE_LAT_LNG_MSG)
 
             return (lat < b['sw']['lat'] or lat > b['ne']['lat'] or
                 lng < b['sw']['lng'] or lng > b['ne']['lng'])
@@ -891,7 +891,8 @@ class FiresFilter(FiresActionBase):
     SPECIFY_MIN_OR_MAX_MSG = "Specify min and/or max area for filtering"
     INVALID_MIN_MAX_MUST_BE_POS_MSG = "Min and max areas must be positive for filtering"
     INVALID_MIN_MUST_BE_LTE_MAX_MSG = "Min area must be LTE max if both are specified"
-    MISSING_FIRE_AREA = "Fire must have area defined to be filtered by area"
+    MISSING_FIRE_AREA_MSG = "Fire must have area defined to be filtered by area"
+    NEGATIVE_FIRE_AREA_MSG = "Fire area can't be negative"
     def _get_area_filter(self, **kwargs):
         """Returns funciton that checks if a fire is smaller than some
         max threshold and/or larger than some min threshold.
@@ -909,9 +910,9 @@ class FiresFilter(FiresActionBase):
 
         def _filter(fire):
             if not fire.location or not fire.location.get('area'):
-                self._fail(fire, self.MISSING_FIRE_AREA)
+                self._fail(fire, self.MISSING_FIRE_AREA_MSG)
             elif fire.location['area'] < 0.0:
-                self._fail(fire, self.MISSING_FIRE_AREA)
+                self._fail(fire, self.NEGATIVE_FIRE_AREA_MSG)
 
             return ((min_area is not None and fire.location['area'] < min_area) or
                 (max_area is not None and fire.location['area'] > max_area))
