@@ -330,6 +330,13 @@ class FiresManager(object):
         if data:
             v.update(data)
 
+        # TDOO: checking that
+        #     > self.processing[-1].keys() != ['module_name']
+        #   seems to be a bug; should it instead be checking that
+        #     > self.processing[-1]['module'] != module_name
+        #   (though this would be sketchy, since a module may very well have
+        #    been run twice in a row)....maybe we should always
+        #   append a new record
         if not self.processing or self.processing[-1].keys() != ['module_name']:
             self.processing = self.processing or []
             self.processing.append(v)
