@@ -44,6 +44,15 @@ The localmet module relies on the fortran arl profile utility. It is
 expected to reside in a directory in the search path. To obtain `profile`,
 contact NOAA.
 
+### Plumerise
+
+#### FEPS
+
+If running FEPS plumerise, you'll need the feps_weather and feps_plumerise
+executables. They are expected to reside in a directory in the search path.
+Contact [USFS PNW AirFire Research Team](http://www.airfire.org/) for more
+information.
+
 ### dispersion
 
 #### hysplit
@@ -1154,11 +1163,16 @@ emissions config
 
 ##### plumerising
 
- - ***'config' > 'plumerising' > 'model'*** -- *optional* -- plumerise model; defaults to "sev"
+ - ***'config' > 'plumerising' > 'model'*** -- *optional* -- plumerise model; defaults to "feps"
+
+###### if feps:
+
+ - ***'config' > 'plumerising' > 'feps' > 'feps_weather_binary'*** -- *optional* -- defaults to "feps_weather"
+ - ***'config' > 'plumerising' > 'feps' > 'feps_plumerise_binary'*** -- *optional* -- defaults to "feps_plumerise"
+ - ***'config' > 'plumerising' > 'feps' > 'plume_top_behavior'*** -- *optional* -- how to model plume top; options: 'Briggs', 'FEPS', 'auto'; defaults to 'auto'
 
 ###### if sev:
 
- - ***'config' > 'plumerising' > 'sev'*** -- *optional* -- plumerise model; defaults to "sev"
  - ***'config' > 'plumerising' > 'sev' > 'alpha'*** -- *optional* -- default: 0.24
  - ***'config' > 'plumerising' > 'sev' > 'beta'*** -- *optional* -- default: 170
  - ***'config' > 'plumerising' > 'sev' > 'ref_power'*** -- *optional* -- default: 1e6
