@@ -284,8 +284,8 @@ class FireIngester(object):
     def _ingest_special_field_date_time(self, fire):
         """Ingests/parses 'date_time' field, found in sf2 fire data
 
-        Note: older SF2 fire data formatted the date_time field with
-        local timezone information, and mis-representing everything as
+        Note: older SF2 fire data formatted the date_time field without
+        local timezone information, mis-representing everything as
         UTC.  E.g.:
 
             '201405290000Z'
@@ -294,7 +294,7 @@ class FireIngester(object):
 
             '201508040000-04:00'
 
-        With utc offset embedded in the string.
+        With true utc offset embedded in the string.
         """
         if not fire['location'].get('utc_offset') or not fire.get('growth'):
             date_time = self._parsed_input.get('date_time')
@@ -314,7 +314,7 @@ class FireIngester(object):
                         if m:
                             start = datetime.datetime.strptime(
                                 m.group(1), self.DATE_TIME_FMT)
-                            utc_offset = "+00:00"
+                            # Note: we don't know utc offset; don't set
 
                     if start is not None and not fire.get('growth'):
                         # As assume 24-hour
