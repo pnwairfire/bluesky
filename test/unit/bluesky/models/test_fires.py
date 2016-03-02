@@ -969,6 +969,7 @@ class TestFiresManagerFilterFires(object):
             with raises(fires.FiresFilter.FilterError) as e_info:
                 fm.filter_fires()
             assert fm.num_fires == 9
+            assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
             assert e_info.value.message == err_msg
             # skip failures
             fm.set_config_value(True, 'filter', 'skip_failures')
@@ -1127,6 +1128,7 @@ class TestFiresManagerFilterFires(object):
             with raises(fires.FiresFilter.FilterError) as e_info:
                 fm.filter_fires()
             assert fm.num_fires == 8
+            assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
             assert e_info.value.message == err_msg
             # skip failures
             fm.set_config_value(True, 'filter', 'skip_failures')
