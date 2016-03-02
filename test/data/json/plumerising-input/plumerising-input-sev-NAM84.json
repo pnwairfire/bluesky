@@ -1,4 +1,9 @@
 {
+    "config":{
+        "plumerising":{
+            "model": "sev"
+        }
+    },
     "fire_information": [
         {
             "event_of": {
