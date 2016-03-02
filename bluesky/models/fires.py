@@ -807,12 +807,19 @@ class FiresFilter(FiresActionBase):
                         raise
 
                 for fire in self._fires_manager.fires:
-                    if filter_func(fire):
-                        self._fires_manager.remove_fire(fire)
-                        if self._fires_manager.filtered_fires is None:
-                            self._fires_manager.filtered_fires  = []
-                        # TDOO: add reason for filtering (specify at least filed)
-                        self._fires_manager.filtered_fires.append(fire)
+                    try:
+                        if filter_func(fire):
+                            self._fires_manager.remove_fire(fire)
+                            if self._fires_manager.filtered_fires is None:
+                                self._fires_manager.filtered_fires  = []
+                            # TDOO: add reason for filtering (specify at least filed)
+                            self._fires_manager.filtered_fires.append(fire)
+                    except self.FilterError, e:
+                        if self._skip_failures:
+                            continue
+                        else:
+                            raise
+
 
     ##
     ## Unterlying filter methods
