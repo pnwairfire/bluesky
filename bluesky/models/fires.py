@@ -588,6 +588,7 @@ class FiresMerger(FiresActionBase):
         """
         for fire_id in self._fires_manager._fire_ids:
             if len(self._fires_manager._fires[fire_id]) > 1:
+                logging.debug("merging records for fire %s ", fire_id)
                 self._merge_fire_id(fire_id)
 
     ##
@@ -799,6 +800,7 @@ class FiresFilter(FiresActionBase):
             # else, noop and return
         else:
             for f in filter_fields:
+                logging.debug('About to run %s filter', f)
                 try:
                     filter_getter = getattr(self, '_get_{}_filter'.format(f),
                         self._get_filter)
@@ -824,6 +826,8 @@ class FiresFilter(FiresActionBase):
                                 self._fires_manager.filtered_fires  = []
                             # TDOO: add reason for filtering (specify at least filed)
                             self._fires_manager.filtered_fires.append(fire)
+                            logging.debug('Filtered fire %s (%s)', fire.id,
+                                fire._private_id)
                     except self.FilterError, e:
                         if self._skip_failures:
                             continue
