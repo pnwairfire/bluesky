@@ -916,7 +916,9 @@ class FiresFilter(FiresActionBase):
             raise self.FilterError(self.INVALID_MIN_MUST_BE_LTE_MAX_MSG)
 
         def _filter(fire):
-            if not fire.location or not fire.location.get('area'):
+            if (not fire.get('location') or
+                    not isinstance(fire.location, dict) or
+                    not fire.location.get('area')):
                 self._fail(fire, self.MISSING_FIRE_AREA_MSG)
             elif fire.location['area'] < 0.0:
                 self._fail(fire, self.NEGATIVE_FIRE_AREA_MSG)
