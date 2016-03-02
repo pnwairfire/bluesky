@@ -200,7 +200,8 @@ class FiresManager(object):
     def merge_fires(self):
         """Merges fires that have the same id.
         """
-        FiresMerger(self).merge()
+        with FiresMerger(self) as m:
+            m.merge()
 
     ## IO
 
@@ -411,7 +412,8 @@ class FiresManager(object):
     ## Filtering Fires
 
     def filter_fires(self):
-        FiresFilter(self).filter()
+        with FiresFilter(self) as ff:
+            ff.filter()
 
     ## Failures
 
@@ -524,6 +526,14 @@ class FiresActionBase(object):
         self._skip_failures = not not self._fires_manager.get_config_value(
             self.ACTION, 'skip_failures')
 
+    def __enter__(self):
+        logging.info("Number of fires before running %s: %s", self.ACTION,
+            self._fires_manager.num_fires)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        logging.info("Number of fires after running %s: %s", self.ACTION,
+            self._fires_manager.num_fires)
     ##
     ## Abstract methods
     ##
