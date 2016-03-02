@@ -112,7 +112,7 @@ class ComputeFunction(object):
                         "Missing localmet data required for computing SEV plumerise")
                 g_pct = float(g['pct']) / 100.0
                 g_area = fire.location['area'] * g_pct
-                g_frp = frp * g_pct  # TODO: is this appropriate?
+                g_frp = frp and frp * g_pct  # TODO: is this appropriate?
                 plumerise_data = pr.compute(g['localmet'], g_area, frp=g_frp)
                 g['plumerise'] = plumerise_data['hours']
 
