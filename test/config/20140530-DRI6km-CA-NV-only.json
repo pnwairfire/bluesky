@@ -6,12 +6,12 @@
             "location": {
                   "boundary": {
                         "ne": {
-                              "lat": 49.0,
-                              "lng": -117.5
+                            "lat": 42.0,
+                            "lng": -114.5
                         },
                         "sw": {
-                              "lat": 45.5,
-                              "lng": -125.0
+                            "lat": 32.5,
+                            "lng": -124.5
                         }
                   }
             }
@@ -23,16 +23,10 @@
             "species": ["PM25"]
         },
         "findmetdata": {
-            "met_root_dir": "/NAM84/",
-            "arl": {
-                "index_filename_pattern": "NAM84_ARL_index.csv"
-            }
-        },
-        "localmet":{
-            "time_step": 3
+            "met_root_dir": "/DRI_6km/"
         },
         "dispersion": {
-            "start": "2015-08-05T00:00:00",
+            "start": "2014-05-30T00:00:00",
             "num_hours": 48,
             "model": "hysplit",
             "dest_dir": "/bsp-output/bsp-dispersion-output/",
@@ -42,12 +36,12 @@
                     "projection": "LatLon",
                     "boundary": {
                         "ne": {
-                            "lat": 49.0,
-                            "lng": -117.5
+                            "lat": 42.0,
+                            "lng": -114.5
                         },
                         "sw": {
-                            "lat": 45.5,
-                            "lng": -125.0
+                            "lat": 32.5,
+                            "lng": -124.5
                         }
                     }
                 }
