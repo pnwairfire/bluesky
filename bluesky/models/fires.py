@@ -631,6 +631,8 @@ class FiresMerger(FiresActionBase):
                         # add back what was merge in progress
                         self._fires_manager.add_fire(combined_fire)
                     raise ValueError(e.message)
+                # else, just log e.message (which is detailed enough)
+                logging.warn(e.message)
 
         if combined_fire:
             # add_fire will take care of creating new list
@@ -797,7 +799,8 @@ class FiresFilter(FiresActionBase):
         if not filter_fields:
             if not self._skip_failures:
                 raise self.FilterError(self.NO_FILTERS_MSG)
-            # else, noop and return
+            # else, just log and return
+            logging.warn(self.NO_FILTERS_MSG)
         else:
             for f in filter_fields:
                 logging.debug('About to run %s filter', f)
@@ -807,6 +810,7 @@ class FiresFilter(FiresActionBase):
                     kwargs = filter_config.get(f)
                     if not kwargs:
                         if self._skip_failures:
+                            logging.warn(self.MISSING_FILTER_CONFIG_MSG)
                             continue
                         else:
                             raise self.FilterError(self.MISSING_FILTER_CONFIG_MSG)
@@ -814,6 +818,7 @@ class FiresFilter(FiresActionBase):
                     filter_func = filter_getter(**kwargs)
                 except self.FilterError, e:
                     if self._skip_failures:
+                        logging.warn("Failed to initialize %s filter: %s", f, e)
                         continue
                     else:
                         raise
@@ -830,6 +835,8 @@ class FiresFilter(FiresActionBase):
                                 fire._private_id)
                     except self.FilterError, e:
                         if self._skip_failures:
+                            # e.message is already detailed
+                            logging.warn(e.message)
                             continue
                         else:
                             raise
