@@ -905,6 +905,7 @@ class TestFiresManagerFilterFires(object):
         assert [] == fm.fires
 
     def test_filter_by_location(self):
+
         fm = fires.FiresManager()
         init_fires = [
             fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
@@ -920,41 +921,38 @@ class TestFiresManagerFilterFires(object):
         fm.fires = init_fires
         assert fm.num_fires == 9
 
-        ## empty config
-        fm.set_config_value({}, 'filter', 'location')
-        fm.set_config_value(False, 'filter', 'skip_failures')
-        with raises(fires.FiresFilter.FilterError) as e_info:
+        ## Failure situations
+        scenarios = (
+            # empty config
+            ({}, fires.FiresFilter.MISSING_FILTER_CONFIG_MSG),
+            # boundary not specified
+            ({'foo': 'bar'}, fires.FiresFilter.SPECIFY_BOUNDARY_MSG)
+
+            ## Invalid boundary
+            # TODO: Invalid keys
+            # TODO: insufficient keys
+            # TODO: lat/lng outside of valid range
+            # TODO: sw east of ne
+            # TODO: sw north of ne
+
+            ## Invalid fire
+            # TODO: missing lat
+            # TODO: missing lng
+            # TODO: missing both lat and lng
+        )
+        for config, err_msg in scenarios:
+            fm.set_config_value(config, 'filter', 'location')
+            # don't skip failures
+            fm.set_config_value(False, 'filter', 'skip_failures')
+            with raises(fires.FiresFilter.FilterError) as e_info:
+                fm.filter_fires()
+            assert fm.num_fires == 9
+            assert e_info.value.message == err_msg
+            # skip failures
+            fm.set_config_value(True, 'filter', 'skip_failures')
             fm.filter_fires()
-        assert fm.num_fires == 9
-        assert e_info.value.message == fires.FiresFilter.MISSING_FILTER_CONFIG_MSG
-        fm.set_config_value(True, 'filter', 'skip_failures')
-        fm.filter_fires()
-        assert fm.num_fires == 9
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
-
-        ## Boundary not specified, but invalid 'foo' is
-        fm.set_config_value({'foo': 'bar'}, 'filter', 'location')
-        fm.set_config_value(False, 'filter', 'skip_failures')
-        with raises(fires.FiresFilter.FilterError) as e_info:
-            fm.filter_fires()
-        assert fm.num_fires == 9
-        assert e_info.value.message == fires.FiresFilter.SPECIFY_BOUNDARY_MSG
-        fm.set_config_value(True, 'filter', 'skip_failures')
-        fm.filter_fires()
-        assert fm.num_fires == 9
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
-
-        ## Invalid boundary
-        # TODO: Invalid keys
-        # TODO: insufficient keys
-        # TODO: lat/lng outside of valid range
-        # TODO: sw east of ne
-        # TODO: sw north of ne
-
-        ## Invalid fire
-        # TODO: missing lat
-        # TODO: missing lng
-        # TODO: missing both lat and lng
+            assert fm.num_fires == 9
+            assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## noops
         fm.set_config_value({"ne": {"lat": 88.12, "lng": 40},
@@ -1070,35 +1068,35 @@ class TestFiresManagerFilterFires(object):
         fm.fires = init_fires
         assert fm.num_fires == 8
 
-        ## empty config
-        fm.set_config_value({}, 'filter', 'area')
-        fm.set_config_value(False, 'filter', 'skip_failures')
-        with raises(fires.FiresFilter.FilterError) as e_info:
-            fm.filter_fires()
-        assert fm.num_fires == 8
-        assert e_info.value.message == fires.FiresFilter.MISSING_FILTER_CONFIG_MSG
-        fm.set_config_value(True, 'filter', 'skip_failures')
-        fm.filter_fires()
-        assert fm.num_fires == 8
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+        ## Failure situations
+        scenarios = (
+            # empty config
+            ({}, fires.FiresFilter.MISSING_FILTER_CONFIG_MSG),
+            # either min nor max is specified
+            ({'foo': 'bar'}, fires.FiresFilter.SPECIFY_MIN_OR_MAX_MSG)
 
-        ## Neither min nor max is specified, but invalid 'foo' is
-        fm.set_config_value({'foo': 'bar'}, 'filter', 'area')
-        fm.set_config_value(False, 'filter', 'skip_failures')
-        with raises(fires.FiresFilter.FilterError) as e_info:
-            fm.filter_fires()
-        assert fm.num_fires == 8
-        assert e_info.value.message == fires.FiresFilter.SPECIFY_MIN_OR_MAX_MSG
-        fm.set_config_value(True, 'filter', 'skip_failures')
-        fm.filter_fires()
-        assert fm.num_fires == 8
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+            ## Invalid min/max
+            # TODO: both negative
+            # TODO: min is negative
+            # TODO: max is negative
+            # TODO: min > max
 
-        ## Invalid min/max
-        # TODO: both negative
-        # TODO: min is negative
-        # TODO: max is negative
-        # TODO: min > max
+            ## Invalid fire
+            # TODO: missing area
+        )
+        for config, err_msg in scenarios:
+            fm.set_config_value(config, 'filter', 'area')
+            # don't skip failures
+            fm.set_config_value(False, 'filter', 'skip_failures')
+            with raises(fires.FiresFilter.FilterError) as e_info:
+                fm.filter_fires()
+            assert fm.num_fires == 8
+            assert e_info.value.message == err_msg
+            # skip failures
+            fm.set_config_value(True, 'filter', 'skip_failures')
+            fm.filter_fires()
+            assert fm.num_fires == 8
+            assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## noops
         fm.set_config_value(False, 'filter', 'skip_failures')
