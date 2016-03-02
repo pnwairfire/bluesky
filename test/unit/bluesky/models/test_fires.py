@@ -926,14 +926,41 @@ class TestFiresManagerFilterFires(object):
             # empty config
             ({}, fires.FiresFilter.MISSING_FILTER_CONFIG_MSG),
             # boundary not specified
-            ({'foo': 'bar'}, fires.FiresFilter.SPECIFY_BOUNDARY_MSG)
+            ({'foo': 'bar'}, fires.FiresFilter.SPECIFY_BOUNDARY_MSG),
 
             ## Invalid boundary
-            # TODO: Invalid keys
-            # TODO: insufficient keys
-            # TODO: lat/lng outside of valid range
-            # TODO: sw east of ne
-            # TODO: sw north of ne
+            # Invalid and insufficient keys
+            ({'boundary': {"foo": "bar"}},
+                fires.FiresFilter.INVALID_BOUNDARY_FIELDS),
+            # Invalid keys
+            ({'boundary': {
+                "sdfsdf": 123,
+                "ne": {"lat": 88.12, "lng": 40},
+                "sw": {"lat": -50.75,"lng": -131.5}}},
+                fires.FiresFilter.INVALID_BOUNDARY_FIELDS),
+            # insufficient keys
+            ({'boundary': {
+                "ne": {"lng": 40},
+                "sw": {"lat": -50.75,"lng": -131.5}}},
+                fires.FiresFilter.INVALID_BOUNDARY_FIELDS),
+            ({'boundary': {
+                "sw": {"lat": -50.75,"lng": -131.5}}},
+                fires.FiresFilter.INVALID_BOUNDARY_FIELDS),
+            # lat/lng outside of valid range
+            ({'boundary': {
+                "ne": {"lat": 98.12, "lng": 40},
+                "sw": {"lat": -50.75,"lng": -131.5}}},
+                fires.FiresFilter.INVALID_BOUNDARY),
+            # sw east of ne
+            ({'boundary': {
+                "ne": {"lat": 68.12, "lng": 40},
+                "sw": {"lat": 50.75,"lng": 50.5}}},
+                fires.FiresFilter.INVALID_BOUNDARY),
+            # sw north of ne
+            ({'boundary': {
+                "ne": {"lat": 48.12, "lng": 40},
+                "sw": {"lat": 50.75,"lng": -50.5}}},
+                fires.FiresFilter.INVALID_BOUNDARY)
 
             ## Invalid fire
             # TODO: missing lat
