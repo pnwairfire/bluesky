@@ -14,7 +14,7 @@ import sys
 import traceback
 import uuid
 
-from bluesky import datautils, configuration
+from bluesky import datautils, configuration, datetimeutils
 from bluesky.exceptions import (
     BlueSkyImportError, BlueSkyModuleError
 )
@@ -58,6 +58,17 @@ class Fire(dict):
     # @property
     # def raw_dict(self):
     #     return {k: self[k] for k in self}
+
+    @property
+    def start(self):
+        # Don't memoize, in case growth windows are added/removed/modified
+        if 'growth' in self:
+            starts = [g['start'] for g in self.growth if g.get('start')]
+            if starts:
+                return datetimeutils.parse_datetime(sorted(starts)[0], 'start')
+
+    # TODO: somehow clear out memoized _latitude/_longitude when location
+    #   changes (not sure where to do that); or maybe don't memoize
 
     @property
     def latitude(self):

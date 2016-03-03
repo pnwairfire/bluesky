@@ -3,6 +3,7 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
+import datetime
 import json
 import sys
 import StringIO
@@ -104,6 +105,38 @@ class TestFire:
             f['sdfdsf']
         with raises(KeyError) as e:
             f.rifsijsflj
+
+    def test_start(self):
+        # no growth windows
+        assert None == fires.Fire({}).start
+        # empty growth list
+        assert None == fires.Fire({"growth": []}).start
+        # one growth window with no 'start'
+        assert None == fires.Fire({"growth": [{}]}).start
+        # one growth window with None 'start'
+        assert None == fires.Fire({"growth": [{'start': None}]}).start
+        # multiple growth windows with no 'start'
+        assert None == fires.Fire({"growth": [{}, {}]}).start
+        # multiple growth windows with None 'start'
+        assert None == fires.Fire({"growth": [
+            {'start': None}, {'start': None}]}).start
+        # one growth window with start defined
+        assert datetime.datetime(2014,05,27,17,0,0) == fires.Fire({"growth": [
+            {'start': "2014-05-27T17:00:00"}]}).start
+        # multiple growth windows, some with 'start' defined, out of order
+        assert datetime.datetime(2014,05,27,17,0,0) == fires.Fire({"growth": [
+            {'start': None},
+            {'start': "2014-05-29T17:00:00"},
+            {'start': "2014-05-27T17:00:00"},
+            {'start': None}
+            ]}).start
+
+        # multiple growth windows, all with 'start' defined, out of order
+        assert datetime.datetime(2014,05,27,17,0,0) == fires.Fire({"growth": [
+            {'start': "2014-05-29T17:00:00"},
+            {'start': "2014-05-27T17:00:00"},
+            {'start': "2014-05-28T17:00:00"}
+            ]}).start
 
 ##
 ## Tests for FiresManager
