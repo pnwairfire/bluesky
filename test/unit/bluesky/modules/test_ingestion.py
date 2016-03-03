@@ -365,3 +365,56 @@ class TestIngester(object):
         parsed_input = self.ingester.ingest(f)
         assert expected == f
         assert expected_parsed_input == parsed_input
+
+    def test_fire_with_old_sf2_date_time(self):
+        f = {
+            "id": "SF11C14225236095807750",
+            "latitude": 47.0,
+            "longitude": -122.0,
+            "area": 100.0,
+            "date_time": '201405290000Z'
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "location":{
+                "latitude": 47.0,
+                "longitude": -122.0,
+                "area": 100.0
+            },
+            "growth":[{
+                "start": "2014-05-29T00:00:00",
+                "end": "2014-05-30T00:00:00",
+                "pct": 100.0
+            }]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+    def test_fire_with_new_sf2_date_time(self):
+        f = {
+            "id": "SF11C14225236095807750",
+            "latitude": 47.0,
+            "longitude": -122.0,
+            "area": 100.0,
+            "date_time": '201508040000-04:00'
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "location": {
+                "latitude": 47.0,
+                "longitude": -122.0,
+                "area": 100.0,
+                "utc_offset": "-04:00",
+            },
+            "growth":[{
+                "start": "2015-08-04T00:00:00",
+                "end": "2015-08-05T00:00:00",
+                "pct": 100.0
+            }]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
