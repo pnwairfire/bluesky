@@ -84,6 +84,10 @@ class TestParseUtcOffset(object):
         assert 0.0 == parse_utc_offset('+00:00')
         assert 4.0 == parse_utc_offset('+04:00')
         assert -3.5 == parse_utc_offset('-03:30')
+        assert 0.0 == parse_utc_offset(0.0)
+        assert 4.0 == parse_utc_offset(4)
+        assert -3.5 == parse_utc_offset(-3.5)
+
 
 ##
 ## Tests for is_round_hour

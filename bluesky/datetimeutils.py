@@ -57,11 +57,16 @@ def parse_utc_offset(utc_offset_str):
      - http://labix.org/python-dateutil
      - http://arrow.readthedocs.org/en/latest/
     """
+    if isinstance(utc_offset_str, (float, int)):
+        return float(utc_offset_str)
+
     if not utc_offset_str:
         raise ValueError("UTC offset not defined")
+
     m = OFFSET_MATCHER.match(utc_offset_str)
     if not m:
         raise ValueError("Invalid UTC offset string format: {}".format(utc_offset_str))
+
     hours = float(m.group(1))
     minutes = float(m.group(2))
     if hours < -13 or hours > 13 or minutes < 0 or minutes > 59:
