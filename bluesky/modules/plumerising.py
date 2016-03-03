@@ -11,6 +11,7 @@ import logging
 
 from plumerise import sev, feps, __version__ as plumerise_version
 
+from bluesky import sun
 
 __all__ = [
     'run'
@@ -76,14 +77,27 @@ class ComputeFunction(object):
             # TODO: aggregate and summarize consumption over all fuelbeds
             #   (or should this be done in consumption module?); make sure
             #   to validate that each fuelbed has consumption data
+            import pdb;pdb.set_trace()
             consumption = {}
-
-            # TODO: get this from wherever it's defined
-            moisture_duff = 1
-
             if not consumption:
                 raise ValueError("Missing fire consumption data required for "
                     "FEPS plumerise")
+
+            start = fire.start
+            if not start:
+                raise ValueError("Missing fire start time FEPS plumerise")
+
+            # Fill in missing sunrise / sunset
+            if any(fire.location.get(k) is None for k in
+                    ('sunrise_hour', 'sunset_hour')]:
+                utc_offset = fire.location.get('utc_offset', 0.0) # default: UTC
+                # Use NOAA-standard sunrise/sunset calculations
+                tmidday = datetime(start.year, start.month, start.day, int(12))
+                s = sun.Sun(lat=fire.latitude, long=fire.longitude)
+                # just set them both, even if one is already set
+                fire.location["sunrise_hour"] = s.sunrise_hr(tmidday) + utc_offset
+                fire.location["sunset_hour"] = s.sunset_hr(tmidday) + utc_offset
+
             for g in fire.growth:
                 if not g.get('timeprofile'):
                     raise ValueError("Missing timeprofile data required for "
@@ -92,11 +106,13 @@ class ComputeFunction(object):
                 g_pct = float(g['pct']) / 100.0
                 g_area = fire.location['area'] * g_pct
                 g_consumption = copy.deepcopy(consumption)
-                g_moisture_duff = moisture_duff * g_pct
                 datautils.multiply_nested_data(g_consumption, g_pct)
-                multiply_nested_data(g['plumerise'])
 
-                plumerise_data = pr.compute(g['time_profile'], g_consumption, g_moisture_duff, g_area)
+                # TODO: if managing working dir here, pass it in
+                #   (I think we'll let plumerising package handle it,
+                #   since we don't need to keep the output files)
+                plumerise_data = pr.compute(g['time_profile'], g_consumption,
+                    fire.location, start)
                 g['plumerise'] = plumerise_data['plumerise']
                 # TODO: do anything with plumerise_data['heat'] ?
 
