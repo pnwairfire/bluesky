@@ -71,6 +71,7 @@ class ComputeFunction(object):
 
             # TODO: create and change to working directory here (per fire),
             #   above (one per all fires), or below (per growth window)
+            #   or just let plumerise create tempdir?
 
             # TODO: aggregate and summarize consumption over all fuelbeds
             #   (or should this be done in consumption module?); make sure

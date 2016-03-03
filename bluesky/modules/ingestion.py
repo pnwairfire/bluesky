@@ -48,26 +48,43 @@ def run(fires_manager):
 class FireIngester(object):
     """Inputs, transforms, and validates fire data, recording original copy
     under 'input' key.
-    """
 
-    # TODO: support synonyms (?)
-    #  ex:
-    #    SYNONYMS = {
-    #        "timezone": "utc_offset",
-    #        "date_time": "start"
-    #        # TODO: fill in other synonyms
-    #    }
-    #  with logic like:
-    #    for k,v in self.SYNONYMS.items():
-    #        if fire.has_key(k) and not fire.has_key(v):
-    #            # TDOO: should we pop 'k':
-    #            #  >  self[v] = self.pop(k)
-    #            fire[v] = fire[k]
-    # and do so recursively to get nested objects under fire object
+    Currently, for synonyms, you need to create a '_ingest_special_field_*'
+    method to rename and record the field in the correct place.
+
+    TODO: add more generic logic to handle simple fields with possible
+      synonyms. e.g.
+
+        SYNONYMS = {
+            # field, section (optional), synonyms (optional)
+            ("foo", None, None),
+            ("bar", "location", None),
+            ("baz", None, ["baaz", "baaaaz"])
+        }
+
+        for field, section, synonyms in SYNONYMS:
+            v = None
+            for f in [field] + (synonyms or []):
+                v = self._get_field(f, section)
+                if v:
+                    break
+            if v:
+                if section:
+                    if 'section' not in fire:
+                        fire['section'] = {}
+                    fire['section'][field] = v
+                else:
+                    fire[field] = v
+
+      and, if necessary, refactor to support arbitrary section nesting
+    """
 
     SCALAR_FIELDS = {
         "id", "type", "fuel_type"
     }
+    # TODO: do anything with other fields found in daily SF2 data
+    #     > 'owner','sf_event_guid','sf_server','sf_stream_name','fips','scc'
+
     NESTED_FIELD_METHOD_PREFIX = '_ingest_nested_field_'
     SPECIAL_FIELD_METHOD_PREFIX = '_ingest_special_field_'
 
@@ -205,10 +222,10 @@ class FireIngester(object):
         if event_of_dict:
             fire['event_of'] = event_of_dict
 
+    ## 'growth'
+
     GROWTH_FIELDS = ['start','end', 'pct']
     OPTIONAL_GROWTH_FIELDS = ['localmet', 'timeprofile', 'plumerise']
-
-    ## 'growth'
 
     def _ingest_optional_growth_fields(self, growth, src):
         for f in self.OPTIONAL_GROWTH_FIELDS:
@@ -249,6 +266,11 @@ class FireIngester(object):
         'fccs_id', 'pct', 'fuel_loadings',
         'consumption', 'emissions', 'emissions_details'
     ]
+    # TODO: do anything with fuelbed related data found in daily SF2 data ?
+    #   e.g.:
+    #     > consumption_flaming,consumption_smoldering,consumption_residual,
+    #     > consumption_duff, heat,pm25,pm10,co,co2,ch4,nox,nh3,so2,voc,canopy,
+    #     > fccs_number,veg
 
     def _ingest_nested_field_fuelbeds(self, fire):
         if self._parsed_input.get('fuelbeds'):
@@ -275,6 +297,15 @@ class FireIngester(object):
     ##
     ## Special Field Ingest Methods
     ##
+
+    # TODO: grab 'timezone' and store in 'location' > 'timezone' (if not already
+    #   defined); note that it's not the same as utc_offset - utc_offset reflects
+    #   daylight savings and thus is the true offset from UTC, whereas timezone
+    #   does not change; e.g. an agust 5th fire in Florida is listed with timezone
+    #   -5.0 and utc_offset (embedded in the 'date_time' field) '-04:00'
+
+    # TODO: grab event_url (store in 'event_of' > 'url', if not already defined)
+    #     > event_url
 
     ## 'date_time'
     OLD_DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?Z$')
