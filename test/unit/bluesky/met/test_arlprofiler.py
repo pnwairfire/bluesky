@@ -9,6 +9,7 @@ import tempfile
 from py.test import raises
 from numpy.testing import assert_approx_equal
 
+from bluesky import sun
 from bluesky.met import arlprofiler
 
 ##
@@ -345,8 +346,8 @@ class TestARLProfile(object):
                     check_vals(k, actual[dt][k],   expected[dt][k])
 
     def monkeypatch_sun(self, monkeypatch):
-        monkeypatch.setattr(arlprofiler.Sun, "sunrise_hr", lambda *args: 13)
-        monkeypatch.setattr(arlprofiler.Sun, "sunset_hr", lambda *args: 25)
+        monkeypatch.setattr(sun.Sun, "sunrise_hr", lambda *args: 13)
+        monkeypatch.setattr(sun.Sun, "sunset_hr", lambda *args: 25)
         #monkeypatch.setattr(arlprofiler, "Sun", MockSun)
 
     def test_one_all_hours_with_offset(self, monkeypatch):
