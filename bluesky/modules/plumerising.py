@@ -6,12 +6,13 @@ Requires time profiled emissions and localmet data.
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
+import copy
 import datetime
 import logging
 
 from plumerise import sev, feps, __version__ as plumerise_version
 
-from bluesky import sun, datautils
+from bluesky import sun, datautils, datetimeutils
 
 __all__ = [
     'run'
@@ -77,22 +78,28 @@ class ComputeFunction(object):
             # TODO: aggregate and summarize consumption over all fuelbeds
             #   (or should this be done in consumption module?); make sure
             #   to validate that each fuelbed has consumption data
-            import pdb;pdb.set_trace()
-            consumption = {}
-            if not consumption:
+            all_consumption = datautils.summarize([fire], 'consumption')
+            if not all_consumption:
                 raise ValueError("Missing fire consumption data required for "
                     "FEPS plumerise")
+            consumption = {
+                k: v[0] for k,v in all_consumption['summary']['total'].items()
+            }
 
             start = fire.start
             if not start:
                 raise ValueError("Missing fire start time FEPS plumerise")
 
             # Fill in missing sunrise / sunset
-            if any(fire.location.get(k) is None for k in
-                    ('sunrise_hour', 'sunset_hour')]:
-                utc_offset = fire.location.get('utc_offset', 0.0) # default: UTC
+            if any([fire.location.get(k) is None for k in
+                    ('sunrise_hour', 'sunset_hour')]):
+                # default: UTC
+                utc_offset = datetimeutils.parse_utc_offset(
+                    fire.location.get('utc_offset', 0.0))
+
                 # Use NOAA-standard sunrise/sunset calculations
-                tmidday = datetime(start.year, start.month, start.day, int(12))
+                tmidday = datetime.datetime(start.year, start.month, start.day, int(12))
+
                 s = sun.Sun(lat=fire.latitude, long=fire.longitude)
                 # just set them both, even if one is already set
                 fire.location["sunrise_hour"] = s.sunrise_hr(tmidday) + utc_offset
@@ -111,9 +118,9 @@ class ComputeFunction(object):
                 # TODO: if managing working dir here, pass it in
                 #   (I think we'll let plumerising package handle it,
                 #   since we don't need to keep the output files)
-                plumerise_data = pr.compute(g['time_profile'], g_consumption,
-                    fire.location, start)
-                g['plumerise'] = plumerise_data['plumerise']
+                plumerise_data = pr.compute(g['timeprofile'], g_consumption,
+                    fire.location)
+                g['plumerise'] = plumerise_data['hours']
                 # TODO: do anything with plumerise_data['heat'] ?
 
         return _f
