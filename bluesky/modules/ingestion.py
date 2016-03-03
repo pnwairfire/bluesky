@@ -165,7 +165,7 @@ class FireIngester(object):
         fields = {}
         for k in optional_fields:
             v = self._get_field(k, section)
-            if v:
+            if v is not None:
                 fields[k] = v
         return fields
 
