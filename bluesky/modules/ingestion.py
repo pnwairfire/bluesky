@@ -177,7 +177,25 @@ class FireIngester(object):
 
     OPTIONAL_LOCATION_FIELDS = [
         "ecoregion",
-        "utc_offset" # utc_offest is only required by modules using met data
+        # utc_offset is for the most part required by modules using met data
+        # (but not exclusively; e.g. FEPS plumerise uses it)
+        "utc_offset",
+        # SF2 weather, moisture, etc. fields
+        'elevation','slope',
+        'state','county','country',
+        'fuel_1hr','fuel_10hr','fuel_100hr',
+        'fuel_1khr','fuel_10khr','fuel_gt10khr',
+        'canopy','shrub','grass','rot','duff', 'litter',
+        'moisture_1hr','moisture_10hr',
+        'moisture_100hr','moisture_1khr',
+        'moisture_live','moisture_duff',
+        'min_wind','max_wind',
+        'min_wind_aloft', 'max_wind_aloft',
+        'min_humid','max_humid',
+        'min_temp','max_temp',
+        'min_temp_hour','max_temp_hour',
+        'sunrise_hour','sunset_hour',
+        'snow_month','rain_days'
         # TODO: fill in others
     ]
     for _s in consumeutils.SETTINGS.values():
@@ -213,9 +231,13 @@ class FireIngester(object):
             # 'name' can be defined at the top level as well as under 'event_of'
             ("name", self._get_field("name", 'event_of')),
             # event id, if defined, can be defined as 'event_id' at the top
-            # level or as 'id' be under 'event_of'
+            # level or as 'id' under 'event_of'
             ("id", self._parsed_input.get('event_of', {}).get('id') or
-                self._parsed_input.get('event_id'))
+                self._parsed_input.get('event_id')),
+            # event url, if defined, can be defined as 'event_url' at the top
+            # level or as 'url' under 'event_of'
+            ("url", self._parsed_input.get('event_of', {}).get('url') or
+                self._parsed_input.get('event_url'))
         ]
         event_of_dict = { k:v for k, v in event_of_fields if v}
 
@@ -269,7 +291,7 @@ class FireIngester(object):
     # TODO: do anything with fuelbed related data found in daily SF2 data ?
     #   e.g.:
     #     > consumption_flaming,consumption_smoldering,consumption_residual,
-    #     > consumption_duff, heat,pm25,pm10,co,co2,ch4,nox,nh3,so2,voc,canopy,
+    #     > consumption_duff, heat,pm25,pm10,co,co2,ch4,nox,nh3,so2,voc,
     #     > fccs_number,veg
 
     def _ingest_nested_field_fuelbeds(self, fire):
@@ -303,9 +325,6 @@ class FireIngester(object):
     #   daylight savings and thus is the true offset from UTC, whereas timezone
     #   does not change; e.g. an agust 5th fire in Florida is listed with timezone
     #   -5.0 and utc_offset (embedded in the 'date_time' field) '-04:00'
-
-    # TODO: grab event_url (store in 'event_of' > 'url', if not already defined)
-    #     > event_url
 
     ## 'date_time'
     OLD_DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?Z$')
