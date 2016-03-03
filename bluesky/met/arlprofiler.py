@@ -17,8 +17,7 @@ import logging
 import os
 import subprocess
 from datetime import date, datetime, time, timedelta
-from math import acos, asin, cos, sin, tan, exp, log, pow
-from math import degrees as deg, radians as rad
+from math import exp, log, pow
 
 from bluesky import osutils, sun
 from bluesky.datetimeutils import parse_datetimes

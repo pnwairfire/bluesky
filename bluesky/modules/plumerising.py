@@ -6,12 +6,12 @@ Requires time profiled emissions and localmet data.
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
-import consume
+import datetime
 import logging
 
 from plumerise import sev, feps, __version__ as plumerise_version
 
-from bluesky import sun
+from bluesky import sun, datautils
 
 __all__ = [
     'run'

@@ -3,6 +3,9 @@
 TODO: move this to pyairfire?
 """
 
+from math import acos, asin, cos, sin, tan
+from math import degrees as deg, radians as rad
+
 class Sun(object):
     """Calculates sunrise and sunset based on equations from NOAA:
     http://www.srrb.noaa.gov/highlights/sunrise/calcdetails.html
