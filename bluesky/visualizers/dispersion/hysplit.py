@@ -107,8 +107,15 @@ FIRE_LOCATIONS_CSV_FIELDS = [
     ('event_name', lambda f, g: f.get('event_of', {}).get('name')),
     ('event_guid', lambda f, g: f.get('event_of', {}).get('id')),
     ('fccs_number', _pick_representative_fuelbed),
-    # TDOO: add 'VEG' ?
-    # TODO: Add other fields if user's want them
+    # TODO: Add other fields if users want them
+    # TODO: add other sf2 fields (which we're now ingesting)
+    # TDOO: add 'VEG'? (Note: sf2 has 'veg' field, which we're *not* ingesting,
+    #   since it seems to be a fuelbed discription which is probably for
+    #   the one fccs id in the sf2 feed. This single fccs id and its description
+    #   don't necesasrily represent the entire fire area, which could have
+    #   multiple fuelbeds, so ingestion ignores it.  we could set 'VEG' to
+    #   a concatenation of the fuelbeds or the one one making up the largest
+    #   fraction of the fire.)
     ('heat', _get_heat)
 ] + [(s.lower(), _get_emissions_species(s)) for s in BLUESKYKML_SPECIES_LIST]
 """List of fire location csv fields, with function to extract from fire object"""
