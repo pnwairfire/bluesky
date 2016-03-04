@@ -98,12 +98,11 @@ class ComputeFunction(object):
                     fire.location.get('utc_offset', 0.0))
 
                 # Use NOAA-standard sunrise/sunset calculations
-                tmidday = datetime.datetime(start.year, start.month, start.day, int(12))
-
-                s = sun.Sun(lat=fire.latitude, long=fire.longitude)
+                s = sun.Sun(lat=fire.latitude, lng=fire.longitude)
+                d = start.date()
                 # just set them both, even if one is already set
-                fire.location["sunrise_hour"] = s.sunrise_hr(tmidday) + utc_offset
-                fire.location["sunset_hour"] = s.sunset_hr(tmidday) + utc_offset
+                fire.location["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
+                fire.location["sunset_hour"] = s.sunset_hr(d, utc_offset)
 
             for g in fire.growth:
                 if not g.get('timeprofile'):

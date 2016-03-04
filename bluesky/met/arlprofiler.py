@@ -448,10 +448,10 @@ class ARLProfile(object):
 
     def fill_in_fields(self):
         # The following is from BSF
-        tmidday = datetime(self.first.year, self.first.month, self.first.day, 12)
-        s = sun.Sun(lat=self.lat, long=self.lng)
-        sunrise = s.sunrise_hr(tmidday) + self.utc_offset
-        sunset = s.sunset_hr(tmidday) + self.utc_offset
+        d = self.first.date()
+        s = sun.Sun(lat=self.lat, lng=self.lng)
+        sunrise = s.sunrise_hr(d) + self.utc_offset
+        sunset = s.sunset_hr(d) + self.utc_offset
         # default Planetary Boundary Layer (PBL) step function
         default_pbl = lambda hr,sunrise,sunset: 1000.0 if (sunrise + 1) < hr < sunset else 100.0
 
