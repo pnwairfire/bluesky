@@ -96,10 +96,10 @@ def _apply_settings(fc, location, burn_type):
             # len(defined_fields) > 1
             setattr(fc, d['field'], location[defined_fields[0]])
         elif 'default' in d:
-            setattr(fc, k, d['default'])
+            setattr(fc, d['field'], d['default'])
         else:
             raise BlueSkyConfigurationError("Specify {} for {} burns".format(
-                k, burn_type))
+                d['field'], burn_type))
 
 class FuelLoadingsManager(object):
 
