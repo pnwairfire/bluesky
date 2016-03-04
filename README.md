@@ -1097,8 +1097,26 @@ TODO: fill in this section...
 
 ##### plumerising
 
- - ***'fire_information' > 'growth' > 'localmet'*** -- *required in each growth object* --
  - ***'fire_information' > 'location' > 'area'*** -- *required* --
+
+###### If running FEPS model
+
+ - ***'fire_information' > 'location' > 'area'*** -- *required* --
+ - ***'fire_information' > 'fuelbeds' > 'consumption'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'start'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'pct'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'timeprofile'*** -- *required* --
+
+FEPS uses a number of fire 'location' fields (listed in the ```ingestion```
+section, above). All are optional, as the underlying FEPS module has built-in
+defaults.
+
+###### If running SEV model
+
+ - ***'fire_information' > 'location' > 'area'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'pct'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'localmet'*** -- *required* --
+ - ***'fire_information' > 'meta' > 'frp'*** -- *optional* --
 
 ##### dispersion
 
