@@ -198,8 +198,13 @@ class FireIngester(object):
         'snow_month','rain_days'
         # TODO: fill in others
     ]
-    for _s in consumeutils.SETTINGS.values():
-        OPTIONAL_LOCATION_FIELDS.extend([e[0] for e in _s])
+    for a in consumeutils.SETTINGS.values():
+        for b in a:
+            OPTIONAL_LOCATION_FIELDS.append(b['field'])
+            if 'synonyms' in b:
+                OPTIONAL_LOCATION_FIELDS.extend(b['synonyms'])
+    # remove dupes
+    OPTIONAL_LOCATION_FIELDS = list(set(OPTIONAL_LOCATION_FIELDS))
 
     def _ingest_nested_field_location(self, fire):
         # TODO: validate fields

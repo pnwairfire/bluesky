@@ -672,3 +672,29 @@ class TestIngester(object):
         parsed_input = self.ingester.ingest(f)
         assert expected == f
         assert expected_parsed_input == parsed_input
+
+    def test_fire_with_consume_synonyms(self):
+        f = {
+            "id": "SF11C14225236095807750",
+            "latitude": 47.0,
+            "longitude": -122.0,
+            "area": 100.0,
+            "rain_days": 10,
+            "days_since_rain": 10,
+            "moisture_10hr": 23.23
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "location": {
+                "latitude": 47.0,
+                "longitude": -122.0,
+                "area": 100.0,
+                "rain_days": 10,
+                "days_since_rain": 10,
+                "moisture_10hr": 23.23
+            }
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input

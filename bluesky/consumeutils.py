@@ -22,32 +22,81 @@ __all__ = [
 
 # TODO: These burn-type pecific settings sets might not be correct
 # TODO: Check with Susan P, Susan O, Kjell, etc. to make sure defaults are correct
+# TODO: Check with Susan P, Susan O, Kjell, etc. to make sure sysnonyms are
+#  valid and to see if any are missing
 SETTINGS = {
     'natural': [],
     'activity': [
-        ('slope', 5), # percent, from 1 to 100; default from consume package
-        ('windspeed', 5),  # default from consume package
-        ('days_since_rain', 10),  # our default
-        ('fuel_moisture_10hr_pct', 50), # default from consume package
-        ('length_of_ignition', 120), # in minutes; our default
-        ('fm_type', "MEAS-Th") # default from consume package
+        {
+            'field': 'slope',
+            'default': 5 # percent, from 1 to 100; default from consume package
+        },
+        {
+            'field': 'windspeed',
+            'default': 5,  # default from consume package
+            # TODO: is 'max_wind' a valid synonym? or 'min_wind_aloft'?
+        },
+        {
+            'field': 'days_since_rain',
+            'default': 10,   # our default
+            'synonyms': ['rain_days'] # TODO: confirm
+        },
+        {
+            'field': 'fuel_moisture_10hr_pct',
+            'default': 50, # default from consume package
+            'synonyms': ['moisture_10hr'] # TODO: confirm
+        },
+        {
+            'field': 'length_of_ignition',
+            'default': 120 # in minutes; our default
+        },
+        {
+            'field': 'fm_type',
+            'default': "MEAS-Th" # default from consume package
+        }
     ],
     'all': [
-        ('fuel_moisture_1000hr_pct', 50), # default from consume package
-        ('fuel_moisture_duff_pct', 50), # default from consume package
-        ('canopy_consumption_pct', 0),
-        ('shrub_blackened_pct', 50),
-        ('output_units', "tons_ac"),  # default in consume package is 'tons_ac'
-        ('pile_blackened_pct', 0)
+        {
+            'field': 'fuel_moisture_1000hr_pct',
+            'default': 50, # default from consume package
+            'synonyms': ['moisture_1khr'] # TODO: confirm
+        },
+        {
+            'field': 'fuel_moisture_duff_pct',
+            'default': 50, # default from consume package
+            'synonyms': ['moisture_duff'] # TODO: confirm
+        },
+        {
+            'field': 'canopy_consumption_pct',
+            'default': 0,
+            # TDOO: is 'canopy' a valid synonym
+        },
+        {
+            'field': 'shrub_blackened_pct',
+            'default': 50,
+            # TODO: is 'shrub' a valid synonym
+        },
+        {
+            'field': 'output_units',
+            'default': "tons_ac"  # default in consume package is 'tons_ac'
+        },
+        {
+            'field': 'pile_blackened_pct',
+            'default': 0
+        },
     ]
 }
 def _apply_settings(fc, location, burn_type):
     valid_settings = SETTINGS[burn_type] + SETTINGS['all']
-    for k, default in valid_settings:
-        if location.has_key(k):
-            setattr(fc, k, location[k])
-        elif default is not None:
-            setattr(fc, k, default)
+    for d in valid_settings:
+        possible_name = [d['field']] + d.get('synonyms', [])
+        defined_fields = [f for f in possible_name if f in location]
+        if defined_fields:
+            # use first of defined fields - it's not likely that
+            # len(defined_fields) > 1
+            setattr(fc, d['field'], location[defined_fields[0]])
+        elif 'default' in d:
+            setattr(fc, k, d['default'])
         else:
             raise BlueSkyConfigurationError("Specify {} for {} burns".format(
                 k, burn_type))
