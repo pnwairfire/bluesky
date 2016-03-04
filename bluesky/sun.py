@@ -32,111 +32,78 @@ class Sun(object):
     ##
 
     def sunrise(self, day, utc_offset=0):
+        """Computes datetime of sunrise as a datetime.datetime object.
+
+        args:
+         - day -- date (datetime.date) of sunrise
+         - utc_offset -- UTC offset of time to return; default 0 (UTC)
+
+        e.g. The sun rose/set at 6:43am/6:00pm in Seattle on 2015 March 4th.
+        Given that Seattle's UTC offset is -8 at that time of year, calling
+        `s.sunrise(d, -8)` will return `datetime.datetime(2016,3,4,6,45,51)`.
+        Calling `s.sunrise(d)`, on the other hand, will return
+        `datetime.datetime(2016,3,4,14,45,51)`
         """
-        Return the time of sunrise as a datetime.time object.
-        when is a datetime.datetime object. If none is given a
-        local time zone is assumed (including daylight saving if present).
-        """
-        self._preptime(day)
-        self._calc()
-        return Sun._time_from_decimal_day(self.sunrise_t, utc_offset)
+        self._calc(day, utc_offset)
+        return self._sunrise
 
     def sunrise_hr(self, day, utc_offset=0):
+        """Computes hour (int) of sunrise, rounded to the nearest hour
+
+        args:
+         - day -- date (datetime.date) of sunrise
+         - utc_offset -- UTC offset of time to return; default 0 (UTC)
         """
-        Return the time of sunrise as an int.
-        when is a datetime.datetime object. If none is given a
-        local time zone is assumed (including daylight saving if present)
-        """
-        self._preptime(day)
-        self._calc()
-        return Sun._hour_from_decimal_day(self.sunrise_t, utc_offset)
+        self._calc(day, utc_offset)
+        return self._rounded_hour(self._sunrise)
 
     def sunset(self, day, utc_offset=0):
-        self._preptime(day)
-        self._calc()
-        return Sun._time_from_decimal_day(self.sunset_t, utc_offset)
+        """Computes datetime of sunset as a datetime.datetime object.
+
+        args:
+         - day -- date (datetime.date) of sunset
+         - utc_offset -- UTC offset of time to return; default 0 (UTC)
+
+        e.g. The sun rose/set at 6:43am/6:00pm in Seattle on 2015 March 4th.
+        Given that Seattle's UTC offset is -8 at that time of year, calling
+        `s.sunset(d, -8)` will return `datetime.datetime(2016,3,4,17,56,27)`.
+        Calling `s.sunrise(d)`, on the other hand, will return
+        `datetime.datetime(2016,3,5,2,56,27)`
+        """
+        self._calc(day, utc_offset)
+        return self._sunset
 
     def sunset_hr(self, day, utc_offset=0):
-        self._preptime(day)
-        self._calc()
-        return Sun._hour_from_decimal_day(self.sunset_t, utc_offset)
+        """Computes hour (int) of sunset, rounded to the nearest hour
+
+        args:
+         - day -- date (datetime.date) of sunset
+         - utc_offset -- UTC offset of time to return; default 0 (UTC)
+        """
+        self._calc(day, utc_offset)
+        return self._rounded_hour(self._sunset)
 
     def solarnoon(self, day, utc_offset=0):
-        self._preptime(day)
-        self._calc()
-        return Sun._time_from_decimal_day(self.solarnoon_t, utc_offset)
+        """Computes datetime of solor noon as a datetime.datetime object.
+
+        args:
+         - day -- date (datetime.date) of sunset
+         - utc_offset -- UTC offset of time to return; default 0 (UTC)
+        """
+        self._calc(day, utc_offset)
+        return self._solarnoon
 
     ##
     ## 'Private' methods
     ##
 
-    @staticmethod
-    def _time_from_decimal_day(day, utc_offset):
-        """
-        returns a datetime.time object.
-        day is a decimal day between 0.0 and 1.0, e.g. noon = 0.5
-        """
-
-        # TODO: return datetime object instead of time so that we know
-        #   if hour is next day or previous day
-        #   (e.g. if you want to know the GMT time of Seattle's sunset,
-        #    or if you want to know the Seattle time of London's sunrise)
-
-        hours = 24.0 * day + utc_offset
-        h = int(hours)
-        minutes = (hours - h) * 60
-        m = int(minutes)
-        seconds = (minutes - m) * 60
-        s = int(seconds)
-        return datetime.time(hour=h%24, minute=m, second=s)
-
-    @staticmethod
-    def _hour_from_decimal_day(day, utc_offset):
-        """
-        returns an int representing the hour of a given
-        day as a decimal day between 0.0 and 1.0, e.g. noon = 0.5
-        """
-
-        # TODO: return datetime object instead of time so that we know
-        #   if hour is next day or previous day
-        #   (e.g. if you want to know the GMT time of Seattle's sunset,
-        #    or if you want to know the Seattle time of London's sunrise)
-
-        # TODO: refactor this to call _time_from_decimal_day, or vice-versa
-
-        hours  = 24.0 * day + utc_offset
-        h = int(hours)
-        minutes= (hours - h) * 60
-        m = int(minutes)
-        return ((h + 1) if m > 29 else h) %24
-
-    def _preptime(self, day):
-        """
-        Extract information in a suitable format from when,
-        a datetime.datetime object.
-        """
-        # datetime days are numbered in the Gregorian calendar
-        # while the calculations from NOAA are distibuted as
-        # OpenOffice spreadsheets with days numbered from
-        # 1/1/1900. The difference are those numbers taken for
-        # 18/12/2010
-        # daynumber 1=1/1/1900
-        self.day = day.toordinal() - (734124 - 40529)
-        # percentage past midnight, i.e. noon  is 0.5
-        #self.time= 0.5 #(t.hour + t.minute / 60.0 + t.second / 3600.0) / 24.0
-
-    def _calc(self):
-        """
-        Perform the actual calculations for sunrise, sunset and
+    def _calc(self, day_date, utc_offset):
+        """Perform the actual calculations for sunrise, sunset and
         a number of related quantities.
-
-        The results are stored in the instance variables
-        sunrise_t, sunset_t and solarnoon_t
         """
-        longitude = self.lng     # in decimal degrees, east is positive
-        latitude = self.lat       # in decimal degrees, north is positive
+        day = day_date.toordinal() - (734124 - 40529)
 
-        Jday = self.day + 2415018.5  # Julian day
+        Jday = day + 2415018.5  # Julian day
         Jcent = (Jday - 2451545) / 36525               # Julian century
 
         Manom = 357.52911 + Jcent * (35999.05029 - 0.0001537 * Jcent)
@@ -152,8 +119,46 @@ class Sun(object):
 
         eqtime = 4*deg(vary*sin(2*rad(Mlong))-2*Eccent*sin(rad(Manom))+4*Eccent*vary*sin(rad(Manom))*cos(2*rad(Mlong))-0.5*vary*vary*sin(4*rad(Mlong))-1.25*Eccent*Eccent*sin(2*rad(Manom)))
 
-        hourangle = deg(acos(cos(rad(90.833))/(cos(rad(latitude))*cos(rad(declination)))-tan(rad(latitude))*tan(rad(declination))))
+        hourangle = deg(acos(cos(rad(90.833))/(cos(rad(self.lat))*cos(rad(declination)))-tan(rad(self.lat))*tan(rad(declination))))
 
-        self.solarnoon_t = (720 - 4 * longitude - eqtime) / 1440
-        self.sunrise_t = self.solarnoon_t - hourangle * 4 / 1440
-        self.sunset_t = self.solarnoon_t + hourangle * 4 / 1440
+        solarnoon_t = (720 - 4 * self.lng - eqtime) / 1440
+        sunrise_t = solarnoon_t - hourangle * 4 / 1440
+        sunset_t = solarnoon_t + hourangle * 4 / 1440
+
+        self._sunrise = self._datetime_from_decimal_day(sunrise_t, day_date, utc_offset)
+        self._sunset = self._datetime_from_decimal_day(sunset_t, day_date, utc_offset)
+        self._solarnoon = self._datetime_from_decimal_day(solarnoon_t, day_date, utc_offset)
+
+    def _datetime_from_decimal_day(self, day_decimal, day_date, utc_offset):
+        """
+        returns a datetime.time object.
+        day is a decimal day between 0.0 and 1.0, e.g. noon = 0.5
+        """
+
+        # TODO: return datetime object instead of time so that we know
+        #   if hour is next day or previous day
+        #   (e.g. if you want to know the GMT time of Seattle's sunset,
+        #    or if you want to know the Seattle time of London's sunrise)
+        offset_days = 0
+        hours = 24.0 * day_decimal + utc_offset
+        if hours > 24.0:
+            offset_days = int(hours / 24.0) # should be at most 1
+            hours = hours % 24
+        elif hours < 0.0:
+            offset_days = -1 + int(hours / 24.0) # should be at most 1
+            hours = hours + 24.0*abs(offset_days)
+
+        h = int(hours)
+        minutes = (hours - h) * 60
+        m = int(minutes)
+        seconds = (minutes - m) * 60
+        s = int(seconds)
+
+        dt = datetime.datetime(year=day_date.year, month=day_date.month,
+            day=day_date.day, hour=h, minute=m, second=s)
+        return dt + datetime.timedelta(days=offset_days)
+
+    def _rounded_hour(self, dt):
+        """Returns datetime's hour, rounded to the nearest hour
+        """
+        return  (dt + datetime.timedelta(hours=int(dt.minute > 29))).hour
