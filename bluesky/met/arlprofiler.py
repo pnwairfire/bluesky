@@ -16,7 +16,7 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 import logging
 import os
 import subprocess
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, timedelta
 from math import exp, log, pow
 
 from bluesky import osutils, sun
