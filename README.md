@@ -950,15 +950,83 @@ fire data into downstream modules.)
 
 Ingestion requires that none of the fires in 'fire_information' are empty objects.
 
- - ***'fire_information' > 'location'*** -- *required* -- containing either single lat/lng + area or polygon perimeter coordinates; if perimeter and lat/lng+area are specified, perimiter data is used and lat/lng+area are ignored
- - ***'fire_information' > 'event_of' > 'name'*** -- *optional* -- this may also be specified at the top level, in which case the ingestion module embeds it under 'event_of'
- - ***'fire_information' > 'event_of' > 'id'*** -- *optional* -- this may also be specified as 'event_id' at the top level, in which case the ingestion module embeds it under 'event_of'
- - ***'fire_information' > 'growth' > 'start'*** -- *required if growth is specified* --
+ - ***'fire_information' > 'id'*** -- *optional* -- fire's identifier
+ - ***'fire_information' > 'type'*** -- *optional* -- fire type ('rx, 'wildfire', or 'wf' - 'wildfire' and 'wf' are equivalent); default 'wildfire'
+ - ***'fire_information' > 'fuel_type'*** -- *optional* -- Fuel type ('natural', 'activity', or 'piles'); default 'natural'
+
+###### 'location'
+
+The following fields may be specified under a fire's "location" field or at the top level, in which case the ingestion module embeds it under 'location'
+
+ - ***'fire_information' > 'location' > 'area'*** -- *required* if perimeter is not defined --
+ - ***'fire_information' > 'location' > 'latitude'*** -- *required* if perimeter is not defined --
+ - ***'fire_information' > 'location' > 'longitude'*** -- *required* if perimeter is not defined --
+ - ***'fire_information' > 'location' > 'perimeter'*** -- *required* if single lat/lng + area aren't defined (if perimeter and lat/lng+area are specified, perimiter data is used and lat/lng+area are ignored) -- set of coordinates defining polygon representing fire perimeter
+ - ***'fire_information' > 'location' > 'ecoregion'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'utc_offset'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'elevation'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'slope'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'state'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'county'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'country'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'fuel_1hr'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'fuel_10hr'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'fuel_100hr'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'fuel_1khr'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'fuel_10khr'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'fuel_gt10khr'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'canopy'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'shrub'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'grass'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'rot'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'duff'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'litter'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'moisture_1hr'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'moisture_10hr'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'moisture_100hr'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'moisture_1khr'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'moisture_live'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'moisture_duff'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'min_wind'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'max_wind'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'min_wind_aloft'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'max_wind_aloft'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'min_humid'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'max_humid'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'min_temp'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'max_temp'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'min_temp_hour'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'max_temp_hour'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'sunrise_hour'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'sunset_hour'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'snow_month'*** -- *optional* --
+ - ***'fire_information' > 'location' > 'rain_days'*** -- *optional* --
+
+###### 'event_of'
+
+The following fields may be specified under a fire's "location" field or at the top level, in which case the ingestion module embeds it under 'event_of'
+
+ - ***'fire_information' > 'event_of' > 'name'*** -- *optional* --
+ - ***'fire_information' > 'event_of' > 'id'*** -- *optional* -- specified as 'event_id' if at the top level
+
+###### 'growth'
+
+ - ***'fire_information' > 'growth' > 'start'*** -- *required if growth is specified* -- can be inferred from other fields
  - ***'fire_information' > 'growth' > 'end'*** -- *required if growth is specified* --
  - ***'fire_information' > 'growth' > 'pct'*** -- *required if growth is specified* --
  - ***'fire_information' > 'growth' > 'localmet'*** -- *optional* -- 'localmet' is generated by an internal module (localmet); ingestion passes this on if defined
  - ***'fire_information' > 'growth' > 'timeprofile'*** -- *optional* -- as with 'localmet', 'timeprofile' is generated by an internal module (timeprofiling); ingestion passes this on if defined
  - ***'fire_information' > 'growth' > 'plumerise'*** -- *optional* -- as with 'localmet' and 'timeprofile', 'plumerise' is generated by an internal module (plumerising); ingestion passes this on if defined
+
+
+If no growth objects are specified for a fire, but
+the fire has 'start' and 'end' keys, a growth object will be created with
+the 'start' and 'end' values and 'pct' set to 100.0
+
+###### 'fuelbeds'
+
+No fuelbed data is required, but ingestion will pass on any fuelbeds defined
+
  - ***'fire_information' > 'fuelbeds' > 'fccs_id'*** -- *optional* --
  - ***'fire_information' > 'fuelbeds' > 'pct'*** -- *optional* --
  - ***'fire_information' > 'fuelbeds' > 'fuel_loadings'*** -- *optional* --
@@ -966,12 +1034,13 @@ Ingestion requires that none of the fires in 'fire_information' are empty object
  - ***'fire_information' > 'fuelbeds' > 'emissions'*** -- *optional* --
  - ***'fire_information' > 'fuelbeds' > 'emissions_details'*** -- *optional* --
 
-Note about growth:  if not growth objects are specified for a fire, but
-the fire has 'start' and 'end' keys, a growth object will be created with
-the 'start' and 'end' values and 'pct' set to 100.0
+###### 'meta'
 
-Note about fuelbeds: no fuelbed data is required, but ingestion will pass
-on and fuelbeds is defined
+Any fields defined under ***'fire_information' > 'meta'*** are ingested as is
+
+###### Other fields
+
+ - ***'fire_information' > 'date_time'*** -- *optional* -- if defined, date_time is used to infer growth window and utc offset (if possible), which are used if not already defined for the fire
 
 ##### merge
 
