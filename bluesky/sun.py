@@ -154,6 +154,7 @@ class Sun(object):
         seconds = (minutes - m) * 60
         s = int(seconds)
 
+        # TODO: set datetime information in datetime.datetime object ?
         dt = datetime.datetime(year=day_date.year, month=day_date.month,
             day=day_date.day, hour=h, minute=m, second=s)
         return dt + datetime.timedelta(days=offset_days)
