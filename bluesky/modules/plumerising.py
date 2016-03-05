@@ -70,21 +70,14 @@ class ComputeFunction(object):
         pr = feps.FEPSPlumeRise(**config)
 
         def _f(fire):
-
             # TODO: create and change to working directory here (per fire),
-            #   above (one per all fires), or below (per growth window)
-            #   or just let plumerise create tempdir?
+            #   above (one working dir per all fires), or below (per growth
+            #   window)...or just let plumerise create temp workingdir (as
+            #   it's currently doing?
 
-            # TODO: aggregate and summarize consumption over all fuelbeds
-            #   (or should this be done in consumption module?); make sure
-            #   to validate that each fuelbed has consumption data
-            all_consumption = datautils.summarize([fire], 'consumption')
-            if not all_consumption:
+            if not fire.get('consumption', {}).get('summary'):
                 raise ValueError("Missing fire consumption data required for "
                     "FEPS plumerise")
-            consumption = {
-                k: v[0] for k,v in all_consumption['summary']['total'].items()
-            }
 
             start = fire.start
             if not start:
@@ -111,7 +104,7 @@ class ComputeFunction(object):
 
                 g_pct = float(g['pct']) / 100.0
                 g_area = fire.location['area'] * g_pct
-                g_consumption = copy.deepcopy(consumption)
+                g_consumption = copy.deepcopy(fire.consumption['summary'])
                 datautils.multiply_nested_data(g_consumption, g_pct)
 
                 # TODO: if managing working dir here, pass it in
