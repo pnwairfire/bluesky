@@ -25,6 +25,14 @@
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
+            "consumption": {
+                "summary": {
+                    "flaming": 2165.6831964258654,
+                    "residual": 1761.0414186789003,
+                    "smoldering": 2091.3473506535884,
+                    "total": 6018.071965758354
+                }
+            },
             "fuelbeds": [
                 {
                     "consumption": {
