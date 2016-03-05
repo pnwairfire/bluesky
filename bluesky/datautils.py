@@ -40,7 +40,7 @@ def deepmerge(a, b):
             a[key] = b[key]
     return a
 
-def summarize(fires, subdata_key):
+def summarize(fires, subdata_key, include_details=True):
     """Summarizes data within fuelbed objects across all fires
 
     args
@@ -49,6 +49,19 @@ def summarize(fires, subdata_key):
      - subdata_key -- fuelbed keys to summarize; e.g. 'emissions'
     """
     totals = {'total': 0.0}
+
+    def _summarize_without_defails(nested_data, last_key=None):
+        if isinstance(nested_data, dict):
+            for k in nested_data:
+                if k not in ('summary', 'total', 'totals'):
+                    _summarize_without_defails(nested_data[k], k)
+        else:
+            if last_key:
+                s = sum(nested_data)
+                totals[last_key] = totals.get(last_key, 0.0)
+                totals[last_key] += s
+                totals['total'] += s
+
     def _summarize(nested_data, summary, last_key=None):
         if isinstance(nested_data, dict):
             summary = summary or {}
@@ -71,7 +84,10 @@ def summarize(fires, subdata_key):
     summary = {}
     for fire in fires:
         for fb in fire.fuelbeds:
-            summary = _summarize(fb[subdata_key], summary)
+            if include_details:
+                summary = _summarize(fb[subdata_key], summary)
+            else:
+                _summarize_without_defails(fb[subdata_key])
     summary.update(summary=totals)
     return summary
 

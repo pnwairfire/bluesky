@@ -54,7 +54,9 @@ class TestDeepMerge(object):
 class TestSummarizeConsumption(object):
 
     def test_no_fires(self):
-        assert datautils.summarize([], 'consumption') == {"summary": {"total": 0.0}}
+        e = {"summary": {"total": 0.0}}
+        assert datautils.summarize([], 'consumption') == e
+        assert datautils.summarize([], 'consumption', include_details=False) == e
 
     def test_one_fire_one_fuelbed(self):
         fires = [
@@ -95,6 +97,9 @@ class TestSummarizeConsumption(object):
             "total": 12
         }
         assert datautils.summarize(fires, 'consumption') == expected
+        assert datautils.summarize(fires, 'consumption', include_details=False) == {
+            "summary": expected["summary"]
+        }
 
     def test_one_fire_two_fuelbeds(self):
         fires = [
@@ -179,6 +184,9 @@ class TestSummarizeConsumption(object):
         }
         summary = datautils.summarize(fires, 'consumption')
         assert summary == expected_summary
+        assert datautils.summarize(fires, 'consumption', include_details=False) == {
+            "summary": expected_summary["summary"]
+        }
 
     def test_two_fires(self):
         fires = [
@@ -302,11 +310,16 @@ class TestSummarizeConsumption(object):
         }
         summary = datautils.summarize(fires, 'consumption')
         assert summary == expected_summary
+        assert datautils.summarize(fires, 'consumption', include_details=False) == {
+            "summary": expected_summary["summary"]
+        }
 
 class TestSummarizeEmissions(object):
 
     def test_no_fires(self):
-        assert datautils.summarize([], 'emissions') == {"summary": {"total": 0.0}}
+        e = {"summary": {"total": 0.0}}
+        assert datautils.summarize([], 'emissions') == e
+        assert datautils.summarize([], 'emissions', include_details=False) == e
 
     def test_one_fire_one_fuelbed(self):
         fires = [
@@ -347,6 +360,9 @@ class TestSummarizeEmissions(object):
         }
         actual = datautils.summarize(fires, 'emissions')
         assert actual == expected
+        assert datautils.summarize(fires, 'emissions', include_details=False) == {
+            "summary": expected["summary"]
+        }
 
     def test_one_fire_two_fuelbeds(self):
         fires = [
@@ -431,6 +447,9 @@ class TestSummarizeEmissions(object):
         }
         summary = datautils.summarize(fires, 'emissions')
         assert summary == expected_summary
+        assert datautils.summarize(fires, 'emissions', include_details=False) == {
+            "summary": expected_summary["summary"]
+        }
 
     def test_two_fires(self):
         fires = [
@@ -547,6 +566,9 @@ class TestSummarizeEmissions(object):
         }
         summary = datautils.summarize(fires, 'emissions')
         assert summary == expected_summary
+        assert datautils.summarize(fires, 'emissions', include_details=False) == {
+            "summary": expected_summary["summary"]
+        }
 
 class TestMultiplyNestedData(object):
 
