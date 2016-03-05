@@ -48,16 +48,23 @@ def summarize(fires, subdata_key):
         data to summarize
      - subdata_key -- fuelbed keys to summarize; e.g. 'emissions'
     """
-
-    def _summarize(nested_data, summary):
+    totals = {'total': 0.0}
+    def _summarize(nested_data, summary, last_key=None):
         if isinstance(nested_data, dict):
             summary = summary or {}
             for k in nested_data:
-                summary[k] = _summarize(nested_data[k], summary.get(k))
+                if k not in ('summary', 'total', 'totals'):
+                    summary[k] = _summarize(nested_data[k], summary.get(k), k)
         else:
             num_values = len(nested_data)
-            summary = summary or [0] * num_values
+            summary = summary or [0.0] * num_values
+            if last_key:
+                totals[last_key] = totals.get(last_key, 0.0)
+
             for i in range(num_values):
+                totals['total'] += nested_data[i]
+                if last_key:
+                    totals[last_key] += nested_data[i]
                 summary[i] += nested_data[i]
         return summary
 
@@ -65,6 +72,7 @@ def summarize(fires, subdata_key):
     for fire in fires:
         for fb in fire.fuelbeds:
             summary = _summarize(fb[subdata_key], summary)
+    summary.update(summary=totals)
     return summary
 
 def _is_num(v):
