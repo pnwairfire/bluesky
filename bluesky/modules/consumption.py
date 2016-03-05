@@ -89,6 +89,8 @@ def _run_fire(msg_level, fuel_loadings_manager, fire):
         _apply_settings(fc, fire['location'], burn_type)
         _results = fc.results()
         if _results:
+            # TODO: validate that _results['consumption'] and
+            #   _results['heat'] are defined
             fb['consumption'] = _results['consumption']
             fb['consumption'].pop('debug', None)
             fb['heat'] = _results['heat release']
@@ -113,6 +115,11 @@ def _run_fire(msg_level, fuel_loadings_manager, fire):
             #   include it in the exception message
             raise RuntimeError("Failed to calculate consumption for fire "
                 "{} fuelbed {}".format(fire.id, fb['fccs_id']))
+
+    # Aggregate consumption over all fuelbeds; include only per-phase totals,
+    # not per category > sub-category > phase
+    fire.consumption = datautils.summarize([fire], 'consumption',
+        include_details=False)
 
 REQUIRED_TOP_LEVEL_FIELDS = ['fuelbeds', 'location']
 REQUIRED_LOCATION_FIELDS = ['area']
