@@ -3,6 +3,7 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
+import copy
 import datetime
 from py.test import raises
 
@@ -53,7 +54,7 @@ class TestDeepMerge(object):
 class TestSummarizeConsumption(object):
 
     def test_no_fires(self):
-        assert datautils.summarize([], 'consumption') == {}
+        assert datautils.summarize([], 'consumption') == {"summary": {"total": 0.0}}
 
     def test_one_fire_one_fuelbed(self):
         fires = [
@@ -84,7 +85,16 @@ class TestSummarizeConsumption(object):
                 ]
             })
         ]
-        assert datautils.summarize(fires, 'consumption') == fires[0]['fuelbeds'][0]['consumption']
+        expected = copy.deepcopy(fires[0]['fuelbeds'][0]['consumption'])
+        expected['canopy']['ladder fuels'].pop("total")
+        expected['summary'] = {
+            "residual": 1.0,
+            "smoldering": 2.0,
+            "flaming": 4.0,
+            "baz": 5.0,
+            "total": 12
+        }
+        assert datautils.summarize(fires, 'consumption') == expected
 
     def test_one_fire_two_fuelbeds(self):
         fires = [
@@ -140,8 +150,7 @@ class TestSummarizeConsumption(object):
             "canopy": {
                 "ladder fuels": {
                     "residual": [13.0],
-                    "smoldering": [15.0],
-                    "total": [17.0]
+                    "smoldering": [15.0]
                 },
                 "midstory": {
                     "flaming": [4.0]
@@ -159,6 +168,13 @@ class TestSummarizeConsumption(object):
                 "baz": {
                     "flaming": [15.0]
                 }
+            },
+            "summary": {
+                "residual": 13.0,
+                "smoldering": 15.0,
+                "flaming": 34.0,
+                "baz": 5.0,
+                "total": 67.0
             }
         }
         summary = datautils.summarize(fires, 'consumption')
@@ -233,6 +249,11 @@ class TestSummarizeConsumption(object):
                                     "flaming": [113.0]
                                 }
                             }
+                        },
+                        "summary": {
+                            "sdf": {
+                                "sdf":[23.0]
+                            }
                         }
                     }
                 ]
@@ -242,8 +263,7 @@ class TestSummarizeConsumption(object):
             "canopy": {
                 "ladder fuels": {
                     "residual": [13.0],
-                    "smoldering": [15.0],
-                    "total": [17.0]
+                    "smoldering": [15.0]
                 },
                 "midstory": {
                     "flaming": [4.0]
@@ -269,6 +289,15 @@ class TestSummarizeConsumption(object):
                 "baz": {
                     "flaming": [113.0]
                 }
+            },
+            "summary": {
+                "residual": 13.0,
+                "redisual": 32.0,
+                "smoldering": 15.0,
+                "flaming": 172.0,
+                "baz": 5.0,
+                "total": 237.0
+
             }
         }
         summary = datautils.summarize(fires, 'consumption')
@@ -277,7 +306,7 @@ class TestSummarizeConsumption(object):
 class TestSummarizeEmissions(object):
 
     def test_no_fires(self):
-        assert datautils.summarize([], 'emissions') == {}
+        assert datautils.summarize([], 'emissions') == {"summary": {"total": 0.0}}
 
     def test_one_fire_one_fuelbed(self):
         fires = [
@@ -309,7 +338,15 @@ class TestSummarizeEmissions(object):
                 ]
             })
         ]
-        assert datautils.summarize(fires, 'emissions') == fires[0]['fuelbeds'][0]['emissions']
+        expected = copy.deepcopy(fires[0]['fuelbeds'][0]['emissions'])
+        expected['canopy']['ladder fuels'].pop("total")
+        expected['summary'] = {
+            "CO": 12.0,
+            "CO2": 4.0,
+            "total": 16.0
+        }
+        actual = datautils.summarize(fires, 'emissions')
+        assert actual == expected
 
     def test_one_fire_two_fuelbeds(self):
         fires = [
@@ -366,8 +403,7 @@ class TestSummarizeEmissions(object):
             "canopy": {
                 "ladder fuels": {
                     "residual": {"CO": [13.0]},
-                    "smoldering": {"CO": [15.0]},
-                    "total": {"CO": [17.0]}
+                    "smoldering": {"CO": [15.0]}
                 },
                 "midstory": {
                     "flaming": {"CO": [4.0]},
@@ -386,6 +422,11 @@ class TestSummarizeEmissions(object):
                 "baz": {
                     "flaming": {"CO": [15.0]}
                 }
+            },
+            "summary":{
+                "CO": 67.0,
+                "CO2": 4.0,
+                "total": 71.0
             }
         }
         summary = datautils.summarize(fires, 'emissions')
@@ -471,7 +512,6 @@ class TestSummarizeEmissions(object):
                 "ladder fuels": {
                     "residual": {"CO": [13.0]},
                     "smoldering": {"CO": [15.0]},
-                    "total": {"CO": [17.0]}
                 },
                 "midstory": {
                     "flaming": {"CO": [4.0]},
@@ -498,6 +538,11 @@ class TestSummarizeEmissions(object):
                 "baz": {
                     "flaming": {"CO": [113.0]}
                 }
+            },
+            "summary":{
+                "CO": 237.0,
+                "CO2": 4.0,
+                "total": 241.0
             }
         }
         summary = datautils.summarize(fires, 'emissions')
