@@ -2,12 +2,49 @@
 
 The code in this module was copied from BlueSky Framework, and modified
 significantly.  It was originally written by Sonoma Technology, Inc.
+
+v0.2.0 introduced a number of chnanges migrated from BSF's hysplit v8.
+Heres are the notes coped from BSF:
+
+    '''
+        Version 8 - modifications Dec 2015, rcs
+
+         1) greatly expanded user access to variables in the hysplit
+            CONTROL and SETUP.CFG files
+         2) heavily modified the way particle initialization files are
+            created/read, including support for MPI (read and write)
+            runs but not for TODO tranched runs
+
+            READ_INIT_FILE is not longer supported, instead use NINIT
+                to control if and how to read in PINPF file
+
+            HYSPLIT_SETUP_CFG is no longer supported. instead include
+                the SETUP.CFG variable one wishes to set in the .ini
+                list of supported vars:
+                NCYCL, NDUMP, KHMAX, NINIT, INITD, PINPF, POUTF,
+                QCYCLE, TRATIO, DELT, NUMPAR, MAXPAR, MGMIN and
+                ICHEM
+
+                PINPF & POUTF can both handle strftime strings in
+                      their names.
+                      NOTE: full path name length must be <= 80 chars.
+
+            new variables now accessible in the CONTROL file are
+                three sampling interv opts (type, hour and minutes),
+                three particle opts (diameter, density, shape),
+                five dry dep opts (vel, mol weight, reactivity,
+                                   diffusivity, henry const),
+                three wet dep opts (henry, in-cloud scavenging ratio,
+                                    below-cloud scav coef),
+                radioactive half-life and
+                resusspension constant
+    '''
 """
 
 __author__ = "Joel Dubowy and Sonoma Technology, Inc."
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 import copy
 import logging
@@ -109,6 +146,8 @@ class HYSPLITDispersion(DispersionBase):
         self._met_info['files'] = list(self._met_info['files'])
 
     def _create_dummy_fire_if_necessary(self):
+        # TODO: create a dummy fire no matter what (in case whatever fires
+        #   are in the list are filtered by hysplit?)
         if not self._fires:
             self._fires = [self._generate_dummy_fire()]
 
@@ -270,6 +309,9 @@ class HYSPLITDispersion(DispersionBase):
         # so that they don't have to be passed into each call to _run_process
         # The only things that change from call to call are context and fires
 
+        # added lines for strftime conversion in path names (rcs)
+        pathdate = self.config("DATE",BSDateTime)
+
         for f in self._met_info['files']:
             os.symlink(f, os.path.join(working_dir, os.path.basename(f)))
 
@@ -286,26 +328,55 @@ class HYSPLITDispersion(DispersionBase):
         output_conc_file = os.path.join(working_dir, "hysplit.con")
         output_file = os.path.join(working_dir, self.OUTPUT_FILE_NAME)
 
-        # Default value for NINIT for use in set up file.  0 equals no particle initialization
-        ninit_val = "0"
+        # NINIT: sets how particle init file is to be used
+        #  0 = no particle initialization file read (default)
+        #  1 = read pinpf file only once at initialization time
+        #  2 = check each hour, if there is a match then read those values in
+        #  3 = like '2' but replace emissions instead of adding to existing
+        #      particles
+        ninit = self.config("NINIT")
+        ninit_val = 0
+        if ninit != None:
+            ninit_val = int(ninit)
 
-        if self.config("READ_INIT_FILE"):
-            parinit_file = self.config("DISPERSION_FOLDER") + "/PARINIT"
+        # need an input file if ninit_val > 0
+        if ninit_val > 0:
+             # name of pardump input file, pinpf (check for strftime strings)
+            pinpf = self.config("PINPF")
+            if "%" in pinpf:
+                pinpf = pathdate.strftime(pinpf)
+            parinitFiles = [ "%s" % pinpf ]
 
-            if not os.path.isfile(parinit_file):
-                if self.config("STOP_IF_NO_PARINIT"):
-                     msg = "Found no matching particle initialization files. Stop."
-                     raise Exception(msg)
-                else:
-                     logging.warn("No matching particle initialization file found; Using no particle initialization")
-                     logging.debug("Particle initialization file not found '%s'", parinit_file)
-            else:
-                os.symlink(parinit_file,
-                    os.path.join(working_dir, os.path.dirname(parinit_file)))
-                logging.info("Using particle initialization file %s" % parinit_file)
-                ninit_val = "1"
+            # if an MPI run need to create the full list of expected files
+            # based on the number of CPUs
+            if self.config("MPI",bool):
+                NCPUS = self.config("NCPUS", int)
+                parinitFiles = ["%s.%3.3i" % ( pinpf, (i+1)) for i in range(NCPUS)]
 
-        # Prepare for an MPI run
+            # loop over parinitFiles check if exists.
+            # for MPI runs check that all files exist...if any in the list
+            # don't exist raise exception if STOP_IF_NO_PARINIT is True
+            # if STOP_IF_NO_PARINIT is False and all/some files don't exist,
+            # set ninit_val to 0 and issue warning.
+            for f in parinitFiles:
+                if not context.file_exists(f):
+                    if self.config("STOP_IF_NO_PARINIT", bool):
+                        msg = "Matching particle init file, %s, not found. Stop." % f
+                        raise Exception(msg)
+                    else:
+                        msg = "No matching particle initialization file, %s, found; Using no particle initialization" % f
+                        self.log.warn(msg)
+                        self.log.debug(msg)
+                        ninit_val = 0
+                    self.log.info("Using particle initialization file %s" % f)
+
+        # Prepare for run ... get pardump name just in case needed
+        poutf = self.config("POUTF")
+        if "%" in poutf:
+            poutf = pathdate.strftime(poutf)
+        pardumpFiles = [ "%s" % poutf ]
+
+        # If MPI run
         if self.config("MPI"):
             NCPUS = self.config("NCPUS")
             logging.info("Running MPI HYSPLIT with %s processors." % NCPUS)
@@ -314,7 +385,13 @@ class HYSPLITDispersion(DispersionBase):
                 NCPUS = 1
 
             message_files = ["MESSAGE.%3.3i" % (i+1) for i in range(NCPUS)]
-            pardumpFiles = ["PARDUMP.%3.3i" % (i+1) for i in range(NCPUS)]
+
+            # name of the pardump files (one for each CPU)
+            if self.config("MAKE_INIT_FILE",bool):
+                pardumpFiles = ["%s.%3.3i" % ( poutf, (i+1)) for i in range(NCPUS)]
+
+            # what command do we use to issue an mpi version of hysplit
+
             # TODO: either update the following checks for self.BINARIES['MPI'] and
             # self.BINARIES['HYSPLIT_MPI'] to try running with -v or -h option or
             # something similar,  or remove them
@@ -324,26 +401,14 @@ class HYSPLITDispersion(DispersionBase):
             # if not os.path.isfile(self.BINARIES['HYSPLIT_MPI']):
             #     msg = "HYSPLIT MPI executable %s not found." % self.BINARIES['HYSPLIT_MPI']
             #     raise AssertionError(msg)
-            if self.config("READ_INIT_FILE"): # TODO: Finish MPI support for particle initialization
-                logging.warn("Particile initialization in BlueSky module not currently supported for MPI runs.")
+
+        # Else single cpu run
         else:
             NCPUS = 1
 
         self._write_emissions(emissions_file)
         self._write_control_file(control_file, output_conc_file)
         self._write_setup_file(emissions_file, setup_file, ninit_val, NCPUS)
-
-        # Copy in the user_defined SETUP.CFG file or write a new one
-        HYSPLIT_SETUP_FILE = self.config("HYSPLIT_SETUP_FILE")
-        if HYSPLIT_SETUP_FILE != None:
-            logging.debug("Copying HYSPLIT SETUP file from %s" % (HYSPLIT_SETUP_FILE))
-            config_setup_file = open(HYSPLIT_SETUP_FILE, 'rb')
-            setup_file = open(setup_file, 'wb')
-            shutil.copyfileobj(config_setup_file, setup_file)
-            config_setup_file.close()
-            setup_file.close()
-        else:
-            self._write_setup_file(emissions_file, setup_file, ninit_val, NCPUS)
 
         # Run HYSPLIT
         if self.config("MPI"):
@@ -379,14 +444,9 @@ class HYSPLITDispersion(DispersionBase):
         for f in message_files:
             self._archive_file(f)
         if self.config("MAKE_INIT_FILE"):
-            if self.config("MPI"):
-                for f in pardumpFiles:
-                    self._archive_file(f)
-                    #shutil.copy2(os.path.join(working_dir, f), self._run_output_dir)
-            else:
-                pardump_file = os.path.join(working_dir, "PARDUMP")
-                self._archive_file(pardump_file)
-                #shutil.copy2(pardump_file, self._run_output_dir + "/PARDUMP_"+ self.config("DATE"))
+            for f in pardumpFiles:
+                self._archive_file(f)
+                #shutil.copy2(os.path.join(working_dir, f), self._run_output_dir)
 
     def _write_emissions(self, emissions_file):
         # A value slightly above ground level at which to inject smoldering
@@ -716,12 +776,6 @@ class HYSPLITDispersion(DispersionBase):
             # Number of simultaneous concentration grids
             f.write("1\n")
 
-            # NOTE: The size of the output concentration grid is specified
-            # here, but it appears that the ICHEM=4 option in the SETUP.CFG
-            # file may override these settings and make the sampling grid
-            # correspond to the input met grid instead...
-            # But Ken's testing seems to indicate that this is not the case...
-
             # Sampling grid center location (latitude, longitude)
             f.write("%9.3f %9.3f\n" % (centerLat, centerLon))
             # Sampling grid spacing (degrees latitude and longitude)
@@ -745,13 +799,23 @@ class HYSPLITDispersion(DispersionBase):
             model_end = self._model_start + timedelta(hours=self._num_hours)
             f.write("%s\n" % model_end.strftime("%y %m %d %H %M"))
             # Sampling interval (type hour minute)
-            f.write("0 1 00\n") # Sampling interval:  type hour minute.  A type of 0 gives an average over the interval.
+            # A type of 0 gives an average over the interval.
+            sampling_interval_type = int(self.config("SAMPLING_INTERVAL_TYPE"))
+            sampling_interval_hour = int(self.config("SAMPLING_INTERVAL_HOUR"))
+            sampling_interval_min  = int(self.config("SAMPLING_INTERVAL_MIN"))
+            #f.write("0 1 00\n")
+            f.write("%d %d %d\n" % (sampling_interval_type, sampling_interval_hour, sampling_interval_min))
 
             # Number of pollutants undergoing deposition
             f.write("1\n") # only modeling PM2.5 for now
 
             # Particle diameter (um), density (g/cc), shape
-            f.write("1.0 1.0 1.0\n")
+            particle_diamater = self.config("PARTICLE_DIAMETER",float)
+            particle_density  = self.config("PARTICLE_DENSITY",float)
+            particle_shape    = self.config("PARTICLE_SHAPE",float)
+            #f.write("1.0 1.0 1.0\n")
+            f.write("%g %g %g\n" % ( particle_diamater, particle_density, particle_shape))
+
 
             # Dry deposition:
             #    deposition velocity (m/s),
@@ -759,50 +823,102 @@ class HYSPLITDispersion(DispersionBase):
             #    surface reactivity ratio,
             #    diffusivity ratio,
             #    effective Henry's constant
-            f.write("0.0 0.0 0.0 0.0 0.0\n")
+            dry_dep_velocity    = self.config("DRY_DEP_VELOCITY",float)
+            dry_dep_mol_weight  = self.config("DRY_DEP_MOL_WEIGHT",float)
+            dry_dep_reactivity  = self.config("DRY_DEP_REACTIVITY",float)
+            dry_dep_diffusivity = self.config("DRY_DEP_DIFFUSIVITY",float)
+            dry_dep_eff_henry   = self.config("DRY_DEP_EFF_HENRY",float)
+            #f.write("0.0 0.0 0.0 0.0 0.0\n")
+            f.write("%g %g %g %g %g\n" % ( dry_dep_velocity, dry_dep_mol_weight, dry_dep_reactivity, dry_dep_diffusivity, dry_dep_eff_henry))
 
             # Wet deposition (gases):
             #     actual Henry's constant (M/atm),
             #     in-cloud scavenging ratio (L/L),
             #     below-cloud scavenging coefficient (1/s)
-            f.write("0.0 0.0 0.0\n")
+            wet_dep_actual_henry   = self.config("WET_DEP_ACTUAL_HENRY",float)
+            wet_dep_in_cloud_scav    = self.config("WET_DEP_IN_CLOUD_SCAV",float)
+            wet_dep_below_cloud_scav = self.config("WET_DEP_BELOW_CLOUD_SCAV",float)
+            #f.write("0.0 0.0 0.0\n")
+            f.write("%g %g %g\n" % ( wet_dep_actual_henry, wet_dep_in_cloud_scav, wet_dep_below_cloud_scav ))
 
             # Radioactive decay half-life (days)
-            f.write("0.0\n")
+            radioactive_half_life = self.config("RADIOACTIVE_HALF_LIVE",float)
+            #f.write("0.0\n")
+            f.write("%g\n" % radioactive_half_life)
 
             # Pollutant deposition resuspension constant (1/m)
+            # non-zero requires the definition of a deposition grid
             f.write("0.0\n")
 
     def _write_setup_file(self, emissions_file, setup_file, ninit_val, ncpus):
         # Advanced setup options
         # adapted from Robert's HysplitGFS Perl script
 
+        # added lines for strftime conversion in path names (rcs)
+        pathdate = self.config("DATE",BSDateTime)
+
         khmax_val = int(self.config("KHMAX"))
+
+        # pardump vars
         ndump_val = int(self.config("NDUMP"))
         ncycl_val = int(self.config("NCYCL"))
         dump_datetime = self._model_start + timedelta(hours=ndump_val)
 
+        # emission cycle time
+        qcycle_val =self.config("QCYCLE",float)
+
+        # type of dispersion to use
+        initd_val = int(self.config("INITD"))
+
+        # set time step stuff
+        tratio_val = self.config("TRATIO",float)
+        delt_val = self.config("DELT",float)
+
+        # set numpar (if 0 then set to num_fires * num_heights)
+        # else set to value given (hysplit default of 500)
         num_fires = len(self._fires)
         num_heights = self.num_output_quantiles + 1
-        num_sources = num_fires * num_heights
+        numpar_val = int(self.config("NUMPAR"))
+        num_sources = numpar_val
+        if numpar_val == 0:
+            num_sources = num_fires * num_heights
 
-        max_particles = (num_sources * 1000) / ncpus
+        # set maxpar. if 0 set to num_sources (ie, numpar) * 1000/ncpus
+        # else set to value given (hysplit default of 10000)
+        maxpar_val = int(self.config("MAXPAR"))
+        max_particles = maxpar_val
+        if maxpar_val == 0:
+            max_particles = (num_sources * 1000) / ncpus
+
+        # name of the particle input file (check for strftime strings)
+        pinpf = self.config("PINPF")
+        if "%" in pinpf:
+            pinpf = pathdate.strftime(pinpf)
+
+        # name of the particle output file (check for strftime strings)
+        poutf = self.config("POUTF")
+        if "%" in poutf:
+            poutf = pathdate.strftime(poutf)
+
+        # conversion module
+        ichem_val = int(self.config("ICHEM"))
+
+        # minimum size in grid units of the meteorological sub-grid
+        mgmin_val = int(self.config("MGMIN"))
 
         with open(setup_file, "w") as f:
             f.write("&SETUP\n")
 
-            # ichem: i'm only really interested in ichem = 4 in which case it causes
-            #        the hysplit concgrid to be roughly the same as the met grid
-            # -- But Ken says it may not work as advertised...
-            #f.write("  ICHEM = 4,\n")
+            # conversion module
+            f.write("  ICHEM = %d,\n" % ichem_val)
 
             # qcycle: the number of hours between emission start cycles
-            f.write("  QCYCLE = 1.0,\n")
+            f.write("  QCYCLE = %f,\n" % qcycle_val)
 
-            # mgmin: a run once complained and said i need to reaise this variable to
-            #        some value around what i have here...it has something to do with
-            #        the minimum size (in grid units) of the met sub-grib.
-            f.write("  MGMIN = 750,\n")
+            # mgmin: default is 10 (from the hysplit user manual). however,
+            #        once a run complained and said i need to reaise this
+            #        variable to some value around what i have here
+            f.write("  MGMIN = %d,\n" % mgmin_val)
 
             # maxpar: max number of particles that are allowed to be active at one time
             f.write("  MAXPAR = %d,\n" % max_particles)
@@ -814,40 +930,47 @@ class HYSPLITDispersion(DispersionBase):
             # khmax: maximum particle duration in terms of hours after relase
             f.write("  KHMAX = %d,\n" % khmax_val)
 
+            # delt: used to set time step integration interval (used along
+            #       with tratio
+            f.write("  DELT = %g,\n" % delt_val)
+            f.write("  TRATIO = %g,\n" % tratio_val)
+
             # initd: # 0 - Horizontal and Vertical Particle
             #          1 - Horizontal Gaussian Puff, Vertical Top Hat Puff
             #          2 - Horizontal and Vertical Top Hat Puff
             #          3 - Horizontal Gaussian Puff, Vertical Particle
             #          4 - Horizontal Top-Hat Puff, Vertical Particle (default)
-            f.write("  INITD = 1,\n")
+            f.write("  INITD = %d,\n" % initd_val)
 
             # make the 'smoke initizilaztion' files?
             # pinfp: particle initialization file (see also ninit)
-            if self.config("READ_INIT_FILE"):
-               f.write("  PINPF = \"PARINIT\",\n")
+            if ninit_val > 0:
+                f.write("  PINPF = \"%s\",\n" % pinpf)
 
             # ninit: (used along side pinpf) sets the type of initialization...
-            #          0 - no initialzation (even if files are present)
-            #          1 = read pinpf file only once at initialization time
-            #          2 = check each hour, if there is a match then read those values in
-            #          3 = like '2' but replace emissions instead of adding to existing
-            #              particles
-            f.write("  NINIT = %s,\n" % ninit_val)
+            #        0 - no initialzation (even if files are present)
+            #        1 = read pinpf file only once at initialization time
+            #        2 = check each hour, if there is a match then read those
+            #            values in
+            #        3 = like '2' but replace emissions instead of adding to
+            #            existing particles
+            f.write("  NINIT = %d,\n" % ninit_val)
 
             # poutf: particle output/dump file
             if self.config("MAKE_INIT_FILE"):
-                f.write("  POUTF = \"PARDUMP\",\n")
-                logging.info("Dumping particles to PARDUMP starting at %s every %s hours" % (dump_datetime, ncycl_val))
+                f.write("  POUTF = \"%s\",\n" % poutf)
+                self.log.info("Dumping particles to %s starting at %s every %s hours" % (poutf, dump_datetime, ncycl_val))
 
-            # ndump: when/how often to dump a poutf file negative values indicate to
-            #        just one  create just one 'restart' file at abs(hours) after the
-            #        model start
+            # ndump: when/how often to dump a poutf file negative values
+            #        indicate to just one create just one 'restart' file at
+            #        abs(hours) after the model start
+            # NOTE: negative hours do no actually appear to be supported, rcs)
             if self.config("MAKE_INIT_FILE"):
                 f.write("  NDUMP = %d,\n" % ndump_val)
 
-            # ncycl: set the interval at which time a pardump file is written after the
-            #        1st file (which is first created at T = ndump hours after the
-            #        start of the model simulation
+            # ncycl: set the interval at which time a pardump file is written
+            #        after the 1st file (which is first created at
+            #        T = ndump hours after the start of the model simulation
             if self.config("MAKE_INIT_FILE"):
                 f.write("  NCYCL = %d,\n" % ncycl_val)
 
