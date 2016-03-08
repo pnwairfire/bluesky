@@ -309,9 +309,6 @@ class HYSPLITDispersion(DispersionBase):
         # so that they don't have to be passed into each call to _run_process
         # The only things that change from call to call are context and fires
 
-        # added lines for strftime conversion in path names (rcs)
-        pathdate = self.config("DATE",BSDateTime)
-
         for f in self._met_info['files']:
             os.symlink(f, os.path.join(working_dir, os.path.basename(f)))
 
@@ -344,7 +341,7 @@ class HYSPLITDispersion(DispersionBase):
              # name of pardump input file, pinpf (check for strftime strings)
             pinpf = self.config("PINPF")
             if "%" in pinpf:
-                pinpf = pathdate.strftime(pinpf)
+                pinpf = self._model_start.strftime(pinpf)
             parinitFiles = [ "%s" % pinpf ]
 
             # if an MPI run need to create the full list of expected files
@@ -373,7 +370,7 @@ class HYSPLITDispersion(DispersionBase):
         # Prepare for run ... get pardump name just in case needed
         poutf = self.config("POUTF")
         if "%" in poutf:
-            poutf = pathdate.strftime(poutf)
+            poutf = self._model_start.strftime(poutf)
         pardumpFiles = [ "%s" % poutf ]
 
         # If MPI run
@@ -854,9 +851,6 @@ class HYSPLITDispersion(DispersionBase):
         # Advanced setup options
         # adapted from Robert's HysplitGFS Perl script
 
-        # added lines for strftime conversion in path names (rcs)
-        pathdate = self.config("DATE",BSDateTime)
-
         khmax_val = int(self.config("KHMAX"))
 
         # pardump vars
@@ -893,12 +887,12 @@ class HYSPLITDispersion(DispersionBase):
         # name of the particle input file (check for strftime strings)
         pinpf = self.config("PINPF")
         if "%" in pinpf:
-            pinpf = pathdate.strftime(pinpf)
+            pinpf = self._model_start.strftime(pinpf)
 
         # name of the particle output file (check for strftime strings)
         poutf = self.config("POUTF")
         if "%" in poutf:
-            poutf = pathdate.strftime(poutf)
+            poutf = self._model_start.strftime(poutf)
 
         # conversion module
         ichem_val = int(self.config("ICHEM"))
