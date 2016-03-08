@@ -807,9 +807,9 @@ class HYSPLITDispersion(DispersionBase):
             f.write("1\n") # only modeling PM2.5 for now
 
             # Particle diameter (um), density (g/cc), shape
-            particle_diamater = self.config("PARTICLE_DIAMETER",float)
-            particle_density  = self.config("PARTICLE_DENSITY",float)
-            particle_shape    = self.config("PARTICLE_SHAPE",float)
+            particle_diamater = self.config("PARTICLE_DIAMETER")
+            particle_density  = self.config("PARTICLE_DENSITY")
+            particle_shape    = self.config("PARTICLE_SHAPE")
             #f.write("1.0 1.0 1.0\n")
             f.write("%g %g %g\n" % ( particle_diamater, particle_density, particle_shape))
 
@@ -820,11 +820,11 @@ class HYSPLITDispersion(DispersionBase):
             #    surface reactivity ratio,
             #    diffusivity ratio,
             #    effective Henry's constant
-            dry_dep_velocity    = self.config("DRY_DEP_VELOCITY",float)
-            dry_dep_mol_weight  = self.config("DRY_DEP_MOL_WEIGHT",float)
-            dry_dep_reactivity  = self.config("DRY_DEP_REACTIVITY",float)
-            dry_dep_diffusivity = self.config("DRY_DEP_DIFFUSIVITY",float)
-            dry_dep_eff_henry   = self.config("DRY_DEP_EFF_HENRY",float)
+            dry_dep_velocity    = self.config("DRY_DEP_VELOCITY")
+            dry_dep_mol_weight  = self.config("DRY_DEP_MOL_WEIGHT")
+            dry_dep_reactivity  = self.config("DRY_DEP_REACTIVITY")
+            dry_dep_diffusivity = self.config("DRY_DEP_DIFFUSIVITY")
+            dry_dep_eff_henry   = self.config("DRY_DEP_EFF_HENRY")
             #f.write("0.0 0.0 0.0 0.0 0.0\n")
             f.write("%g %g %g %g %g\n" % ( dry_dep_velocity, dry_dep_mol_weight, dry_dep_reactivity, dry_dep_diffusivity, dry_dep_eff_henry))
 
@@ -832,14 +832,14 @@ class HYSPLITDispersion(DispersionBase):
             #     actual Henry's constant (M/atm),
             #     in-cloud scavenging ratio (L/L),
             #     below-cloud scavenging coefficient (1/s)
-            wet_dep_actual_henry   = self.config("WET_DEP_ACTUAL_HENRY",float)
-            wet_dep_in_cloud_scav    = self.config("WET_DEP_IN_CLOUD_SCAV",float)
-            wet_dep_below_cloud_scav = self.config("WET_DEP_BELOW_CLOUD_SCAV",float)
+            wet_dep_actual_henry   = self.config("WET_DEP_ACTUAL_HENRY")
+            wet_dep_in_cloud_scav    = self.config("WET_DEP_IN_CLOUD_SCAV")
+            wet_dep_below_cloud_scav = self.config("WET_DEP_BELOW_CLOUD_SCAV")
             #f.write("0.0 0.0 0.0\n")
             f.write("%g %g %g\n" % ( wet_dep_actual_henry, wet_dep_in_cloud_scav, wet_dep_below_cloud_scav ))
 
             # Radioactive decay half-life (days)
-            radioactive_half_life = self.config("RADIOACTIVE_HALF_LIVE",float)
+            radioactive_half_life = self.config("RADIOACTIVE_HALF_LIVE")
             #f.write("0.0\n")
             f.write("%g\n" % radioactive_half_life)
 
@@ -859,14 +859,14 @@ class HYSPLITDispersion(DispersionBase):
         dump_datetime = self._model_start + timedelta(hours=ndump_val)
 
         # emission cycle time
-        qcycle_val =self.config("QCYCLE",float)
+        qcycle_val =self.config("QCYCLE")
 
         # type of dispersion to use
         initd_val = int(self.config("INITD"))
 
         # set time step stuff
-        tratio_val = self.config("TRATIO",float)
-        delt_val = self.config("DELT",float)
+        tratio_val = self.config("TRATIO")
+        delt_val = self.config("DELT")
 
         # set numpar (if 0 then set to num_fires * num_heights)
         # else set to value given (hysplit default of 500)
