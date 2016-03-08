@@ -93,7 +93,7 @@ MAKE_INIT_FILE = False
 #        created the dump files. code will warn if there
 #        are few files than CPUs but will ignore files
 #        for cases when more files than CPUs.
-POUTF = ${BS_DIR}/input/dispersion/PARDUMP
+POUTF = './input/dispersion/PARDUMP'
 
 # Number of hours from the start of the simulation to write the particle
 # initialization file (NOTE: unlike the comments in the v7 hysplit module,
