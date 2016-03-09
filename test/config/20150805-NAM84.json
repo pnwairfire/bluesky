@@ -1,22 +1,7 @@
 {
-    "run_id": "NAM84-2015080500-WA-only-{timestamp}",
+    "run_id": "NAM84-2015080500-{timestamp}",
     "config": {
         "skip_failed_fires": true,
-        "filter": {
-            "skip_failures": true,
-            "location": {
-                  "boundary": {
-                        "ne": {
-                              "lat": 49.0,
-                              "lng": -117.0
-                        },
-                        "sw": {
-                              "lat": 45.5,
-                              "lng": -125.0
-                        }
-                  }
-            }
-        },
         "merge": {
             "skip_failures": true
         },
@@ -43,11 +28,11 @@
                     "projection": "LatLon",
                     "boundary": {
                         "ne": {
-                            "lat": 49.0,
-                            "lng": -117.5
+                            "lat": 50.0,
+                            "lng": -67.0
                         },
                         "sw": {
-                            "lat": 45.5,
+                            "lat": 25.0,
                             "lng": -125.0
                         }
                     }
