@@ -99,11 +99,11 @@ POUTF = './input/dispersion/PARDUMP'
 # initialization file (NOTE: unlike the comments in the v7 hysplit module,
 # negative values do not actually appear to be supported as NDUMP must be
 # greater than 0 for this to occur)
-NDUMP = 0
+NDUMP = 24
 
 # The repeat interval at which the particle initialization file will be
 # written after NDUMP
-NCYCL = 0
+NCYCL = 24
 
 ## ADVANCED Setup variable options
 
