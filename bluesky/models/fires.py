@@ -14,7 +14,7 @@ import sys
 import traceback
 import uuid
 
-from bluesky import datautils, configuration, datetimeutils
+from bluesky import datautils, configuration, datetimeutils, process
 from bluesky.exceptions import (
     BlueSkyImportError, BlueSkyModuleError
 )
@@ -391,41 +391,48 @@ class FiresManager(object):
         return self.load(data)
 
     def run(self): #, module_names):
-        failed = False
-        for i in range(len(self._modules)):
-            # if one of the modules already failed, then the only thing
-            # we'll run from here on is the export module
-            if failed and 'export' != self._module_names[i]:
-                continue
+        self.runtime = {"modules": []}
+        with process.RunTimeRecorder(self.runtime):
+            failed = False
 
-            try:
-                # initialize processing recotd
-                self.processing = self.processing or []
-                self.processing.append({
-                    "module_name": self._module_names[i]
-                })
+            for i in range(len(self._modules)):
+                # if one of the modules already failed, then the only thing
+                # we'll run from here on is the export module
+                if failed and 'export' != self._module_names[i]:
+                    continue
 
-                # 'run' modifies fires in place
-                self._modules[i].run(self)
-            except Exception, e:
-                failed = True
-                # when there's an error running modules, don't bail; continue
-                # iterating through requested modules, executing only exports
-                # and then raise BlueSkyModuleError, below, so that the calling
-                # code can decide what to do (which, in the case of bsp and
-                # bsp-web, is to dump the data as is)
-                logging.error(e)
-                tb = traceback.format_exc()
-                logging.debug(tb)
-                self.error = {
-                    "module": self._module_names[i],
-                    "message": str(e),
-                    "traceback": str(tb)
-                }
+                try:
+                    self.runtime['modules'].append({
+                        "module_name": self._module_names[i]
+                    })
+                    with process.RunTimeRecorder(self.runtime['modules'][-1]):
+                        # initialize processing recotd
+                        self.processing = self.processing or []
+                        self.processing.append({
+                            "module_name": self._module_names[i]
+                        })
 
-        if failed:
-            # If there was a failure
-            raise BlueSkyModuleError
+                        # 'run' modifies fires in place
+                        self._modules[i].run(self)
+                except Exception, e:
+                    failed = True
+                    # when there's an error running modules, don't bail; continue
+                    # iterating through requested modules, executing only exports
+                    # and then raise BlueSkyModuleError, below, so that the calling
+                    # code can decide what to do (which, in the case of bsp and
+                    # bsp-web, is to dump the data as is)
+                    logging.error(e)
+                    tb = traceback.format_exc()
+                    logging.debug(tb)
+                    self.error = {
+                        "module": self._module_names[i],
+                        "message": str(e),
+                        "traceback": str(tb)
+                    }
+
+            if failed:
+                # If there was a failure
+                raise BlueSkyModuleError
 
     ## Filtering Fires
 
