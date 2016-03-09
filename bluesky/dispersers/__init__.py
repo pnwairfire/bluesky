@@ -53,7 +53,9 @@ class DispersionBase(object):
     TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
     def __init__(self, met_info, **config):
-        self._config = config
+        # convert all keys to lower case
+        self._config = {k.lower(): v for k, v in config.items()}
+
         # TODO: iterate through self.BINARIES.values() making sure each
         #   exists (though maybe only log warning if doesn't exist, since
         #   they might not all be called for each run
@@ -65,9 +67,8 @@ class DispersionBase(object):
         # check if key is defined, in order, a) in the config as upper case,
         # b) in the config as lower case, c) in the hardcoded defaults as
         # upper case
-        return self._config.get(key.upper(),
-            self._config.get(key.lower(),
-                getattr(self.DEFAULTS, key.upper(), None)))
+        return self._config.get(key.lower(),
+            getattr(self.DEFAULTS, key.upper(), None))
 
     def run(self, fires, start, num_hours, dest_dir, output_dir_name):
         """Runs hysplit
