@@ -193,3 +193,5 @@ WET_DEP_BELOW_CLOUD_SCAV = 0.0
 
 # radioactive decay half live in days (0.0 is default, ie: no decay)
 RADIOACTIVE_HALF_LIVE = 0.0
+
+del os

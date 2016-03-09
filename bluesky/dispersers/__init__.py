@@ -55,6 +55,7 @@ class DispersionBase(object):
     def __init__(self, met_info, **config):
         # convert all keys to lower case
         self._config = {k.lower(): v for k, v in config.items()}
+        self._log_config()
 
         # TODO: iterate through self.BINARIES.values() making sure each
         #   exists (though maybe only log warning if doesn't exist, since
@@ -62,6 +63,24 @@ class DispersionBase(object):
         # TODO: define and call method (which should rely on constant defined
         #   in model-specific classes) which makes sure all required config
         #   options are defined
+
+    def _log_config(self):
+        # TODO: bail if logging level is less than DEBUG (to avoid list and
+        #   set operations)
+        defaults = sorted([c for c in dir(self.DEFAULTS) if not c.startswith('_')])
+        with_no_defaults = [c for c in sorted(self._config.keys())
+            if c.upper() not in defaults]
+        not_overridden = [c for c in defaults if c.lower() not in self._config]
+        overridden = set(defaults).difference(not_overridden)
+        for c in with_no_defaults:
+            logging.debug('User defined dispersion config setting - %s = %s', c,
+                self.config(c))
+        for c in overridden:
+            logging.debug('User overridden dispersion config setting - %s = %s (default: %s)',
+                c, self.config(c), getattr(self.DEFAULTS, c))
+        for c in not_overridden:
+            logging.debug('Default dispersion config setting - %s = %s',
+                c, self.config(c))
 
     def config(self, key):
         # check if key is defined, in order, a) in the config as upper case,
