@@ -24,6 +24,7 @@ __all__ = [
     'BooleanConfigOptionAction',
     'IntegerConfigOptionAction',
     'FloatConfigOptionAction',
+    'JSONConfigOptionAction',
     'ConfigFileAction'
 ]
 
@@ -159,6 +160,14 @@ class FloatConfigOptionAction(ConfigOptionAction):
         except ValueError:
             raise argparse.ArgumentTypeError(
                 "Invalid float value: {}".format(val))
+
+class JSONConfigOptionAction(ConfigOptionAction):
+    def _cast_value(self, val):
+        try:
+            return json.loads(val)
+        except ValueError:
+            raise argparse.ArgumentTypeError(
+                "Invalid json value: {}".format(val))
 
 class ConfigFileAction(argparse.Action):
     def __call__(self, parser, namespace, value, option_string=None):
