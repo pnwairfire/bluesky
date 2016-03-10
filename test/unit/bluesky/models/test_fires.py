@@ -163,7 +163,7 @@ class TestFire:
             fm.run_id = "sdfsdfsdf"
         assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
-        fm = fires.FiresManager("ggg")
+        fm = fires.FiresManager(run_id="ggg")
         assert fm.run_id == "ggg"
         with raises(RuntimeError) as e_info:
             fm.run_id = "sdfsdfsdf"
@@ -176,6 +176,11 @@ class TestFire:
             fm.run_id = "sdfsdfsdf"
         assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
+        # when you load, fm starts from scratch
+        assert fm.run_id == "eee"
+        fm = fires.FiresManager()
+        fm.load({'run_id': "ggbgbg"})
+        assert fm.run_id == "ggbgbg"
 
 ##
 ## Tests for FiresManager
