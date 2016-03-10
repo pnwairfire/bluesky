@@ -88,7 +88,13 @@ OPTIONAL_ARGS = [
         'action': 'store_true',
         'help': "Output bluesky version and exit.",
         'default': False
+    },
+    {
+        'long': '--run-id',
+        'dest': 'run_id',
+        'help': 'custom run id to use instead of generating a new GUID'
     }
+
 ]
 
 POSITIONAL_ARGS = [
@@ -139,7 +145,7 @@ def output_version(parser, args):
 
 def load_fires(args):
     # Note: Calling code handles exception
-    fires_manager = models.fires.FiresManager()
+    fires_manager = models.fires.FiresManager(run_id=args.run_id)
     fires_manager.loads(input_file=args.input_file)
     return fires_manager
 

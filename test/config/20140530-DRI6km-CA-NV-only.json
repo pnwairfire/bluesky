@@ -1,5 +1,4 @@
 {
-    "run_id": "DRI6km-2014053000-{timestamp}",
     "config": {
         "skip_failed_fires": true,
         "filter": {

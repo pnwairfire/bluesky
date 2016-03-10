@@ -138,6 +138,45 @@ class TestFire:
             {'start': "2014-05-28T17:00:00"}
             ]}).start
 
+    def test_run_id_is_immutable(self, monkeypatch):
+        monkeypatch.setattr(uuid, 'uuid1', lambda: "sdf123")
+
+        fm = fires.FiresManager()
+        # if not already set, run_id is set when accessed
+        assert fm.run_id == "sdf123"
+        with raises(RuntimeError) as e_info:
+            fm.run_id = "sdfsdfsdf"
+        assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+
+        # FiresManager.load sets run_id
+        fm = fires.FiresManager()
+        fm.load({})
+        assert fm.run_id == "sdf123"
+        with raises(RuntimeError) as e_info:
+            fm.run_id = "sdfsdfsdf"
+        assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+
+        fm = fires.FiresManager()
+        fm.load({'run_id': "ggbgbg"})
+        assert fm.run_id == "ggbgbg"
+        with raises(RuntimeError) as e_info:
+            fm.run_id = "sdfsdfsdf"
+        assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+
+        fm = fires.FiresManager("ggg")
+        assert fm.run_id == "ggg"
+        with raises(RuntimeError) as e_info:
+            fm.run_id = "sdfsdfsdf"
+        assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+
+        fm = fires.FiresManager()
+        fm.run_id = "eee"
+        assert fm.run_id == "eee"
+        with raises(RuntimeError) as e_info:
+            fm.run_id = "sdfsdfsdf"
+        assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+
+
 ##
 ## Tests for FiresManager
 ##

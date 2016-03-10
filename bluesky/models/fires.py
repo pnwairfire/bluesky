@@ -176,12 +176,14 @@ class FireEncoder(json.JSONEncoder):
 
 class FiresManager(object):
 
-    def __init__(self):
+    def __init__(self, run_id=None):
         self._meta = {}
         self.modules = []
         self.fires = [] # this intitializes self._fires and self_fire_ids
         self._processed_run_id_wildcards = False
         self._num_fires = 0
+        if run_id:
+            self._meta['run_id'] = run_id
 
     ## Importing
 
@@ -279,6 +281,13 @@ class FiresManager(object):
             self._processed_run_id_wildcards = True
         return self._meta['run_id']
 
+    RUN_ID_IS_IMMUTABLE_MSG = "Run id is immutible"
+    @run_id.setter
+    def run_id(self, run_id):
+        if self._meta.get('run_id'):
+            raise RuntimeError(self.RUN_ID_IS_IMMUTABLE_MSG)
+        self._meta['run_id'] = run_id
+
     @modules.setter
     def modules(self, module_names):
         self._module_names = module_names
@@ -372,7 +381,7 @@ class FiresManager(object):
 
         self._meta = input_dict
 
-        # HACK: access run id simply to trigger replacement of wildcars
+        # HACK: access run id simply to trigger replacement of wildcards
         # Note: the check for 'run_id' in self._meta prevents it from being
         #  generated unnecessarily
         # TODO: always generate a run id (by removing the check)?
