@@ -9,6 +9,7 @@ __all__ = [
 __version__ = "0.1.0"
 
 import csv
+import datetime
 import json
 import logging
 import os
@@ -352,16 +353,30 @@ class HysplitVisualizer(object):
         """Creates summary.json (like BSF's) if configured to do so
         """
         if self._config.get('create_summary_json'):
+            grid_params = self._hysplit_output_info.get("grid_parameters", {})
+            d_from = d_to = None
+            try:
+                d_from = datetime_parsing.parse(
+                    self._hysplit_output_info.get("start_time"))
+                d_to = d_from + datetime.timedelta(
+                    hours=self._hysplit_output_info.get("num_hours"))
+            except:
+                pass
+
             contents = {
                  "output_version": "1.0.0",
                  # TODO: populate with real values
-                 "dispersion_period": {"to": "20150808 00Z", "from": "20150805 00Z"},
-                 "width_longitude": 70.0,
-                 "height_latitude": 30.0,
-                 "center_latitude": 37.5,
-                 "center_longitude": -95.0,
-                 "model_configuration": "HYSPLIT",
+                 "dispersion_period": {
+                    "from": d_from and d_from.strftime("%Y%m%d %HZ"),
+                    "to": d_to and d_to.strftime("%Y%m%d %HZ")
+                },
+                 "width_longitude": grid_params.get("width_longitude"),
+                 "height_latitude": grid_params.get("height_latitude"),
+                 "center_latitude": grid_params.get("center_latitude"),
+                 "center_longitude":  grid_params.get("center_longitude"),
+                 "model_configuration": "HYSPLIT"
             }
+
             contents_json = json.dumps(contents)
             logging.debug("generating summary.json: %s", contents_json)
             with open(os.path.join(output_directory, 'summary.json'), 'w') as f:
