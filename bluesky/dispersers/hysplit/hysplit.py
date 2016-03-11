@@ -384,7 +384,7 @@ class HYSPLITDispersion(DispersionBase):
             message_files = ["MESSAGE.%3.3i" % (i+1) for i in range(NCPUS)]
 
             # name of the pardump files (one for each CPU)
-            if self.config("MAKE_INIT_FILE",bool):
+            if self.config("MAKE_INIT_FILE"):
                 pardumpFiles = ["%s.%3.3i" % ( poutf, (i+1)) for i in range(NCPUS)]
 
             # what command do we use to issue an mpi version of hysplit
