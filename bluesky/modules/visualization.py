@@ -36,6 +36,9 @@ def run(fires_manager):
             processed_kwargs.update(dispersion_model=dispersion_model)
             visualization_info.update(dispersion_model=dispersion_model)
             if dispersion_model == 'hysplit':
+                # TODO: look under 'visualization' > 'dispersion' > 'hysplit',
+                #   but support 'visualization' > 'hysplit' for backwards
+                #   compatibility ?
                 hysplit_visualization_config = fires_manager.get_config_value(
                     'visualization', 'hysplit', default={})
                 visualizer = visualizers.dispersion.hysplit.HysplitVisualizer(
