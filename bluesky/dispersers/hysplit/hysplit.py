@@ -614,6 +614,9 @@ class HYSPLITDispersion(DispersionBase):
         numLevels = len(levels)
         verticalLevels = " ".join(str(x) for x in levels)
 
+        # If not specified, projection is assumed to be 'LatLon'
+        is_deg = (self.config('projection') or 'LatLon') == 'LatLon'
+
         # Warn about multiple sampling grid levels and KML/PNG image generation
         if numLevels > 1:
             logging.warn("KML and PNG images will be empty since more than 1 vertical level is selected")
@@ -631,7 +634,7 @@ class HYSPLITDispersion(DispersionBase):
                 "spacing_latitude": self.config("SPACING_LATITUDE")
             }
             # BSF assumed lat/lng if USER_DEFINED_GRID; this support km spacing
-            if self.config('PROJECTION') != 'LatLon':
+            if not is_deg:
                 grid_params["spacing_longitude"] /= hysplit_utils.km_per_deg_lng(
                     grid_params["center_latitude"])
                 grid_params["spacing_latitude"] /= hysplit_utils.KM_PER_DEG_LAT
@@ -650,7 +653,6 @@ class HYSPLITDispersion(DispersionBase):
                 raise BlueSkyConfigurationError("Config settings "
                     "'spacing_latitude' and 'spacing_longitude' required "
                     "to compute hysplit grid")
-            is_deg = self.config('projection') == 'LatLon'
             grid_params = hysplit_utils.square_grid_from_lat_lng(
                 self._fires[0]['latitude'], self._fires[0]['longitude'],
                 self.config('spacing_latitude'), self.config('spacing_longitude'),
