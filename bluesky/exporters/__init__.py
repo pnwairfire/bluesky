@@ -32,44 +32,8 @@ class ExporterBase(object):
             "implement method 'export'".format(self.__class__.__name__))
 
     def _bundle(self, fires_manager, dest, create_tarball=False):
-        self._output_dir_name = self.config('output_dir_name') or fires_manager.run_id
-
-        # create destination dir (to contain output dir) if necessary
-        if not os.path.exists(dest):
-            os.makedirs(dest)
-
-        output_dir = os.path.join(dest, self._output_dir_name)
-        if os.path.exists(output_dir):
-            if self.config('do_not_overwrite'):
-                raise RuntimeError("{} already exists".format(output_dir))
-            else:
-                # delete it; otherwise, exception will be raised by shutil.copytree
-                if os.path.isdir(output_dir):
-                    shutil.rmtree(output_dir)
-                else:
-                    # this really shouldn't ever be the case
-                    os.remove(output_dir)
-
-        # create fresh empty dir
-        os.mkdir(output_dir)
-
-        r = {}
-
-        dirs_to_copy = {}
-        for k in self._extra_exports:
-            d = getattr(fires_manager, k)
-            if d and d.get('output', {}).get('directory'):
-                dirs_to_copy[d['output']['directory']] = dirs_to_copy.get(
-                    d['output']['directory'], [])
-                dirs_to_copy[d['output']['directory']].append(k)
-        for directory, extra_imports in dirs_to_copy.items():
-            new_dirname = '-'.join(extra_imports)
-            shutil.copytree(directory, os.path.join(output_dir, new_dirname))
-            for k in extra_imports:
-                r[k] = {'sub_directory': new_dirname}
-                processor = getattr(self, '_process_{}'.format(k), None)
-                if processor:
-                    processor(getattr(fires_manager, k), r)
+        output_dir = self._create_output_dir(fires_manager, dest)
+        r = self._gather_bundle(fires_manager, output_dir)
 
         # TODO: support option to create symlinks (like link in root of bundle
         #  to KMZ, to images, etc.);  sym-links are preserved by tarball;
@@ -90,16 +54,55 @@ class ExporterBase(object):
             fires_manager.dumps(output_stream=f)
 
         if create_tarball:
-            tarball_name = self.config('tarball_name')
-            tarball = (os.path.join(dest, tarball_name) if tarball_name
-                else "{}.tar.gz".format(output_dir))
-            if os.path.exists(tarball):
-                os.remove(tarball)
-            with tarfile.open(tarball, "w:gz") as tar:
-                tar.add(output_dir, arcname=os.path.basename(output_dir))
-            return tarball
+            self._create_tarball(dest, output_dir)
 
         return output_dir
+
+    def _create_output_dir(self, fires_manager, dest):
+        self._output_dir_name = self.config('output_dir_name') or fires_manager.run_id
+
+        # create destination dir (to contain output dir) if necessary
+        if not os.path.exists(dest):
+            os.makedirs(dest)
+
+        # if output dir exists, delete it or raise exception if not configured
+        # to allow overwriting
+        output_dir = os.path.join(dest, self._output_dir_name)
+        if os.path.exists(output_dir):
+            if self.config('do_not_overwrite'):
+                raise RuntimeError("{} already exists".format(output_dir))
+            else:
+                # delete it; otherwise, exception will be raised by shutil.copytree
+                if os.path.isdir(output_dir):
+                    shutil.rmtree(output_dir)
+                else:
+                    # this really shouldn't ever be the case
+                    os.remove(output_dir)
+
+        # create fresh empty dir
+        os.mkdir(output_dir)
+
+        return output_dir
+
+    def _gather_bundle(self, fires_manager, output_dir):
+        r = {}
+
+        dirs_to_copy = {}
+        for k in self._extra_exports:
+            d = getattr(fires_manager, k)
+            if d and d.get('output', {}).get('directory'):
+                dirs_to_copy[d['output']['directory']] = dirs_to_copy.get(
+                    d['output']['directory'], [])
+                dirs_to_copy[d['output']['directory']].append(k)
+        for directory, extra_imports in dirs_to_copy.items():
+            new_dirname = '-'.join(extra_imports)
+            shutil.copytree(directory, os.path.join(output_dir, new_dirname))
+            for k in extra_imports:
+                r[k] = {'sub_directory': new_dirname}
+                processor = getattr(self, '_process_{}'.format(k), None)
+                if processor:
+                    processor(getattr(fires_manager, k), r)
+        return r
 
     def _process_dispersion(self, d, r):
         # TODO: look in 'd' to see what model of dispersion was run, what files
@@ -263,8 +266,6 @@ class ExporterBase(object):
 
         return selected
 
-
-
     def _find_files(self, directory, pattern):
         """Recursively walks directory looking for files whose name match pattern
 
@@ -280,3 +281,13 @@ class ExporterBase(object):
             for filename in fnmatch.filter(filenames, pattern):
                 matches.append(os.path.join(root, filename))
         return [m.replace(directory, '').lstrip('/') for m in matches]
+
+    def _create_tarball(self, dest, output_dir):
+        tarball_name = self.config('tarball_name')
+        tarball = (os.path.join(dest, tarball_name) if tarball_name
+            else "{}.tar.gz".format(output_dir))
+        if os.path.exists(tarball):
+            os.remove(tarball)
+        with tarfile.open(tarball, "w:gz") as tar:
+            tar.add(output_dir, arcname=os.path.basename(output_dir))
+        return tarball
