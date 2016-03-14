@@ -38,7 +38,7 @@ setup(
         "fccsmap>=0.2.0",
         "timeprofile>=0.1.2",
         "plumerise>=0.2.1",
-        "blueskykml>=0.2.10",
+        "blueskykml>=0.2.11",
         "apps-consume4>=4.1.2",
         "pymongo>=3.1.1"
     ],
