@@ -362,6 +362,7 @@ class HysplitVisualizer(object):
             with open(os.path.join(output_directory, 'summary.json'), 'w') as f:
                 f.write(contents_json)
 
+    DEFAULT_FIRE_LOCATION_ICON = "http://maps.google.com/mapfiles/ms/micons/firedept.png"
     def _get_config_options(self, output_directory):
         """Creates config options dict to be pass into BlueSkyKml
 
@@ -393,6 +394,14 @@ class HysplitVisualizer(object):
           - 'DispersionGridOutput' > 'OUTPUT_DIR'
         """
         config_options = copy.deepcopy(self._config.get('blueskykml_config') or {})
+
+        # Use google's fire icon instead of BlueSkyKml's built-in icon
+        # (if an alternative isn't already specified)
+        if configuration.get_config_value(config_options,
+                'SmokeDispersionKMLInput', 'FIRE_LOCATION_ICON') is None:
+            configuration.set_config_value(config_options,
+                'SmokeDispersionKMLInput', 'FIRE_LOCATION_ICON',
+                self.DEFAULT_FIRE_LOCATION_ICON)
 
         # set output directory if not already specified
         if configuration.get_config_value(config_options,
