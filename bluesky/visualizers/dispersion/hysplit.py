@@ -8,6 +8,7 @@ __all__ = [
 ]
 __version__ = "0.1.0"
 
+import copy
 import csv
 import datetime
 import json
