@@ -363,7 +363,7 @@ class HysplitVisualizer(object):
             with open(os.path.join(output_directory, 'summary.json'), 'w') as f:
                 f.write(contents_json)
 
-    DEFAULT_FIRE_LOCATION_ICON = "http://maps.google.com/mapfiles/ms/micons/firedept.png"
+    DEFAULT_FIRE_EVENT_ICON = "http://maps.google.com/mapfiles/ms/micons/firedept.png"
     def _get_config_options(self, output_directory):
         """Creates config options dict to be pass into BlueSkyKml
 
@@ -379,7 +379,7 @@ class HysplitVisualizer(object):
                     ...,
                     "blueskykml_config": {
                         "SmokeDispersionKMLInput": {
-                            "FIRE_LOCATION_ICON"  : "http://maps.google.com/mapfiles/ms/micons/firedept.png"
+                            "FIRE_EVENT_ICON"  : "http://maps.google.com/mapfiles/ms/micons/firedept.png"
                         }
                         ...
                     }
@@ -390,7 +390,7 @@ class HysplitVisualizer(object):
          whatever is specified under blueskykml_config.  Then, specific
          config options are set if not already defined.
 
-          - 'SmokeDispersionKMLInput' > 'FIRE_LOCATION_ICON' -- set to
+          - 'SmokeDispersionKMLInput' > 'FIRE_EVENT_ICON' -- set to
             "http://maps.google.com/mapfiles/ms/micons/firedept.png"
           - 'DispersionGridOutput' > 'OUTPUT_DIR'
         """
@@ -399,17 +399,17 @@ class HysplitVisualizer(object):
         # Use google's fire icon instead of BlueSkyKml's built-in icon
         # (if an alternative isn't already specified)
         if configuration.get_config_value(config_options,
-                'SmokeDispersionKMLInput', 'FIRE_LOCATION_ICON') is None:
+                'SmokeDispersionKMLInput', 'FIRE_EVENT_ICON') is None:
             configuration.set_config_value(config_options,
-                'SmokeDispersionKMLInput', 'FIRE_LOCATION_ICON',
-                self.DEFAULT_FIRE_LOCATION_ICON)
+                self.DEFAULT_FIRE_EVENT_ICON,
+                'SmokeDispersionKMLInput', 'FIRE_EVENT_ICON')
 
         # set output directory if not already specified
         if configuration.get_config_value(config_options,
                 'DispersionGridOutput', 'OUTPUT_DIR') is None:
             images_dir = str(os.path.join(output_directory,
                 self._config.get('images_dir') or ''))
-            configuration.set_config_value(config_options,
-                'set_config_value', 'OUTPUT_DIR', images_dir)
+            configuration.set_config_value(config_options, images_dir,
+                'DispersionGridOutput', 'OUTPUT_DIR')
 
         return config_options
