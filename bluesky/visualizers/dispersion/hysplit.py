@@ -42,7 +42,7 @@ DEFAULT_FILENAMES = {
     "fire_locations_csv": 'fire_locations.csv',
     "fire_events_csv": 'fire_events.csv',
     "smoke_dispersion_kmz": 'smoke_dispersion.kmz',
-    "fire_kmz": 'fire_information.kmz'
+    "fire_kmz": 'fire_locations.kmz',
 }
 
 BLUESKYKML_DATE_FORMAT = smokedispersionkml.FireData.date_time_format
