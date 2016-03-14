@@ -18,10 +18,11 @@ from collections import namedtuple
 from pyairfire.datetime import parsing as datetime_parsing
 
 from blueskykml import (
-    makedispersionkml, makeaquiptdispersionkml, configuration,
+    makedispersionkml, makeaquiptdispersionkml,
+    configuration as blueskykml_configuration,
     smokedispersionkml, __version__ as blueskykml_version
 )
-from bluesky import osutils
+from bluesky import osutils, configuration
 from bluesky.exceptions import BlueSkyConfigurationError
 
 ###
@@ -229,29 +230,8 @@ class HysplitVisualizer(object):
 
         self._generate_summary_json(output_directory)
 
-        # TODO: support specifying old ini settings in config; maybe
-        #  something like:
-        #     "visualization": {
-        #         "target": "dispersion",
-        #         "hysplit": {
-        #             ...
-        #             "ini_config_settings"
-        #         }
-        #     }
-        #  they would be used to initialize config_options:
-        #   > config_options = self.config.get(ini_config_settings, {})
-        #  Would need to determine which takes preference - old-style
-        #  settings or top level hysplit settings; ex.
-        #      'hysplit' > 'images_dir'
-        #    vs.
-        #      'hysplit' > 'ini_config_settings' > 'DispersionGridOutput' > 'OUTPUT_DIR'
-        config_options = {
-            'DispersionGridOutput': {
-                'OUTPUT_DIR': str(os.path.join(output_directory,
-                    self._config.get('images_dir') or ''))
-            }
-        }
-        config_options.update(self._config.get('blueskykml_config') or {})
+        config_options = self._get_config_options(output_directory)
+
         layer = self._config.get('layer')
         args = BlueskyKmlArgs(
             output_directory=str(output_directory),
@@ -283,7 +263,7 @@ class HysplitVisualizer(object):
                     makeaquiptdispersionkml.main(args)
                 else:
                     makedispersionkml.main(args)
-        except configuration.ConfigurationError, e:
+        except blueskykml_configuration.ConfigurationError, e:
             raise BlueSkyConfigurationError(".....")
 
         return {
@@ -381,3 +361,45 @@ class HysplitVisualizer(object):
             logging.debug("generating summary.json: %s", contents_json)
             with open(os.path.join(output_directory, 'summary.json'), 'w') as f:
                 f.write(contents_json)
+
+    def _get_config_options(self, output_directory):
+        """Creates config options dict to be pass into BlueSkyKml
+
+        This method supports specifying old BSF / blueskykml ini settings
+        under the blueskykml_config config key, which (if defined) is expected
+        to contain nested dicts (each dict representing a config section).
+        e.g.
+
+            "visualization": {
+                "target": "dispersion",
+                "hysplit": {
+                    "dest_dir": "/sdf/sdf/",
+                    ...,
+                    "blueskykml_config": {
+                        "SmokeDispersionKMLInput": {
+                            "FIRE_LOCATION_ICON"  : "http://maps.google.com/mapfiles/ms/micons/firedept.png"
+                        }
+                        ...
+                    }
+                }
+            }
+
+         The config_options dict returned by this method is initialized with
+         whatever is specified under blueskykml_config.  Then, specific
+         config options are set if not already defined.
+
+          - 'SmokeDispersionKMLInput' > 'FIRE_LOCATION_ICON' -- set to
+            "http://maps.google.com/mapfiles/ms/micons/firedept.png"
+          - 'DispersionGridOutput' > 'OUTPUT_DIR'
+        """
+        config_options = copy.deepcopy(self._config.get('blueskykml_config') or {})
+
+        # set output directory if not already specified
+        if configuration.get_config_value(config_options,
+                'DispersionGridOutput', 'OUTPUT_DIR') is None:
+            images_dir = str(os.path.join(output_directory,
+                self._config.get('images_dir') or ''))
+            configuration.set_config_value(config_options,
+                'set_config_value', 'OUTPUT_DIR', images_dir)
+
+        return config_options
