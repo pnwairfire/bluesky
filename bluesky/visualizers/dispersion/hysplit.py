@@ -396,6 +396,7 @@ class HysplitVisualizer(object):
         """
         config_options = copy.deepcopy(self._config.get('blueskykml_config') or {})
 
+        # TODO: should we be using google's icon as the default?
         # Use google's fire icon instead of BlueSkyKml's built-in icon
         # (if an alternative isn't already specified)
         if configuration.get_config_value(config_options,
