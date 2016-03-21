@@ -405,9 +405,9 @@ class FiresManager(object):
 
     def run(self): #, module_names):
         self.runtime = {"modules": []}
-        with process.RunTimeRecorder(self.runtime):
-            failed = False
+        failed = False
 
+        with process.RunTimeRecorder(self.runtime):
             for i in range(len(self._modules)):
                 # if one of the modules already failed, then the only thing
                 # we'll run from here on is the export module
@@ -443,9 +443,9 @@ class FiresManager(object):
                         "traceback": str(tb)
                     }
 
-            if failed:
-                # If there was a failure
-                raise BlueSkyModuleError
+        if failed:
+            # If there was a failure
+            raise BlueSkyModuleError
 
     ## Filtering Fires
 
