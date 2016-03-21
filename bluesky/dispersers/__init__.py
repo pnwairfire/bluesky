@@ -135,12 +135,12 @@ class DispersionBase(object):
         pass
 
 
-    # TODO: set these to None, and let _write_emissions using it's logic to
-    #  handle missing data?
-    # TODO: is this an appropriate fill-in plumerise hour?
-    # MISSING_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.0 for e in range(21)},
-    #     smolder_fraction=0.0)
-    # # TODO: is this an appropriate fill-in timeprofile hour?
+    # This will set values for every 5th percentile (0th, 5th, ..., 100th),
+    # which will be sufficient for whatever reduction factor is used by
+    # hysplit.  (Vsmoke doesn't use plumerise data.)
+    MISSING_PLUMERISE_HOUR = dict(
+        {'percentile_%03d'%(5*e): 0.0 for e in range(21)},
+        smolder_fraction=0.0)
     MISSING_TIMEPROFILE_HOUR = dict({p: 0.0 for p in PHASES}, area_fraction=0.0)
 
     SPECIES = ('PM25', 'CO')
@@ -200,7 +200,7 @@ class DispersionBase(object):
                 timeprofile = {}
                 for i in range(self._num_hours):
                     local_dt = self._model_start + timedelta(hours=(i + utc_offset))
-                    plumerise[local_dt] = all_plumerise.get(local_dt) # or self.MISSING_PLUMERISE_HOUR
+                    plumerise[local_dt] = all_plumerise.get(local_dt) or self.MISSING_PLUMERISE_HOUR
                     timeprofile[local_dt] = all_timeprofile.get(local_dt) or self.MISSING_TIMEPROFILE_HOUR
 
                 # sum the emissions across all fuelbeds, but keep them separate by phase
