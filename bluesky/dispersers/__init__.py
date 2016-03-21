@@ -141,7 +141,9 @@ class DispersionBase(object):
     # MISSING_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.0 for e in range(21)},
     #     smolder_fraction=0.0)
     # # TODO: is this an appropriate fill-in timeprofile hour?
-    # MISSING_TIMEPROFILE_HOUR = {p: 0.0 for p in PHASES }
+    MISSING_TIMEPROFILE_HOUR = dict({p: 0.0 for p in PHASES}, area_fraction=0.0)
+
+    SPECIES = ('PM25', 'CO')
 
     def _set_fire_data(self, fires):
         self._fires = []
@@ -199,7 +201,7 @@ class DispersionBase(object):
                 for i in range(self._num_hours):
                     local_dt = self._model_start + timedelta(hours=(i + utc_offset))
                     plumerise[local_dt] = all_plumerise.get(local_dt) # or self.MISSING_PLUMERISE_HOUR
-                    timeprofile[local_dt] = all_timeprofile.get(local_dt) #or self.MISSING_TIMEPROFILE_HOUR
+                    timeprofile[local_dt] = all_timeprofile.get(local_dt) or self.MISSING_TIMEPROFILE_HOUR
 
                 # sum the emissions across all fuelbeds, but keep them separate by phase
                 emissions = {p: {} for p in self.PHASES}
@@ -212,7 +214,7 @@ class DispersionBase(object):
                 timeprofiled_emissions = {}
                 for dt in timeprofile:
                     timeprofiled_emissions[dt] = {}
-                    for e in ('PM25', 'CO'):
+                    for e in self.SPECIES:
                         timeprofiled_emissions[dt][e] = sum([
                             timeprofile[dt][p]*emissions[p].get('PM25', 0.0)
                                 for p in self.PHASES
