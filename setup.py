@@ -9,6 +9,7 @@ with open('requirements-test.txt') as f:
 setup(
     name='bluesky',
     version=__version__,
+    license='GPLv3+',
     author='Joel Dubowy',
     author_email='jdubowy@gmail.com',
     packages=find_packages(),
@@ -18,6 +19,14 @@ setup(
         'bin/bsp-arlprofiler',
         'bin/bsp-arlquery',
         'bin/bsp-csv2json'
+    ],
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        "Programming Language :: Python :: 2",
+        "Operating System :: POSIX",
+        "Operating System :: MacOS"
     ],
     package_data={
         # TODO: not sure how to specify package data for nested package.
