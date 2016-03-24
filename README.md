@@ -2,6 +2,10 @@
 
 BlueSky Framework rearchitected as a pipeable collection of standalone modules.
 
+***This software is provided for research purposes only. It's output may
+not accurately reflect actual smoke due to numerous reasons. Data are
+provisional; use at own risk.***
+
 ## Non-python Dependencies
 
 ### fuelbeds
