@@ -1693,8 +1693,9 @@ current version of the repo
 
     docker run --name bluesky-base \
         -v /home/foo/path/to/bluesky/repo/:/bluesky/ -w /bluesky/ \
-        bluesky-base pip install --no-binary gdal \
-        --trusted-host pypi.smoke.airfire.org -r requirements.txt
+        bluesky-base bash -lc 'pip install --upgrade pip && \
+        pip install --no-binary gdal \
+        --trusted-host pypi.smoke.airfire.org -r requirements.txt'
 
 then commit the container changes back to image
 
