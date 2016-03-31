@@ -10,7 +10,7 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 import datetime
 import logging
 
-from bluesky.met import arlfinder
+from pyairfire.met import arlfinder
 
 from bluesky.datetimeutils import (
     parse_datetimes, is_round_hour, parse_utc_offset

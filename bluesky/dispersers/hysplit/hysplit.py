@@ -123,7 +123,7 @@ class HYSPLITDispersion(DispersionBase):
         }
 
     def _set_met_info(self, met_info):
-        # TODO: move validation code into common module bluesky.met.validation ?
+        # TODO: move validation code into common module pyairfire.met.validation ?
         self._met_info = {}
 
         if met_info.get('grid'):
