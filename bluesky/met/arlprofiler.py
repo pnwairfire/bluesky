@@ -19,7 +19,8 @@ import subprocess
 from datetime import date, datetime, timedelta
 from math import exp, log, pow
 
-from bluesky import osutils, sun
+from pyairfire import osutils, sun
+
 from bluesky.datetimeutils import parse_datetimes
 
 __all__ = [

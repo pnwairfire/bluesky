@@ -14,7 +14,9 @@ import sys
 import traceback
 import uuid
 
-from bluesky import datautils, configuration, datetimeutils, process
+from pyairfire import process
+
+from bluesky import datautils, configuration, datetimeutils
 from bluesky.exceptions import (
     BlueSkyImportError, BlueSkyModuleError
 )

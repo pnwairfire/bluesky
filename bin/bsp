@@ -14,15 +14,15 @@ import logging
 import sys
 import traceback
 
-from pyairfire import scripting
+from pyairfire import scripting, process
 
 try:
-    from bluesky import exceptions, configuration, modules, models, process, __version__
+    from bluesky import exceptions, configuration, modules, models, __version__
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from bluesky import exceptions, configuration, modules, models, process, __version__
+    from bluesky import exceptions, configuration, modules, models, __version__
 
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"

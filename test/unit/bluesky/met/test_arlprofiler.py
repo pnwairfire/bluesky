@@ -7,9 +7,9 @@ import datetime
 import tempfile
 
 from py.test import raises
+from pyairfire import sun
 from numpy.testing import assert_approx_equal
 
-from bluesky import sun
 from bluesky.met import arlprofiler
 
 ##

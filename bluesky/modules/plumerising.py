@@ -11,8 +11,9 @@ import datetime
 import logging
 
 from plumerise import sev, feps, __version__ as plumerise_version
+from pyairfire import sun
 
-from bluesky import sun, datautils, datetimeutils
+from bluesky import datautils, datetimeutils
 
 __all__ = [
     'run'

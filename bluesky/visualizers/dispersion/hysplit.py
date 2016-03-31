@@ -16,6 +16,7 @@ import logging
 import os
 from collections import namedtuple
 
+from pyairfire import osutils
 from pyairfire.datetime import parsing as datetime_parsing
 
 from blueskykml import (
@@ -23,7 +24,7 @@ from blueskykml import (
     configuration as blueskykml_configuration,
     smokedispersionkml, __version__ as blueskykml_version
 )
-from bluesky import osutils, configuration
+from bluesky import configuration
 from bluesky.exceptions import BlueSkyConfigurationError
 
 ###

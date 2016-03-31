@@ -19,9 +19,10 @@ import shutil
 import subprocess
 from datetime import timedelta
 
+from pyairfire import osutils
 from pyairfire.datetime import parsing as datetime_parsing
 
-from bluesky import datautils, osutils
+from bluesky import datautils
 from bluesky.datetimeutils import parse_utc_offset
 from bluesky.models.fires import Fire
 
