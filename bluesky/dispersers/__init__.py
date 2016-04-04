@@ -262,7 +262,8 @@ class DispersionBase(object):
         if src_dir:
             filename = os.path.join(src_dir, filename)
 
-        shutil.copy(filename, archived_filename)
+        if os.path.exists(filename):
+            shutil.copy(filename, archived_filename)
 
     def _execute(self, *args, **kwargs):
         # TODO: make sure this is the corrrect way to call
