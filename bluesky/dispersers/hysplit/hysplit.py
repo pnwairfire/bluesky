@@ -407,43 +407,47 @@ class HYSPLITDispersion(DispersionBase):
         self._write_control_file(control_file, output_conc_file)
         self._write_setup_file(emissions_file, setup_file, ninit_val, NCPUS)
 
-        # Run HYSPLIT
-        if self.config("MPI"):
-            self._execute(self.BINARIES['MPI'], "-n", str(NCPUS), self.BINARIES['HYSPLIT_MPI'], working_dir=working_dir)
-        else:  # standard serial run
-            self._execute(self.BINARIES['HYSPLIT'], working_dir=working_dir)
+        try:
+            # Run HYSPLIT
+            if self.config("MPI"):
+                self._execute(self.BINARIES['MPI'], "-n", str(NCPUS), self.BINARIES['HYSPLIT_MPI'], working_dir=working_dir)
+            else:  # standard serial run
+                self._execute(self.BINARIES['HYSPLIT'], working_dir=working_dir)
 
-        if not os.path.exists(output_conc_file):
-            msg = "HYSPLIT failed, check MESSAGE file for details"
-            raise AssertionError(msg)
-        self._archive_file(output_conc_file)
-
-        if self.config('CONVERT_HYSPLIT2NETCDF'):
-            logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (output_conc_file, output_file))
-            self._execute(self.BINARIES['HYSPLIT2NETCDF'],
-                "-I" + output_conc_file,
-                "-O" + os.path.basename(output_file),
-                "-X1000000.0",  # Scale factor to convert from grams to micrograms
-                "-D1",  # Debug flag
-                "-L-1",  # Lx is x layers. x=-1 for all layers...breaks KML output for multiple layers
-                working_dir=working_dir
-            )
-
-            if not os.path.exists(output_file):
-                msg = "Unable to convert HYSPLIT concentration file to NetCDF format"
+            if not os.path.exists(output_conc_file):
+                msg = "HYSPLIT failed, check MESSAGE file for details"
                 raise AssertionError(msg)
-        self._archive_file(output_file)
+            self._archive_file(output_conc_file)
 
-        # Archive data files
-        self._archive_file(emissions_file)
-        self._archive_file(control_file)
-        self._archive_file(setup_file)
-        for f in message_files:
-            self._archive_file(f)
-        if self.config("MAKE_INIT_FILE"):
-            for f in pardumpFiles:
+            if self.config('CONVERT_HYSPLIT2NETCDF'):
+                logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (output_conc_file, output_file))
+                self._execute(self.BINARIES['HYSPLIT2NETCDF'],
+                    "-I" + output_conc_file,
+                    "-O" + os.path.basename(output_file),
+                    "-X1000000.0",  # Scale factor to convert from grams to micrograms
+                    "-D1",  # Debug flag
+                    "-L-1",  # Lx is x layers. x=-1 for all layers...breaks KML output for multiple layers
+                    working_dir=working_dir
+                )
+
+                if not os.path.exists(output_file):
+                    msg = "Unable to convert HYSPLIT concentration file to NetCDF format"
+                    raise AssertionError(msg)
+            self._archive_file(output_file)
+
+        finally:
+            # Archive input files
+            self._archive_file(emissions_file)
+            self._archive_file(control_file)
+            self._archive_file(setup_file)
+
+            # Archive data files
+            for f in message_files:
                 self._archive_file(f)
-                #shutil.copy2(os.path.join(working_dir, f), self._run_output_dir)
+            if self.config("MAKE_INIT_FILE"):
+                for f in pardumpFiles:
+                    self._archive_file(f)
+                    #shutil.copy2(os.path.join(working_dir, f), self._run_output_dir)
 
     def _write_emissions(self, emissions_file):
         # A value slightly above ground level at which to inject smoldering
