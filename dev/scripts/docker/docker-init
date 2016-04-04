@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# source this file
+
+docker-machine create --driver virtualbox docker-default
+docker-machine start docker-default
+eval "$(docker-machine env docker-default)"
