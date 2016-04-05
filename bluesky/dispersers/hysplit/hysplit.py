@@ -761,7 +761,7 @@ class HYSPLITDispersion(DispersionBase):
             # Number of input data grids (met files)
             f.write("%d\n" % len(self._met_info['files']))
             # Directory for input data grid and met file name
-            for filename in self._met_info['files']:
+            for filename in sorted(self._met_info['files']):
                 f.write("./\n")
                 f.write("%s\n" % os.path.basename(filename))
 
