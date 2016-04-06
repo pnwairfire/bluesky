@@ -55,7 +55,7 @@ EXAMPLES_STR = """This script updates the arl index with the availability of
 a particular domain on the current server.
 
 Examples:
-  $ ./test/scripts/run-in-docker.py \\
+  $ ./dev/scripts/docker/run-in-docker.py \\
       -i /path/to/fire.json \\
       -r /path/to/bluesky/repo/ \\
       -d /path/to/met/:/met/ \\
