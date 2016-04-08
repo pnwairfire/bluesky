@@ -32,7 +32,9 @@
                             "lng": -131.5
                         }
                     }
-                }
+                },
+                "NUMPAR": 500,
+                "MAXPAR": 12000
             }
         },
         "visualization": {

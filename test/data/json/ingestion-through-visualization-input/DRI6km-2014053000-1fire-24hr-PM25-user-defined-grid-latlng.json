@@ -20,7 +20,9 @@
                 "WIDTH_LONGITUDE": 25.0,
                 "SPACING_LONGITUDE": 0.06831430989396985,
                 "SPACING_LATITUDE": 0.05405405405405406,
-                "PROJECTION": "LatLon"
+                "PROJECTION": "LatLon",
+                "NUMPAR": 500,
+                "MAXPAR": 12000
             }
         },
         "visualization": {

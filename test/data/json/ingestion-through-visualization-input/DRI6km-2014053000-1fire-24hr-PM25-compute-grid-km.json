@@ -15,7 +15,9 @@
             "hysplit": {
                 "compute_grid": true,
                 "spacing_longitude": 6.0,
-                "spacing_latitude": 6.0
+                "spacing_latitude": 6.0,
+                "NUMPAR": 500,
+                "MAXPAR": 12000
             }
         },
         "visualization": {

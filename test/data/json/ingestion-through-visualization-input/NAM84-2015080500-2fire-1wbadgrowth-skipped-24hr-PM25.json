@@ -33,7 +33,9 @@
                             "lng": -131.5
                         }
                     }
-                }
+                },
+                "NUMPAR": 500,
+                "MAXPAR": 24000
             }
         },
         "visualization": {

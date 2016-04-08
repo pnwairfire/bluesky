@@ -19,7 +19,9 @@
                 "HEIGHT_LATITUDE": 14.5,
                 "WIDTH_LONGITUDE": 25.0,
                 "SPACING_LONGITUDE": 6.0,
-                "SPACING_LATITUDE": 6.0
+                "SPACING_LATITUDE": 6.0,
+                "NUMPAR": 500,
+                "MAXPAR": 12000
             }
         },
         "visualization": {
