@@ -134,7 +134,7 @@ DELT = 0.0
 # particle release limits. if 0 is provided then the values are calculated
 # based on the number of sources: numpar = num_sources = num_fires*num_heights)
 # and maxpar = numpar*1000/ncpus
-NUMPAR = 2000
+NUMPAR = 1000
 MAXPAR = 10000000
 
 #
