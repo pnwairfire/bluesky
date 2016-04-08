@@ -78,6 +78,7 @@ FINAL_INSTRUCTIONS = """
 """
 
 def _call(cmd_args):
+    logging.info("Calling: {}".format(' '.join(cmd_args)))
     r = subprocess.call(cmd_args)
     if r:
         scripting.utils.exit_with_msg(
