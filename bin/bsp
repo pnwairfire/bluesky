@@ -8,9 +8,11 @@ Example calls:
  > bsp < fires-before.json > fires-after.json
 """
 
+import fcntl
 import json
 import importlib
 import logging
+import os
 import sys
 import traceback
 
@@ -37,6 +39,13 @@ OPTIONAL_ARGS = [
         'help': 'input file comtaining JSON formatted fire data',
         'action': "store",
         'default': None
+    },
+    {
+        'short': '-n',
+        'long': '--no-input',
+        'help': 'tells bsp not to expect -i or piped input',
+        'action': "store_true",
+        'default': False
     },
     {
         'short': '-o',
@@ -136,9 +145,26 @@ Configuration:
     'bsdf'.
  """.format('\n    '.join(modules.AVAILABLE_MODULES))
 
+def is_piped_input():
+    # make stdin a non-blocking file
+    fd = sys.stdin.fileno()
+    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+    try:
+        sys.stdin.read()
+        return True
+    except:
+        return False
+
 def validate_args(args):
-    # TODO: validate args values as necessary
-    pass
+    if args.no_input:
+        if args.input_file:
+            scripting.utils.exit_with_msg("Options '-n'/'--no-input' and "
+                "'-i'/'--input-file' can't be specified simultaneously")
+        if is_piped_input():
+            scripting.utils.exit_with_msg("Option 'n'/'--no-input' can't be "
+                "specified if there's piped input")
+    # TODO: validate other args values as necessary
 
 def exit_with_traceback(e):
     logging.error(e)
@@ -153,7 +179,9 @@ def output_version(parser, args):
 def load_fires(args):
     # Note: Calling code handles exception
     fires_manager = models.fires.FiresManager()
-    fires_manager.loads(input_file=args.input_file)
+    if not args.no_input:
+        fires_manager.loads(input_file=args.input_file)
+
     # run_id must be specified after the call to loads (as opposed to when
     # instantiatiing fires_manager) - otherwise, loads will delete it
     # (since loads wipes fires_manager and then populates it from scratch).
