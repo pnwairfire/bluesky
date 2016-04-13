@@ -71,7 +71,7 @@ REPO_ROOT_DIR = os.path.abspath(os.path.join(__file__, '../../../..'))
 
 FINAL_INSTRUCTIONS = """
     To upload:
-        docker tag <IMAGE_ID> pnwairfire/bluesky:latest
+        docker tag -f <IMAGE_ID> pnwairfire/bluesky:latest
         docker tag <IMAGE_ID> pnwairfire/bluesky:v<VERSION>
         docker push pnwairfire/bluesky:latest
         docker push pnwairfire/bluesky:v<VERSION>
