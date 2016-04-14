@@ -10,12 +10,16 @@ Example configuration:
                         "name": "smartfire2",
                         "format": "CSV",
                         "type": "file",
-                        "uri": "/data/fires/fire_locations.csv"
+                        "file": "/data/fires/fire_locations.csv"
                     }
                 ]
             }
         }
     }
+
+or, on the command line:
+
+    bsp --no-input -J load.sources='[{"name":"smartfire2","format":"CSV","type":"file","file":"/data/fires/fire_locations.csv"}]'
 
 Currently supported sources:  smartfire2
 Currently supported types: file
