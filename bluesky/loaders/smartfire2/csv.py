@@ -4,15 +4,13 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
+from bluesky.loaders import BaseFileLoader
 
 __all__ = [
     'FileLoader'
 ]
 
-class FileLoader(object):
-
-    def __init__(self, *config):
-        self._config = config
+class FileLoader(BaseFileLoader):
 
     def load(self):
         # TODO: implement

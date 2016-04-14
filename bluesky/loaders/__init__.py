@@ -15,5 +15,22 @@ For example, the smartfire csv file loader is in module
 bluesky.loaders.smartfire.csv and is called FileLoader
 """
 
+import os
+
+from bluesky.exceptions import BlueSkyConfigurationError
+
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
+
+class BaseFileLoader(object):
+
+    def __init__(self, *config):
+        self._file = config.get('file')
+        if not self._file:
+            raise BlueSkyConfigurationError('Specify a file to load')
+        if not os.path.isfile(self._file):
+            raise BlueSkyConfigurationError('File {} does not exist'.format(
+                self._file))
+
+    # TODO: provide file reading functionality in this class, or just let
+    #  subclasses take care of it?
