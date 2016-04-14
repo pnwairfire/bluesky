@@ -189,6 +189,12 @@ class FiresManager(object):
 
     ## Importing
 
+    def add_fires(self, fires):
+        for fire in fires:
+            # cast to Fire, in case it isn't already
+            # TODO: should add_fire do the casting?
+            self.add_fire(Fire(fire))
+
     def add_fire(self, fire):
         self._fires = self._fires or {}
         if not self._fires.has_key(fire.id):
