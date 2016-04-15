@@ -6,8 +6,6 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import os
 
-from pyairfire.io import CSV2JSON
-
 from bluesky.loaders import BaseFileLoader
 
 __all__ = [
@@ -23,29 +21,24 @@ class FileLoader(BaseFileLoader):
 
     def __init__(self, **config):
         super(FileLoader, self).__init__(**config)
-        self._events_by_id = []
+        self._events_filename = None
         if config.get('events_file'):
-            events_filename = self._get_filename(config['events_file'])
-            self._load_events_file(events_filename)
+            self._events_filename = self._get_filename(config['events_file'])
 
     def load(self):
         fires = self._load_csv_file(self._filename)
-        if self._events_by_id:
+        if self._events_filename:
+            events_by_id = self._load_events_file(self._events_filename)
             for f in fires:
-                if f.get('event_id') and f['event_id'] in self._events_by_id:
-                    name = self._events_by_id[f['event_id']].get('event_name')
+                if f.get('event_id') and f['event_id'] in events_by_id:
+                    name = events_by_id[f['event_id']].get('event_name')
                     if name:
                         f["name"] = name
                     # TODO: set any other fields
         return fires
 
     def _load_events_file(self, events_filename):
-        if not os.path.isfile(events_filename):
-            raise BlueSkyConfigurationError('File {} does not exist'.format(
-                events_filename))
+        # Note: events_filename's existence was already verified by
+        #  self._get_filename
         events = self._load_csv_file(events_filename)
-        self._events_by_id = { e.pop('id'): e for e in events}
-
-    def _load_csv_file(self, filename):
-        csv_loader = CSV2JSON(input_file=filename)
-        return csv_loader._load()
+        return { e.pop('id'): e for e in events}

@@ -44,6 +44,10 @@ class BaseFileLoader(BaseLoader):
         super(BaseFileLoader, self).__init__(**config)
         self._filename = self._get_filename(config.get('file'))
 
+    ##
+    ## General File Utilities
+    ##
+
     def _get_filename(self, filename):
         if not filename:
             raise BlueSkyConfigurationError('Specify a file to load')
@@ -59,10 +63,12 @@ class BaseFileLoader(BaseLoader):
 
         return filename
 
+    ##
+    ## File IO
+    ##
 
     def _load_csv_file(self, filename):
         csv_loader = CSV2JSON(input_file=filename)
         return csv_loader._load()
 
-    # TODO: provide file reading functionality in this class, or just let
-    #  subclasses take care of it?
+    # TODO: provide other file reading functionality as needed
