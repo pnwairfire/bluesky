@@ -1198,7 +1198,12 @@ the fire data, each module has its own set of required and optional fields.
  - ***'config' > 'load' > 'sources' > 'name'*** -- *required* for each source-- e.g. 'smartfire2'
  - ***'config' > 'load' > 'sources' > 'format'*** -- *required* for each source-- e.g. 'csv'
  - ***'config' > 'load' > 'sources' > 'type'*** -- *required* for each source-- e.g. 'file'
- - ***'config' > 'load' > 'sources' > 'file'*** -- *required* for each file type source-- e.g. '/path/to/fires.csv'
+ - ***'config' > 'load' > 'sources' > 'date_time'*** -- *optional* for each source-- e.g. '20160412', '2016-04-12T12:00:00'; used to to replace any datetime formate codes in the file name; defaults to current date (local time)
+
+###### if type 'file':
+
+ - ***'config' > 'load' > 'sources' > 'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
+ - ***'config' > 'load' > 'sources' > 'events_file'*** -- *optional* for each file type source-- file containing fire events data; e.g. '/path/to/fire_events.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
 
 ##### ingestion
 
