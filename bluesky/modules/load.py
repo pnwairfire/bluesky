@@ -10,8 +10,8 @@ Example configuration:
                         "name": "smartfire2",
                         "format": "CSV",
                         "type": "file",
-                        "file": "/data/fires/fire_locations.csv",
-                        "events_file": "/data/fires/fire_events.csv"
+                        "file": "/bluesky/data/fires/fire_locations_%Y%m%d.csv",
+                        "events_file": "/bluesky/data/fires/fire_events_%Y%m%d.csv"
                     }
                 ]
             }
@@ -20,7 +20,14 @@ Example configuration:
 
 or, on the command line:
 
-    bsp --no-input -J load.sources='[{"name":"smartfire2","format":"CSV","type":"file","file":"/data/fires/fire_locations.csv","events_file":"/data/fires/fire_events.csv"}]'
+    bsp --no-input -J load.sources='[{
+        "name":"smartfire2",
+        "format":"CSV",
+        "type":"file",
+        "date_time": "20160412",
+        "file": "/bluesky/data/fires/fire_locations_%Y%m%d.csv",
+        "events_file": "/bluesky/data/fires/fire_events_%Y%m%d.csv"
+    }]'
 
 Currently supported sources:  smartfire2
 Currently supported types: file

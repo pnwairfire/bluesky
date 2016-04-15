@@ -1,4 +1,4 @@
 pytest
 mock
 numpy
-timecop
+freezegun

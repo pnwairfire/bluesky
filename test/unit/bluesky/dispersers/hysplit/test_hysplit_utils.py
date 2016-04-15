@@ -7,7 +7,6 @@ Run with py.test:
 
 import datetime
 import time
-import timecop
 
 from bluesky.dispersers.hysplit import hysplit_utils
 
