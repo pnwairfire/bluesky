@@ -10,7 +10,8 @@ Example configuration:
                         "name": "smartfire2",
                         "format": "CSV",
                         "type": "file",
-                        "file": "/data/fires/fire_locations.csv"
+                        "file": "/data/fires/fire_locations.csv",
+                        "events_file": "/data/fires/fire_events.csv"
                     }
                 ]
             }
@@ -19,7 +20,7 @@ Example configuration:
 
 or, on the command line:
 
-    bsp --no-input -J load.sources='[{"name":"smartfire2","format":"CSV","type":"file","file":"/data/fires/fire_locations.csv"}]'
+    bsp --no-input -J load.sources='[{"name":"smartfire2","format":"CSV","type":"file","file":"/data/fires/fire_locations.csv","events_file":"/data/fires/fire_events.csv"}]'
 
 Currently supported sources:  smartfire2
 Currently supported types: file
@@ -46,7 +47,7 @@ def run(fires_manager):
     logging.debug("Running load module")
     successfully_loaded_sources = []
     try:
-        for source in in fires_manager.get_config_value('load', 'sources', default='[]'):
+        for source in fires_manager.get_config_value('load', 'sources', default='[]'):
             # TODO: use something like with fires_manager.fire_failure_handler(fire)
             #   to optionally skip invalid sources (sources that are insufficiently
             #   configured, don't have corresponding loader class, etc.) and source

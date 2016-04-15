@@ -24,13 +24,13 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 class BaseFileLoader(object):
 
-    def __init__(self, *config):
-        self._file = config.get('file')
-        if not self._file:
+    def __init__(self, **config):
+        self._filename = config.get('file')
+        if not self._filename:
             raise BlueSkyConfigurationError('Specify a file to load')
-        if not os.path.isfile(self._file):
+        if not os.path.isfile(self._filename):
             raise BlueSkyConfigurationError('File {} does not exist'.format(
-                self._file))
+                self._filename))
 
     # TODO: provide file reading functionality in this class, or just let
     #  subclasses take care of it?
