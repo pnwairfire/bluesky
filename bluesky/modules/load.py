@@ -27,6 +27,9 @@ Currently supported types: file
 Currently supported formats: CSV
 """
 
+import importlib
+import logging
+
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __author__ = "Joel Dubowy"
@@ -54,21 +57,13 @@ def run(fires_manager):
             #   that fail to load
             try:
                 loader = _import_loader(source)
-                loaded_fires = loader.load()
+                loaded_fires = loader(**source).load()
                 fires_manager.add_fires(loaded_fires)
                 # TODO: add fires to fires_manager
                 successfully_loaded_sources.append(source)
             except:
                 if not fires_manager.get_config_value('skip_failed_sources'):
                     raise
-
-            parsed_input = []
-            fire_ingester = FireIngester()
-            for fire in fires_manager.fires:
-                with fires_manager.fire_failure_handler(fire):
-                    parsed_input.append(fire_ingester.ingest(fire))
-
-        fires_manager.processed(__name__, __version__)
     finally:
         fires_manager.processed(__name__, __version__,
             successfully_loaded_sources=successfully_loaded_sources)

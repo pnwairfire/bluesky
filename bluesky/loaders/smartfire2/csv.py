@@ -17,7 +17,7 @@ __all__ = [
 class FileLoader(BaseFileLoader):
 
     def __init__(self, **config):
-        super(FileLoader, self).__init__()
+        super(FileLoader, self).__init__(**config)
         self._events_by_id = []
         if config.get('events_file'):
             self._load_events_file(config['events_file'])
@@ -26,7 +26,11 @@ class FileLoader(BaseFileLoader):
         fires = self._load_csv_file(self._filename)
         if self._events_by_id:
             for f in fires:
-                if f.get('event_id') and f.get('event_id') in self.events
+                if f.get('event_id') and f['event_id'] in self._events_by_id:
+                    name = self._events_by_id[f['event_id']].get('event_name')
+                    if name:
+                        f["name"] = name
+                    # TODO: set any other fields
         return fires
 
     def _load_events_file(self, events_filename):
@@ -37,5 +41,5 @@ class FileLoader(BaseFileLoader):
         self._events_by_id = { e.pop('id'): e for e in events}
 
     def _load_csv_file(self, filename):
-        csv_loader = CSV2JSON(input_file=events_filename)
+        csv_loader = CSV2JSON(input_file=filename)
         return csv_loader._load()
