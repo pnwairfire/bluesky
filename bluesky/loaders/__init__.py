@@ -27,6 +27,7 @@ __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 class BaseLoader(object):
+
     def __init__(self, **config):
         if config.get('date_time'):
             if not isinstance(config['date_time'], datetime.date):
@@ -43,6 +44,10 @@ class BaseFileLoader(BaseLoader):
     def __init__(self, **config):
         super(BaseFileLoader, self).__init__(**config)
         self._filename = self._get_filename(config.get('file'))
+
+        self._events_filename = None
+        if config.get('events_file'):
+            self._events_filename = self._get_filename(config['events_file'])
 
     ##
     ## General File Utilities
