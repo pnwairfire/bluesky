@@ -19,6 +19,7 @@ import datetime
 import os
 
 from pyairfire.datetime.parsing import parse as parse_dt
+from pyairfire.io import CSV2JSON
 
 from bluesky.exceptions import BlueSkyConfigurationError
 
@@ -41,18 +42,27 @@ class BaseFileLoader(BaseLoader):
 
     def __init__(self, **config):
         super(BaseFileLoader, self).__init__(**config)
-        self._filename = config.get('file')
-        if not self._filename:
+        self._filename = self._get_filename(config.get('file'))
+
+    def _get_filename(self, filename):
+        if not filename:
             raise BlueSkyConfigurationError('Specify a file to load')
 
         # if file does exist with, try filling in datetime codes
-        if not os.path.isfile(self._filename):
-            self._filename = self._date_time.strftime(self._filename)
+        if not os.path.isfile(filename):
+            filename = self._date_time.strftime(filename)
 
         # if it still doesn't exist, raise exception
-        if not os.path.isfile(self._filename):
+        if not os.path.isfile(filename):
             raise BlueSkyConfigurationError('File {} does not exist'.format(
-                self._filename))
+                filename))
+
+        return filename
+
+
+    def _load_csv_file(self, filename):
+        csv_loader = CSV2JSON(input_file=filename)
+        return csv_loader._load()
 
     # TODO: provide file reading functionality in this class, or just let
     #  subclasses take care of it?

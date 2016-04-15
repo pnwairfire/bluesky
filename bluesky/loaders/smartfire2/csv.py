@@ -15,12 +15,18 @@ __all__ = [
 ]
 
 class FileLoader(BaseFileLoader):
+    """Loads csv formatted SF2 fire and events data from filename
+
+    TODO: move code into base class (BaseFileLoader, or maybe some into
+    BaseCsvLoader, and have FileLoader inherit from both)
+    """
 
     def __init__(self, **config):
         super(FileLoader, self).__init__(**config)
         self._events_by_id = []
         if config.get('events_file'):
-            self._load_events_file(config['events_file'])
+            events_filename = self._get_filename(config['events_file'])
+            self._load_events_file(events_filename)
 
     def load(self):
         fires = self._load_csv_file(self._filename)
