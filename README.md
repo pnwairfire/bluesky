@@ -950,6 +950,10 @@ are along the pipeline of modules, the more data you need.  (Note, however,
 that some data required by earlier modules can be dropped when you pipe the
 fire data into downstream modules.)
 
+##### load
+
+(no required fields)
+
 ##### ingestion
 
 Ingestion requires that none of the fires in 'fire_information' are empty objects.
