@@ -61,10 +61,10 @@ class BaseFileLoader(BaseLoader):
         if not os.path.isfile(filename):
             filename = self._date_time.strftime(filename)
 
-        # if it still doesn't exist, raise exception
-        if not os.path.isfile(filename):
-            raise BlueSkyConfigurationError('File {} does not exist'.format(
-                filename))
+            # if it still doesn't exist, raise exception
+            if not os.path.isfile(filename):
+                raise BlueSkyConfigurationError('File {} does not exist'.format(
+                    filename))
 
         return filename
 
