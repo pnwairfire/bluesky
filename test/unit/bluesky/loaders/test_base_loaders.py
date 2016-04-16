@@ -40,7 +40,6 @@ class TestBaseFileLoader(object):
     def setup(self):
         self._temp_dir = tempfile.mkdtemp()
 
-
     def test_file_doesnt_exist(self):
         filename = os.path.join(self._temp_dir, "fires.json")
         with raises(BlueSkyConfigurationError) as e_info:
@@ -53,6 +52,7 @@ class TestBaseFileLoader(object):
             f.write('{}')
         l = BaseFileLoader(file=filename)
         assert l._filename == filename
+        assert l._events_filename == None
 
     @freeze_time("2016-01-14")
     def test_file_exists_with_datetime_codes(self):
@@ -61,6 +61,7 @@ class TestBaseFileLoader(object):
             f.write('{}')
         l = BaseFileLoader(file=filename)
         assert l._filename == filename
+        assert l._events_filename == None
 
     @freeze_time("2016-01-14")
     def test_file_exists_with_defined_date_in_name(self):
@@ -70,6 +71,7 @@ class TestBaseFileLoader(object):
             f.write('{}')
         l = BaseFileLoader(file=config_filename)
         assert l._filename == real_filename
+        assert l._events_filename == None
 
     @freeze_time("2016-01-14")
     def test_file_exists_with_different_defined_date_in_name(self):
@@ -81,3 +83,9 @@ class TestBaseFileLoader(object):
         with raises(BlueSkyConfigurationError) as e_info:
             l = BaseFileLoader(file=config_filename)
         assert e_info.value.message == 'File {} does not exist'.format(interpolated_filename)
+
+    # TODO: test with events file doesn't exist
+    # TODO: test with events file does exist
+    # TODO: test with events file does exist with datetime codes
+    # TODO: test with events file does exist with date in name
+    # TODO: test with events file does exist with different date in name
