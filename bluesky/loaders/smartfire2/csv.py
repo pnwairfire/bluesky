@@ -21,9 +21,6 @@ class FileLoader(BaseFileLoader):
 
     def __init__(self, **config):
         super(FileLoader, self).__init__(**config)
-        self._events_filename = None
-        if config.get('events_file'):
-            self._events_filename = self._get_filename(config['events_file'])
 
     def load(self):
         fires = self._load_csv_file(self._filename)
