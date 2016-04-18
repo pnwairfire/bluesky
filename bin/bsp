@@ -146,24 +146,31 @@ Configuration:
  """.format('\n    '.join(modules.AVAILABLE_MODULES))
 
 def is_piped_input():
-    # make stdin a non-blocking file
-    fd = sys.stdin.fileno()
-    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-    try:
-        sys.stdin.read()
-        return True
-    except:
-        return False
+    # Note: using sys.stdin.isatty() seems to work as well, but is reported
+    # to have unexpected behavior
+    #    >>> not sys.stdin.isatty()
+    # See http://stackoverflow.com/questions/33871836/find-out-if-there-is-input-from-a-pipe-or-not-in-python
+    # Other suggestions in the SO thread don't work for bsp's need
+    return not os.isatty(sys.stdin.fileno())
 
 def validate_args(args):
-    if args.no_input:
-        if args.input_file:
-            scripting.utils.exit_with_msg("Options '-n'/'--no-input' and "
-                "'-i'/'--input-file' can't be specified simultaneously")
-        if is_piped_input():
-            scripting.utils.exit_with_msg("Option 'n'/'--no-input' can't be "
-                "specified if there's piped input")
+    # Only one of three input scenarios allowed at a time - 1) piped, 2) read
+    # from file, 3) --no-input.  There's extra logic here to return error
+    # messages specific to each bad combination
+    is_po = is_piped_input()
+    if is_po and args.no_input and args.input_file:
+        scripting.utils.exit_with_msg("Specify '-n'/'--no-input' or "
+            "'-i'/'--input-file', or pipe input - not all three.")
+    elif args.no_input and args.input_file:
+        scripting.utils.exit_with_msg("Options '-n'/'--no-input' and "
+            "'-i'/'--input-file' can't be specified simultaneously")
+    elif args.no_input and is_po:
+        scripting.utils.exit_with_msg("Option '-n'/'--no-input' can't be "
+            "specified if there's piped input")
+    elif args.input_file and is_po:
+        scripting.utils.exit_with_msg("Option '-i'/'--input-file' can't be "
+            "specified if there's piped input")
+
     # TODO: validate other args values as necessary
 
 def exit_with_traceback(e):
