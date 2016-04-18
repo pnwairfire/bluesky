@@ -57,7 +57,7 @@ def run(fires_manager):
     logging.debug("Running load module")
     successfully_loaded_sources = []
     try:
-        for source in fires_manager.get_config_value('load', 'sources', default='[]'):
+        for source in fires_manager.get_config_value('load', 'sources', default=[]):
             # TODO: use something like with fires_manager.fire_failure_handler(fire)
             #   to optionally skip invalid sources (sources that are insufficiently
             #   configured, don't have corresponding loader class, etc.) and source
