@@ -146,12 +146,43 @@ Configuration:
  """.format('\n    '.join(modules.AVAILABLE_MODULES))
 
 def is_piped_input():
-    # Note: using sys.stdin.isatty() seems to work as well, but is reported
-    # to have unexpected behavior
-    #    >>> not sys.stdin.isatty()
-    # See http://stackoverflow.com/questions/33871836/find-out-if-there-is-input-from-a-pipe-or-not-in-python
-    # Other suggestions in the SO thread don't work for bsp's need
-    return not os.isatty(sys.stdin.fileno())
+    """Returns True if input data is piped into bsp
+
+    TODO: Get this method working!
+
+      All three of the following methods seem to work, but then falsely (?)
+      indicate piped input when bsp is run using subprocess.check_output
+
+      1) using sys.stdin.isatty:
+
+        >>>  return not sys.stdin.isatty()
+
+      2) using os.isattty:
+
+        >>>  not os.isatty(sys.stdin.fileno())
+
+      3) temporarily setting sys.stdin to non-blocking:
+
+        >>>  fd = sys.stdin.fileno()
+        >>>  fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+        >>>  fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+        >>>  r = False
+        >>>  try:
+        >>>      sys.stdin.seek(0)
+        >>>      r = True
+        >>>  except:
+        >>>      pass
+        >>>  finally:
+        >>>      fcntl.fcntl(fd, fcntl.F_SETFL, fl | ~os.O_NONBLOCK)
+        >>>  return r
+
+      See http://stackoverflow.com/questions/33871836/find-out-if-there-is-input-from-a-pipe-or-not-in-python
+      Other suggestions in the SO thread don't work for bsp's need.
+
+      So, for now, this method just always returns False, and downstream code
+      just ignores stdin if either '-i' or '-n' are specified
+    """
+    return False
 
 def validate_args(args):
     # Only one of three input scenarios allowed at a time - 1) piped, 2) read
