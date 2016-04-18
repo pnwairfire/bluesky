@@ -329,6 +329,12 @@ class TestFiresManager:
         assert datetime.datetime(2014,5,25,17) == fm.earliest_start
         assert datetime.datetime(2014,5,28,19) == fm.latest_end
 
+        # same thing, but with time zones specified for two of the fires
+        f1.location['utc_offset'] = '-07:00'
+        f3.location['utc_offset'] = '03:00' # no longer the latest time
+        assert datetime.datetime(2014,5,26,0) == fm.earliest_start
+        assert datetime.datetime(2014,5,29,0) == fm.latest_end
+
     ## Loading
 
     def _stream(test_self, data=''):
