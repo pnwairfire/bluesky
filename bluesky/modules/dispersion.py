@@ -80,18 +80,36 @@ def _get_module_and_class(model):
 
     return module, klass
 
+SECONDS_PER_HOUR = 3600
+
 def _get_time(fires_manager):
     start_str = fires_manager.get_config_value('dispersion', 'start')
+    start = None
+    if start_str:
+        if start_str.lower() == 'today':
+            # default to midnight of current date (local time)
+            d = datetime.date.today()
+            start = datetime.datetime(d.year, d.month, d.day)
+        else:
+            start = datetimeutils.parse_datetime(start_str, 'start')
+
     num_hours = fires_manager.get_config_value('dispersion', 'num_hours')
-    if not start_str or not num_hours:
-        raise ValueError("Config settings 'start' and 'num_hours' required"
-            " for computing dispersion")
-    if start_str.lower() == 'today':
-        # default to midnight of current date (local time)
-        d = datetime.date.today()
-        start = datetime.datetime(d.year, d.month, d.day)
-    else:
-        start = datetimeutils.parse_datetime(start_str, 'start')
+
+    if not start or num_hours is None:
+        s = fires_manager.earliest_start # needed for 'start' and 'num_hours'
+        if not s:
+            raise ValueError("Unable to determine dispersion 'start'")
+        if not start:
+            start = s
+
+        if not num_hours and start == s:
+            e = fires_manager.latest_end # needed only for num_hours
+            if e and e > s:
+                num_hours = int((e - s).total_seconds() / SECONDS_PER_HOUR)
+        if not num_hours:
+            raise ValueError("Unable to determine dispersion 'num_hours'")
+
+    logging.debug("Dispersion window: %s for %s hours", start, num_hours)
     return start, num_hours
 
 
