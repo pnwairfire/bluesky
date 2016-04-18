@@ -182,7 +182,7 @@ class TestSmartfire2CsvFileLoader(object):
         filename = os.path.join(self._temp_dir, "fires.json")
         with open(filename, 'w') as f:
             f.write(FIRES_JSON)
-        events_filename = os.path.join(self._temp_dir, "fires.json")
+        events_filename = os.path.join(self._temp_dir, "events.json")
         with open(events_filename, 'w') as f:
             f.write(EVENTS_JSON)
 
