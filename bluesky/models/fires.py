@@ -338,6 +338,20 @@ class FiresManager(object):
         if config_dict:
             configuration.merge_configs(self.config, config_dict)
 
+    @property
+    def earliest_start(self):
+        start_times = [s for s in [f.start for f in self.fires] if s]
+        if start_times:
+            return sorted(start_times)[0]
+        # TODO: else try to determine from "met", if defined
+
+    @property
+    def latest_end(self):
+        end_times = [e for e in [f.end for f in self.fires] if e]
+        if end_times:
+            return sorted(end_times[-1])
+        # TODO: else try to determine from "met", if defined
+
     # @property(self):
     # def meta(self):
     #     return self._meta

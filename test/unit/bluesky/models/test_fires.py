@@ -251,6 +251,44 @@ class TestFiresManager:
         assert {'1': [fire_objects[0]],'2': [fire_objects[1]]} == fires_manager._fires
         assert {'a':1, 'b':{'c':2}, 'd': 123} == fires_manager._meta == fires_manager.meta
 
+    ## Properties
+
+    def test_earliest_and_latest_times(self):
+        fm = fires.FiresManager()
+        f1 = fires.Fire({
+            'id': '1',
+            'location': {'area': 34, 'latitude': 45.0, 'longitude': -120.0},
+            'growth': [
+                {
+                    "start": "2014-05-27T17:00:00",
+                    "end": "2014-05-28T17:00:00",
+                    "pct": 100.0
+                },
+                {
+                    "start": "2014-05-25T17:00:00",
+                    "end": "2014-05-26T17:00:00",
+                    "pct": 100.0
+                }
+            ]
+        })
+        f2 = fires.Fire({
+            'id': '2',
+            'location': {'area': 132, 'latitude': 45.0, 'longitude': -120.0},
+            "growth":[
+                {
+                    "start": "2014-05-27T19:00:00",
+                    "end": "2014-05-28T19:00:00",
+                    "pct": 100.0
+                }
+            ]
+        })
+        f2 = fires.Fire({
+            'id': '2',
+            'location': {'area': 300, 'latitude': 40.0, 'longitude': -120.0}
+        })
+        assert datetime.datetime(2014,5,25,17) == fm.earliest_time
+        assert datetime.datetime(2014,5,28,19) == fm.latest_time
+
     ## Loading
 
     def _stream(test_self, data=''):
