@@ -106,37 +106,62 @@ class TestFire:
         with raises(KeyError) as e:
             f.rifsijsflj
 
-    def test_start(self):
+    def test_start_and_end(self):
         # no growth windows
-        assert None == fires.Fire({}).start
+        f = fires.Fire({})
+        assert None == f.start
+        assert None == f.end
         # empty growth list
-        assert None == fires.Fire({"growth": []}).start
+        f = fires.Fire({"growth": []})
+        assert None == f.start
+        assert None == f.end
         # one growth window with no 'start'
-        assert None == fires.Fire({"growth": [{}]}).start
+        f = fires.Fire({"growth": [{}]})
+        assert None == f.start
+        assert None == f.end
         # one growth window with None 'start'
-        assert None == fires.Fire({"growth": [{'start': None}]}).start
+        f = fires.Fire({"growth": [{'start': None}]})
+        assert None == f.start
+        assert None == f.end
         # multiple growth windows with no 'start'
-        assert None == fires.Fire({"growth": [{}, {}]}).start
+        f = fires.Fire({"growth": [{}, {}]})
+        assert None == f.start
+        assert None == f.end
         # multiple growth windows with None 'start'
-        assert None == fires.Fire({"growth": [
-            {'start': None}, {'start': None}]}).start
+        f = fires.Fire({"growth": [{'start': None}, {'start': None}]})
+        assert None == f.start
+        assert None == f.end
+        # multiple growth windows with None 'end'
+        f = fires.Fire({"growth": [{'end': None}, {'end': None}]})
+        assert None == f.start
+        assert None == f.end
         # one growth window with start defined
-        assert datetime.datetime(2014,05,27,17,0,0) == fires.Fire({"growth": [
-            {'start': "2014-05-27T17:00:00"}]}).start
-        # multiple growth windows, some with 'start' defined, out of order
-        assert datetime.datetime(2014,05,27,17,0,0) == fires.Fire({"growth": [
-            {'start': None},
-            {'start': "2014-05-29T17:00:00"},
-            {'start': "2014-05-27T17:00:00"},
-            {'start': None}
-            ]}).start
+        f = fires.Fire({"growth": [{'start': "2014-05-27T17:00:00"}]})
+        assert datetime.datetime(2014,05,27,17,0,0) == f.start
+        assert None == f.end
+        # one growth window with end defined
+        f = fires.Fire({"growth": [{'end': "2014-05-27T17:00:00"}]})
+        assert None == f.start
+        assert datetime.datetime(2014,05,27,17,0,0) == f.end
+        # multiple growth windows, some with 'start' defined, some with end
+        # defined, out of order
+        f = fires.Fire({"growth": [
+            {'start': None, 'end': '2014-05-30T17:00:00'},
+            {'start': "2014-05-29T17:00:00", 'end': None},
+            {'start': "2014-05-27T17:00:00", 'end': '2014-05-27T17:00:00'},
+            {'start': None, 'end': None}
+            ]})
+        assert datetime.datetime(2014,05,27,17,0,0) == f.start
+        assert datetime.datetime(2014,05,30,17,0,0) == f.end
 
-        # multiple growth windows, all with 'start' defined, out of order
-        assert datetime.datetime(2014,05,27,17,0,0) == fires.Fire({"growth": [
-            {'start': "2014-05-29T17:00:00"},
-            {'start': "2014-05-27T17:00:00"},
-            {'start': "2014-05-28T17:00:00"}
-            ]}).start
+        # multiple growth windows, all with 'start' & 'end' defined, out of order
+        f = fires.Fire({"growth": [
+            {'start': "2014-05-29T17:00:00", 'end': "2014-05-30T17:00:00"},
+            {'start': "2014-05-27T17:00:00", 'end': "2014-05-28T17:00:00"},
+            {'start': "2014-05-28T17:00:00", 'end': "2014-05-29T17:00:00"}
+            ]})
+        assert datetime.datetime(2014,05,27,17,0,0) == f.start
+        assert datetime.datetime(2014,05,30,17,0,0) == f.end
 
     def test_run_id_is_immutable(self, monkeypatch):
         monkeypatch.setattr(uuid, 'uuid1', lambda: "sdf123")

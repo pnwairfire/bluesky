@@ -69,6 +69,14 @@ class Fire(dict):
             if starts:
                 return datetimeutils.parse_datetime(sorted(starts)[0], 'start')
 
+    @property
+    def end(self):
+        # Don't memoize, in case growth windows are added/removed/modified
+        if 'growth' in self:
+            starts = [g['end'] for g in self.growth if g.get('end')]
+            if starts:
+                return datetimeutils.parse_datetime(sorted(starts)[-1], 'end')
+
     # TODO: somehow clear out memoized _latitude/_longitude when location
     #   changes (not sure where to do that); or maybe don't memoize
 
