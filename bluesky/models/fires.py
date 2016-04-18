@@ -70,12 +70,28 @@ class Fire(dict):
                 return datetimeutils.parse_datetime(sorted(starts)[0], 'start')
 
     @property
+    def start_utc(self):
+        return self._to_utc(self.start)
+
+    @property
     def end(self):
         # Don't memoize, in case growth windows are added/removed/modified
         if 'growth' in self:
             starts = [g['end'] for g in self.growth if g.get('end')]
             if starts:
                 return datetimeutils.parse_datetime(sorted(starts)[-1], 'end')
+    @property
+    def end_utc(self):
+        return self._to_utc(self.end)
+
+    def _to_utc(self, dt):
+        if dt:
+            utc_offset = self.get('location', {}).get('utc_offset')
+            if utc_offset:
+                dt = dt - datetime.timedelta(
+                    hours=datetimeutils.parse_utc_offset(utc_offset))
+            # else, assume zero offset
+            return dt
 
     # TODO: somehow clear out memoized _latitude/_longitude when location
     #   changes (not sure where to do that); or maybe don't memoize

@@ -110,39 +110,57 @@ class TestFire:
         # no growth windows
         f = fires.Fire({})
         assert None == f.start
+        assert None == f.start_utc
         assert None == f.end
+        assert None == f.end_utc
         # empty growth list
         f = fires.Fire({"growth": []})
         assert None == f.start
+        assert None == f.start_utc
         assert None == f.end
+        assert None == f.end_utc
         # one growth window with no 'start'
         f = fires.Fire({"growth": [{}]})
         assert None == f.start
+        assert None == f.start_utc
         assert None == f.end
+        assert None == f.end_utc
         # one growth window with None 'start'
         f = fires.Fire({"growth": [{'start': None}]})
         assert None == f.start
+        assert None == f.start_utc
         assert None == f.end
+        assert None == f.end_utc
         # multiple growth windows with no 'start'
         f = fires.Fire({"growth": [{}, {}]})
         assert None == f.start
+        assert None == f.start_utc
         assert None == f.end
+        assert None == f.end_utc
         # multiple growth windows with None 'start'
         f = fires.Fire({"growth": [{'start': None}, {'start': None}]})
         assert None == f.start
+        assert None == f.start_utc
         assert None == f.end
+        assert None == f.end_utc
         # multiple growth windows with None 'end'
         f = fires.Fire({"growth": [{'end': None}, {'end': None}]})
         assert None == f.start
+        assert None == f.start_utc
         assert None == f.end
+        assert None == f.end_utc
         # one growth window with start defined
         f = fires.Fire({"growth": [{'start': "2014-05-27T17:00:00"}]})
         assert datetime.datetime(2014,05,27,17,0,0) == f.start
+        assert datetime.datetime(2014,05,27,17,0,0) == f.start_utc
         assert None == f.end
+        assert None == f.end_utc
         # one growth window with end defined
         f = fires.Fire({"growth": [{'end': "2014-05-27T17:00:00"}]})
         assert None == f.start
+        assert None == f.start_utc
         assert datetime.datetime(2014,05,27,17,0,0) == f.end
+        assert datetime.datetime(2014,05,27,17,0,0) == f.end_utc
         # multiple growth windows, some with 'start' defined, some with end
         # defined, out of order
         f = fires.Fire({"growth": [
@@ -152,7 +170,9 @@ class TestFire:
             {'start': None, 'end': None}
             ]})
         assert datetime.datetime(2014,05,27,17,0,0) == f.start
+        assert datetime.datetime(2014,05,27,17,0,0) == f.start_utc
         assert datetime.datetime(2014,05,30,17,0,0) == f.end
+        assert datetime.datetime(2014,05,30,17,0,0) == f.end_utc
 
         # multiple growth windows, all with 'start' & 'end' defined, out of order
         f = fires.Fire({"growth": [
@@ -162,6 +182,25 @@ class TestFire:
             ]})
         assert datetime.datetime(2014,05,27,17,0,0) == f.start
         assert datetime.datetime(2014,05,30,17,0,0) == f.end
+        assert datetime.datetime(2014,05,27,17,0,0) == f.start_utc
+        assert datetime.datetime(2014,05,30,17,0,0) == f.end_utc
+        # multiple growth windows, all with 'start' & 'end' defined, out of
+        # order, with utc_offset defined
+        f = fires.Fire({
+            "location": {
+                "utc_offset": '-07:00'
+            },
+            "growth": [
+                {'start': "2014-05-29T17:00:00", 'end': "2014-05-30T17:00:00"},
+                {'start': "2014-05-27T17:00:00", 'end': "2014-05-28T17:00:00"},
+                {'start': "2014-05-28T17:00:00", 'end': "2014-05-29T17:00:00"}
+            ]
+        })
+        assert datetime.datetime(2014,05,27,17,0,0) == f.start
+        assert datetime.datetime(2014,05,30,17,0,0) == f.end
+        assert datetime.datetime(2014,05,28,0,0,0) == f.start_utc
+        assert datetime.datetime(2014,05,31,0,0,0) == f.end_utc
+
 
     def test_run_id_is_immutable(self, monkeypatch):
         monkeypatch.setattr(uuid, 'uuid1', lambda: "sdf123")
