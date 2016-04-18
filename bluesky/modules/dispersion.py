@@ -87,8 +87,8 @@ def _get_time(fires_manager):
     start = None
     if start_str:
         if start_str.lower() == 'today':
-            # default to midnight of current date (local time)
-            d = datetime.date.today()
+            # default to midnight of current UTC date
+            d = datetime.datetime.utcnow()
             start = datetime.datetime(d.year, d.month, d.day)
         else:
             start = datetimeutils.parse_datetime(start_str, 'start')
