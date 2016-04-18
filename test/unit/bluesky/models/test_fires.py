@@ -282,12 +282,13 @@ class TestFiresManager:
                 }
             ]
         })
-        f2 = fires.Fire({
+        f3 = fires.Fire({
             'id': '2',
             'location': {'area': 300, 'latitude': 40.0, 'longitude': -120.0}
         })
-        assert datetime.datetime(2014,5,25,17) == fm.earliest_time
-        assert datetime.datetime(2014,5,28,19) == fm.latest_time
+        fm.fires = [f1, f2, f3]
+        assert datetime.datetime(2014,5,25,17) == fm.earliest_start
+        assert datetime.datetime(2014,5,28,19) == fm.latest_end
 
     ## Loading
 
