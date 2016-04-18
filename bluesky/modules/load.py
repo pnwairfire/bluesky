@@ -10,8 +10,8 @@ Example configuration:
                         "name": "smartfire2",
                         "format": "CSV",
                         "type": "file",
-                        "file": "/bluesky/data/fires/fire_locations_%Y%m%d.csv",
-                        "events_file": "/bluesky/data/fires/fire_events_%Y%m%d.csv"
+                        "file": "/bluesky/data/fires/fire_locations.csv",
+                        "events_file": "/bluesky/data/fires/fire_events.csv"
                     }
                 ]
             }
@@ -20,14 +20,14 @@ Example configuration:
 
 or, on the command line:
 
-    bsp --no-input -J load.sources='[{
+    bsp --no-input -B skip_failed_fires=True -J load.sources='[{
         "name":"smartfire2",
         "format":"CSV",
         "type":"file",
         "date_time": "20160412",
         "file": "/bluesky/data/fires/fire_locations_%Y%m%d.csv",
         "events_file": "/bluesky/data/fires/fire_events_%Y%m%d.csv"
-    }]'
+    }]' load -o out.json
 
 Currently supported sources:  smartfire2
 Currently supported types: file
