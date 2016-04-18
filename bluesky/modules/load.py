@@ -10,8 +10,8 @@ Example configuration:
                         "name": "smartfire2",
                         "format": "CSV",
                         "type": "file",
-                        "file": "/bluesky/data/fires/fire_locations.csv",
-                        "events_file": "/bluesky/data/fires/fire_events.csv"
+                        "file": "/bluesky/data/fires/fire_locations_%Y%m%d.csv",
+                        "events_file": "/bluesky/data/fires/fire_events_%Y%m%d.csv"
                     }
                 ]
             }
