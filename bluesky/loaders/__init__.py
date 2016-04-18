@@ -35,7 +35,7 @@ class BaseLoader(object):
             else:
                 self._date_time = config['date_time']
         else:
-            # default to current date
+            # default to current date (local time)
             self._date_time = datetime.date.today()
 
 

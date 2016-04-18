@@ -8,6 +8,7 @@ __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import consume
+import datetime
 import importlib
 import logging
 
@@ -85,7 +86,12 @@ def _get_time(fires_manager):
     if not start_str or not num_hours:
         raise ValueError("Config settings 'start' and 'num_hours' required"
             " for computing dispersion")
-    start = datetimeutils.parse_datetime(start_str, 'start')
+    if start_str.lower() == 'today':
+        # default to midnight of current date (local time)
+        d = datetime.date.today()
+        start = datetime.datetime(d.year, d.month, d.day)
+    else:
+        start = datetimeutils.parse_datetime(start_str, 'start')
     return start, num_hours
 
 
