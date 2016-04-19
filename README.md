@@ -1292,8 +1292,8 @@ emissions config
 
 ##### dispersion
 
- - ***'config' > 'dispersion' > 'start'*** -- *required* -- modeling start time (ex. "2015-01-21T00:00:00Z")
- - ***'config' > 'dispersion' > 'num_hours'*** -- *required* -- number of hours in model run
+ - ***'config' > 'dispersion' > 'start'*** -- *required* (unless it can be determined from fire growth windows) -- modeling start time (ex. "2015-01-21T00:00:00Z"); 'today' is also recognized, in which case start is set to midnight of the current utc date
+ - ***'config' > 'dispersion' > 'num_hours'*** -- *required* (unless it can be determined from fire growth windows) -- number of hours in model run
  - ***'config' > 'dispersion' > 'dest_dir'*** -- *required* -- destination directory to contain output dir
  - ***'config' > 'dispersion' > 'output_dir_name'*** -- *optional* -- name of output directory; defaults to run_id, which is generated if not defined
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
