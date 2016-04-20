@@ -35,9 +35,9 @@ class BaseLoader(object):
             if isinstance(config['date_time'], datetime.date):
                 self._date_time = config['date_time']
             elif hasattr(config['date_time'], 'lower'):
-                if config['date_time'] == 'today':
+                if config['date_time'].lower() == 'today':
                     self._date_time = datetimeutils.today_utc()
-                elif config['date_time'] == 'yesterday':
+                elif config['date_time'].lower() == 'yesterday':
                     self._date_time = datetimeutils.yesterday_utc()
                 else:
                     self._date_time = parse_dt(config['date_time'])
