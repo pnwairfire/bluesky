@@ -5,6 +5,7 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import fnmatch
 import json
+import logging
 import os
 import re
 import shutil
@@ -58,8 +59,29 @@ class ExporterBase(object):
 
         return output_dir
 
+    OUTPUT_DIR_NAME_WILDCARDS = [
+        (re.compile('{dispersion_output_dir_name}'),
+            lambda fires_manager: os.path.basename(fires_manager.dispersion and
+                fires_manager.dispersion.get('output', {}).get('directory') or ''))
+        # TDOO: any other?
+    ]
+    def _replace_output_dir_wild_cards(self, fires_manager, output_dir_name):
+        if output_dir_name:
+            for m, f in self.OUTPUT_DIR_NAME_WILDCARDS:
+                try:
+                    if m.search(output_dir_name):
+                        output_dir_name = output_dir_name.replace(
+                            m.pattern, f(fires_manager))
+                except Exception, e:
+                    logging.error("Failed to replace {} in export output dir "
+                        "name - {}".format(m.pattern, e.message))
+                    # Just skip
+
+        return output_dir_name
+
     def _create_output_dir(self, fires_manager, dest):
-        self._output_dir_name = self.config('output_dir_name') or fires_manager.run_id
+        self._output_dir_name = self._replace_output_dir_wild_cards(
+            fires_manager, self.config('output_dir_name')) or fires_manager.run_id
 
         # create destination dir (to contain output dir) if necessary
         if not os.path.exists(dest):
