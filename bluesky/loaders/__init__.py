@@ -16,6 +16,7 @@ bluesky.loaders.smartfire.csv and is called FileLoader
 """
 
 import datetime
+import logging
 import os
 
 from pyairfire.datetime.parsing import parse as parse_dt
@@ -46,6 +47,7 @@ class BaseLoader(object):
                     "{}".format(config['date_time']))
         else:
             self._date_time = datetimeutils.today_utc()
+        logging.debug('Load date_time = %s', self._date_time)
 
 class BaseFileLoader(BaseLoader):
 
