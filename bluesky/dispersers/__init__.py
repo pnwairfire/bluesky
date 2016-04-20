@@ -108,8 +108,9 @@ class DispersionBase(object):
         self._model_start = start
         self._num_hours = num_hours
 
-        self._run_output_dir = os.path.join(os.path.abspath(dest_dir),
-            output_dir_name)
+        self._run_output_dir = start.strftime(
+            os.path.join(os.path.abspath(dest_dir), output_dir_name))
+
         os.makedirs(self._run_output_dir)
 
         self._set_fire_data(fires)
