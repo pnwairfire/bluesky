@@ -21,4 +21,3 @@ def find_with_datetime(file_or_dir_name, date_time):
                 file_or_dir_name))
 
     return file_or_dir_name
-

@@ -310,6 +310,10 @@ class FiresManager(object):
                 if m.search(self._meta['run_id']):
                     self._meta['run_id'] = self._meta['run_id'].replace(
                         m.pattern, f())
+            # support strftime format codes to fill with current time
+            #   (this is an alternative to {timestamp})
+            self._meta['run_id'] = datetimeutils.today_utc().strftime(
+                self._meta['run_id'])
             self._processed_run_id_wildcards = True
         return self._meta['run_id']
 
