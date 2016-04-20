@@ -20,6 +20,12 @@ def today_midnight_utc():
     d = datetime.datetime.utcnow()
     return datetime.datetime(d.year, d.month, d.day)
 
+def today_utc():
+    return today_midnight_utc().date()
+
 ONE_DAY = datetime.timedelta(days=1)
 def yesterday_midnight_utc():
     return today_midnight_utc() - ONE_DAY
+
+def yesterday_utc():
+    return yesterday_midnight_utc().date()
