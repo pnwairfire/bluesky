@@ -8,7 +8,6 @@ __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import consume
-import datetime
 import importlib
 import logging
 
@@ -88,8 +87,7 @@ def _get_time(fires_manager):
     if start_str:
         if start_str.lower() == 'today':
             # default to midnight of current UTC date
-            d = datetime.datetime.utcnow()
-            start = datetime.datetime(d.year, d.month, d.day)
+            start = datetimeutils.today_midnight_utc()
         else:
             start = datetimeutils.parse_datetime(start_str, 'start')
 
