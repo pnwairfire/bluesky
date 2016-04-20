@@ -6,7 +6,6 @@ import datetime
 import os
 import tempfile
 
-from freezegun import freeze_time
 from py.test import raises
 
 from bluesky.loaders.smartfire2 import csv as sf2csv
