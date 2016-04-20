@@ -21,6 +21,7 @@ import os
 from pyairfire.datetime.parsing import parse as parse_dt
 from pyairfire.io import CSV2JSON
 
+from bluesky import datetimeutils
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __author__ = "Joel Dubowy"
@@ -29,15 +30,22 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 class BaseLoader(object):
 
     def __init__(self, **config):
+        # TODO: use local times instead of UTC?
         if config.get('date_time'):
-            if not isinstance(config['date_time'], datetime.date):
-                self._date_time = parse_dt(config['date_time'])
-            else:
+            if isinstance(config['date_time'], datetime.date):
                 self._date_time = config['date_time']
+            elif hasattr(config['date_time'], 'lower'):
+                if config['date_time'] == 'today':
+                    self._date_time = datetimeutils.today_utc()
+                elif config['date_time'] == 'yesterday':
+                    self._date_time = datetimeutils.yesterday_utc()
+                else:
+                    self._date_time = parse_dt(config['date_time'])
+            else:
+                raise ValueError("Invalid value for load source's date_time: "
+                    "{}".format(config['date_time']))
         else:
-            # default to current date (local time)
-            self._date_time = datetime.date.today()
-
+            self._date_time = datetimeutils.today_utc()
 
 class BaseFileLoader(BaseLoader):
 

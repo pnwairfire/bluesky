@@ -19,7 +19,13 @@ class TestBaseLoader(object):
         assert l._date_time == datetime.date(2016, 1, 14)
 
     @freeze_time("2016-01-14")
-    def test_date_defined_as_string(self):
+    def test_date_defined_as_invalid_value(self):
+        with raises(ValueError) as e_info:
+            l = BaseLoader(date_time=123)
+        assert e_info.value.message == "Invalid value for load source's date_time: 123"
+
+    @freeze_time("2016-01-14")
+    def test_date_defined_as_date_string(self):
         l = BaseLoader(date_time="20151214")
         assert l._date_time == datetime.datetime(2015, 12, 14)
 
@@ -27,12 +33,20 @@ class TestBaseLoader(object):
         assert l._date_time == datetime.datetime(2015, 12, 14, 10, 2, 1)
 
     @freeze_time("2016-01-14")
-    def test_date_defined_as_date(self):
+    def test_date_defined_as_date_object(self):
         l = BaseLoader(date_time=datetime.date(2015, 12, 14))
         assert l._date_time == datetime.date(2015, 12, 14)
 
         l = BaseLoader(date_time=datetime.datetime(2015, 12, 14, 2, 1, 23))
         assert l._date_time == datetime.datetime(2015, 12, 14, 2, 1, 23)
+
+    @freeze_time("2016-01-14")
+    def test_date_defined_as_today_or_yesterday_string(self):
+        l = BaseLoader(date_time='today')
+        assert l._date_time == datetime.date(2016, 1, 14)
+
+        l = BaseLoader(date_time='yesterday')
+        assert l._date_time == datetime.date(2016, 1, 13)
 
 
 class TestBaseFileLoader(object):
