@@ -33,6 +33,23 @@ def yesterday_midnight_utc():
 def yesterday_utc():
     return yesterday_midnight_utc().date()
 
+def replace_wildcards(val, today=None):
+    """Replaces strftime control codes and special wildcards
+
+    Notes:
+     - 'today' defaults to current day in GMT
+     - 'yesterday' is the day prior to 'today'
+     - stftime control codes ('%Y', '%m', etc.) are replaced using 'today'
+    """
+    if val is not None:
+        today = today or today_utc()
+        yesterday = today - ONE_DAY
+        val = today.strftime(val)
+        val = val.replace('{today}', today.strftime('%Y%m%d'))
+        val = val.replace('{yesterday}', yesterday.strftime('%Y%m%d'))
+        return val
+
+
 
 _TO_DATETIME_EXTRA_FORMATS = [
     '%Y%m%dT%H:%M:%S', '%Y%m%dT%H:%M:%SZ',
@@ -42,20 +59,12 @@ _TO_DATETIME_EXTRA_FORMATS = [
 ]
 def to_datetime(val, today=None):
     """Returns date[time] object represented by string
-
-    Notes:
-     - 'today' represents the current day in GMT
-     - 'yesterday' represents the the day before the currrent day in GMT
-     - stftime control codes ('%Y', '%m', etc.) are replaced using current
-       GMT day's midnight
     """
     def _invalid(final_val):
         raise BlueSkyDatetimeValueError(
             "Invalid datetime string value: {}".format(val))
 
     if val is not None:
-        today = today or today_utc()
-        yesterday = today - ONE_DAY
         if isinstance(val, datetime.date):
             return val
         elif hasattr(val, 'lower'):
@@ -64,11 +73,7 @@ def to_datetime(val, today=None):
             except ValueError, e:
                 # try filling in strftime control code as well as any
                 # {today} or {yesterday} wild cards
-                val = today.strftime(val)
-                val = val.replace('{today}', today.strftime('%Y%m%d'))
-                val = val.replace('{yesterday}', yesterday.strftime('%Y%m%d'))
-                # now, any exception raised by parse_dt will rise up to
-                # calling call
+                val = replace_wildcards(val, today=today)
                 try:
                     return parse_dt(val,
                         extra_formats=_TO_DATETIME_EXTRA_FORMATS)

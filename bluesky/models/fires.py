@@ -387,11 +387,6 @@ class FiresManager(object):
         elif isinstance(val, list):
             return [self.replace_config_wildcards(v) for v in val]
         elif hasattr(val, 'lower'):  # i.e. it's a string
-            # Note: only call datetimeutils.to_datetime if start_str is defined,
-            #   because if it isn't defined, we want to determine start from fire
-            #   growth windows (i.e. fires_manager.earliest_start), below.
-            #   datetimeutils.to_datetime defaults to today, UTC, if start_str
-            #   isn't defined
             if val:
                 # first, try to convert to datetime
                 try:
@@ -400,7 +395,12 @@ class FiresManager(object):
                 except BlueSkyDatetimeValueError:
                     pass
 
-            # next, try to replace wildcards
+                # next, try to replace wildcards
+                # TODO:
+                val = datetimeutils.replace_wildcards(val,
+                    today=self.date_time.date())
+
+                # TODO: any other replacements?
 
         return val
 

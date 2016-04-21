@@ -60,6 +60,28 @@ class TestTodayAndYesterdayMidnight(object):
         assert datetimeutils.yesterday_midnight_utc() == self.MN_4_18
         assert datetimeutils.yesterday_utc() == self.MN_4_18.date()
 
+class TesetReplaceWildcards(object):
+    @freeze_time("2016-01-14")
+    def test_today_not_defined(self):
+        assert datetimeutils.to_datetime(None) == None
+        assert datetimeutils.to_datetime("%Y%m%d00") == "2016011400"
+        assert datetimeutils.to_datetime("%Y%m%d%H%M%S") == "20160114000000"
+
+    @freeze_time("2016-01-14")
+    def test_today_defined(self):
+        assert datetimeutils.to_datetime(None,
+            today=datetime.date(2016, 2, 15)) == None
+        assert datetimeutils.to_datetime(None,
+            today=datetime.datetime(2016, 2, 15, 0)) == None
+        assert datetimeutils.to_datetime("%Y%m%d00",
+            today=datetime.date(2016, 2, 15)) == "2016021500"
+        assert datetimeutils.to_datetime("%Y%m%d00",
+            today=datetime.datetime(2016, 2, 15, 1)) == "2016021500"
+        assert datetimeutils.to_datetime("%Y%m%d%H%M%S",
+            today=datetime.date(2016, 2, 15)) == "20160215000000"
+        assert datetimeutils.to_datetime("%Y%m%d%H%M%S",
+            today=datetime.datetime(2016, 2, 15, 1)) == "20160215010000"
+
 class TestToDatetime(object):
 
     @freeze_time("2016-01-14")
