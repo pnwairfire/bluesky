@@ -53,8 +53,6 @@ def fill_in_datetime_strings(val, today=None):
     # else, return val as is
     return val
 
-
-
 _TO_DATETIME_EXTRA_FORMATS = [
     '%Y%m%dT%H:%M:%S', '%Y%m%dT%H:%M:%SZ',
     # TODO: do these last two cause any problems?  The reason to include them is
