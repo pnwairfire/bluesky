@@ -33,21 +33,25 @@ def yesterday_midnight_utc():
 def yesterday_utc():
     return yesterday_midnight_utc().date()
 
-def replace_wildcards(val, today=None):
-    """Replaces strftime control codes and special wildcards
+def fill_in_datetime_strings(val, today=None):
+    """Replaces strftime control codes and special wildcards if input is a string
 
     Notes:
      - 'today' defaults to current day in GMT
      - 'yesterday' is the day prior to 'today'
      - stftime control codes ('%Y', '%m', etc.) are replaced using 'today'
+
+    TODO:
+     - rename this method ?
     """
-    if val is not None:
+    if hasattr(val, 'lower'):
         today = today or today_utc()
         yesterday = today - ONE_DAY
         val = today.strftime(val)
         val = val.replace('{today}', today.strftime('%Y%m%d'))
         val = val.replace('{yesterday}', yesterday.strftime('%Y%m%d'))
-        return val
+    # else, return val as is
+    return val
 
 
 
