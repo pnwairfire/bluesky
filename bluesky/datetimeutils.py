@@ -17,6 +17,8 @@ from pyairfire.datetime.parsing import (
     parse as parse_dt
 )
 
+from bluesky.exceptions import BlueSkyDatetimeValueError
+
 def today_midnight_utc():
     d = datetime.datetime.utcnow()
     return datetime.datetime(d.year, d.month, d.day)
@@ -38,7 +40,7 @@ _TO_DATETIME_EXTRA_FORMATS = [
     #  so that you can, for e.g., specify '{today}12Z' for dispersion start time
     '%Y%m%dT%H', '%Y%m%dT%HZ'
 ]
-def to_datetime(val, reference_date_time=None):
+def to_datetime(val, today=None):
     """Returns date[time] object represented by string
 
     Notes:
@@ -48,38 +50,31 @@ def to_datetime(val, reference_date_time=None):
        GMT day's midnight
     """
     def _invalid(final_val):
-        raise ValueError("Invalid datetime string value: {}".format(val))
+        raise BlueSkyDatetimeValueError(
+            "Invalid datetime string value: {}".format(val))
 
-    today = reference_date_time or today_utc()
-    yesterday = today - ONE_DAY
-    if val:
+    if val is not None:
+        today = today or today_utc()
+        yesterday = today - ONE_DAY
         if isinstance(val, datetime.date):
             return val
         elif hasattr(val, 'lower'):
-            # TODO: depricate 'today' and 'yesterday', since same thing
-            #  can be accomplished with '{today}' and '{yesterday}',
-            #  or just leave in for convenience ?
-            if val.lower() == 'today':
-                return today
-            elif val.lower() == 'yesterday':
-                return yesterday
-            else:
+            try:
+                return parse_dt(val)
+            except ValueError, e:
+                # try filling in strftime control code as well as any
+                # {today} or {yesterday} wild cards
+                val = today.strftime(val)
+                val = val.replace('{today}', today.strftime('%Y%m%d'))
+                val = val.replace('{yesterday}', yesterday.strftime('%Y%m%d'))
+                # now, any exception raised by parse_dt will rise up to
+                # calling call
                 try:
-                    return parse_dt(val)
-                except ValueError, e:
-                    # try filling in strftime control code as well as any
-                    # {today} or {yesterday} wild cards
-                    val = today.strftime(val)
-                    val = val.replace('{today}', today.strftime('%Y%m%d'))
-                    val = val.replace('{yesterday}', yesterday.strftime('%Y%m%d'))
-                    # now, any exception raised by parse_dt will rise up to
-                    # calling call
-                    try:
-                        return parse_dt(val,
-                            extra_formats=_TO_DATETIME_EXTRA_FORMATS)
-                    except:
-                        _invalid(val)
+                    return parse_dt(val,
+                        extra_formats=_TO_DATETIME_EXTRA_FORMATS)
+                except:
+                    _invalid(val)
         else:
             _invalid(val)
-    else:
-        return today
+
+    # else, it just returns None, val's value

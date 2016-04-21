@@ -64,7 +64,7 @@ class TestToDatetime(object):
 
     @freeze_time("2016-01-14")
     def test_date_not_defined(self):
-        assert datetimeutils.to_datetime(None) == datetime.date(2016, 1, 14)
+        assert datetimeutils.to_datetime(None) == None
 
     @freeze_time("2016-01-14")
     def test_date_defined_as_invalid_value(self):
