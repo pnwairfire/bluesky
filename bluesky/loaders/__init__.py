@@ -29,7 +29,10 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 class BaseLoader(object):
 
     def __init__(self, **config):
-        self._date_time = config.get('date_time') or datetimeutils.today_utc()
+        # Note: it's up to calling code to default self._date_time to
+        #  today or whatever is appropriate, or it can be configured with
+        #  '{today}' or '{testerday}' wildcards
+        self._date_time = config.get('date_time')
         logging.debug('Load date_time = %s', self._date_time)
 
 class BaseFileLoader(BaseLoader):
