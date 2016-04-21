@@ -61,7 +61,7 @@ _TO_DATETIME_EXTRA_FORMATS = [
     #  so that you can, for e.g., specify '{today}12Z' for dispersion start time
     '%Y%m%dT%H', '%Y%m%dT%HZ'
 ]
-def to_datetime(val, today=None):
+def to_datetime(val):
     """Returns date[time] object represented by string
     """
     def _invalid(final_val):
@@ -73,16 +73,10 @@ def to_datetime(val, today=None):
             return val
         elif hasattr(val, 'lower'):
             try:
-                return parse_dt(val)
+                return parse_dt(val,
+                    extra_formats=_TO_DATETIME_EXTRA_FORMATS)
             except ValueError, e:
-                # try filling in strftime control code as well as any
-                # {today} or {yesterday} wild cards
-                val = replace_wildcards(val, today=today)
-                try:
-                    return parse_dt(val,
-                        extra_formats=_TO_DATETIME_EXTRA_FORMATS)
-                except:
-                    _invalid(val)
+                _invalid(val)
         else:
             _invalid(val)
 

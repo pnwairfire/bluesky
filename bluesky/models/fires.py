@@ -305,6 +305,8 @@ class FiresManager(object):
         if not self._meta.get('date_time'):
             self._meta['date_time'] = datetimeutils.today_utc()
         elif not self._processed_date_time:
+            self._meta['date_time'] = datetimeutils.fill_in_datetime_strings(
+                self._meta['date_time'])
             self._meta['date_time'] = datetimeutils.to_datetime(
                 self._meta['date_time'])
             self._processed_date_time = True
@@ -388,17 +390,15 @@ class FiresManager(object):
             return [self.replace_config_wildcards(v) for v in val]
         elif hasattr(val, 'lower'):  # i.e. it's a string
             if val:
-                # first, try to convert to datetime
+                # first, fill in any datetime control codes or wildcards
+                val = datetimeutils.fill_in_datetime_strings(val,
+                    today=self.date_time.date())
+
+                # then, see if the resulting string purely represents a datetime
                 try:
-                    return datetimeutils.to_datetime(val,
-                        today=self.date_time.date())
+                    val datetimeutils.to_datetime(val)
                 except BlueSkyDatetimeValueError:
                     pass
-
-                # next, try to replace wildcards
-                # TODO:
-                val = datetimeutils.replace_wildcards(val,
-                    today=self.date_time.date())
 
                 # TODO: any other replacements?
 
