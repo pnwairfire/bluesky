@@ -387,7 +387,7 @@ class FiresManager(object):
             for k in val:
                 val[k] = self.replace_config_wildcards(val)
         elif isinstance(val, list):
-            return [self.replace_config_wildcards(v) for v in val]
+            val = [self.replace_config_wildcards(v) for v in val]
         elif hasattr(val, 'lower'):  # i.e. it's a string
             if val:
                 # first, fill in any datetime control codes or wildcards
