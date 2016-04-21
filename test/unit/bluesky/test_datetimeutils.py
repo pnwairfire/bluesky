@@ -9,6 +9,7 @@ from freezegun import freeze_time
 from py.test import raises
 
 from bluesky import datetimeutils
+from bluesky.exceptions import BlueSkyDatetimeValueError
 
 class TestTodayAndYesterdayMidnight(object):
 
@@ -90,27 +91,33 @@ class TestToDatetime(object):
 
     @freeze_time("2016-01-14")
     def test_date_defined_as_invalid_value(self):
-        with raises(ValueError) as e_info:
+        with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime(123)
         assert e_info.value.message == "Invalid datetime string value: 123"
 
-        with raises(ValueError) as e_info:
+        with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('{today}12:11:00')
         assert e_info.value.message == 'Invalid datetime string value: 2016011412:11:00'
 
-        with raises(ValueError) as e_info:
+        with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('{today}12:11:00Z')
         assert e_info.value.message == 'Invalid datetime string value: 2016011412:11:00Z'
 
-
-        with raises(ValueError) as e_info:
+        with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('{yesterday}12:11:00')
         assert e_info.value.message == 'Invalid datetime string value: 2016011312:11:00'
 
-        with raises(ValueError) as e_info:
+        with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('{yesterday}12:11:00Z')
         assert e_info.value.message == 'Invalid datetime string value: 2016011312:11:00Z'
 
+        with raises(BlueSkyDatetimeValueError) as e_info:
+            dt = datetimeutils.to_datetime('today')
+        assert e_info.value.message == 'Invalid datetime string value: today'
+
+        with raises(BlueSkyDatetimeValueError) as e_info:
+            dt = datetimeutils.to_datetime('yesterday')
+        assert e_info.value.message == 'Invalid datetime string value: yesterday'
 
     @freeze_time("2016-01-14")
     def test_date_defined_as_date_string(self):
@@ -127,14 +134,6 @@ class TestToDatetime(object):
 
         dt = datetimeutils.to_datetime(datetime.datetime(2015, 12, 14, 2, 1, 23))
         assert dt == datetime.datetime(2015, 12, 14, 2, 1, 23)
-
-    @freeze_time("2016-01-14")
-    def test_date_defined_as_today_or_yesterday_string(self):
-        dt = datetimeutils.to_datetime('today')
-        assert dt == datetime.date(2016, 1, 14)
-
-        dt = datetimeutils.to_datetime('yesterday')
-        assert dt == datetime.date(2016, 1, 13)
 
     @freeze_time("2016-01-14")
     def test_date_defined_with_strftime_codes_and_or_today_or_yesterday_wildcards(self):
