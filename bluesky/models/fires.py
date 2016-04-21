@@ -18,7 +18,7 @@ from pyairfire import process
 
 from bluesky import datautils, configuration, datetimeutils
 from bluesky.exceptions import (
-    BlueSkyImportError, BlueSkyModuleError
+    BlueSkyImportError, BlueSkyModuleError, BlueSkyDatetimeValueError
 )
 
 __all__ = [
@@ -206,12 +206,15 @@ class FiresManager(object):
         self._meta = {}
         self.modules = []
         self.fires = [] # this intitializes self._fires and self_fire_ids
+        self._processed_date_time = False
         self._processed_run_id_wildcards = False
         self._num_fires = 0
         if run_id:
             self._meta['run_id'] = run_id
 
+    ##
     ## Importing
+    ##
 
     def add_fires(self, fires):
         for fire in fires:
@@ -240,7 +243,9 @@ class FiresManager(object):
                 self._fire_ids.remove(fire.id)
                 self._fires.pop(fire.id)
 
+    ##
     ## Merging Fires
+    ##
 
     def merge_fires(self):
         """Merges fires that have the same id.
@@ -262,7 +267,7 @@ class FiresManager(object):
                 return sys.stdout
 
     ##
-    ## 'Public' Methods
+    ## Fire Related Properties
     ##
 
     def _get_fire(self, fire):
@@ -289,6 +294,31 @@ class FiresManager(object):
         self._fire_ids = set()
         for fire in fires_list:
             self.add_fire(Fire(fire))
+
+    ##
+    ## Special Meta Attributes
+    ##
+
+    # TDOO: rename date_time
+    @property
+    def date_time(self):
+        if not self._meta.get('date_time'):
+            self._meta['date_time'] = datetimeutils.today_utc()
+        elif not self._processed_date_time:
+            self._meta['date_time'] = datetimeutils.to_datetime(
+                self._meta['date_time'])
+            self._processed_date_time = True
+
+        return self._meta['date_time']
+
+    @date_time.setter
+    def date_time(self, date_time):
+        self._meta['date_time'] = date_time
+        # HACK: access date_time simply to trigger replacement of wildcards
+        # Note: the check for 'date_time' in self._meta prevents it from being
+        #  generated unnecessarily
+        self.run_id
+
 
     @property
     def modules(self):
@@ -346,17 +376,59 @@ class FiresManager(object):
     def meta(self):
         return self._meta
 
+    ##
+    ## Configuration
+    ##
+
+    def replace_config_wildcards(self, val):
+        if isinstance(val, dict):
+            for k in val:
+                val[k] = self.replace_config_wildcards(val)
+        elif isinstance(val, list):
+            return [self.replace_config_wildcards(v) for v in val]
+        elif hasattr(val, 'lower'):  # i.e. it's a string
+            # Note: only call datetimeutils.to_datetime if start_str is defined,
+            #   because if it isn't defined, we want to determine start from fire
+            #   growth windows (i.e. fires_manager.earliest_start), below.
+            #   datetimeutils.to_datetime defaults to today, UTC, if start_str
+            #   isn't defined
+            if val:
+                # first, try to convert to datetime
+                try:
+                    return datetimeutils.to_datetime(val,
+                        today=self.date_time.date())
+                except BlueSkyDatetimeValueError:
+                    pass
+
+            # next, try to replace wildcards
+
+        return val
+
     def get_config_value(self, *keys, **kwargs):
-        return configuration.get_config_value(self.config, *keys, **kwargs)
+        return configuration.get_config_value(self._config, *keys, **kwargs)
 
     def set_config_value(self, value, *keys):
-        self.config = self.config or dict()
-        configuration.set_config_value(self.config, value, *keys)
+        self._config = self.config or dict()
+        value = self.replace_config_wildcards(value)
+        configuration.set_config_value(self._config, value, *keys)
+
+    @property
+    def config(self):
+        return self._config
+
+    @config.setter
+    def config(self, config):
+        self._config = self.replace_config_wildcards(config)
 
     def merge_config(self, config_dict):
-        self.config = self.config or dict()
+        self._config = self._config or dict()
+
         if config_dict:
-            configuration.merge_configs(self.config, config_dict)
+            configuration.merge_configs(self._config, config_dict)
+
+    ##
+    ## Helper methods
+    ##
 
     @property
     def earliest_start(self):
@@ -394,6 +466,10 @@ class FiresManager(object):
             self._meta[attr] = val
         super(FiresManager, self).__setattr__(attr, val)
 
+    ##
+    ## Running Modules
+    ##
+
     def processed(self, module_name, version, **data):
         # TODO: determine module from call stack rather than require name
         # to be passed in.  Also get version from module's __version__
@@ -420,38 +496,6 @@ class FiresManager(object):
     def summarize(self, **data):
         self.summary = self.summary or {}
         self.summary = datautils.deepmerge(self.summary, data)
-
-    ## Loading data
-
-    def load(self, input_dict):
-        if not hasattr(input_dict, 'keys'):
-            raise ValueError("Invalid fire data")
-
-        # wipe out existing list of modules, if any
-        self.modules = input_dict.pop('modules', [])
-
-        # wipe out existing fires, if any
-        self.fires = input_dict.pop('fire_information', [])
-
-        self._meta = input_dict
-
-        # HACK: access run id simply to trigger replacement of wildcards
-        # Note: the check for 'run_id' in self._meta prevents it from being
-        #  generated unnecessarily
-        # TODO: always generate a run id (by removing the check)?
-        if 'run_id' in self._meta:
-            self.run_id
-
-    def loads(self, input_stream=None, input_file=None):
-        """Loads json-formatted fire data, creating list of Fire objects and
-        storing other fields in self.meta.
-        """
-        if input_stream and input_file:
-            raise RuntimeError("Don't specify both input_stream and input_file")
-        if not input_stream:
-            input_stream = self._stream(input_file, 'r')
-        data = json.loads(''.join([d for d in input_stream]))
-        return self.load(data)
 
     def run(self): #, module_names):
         self.runtime = {"modules": []}
@@ -572,6 +616,40 @@ class FiresManager(object):
     def skip_failed_fires(self):
         return not not self.get_config_value('skip_failed_fires')
 
+    ## Loading data
+
+    def load(self, input_dict):
+        if not hasattr(input_dict, 'keys'):
+            raise ValueError("Invalid fire data")
+
+        # wipe out existing list of modules, if any
+        self.modules = input_dict.pop('modules', [])
+
+        # wipe out existing fires, if any
+        self.fires = input_dict.pop('fire_information', [])
+
+        self.config = input_dict.pop('config', {})
+
+        self._meta = input_dict
+
+        # HACK: access run id simply to trigger replacement of wildcards
+        # Note: the check for 'run_id' in self._meta prevents it from being
+        #  generated unnecessarily
+        # TODO: always generate a run id (by removing the check)?
+        if 'run_id' in self._meta:
+            self.run_id
+
+    def loads(self, input_stream=None, input_file=None):
+        """Loads json-formatted fire data, creating list of Fire objects and
+        storing other fields in self.meta.
+        """
+        if input_stream and input_file:
+            raise RuntimeError("Don't specify both input_stream and input_file")
+        if not input_stream:
+            input_stream = self._stream(input_file, 'r')
+        data = json.loads(''.join([d for d in input_stream]))
+        return self.load(data)
+
     ## Dumping data
 
     def dump(self):
@@ -585,7 +663,7 @@ class FiresManager(object):
         # TODO: keep track of whether modules were specified in the input
         # json or on the command line, and add them to the output if they
         # were in the input
-        return dict(self._meta, fire_information=self.fires)
+        return dict(self._meta, fire_information=self.fires, config=self.config)
 
     def dumps(self, output_stream=None, output_file=None):
         if output_stream and output_file:

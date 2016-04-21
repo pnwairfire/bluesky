@@ -29,9 +29,7 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 class BaseLoader(object):
 
     def __init__(self, **config):
-        # TODO: pass in global date_time
-        # TODO: use local times instead of UTC?
-        self._date_time = datetimeutils.to_datetime(config.get('date_time'))
+        self._date_time = config.get('date_time') or datetimeutils.today_utc()
         logging.debug('Load date_time = %s', self._date_time)
 
 class BaseFileLoader(BaseLoader):

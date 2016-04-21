@@ -82,16 +82,7 @@ def _get_module_and_class(model):
 SECONDS_PER_HOUR = 3600
 
 def _get_time(fires_manager):
-    start_str = fires_manager.get_config_value('dispersion', 'start')
-    start = None
-    # Note: only call datetimeutils.to_datetime if start_str is defined,
-    #   because if it isn't defined, we want to determine start from fire
-    #   growth windows (i.e. fires_manager.earliest_start), below.
-    #   datetimeutils.to_datetime defaults to today, UTC, if start_str
-    #   isn't defined
-    if start_str:
-        start = datetimeutils.to_datetime(start_str, fires_manager.date_time)
-
+    start = fires_manager.get_config_value('dispersion', 'start')
     num_hours = fires_manager.get_config_value('dispersion', 'num_hours')
 
     if not start or num_hours is None:

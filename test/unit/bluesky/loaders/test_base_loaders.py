@@ -15,6 +15,16 @@ from bluesky.loaders import BaseLoader, BaseFileLoader
 #   test_datetimeutils:TeetToDatetime (since the code is all in
 #   datetimeutils.to_datetime)
 
+class TestBaseLoader(object):
+
+    @freeze_time("2016-01-14")
+    def test(self):
+        l = BaseLoader()
+        l._date_time = datetime.date(2016, 1, 14)
+        l = BaseLoader(date_time=datetime.date(2016, 2, 14))
+        l._date_time = datetime.date(2016, 2, 14)
+        l = BaseLoader(date_time=datetime.datetime(2016, 2, 14, 12, 1))
+        l._date_time = datetime.datetime(2016, 2, 14, 12, 1)
 
 class TestBaseFileLoader(object):
 
