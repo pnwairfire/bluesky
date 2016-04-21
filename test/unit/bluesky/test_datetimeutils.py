@@ -77,7 +77,9 @@ class TestReplaceWildcards(object):
         assert datetimeutils.fill_in_datetime_strings("%Y%m%d00") == "2016011400"
         assert datetimeutils.fill_in_datetime_strings("%Y%m%d%H%M%S") == "20160114000000"
         assert datetimeutils.fill_in_datetime_strings("{today}") == "20160114"
+        assert datetimeutils.fill_in_datetime_strings("{today}00") == "2016011400"
         assert datetimeutils.fill_in_datetime_strings("{yesterday}") == "20160113"
+        assert datetimeutils.fill_in_datetime_strings("{yesterday}12") == "2016011312"
 
     @freeze_time("2016-01-14")
     def test_today_defined(self):
