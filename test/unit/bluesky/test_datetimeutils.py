@@ -6,6 +6,7 @@ __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 import datetime
 
 from freezegun import freeze_time
+from py.test import raises
 
 from bluesky import datetimeutils
 
@@ -58,3 +59,100 @@ class TestTodayAndYesterdayMidnight(object):
         assert datetimeutils.today_utc() == self.MN_4_19.date()
         assert datetimeutils.yesterday_midnight_utc() == self.MN_4_18
         assert datetimeutils.yesterday_utc() == self.MN_4_18.date()
+
+class TestToDatetime(object):
+
+    @freeze_time("2016-01-14")
+    def test_date_not_defined(self):
+        assert datetimeutils.to_datetime(None) == datetime.date(2016, 1, 14)
+
+    @freeze_time("2016-01-14")
+    def test_date_defined_as_invalid_value(self):
+        with raises(ValueError) as e_info:
+            dt = datetimeutils.to_datetime(123)
+        assert e_info.value.message == "Invalid datetime string value: 123"
+
+        with raises(ValueError) as e_info:
+            dt = datetimeutils.to_datetime('{today}12:11:00')
+        assert e_info.value.message == 'Invalid datetime string value: 2016011412:11:00'
+
+        with raises(ValueError) as e_info:
+            dt = datetimeutils.to_datetime('{today}12:11:00Z')
+        assert e_info.value.message == 'Invalid datetime string value: 2016011412:11:00Z'
+
+
+        with raises(ValueError) as e_info:
+            dt = datetimeutils.to_datetime('{yesterday}12:11:00')
+        assert e_info.value.message == 'Invalid datetime string value: 2016011312:11:00'
+
+        with raises(ValueError) as e_info:
+            dt = datetimeutils.to_datetime('{yesterday}12:11:00Z')
+        assert e_info.value.message == 'Invalid datetime string value: 2016011312:11:00Z'
+
+
+    @freeze_time("2016-01-14")
+    def test_date_defined_as_date_string(self):
+        dt = datetimeutils.to_datetime("20151214")
+        assert dt == datetime.datetime(2015, 12, 14)
+
+        dt = datetimeutils.to_datetime("2015-12-14T10:02:01")
+        assert dt == datetime.datetime(2015, 12, 14, 10, 2, 1)
+
+    @freeze_time("2016-01-14")
+    def test_date_defined_as_date_object(self):
+        dt = datetimeutils.to_datetime(datetime.date(2015, 12, 14))
+        assert dt == datetime.date(2015, 12, 14)
+
+        dt = datetimeutils.to_datetime(datetime.datetime(2015, 12, 14, 2, 1, 23))
+        assert dt == datetime.datetime(2015, 12, 14, 2, 1, 23)
+
+    @freeze_time("2016-01-14")
+    def test_date_defined_as_today_or_yesterday_string(self):
+        dt = datetimeutils.to_datetime('today')
+        assert dt == datetime.date(2016, 1, 14)
+
+        dt = datetimeutils.to_datetime('yesterday')
+        assert dt == datetime.date(2016, 1, 13)
+
+    @freeze_time("2016-01-14")
+    def test_date_defined_with_strftime_codes_and_or_today_or_yesterday_wildcards(self):
+        dt = datetimeutils.to_datetime('{today}')
+        assert dt == datetime.datetime(2016, 1, 14)
+        dt = datetimeutils.to_datetime('{today}121100')
+        assert dt == datetime.datetime(2016, 1, 14, 12, 11, 00)
+        dt = datetimeutils.to_datetime('{today}121100Z')
+        assert dt == datetime.datetime(2016, 1, 14, 12, 11, 00)
+        dt = datetimeutils.to_datetime('{today}T121100')
+        assert dt == datetime.datetime(2016, 1, 14, 12, 11, 00)
+        dt = datetimeutils.to_datetime('{today}T121100Z')
+        assert dt == datetime.datetime(2016, 1, 14, 12, 11, 00)
+
+        dt = datetimeutils.to_datetime('{today}T12:11:00')
+        assert dt == datetime.datetime(2016, 1, 14, 12, 11, 00)
+        dt = datetimeutils.to_datetime('{today}T12:11:00Z')
+        assert dt == datetime.datetime(2016, 1, 14, 12, 11, 00)
+        dt = datetimeutils.to_datetime('{today}T12')
+        assert dt == datetime.datetime(2016, 1, 14, 12)
+        dt = datetimeutils.to_datetime('{today}T12Z')
+        assert dt == datetime.datetime(2016, 1, 14, 12)
+
+        dt = datetimeutils.to_datetime('{yesterday}')
+        assert dt == datetime.datetime(2016, 1, 13)
+        dt = datetimeutils.to_datetime('{yesterday}121100')
+        assert dt == datetime.datetime(2016, 1, 13, 12, 11, 00)
+        dt = datetimeutils.to_datetime('{yesterday}121100Z')
+        assert dt == datetime.datetime(2016, 1, 13, 12, 11, 00)
+        dt = datetimeutils.to_datetime('{yesterday}T121100')
+        assert dt == datetime.datetime(2016, 1, 13, 12, 11, 00)
+        dt = datetimeutils.to_datetime('{yesterday}T121100Z')
+        assert dt == datetime.datetime(2016, 1, 13, 12, 11, 00)
+        dt = datetimeutils.to_datetime('{yesterday}T12:11:00')
+        assert dt == datetime.datetime(2016, 1, 13, 12, 11, 00)
+        dt = datetimeutils.to_datetime('{yesterday}T12:11:00Z')
+        assert dt == datetime.datetime(2016, 1, 13, 12, 11, 00)
+        dt = datetimeutils.to_datetime('{yesterday}T12')
+        assert dt == datetime.datetime(2016, 1, 13, 12)
+        dt = datetimeutils.to_datetime('{yesterday}T12Z')
+        assert dt == datetime.datetime(2016, 1, 13, 12)
+
+        # TODO: test datetime='%Y-%m-%dT12:00:00', etc.
