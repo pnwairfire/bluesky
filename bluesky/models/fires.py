@@ -427,7 +427,7 @@ class FiresManager(object):
             configuration.merge_configs(self._config, config_dict)
 
     ##
-    ## Helper methods
+    ## Helper properties
     ##
 
     @property
@@ -444,9 +444,10 @@ class FiresManager(object):
             return sorted(end_times)[-1]
         # TODO: else try to determine from "met", if defined (?)
 
-    # @property(self):
-    # def meta(self):
-    #     return self._meta
+    ##
+    ## Meta Properties
+    ##
+
 
     def __getattr__(self, attr):
         """Provides get access to meta data
