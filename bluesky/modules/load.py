@@ -24,9 +24,8 @@ or, on the command line:
         "name":"smartfire2",
         "format":"CSV",
         "type":"file",
-        "date_time": "20160412",
-        "file": "/bluesky/data/fires/fire_locations_%Y%m%d.csv",
-        "events_file": "/bluesky/data/fires/fire_events_%Y%m%d.csv"
+        "file": "/bluesky/data/fires/fire_locations_{yesterday:%Y%m%d}.csv",
+        "events_file": "/bluesky/data/fires/fire_events_{yesterday:%Y%m%d}.csv"
     }]' load -o out.json
 
 Currently supported sources:  smartfire2
