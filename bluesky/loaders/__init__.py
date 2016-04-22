@@ -22,30 +22,27 @@ import os
 from pyairfire.io import CSV2JSON
 
 from bluesky import datetimeutils, fileutils
+from bluesky.exceptions import BlueSkyConfigurationError
 
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
-class BaseLoader(object):
+class BaseFileLoader(object):
 
     def __init__(self, **config):
-        # Note: it's up to calling code to default self._date_time to
-        #  today or whatever is appropriate, or it can be configured with
-        #  '{today}' or '{testerday}' wildcards
-        self._date_time = config.get('date_time')
-        logging.debug('Load date_time = %s', self._date_time)
-
-class BaseFileLoader(BaseLoader):
-
-    def __init__(self, **config):
-        super(BaseFileLoader, self).__init__(**config)
-        self._filename = fileutils.find_with_datetime(
-            config.get('file'), self._date_time)
+        self._filename = config.get('file')
+        if not self._filename:
+            raise BlueSkyConfigurationError("Fires file to load not specified")
+        if not os.path.isfile(self._filename):
+            raise BlueSkyConfigurationError("Fires file to load {} does not "
+                "exist".format(self._filename))
 
         self._events_filename = None
         if config.get('events_file'):
-            self._events_filename = fileutils.find_with_datetime(
-                config['events_file'], self._date_time)
+            self._events_filename = config['events_file']
+            if not os.path.isfile(self._events_filename):
+                raise BlueSkyConfigurationError("Fire events file to load {} "
+                    "does not exist".format(self._events_filename))
 
     ##
     ## File IO

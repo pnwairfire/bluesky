@@ -63,7 +63,6 @@ def run(fires_manager):
             #   configured, don't have corresponding loader class, etc.) and source
             #   that fail to load
             try:
-                source['date_time'] = source.get('date_time') or fires_manager.date_time
                 loader = _import_loader(source)
                 loaded_fires = loader(**source).load()
                 fires_manager.add_fires(loaded_fires)
