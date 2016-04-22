@@ -196,6 +196,8 @@ class FireEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, 'tolist'):
             return obj.tolist()
+        elif isinstance(obj, datetime.date):
+            return obj.isoformat()
 
         return json.JSONEncoder.default(self, obj)
 
