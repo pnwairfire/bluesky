@@ -385,7 +385,7 @@ class FiresManager(object):
     def replace_config_wildcards(self, val):
         if isinstance(val, dict):
             for k in val:
-                val[k] = self.replace_config_wildcards(val)
+                val[k] = self.replace_config_wildcards(val[k])
         elif isinstance(val, list):
             val = [self.replace_config_wildcards(v) for v in val]
         elif hasattr(val, 'lower'):  # i.e. it's a string
