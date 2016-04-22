@@ -109,6 +109,13 @@ OPTIONAL_ARGS = [
         'long': '--run-id',
         'dest': 'run_id',
         'help': 'custom run id to use instead of generating a new GUID'
+    },
+    {
+        'long': '--date-time',
+        'help': ("What's considdered the current day in the context of the "
+            "run; defaults to current UTC day; used to replace config "
+            "wildcards ('{today}', etc.)")
+        #'action': scripting.args.ParseDatetimeAction
     }
 
 ]
@@ -217,6 +224,8 @@ def output_version(parser, args):
 def load_fires(args):
     # Note: Calling code handles exception
     fires_manager = models.fires.FiresManager()
+    if args.date_time:
+        fires_manager.date_time = args.date_time
     if not args.no_input:
         fires_manager.loads(input_file=args.input_file)
 
