@@ -18,7 +18,7 @@ def find_with_datetime(file_or_dir_name, date_time):
 
     # if it still doesn't exist, raise exception
     if not os.path.isfile(file_or_dir_name):
-        raise BlueSkyConfigurationError('File/dir {} does not exist'.format(
+        raise BlueSkyConfigurationError('File {} does not exist'.format(
             file_or_dir_name))
 
     return file_or_dir_name
