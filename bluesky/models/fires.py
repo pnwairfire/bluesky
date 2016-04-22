@@ -392,7 +392,7 @@ class FiresManager(object):
             if val:
                 # first, fill in any datetime control codes or wildcards
                 val = datetimeutils.fill_in_datetime_strings(val,
-                    today=self.date_time.date())
+                    today=self.date_time)
 
                 # then, see if the resulting string purely represents a datetime
                 try:
