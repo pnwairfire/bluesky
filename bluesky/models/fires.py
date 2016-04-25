@@ -319,6 +319,7 @@ class FiresManager(object):
 
     @date_time.setter
     def date_time(self, date_time):
+        self._processed_date_time = False
         self._meta['date_time'] = date_time
         # HACK: access date_time simply to trigger replacement of wildcards
         # Note: the check for 'date_time' in self._meta prevents it from being
