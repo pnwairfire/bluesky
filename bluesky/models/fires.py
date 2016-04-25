@@ -206,6 +206,8 @@ class FiresManager(object):
 
     def __init__(self, run_id=None):
         self._meta = {}
+        self.date_time # triggers setting of default
+        self.config = {}
         self.modules = []
         self.fires = [] # this intitializes self._fires and self_fire_ids
         self._processed_date_time = False
@@ -321,8 +323,7 @@ class FiresManager(object):
         # HACK: access date_time simply to trigger replacement of wildcards
         # Note: the check for 'date_time' in self._meta prevents it from being
         #  generated unnecessarily
-        self.run_id
-
+        self.date_time
 
     @property
     def modules(self):
@@ -632,6 +633,7 @@ class FiresManager(object):
         self.fires = input_dict.pop('fire_information', [])
 
         self.config = input_dict.pop('config', {})
+        self.date_time = input_dict.pop('date_time', None)
 
         self._meta = input_dict
 
@@ -666,7 +668,8 @@ class FiresManager(object):
         # TODO: keep track of whether modules were specified in the input
         # json or on the command line, and add them to the output if they
         # were in the input
-        return dict(self._meta, fire_information=self.fires, config=self.config)
+        return dict(self._meta, fire_information=self.fires, config=self.config,
+            date_time=self.date_time)
 
     def dumps(self, output_stream=None, output_file=None):
         if output_stream and output_file:

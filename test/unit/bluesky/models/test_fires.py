@@ -9,6 +9,8 @@ import sys
 import StringIO
 import uuid
 
+import freezegun
+
 from py.test import raises
 from numpy.testing import assert_approx_equal
 
@@ -229,6 +231,7 @@ class TestFiresManager:
         assert 2 == fires_manager.b['c']
         assert None == fires_manager.d
 
+    @freezegun.freeze_time("2016-04-20")
     def test_setting_fires_and_meta(self):
         fires_manager = fires.FiresManager()
         fire_objects = [
@@ -244,7 +247,12 @@ class TestFiresManager:
         assert fires_manager.num_fires == 2
         assert set(['1','2']) == fires_manager._fire_ids
         assert {'1': [fire_objects[0]],'2': [fire_objects[1]]} == fires_manager._fires
-        assert {'a':1, 'b':{'c':2}, 'd': 123} == fires_manager._meta == fires_manager.meta
+        expected_meta = {
+            'a':1, 'b':{'c':2}, 'd': 123,
+            'date_time': freezegun.api.FakeDate(2016, 4, 20),
+            'config': {}
+        }
+        assert expected_meta == fires_manager._meta == fires_manager.meta
 
     ## Properties
 
@@ -436,6 +444,7 @@ class TestFiresManager:
     def test_dump_one_fire_with_meta(self, monkeypatch):
         pass
 
+    @freezegun.freeze_time("2016-04-20")
     def test_dump_multiple_fires_with_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream())
@@ -452,6 +461,8 @@ class TestFiresManager:
 
         fires_manager.dumps()
         expected = {
+            "date_time": "2016-04-20",
+            "config": {},
             "fire_information": fire_objects,
             "foo": {"bar": "baz"}
         }

@@ -115,7 +115,8 @@ OPTIONAL_ARGS = [
         'help': ("What's considdered the current day in the context of the "
             "run; defaults to current UTC day; used to replace config "
             "wildcards ('{today}', etc.)")
-        #'action': scripting.args.ParseDatetimeAction
+        # Note: not using scripting.args.ParseDatetimeAction because
+        #  bsp supports things like '{today}', '{yesterday}', etc.
     }
 
 ]
