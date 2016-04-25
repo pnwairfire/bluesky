@@ -408,26 +408,27 @@ class FiresManager(object):
         return val
 
     def get_config_value(self, *keys, **kwargs):
-        return configuration.get_config_value(self._config, *keys, **kwargs)
+        return configuration.get_config_value(self.config, *keys,
+            **kwargs)
 
     def set_config_value(self, value, *keys):
-        self._config = self.config or dict()
+        self._meta['config'] = self._meta.get('config') or dict()
         value = self.replace_config_wildcards(value)
-        configuration.set_config_value(self._config, value, *keys)
+        configuration.set_config_value(self._meta['config'], value, *keys)
 
     @property
     def config(self):
-        return self._config
+        return self._meta.get('config', dict())
 
     @config.setter
     def config(self, config):
-        self._config = self.replace_config_wildcards(config)
+        self._meta['config'] = self.replace_config_wildcards(config)
 
     def merge_config(self, config_dict):
-        self._config = self._config or dict()
+        self._meta['config'] = self._meta.get('config') or dict()
 
         if config_dict:
-            configuration.merge_configs(self._config, config_dict)
+            configuration.merge_configs(self._meta['config'], config_dict)
 
     ##
     ## Helper properties
@@ -668,8 +669,7 @@ class FiresManager(object):
         # TODO: keep track of whether modules were specified in the input
         # json or on the command line, and add them to the output if they
         # were in the input
-        return dict(self._meta, fire_information=self.fires, config=self.config,
-            date_time=self.date_time)
+        return dict(self._meta, fire_information=self.fires)
 
     def dumps(self, output_stream=None, output_file=None):
         if output_stream and output_file:
