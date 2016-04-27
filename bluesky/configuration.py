@@ -93,6 +93,29 @@ def merge_configs(config, to_be_merged_config):
     return config
 
 ##
+## Config dict immutability
+##
+
+# TODO: move ImmutableConfigDict to pyairfire?
+
+class ImmutableConfigDict(dict):
+    # from https://www.python.org/dev/peps/pep-0351/
+
+    def __hash__(self):
+        return id(self)
+
+    def _immutable(self, *args, **kws):
+        raise TypeError('object is immutable')
+
+    __setitem__ = _immutable
+    __delitem__ = _immutable
+    clear       = _immutable
+    update      = _immutable
+    setdefault  = _immutable
+    pop         = _immutable
+    popitem     = _immutable
+
+##
 ## Parsing config options from the command line
 ##
 

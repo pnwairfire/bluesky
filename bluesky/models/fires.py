@@ -419,17 +419,18 @@ class FiresManager(object):
 
     @property
     def config(self):
-        return self._meta.get('config', dict())
+        return self._im_config
 
     @config.setter
     def config(self, config):
         self._meta['config'] = self.replace_config_wildcards(config)
+        self._im_config = configuration.ImmutableConfigDict(self._meta['config'])
 
     def merge_config(self, config_dict):
-        self._meta['config'] = self._meta.get('config') or dict()
-
         if config_dict:
-            configuration.merge_configs(self._meta['config'], config_dict)
+            # Use setter to take care of resetting self._im_config
+            self.config = configuration.merge_configs(
+                self._meta['config'] or dict(), config_dict)
 
     ##
     ## Helper properties
