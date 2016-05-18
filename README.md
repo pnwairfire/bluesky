@@ -959,7 +959,7 @@ fire data into downstream modules.)
 Ingestion requires that none of the fires in 'fire_information' are empty objects.
 
  - ***'fire_information' > 'id'*** -- *optional* -- fire's identifier
- - ***'fire_information' > 'type'*** -- *optional* -- fire type ('rx, 'wildfire', or 'wf' - 'wildfire' and 'wf' are equivalent); default 'wildfire'
+ - ***'fire_information' > 'type'*** -- *optional* -- fire type ('rx', 'wildfire', or 'wf' - 'wildfire' and 'wf' are equivalent); default 'wildfire'
  - ***'fire_information' > 'fuel_type'*** -- *optional* -- Fuel type ('natural', 'activity', or 'piles'); default 'natural'
 
 ###### 'location'
