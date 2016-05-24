@@ -302,15 +302,6 @@ class TestFiresManager:
         fm.load({'run_id': "ggbgbg"})
         assert fm.run_id == "ggbgbg"
 
-
-    # TODO: tests for setting configuration (to make sure filecards get filled in, etc.)
-
-    def test_setting_config(self):
-        config = {
-            'a':
-        }
-
-
     def test_earliest_and_latest_times(self):
         fm = fires.FiresManager()
         f1 = fires.Fire({
@@ -525,6 +516,93 @@ class TestFiresManager:
         assert fires_manager.fires[1]['error']['traceback']
         assert fires_manager.failed_fires is None
 
+
+##
+## Tests for setting configuration (to make sure filecards get
+## filled in, etc.) and merging
+##
+
+class TestFiresManagerSetAndMergeConfig(object):
+
+
+    def test_merge_configs(self):
+        fm = FiresManager()
+        fm.merge_config({
+            "foo": {
+                "a": 111,
+                "b": 222,
+                "c": 333,
+                "d": 444
+            }
+        })
+        fm.merge_config({
+            "foo": {
+                "b": 2222,
+                "c": 3333,
+                "d": 4444,
+                "bb": "bb"
+            },
+            "bar": {
+                "b": "b"
+            },
+            "b": "b"
+        })
+        fm.merge_config({
+            "foo": {
+                "c": 33333,
+                "d": 44444,
+                "cc": "cc"
+            },
+            "baz": {
+                "c": "c"
+            },
+            "c": "c"
+        })
+        fm.set_config_value("444444", '-C', 'foo', 'd')
+        fm.set_config_value("dd", '-C', 'foo', 'dd')
+        fm.set_config_value("d", '-C', 'boo.d')
+        fm.set_config_value("d", '-C', 'd')
+        fm.set_config_value(True, '-B', 'dbt')
+        fm.set_config_value(False, '-B', 'dbf')
+        fm.set_config_value(23, '-I', 'di')
+        fm.set_config_value(123.23, '-F', 'df')
+        fm.set_config_value('23', 'dci')
+        fm.set_config_value('123.23', 'dcf')
+        EXPECTED = {
+            "foo": {
+                "a": 111,
+                "b": 2222,
+                "c": 33333,
+                "d": "444444", # because it was set on command line
+                "bb": "bb",
+                "cc": "cc",
+                "dd": "dd"
+            },
+            "bar": {
+                "b": "b"
+            },
+            "baz": {
+                "c": "c"
+            },
+            "boo": {
+                "d": "d"
+            },
+            "b": "b",
+            "c": "c",
+            "d": "d",
+            "dbt": True,
+            "dbf": False,
+            "di": 23,
+            "df": 123.23,
+            "dci": "23",
+            "dcf": "123.23"
+        }
+        assert fm.config == EXPECTED
+
+    # def test_setting_config(self):
+    #     config = {
+    #         'a':
+    #     }
 
 
 ##
