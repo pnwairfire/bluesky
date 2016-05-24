@@ -42,12 +42,16 @@ def config_parser_to_dict(config):
 ## Utility mehtods
 ##
 
+NO_KEYS_ERR_MSG = "No config key(s) specified"
 def get_config_value(config, *keys, **kwargs):
     """Returns value from arbitrary nesting in config dict
 
     Recognized kwargs:
      - default -- if not specified, None is used as the default
     """
+    if not keys:
+        raise BlueSkyConfigurationError(NO_KEYS_ERR_MSG)
+
     default = kwargs.get('default', None)
     if config and isinstance(config, dict) and keys:
         if len(keys) == 1:

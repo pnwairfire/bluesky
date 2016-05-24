@@ -12,6 +12,7 @@ from bluesky.configuration import (
     get_config_value,
     set_config_value,
     merge_configs,
+    NO_KEYS_ERR_MSG,
     INVALID_CONFIG_ERR_MSG,
     MISSING_KEYS_ERR_MSG,
     CONFIG_CONFLICT
@@ -48,13 +49,22 @@ class TestConfigParserToDict(object):
 ##
 
 class TestGetConfigValue(object):
+
     def test_no_config(self):
+        with raises(BlueSkyConfigurationError) as e_info:
+            get_config_value(None)
+        assert e_info.value.message == NO_KEYS_ERR_MSG
+
         assert None == get_config_value(None, 's')
         assert None == get_config_value(None, 's', 'sdf')
         assert 1 == get_config_value(None, 's', default=1)
         assert 1 == get_config_value(None, 's', 'sdf', default=1)
 
     def test_empty_config(self):
+        with raises(BlueSkyConfigurationError) as e_info:
+            get_config_value({})
+        assert e_info.value.message == NO_KEYS_ERR_MSG
+
         assert None == get_config_value({}, 's')
         assert None == get_config_value({}, 's', 'sdf')
         assert 1 == get_config_value({}, 's', default=1)
@@ -75,6 +85,10 @@ class TestGetConfigValue(object):
             },
             'c': 12
         }
+
+        with raises(BlueSkyConfigurationError) as e_info:
+            get_config_value(config)
+        assert e_info.value.message == NO_KEYS_ERR_MSG
 
         assert None == get_config_value(config, 'z')
         assert None == get_config_value(config, 'z', 'b')
