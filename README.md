@@ -940,6 +940,17 @@ For usage and examples, use the ```-h``` with each script.
 
 ## Required and Optional Fields for ```bsp```
 
+The top level input data fields that bsp recognizes are: ```run_id```,
+```today```, ```config```, and ```fire_information```.
+
+### 'run_id'
+
+...(fill in description)...
+
+### 'today'
+
+...(fill in description)...
+
 ### 'fire_information' Fields
 
 The top level 'fire_information' array has data added to it's elements as it
