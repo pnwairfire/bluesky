@@ -249,7 +249,7 @@ class TestFiresManager:
         assert {'1': [fire_objects[0]],'2': [fire_objects[1]]} == fires_manager._fires
         expected_meta = {
             'a':1, 'b':{'c':2}, 'd': 123,
-            'date_time': freezegun.api.FakeDate(2016, 4, 20),
+            'today': freezegun.api.FakeDate(2016, 4, 20),
             'config': {}
         }
         assert expected_meta == fires_manager._meta == fires_manager.meta
@@ -461,7 +461,7 @@ class TestFiresManager:
 
         fires_manager.dumps()
         expected = {
-            "date_time": "2016-04-20",
+            "today": "2016-04-20",
             "config": {},
             "fire_information": fire_objects,
             "foo": {"bar": "baz"}
