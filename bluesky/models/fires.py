@@ -357,7 +357,7 @@ class FiresManager(object):
     @run_id.setter
     def run_id(self, run_id):
         if self._meta.get('run_id'):
-            raise RuntimeError(self.RUN_ID_IS_IMMUTABLE_MSG)
+            raise TypeError(self.RUN_ID_IS_IMMUTABLE_MSG)
         self._meta['run_id'] = run_id
         # HACK: access run id simply to trigger replacement of wildcards
         # Note: the check for 'run_id' in self._meta prevents it from being

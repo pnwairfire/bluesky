@@ -264,7 +264,7 @@ class TestFiresManager:
         fm = fires.FiresManager()
         # if not already set, run_id is set when accessed
         assert fm.run_id == "sdf123"
-        with raises(RuntimeError) as e_info:
+        with raises(TypeError) as e_info:
             fm.run_id = "sdfsdfsdf"
         assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
@@ -272,27 +272,27 @@ class TestFiresManager:
         fm = fires.FiresManager()
         fm.load({})
         assert fm.run_id == "sdf123"
-        with raises(RuntimeError) as e_info:
+        with raises(TypeError) as e_info:
             fm.run_id = "sdfsdfsdf"
         assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
         fm = fires.FiresManager()
         fm.load({'run_id': "ggbgbg"})
         assert fm.run_id == "ggbgbg"
-        with raises(RuntimeError) as e_info:
+        with raises(TypeError) as e_info:
             fm.run_id = "sdfsdfsdf"
         assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
         fm = fires.FiresManager(run_id="ggg")
         assert fm.run_id == "ggg"
-        with raises(RuntimeError) as e_info:
+        with raises(TypeError) as e_info:
             fm.run_id = "sdfsdfsdf"
         assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
         fm = fires.FiresManager()
         fm.run_id = "eee"
         assert fm.run_id == "eee"
-        with raises(RuntimeError) as e_info:
+        with raises(TypeError) as e_info:
             fm.run_id = "sdfsdfsdf"
         assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
