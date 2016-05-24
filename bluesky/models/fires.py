@@ -429,7 +429,7 @@ class FiresManager(object):
         if config_dict:
             # Use setter to take care of resetting self._im_config
             self.config = configuration.merge_configs(
-                self._meta['config'] or dict(), config_dict)
+                self._meta.get('config') or dict(), config_dict)
 
     ##
     ## Helper properties
