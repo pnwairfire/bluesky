@@ -7,6 +7,7 @@ TODO: test error cases ('-c' set to non-existent file; invalid values for
     config conflicts; etc.)
 """
 
+import datetime
 import json
 import logging
 import os
@@ -110,12 +111,19 @@ config_2_file.flush()
 
 cmd_args = [
     BSP, '-i', input_file.name,
-    '-c', config_1_file.name, '-c', config_2_file.name,
-    '-C', 'foo.d=444444', '-C', 'foo.dd=dd',
-    '-C', 'boo.d=d', '-C', 'd=d',
-    '-B', 'dbt=true', '-B', 'dbf=0',
-    '-I', 'di=23', '-F', 'df=123.23',
-    '-C', 'dci=23', '-C', 'dcf=123.23'
+    '--log-level', 'DEBUG',
+    '-c', config_1_file.name,
+    '-c', config_2_file.name,
+    '-C', 'foo.d=444444',
+    '-C', 'foo.dd=dd',
+    '-C', 'boo.d=d',
+    '-C', 'd=d',
+    '-B', 'dbt=true',
+    '-B', 'dbf=0',
+    '-I', 'di=23',
+    '-F', 'df=123.23',
+    '-C', 'dci=23',
+    '-C', 'dcf=123.23'
 ]
 output = subprocess.check_output(cmd_args)
 actual = json.loads(output)
@@ -123,4 +131,9 @@ actual.pop('runtime')
 logging.basicConfig(level=logging.INFO)
 logging.info("actual:   {}".format(actual))
 logging.info("expected: {}".format(EXPECTED))
-assert EXPECTED == actual
+today = actual.pop('today')
+assert today == datetime.datetime.utcnow().strftime('%Y-%m-%d')
+#assert actual == EXPECTED
+assert set(actual.keys()) == set(['config', 'fire_information'])
+assert actual['fire_information'] == EXPECTED['fire_information']
+assert actual['config'] == EXPECTED['config']
