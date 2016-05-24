@@ -206,11 +206,11 @@ class FiresManager(object):
 
     def __init__(self, run_id=None):
         self._meta = {}
-        self.date_time # triggers setting of default
+        self.today # triggers setting of default
         self.config = {}
         self.modules = []
         self.fires = [] # this intitializes self._fires and self_fire_ids
-        self._processed_date_time = False
+        self._processed_today = False
         self._processed_run_id_wildcards = False
         self._num_fires = 0
         if run_id:
@@ -303,28 +303,27 @@ class FiresManager(object):
     ## Special Meta Attributes
     ##
 
-    # TDOO: rename date_time
     @property
-    def date_time(self):
-        if not self._meta.get('date_time'):
-            self._meta['date_time'] = datetimeutils.today_utc()
-        elif not self._processed_date_time:
-            self._meta['date_time'] = datetimeutils.fill_in_datetime_strings(
-                self._meta['date_time'])
-            self._meta['date_time'] = datetimeutils.to_datetime(
-                self._meta['date_time'])
-            self._processed_date_time = True
+    def today(self):
+        if not self._meta.get('today'):
+            self._meta['today'] = datetimeutils.today_utc()
+        elif not self._processed_today:
+            self._meta['today'] = datetimeutils.fill_in_datetime_strings(
+                self._meta['today'])
+            self._meta['today'] = datetimeutils.to_datetime(
+                self._meta['today'])
+            self._processed_today = True
 
-        return self._meta['date_time']
+        return self._meta['today']
 
-    @date_time.setter
-    def date_time(self, date_time):
-        self._processed_date_time = False
-        self._meta['date_time'] = date_time
-        # HACK: access date_time simply to trigger replacement of wildcards
-        # Note: the check for 'date_time' in self._meta prevents it from being
+    @today.setter
+    def today(self, today):
+        self._processed_today = False
+        self._meta['today'] = today
+        # HACK: access today simply to trigger replacement of wildcards
+        # Note: the check for 'today' in self._meta prevents it from being
         #  generated unnecessarily
-        self.date_time
+        self.today
 
     @property
     def modules(self):
@@ -396,7 +395,7 @@ class FiresManager(object):
             if val:
                 # first, fill in any datetime control codes or wildcards
                 val = datetimeutils.fill_in_datetime_strings(val,
-                    today=self.date_time)
+                    today=self.today)
 
                 # then, see if the resulting string purely represents a datetime
                 try:
@@ -636,7 +635,7 @@ class FiresManager(object):
         self.fires = input_dict.pop('fire_information', [])
 
         self.config = input_dict.pop('config', {})
-        self.date_time = input_dict.pop('date_time', None)
+        self.today = input_dict.pop('today', None)
 
         self._meta = input_dict
 
