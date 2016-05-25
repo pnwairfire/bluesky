@@ -3,6 +3,7 @@
 __author__ = "Joel Dubowy"
 __copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
+import copy
 import datetime
 import json
 import sys
@@ -559,9 +560,35 @@ class TestFiresManager:
 
 class TestFiresManagerSetAndMergeConfig(object):
 
+    # TODO: USe freeze fun or set 'today', and then use
+    # various '{(today:yesterday)[:patterm]}' in config settings
+
+    RAW_CONFIG = {
+        "foo":"bar",
+        "bar": "{today}-sdf-{yesterday:%Y-%m-%d}T12Z-%Y__%m-%d-{today-2:%m_%d}-",
+        "baz": 234
+    }
+    CONFIG_2016_05_04 = {
+        "foo":"bar",
+        "bar": "20160504-sdf-2016-05-03T12Z-%Y__%m-%d-05_02-",
+        "baz": 234
+    }
+    def test_setting_config_manually(self):
+        fm = fires.FiresManager()
+        fm.today = datetime.datetime(2016, 5, 4)
+        fm.config = copy.deepcopy(self.RAW_CONFIG)
+        assert fm.config == self.CONFIG_2016_05_04
+
+    def test_loading_config(self):
+        fm = fires.FiresManager()
+        fm.load({
+            'today': datetime.datetime(2016, 5, 4),
+            'config': copy.deepcopy(self.RAW_CONFIG)
+        })
+        assert fm.config == self.CONFIG_2016_05_04
 
     def test_merge_configs(self):
-        fm = FiresManager()
+        fm = fires.FiresManager()
         fm.merge_config({
             "foo": {
                 "a": 111,
@@ -633,11 +660,6 @@ class TestFiresManagerSetAndMergeConfig(object):
             "dcf": "123.23"
         }
         assert fm.config == EXPECTED
-
-    # def test_setting_config(self):
-    #     config = {
-    #         'a':
-    #     }
 
 
 ##
