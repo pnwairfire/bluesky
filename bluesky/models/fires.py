@@ -206,12 +206,12 @@ class FiresManager(object):
 
     def __init__(self, run_id=None):
         self._meta = {}
-        self.today # triggers setting of default
-        self.config = {}
-        self._raw_config = None
+        # self.today triggers setting of today to default and setting of
+        # self._processed_today to True
+        self.today
+        self.config = {} # self._raw_config will be set by config.setter
         self.modules = []
         self.fires = [] # this intitializes self._fires and self_fire_ids
-        self._processed_today = False
         self._processed_run_id_wildcards = False
         self._num_fires = 0
         if run_id:
