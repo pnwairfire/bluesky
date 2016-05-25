@@ -646,14 +646,11 @@ class FiresManager(object):
 
         self._meta = input_dict
 
-        # HACK: access 'today' and 'run_id' simply to trigger replacement
-        #  of wildcards
-        # Note: the checks for 'today' and 'run_id' in self._meta prevent
-        #  then from being generated unnecessarily
-        # TODO: always generate 'today' and 'run_id' (by removing the checks)?
-        if 'today' in self._meta:
-            self._processed_today = False
-            self.today
+        # HACK: access 'today' and 'run_id' to trigger replacement
+        #  of wildcards or setting of defaults, but only do so for
+        #  run_id if it's defined
+        self._processed_today = False
+        self.today
         if 'run_id' in self._meta:
             self._processed_run_id_wildcards = False
             self.run_id
