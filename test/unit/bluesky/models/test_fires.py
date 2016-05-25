@@ -520,17 +520,6 @@ class TestFiresManager(object):
             "foo": {"bar": "baz"}
         }
 
-        # def convert_unicode(d):
-        #     if hasattr(d, 'keys'):
-        #         return {str(k): convert_unicode(v) for k,v in d.items()}
-        #     # handle strings before arrays, since strings have attr 'count' too
-        #     elif hasattr(d, 'lower'):
-        #         return str(d)
-        #     elif hasattr(d, 'count'):
-        #         return [convert_unicode(e) for e in d]
-        #     else:
-        #         return d
-        #assert expected == convert_unicode(json.loads(self._output.getvalue()))
         assert expected == json.loads(self._output.getvalue())
 
     # TODO: test instantiating with fires, dump, adding more with loads, dump, etc.
