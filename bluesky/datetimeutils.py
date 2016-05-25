@@ -35,7 +35,7 @@ def yesterday_utc():
     return yesterday_midnight_utc().date()
 
 
-DATETIME_WILDCARD_MATCHER = re.compile(r'{(today|yesterday)(-[0-9]+)?(:(?P<format_string>[^}]+))?}')
+DATETIME_WILDCARD_MATCHER = re.compile(r'{(today|yesterday)([-+]{1}[0-9]+)?(:(?P<format_string>[^}]+))?}')
 DEFAULT_DATE_FORMAT_STRING = '%Y%m%d'
 def fill_in_datetime_strings(val, today=None):
     """Replaces strftime control codes and special wildcards if input is a string
