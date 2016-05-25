@@ -66,14 +66,14 @@ def fill_in_datetime_strings(val, today=None):
 
             val = val.replace(m.group(0), day.strftime(pattern))
 
-        # now format all remaining patterns with 'today'
-        # Note that ('{today:PATTERN}', handled above, really isn't necessary,
-        # since any pattern not wrapped in '{today:' + '}' will get formatted
-        # with today, but it's a way to explicitly show that the datetime
-        # control codes should be formatted with today's date)
-        val = today.strftime(val)
+        # Note: At this point, we used to format all remaining datetime control
+        # codes ('%Y', '%m', etc.) outside of '{(today|tomorrow):' + '}' using
+        # 'today':
+        #    > val = today.strftime(val)
+        # This was removed to avoid confusion caused by unintended conversions
+        # (such as when '%Y' or other codes happen to be part of config settings.)
 
-    # else, return val as is
+    # return val, wether it was modified or not
     return val
 
 _TO_DATETIME_EXTRA_FORMATS = [
