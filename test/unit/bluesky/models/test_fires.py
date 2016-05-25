@@ -209,7 +209,7 @@ class TestFire:
 ## Tests for FiresManager
 ##
 
-class TestFiresManager:
+class TestFiresManager(object):
 
     ## Get/Set Fires and Meta
 
@@ -411,6 +411,7 @@ class TestFiresManager:
         with raises(ValueError):
             fires_manager.loads()
 
+    @freezegun.freeze_time("2016-04-20")
     def test_load_no_fires_no_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{}'))
@@ -421,8 +422,14 @@ class TestFiresManager:
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{"fire_information":[]}'))
         fires_manager.loads()
         assert [] == fires_manager.fires
-        assert {} == fires_manager.meta
+        expected_meta = {
+            "today": datetime.date(2016,4,20),
+            'config':{}
+        }
+        assert expected_meta == fires_manager.meta
+        assert {"foo": {"bar": "baz"}} == fires_manager.meta
 
+    @freezegun.freeze_time("2016-04-20")
     def test_load_no_fires_with_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
@@ -430,35 +437,54 @@ class TestFiresManager:
         fires_manager.loads()
         assert fires_manager.num_fires == 0
         assert [] == fires_manager.fires
-        assert {"foo": {"bar": "baz"}} == fires_manager.meta
+        expected_meta = {
+            "today": datetime.date(2016,4,20),
+            'config':{},
+            "foo": {"bar": "baz"}
+        }
+        assert expected_meta == fires_manager.meta
 
+    @freezegun.freeze_time("2016-04-20")
     def test_load_one_fire_with_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
             '{"fire_information":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"}],'
             '"foo": {"bar": "baz"}}'))
         fires_manager.loads()
-        expected = [
+        expected_fires = [
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"})
         ]
         assert fires_manager.num_fires == 1
-        assert expected == fires_manager.fires
-        assert {"foo": {"bar": "baz"}} == fires_manager.meta
+        assert expected_fires == fires_manager.fires
+        expected_meta = {
+            "today": datetime.date(2016,4,20),
+            'config':{},
+            "foo": {"bar": "baz"}
+        }
+        assert expected_meta == fires_manager.meta
 
+    @freezegun.freeze_time("2016-04-20")
     def test_load_multiple_fires_with_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
             '{"fire_information":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
             '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}],'
             '"foo": {"bar": "baz"}}'))
+        #monkeypatch.setattr(uuid, "uuid1", lambda: "abcd1234")
         fires_manager.loads()
-        expected = [
+        expected_fires = [
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
             fires.Fire({'id':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
         ]
         assert fires_manager.num_fires == 2
-        assert expected == fires_manager.fires
-        assert {"foo": {"bar": "baz"}} == fires_manager.meta
+        assert expected_fires == fires_manager.fires
+        expected_meta = {
+            #"run_id": 'abcd1234'
+            "today": datetime.date(2016,4,20),
+            'config':{},
+            "foo": {"bar": "baz"},
+        }
+        assert expected_meta == fires_manager.meta
 
     ## Dumping
 
@@ -484,7 +510,7 @@ class TestFiresManager:
             '2': [fire_objects[1]]
         }
         fires_manager._fire_ids = ['1','2']
-        fires_manager._meta = {"foo": {"bar": "baz"}}
+        fires_manager.foo = {"bar": "baz"}
 
         fires_manager.dumps()
         expected = {
@@ -493,6 +519,18 @@ class TestFiresManager:
             "fire_information": fire_objects,
             "foo": {"bar": "baz"}
         }
+
+        # def convert_unicode(d):
+        #     if hasattr(d, 'keys'):
+        #         return {str(k): convert_unicode(v) for k,v in d.items()}
+        #     # handle strings before arrays, since strings have attr 'count' too
+        #     elif hasattr(d, 'lower'):
+        #         return str(d)
+        #     elif hasattr(d, 'count'):
+        #         return [convert_unicode(e) for e in d]
+        #     else:
+        #         return d
+        #assert expected == convert_unicode(json.loads(self._output.getvalue()))
         assert expected == json.loads(self._output.getvalue())
 
     # TODO: test instantiating with fires, dump, adding more with loads, dump, etc.
