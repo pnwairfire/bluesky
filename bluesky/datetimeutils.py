@@ -35,8 +35,9 @@ def yesterday_utc():
     return yesterday_midnight_utc().date()
 
 
-TODAY_MATCHER = re.compile(r'{today:(?P<format_string>[^}]+)}')
-YESTERDAY_MATCHER = re.compile(r'.*{yesterday:(?P<format_string>[^}]+)}.*')
+DATETIME_WILDCARD_MATCHER = re.compile(r'{(today|yesterday)(-[0-9]+)?(:(?P<format_string>[^}]+))?}')
+DEFAULT_DATE_FORMAT_STRING = '%Y%m%d'
+#YESTERDAY_MATCHER = re.compile(r'.*{yesterday:(?P<format_string>[^}]+)}.*')
 def fill_in_datetime_strings(val, today=None):
     """Replaces strftime control codes and special wildcards if input is a string
 
@@ -51,20 +52,27 @@ def fill_in_datetime_strings(val, today=None):
     if hasattr(val, 'lower'):
         today = today or today_utc()
         yesterday = today - ONE_DAY
-        val = val.replace('{today}', today.strftime('%Y%m%d'))
-        val = val.replace('{yesterday}', yesterday.strftime('%Y%m%d'))
+
+        #val = val.replace('{today}', today.strftime('%Y%m%d'))
+        #val = val.replace('{yesterday}', yesterday.strftime('%Y%m%d'))
         while True:
-            m = YESTERDAY_MATCHER.match(val)
+            m = DATETIME_WILDCARD_MATCHER.search(val)
             if not m:
                 break
-            val = val.replace('{yesterday:' + m.group(1) + '}',
-                yesterday.strftime(m.group(1)))
-        # for '{today:PATTERN}' just repalce with patterm, since we'll
-        # format all remaining patterns with 'today'
-        # ('{today:PATTERN}' really isn't necessary, but it's a way to
-        #  explicitly show that the datetime control codes should be formatted
-        #  with today's date)
-        val = TODAY_MATCHER.sub(r'\g<format_string>', val)
+            t_or_y, offset, colon_plus_pattern, pattern = m.groups()
+            to_replace = m.group(0)
+            pattern = pattern or DEFAULT_DATE_FORMAT_STRING
+            day = (today - ONE_DAY) if (t_or_y == 'yesterday') else today
+            if offset:
+                day = day + datetime.timedelta(days=int(offset))
+
+            val = val.replace(to_replace, day.strftime(pattern))
+
+        # now format all remaining patterns with 'today'
+        # Note that ('{today:PATTERN}', handled above, really isn't necessary,
+        # since any pattern not wrapped in '{today:' + '}' will get formatted
+        # with today, but it's a way to explicitly show that the datetime
+        # control codes should be formatted with today's date)
         val = today.strftime(val)
 
     # else, return val as is
