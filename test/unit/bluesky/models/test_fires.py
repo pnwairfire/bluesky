@@ -414,20 +414,21 @@ class TestFiresManager(object):
     @freezegun.freeze_time("2016-04-20")
     def test_load_no_fires_no_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
-        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{}'))
-        fires_manager.loads()
-        assert fires_manager.num_fires == 0
-        assert [] == fires_manager.fires
-        assert {} == fires_manager.meta
-        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{"fire_information":[]}'))
-        fires_manager.loads()
-        assert [] == fires_manager.fires
         expected_meta = {
             "today": datetime.date(2016,4,20),
             'config':{}
         }
+
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{}'))
+        fires_manager.loads()
+        assert fires_manager.num_fires == 0
+        assert [] == fires_manager.fires
         assert expected_meta == fires_manager.meta
-        assert {"foo": {"bar": "baz"}} == fires_manager.meta
+
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{"fire_information":[]}'))
+        fires_manager.loads()
+        assert [] == fires_manager.fires
+        assert expected_meta == fires_manager.meta
 
     @freezegun.freeze_time("2016-04-20")
     def test_load_no_fires_with_meta(self, monkeypatch):
