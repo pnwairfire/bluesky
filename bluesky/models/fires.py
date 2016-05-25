@@ -420,6 +420,7 @@ class FiresManager(object):
         self._meta['config'] = self._meta.get('config') or dict()
         value = self.replace_config_wildcards(value)
         configuration.set_config_value(self._meta['config'], value, *keys)
+        self._im_config = configuration.ImmutableConfigDict(self._meta['config'])
 
     @property
     def config(self):
