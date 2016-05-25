@@ -73,21 +73,31 @@ class TestReplaceWildcards(object):
         # string with nothing to replace
         assert datetimeutils.fill_in_datetime_strings("sljdfsd") == "sljdfsd"
 
+        # invalid and thus not-replaceable
+        assert datetimeutils.fill_in_datetime_strings("{today4}") == "{today4}"
+        assert datetimeutils.fill_in_datetime_strings("{yesterday++1}") == "{yesterday++1}"
+        assert datetimeutils.fill_in_datetime_strings("{today--1:%Y}") == "{today--1:%Y}"
+
+        # control codes outside of '{(today|tomorrow):' + '}'  and thus not replaced
+        assert datetimeutils.fill_in_datetime_strings("%Y-%m-%d") == "%Y-%m-%d"
+
         # strings with replacements
-        assert datetimeutils.fill_in_datetime_strings("%Y%m%d00") == "2016011400"
-        assert datetimeutils.fill_in_datetime_strings("%Y%m%d%H%M%S") == "20160114000000"
         assert datetimeutils.fill_in_datetime_strings("{today}") == "20160114"
         assert datetimeutils.fill_in_datetime_strings("{today}00") == "2016011400"
+        assert datetimeutils.fill_in_datetime_strings("{today+1}") == "20160115"
         assert datetimeutils.fill_in_datetime_strings("{today-4}") == "20160110"
         assert datetimeutils.fill_in_datetime_strings("{today-4}00") == "2016011000"
+        assert datetimeutils.fill_in_datetime_strings("{yesterday+3}") == "20160116"
         assert datetimeutils.fill_in_datetime_strings("{yesterday-4}") == "20160109"
         assert datetimeutils.fill_in_datetime_strings("{yesterday-4}12") == "2016010912"
         assert datetimeutils.fill_in_datetime_strings("{today:%Y-%m-%d}") == "2016-01-14"
         assert datetimeutils.fill_in_datetime_strings("{today:%Y-%m-%d}T12Z") == "2016-01-14T12Z"
+        assert datetimeutils.fill_in_datetime_strings("{today+2:%Y-%m-%d}") == "2016-01-16"
         assert datetimeutils.fill_in_datetime_strings("{today-2:%Y-%m-%d}") == "2016-01-12"
         assert datetimeutils.fill_in_datetime_strings("{today-3:%Y-%m-%d}T12Z") == "2016-01-11T12Z"
         assert datetimeutils.fill_in_datetime_strings("{yesterday:%Y-%m-%d}") == "2016-01-13"
         assert datetimeutils.fill_in_datetime_strings("{yesterday:%Y-%m-%d}T12Z") == "2016-01-13T12Z"
+        assert datetimeutils.fill_in_datetime_strings("{yesterday+1:%Y-%m-%d}") == "2016-01-14"
         assert datetimeutils.fill_in_datetime_strings("{yesterday-4:%Y-%m-%d}") == "2016-01-09"
         assert datetimeutils.fill_in_datetime_strings("{yesterday-5:%Y-%m-%d}T12Z") == "2016-01-08T12Z"
 
@@ -95,13 +105,15 @@ class TestReplaceWildcards(object):
             "{today}-sdf-{yesterday:%Y-%m-%d}T12Z-%Y__%m-%d-{today:%m_%d}-"
             "{yesterday}-{sdf}-{today:%m%d%Y}-{yesterday:%m-%d-%Y}"
             "{today-2}=={today-3:%Y-%m-%d}-{yesterday-2}-{yesterday-3:%Y-%m-%d}"
+            "{today+2}=={yesterday+2:%Y-%m-%d}"
             "%Y%m%dT%H%M%S")
-        assert val == ("20160114-sdf-2016-01-13T12Z-2016__01-14-01_14-"
+        assert val == ("20160114-sdf-2016-01-13T12Z-%Y__%m-%d-01_14-"
             "20160113-{sdf}-01142016-01-13-2016"
             "20160112==2016-01-11-20160111-2016-01-10"
-            "20160114T000000")
+            "20160116==2016-01-15"
+            "%Y%m%dT%H%M%S")
 
-    @freeze_time("2016-01-14")
+    @freeze_time("2016-01-10")
     def test_today_defined(self):
         # None value - leave as is
         assert datetimeutils.fill_in_datetime_strings(None,
@@ -121,17 +133,18 @@ class TestReplaceWildcards(object):
         assert datetimeutils.fill_in_datetime_strings("sljdfsd",
             today=datetime.datetime(2016, 2, 15, 1)) == "sljdfsd"
 
+        # invalid and thus not-replaceable
+        assert datetimeutils.fill_in_datetime_strings("{today4}",
+            today=datetime.date(2016, 2, 15)) == "{today4}"
+        assert datetimeutils.fill_in_datetime_strings("{yesterday++1}",
+            today=datetime.date(2016, 2, 15)) == "{yesterday++1}"
+        assert datetimeutils.fill_in_datetime_strings("{today--1:%Y}",
+            today=datetime.date(2016, 2, 15)) == "{today--1:%Y}"
+
+        # control codes outside of '{(today|tomorrow):' + '}'  and thus not replaced
+        assert datetimeutils.fill_in_datetime_strings("%Y-%m-%d") == "%Y-%m-%d"
+
         # strings with replacements
-        assert datetimeutils.fill_in_datetime_strings("%Y%m%d00",
-            today=datetime.date(2016, 2, 15)) == "2016021500"
-        assert datetimeutils.fill_in_datetime_strings("%Y%m%d00",
-            today=datetime.datetime(2016, 2, 15, 1)) == "2016021500"
-
-        assert datetimeutils.fill_in_datetime_strings("%Y%m%d%H%M%S",
-            today=datetime.date(2016, 2, 15)) == "20160215000000"
-        assert datetimeutils.fill_in_datetime_strings("%Y%m%d%H%M%S",
-            today=datetime.datetime(2016, 2, 15, 1)) == "20160215010000"
-
         assert datetimeutils.fill_in_datetime_strings("{today}",
             today=datetime.date(2016, 2, 15)) == "20160215"
         assert datetimeutils.fill_in_datetime_strings("{today}",
@@ -171,6 +184,18 @@ class TestReplaceWildcards(object):
             today=datetime.date(2016, 2, 15)) == "2016-02-13"
         assert datetimeutils.fill_in_datetime_strings("{yesterday-2:%Y-%m-%d}",
             today=datetime.datetime(2016, 2, 15, 1)) == "2016-02-12"
+
+        val = datetimeutils.fill_in_datetime_strings(
+            "{today}-sdf-{yesterday:%Y-%m-%d}T12Z-%Y__%m-%d-{today:%m_%d}-"
+            "{yesterday}-{sdf}-{today:%m%d%Y}-{yesterday:%m-%d-%Y}"
+            "{today-2}=={today-3:%Y-%m-%d}-{yesterday-2}-{yesterday-3:%Y-%m-%d}"
+            "{today+2}=={yesterday+2:%Y-%m-%d}"
+            "%Y%m%dT%H%M%S", today=datetime.date(2016, 1, 14))
+        assert val == ("20160114-sdf-2016-01-13T12Z-%Y__%m-%d-01_14-"
+            "20160113-{sdf}-01142016-01-13-2016"
+            "20160112==2016-01-11-20160111-2016-01-10"
+            "20160116==2016-01-15"
+            "%Y%m%dT%H%M%S")
 
 class TestToDatetime(object):
 
