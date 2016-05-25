@@ -82,20 +82,34 @@ _TO_DATETIME_EXTRA_FORMATS = [
     #  so that you can, for e.g., specify '{today}12Z' for dispersion start time
     '%Y%m%dT%H', '%Y%m%dT%HZ'
 ]
-def to_datetime(val):
+# VALID_DATETIME_RANGE is arbitraily defined, but prevents things like
+# '444444' being interpreted as datetime.datetime(4444, 4, 4, 0, 0)
+VALID_DATETIME_RANGE = (
+    # beginning of unix epoch
+    datetime.datetime(1970, 1, 1),
+    # 100 years from now
+    datetime.datetime.now() + datetime.timedelta(days=1) * 360 * 100
+)
+def to_datetime(val, limit_range=False):
     """Returns date[time] object represented by string
     """
-    def _invalid(final_val):
+    # the preceeding '_' in '_val' isn't necessary given scoping rules,
+    # but it's there to avoid confusion
+    def _invalid(_val):
         raise BlueSkyDatetimeValueError(
-            "Invalid datetime string value: {}".format(val))
+            "Invalid datetime string value: {}".format(_val))
 
     if val is not None:
         if isinstance(val, datetime.date):
             return val
         elif hasattr(val, 'lower'):
             try:
-                return parse_dt(val,
-                    extra_formats=_TO_DATETIME_EXTRA_FORMATS)
+                dt = parse_dt(val, extra_formats=_TO_DATETIME_EXTRA_FORMATS)
+                # sanity check:
+                if limit_range and (dt < VALID_DATETIME_RANGE[0]
+                        or dt > VALID_DATETIME_RANGE[1]):
+                    _invalid(val + ' (outside of valid range)')
+                return dt
             except ValueError, e:
                 _invalid(val)
         else:

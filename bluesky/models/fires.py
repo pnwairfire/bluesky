@@ -404,7 +404,7 @@ class FiresManager(object):
 
                 # then, see if the resulting string purely represents a datetime
                 try:
-                    val = datetimeutils.to_datetime(val)
+                    val = datetimeutils.to_datetime(val, limit_range=True)
                 except BlueSkyDatetimeValueError:
                     pass
 
