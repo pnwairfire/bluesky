@@ -604,6 +604,7 @@ class TestFiresManagerSetAndMergeConfig(object):
 
     def test_merge_configs(self):
         fm = fires.FiresManager()
+
         fm.merge_config({
             "foo": {
                 "a": 111,
@@ -612,6 +613,16 @@ class TestFiresManagerSetAndMergeConfig(object):
                 "d": 444
             }
         })
+        EXPECTED = {
+            "foo": {
+                "a": 111,
+                "b": 222,
+                "c": 333,
+                "d": 444
+            }
+        }
+        assert fm.config == EXPECTED
+
         fm.merge_config({
             "foo": {
                 "b": 2222,
@@ -624,6 +635,21 @@ class TestFiresManagerSetAndMergeConfig(object):
             },
             "b": "b"
         })
+        EXPECTED = {
+            "foo": {
+                "a": 111,
+                "b": 2222,
+                "c": 3333,
+                "d": 4444,
+                "bb": "bb"
+            },
+            "bar": {
+                "b": "b"
+            },
+            "b": "b"
+        }
+        assert fm.config == EXPECTED
+
         fm.merge_config({
             "foo": {
                 "c": 33333,
@@ -635,14 +661,34 @@ class TestFiresManagerSetAndMergeConfig(object):
             },
             "c": "c"
         })
-        fm.set_config_value("444444", '-C', 'foo', 'd')
-        fm.set_config_value("dd", '-C', 'foo', 'dd')
-        fm.set_config_value("d", '-C', 'boo.d')
-        fm.set_config_value("d", '-C', 'd')
-        fm.set_config_value(True, '-B', 'dbt')
-        fm.set_config_value(False, '-B', 'dbf')
-        fm.set_config_value(23, '-I', 'di')
-        fm.set_config_value(123.23, '-F', 'df')
+        EXPECTED = {
+            "foo": {
+                "a": 111,
+                "b": 2222,
+                "c": 33333,
+                "d": 44444,
+                "bb": "bb",
+                "cc": "cc"
+            },
+            "bar": {
+                "b": "b"
+            },
+            "baz": {
+                "c": "c"
+            },
+            "b": "b",
+            "c": "c"
+        }
+        assert fm.config == EXPECTED
+
+        fm.set_config_value("444444", 'foo', 'd')
+        fm.set_config_value("dd", 'foo', 'dd')
+        fm.set_config_value("d", 'boo', 'd')
+        fm.set_config_value("d", 'd')
+        fm.set_config_value(True, 'dbt')
+        fm.set_config_value(False, 'dbf')
+        fm.set_config_value(23, 'di')
+        fm.set_config_value(123.23, 'df')
         fm.set_config_value('23', 'dci')
         fm.set_config_value('123.23', 'dcf')
         EXPECTED = {
