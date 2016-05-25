@@ -37,14 +37,14 @@ def yesterday_utc():
 
 DATETIME_WILDCARD_MATCHER = re.compile(r'{(today|yesterday)(-[0-9]+)?(:(?P<format_string>[^}]+))?}')
 DEFAULT_DATE_FORMAT_STRING = '%Y%m%d'
-#YESTERDAY_MATCHER = re.compile(r'.*{yesterday:(?P<format_string>[^}]+)}.*')
 def fill_in_datetime_strings(val, today=None):
     """Replaces strftime control codes and special wildcards if input is a string
 
     Notes:
      - 'today' defaults to current day in GMT
      - 'yesterday' is the day prior to 'today'
-     - stftime control codes ('%Y', '%m', etc.) are replaced using 'today'
+     - strftime control codes ('%Y', '%m', etc.) not wrapped in '{today:' + '}'
+       are replaced using 'today'
 
     TODO:
      - rename this method ?
@@ -53,20 +53,18 @@ def fill_in_datetime_strings(val, today=None):
         today = today or today_utc()
         yesterday = today - ONE_DAY
 
-        #val = val.replace('{today}', today.strftime('%Y%m%d'))
-        #val = val.replace('{yesterday}', yesterday.strftime('%Y%m%d'))
         while True:
             m = DATETIME_WILDCARD_MATCHER.search(val)
             if not m:
                 break
-            t_or_y, offset, colon_plus_pattern, pattern = m.groups()
-            to_replace = m.group(0)
-            pattern = pattern or DEFAULT_DATE_FORMAT_STRING
-            day = (today - ONE_DAY) if (t_or_y == 'yesterday') else today
+
+            offset = m.group(2) and int(m.group(2))
+            pattern = m.group(4) or DEFAULT_DATE_FORMAT_STRING
+            day = (today - ONE_DAY) if (m.group(1) == 'yesterday') else today
             if offset:
                 day = day + datetime.timedelta(days=int(offset))
 
-            val = val.replace(to_replace, day.strftime(pattern))
+            val = val.replace(m.group(0), day.strftime(pattern))
 
         # now format all remaining patterns with 'today'
         # Note that ('{today:PATTERN}', handled above, really isn't necessary,
