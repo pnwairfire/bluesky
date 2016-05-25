@@ -323,6 +323,7 @@ class FiresManager(object):
         # HACK: access today simply to trigger replacement of wildcards
         # Note: the check for 'today' in self._meta prevents it from being
         #  generated unnecessarily
+        # TODO: return self.today ?
         self.today
 
     @property
@@ -635,15 +636,19 @@ class FiresManager(object):
         self.fires = input_dict.pop('fire_information', [])
 
         self.config = input_dict.pop('config', {})
-        self.today = input_dict.pop('today', None)
 
         self._meta = input_dict
 
-        # HACK: access run id simply to trigger replacement of wildcards
-        # Note: the check for 'run_id' in self._meta prevents it from being
-        #  generated unnecessarily
-        # TODO: always generate a run id (by removing the check)?
+        # HACK: access 'today' and 'run_id' simply to trigger replacement
+        #  of wildcards
+        # Note: the checks for 'today' and 'run_id' in self._meta prevent
+        #  then from being generated unnecessarily
+        # TODO: always generate 'today' and 'run_id' (by removing the checks)?
+        if 'today' in self._meta:
+            self._processed_today = False
+            self.today
         if 'run_id' in self._meta:
+            self._processed_run_id_wildcards = False
             self.run_id
 
     def loads(self, input_stream=None, input_file=None):

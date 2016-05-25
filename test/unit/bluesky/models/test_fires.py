@@ -256,7 +256,42 @@ class TestFiresManager:
 
     ## Properties
 
-    # TODO: tests for date_time
+    @freezegun.freeze_time("2016-04-20")
+    def test_today_is_processed_for_wildcards(self, monkeypatch):
+        fm = fires.FiresManager()
+        assert fm.today == datetime.date(2016,4,20)
+
+        # test setting fm.today by load
+
+        fm.load({'today': datetime.datetime(2012, 4,3,22,11)})
+        assert fm.today == datetime.datetime(2012, 4,3,22,11)
+
+        fm.load({'today': "2012-04-02T22:11:00Z"})
+        assert fm.today == datetime.datetime(2012, 4,2,22,11)
+
+        fm.load({'today': "{today}"})
+        assert fm.today == datetime.datetime(2016, 4,20)
+
+        fm.load({'today': "{yesterday}"})
+        assert fm.today == datetime.datetime(2016, 4, 19)
+
+        # TODO: any other possibilities ??
+
+        # test setting fm.today by assignmentd
+
+        fm.today = datetime.datetime(2016, 4, 1)
+        assert fm.today == datetime.datetime(2016, 4, 1)
+
+        fm.today = "2012-04-04T22:13:00Z"
+        assert fm.today == datetime.datetime(2012, 4, 4, 22, 13)
+
+        fm.today = "{today}"
+        assert fm.today == datetime.datetime(2016, 4, 20)
+
+        fm.today = "{yesterday}"
+        assert fm.today == datetime.datetime(2016, 4, 19)
+
+        # TODO: any other possibilities ??
 
     def test_run_id_is_immutable(self, monkeypatch):
         monkeypatch.setattr(uuid, 'uuid1', lambda: "sdf123")
