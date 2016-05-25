@@ -635,7 +635,8 @@ class FiresManager(object):
         # wipe out existing fires, if any
         self.fires = input_dict.pop('fire_information', [])
 
-        self.config = input_dict.pop('config', {})
+        # pop config, but don't set until after today has been set
+        config = input_dict.pop('config', {})
 
         self._meta = input_dict
 
@@ -650,6 +651,8 @@ class FiresManager(object):
         if 'run_id' in self._meta:
             self._processed_run_id_wildcards = False
             self.run_id
+
+        self.config = config
 
     def loads(self, input_stream=None, input_file=None):
         """Loads json-formatted fire data, creating list of Fire objects and
