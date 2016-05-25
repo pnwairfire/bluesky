@@ -573,11 +573,21 @@ class TestFiresManagerSetAndMergeConfig(object):
         "bar": "20160504-sdf-2016-05-03T12Z-%Y__%m-%d-05_02-",
         "baz": 234
     }
+    CONFIG_2016_05_05 = {
+        "foo":"bar",
+        "bar": "20160505-sdf-2016-05-04T12Z-%Y__%m-%d-05_03-",
+        "baz": 234
+    }
     def test_setting_config_manually(self):
         fm = fires.FiresManager()
         fm.today = datetime.datetime(2016, 5, 4)
         fm.config = copy.deepcopy(self.RAW_CONFIG)
         assert fm.config == self.CONFIG_2016_05_04
+        fm.today = datetime.datetime(2016, 5, 5)
+        assert fm.config == self.CONFIG_2016_05_05
+        # TODO: set fm.today = datetime.datetime(2016, 5, 5) again
+        #   and make sure (by capturing method calls) that config
+        #   doesn't get reprocessed
 
     def test_loading_config(self):
         fm = fires.FiresManager()
@@ -586,6 +596,11 @@ class TestFiresManagerSetAndMergeConfig(object):
             'config': copy.deepcopy(self.RAW_CONFIG)
         })
         assert fm.config == self.CONFIG_2016_05_04
+        fm.today = datetime.datetime(2016, 5, 5)
+        assert fm.config == self.CONFIG_2016_05_05
+        # TODO: set fm.today = datetime.datetime(2016, 5, 5) again
+        #   and make sure (by capturing method calls) that config
+        #   doesn't get reprocessed
 
     def test_merge_configs(self):
         fm = fires.FiresManager()

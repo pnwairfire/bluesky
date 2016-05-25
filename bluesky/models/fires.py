@@ -208,6 +208,7 @@ class FiresManager(object):
         self._meta = {}
         self.today # triggers setting of default
         self.config = {}
+        self._raw_config = None
         self.modules = []
         self.fires = [] # this intitializes self._fires and self_fire_ids
         self._processed_today = False
@@ -318,13 +319,16 @@ class FiresManager(object):
 
     @today.setter
     def today(self, today):
+        previous_today = self.today
         self._processed_today = False
         self._meta['today'] = today
-        # HACK: access today simply to trigger replacement of wildcards
-        # Note: the check for 'today' in self._meta prevents it from being
-        #  generated unnecessarily
-        # TODO: return self.today ?
-        self.today
+        # HACK (sort of): we need to call self.today to trigger replacement
+        #   of wildcards and then converstion to datetime object (that's a
+        #   hack), but we need to access it anyway to see if we need to
+        #   reprocess the raw config
+        new_today = self.today
+        if self._raw_config and previous_today != new_today:
+            self.config = self._raw_config
 
     @property
     def modules(self):
@@ -423,6 +427,7 @@ class FiresManager(object):
 
     @config.setter
     def config(self, config):
+        self._raw_config = copy.deepcopy(config)
         self._meta['config'] = self.replace_config_wildcards(config)
         self._im_config = configuration.ImmutableConfigDict(self._meta['config'])
 
