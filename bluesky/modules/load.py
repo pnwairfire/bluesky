@@ -39,7 +39,6 @@ import logging
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __author__ = "Joel Dubowy"
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 __all__ = [
     'run'

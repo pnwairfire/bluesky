@@ -6,7 +6,6 @@ TODO: refactor this as a class
 """
 
 __author__ = "Joel Dubowy and Sonoma Technology, Inc."
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import logging
 import math

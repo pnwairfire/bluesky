@@ -5,7 +5,6 @@ TODO: Remove this module and update all imports of this module to import
 """
 
 __author__ = "Joel Dubowy"
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 from pyairfire.data.utils import (
     deepmerge,

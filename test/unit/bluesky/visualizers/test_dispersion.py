@@ -1,7 +1,6 @@
 """Unit tests for bluesky.configuration"""
 
 __author__ = "Joel Dubowy"
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 from py.test import raises
 

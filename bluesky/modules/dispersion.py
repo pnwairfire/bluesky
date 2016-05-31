@@ -5,7 +5,6 @@ Executables. See the repo README.md for more information.
 """
 
 __author__ = "Joel Dubowy"
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import consume
 import importlib

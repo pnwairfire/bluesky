@@ -1,7 +1,6 @@
 """bluesky.exporters.uploader"""
 
 __author__ = "Joel Dubowy"
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import copy
 import getpass

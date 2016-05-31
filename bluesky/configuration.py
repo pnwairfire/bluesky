@@ -5,7 +5,6 @@ TODO: create ConfigDict class with method 'merge' (which, as the name
 """
 
 __author__ = "Joel Dubowy"
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 import argparse
 import ConfigParser

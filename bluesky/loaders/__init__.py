@@ -25,7 +25,6 @@ from bluesky import datetimeutils, fileutils
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __author__ = "Joel Dubowy"
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 class BaseFileLoader(object):
 

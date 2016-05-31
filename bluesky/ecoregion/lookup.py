@@ -16,7 +16,6 @@ except ImportError, e:
         "Missing dependencies required for ecoregion lookup - {}".format(e))
 
 __author__ = "Joel Dubowy and Sonoma Technology, Inc."
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 
 class EcoregionLookup(object):

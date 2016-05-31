@@ -27,7 +27,6 @@ except:
     from bluesky import exceptions, configuration, modules, models, __version__
 
 __author__ = "Joel Dubowy"
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 REQUIRED_ARGS = []
 

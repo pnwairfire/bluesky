@@ -42,7 +42,6 @@ Heres are the notes coped from BSF:
 """
 
 __author__ = "Joel Dubowy and Sonoma Technology, Inc."
-__copyright__ = "Copyright 2016, AirFire, PNW, USFS"
 
 __version__ = "0.2.0"
 
