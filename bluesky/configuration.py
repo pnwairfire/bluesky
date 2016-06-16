@@ -12,6 +12,15 @@ import json
 import os
 import re
 
+from pyairfire.scripting.args import (
+    ConfigOptionAction,
+    BooleanConfigOptionAction,
+    IntegerConfigOptionAction,
+    FloatConfigOptionAction,
+    JSONConfigOptionAction,
+    ConfigFileAction
+)
+
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
@@ -118,108 +127,4 @@ class ImmutableConfigDict(dict):
     pop         = _immutable
     popitem     = _immutable
 
-##
-## Parsing config options from the command line
-##
 
-# TODO: move *Config*Action classes to pyairfire ?
-
-class ConfigOptionAction(argparse.Action):
-
-    EXTRACTER = re.compile('^([^=]+)=([^=]+)$')
-
-    def _cast_value(self, val):
-        # default is to return as is (as str)
-        return val
-
-    def __call__(self, parser, namespace, value, option_string=None):
-        """Set individual config option in config dict
-
-        Note: Expects value to be of the format 'section.*.key=value', with
-        any section nesting depth.
-
-        TODO: come up with way to specify numeric and boolean values
-          (maybe have separate option, e.g. '--int-config-option'; would
-           need to do something like subclass ConfigOptionAction and
-           have hook for setting value so that subclasses could used
-           that hook to cast to int)
-        """
-        m = self.EXTRACTER.search(value.strip())
-        if not m:
-            msg = ("Invalid value '{}' for option '{}' - value must be of the "
-                "form 'section.*.key=value'".format(value, option_string))
-            raise argparse.ArgumentTypeError(msg)
-
-        config_dict = getattr(namespace, self.dest)
-        if not config_dict:
-            config_dict = dict()
-            setattr(namespace, self.dest, config_dict)
-
-        val = self._cast_value(m.group(2))
-        set_config_value(config_dict, val, *m.group(1).split('.'))
-
-class BooleanConfigOptionAction(ConfigOptionAction):
-    TRUE_VALS = set(['true', "1"])
-    FALSE_VALS = set(['false', "0"])
-    def _cast_value(self, val):
-        val = val.lower()
-        if val in self.TRUE_VALS:
-            return True
-        elif val in self.FALSE_VALS:
-            return False
-        else:
-            raise argparse.ArgumentTypeError(
-                "Invalid boolean value: {}".format(val))
-
-class IntegerConfigOptionAction(ConfigOptionAction):
-    def _cast_value(self, val):
-        try:
-            return int(val)
-        except ValueError:
-            raise argparse.ArgumentTypeError(
-                "Invalid integer value: {}".format(val))
-
-class FloatConfigOptionAction(ConfigOptionAction):
-    def _cast_value(self, val):
-        try:
-            return float(val)
-        except ValueError:
-            raise argparse.ArgumentTypeError(
-                "Invalid float value: {}".format(val))
-
-class JSONConfigOptionAction(ConfigOptionAction):
-    def _cast_value(self, val):
-        try:
-            return json.loads(val)
-        except ValueError:
-            raise argparse.ArgumentTypeError(
-                "Invalid json value: {}".format(val))
-
-class ConfigFileAction(argparse.Action):
-    def __call__(self, parser, namespace, value, option_string=None):
-        """Load config settings from json file
-        """
-        filename = os.path.abspath(value.strip())
-        if not os.path.isfile(filename):
-            raise argparse.ArgumentTypeError(
-                "File {} does not exist".format(filename))
-
-        with open(filename) as f:
-            try:
-                config_dict = json.loads(f.read())
-            except ValueError:
-                raise argparse.ArgumentTypeError("File {} contains "
-                    "invalid config JSON data".format(filename))
-
-        if 'config' not in config_dict:
-            raise argparse.ArgumentTypeError("Config file must contain top "
-                "level 'config' key")
-        config_dict = config_dict['config']
-
-        existing_config_dict = getattr(namespace, self.dest)
-        if not existing_config_dict:
-            # first file loaded
-            setattr(namespace, self.dest, config_dict)
-        else:
-            # subsequent file loaded
-            merge_configs(existing_config_dict, config_dict)
