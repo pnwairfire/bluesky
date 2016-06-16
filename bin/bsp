@@ -10,7 +10,6 @@ Example calls:
 
 import fcntl
 import json
-import importlib
 import logging
 import os
 import sys
