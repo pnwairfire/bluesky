@@ -40,12 +40,12 @@ setup(
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
     install_requires=[
         "pyairfire>=1.1.1",
-        "eflookup>=0.6.2",
-        "emitcalc>=0.3.2",
-        "fccsmap>=0.2.0",
-        "timeprofile>=0.1.2",
-        "plumerise>=0.2.1",
-        "blueskykml>=0.2.11",
+        "eflookup>=1.0.1",
+        "emitcalc>=1.0.0",
+        "fccsmap>=1.0.0",
+        "timeprofile>=1.0.0",
+        "plumerise>=1.0.0",
+        "blueskykml>=1.0.0",
         "apps-consume4>=4.1.2"
     ],
     dependency_links=[
