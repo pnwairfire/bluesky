@@ -112,7 +112,7 @@ First, install pip (with sudo if necessary):
 
 Run the following to install python dependencies:
 
-    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
+    pip install --trusted-host pypi.smoke.airfire.org -r requirements.txt
 
 Run the following to install packages required for development and testing:
 
