@@ -1962,3 +1962,32 @@ containers after they've been used.  To clean up, you can use the following:
 
     # remove all untagged images:
     docker images | grep "<none>" | awk '{print $3}' | xargs docker rmi
+
+Note: if you use the ```--rm``` option in ```docker run```, the cleaner will be
+automatically deleted after use.
+
+### Running other tools in docker
+
+#### BlueSkyKml
+
+Since BlueSkyKml is installed as a dependency of bluesky, you can run
+```makedispersionkml``` just as you'd run ```bsp```. As with ```bsp```,
+you'll need to use the '-v' option to mount host machine
+directories in your container.  For example, suppose you've got bluesky
+output data in /bluesky-output/20151212f/data/ and you want to create
+the dispersion kml in /docker-output/, you could run something like the
+following:
+
+    docker run \
+        -v /home/foo/bluesky-output/2015121200/data/:/input/ \
+        -v /home/foo/docker-output/:/output/ bluesky \
+        makedispersionkml \
+        -i /input/smoke_dispersion.nc \
+        -l /input/fire_locations.csv \
+        -e /input/fire_events.csv \
+        -o /output/
+
+#### Other tools
+
+There are a number of other executables installed as dependencies of bluesky.
+Look in ```/usr/local/bin/``` to see what's there.
