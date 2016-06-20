@@ -264,7 +264,7 @@ class HysplitVisualizer(object):
                     makeaquiptdispersionkml.main(args)
                 else:
                     makedispersionkml.main(args)
-        except blueskykml_configuration.ConfigurationError, e:
+        except blueskykml_configuration.ConfigurationError as e:
             raise BlueSkyConfigurationError(".....")
 
         return {

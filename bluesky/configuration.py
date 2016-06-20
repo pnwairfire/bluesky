@@ -7,7 +7,7 @@ TODO: create ConfigDict class with method 'merge' (which, as the name
 __author__ = "Joel Dubowy"
 
 import argparse
-import ConfigParser
+import configparser
 import json
 import os
 import re

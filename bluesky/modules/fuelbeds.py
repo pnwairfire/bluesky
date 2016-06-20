@@ -8,6 +8,7 @@ from collections import defaultdict
 
 import fccsmap
 from fccsmap.lookup import FccsLookUp
+from functools import reduce
 
 __all__ = [
     'run'

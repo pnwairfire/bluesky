@@ -109,7 +109,7 @@ def to_datetime(val, limit_range=False):
                         or dt > VALID_DATETIME_RANGE[1]):
                     _invalid(val + ' (outside of valid range)')
                 return dt
-            except ValueError, e:
+            except ValueError as e:
                 _invalid(val)
         else:
             _invalid(val)

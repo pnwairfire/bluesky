@@ -102,7 +102,7 @@ class FireIngester(object):
 
         # copy back down any recognized top level, 'scalar' fields
         for k in self.SCALAR_FIELDS:
-            if self._parsed_input.has_key(k):
+            if k in self._parsed_input:
                 fire[k] = self._parsed_input[k]
 
         # Call separate ingest methods for each nested object
@@ -384,6 +384,6 @@ class FireIngester(object):
                             'utc_offset'):
                         fire['location']['utc_offset'] = utc_offset
 
-                except Exception, e:
+                except Exception as e:
                     logging.warn("Failed to parse 'date_time' value %s",
                         date_time)

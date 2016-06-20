@@ -231,7 +231,7 @@ class VSMOKEDispersion(DispersionBase):
                 in_var.acres, tons, efpm, efco, in_var.tfire, thot, tconst,
                 tdecay, grad_rise, rfrc)
             )
-            for hour in xrange(self._num_hours):
+            for hour in range(self._num_hours):
 
                 f.write("%d %f %f %d %s %d %f %f %f %f %f %f\n" % (
                     hour + 1, in_var.temp_fire, in_var.pres, in_var.irha,
@@ -240,7 +240,7 @@ class VSMOKEDispersion(DispersionBase):
                     in_var.bkgpma, in_var.bkgcoa)
                 )
 
-            for hour in xrange(self._num_hours):
+            for hour in range(self._num_hours):
                 dt = self._model_start + timedelta(hours=hour)
                 local_dt = dt + timedelta(hours=fire.utc_offset)
 

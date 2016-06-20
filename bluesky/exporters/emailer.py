@@ -5,7 +5,7 @@ __author__ = "Joel Dubowy"
 import json
 import logging
 import smtplib
-import StringIO
+import io
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -56,7 +56,7 @@ class EmailExporter(ExporterBase):
 
             # TODO: attach json dump of fires_amanager instead of making it
             #   the email's content ?
-            d = StringIO.StringIO()
+            d = io.StringIO()
             fires_manager.dumps(output_stream=d)
             content = d.getvalue()
 
@@ -83,7 +83,7 @@ class EmailExporter(ExporterBase):
             s.quit()
             fires_manager.export['email'] = {"sent_to": self._recipients}
 
-        except Exception, e:
+        except Exception as e:
             msg = 'Failed to send email to {} - {}'.format(
                 ', '.join(self._recipients), e.message)
             logging.error(msg)

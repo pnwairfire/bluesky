@@ -24,6 +24,7 @@ from pyairfire.datetime import parsing as datetime_parsing
 from bluesky import datautils
 from bluesky.datetimeutils import parse_utc_offset
 from bluesky.models.fires import Fire
+from functools import reduce
 
 
 # Note: HYSPLIT can accept concentrations in any units, but for
@@ -37,9 +38,7 @@ BTU_TO_MW = 3414425.94972     # Btu to MW
 # Conversion factor for fire size
 SQUARE_METERS_PER_ACRE = 4046.8726
 
-class DispersionBase(object):
-
-    __metaclass__ = abc.ABCMeta
+class DispersionBase(object, metaclass=abc.ABCMeta):
 
     # 'BINARIES' dict should be defined by each subclass which depend on
     # external binaries

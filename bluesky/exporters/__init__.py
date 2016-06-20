@@ -71,7 +71,7 @@ class ExporterBase(object):
                     if m.search(output_dir_name):
                         output_dir_name = output_dir_name.replace(
                             m.pattern, f(fires_manager))
-                except Exception, e:
+                except Exception as e:
                     logging.error("Failed to replace {} in export output dir "
                         "name - {}".format(m.pattern, e.message))
                     # Just skip
@@ -115,7 +115,7 @@ class ExporterBase(object):
                 dirs_to_copy[d['output']['directory']] = dirs_to_copy.get(
                     d['output']['directory'], [])
                 dirs_to_copy[d['output']['directory']].append(k)
-        for directory, extra_imports in dirs_to_copy.items():
+        for directory, extra_imports in list(dirs_to_copy.items()):
             new_dirname = '-'.join(extra_imports)
             shutil.copytree(directory, os.path.join(output_dir, new_dirname))
             for k in extra_imports:

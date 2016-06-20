@@ -81,7 +81,7 @@ def _import_loader(source):
     try:
         loader_module = importlib.import_module('bluesky.loaders.{}.{}'.format(
             source['name'].lower(), source['format'].lower()))
-    except ImportError, e:
+    except ImportError as e:
         raise BlueSkyConfigurationError("Invalid source and/or format: {},{}".format(
             source['name'], source['format']))
 

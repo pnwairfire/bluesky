@@ -3,7 +3,7 @@
 __author__ = "Joel Dubowy"
 
 import copy
-import mock
+from unittest import mock
 
 from py.test import raises
 

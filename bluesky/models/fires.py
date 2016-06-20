@@ -228,7 +228,7 @@ class FiresManager(object):
 
     def add_fire(self, fire):
         self._fires = self._fires or {}
-        if not self._fires.has_key(fire.id):
+        if fire.id not in self._fires:
             self._fires[fire.id] = []
             self._fire_ids.add(fire.id)
         self._fires[fire.id].append(fire)
@@ -237,7 +237,7 @@ class FiresManager(object):
 
     def remove_fire(self, fire):
         # TODO: raise exception if fire doesn't exist ?
-        if self._fires.has_key(fire.id):
+        if fire.id in self._fires:
             _n = len(self._fires[fire.id])
             self._fires[fire.id] = [f for f in self._fires[fire.id]
                 if f._private_id != fire._private_id]
@@ -374,7 +374,7 @@ class FiresManager(object):
         for m in module_names:
             try:
                 self._modules.append(importlib.import_module('bluesky.modules.%s' % (m)))
-            except ImportError, e:
+            except ImportError as e:
                 if e.message == 'No module named {}'.format(m):
                     raise BlueSkyImportError("Invalid module '{}'".format(m))
                 else:
@@ -499,7 +499,7 @@ class FiresManager(object):
         #   (though this would be sketchy, since a module may very well have
         #    been run twice in a row)....maybe we should always
         #   append a new record
-        if not self.processing or self.processing[-1].keys() != ['module_name']:
+        if not self.processing or list(self.processing[-1].keys()) != ['module_name']:
             self.processing = self.processing or []
             self.processing.append(v)
         else:
@@ -533,7 +533,7 @@ class FiresManager(object):
 
                         # 'run' modifies fires in place
                         self._modules[i].run(self)
-                except Exception, e:
+                except Exception as e:
                     failed = True
                     # when there's an error running modules, don't bail; continue
                     # iterating through requested modules, executing only exports
@@ -695,11 +695,9 @@ class FiresManager(object):
 ## Filtering and Merging Fires
 ##
 
-class FiresActionBase(object):
+class FiresActionBase(object, metaclass=abc.ABCMeta):
     """Base class for merging or filtering fires
     """
-
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, fires_manager):
         """Constructor
@@ -810,7 +808,7 @@ class FiresMerger(FiresActionBase):
                 combined_fire = self._merge_into_combined_fire(fire,
                     combined_fire)
 
-            except FiresMerger.MergeError, e:
+            except FiresMerger.MergeError as e:
                 if not self._skip_failures:
                     if combined_fire:
                         # add back what was merge in progress
@@ -851,7 +849,7 @@ class FiresMerger(FiresActionBase):
                 # if remove_fire fails, combined_fire won't be updated
                 self._fires_manager.remove_fire(fire)
 
-            except Exception, e:
+            except Exception as e:
                 self._fail(fire, e)
 
         return new_combined_fire
@@ -1001,7 +999,7 @@ class FiresFilter(FiresActionBase):
                             raise self.FilterError(self.MISSING_FILTER_CONFIG_MSG)
                     kwargs.update(filter_field=f)
                     filter_func = filter_getter(**kwargs)
-                except self.FilterError, e:
+                except self.FilterError as e:
                     if self._skip_failures:
                         logging.warn("Failed to initialize %s filter: %s", f, e)
                         continue
@@ -1018,7 +1016,7 @@ class FiresFilter(FiresActionBase):
                             self._fires_manager.filtered_fires.append(fire)
                             logging.debug('Filtered fire %s (%s)', fire.id,
                                 fire._private_id)
-                    except self.FilterError, e:
+                    except self.FilterError as e:
                         if self._skip_failures:
                             # e.message is already detailed
                             logging.warn(e.message)
@@ -1093,7 +1091,7 @@ class FiresFilter(FiresActionBase):
             try:
                 lat = fire.latitude
                 lng = fire.longitude
-            except ValueError, e:
+            except ValueError as e:
                 self._fail(fire, self.MISSING_FIRE_LAT_LNG_MSG)
             if not lat or not lng:
                 self._fail(fire, self.MISSING_FIRE_LAT_LNG_MSG)

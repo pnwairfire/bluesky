@@ -439,7 +439,7 @@ if __name__ == "__main__":
     try:
         success = run(args)
 
-    except Exception, e:
+    except Exception as e:
         logging.error(e)
         logging.debug(traceback.format_exc())
         scripting.utils.exit_with_msg(e)

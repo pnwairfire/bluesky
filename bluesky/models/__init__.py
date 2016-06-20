@@ -3,4 +3,4 @@
 __author__ = "Joel Dubowy"
 
 #from fires import Fire
-import fires
+from . import fires

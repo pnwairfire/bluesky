@@ -269,11 +269,11 @@ def main():
         fires_manager.merge_config(args.config_options)
 
         fires_manager.run()
-    except exceptions.BlueSkyModuleError, e:
+    except exceptions.BlueSkyModuleError as e:
         # The error was added to fires_manager's meta data, and will be
         # included in the output data
         pass
-    except Exception, e:
+    except Exception as e:
         exit_with_traceback(e)
 
     fires_manager.dumps(output_file=args.output_file)

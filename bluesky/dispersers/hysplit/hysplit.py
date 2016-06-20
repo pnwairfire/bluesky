@@ -258,13 +258,13 @@ class HYSPLITDispersion(DispersionBase):
             def run(self):
                 try:
                     runner._run_process(self.fires, self.working_dir)
-                except Exception, e:
+                except Exception as e:
                     self.exc = e
 
         fire_tranches = hysplit_utils.create_fire_tranches(
             fire_sets, num_processes)
         threads = []
-        for nproc in xrange(len(fire_tranches)):
+        for nproc in range(len(fire_tranches)):
             fires = fire_tranches[nproc]
             # Note: no need to set _context.basedir; it will be set to workdir
             logging.info("Starting thread to run HYSPLIT on %d fires." % (len(fires)))
@@ -293,7 +293,7 @@ class HYSPLITDispersion(DispersionBase):
 
         #ncea_args = ["-y", "ttl", "-O"]
         ncea_args = ["-O","-v","PM25","-y","ttl"]
-        ncea_args.extend(["%d/%s" % (i, self.OUTPUT_FILE_NAME) for i in  xrange(num_processes)])
+        ncea_args.extend(["%d/%s" % (i, self.OUTPUT_FILE_NAME) for i in  range(num_processes)])
         ncea_args.append(output_file)
         self._execute(self.BINARIES['NCEA'], *ncea_args, working_dir=working_dir)
 

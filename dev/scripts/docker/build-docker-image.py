@@ -14,7 +14,7 @@ DOCKER_IMAGE_NAMES = {
     "base": "bluesky-base",
     "complete": "bluesky"
 }
-VALID_IMAGES_STR = ', '.join(DOCKER_IMAGE_NAMES.keys())
+VALID_IMAGES_STR = ', '.join(list(DOCKER_IMAGE_NAMES.keys()))
 
 REQUIRED_ARGS = [
     {

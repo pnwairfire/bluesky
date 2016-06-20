@@ -215,7 +215,7 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
             if row[0] == str(fccs_id):
                 d = dict(row)
                 for k in d:
-                    if self.FUEL_LOADINGS_KEY_MAPPINGS.has_key(k):
+                    if k in self.FUEL_LOADINGS_KEY_MAPPINGS:
                         d[self.FUEL_LOADINGS_KEY_MAPPINGS[k]] = d.pop(k)
                 d.pop('fccs_id', None)
                 return d
@@ -254,7 +254,7 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
             # aren't filled in.
             try:
                 row = self.FCCS_LOADINGS_CSV_ROW_TEMPLATE.format(**fuel_loadings)
-            except KeyError, e:
+            except KeyError as e:
                 raise BlueSkyConfigurationError(
                     "Missing fuel loadings field: '{}'".format(e.message))
 

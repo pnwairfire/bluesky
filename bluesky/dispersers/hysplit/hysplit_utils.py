@@ -9,6 +9,7 @@ __author__ = "Joel Dubowy and Sonoma Technology, Inc."
 
 import logging
 import math
+from functools import reduce
 
 
 __all__ = [
@@ -30,7 +31,7 @@ def create_fire_sets(fires):
     fires_dict = {e: [] for e in set([f.id for f in fires])}
     for f in fires:
         fires_dict[f.id].append(f)
-    return  fires_dict.values()
+    return  list(fires_dict.values())
 
 def create_fire_tranches(fire_sets, num_processes):
     """Creates tranches of FireLocationData, each tranche to be processed by its
@@ -54,7 +55,7 @@ def create_fire_tranches(fire_sets, num_processes):
 
     idx = 0
     fire_tranches = []
-    for nproc in xrange(num_processes):
+    for nproc in range(num_processes):
         s = idx
         idx += min_n_fire_sets_per_process
         if nproc < extra_fire_cutoff:

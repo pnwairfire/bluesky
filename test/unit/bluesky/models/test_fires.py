@@ -6,7 +6,7 @@ import copy
 import datetime
 import json
 import sys
-import StringIO
+import io
 import uuid
 
 import freezegun
@@ -385,9 +385,9 @@ class TestFiresManager(object):
     def _stream(test_self, data=''):
         def _stream(self, file_name, flag):
             if flag == 'r':
-                return StringIO.StringIO(data)
+                return io.StringIO(data)
             else:
-                test_self._output = StringIO.StringIO()
+                test_self._output = io.StringIO()
                 return test_self._output
         return _stream
 

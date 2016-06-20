@@ -2,7 +2,7 @@
 
 __author__ = "Joel Dubowy"
 
-import ConfigParser
+import configparser
 
 from py.test import raises
 
@@ -26,11 +26,11 @@ class TestConfigParserToDict(object):
         assert {} == d
 
     def test_empty(self):
-        d = config_parser_to_dict(ConfigParser.ConfigParser())
+        d = config_parser_to_dict(configparser.ConfigParser())
         assert {} == d
 
     def test_valid(self):
-        c = ConfigParser.ConfigParser()
+        c = configparser.ConfigParser()
         c.add_section('a')
         c.add_section('b')
         c.set('a', 'aa', 'sdf')

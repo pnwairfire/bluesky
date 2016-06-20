@@ -13,6 +13,7 @@ from timeprofile.static import (
 
 from bluesky.datetimeutils import parse_datetimes
 from bluesky.exceptions import BlueSkyConfigurationError
+from functools import reduce
 
 __all__ = [
     'run'
@@ -33,10 +34,10 @@ def run(fires_manager):
         with fires_manager.fire_failure_handler(fire):
             try:
                 _run_fire(hourly_fractions, fire)
-            except InvalidHourlyFractionsError, e:
+            except InvalidHourlyFractionsError as e:
                 raise BlueSkyConfigurationError(
                     "Invalid timeprofiling hourly fractions: '{}'".format(e.message))
-            except InvalidStartEndTimesError, e:
+            except InvalidStartEndTimesError as e:
                 raise BlueSkyConfigurationError(
                     "Invalid timeprofiling start end times: '{}'".format(e.message))
             # except InvalidEmissionsDataError, e:
@@ -61,8 +62,8 @@ def _run_fire(hourly_fractions, fire):
             hourly_fractions=hourly_fractions)
         # convert timeprofile to dict with dt keys
         g['timeprofile'] = {}
-        fields = profiler.hourly_fractions.keys()
-        for i in range(len(profiler.hourly_fractions.values()[0])): # each phase should have same len
+        fields = list(profiler.hourly_fractions.keys())
+        for i in range(len(list(profiler.hourly_fractions.values())[0])): # each phase should have same len
             hr = profiler.start_hour + (i * profiler.ONE_HOUR)
             g['timeprofile'][hr.isoformat()] = {
                 p: profiler.hourly_fractions[p][i] for p in fields }

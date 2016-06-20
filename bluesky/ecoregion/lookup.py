@@ -10,7 +10,7 @@ import os
 try:
     import mapscript
     from osgeo import ogr
-except ImportError, e:
+except ImportError as e:
     from bluesky import exceptions
     raise exceptions.MissingDependencyError(
         "Missing dependencies required for ecoregion lookup - {}".format(e))
