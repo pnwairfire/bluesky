@@ -98,7 +98,7 @@ class FireIngester(object):
             raise ValueError("Fire contains no data")
 
         # move original data under 'input key'
-        self._parsed_input = { k: fire.pop(k) for k in fire.keys() }
+        self._parsed_input = { k: fire.pop(k) for k in list(fire.keys()) }
 
         # copy back down any recognized top level, 'scalar' fields
         for k in self.SCALAR_FIELDS:
