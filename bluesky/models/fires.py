@@ -182,7 +182,7 @@ class Fire(dict):
     def __getattr__(self, attr):
         if attr in self.keys():
             return self[attr]
-        raise KeyError(attr)
+        raise AttributeError(attr)
 
     def __setattr__(self, attr, val):
         if not attr.startswith('_') and not hasattr(Fire, attr):

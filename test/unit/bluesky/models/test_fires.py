@@ -105,7 +105,7 @@ class TestFire:
         assert 'sdf' == f.b
         with raises(KeyError) as e:
             f['sdfdsf']
-        with raises(KeyError) as e:
+        with raises(AttributeError) as e:
             f.rifsijsflj
 
     def test_start_and_end(self):
