@@ -67,35 +67,35 @@ class TestFire:
         with raises(ValueError) as e_info:
             f = fires.Fire({"a": 123, "b": "sdf",
                 "type": 'foo', 'fuel_type': 'piles'})
-        assert e_info.value.message == fires.Fire.INVALID_TYPE_MSG.format('foo')
+        assert e_info.value.args[0] == fires.Fire.INVALID_TYPE_MSG.format('foo')
 
         f = fires.Fire()
 
         # validates 'type' on setattr
         with raises(ValueError) as e_info:
             f.type = 'foo'
-        assert e_info.value.message == fires.Fire.INVALID_TYPE_MSG.format('foo')
+        assert e_info.value.args[0] == fires.Fire.INVALID_TYPE_MSG.format('foo')
 
         # validates 'type' on dict set
         with raises(ValueError) as e_info:
             f['type'] = 'foo'
-        assert e_info.value.message == fires.Fire.INVALID_TYPE_MSG.format('foo')
+        assert e_info.value.args[0] == fires.Fire.INVALID_TYPE_MSG.format('foo')
 
         # validates 'fuel_type' on instantiation
         with raises(ValueError) as e_info:
             f = fires.Fire({"a": 123, "b": "sdf",
                 "type": 'rx', 'fuel_type': 'bar'})
-        assert e_info.value.message == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
+        assert e_info.value.args[0] == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
 
         # validates 'fuel_type' on setattr
         with raises(ValueError) as e_info:
             f.fuel_type = 'bar'
-        assert e_info.value.message == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
+        assert e_info.value.args[0] == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
 
         # validates 'fuel_type' on dict set
         with raises(ValueError) as e_info:
             f['fuel_type'] = 'bar'
-        assert e_info.value.message == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
+        assert e_info.value.args[0] == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
 
     def test_accessing_attributes(self):
         f = fires.Fire({'a': 123, 'b': 'sdf'})
@@ -301,7 +301,7 @@ class TestFiresManager(object):
         assert fm.run_id == "sdf123"
         with raises(TypeError) as e_info:
             fm.run_id = "sdfsdfsdf"
-        assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+        assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
         # FiresManager.load sets run_id
         fm = fires.FiresManager()
@@ -309,27 +309,27 @@ class TestFiresManager(object):
         assert fm.run_id == "sdf123"
         with raises(TypeError) as e_info:
             fm.run_id = "sdfsdfsdf"
-        assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+        assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
         fm = fires.FiresManager()
         fm.load({'run_id': "ggbgbg"})
         assert fm.run_id == "ggbgbg"
         with raises(TypeError) as e_info:
             fm.run_id = "sdfsdfsdf"
-        assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+        assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
         fm = fires.FiresManager(run_id="ggg")
         assert fm.run_id == "ggg"
         with raises(TypeError) as e_info:
             fm.run_id = "sdfsdfsdf"
-        assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+        assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
         fm = fires.FiresManager()
         fm.run_id = "eee"
         assert fm.run_id == "eee"
         with raises(TypeError) as e_info:
             fm.run_id = "sdfsdfsdf"
-        assert e_info.value.message == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+        assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
         # when you load, fm starts from scratch
         assert fm.run_id == "eee"
@@ -801,7 +801,7 @@ class TestFiresManagerMergeFires(object):
                 with raises(ValueError) as e_info:
                     fm.merge_fires()
                 assert fm.num_fires == 2
-                assert e_info.value.message.index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
+                assert e_info.value.args[0].index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
@@ -820,7 +820,7 @@ class TestFiresManagerMergeFires(object):
                 with raises(ValueError) as e_info:
                     fm.merge_fires()
                 assert fm.num_fires == 2
-                assert e_info.value.message.index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
+                assert e_info.value.args[0].index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
@@ -852,7 +852,7 @@ class TestFiresManagerMergeFires(object):
                 with raises(ValueError) as e_info:
                     fm.merge_fires()
                 assert fm.num_fires == 2
-                assert e_info.value.message.index(fires.FiresMerger.LOCATION_MISMATCH_MSG) > 0
+                assert e_info.value.args[0].index(fires.FiresMerger.LOCATION_MISMATCH_MSG) > 0
             else:
                 fm.merge_fires()
                 # Sort by area since ids are the same
@@ -892,7 +892,7 @@ class TestFiresManagerMergeFires(object):
                 with raises(ValueError) as e_info:
                     fm.merge_fires()
                 assert fm.num_fires == 2
-                assert e_info.value.message.index(
+                assert e_info.value.args[0].index(
                     fires.FiresMerger.GROWTH_FOR_BOTH_OR_NONE_MSG) > 0
             else:
                 fm.merge_fires()
@@ -935,7 +935,7 @@ class TestFiresManagerMergeFires(object):
                 with raises(ValueError) as e_info:
                     fm.merge_fires()
                 assert fm.num_fires == 2
-                assert e_info.value.message.index(fires.FiresMerger.EVENT_MISMATCH_MSG) > 0
+                assert e_info.value.args[0].index(fires.FiresMerger.EVENT_MISMATCH_MSG) > 0
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
@@ -973,7 +973,7 @@ class TestFiresManagerMergeFires(object):
                 with raises(ValueError) as e_info:
                     fm.merge_fires()
                 assert fm.num_fires == 2
-                assert e_info.value.message.index(fires.FiresMerger.FIRE_TYPE_MISMATCH_MSG) > 0
+                assert e_info.value.args[0].index(fires.FiresMerger.FIRE_TYPE_MISMATCH_MSG) > 0
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
@@ -987,7 +987,7 @@ class TestFiresManagerMergeFires(object):
                 with raises(ValueError) as e_info:
                     fm.merge_fires()
                 assert fm.num_fires == 2
-                assert e_info.value.message.index(fires.FiresMerger.FUEL_TYPE_MISMATCH_MSG) > 0
+                assert e_info.value.args[0].index(fires.FiresMerger.FUEL_TYPE_MISMATCH_MSG) > 0
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
@@ -1196,7 +1196,7 @@ class TestFiresManagerFilterFires(object):
         with raises(fires.FiresFilter.FilterError) as e_info:
             fm.filter_fires()
         assert fm.num_fires == 1
-        assert e_info.value.message == fires.FiresFilter.NO_FILTERS_MSG
+        assert e_info.value.args[0] == fires.FiresFilter.NO_FILTERS_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
         assert fm.num_fires == 1
@@ -1227,7 +1227,7 @@ class TestFiresManagerFilterFires(object):
         with raises(fires.FiresFilter.FilterError) as e_info:
             fm.filter_fires()
         assert fm.num_fires == 11
-        assert e_info.value.message == fires.FiresFilter.MISSING_FILTER_CONFIG_MSG
+        assert e_info.value.args[0] == fires.FiresFilter.MISSING_FILTER_CONFIG_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
         assert fm.num_fires == 11
@@ -1239,7 +1239,7 @@ class TestFiresManagerFilterFires(object):
         with raises(fires.FiresFilter.FilterError) as e_info:
             fm.filter_fires()
         assert fm.num_fires == 11
-        assert e_info.value.message == fires.FiresFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
+        assert e_info.value.args[0] == fires.FiresFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
         assert fm.num_fires == 11
@@ -1252,7 +1252,7 @@ class TestFiresManagerFilterFires(object):
         with raises(fires.FiresFilter.FilterError) as e_info:
             fm.filter_fires()
         assert fm.num_fires == 11
-        assert e_info.value.message == fires.FiresFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
+        assert e_info.value.args[0] == fires.FiresFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
         assert fm.num_fires == 11
@@ -1401,7 +1401,7 @@ class TestFiresManagerFilterFires(object):
                 fm.filter_fires()
             assert fm.num_fires == 9
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
-            assert e_info.value.message == err_msg
+            assert e_info.value.args[0] == err_msg
             # skip failures
             fm.set_config_value(True, 'filter', 'skip_failures')
             fm.filter_fires()
@@ -1533,7 +1533,7 @@ class TestFiresManagerFilterFires(object):
                 fm.filter_fires()
             assert fm.num_fires == 1
             assert [f] == fm.fires
-            assert e_info.value.message.index(err_msg) > 0
+            assert e_info.value.args[0].index(err_msg) > 0
             # skip failures
             fm.set_config_value(True, 'filter', 'skip_failures')
             fm.filter_fires()
@@ -1589,7 +1589,7 @@ class TestFiresManagerFilterFires(object):
                 fm.filter_fires()
             assert fm.num_fires == 8
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
-            assert e_info.value.message == err_msg
+            assert e_info.value.args[0] == err_msg
             # skip failures
             fm.set_config_value(True, 'filter', 'skip_failures')
             fm.filter_fires()
@@ -1693,7 +1693,7 @@ class TestFiresManagerFilterFires(object):
                 fm.filter_fires()
             assert fm.num_fires == 1
             assert [f] == fm.fires
-            assert e_info.value.message.index(err_msg) > 0
+            assert e_info.value.args[0].index(err_msg) > 0
             # skip failures
             fm.set_config_value(True, 'filter', 'skip_failures')
             fm.filter_fires()

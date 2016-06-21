@@ -375,7 +375,7 @@ class FiresManager(object):
             try:
                 self._modules.append(importlib.import_module('bluesky.modules.%s' % (m)))
             except ImportError as e:
-                if e.message == 'No module named {}'.format(m):
+                if str(e) == 'No module named {}'.format(m):
                     raise BlueSkyImportError("Invalid module '{}'".format(m))
                 else:
                     logging.debug(traceback.format_exc())
@@ -598,11 +598,11 @@ class FiresManager(object):
                         # top level if skip_failed_fires == False
                         f.error = {
                             "type": value.__class__.__name__,
-                            "message": value.message,
+                            "message": str(value),
                             "traceback": str(traceback.format_exc(tb))
                         }
                         if fires_manager.skip_failed_fires:
-                            logging.warn(value.message)
+                            logging.warn(str(value))
                             logging.warn(str(traceback.format_exc(tb)))
                             # move fire to failed list, excluding it from
                             # future processing
@@ -813,9 +813,9 @@ class FiresMerger(FiresActionBase):
                     if combined_fire:
                         # add back what was merge in progress
                         self._fires_manager.add_fire(combined_fire)
-                    raise ValueError(e.message)
-                # else, just log e.message (which is detailed enough)
-                logging.warn(e.message)
+                    raise ValueError(str(e))
+                # else, just log str(e) (which is detailed enough)
+                logging.warn(str(e))
 
         if combined_fire:
             # add_fire will take care of creating new list
@@ -1018,8 +1018,8 @@ class FiresFilter(FiresActionBase):
                                 fire._private_id)
                     except self.FilterError as e:
                         if self._skip_failures:
-                            # e.message is already detailed
-                            logging.warn(e.message)
+                            # str(e) is already detailed
+                            logging.warn(str(e))
                             continue
                         else:
                             raise

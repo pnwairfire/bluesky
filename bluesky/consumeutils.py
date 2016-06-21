@@ -256,7 +256,7 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
                 row = self.FCCS_LOADINGS_CSV_ROW_TEMPLATE.format(**fuel_loadings)
             except KeyError as e:
                 raise BlueSkyConfigurationError(
-                    "Missing fuel loadings field: '{}'".format(e.message))
+                    "Missing fuel loadings field: '{}'".format(str(e)))
 
             f.write(row)
             f.flush()

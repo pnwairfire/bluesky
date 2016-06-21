@@ -36,10 +36,10 @@ def run(fires_manager):
                 _run_fire(hourly_fractions, fire)
             except InvalidHourlyFractionsError as e:
                 raise BlueSkyConfigurationError(
-                    "Invalid timeprofiling hourly fractions: '{}'".format(e.message))
+                    "Invalid timeprofiling hourly fractions: '{}'".format(str(e)))
             except InvalidStartEndTimesError as e:
                 raise BlueSkyConfigurationError(
-                    "Invalid timeprofiling start end times: '{}'".format(e.message))
+                    "Invalid timeprofiling start end times: '{}'".format(str(e)))
             # except InvalidEmissionsDataError, e:
             #     TODO: do anything with InvalidEmissionsDataError?
             #     raise

@@ -206,57 +206,57 @@ class TestToDatetime(object):
     def test_date_defined_as_invalid_value(self):
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime(123)
-        assert e_info.value.message == "Invalid datetime string value: 123"
+        assert e_info.value.args[0] == "Invalid datetime string value: 123"
 
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('2016011412:11:00')
-        assert e_info.value.message == 'Invalid datetime string value: 2016011412:11:00'
+        assert e_info.value.args[0] == 'Invalid datetime string value: 2016011412:11:00'
 
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('2016011412:11:00Z')
-        assert e_info.value.message == 'Invalid datetime string value: 2016011412:11:00Z'
+        assert e_info.value.args[0] == 'Invalid datetime string value: 2016011412:11:00Z'
 
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('2016011312:11:00')
-        assert e_info.value.message == 'Invalid datetime string value: 2016011312:11:00'
+        assert e_info.value.args[0] == 'Invalid datetime string value: 2016011312:11:00'
 
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('2016011312:11:00Z')
-        assert e_info.value.message == 'Invalid datetime string value: 2016011312:11:00Z'
+        assert e_info.value.args[0] == 'Invalid datetime string value: 2016011312:11:00Z'
 
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('today')
-        assert e_info.value.message == 'Invalid datetime string value: today'
+        assert e_info.value.args[0] == 'Invalid datetime string value: today'
 
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('yesterday')
-        assert e_info.value.message == 'Invalid datetime string value: yesterday'
+        assert e_info.value.args[0] == 'Invalid datetime string value: yesterday'
 
         # strftime control codes need to be replaced by call to
         # fill_in_datetime_strings, separately from  call to_datetime
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('%Y%m%d')
-        assert e_info.value.message == 'Invalid datetime string value: %Y%m%d'
+        assert e_info.value.args[0] == 'Invalid datetime string value: %Y%m%d'
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('%Y%m%d%H%M%S')
-        assert e_info.value.message == 'Invalid datetime string value: %Y%m%d%H%M%S'
+        assert e_info.value.args[0] == 'Invalid datetime string value: %Y%m%d%H%M%S'
 
         # '{today}' and '{yesterday}' need to be replaced by call to
         # fill_in_datetime_strings, separately from  call to_datetime
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('{today}')
-        assert e_info.value.message == 'Invalid datetime string value: {today}'
+        assert e_info.value.args[0] == 'Invalid datetime string value: {today}'
 
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('{yesterday}')
-        assert e_info.value.message == 'Invalid datetime string value: {yesterday}'
+        assert e_info.value.args[0] == 'Invalid datetime string value: {yesterday}'
 
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('1915-12-14T10:02:01', limit_range=True)
-        assert e_info.value.message == 'Invalid datetime string value: 1915-12-14T10:02:01 (outside of valid range)'
+        assert e_info.value.args[0] == 'Invalid datetime string value: 1915-12-14T10:02:01 (outside of valid range)'
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('2117-12-14T10:02:01', limit_range=True)
-        assert e_info.value.message == 'Invalid datetime string value: 2117-12-14T10:02:01 (outside of valid range)'
+        assert e_info.value.args[0] == 'Invalid datetime string value: 2117-12-14T10:02:01 (outside of valid range)'
 
     @freeze_time("2016-01-14")
     def test_date_defined_as_date_string(self):

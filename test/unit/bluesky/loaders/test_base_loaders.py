@@ -19,13 +19,13 @@ class TestBaseFileLoader(object):
         filename = os.path.join(self._temp_dir, "fires.json")
         with raises(BlueSkyConfigurationError) as e_info:
             l = BaseFileLoader()
-        assert e_info.value.message == 'Fires file to load not specified'.format(filename)
+        assert e_info.value.args[0] == 'Fires file to load not specified'.format(filename)
 
     def test_file_doesnt_exist(self):
         filename = os.path.join(self._temp_dir, "fires.json")
         with raises(BlueSkyConfigurationError) as e_info:
             l = BaseFileLoader(file=filename)
-        assert e_info.value.message == 'Fires file to load {} does not exist'.format(filename)
+        assert e_info.value.args[0] == 'Fires file to load {} does not exist'.format(filename)
 
     def test_file_exists(self):
         filename = os.path.join(self._temp_dir, "fires.json")

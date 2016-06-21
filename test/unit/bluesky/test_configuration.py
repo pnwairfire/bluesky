@@ -52,7 +52,7 @@ class TestGetConfigValue(object):
     def test_no_config(self):
         with raises(BlueSkyConfigurationError) as e_info:
             get_config_value(None)
-        assert e_info.value.message == NO_KEYS_ERR_MSG
+        assert e_info.value.args[0] == NO_KEYS_ERR_MSG
 
         assert None == get_config_value(None, 's')
         assert None == get_config_value(None, 's', 'sdf')
@@ -62,7 +62,7 @@ class TestGetConfigValue(object):
     def test_empty_config(self):
         with raises(BlueSkyConfigurationError) as e_info:
             get_config_value({})
-        assert e_info.value.message == NO_KEYS_ERR_MSG
+        assert e_info.value.args[0] == NO_KEYS_ERR_MSG
 
         assert None == get_config_value({}, 's')
         assert None == get_config_value({}, 's', 'sdf')
@@ -87,7 +87,7 @@ class TestGetConfigValue(object):
 
         with raises(BlueSkyConfigurationError) as e_info:
             get_config_value(config)
-        assert e_info.value.message == NO_KEYS_ERR_MSG
+        assert e_info.value.args[0] == NO_KEYS_ERR_MSG
 
         assert None == get_config_value(config, 'z')
         assert None == get_config_value(config, 'z', 'b')
@@ -116,12 +116,12 @@ class TestSetConfigValue(object):
     def test_invalid_config(self):
         with raises(BlueSkyConfigurationError) as e_info:
             set_config_value(12, 3, '123')
-        assert e_info.value.message == INVALID_CONFIG_ERR_MSG
+        assert e_info.value.args[0] == INVALID_CONFIG_ERR_MSG
 
     def test_no_keys(self):
         with raises(BlueSkyConfigurationError) as e_info:
             set_config_value({}, 32)
-        assert e_info.value.message == MISSING_KEYS_ERR_MSG
+        assert e_info.value.args[0] == MISSING_KEYS_ERR_MSG
 
     def test_basic(self):
         config = {}
@@ -147,24 +147,24 @@ class TestMergeConfigs(object):
     def test_invalid_configs(self):
         with raises(BlueSkyConfigurationError) as e_info:
             merge_configs(12, {'a': 1})
-        assert e_info.value.message == INVALID_CONFIG_ERR_MSG
+        assert e_info.value.args[0] == INVALID_CONFIG_ERR_MSG
 
         with raises(BlueSkyConfigurationError) as e_info:
             merge_configs({'a': 1}, 12)
-        assert e_info.value.message == INVALID_CONFIG_ERR_MSG
+        assert e_info.value.args[0] == INVALID_CONFIG_ERR_MSG
 
         with raises(BlueSkyConfigurationError) as e_info:
             merge_configs(12, 12)
-        assert e_info.value.message == INVALID_CONFIG_ERR_MSG
+        assert e_info.value.args[0] == INVALID_CONFIG_ERR_MSG
 
     def test_conflicting_configs(self):
         with raises(BlueSkyConfigurationError) as e_info:
             merge_configs({'a': 'a'}, {'a': {'b': 'c'}})
-        assert e_info.value.message == CONFIG_CONFLICT
+        assert e_info.value.args[0] == CONFIG_CONFLICT
 
         with raises(BlueSkyConfigurationError) as e_info:
             merge_configs({'a': {'b': 'c'}}, {'a': 'a'})
-        assert e_info.value.message == CONFIG_CONFLICT
+        assert e_info.value.args[0] == CONFIG_CONFLICT
 
     def test_empty_both_configs(self):
         a = {}

@@ -14,7 +14,7 @@ class TestHysplitVisualizerPickRepresentativeFuelbed(object):
         }
         with raises(TypeError) as e_info:
             hysplit._pick_representative_fuelbed(f, {})
-        # TODO: assert e_info.value.message == '...''
+        # TODO: assert e_info.value.args[0] == '...''
 
         f = {
             "fuelbeds": [
@@ -23,7 +23,7 @@ class TestHysplitVisualizerPickRepresentativeFuelbed(object):
         }
         with raises(KeyError) as e_info:
             hysplit._pick_representative_fuelbed(f, {})
-        # TODO: assert e_info.value.message == '...''
+        # TODO: assert e_info.value.args[0] == '...''
         f = {
             "fuelbeds": [
                 {"fccs_id": "46","sdfsdfpct": 100.0}
@@ -31,7 +31,7 @@ class TestHysplitVisualizerPickRepresentativeFuelbed(object):
         }
         with raises(KeyError) as e_info:
             hysplit._pick_representative_fuelbed(f, {})
-        # TODO: assert e_info.value.message == '...''
+        # TODO: assert e_info.value.args[0] == '...''
 
     def test_no_fuelbeds(self):
         f = {}

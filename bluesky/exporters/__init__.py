@@ -73,7 +73,7 @@ class ExporterBase(object):
                             m.pattern, f(fires_manager))
                 except Exception as e:
                     logging.error("Failed to replace {} in export output dir "
-                        "name - {}".format(m.pattern, e.message))
+                        "name - {}".format(m.pattern, str(e)))
                     # Just skip
 
         return output_dir_name

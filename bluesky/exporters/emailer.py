@@ -85,6 +85,6 @@ class EmailExporter(ExporterBase):
 
         except Exception as e:
             msg = 'Failed to send email to {} - {}'.format(
-                ', '.join(self._recipients), e.message)
+                ', '.join(self._recipients), str(e))
             logging.error(msg)
             fires_manager.export['email'] = {"error": msg}
