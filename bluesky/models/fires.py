@@ -598,11 +598,11 @@ class FiresManager(object):
                         f.error = {
                             "type": value.__class__.__name__,
                             "message": str(value),
-                            "traceback": str(traceback.format_exc(tb))
+                            "traceback": str(traceback.format_tb(tb))
                         }
                         if fires_manager.skip_failed_fires:
                             logging.warn(str(value))
-                            logging.warn(str(traceback.format_exc(tb)))
+                            logging.warn(str(traceback.format_tb(tb)))
                             # move fire to failed list, excluding it from
                             # future processing
                             if fires_manager.failed_fires is None:
