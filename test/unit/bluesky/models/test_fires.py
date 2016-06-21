@@ -222,7 +222,6 @@ class TestFiresManager(object):
             '1': [fire_objects[0]],
             '2': [fire_objects[1]]
         }
-        fires_manager._fire_ids = ['1','2']
         fires_manager._meta = {'a':1, 'b':{'c':2}}
 
         assert fire_objects == fires_manager.fires
@@ -245,7 +244,7 @@ class TestFiresManager(object):
         fires_manager.meta['d'] = 123
 
         assert fires_manager.num_fires == 2
-        assert set(['1','2']) == fires_manager._fire_ids
+        assert set(['1','2']) == set(list(fires_manager._fires.keys()))
         assert {'1': [fire_objects[0]],'2': [fire_objects[1]]} == fires_manager._fires
         expected_meta = {
             'a':1, 'b':{'c':2}, 'd': 123,

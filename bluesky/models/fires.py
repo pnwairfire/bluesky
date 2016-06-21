@@ -12,6 +12,7 @@ import re
 import sys
 import traceback
 import uuid
+from collections import OrderedDict
 
 from pyairfire import process
 
@@ -227,10 +228,9 @@ class FiresManager(object):
             self.add_fire(Fire(fire))
 
     def add_fire(self, fire):
-        self._fires = self._fires or {}
+        self._fires = self._fires or OrderedDict()
         if fire.id not in self._fires:
             self._fires[fire.id] = []
-            self._fire_ids.add(fire.id)
         self._fires[fire.id].append(fire)
         self._num_fires += 1
 
@@ -244,7 +244,6 @@ class FiresManager(object):
             self._num_fires -= (_n - len(self._fires[fire.id]))
             if len(self._fires[fire.id]) == 0:
                 # that was last fire with that id
-                self._fire_ids.remove(fire.id)
                 self._fires.pop(fire.id)
 
     ##
@@ -285,7 +284,8 @@ class FiresManager(object):
 
     @property
     def fires(self):
-        return [f for fire_id in self._fire_ids for f in self._fires[fire_id]]
+        return [fire_obj for fire_list in self._fires.values()
+            for fire_obj in fire_list]
 
     @property
     def num_fires(self):
@@ -294,8 +294,7 @@ class FiresManager(object):
     @fires.setter
     def fires(self, fires_list):
         self._num_fires = 0
-        self._fires = {}
-        self._fire_ids = set()
+        self._fires = OrderedDict()
         for fire in fires_list:
             self.add_fire(Fire(fire))
 
