@@ -768,7 +768,7 @@ class FiresMerger(FiresActionBase):
     def merge(self):
         """Merges fires that have the same id.
         """
-        for fire_id in self._fires_manager._fire_ids:
+        for fire_id in list(self._fires_manager._fires.keys()):
             if len(self._fires_manager._fires[fire_id]) > 1:
                 logging.debug("merging records for fire %s ", fire_id)
                 self._merge_fire_id(fire_id)
