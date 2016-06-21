@@ -7,3 +7,4 @@ bluesky.egg-info/
 logs/
 MESSAGE
 profile.txt
+.cache
