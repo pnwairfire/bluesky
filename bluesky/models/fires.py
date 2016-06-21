@@ -175,11 +175,8 @@ class Fire(dict):
 
     def __setitem__(self, attr, val):
         k = '_validate_{}'.format(attr)
-        try:
+        if hasattr(self, k):
             val = getattr(self, k)(val)
-        except KeyError:
-            pass
-
         super(Fire, self).__setitem__(attr, val)
 
     def __getattr__(self, attr):
