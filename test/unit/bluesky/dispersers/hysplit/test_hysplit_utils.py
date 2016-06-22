@@ -40,10 +40,8 @@ class TestHysplitUtils(object):
             [fires[5]]  #id 100
         ]
         fire_sets = hysplit_utils.create_fire_sets(fires)
-        # Note: The following assumes that, in create_fire_sets,
-        # filtered_fires_dict.values() returns sets ordered by the dict keys
-        # (i.e. location id)
-        assert expected_sets == fire_sets
+        # order not preserved, so sort results
+        assert expected_sets == sorted(fire_sets, key=lambda e: e[0].id)
 
     def test_create_fire_tranches(self):
         fire_sets = [
