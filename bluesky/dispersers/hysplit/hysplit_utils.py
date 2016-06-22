@@ -42,7 +42,7 @@ def create_fire_tranches(fire_sets, num_processes):
 
     n_sets = len(fire_sets)
     num_processes = min(n_sets, num_processes)  # just to be sure
-    min_n_fire_sets_per_process = n_sets / num_processes
+    min_n_fire_sets_per_process = n_sets // num_processes
     extra_fire_cutoff = n_sets % num_processes
 
     logging.info("Running %d HYSPLIT49 Dispersion model processes "
