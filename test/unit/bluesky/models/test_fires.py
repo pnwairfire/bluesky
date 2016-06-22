@@ -218,10 +218,7 @@ class TestFiresManager(object):
             fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '2', 'name': 'n2', 'bar':'a1', 'baz':'baz1'})
         ]
-        fires_manager._fires = {
-            '1': [fire_objects[0]],
-            '2': [fire_objects[1]]
-        }
+        fires_manager.fires = fire_objects
         fires_manager._meta = {'a':1, 'b':{'c':2}}
 
         assert fire_objects == fires_manager.fires
