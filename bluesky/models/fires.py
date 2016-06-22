@@ -211,7 +211,7 @@ class FiresManager(object):
         self.today
         self.config = {} # self._raw_config will be set by config.setter
         self.modules = []
-        self.fires = [] # this intitializes self._fires and self_fire_ids
+        self.fires = [] # this intitializes self._fires and self._num_fires
         self._processed_run_id_wildcards = False
         self._num_fires = 0
         if run_id:

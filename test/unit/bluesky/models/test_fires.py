@@ -504,11 +504,7 @@ class TestFiresManager(object):
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
             fires.Fire({'id':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
         ]
-        fires_manager._fires = {
-            '1': [fire_objects[0]],
-            '2': [fire_objects[1]]
-        }
-        fires_manager._fire_ids = ['1','2']
+        fires_manager.fires = fire_objects
         fires_manager.foo = {"bar": "baz"}
 
         fires_manager.dumps()
