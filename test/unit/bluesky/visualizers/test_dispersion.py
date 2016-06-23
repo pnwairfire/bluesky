@@ -1,4 +1,4 @@
-"""Unit tests for bluesky.configuration"""
+"""Unit tests for bluesky.visualizers.dispersion.hysplit"""
 
 __author__ = "Joel Dubowy"
 

@@ -14,9 +14,9 @@ import traceback
 import uuid
 from collections import OrderedDict
 
-from pyairfire import process
+from pyairfire import process, configuration
 
-from bluesky import datautils, configuration, datetimeutils
+from bluesky import datautils, datetimeutils
 from bluesky.exceptions import (
     BlueSkyImportError, BlueSkyModuleError, BlueSkyDatetimeValueError
 )

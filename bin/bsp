@@ -15,10 +15,10 @@ import os
 import sys
 import traceback
 
-from pyairfire import scripting, process
+from pyairfire import scripting, process, configuration
 
 try:
-    from bluesky import exceptions, configuration, modules, models, __version__
+    from bluesky import exceptions, modules, models, __version__
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
@@ -58,42 +58,42 @@ OPTIONAL_ARGS = [
         'long': '--config-option',
         'dest': 'config_options',
         'help': "Config option override, formatted like 'section.*.key=stringvalue'",
-        'action': configuration.ConfigOptionAction
+        'action': scripting.args.ConfigOptionAction
     },
     {
         'short': "-B",
         'long': '--boolean-config-option',
         'dest': 'config_options',
         'help': "Config option override, formatted like 'section.*.key=boolvalue'",
-        'action': configuration.BooleanConfigOptionAction
+        'action': scripting.args.BooleanConfigOptionAction
     },
     {
         'short': "-I",
         'long': '--integer-config-option',
         'dest': 'config_options',
         'help': "Config option override, formatted like 'section.*.key=intvalue'",
-        'action': configuration.IntegerConfigOptionAction
+        'action': scripting.args.IntegerConfigOptionAction
     },
     {
         'short': "-F",
         'long': '--float-config-option',
         'dest': 'config_options',
         'help': "Config option override, formatted like 'section.*.key=floatvalue'",
-        'action': configuration.FloatConfigOptionAction
+        'action': scripting.args.FloatConfigOptionAction
     },
     {
         'short': "-J",
         'long': '--json-config-option',
         'dest': 'config_options',
         'help': "Config option override supporting any json formatted value, formatted like 'section.*.key=jsonvalue'",
-        'action': configuration.JSONConfigOptionAction
+        'action': scripting.args.JSONConfigOptionAction
     },
     {
         'short': '-c',
         'long': '--config-file',
         'dest': 'config_file_options',
         'help': 'config file comtaining JSON formatted overrides for default config values',
-        'action': configuration.ConfigFileAction
+        'action': scripting.args.ConfigFileAction
     },
     {
         #'short': "-v",

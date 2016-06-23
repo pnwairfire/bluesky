@@ -11,7 +11,7 @@ import shutil
 import tarfile
 import tempfile
 
-from bluesky import configuration
+from pyairfire import configuration
 
 
 # TODO: Support exporting VSMOKE dispersion, which would include KMLs
