@@ -97,15 +97,15 @@ EXPECTED = {
     "fire_information": []
 }
 
-input_file = tempfile.NamedTemporaryFile()
+input_file = tempfile.NamedTemporaryFile(mode='w+t')
 input_file.write(json.dumps(INPUT))
 input_file.flush()
 
-config_1_file = tempfile.NamedTemporaryFile()
+config_1_file = tempfile.NamedTemporaryFile(mode='w+t')
 config_1_file.write(json.dumps(CONFIG_1))
 config_1_file.flush()
 
-config_2_file = tempfile.NamedTemporaryFile()
+config_2_file = tempfile.NamedTemporaryFile(mode='w+t')
 config_2_file.write(json.dumps(CONFIG_2))
 config_2_file.flush()
 
