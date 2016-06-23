@@ -126,7 +126,7 @@ cmd_args = [
     '-C', 'dcf=123.23'
 ]
 output = subprocess.check_output(cmd_args)
-actual = json.loads(output)
+actual = json.loads(output.decode())
 actual.pop('runtime')
 logging.basicConfig(level=logging.INFO)
 logging.info("actual:   {}".format(actual))
