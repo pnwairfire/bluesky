@@ -7,7 +7,7 @@
 #
 #   docker run --name bluesky-base \
 #      -v /path/to/bluesky/repo/:/bluesky/ -w /bluesky/ \
-#      bluesky-base pip install --no-binary gdal \
+#      bluesky-base pip3 install --no-binary gdal \
 #      --trusted-host pypi.smoke.airfire.org -r requirements.txt
 #   docker commit bluesky-base bluesky-base
 #   docker run -v /path/to/bluesky/repo/:/bluesky/ \
@@ -18,8 +18,6 @@ FROM ubuntu:16.04
 MAINTAINER Joel Dubowy
 
 # Install base dependencies
-# Note: upgrade distribute and install png and freetype libs for
-#   matplotlib, which is needed by bluesky kml
 RUN apt-get update \
     && apt-get install -y \
         g++ \
@@ -29,16 +27,19 @@ RUN apt-get update \
         less \
         python3 \
         python3-dev \
-        python3-pip \
-    && pip3 install --upgrade \
-        pip3 \
+        python3-pip
+
+RUN pip3 install \
         distribute
 
+# Note: upgrade distribute and install png and freetype libs for
+#   matplotlib, which is needed by bluesky kml
 RUN apt-get install -y \
+        libpng-dev \
+    && apt-get install -y \
         libfreetype6-dev \
-        libpng16-dev \
         libnetcdf-dev \
-        libproj-dev \
+        libproj-dev
 
 # Install numpy and gdal
 # Note: numpy 1.8.0 needs to be installed before libgdal
@@ -46,13 +47,15 @@ RUN pip3 install \
         numpy==1.8.0 \
     && apt-get install -y \
         libgdal-dev \
-        gdal-bin \ # install gdal-bin for gdalwarp and gdal_translate
         nco \
     && apt-get install -y \
         python3-gdal \
     && apt-get install -y \
         libxml2-dev \
         libxslt1-dev
+
+RUN apt-get install -y \
+        gdal-bin # install gdal-bin for gdalwarp and gdal_translate
 
 # mapserver and mapscript are needed to lookup ecoregion in consume
 RUN apt-get install -y \
