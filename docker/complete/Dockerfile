@@ -12,4 +12,4 @@ RUN pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http:/
 ### To install from github instead of from AirFire's pypi server
 #RUN pip install --no-binary gdal  --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple   https://github.com/pnwairfire/bluesky/archive/branch-name.tar.gz gdal==1.7.3
 
-CMD ["bsp", "-h"]
+CMD ["python3", "bsp", "-h"]

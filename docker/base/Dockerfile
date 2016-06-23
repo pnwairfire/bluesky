@@ -13,7 +13,7 @@
 #   docker run -v /path/to/bluesky/repo/:/bluesky/ \
 #      bluesky-base /bluesky/bin/bsp ...
 
-FROM ubuntu:12.04
+FROM ubuntu:16.04
 
 MAINTAINER Joel Dubowy
 
@@ -24,41 +24,37 @@ RUN apt-get update \
     && apt-get install -y \
         g++ \
         gcc \
-        libfreetype6-dev \
-        libpng12-dev \
         make \
-        nco \
-        python \
-        python-dev \
-        python-pip \
-    && apt-get install -y \
-        libnetcdf-dev \
-        proj \
-    && pip install --upgrade \
-        pip \
+        dialog \
+        less \
+        python3 \
+        python3-dev \
+        python3-pip \
+    && pip3 install --upgrade \
+        pip3 \
         distribute
+
+RUN apt-get install -y \
+        libfreetype6-dev \
+        libpng16-dev \
+        libnetcdf-dev \
+        libproj-dev \
 
 # Install numpy and gdal
 # Note: numpy 1.8.0 needs to be installed before libgdal
-RUN pip install \
+RUN pip3 install \
         numpy==1.8.0 \
     && apt-get install -y \
-        libgdal1-1.7.0 \
+        libgdal-dev \
+        gdal-bin \ # install gdal-bin for gdalwarp and gdal_translate
+        nco \
     && apt-get install -y \
-        python-gdal \
+        python3-gdal \
     && apt-get install -y \
         libxml2-dev \
         libxslt1-dev
 
-# install gdal-bin for gdalwarp and gdal_translate
-RUN apt-get install -y \
-    gdal-bin
-
 # mapserver and mapscript are needed to lookup ecoregion in consume
 RUN apt-get install -y \
         mapserver-bin \
-        python-mapscript
-
-RUN apt-get install -y \
-        dialog \
-        less
+        python-mapscript  # NOT SURE IF THIS WILL WORK WITH PYTHON 3
