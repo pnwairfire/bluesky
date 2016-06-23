@@ -21,7 +21,7 @@ import os
 
 from pyairfire.io import CSV2JSON
 
-from bluesky import datetimeutils, fileutils
+from bluesky import datetimeutils
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __author__ = "Joel Dubowy"
