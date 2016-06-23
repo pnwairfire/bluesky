@@ -44,6 +44,7 @@ setup(
         "emitcalc>=1.0.0",
         "fccsmap>=1.0.0",
         "timeprofile>=1.0.0",
+        "met>=0.1.0",
         "plumerise>=1.0.0",
         "blueskykml>=1.0.0",
         "apps-consume4>=4.1.2"
@@ -54,6 +55,7 @@ setup(
         "https://pypi.smoke.airfire.org/simple/emitcalc/",
         "https://pypi.smoke.airfire.org/simple/fccsmap/",
         "https://pypi.smoke.airfire.org/simple/timeprofile/",
+        "https://pypi.smoke.airfire.org/simple/met/",
         "https://pypi.smoke.airfire.org/simple/plumerise/",
         "https://pypi.smoke.airfire.org/simple/blueskykml/",
         "https://pypi.smoke.airfire.org/simple/apps-consume4/"

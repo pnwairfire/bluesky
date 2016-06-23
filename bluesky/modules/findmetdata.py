@@ -9,7 +9,7 @@ __author__ = "Joel Dubowy"
 import datetime
 import logging
 
-from pyairfire.met import arlfinder
+from met.arl import arlfinder
 
 from bluesky.datetimeutils import (
     parse_datetimes, is_round_hour, parse_utc_offset

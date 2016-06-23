@@ -11,7 +11,7 @@ __author__ = "Joel Dubowy"
 import logging
 import os
 
-from pyairfire.met.arlprofiler import ArlProfiler
+from met.arl.arlprofiler import ArlProfiler
 
 from bluesky.datetimeutils import parse_datetimes, parse_utc_offset
 
