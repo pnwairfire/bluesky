@@ -45,7 +45,8 @@ EXAMPLES_STR = """
 Valid images: {valid_images}
 
 Examples:
-  $ ./dev/scripts/docker/run-in-docker.py -i complete
+  $ ./dev/scripts/docker/build-docker-image.py --log-level=DEBUG -i base
+  $ ./dev/scripts/docker/build-docker-image.py --log-level=DEBUG -i complete -n bluesky
  """.format(valid_images=VALID_IMAGES_STR)
 
 BINARIES = [
