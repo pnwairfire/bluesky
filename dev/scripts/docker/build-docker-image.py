@@ -134,7 +134,8 @@ def _copy_aux_files(args):
         for f in AUX_FILES:
             src = os.path.join(REPO_ROOT_DIR, 'bluesky', f)
             dest = '{}:{}'.format(args.image_name, os.path.join(
-                '/usr/local/lib/python2.7/dist-packages/bluesky', f))
+                '/usr/local/lib/python3.5/dist-packages/bluesky', f))
+            _call(['mkdir', '-p', dest])
             _call(['docker', 'cp', src, dest])
 
 def _commit(args):
