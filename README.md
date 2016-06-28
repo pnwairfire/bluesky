@@ -12,7 +12,7 @@ This package was originally developed to support python 2.7, but has since
 been refactored to support 3.5. Attempts to support both 2.7 and 3.5 have
 been made but are not guaranteed.
 
-## Non-python Dependencies
+## External Dependencies
 
 ### fuelbeds
 
@@ -103,7 +103,7 @@ or http:
 
     git clone https://github.com/pnwairfire/bluesky.git
 
-### Install Dependencies
+### Install python Dependencies
 
 First, install pip (with sudo if necessary):
 
