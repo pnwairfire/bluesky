@@ -40,12 +40,12 @@ setup(
     install_requires=[
         "pyairfire>=1.2.2",
         "eflookup>=1.0.1",
-        "emitcalc>=1.0.0",
-        "fccsmap>=1.0.0",
+        "emitcalc>=1.0.1",
+        "fccsmap>=1.0.1",
         "timeprofile>=1.0.0",
         "met>=0.1.0",
         "plumerise>=1.0.0",
-        "blueskykml>=1.0.0",
+        "blueskykml>=1.0.1",
         "apps-consume4>=4.1.2"
     ],
     dependency_links=[
