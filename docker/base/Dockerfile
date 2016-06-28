@@ -29,22 +29,22 @@ RUN apt-get update \
         python3-dev \
         python3-pip
 
-RUN pip3 install \
+# upgrade distribute
+RUN pip3 install --upgrade \
         distribute
 
-# Note: upgrade distribute and install png and freetype libs for
-#   matplotlib, which is needed by bluesky kml
+# install png and freetype libs for matplotlib, which is needed
+# by bluesky kml, as well as netcdf and proj libs
 RUN apt-get install -y \
         libpng-dev \
-    && apt-get install -y \
         libfreetype6-dev \
         libnetcdf-dev \
         libproj-dev
 
-# Install numpy and gdal
-# Note: numpy 1.8.0 needs to be installed before libgdal
-RUN pip3 install \
-        numpy==1.8.0 \
+# Install numpy (which must be installed first); gdal, it's python bindings,
+# and it's utilities; and xml libs
+RUN apt-get install -y \
+        python3-numpy \
     && apt-get install -y \
         libgdal-dev \
         nco \
@@ -52,9 +52,8 @@ RUN pip3 install \
         python3-gdal \
     && apt-get install -y \
         libxml2-dev \
-        libxslt1-dev
-
-RUN apt-get install -y \
+        libxslt1-dev \
+    && apt-get install -y \
         gdal-bin # install gdal-bin for gdalwarp and gdal_translate
 
 # mapserver and mapscript are needed to lookup ecoregion in consume
