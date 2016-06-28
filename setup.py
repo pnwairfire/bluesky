@@ -46,7 +46,7 @@ setup(
         "met>=0.1.1",
         "plumerise>=1.0.0",
         "blueskykml>=1.0.1",
-        "apps-consume4>=4.1.2"
+        "apps-consume4>=4.1.3"
     ],
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/pyairfire/",
