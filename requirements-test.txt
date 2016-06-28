@@ -1,3 +1,2 @@
 pytest
-# numpy  <-- numpy should have already been installed
 freezegun
