@@ -269,6 +269,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         logging.debug('Executing {}'.format(' '.join(args)))
         # Use check_output so that output isn't sent to stdout
         output = subprocess.check_output(args, cwd=kwargs.get('working_dir'))
+        output = output.decode('ascii')
         if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
             logging.debug('Captured {} output:'.format(args[0]))
             for line in output.split('\n'):
