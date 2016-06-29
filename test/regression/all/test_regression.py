@@ -56,9 +56,9 @@ Examples:
 
 def check(expected, actual):
     success = True
-    #TODO: implement
-    import pdb;pdb.set_trace()
-    return success
+    expected.pop('runtime')
+    actual.pop('runtime')
+    return expected == actual
 
 def run_input(module, input_file):
     output_file = input_file.replace('input/', 'output/').replace(
@@ -83,22 +83,20 @@ def run_input(module, input_file):
     logging.info('Loading expected output file %s', output_file)
     with open(output_file, 'r') as f:
         expected = json.loads(f.read())
-    return check(expected, fires_manager.dump())
+    success = check(expected, fires_manager.dump())
+    logging.info('Success!') if success else logging.error('FAILED')
+    return success
 
 def run_module(module):
     files = [os.path.abspath(f) for f in glob.glob(os.path.join(
         os.path.dirname(__file__), module, 'input', '*')) ]
-    for f in files:
-        run_input(module, f)
+    return all([run_input(module, f) for f in files])
 
 def run(args):
     if args.module:
         return run_module(args.module)
     else:
-        success = True
-        for module in MODULES:
-            success = success and run_module(module)
-    return success
+        return all([run_module(module) for module in MODULES])
 
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
