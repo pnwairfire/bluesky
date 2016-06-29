@@ -1767,8 +1767,7 @@ and another (runnin vsmoke):
         ./bin/bsp --log-level=DEBUG \
         -i ./test/data/json/ingestion-through-visualization-input/vsmoke-1fire-24hr-PM25.json \
         ingestion fuelbeds consumption emissions \
-        timeprofiling dispersion \
-        dispersion visualization export| python -m json.tool > out-vsmoke.json
+        timeprofiling dispersion export| python -m json.tool
 
 #### Executables needing to be manually installed
 
