@@ -439,7 +439,9 @@ class GeoJSON(object):
             s += '{"type": "FeatureCollection","features":['
             for aqi in self.plume_rings[fire]:
                 # add a plume ring for each hour of the fire
-                for hr in sorted(list(self.plume_rings[fire][aqi].keys()))[:-2]:
+                hrs = sorted([h for h in self.plume_rings[fire][aqi].keys()
+                    if h not in ('color', 'timezone')])
+                for hr in hrs:
                     # we need at least 4 points to guarantee our inputs are valid rings
                     if len(self.plume_rings[fire][aqi][hr]) <= 3:
                         continue
