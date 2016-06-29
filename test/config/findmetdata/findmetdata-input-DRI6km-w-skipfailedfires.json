@@ -1,0 +1,12 @@
+{
+    "config": {
+        "skip_failed_fires": true,
+        "findmetdata": {
+            "met_root_dir": "/DRI_6km/",
+            "met_format": "arl",
+            "arl": {
+                "index_filename_pattern": "arl12hrindex.csv"
+            }
+        }
+    }
+}
