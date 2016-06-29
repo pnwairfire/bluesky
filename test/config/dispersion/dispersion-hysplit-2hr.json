@@ -1,0 +1,44 @@
+{
+    "config": {
+        "dispersion": {
+            "start": "2014-05-30T05:00:00Z",
+            "num_hours": 2,
+            "model": "hysplit",
+            "dest_dir": "/tmp/bsp-output"
+        },
+        "visualization": {
+            "target": "dispersion",
+            "hysplit": {
+                "images_dir": "images/",
+                "data_dir": "data/"
+            }
+        }
+    },
+    "met": {
+        "grid": {
+            "spacing": 6.0,
+            "boundary": {
+                "ne": {
+                    "lat": 45.25,
+                    "lng": -106.5
+                },
+                "sw": {
+                    "lat": 27.75,
+                    "lng": -131.5
+                }
+            }
+        },
+        "files": [
+            {
+                "file": "/DRI_6km/2014052912/wrfout_d2.2014052912.f00-11_12hr01.arl",
+                "first_hour": "2014-05-29T12:00:00",
+                "last_hour": "2014-05-29T23:00:00"
+            },
+            {
+                "file": "/DRI_6km/2014053000/wrfout_d2.2014053000.f00-11_12hr01.arl",
+                "first_hour": "2014-05-30T00:00:00",
+                "last_hour": "2014-05-30T11:00:00"
+            }
+        ]
+    }
+}
