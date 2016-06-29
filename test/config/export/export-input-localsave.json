@@ -1,0 +1,11 @@
+{
+    "config": {
+        "export": {
+            "modes": ["localsave"],
+            "extra_exports": ["dispersion", "visualization"],
+            "localsave": {
+                "dest_dir": "/bsp-output/bsp-local-exports/"
+            }
+        }
+    }
+}
