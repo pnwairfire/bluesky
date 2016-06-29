@@ -3,38 +3,36 @@
 """test_regression.py - regression test for a subset of the bsp modules
 
 Note: this test is called test_regression so that it's picked up by py.test.
+
+TODO: use a regression testing framework?
+TODO: rename this script
 """
 
 __author__ = "Joel Dubowy"
 
-import copy
-import csv
 import glob
+import json
 import logging
 import os
 import subprocess
 import sys
 import traceback
-import uuid
 
 from pyairfire import scripting
 
 # Hack to put the repo root dir at the front of sys.path so that
 # the local bluesky package is found
-# app_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
-#    os.path.abspath(__file__)))))
-# sys.path.insert(0, app_root)
+app_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
+   os.path.abspath(__file__)))))
+sys.path.insert(0, app_root)
 
 # We're running bluesky via the package rather than by running the bsp script
 # to allow breaking into the code (with pdb)
 from bluesky import models
 
-# TODO: rename this script
-
-# TODO: use a regression testing framework?
-
 MODULES = [ os.path.basename(m.rstrip('/'))
-    for m in glob.glob(os.path.join(os.path.dirname(__file__), '*'))]
+    for m in glob.glob(os.path.join(os.path.dirname(__file__), '*'))
+    if os.path.isdir(m)]
 
 REQUIRED_ARGS = [
 ]
@@ -52,22 +50,43 @@ EXAMPLES_STR = """
 Examples:
 
     $ ./test/regression/all/test_regression.py
-    $ ./test/regression/all/test_regression.py -m emissions
+    $ ./test/regression/all/test_regression.py --log-level=DEBUG -m emissions
 """
 
 
-def check(actual, expected_partials, expected_totals):
+def check(expected, actual):
     success = True
     #TODO: implement
+    import pdb;pdb.set_trace()
     return success
 
+def run_input(module, input_file):
+    logging.info('Running bsp on %s', input_file)
+    try:
+        fires_manager = models.fires.FiresManager()
+        fires_manager.loads(input_file=input_file)
+        fires_manager.modules = [module]
+        fires_manager.run()
+    except Exception as e:
+        logging.error('Failed run: %s', e)
+        return False
+
+    output_file = input_file.replace('input/', 'output/').replace(
+        '.json', '-EXPECTED-OUTPUT.json')
+    logging.info('Loading expected output file %s', output_file)
+    with open(output_file, 'r') as f:
+        expected = json.loads(f.read())
+    return check(expected, fires_manager.dump())
+
 def run_module(module):
-    #TODO: implement
-    pass
+    files = [os.path.abspath(f) for f in glob.glob(os.path.join(
+        os.path.dirname(__file__), module, 'input', '*')) ]
+    for f in files:
+        run_input(module, f)
 
 def run(args):
     if args.module:
-        return run_module(module)
+        return run_module(args.module)
     else:
         success = True
         for module in MODULES:
