@@ -1740,6 +1740,20 @@ Then run bluesky:
 
     docker run --rm -v $HOME/code/pnwairfire-bluesky/:/bluesky/ -w /bluesky/ bluesky-base ./bin/bsp -h
 
+Another example:
+
+    docker run --rm -i \
+        -v $HOME/docker-bsp-output/:/bsp-output/ \
+        -v $HOME/DRI_6km/:/DRI_6km/ \
+        -v $HOME/code/:/code/ \
+        -w /code/pnwairfire-bluesky/ \
+        bluesky \
+        bsp --log-level=DEBUG \
+        -i ./test/data/json/ingestion-through-visualization-input/DRI6km-2014053000-1fire-24hr-PM25-compute-grid-km.json \
+        ingestion fuelbeds consumption emissions \
+        timeprofiling findmetdata localmet plumerising \
+        dispersion visualization export | python -m json.tool > out.json
+
 #### Executables needing to be manually installed
 
 The Dockerfiles specify everything you need to to run bluesky through
