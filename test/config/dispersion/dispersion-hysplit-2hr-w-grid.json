@@ -20,13 +20,6 @@
                     }
                 }
             }
-        },
-        "visualization": {
-            "target": "dispersion",
-            "hysplit": {
-                "images_dir": "images/",
-                "data_dir": "data/"
-            }
         }
     }
 }

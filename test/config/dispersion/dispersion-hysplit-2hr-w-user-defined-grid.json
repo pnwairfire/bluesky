@@ -14,13 +14,6 @@
                 "SPACING_LONGITUDE": 0.05,
                 "SPACING_LATITUDE": 0.05
             }
-        },
-        "visualization": {
-            "target": "dispersion",
-            "hysplit": {
-                "images_dir": "images/",
-                "data_dir": "data/"
-            }
         }
     }
 }

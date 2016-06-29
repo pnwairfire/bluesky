@@ -5,13 +5,6 @@
             "num_hours": 2,
             "model": "hysplit",
             "dest_dir": "/tmp/bsp-output"
-        },
-        "visualization": {
-            "target": "dispersion",
-            "hysplit": {
-                "images_dir": "images/",
-                "data_dir": "data/"
-            }
         }
     }
 }
