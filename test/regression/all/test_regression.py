@@ -61,6 +61,9 @@ def check(expected, actual):
     return success
 
 def run_input(module, input_file):
+    output_file = input_file.replace('input/', 'output/').replace(
+        '.json', '-EXPECTED-OUTPUT.json')
+
     logging.info('Running bsp on %s', input_file)
     try:
         fires_manager = models.fires.FiresManager()
@@ -68,11 +71,15 @@ def run_input(module, input_file):
         fires_manager.modules = [module]
         fires_manager.run()
     except Exception as e:
-        logging.error('Failed run: %s', e)
-        return False
+        # if output file doesn't exist, it means this expection was expected
+        # TODO: confirm that this is valid logic
+        if os.path.isfile(output_file):
+            logging.error('Failed run: %s', e)
+            return False
+        else:
+            logging.debug('Expected run failure')
+            return True
 
-    output_file = input_file.replace('input/', 'output/').replace(
-        '.json', '-EXPECTED-OUTPUT.json')
     logging.info('Loading expected output file %s', output_file)
     with open(output_file, 'r') as f:
         expected = json.loads(f.read())
