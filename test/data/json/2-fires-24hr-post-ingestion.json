@@ -1,0 +1,48 @@
+{
+    "fire_information": [
+        {
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Yosemite, CA"
+            },
+            "id": "SF11C14225236095807750",
+            "type": "wildfire",
+            "location": {
+                "area": 10000,
+                "ecoregion": "western",
+                "latitude": 37.909644,
+                "longitude": -119.7615805,
+                "utc_offset": "-07:00"
+            },
+            "growth": [
+                {
+                    "start": "2014-05-29T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "pct": 100.0
+                }
+            ]
+        },
+        {
+            "event_of": {
+                "id": "sdfkj234kljfd",
+                "name": "Natural Fire in North Tahoe"
+            },
+            "id": "sdk2risodijfdsf",
+            "type": "wildfire",
+            "location": {
+                "area": 20000.0,
+                "ecoregion": "western",
+                "latitude":  39.3,
+                "longitude": -120.0,
+                "utc_offset": "-07:00"
+            },
+            "growth": [
+                {
+                    "start": "2014-05-29T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "pct": 100.0
+                }
+            ]
+        }
+    ]
+}
