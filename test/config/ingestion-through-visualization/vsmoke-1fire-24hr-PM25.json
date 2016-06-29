@@ -1,0 +1,27 @@
+{
+    "config": {
+        "emissions": {
+            "species": ["PM25"]
+        },
+        "dispersion": {
+            "start": "2014-05-30T00:00:00",
+            "num_hours": 24,
+            "model": "vsmoke",
+            "dest_dir": "/bsp-output/bsp-dispersion-output/"
+        },
+        "export": {
+            "modes": ["email", "localsave"],
+            "extra_exports": ["dispersion"],
+            "email": {
+                "recipients": ["jdubowy+blueskytest@gmail.com"],
+                "sender": "bsp@airfire.org",
+                "subject": "BSP output",
+                "smtp_server": "127.0.0.1",
+                "smtp_port": 1025
+            },
+            "localsave": {
+                "dest_dir": "/bsp-output/bsp-local-exports/"
+            }
+        }
+    }
+}

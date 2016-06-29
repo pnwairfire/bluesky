@@ -1,28 +1,28 @@
 {
-    "run_id": "PNW1.33km-2015081500-1fire-24hr-PM25-{timestamp}",
     "config": {
         "emissions": {
             "species": ["PM25"]
         },
         "findmetdata": {
-            "met_root_dir": "/NWRMC/1.33km/"
+            "met_root_dir": "/DRI_6km/"
         },
         "dispersion": {
-            "start": "2015-08-15T00:00:00",
+            "start": "2014-05-30T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
             "dest_dir": "/bsp-output/bsp-dispersion-output/",
             "hysplit": {
                 "grid": {
-                    "spacing": 1.33,
+                    "spacing": 0.06,
+                    "projection": "LatLon",
                     "boundary": {
                         "ne": {
-                            "lat": 48.97,
-                            "lng": -114.08
+                            "lat": 45.25,
+                            "lng": -106.5
                         },
                         "sw": {
-                            "lat": 44.77,
-                            "lng": -126.08
+                            "lat": 27.75,
+                            "lng": -131.5
                         }
                     }
                 },
@@ -51,29 +51,5 @@
                 "dest_dir": "/bsp-output/bsp-local-exports/"
             }
         }
-    },
-    "fire_information": [
-        {
-            "event_of": {
-                "id": "SF11E128519",
-                "name": "Unnamed fire in Wasco County, Oregon"
-            },
-            "id": "SF11C2457577860647680",
-            "type": "wildfire",
-            "location": {
-                "area": 10000,
-                "ecoregion": "western",
-                "latitude": 44.794,
-                "longitude": -121.375,
-                "utc_offset": "-07:00"
-            },
-            "growth": [
-                {
-                    "start": "2015-08-14T17:00:00",
-                    "end": "2015-08-15T17:00:00",
-                    "pct": 100.0
-                }
-            ]
-        }
-    ]
+    }
 }
