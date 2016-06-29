@@ -1742,13 +1742,14 @@ Then run bluesky:
 
 Another example:
 
-    docker run --rm -i \
+    docker run --rm -ti \
         -v $HOME/docker-bsp-output/:/bsp-output/ \
         -v $HOME/DRI_6km/:/DRI_6km/ \
         -v $HOME/code/:/code/ \
         -w /code/pnwairfire-bluesky/ \
-        bluesky \
-        bsp --log-level=DEBUG \
+        -e PYTHONPATH=/code/pnwairfire-bluesky/ \
+        bluesky-base \
+        ./bin/bsp --log-level=DEBUG \
         -i ./test/data/json/ingestion-through-visualization-input/DRI6km-2014053000-1fire-24hr-PM25-compute-grid-km.json \
         ingestion fuelbeds consumption emissions \
         timeprofiling findmetdata localmet plumerising \
