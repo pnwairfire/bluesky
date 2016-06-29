@@ -58,7 +58,8 @@ def check(expected, actual):
     success = True
     expected.pop('runtime')
     actual.pop('runtime')
-    return expected == actual
+    # TODO: cherry pick other fields to check
+    return expected['fire_information'] == actual['fire_information']
 
 def run_input(module, input_file):
     output_file = input_file.replace('input/', 'output/').replace(
@@ -83,7 +84,10 @@ def run_input(module, input_file):
     logging.info('Loading expected output file %s', output_file)
     with open(output_file, 'r') as f:
         expected = json.loads(f.read())
-    success = check(expected, fires_manager.dump())
+    # dumps and loads actual to convert datetimest, etc.
+    actual = json.loads(json.dumps(fires_manager.dump(),
+        cls=models.fires.FireEncoder))
+    success = check(expected, actual)
     logging.info('Success!') if success else logging.error('FAILED')
     return success
 
@@ -113,4 +117,7 @@ if __name__ == "__main__":
         logging.debug(traceback.format_exc())
         scripting.utils.exit_with_msg(e)
 
-    sys.exit(int(not success))
+    # No need to exit with code when we use the assertion here.
+    #  will return 0 if sucecss and 1 otherwise
+    #sys.exit(int(not success))
+    assert success
