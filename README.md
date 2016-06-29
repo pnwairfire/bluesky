@@ -1755,6 +1755,21 @@ Another example:
         timeprofiling findmetdata localmet plumerising \
         dispersion visualization export | python -m json.tool > out.json
 
+and another (runnin vsmoke):
+
+    docker run --rm -ti \
+        -v $HOME/docker-bsp-output/:/bsp-output/ \
+        -v $HOME/DRI_6km/:/DRI_6km/ \
+        -v $HOME/code/:/code/ \
+        -w /code/pnwairfire-bluesky/ \
+        -e PYTHONPATH=/code/pnwairfire-bluesky/ \
+        bluesky-base \
+        ./bin/bsp --log-level=DEBUG \
+        -i ./test/data/json/ingestion-through-visualization-input/vsmoke-1fire-24hr-PM25.json \
+        ingestion fuelbeds consumption emissions \
+        timeprofiling dispersion \
+        dispersion visualization export| python -m json.tool > out-vsmoke.json
+
 #### Executables needing to be manually installed
 
 The Dockerfiles specify everything you need to to run bluesky through
