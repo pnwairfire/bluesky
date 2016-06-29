@@ -1750,7 +1750,8 @@ Another example:
         -e PYTHONPATH=/code/pnwairfire-bluesky/ \
         bluesky-base \
         ./bin/bsp --log-level=DEBUG \
-        -i ./test/data/json/ingestion-through-visualization-input/DRI6km-2014053000-1fire-24hr-PM25-compute-grid-km.json \
+        -i ./test/data/json/1-fire-24hr-post-ingestion.json \
+        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM25-compute-grid-km.json \
         ingestion fuelbeds consumption emissions \
         timeprofiling findmetdata localmet plumerising \
         dispersion visualization export | python -m json.tool > out.json
@@ -1765,7 +1766,8 @@ and another (runnin vsmoke):
         -e PYTHONPATH=/code/pnwairfire-bluesky/ \
         bluesky-base \
         ./bin/bsp --log-level=DEBUG \
-        -i ./test/data/json/ingestion-through-visualization-input/vsmoke-1fire-24hr-PM25.json \
+        -i ./test/data/json/1-fire-24hr-post-ingestion.json \
+        -c ./test/config/ingestion-through-visualization/vsmoke-24hr-PM25.json \
         ingestion fuelbeds consumption emissions \
         timeprofiling dispersion export| python -m json.tool
 
@@ -1971,7 +1973,11 @@ Note that the above command, with the '-w /pnwairfire-bluesky/' option, puts
 you in the bluesky repo root directory. Now, you can run bsp and step into
 the code as you normally would in development. E.g.:
 
-    ./bin/bsp --log-level=DEBUG -i ./test/data/json/ingestion-through-visualization-input/NAM84-2015080500-1fire-24hr-PM25.json ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
+    ./bin/bsp --log-level=DEBUG \
+        -i ./test/data/json/1-fire-24hr-post-ingestion.json \
+        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM25-compute-grid-km.json \
+         ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet \
+         plumerising dispersion visualization export | python -m json.tool > out.json
 
 ### Notes about using Docker
 
