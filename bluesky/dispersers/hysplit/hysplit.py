@@ -215,7 +215,7 @@ class HYSPLITDispersion(DispersionBase):
             self._reduction_factor -= 1
             logging.debug("VERTICAL_EMISLEVELS_REDUCTION_FACTOR reset to %s" % str(self._reduction_factor))
 
-        self.num_output_quantiles = self.NQUANTILES/self._reduction_factor
+        self.num_output_quantiles = self.NQUANTILES // self._reduction_factor
 
         if self._reduction_factor != 1:
             logging.info("Number of vertical emission levels reduced by factor of %s" % str(self._reduction_factor))
