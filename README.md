@@ -112,7 +112,7 @@ First, install pip (with sudo if necessary):
 
 Run the following to install python dependencies:
 
-    pip install --trusted-host pypi.smoke.airfire.org -r requirements.txt
+    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
 
 Run the following to install packages required for development and testing:
 
@@ -196,7 +196,7 @@ First, install pip (with sudo if necessary):
 
 Then, to install, for example, v1.0.5, use the following (with sudo if necessary):
 
-    pip install --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==1.0.5
+    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==1.0.5
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
@@ -1729,7 +1729,7 @@ repo is in ```$HOME/code/pnwairfire-bluesky/```.)
 
     docker run --name bluesky-base \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ -w /bluesky/ \
-        bluesky-base bash -lc 'pip3 install \
+        bluesky-base bash -lc 'pip3 install --no-binary gdal \
         --trusted-host pypi.smoke.airfire.org -r requirements.txt'
 
 then commit the container changes back to image
@@ -1787,7 +1787,7 @@ back to the images
 
 Now, you can run commands relying on these executables. For example:
 
-     docker run --rm -v /home/foo/DRI_6km/:/DRI_6km/ bluesky arlprofiler -f '/DRI_6km/2014052900/wrfout_d2.2014052900.f00-11_12hr01.arl;2014-05-29T00:00:00;2014-05-29T02:00:00' -l 37 -g -119 -s 2014-05-29T00:00:00 -e 2014-05-29T02:00:00 -o -7
+     docker run --rm -v $HOME/DRI_6km/:/DRI_6km/ bluesky arlprofiler -f '/DRI_6km/2014052900/wrfout_d2.2014052900.f00-11_12hr01.arl;2014-05-29T00:00:00;2014-05-29T02:00:00' -l 37 -g -119 -s 2014-05-29T00:00:00 -e 2014-05-29T02:00:00 -o -7
 
 Another example, running through vsmoke dispersion:
 
@@ -1909,7 +1909,7 @@ Another example, running through hysplit dispersion:
                 ]
             }
         ]
-    }' | docker run --rm -i -v $HOME/docker-bsp-output/:/bsp-output/ -v /home/foo/DRI_6km/:/DRI_6km/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
+    }' | docker run --rm -i -v $HOME/docker-bsp-output/:/bsp-output/ -v $HOME/DRI_6km/:/DRI_6km/ bluesky bsp --log-level=DEBUG ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
 
 Again, the dispersion output will be under $HOME/bsp-dispersion-output/ on your
 host machine, and the export directory will be under $HOME/bsp-local-exports.
@@ -1981,8 +1981,8 @@ the dispersion kml in /docker-output/, you could run something like the
 following:
 
     docker run --rm \
-        -v /home/foo/bluesky-output/2015121200/data/:/input/ \
-        -v /home/foo/docker-output/:/output/ bluesky \
+        -v $HOME/bluesky-output/2015121200/data/:/input/ \
+        -v $HOME/docker-output/:/output/ bluesky \
         makedispersionkml \
         -i /input/smoke_dispersion.nc \
         -l /input/fire_locations.csv \
