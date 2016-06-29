@@ -1,0 +1,13 @@
+{
+    "config": {
+        "visualization": {
+            "target": "dispersion",
+            "hysplit": {
+                "is_aquipt": false,
+                "images_dir": "images/",
+                "data_dir": "data/",
+                "dest_dir": "/bsp-output/bsp-visualization-output"
+            }
+        }
+    }
+}
