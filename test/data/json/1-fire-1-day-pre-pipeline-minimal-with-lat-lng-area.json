@@ -9,6 +9,11 @@
                 "longitude": -121.3990506,
                 "area": 200,
                 "ecoregion": "southern",
+                "country": "USA",
+                "slope": 20.0,
+                "max_humid": 70.0,
+                "elevation": 2320.0,
+                "state": "KS",
                 "utc_offset": "-07:00"
             },
             "growth": [
