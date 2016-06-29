@@ -197,7 +197,7 @@ class FireIngester(object):
         'snow_month','rain_days'
         # TODO: fill in others
     ]
-    for a in consumeutils.SETTINGS.values():
+    for a in list(consumeutils.SETTINGS.values()):
         for b in a:
             OPTIONAL_LOCATION_FIELDS.append(b['field'])
             if 'synonyms' in b:

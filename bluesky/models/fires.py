@@ -181,7 +181,7 @@ class Fire(dict):
         super(Fire, self).__setitem__(attr, val)
 
     def __getattr__(self, attr):
-        if attr in self.keys():
+        if attr in list(self.keys()):
             return self[attr]
         raise AttributeError(attr)
 
