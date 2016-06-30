@@ -59,13 +59,22 @@ def check(expected, actual):
     expected.pop('runtime')
     actual.pop('runtime')
     # TODO: cherry pick other fields to check
-    return expected['fire_information'] == actual['fire_information']
+    if len(expected['fire_information']) != len(actual['fire_information']):
+        return False
+
+    for i in range(len(expected['fire_information'])):
+        expected['fire_information'][i].pop('error', None)
+        actual['fire_information'][i].pop('error', None)
+        if expected['fire_information'][i] != actual['fire_information'][i]:
+            return False
+
+    return True
 
 def run_input(module, input_file):
     output_file = input_file.replace('input/', 'output/').replace(
         '.json', '-EXPECTED-OUTPUT.json')
 
-    logging.info('Running bsp on %s', input_file)
+    logging.debug('Running bsp on %s', input_file)
     try:
         fires_manager = models.fires.FiresManager()
         fires_manager.loads(input_file=input_file)
@@ -79,25 +88,25 @@ def run_input(module, input_file):
         # if output file doesn't exist, it means this expection was expected
         # TODO: confirm that this is valid logic
         if os.path.isfile(output_file):
-            logging.error('Failed run %s - %s', input_file, e)
+            logging.error('FAILED - %s - %s', input_file, e)
             return False
         else:
             logging.debug('Caught expected exception')
             return True
 
     try:
-        logging.info('Loading expected output file %s', output_file)
+        logging.debug('Loading expected output file %s', output_file)
         with open(output_file, 'r') as f:
             expected = json.loads(f.read())
     except FileNotFoundError as e:
-        logging.error('Failed run %s - missing output file', input_file)
+        logging.error('FAILED - %s - missing output file', input_file)
         return False
 
     # dumps and loads actual to convert datetimest, etc.
     actual = json.loads(json.dumps(fires_manager.dump(),
         cls=models.fires.FireEncoder))
     success = check(expected, actual)
-    logging.info('Success!') if success else logging.error('Failed run %s', input_file)
+    logging.info('PASSED - %s', input_file) if success else logging.error('FAILED - %s', input_file)
     return success
 
 def run_module(module):
