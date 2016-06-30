@@ -115,11 +115,12 @@ def run_module(module):
     return all([run_input(module, f) for f in files])
 
 def test(module=None):
-    if module:
-        assert run_module(module)
-    else:
-        results = [run_module(module) for module in MODULES]
-        assert all(results)
+    modules = [module] if module else MODULES
+    results = [run_module(module) for module in modules]
+    logging.info('Summary:')
+    for i, r in enumerate(results):
+        logging.info(' %s: %s', modules[i], 'PASSED' if r else 'FAILED')
+    assert all(results)
 
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
