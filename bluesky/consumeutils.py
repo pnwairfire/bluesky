@@ -239,7 +239,7 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
         if fccs_id not in self._custom:
             fuel_loadings = copy.copy(self._all_fuel_loadings[fccs_id])
 
-            f = tempfile.NamedTemporaryFile()
+            f = tempfile.NamedTemporaryFile(mode='w')
 
             f.write(self.FCCS_LOADINGS_CSV_HEADER)
             # set fuelbed_id
