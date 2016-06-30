@@ -97,7 +97,8 @@ def check(expected, actual):
     for i in range(len(expected['fire_information'])):
         expected['fire_information'][i].pop('error', None)
         actual['fire_information'][i].pop('error', None)
-        return check_value(expected['fire_information'][i], actual['fire_information'][i])
+        if not check_value(expected['fire_information'][i], actual['fire_information'][i]):
+            return False
 
     return True
 
