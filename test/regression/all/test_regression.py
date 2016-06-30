@@ -18,6 +18,7 @@ import subprocess
 import sys
 import traceback
 
+from numpy.testing import assert_approx_equal
 from pyairfire import scripting
 
 # Hack to put the repo root dir at the front of sys.path so that
@@ -53,6 +54,37 @@ Examples:
     $ ./test/regression/all/test_regression.py --log-level=DEBUG -m emissions
 """
 
+def check_value(expected, actual):
+    if type(expected) != type(actual):
+        return False
+
+    if type(expected) == dict:
+        if set(expected.keys()) != set(actual.keys()):
+            return False
+        for k in expected:
+            if not check_value(expected[k], actual[k]):
+                return False
+        return True
+
+    elif type(expected) == list:
+        if len(expected) != len(actual):
+            return False
+        for i in range(len(expected)):
+            if not check_value(expected[i], actual[i]):
+                return False
+        return True
+
+    elif type(expected) == float:
+        try:
+            # if failure, we want to return False rather than have AssertionError raised
+            assert_approx_equal(expected, actual)
+        except AssertionError:
+            return False
+        return True
+
+    else:
+        return expected == actual
+
 
 def check(expected, actual):
     success = True
@@ -65,8 +97,7 @@ def check(expected, actual):
     for i in range(len(expected['fire_information'])):
         expected['fire_information'][i].pop('error', None)
         actual['fire_information'][i].pop('error', None)
-        if expected['fire_information'][i] != actual['fire_information'][i]:
-            return False
+        return check_value(expected['fire_information'][i], actual['fire_information'][i])
 
     return True
 
