@@ -328,8 +328,8 @@ example, assume that you start with the following fire data:
                 "growth": [
                     {
                         "pct": 100,
-                        "start": "20150120",
-                        "end": "20150120"
+                        "start": "2015-01-20T17:00:00",
+                        "end": "2015-01-21T17:00:00"
                     }
                 ]
             }
@@ -364,9 +364,9 @@ fields):
                 ],
                 "growth": [
                     {
-                        "end": "20150120",
+                        "end": "2015-01-21T17:00:00",
                         "pct": 100,
-                        "start": "20150120"
+                        "start": "2015-01-20T17:00:00"
                     }
                 ],
                 "id": "SF11C14225236095807750",
@@ -466,9 +466,9 @@ yielding the following augmented output:
                 ],
                 "growth": [
                     {
-                        "end": "20150120",
+                        "end": "2015-01-21T17:00:00",
                         "pct": 100,
-                        "start": "20150120"
+                        "start": "2015-01-20T17:00:00"
                     }
                 ],
                 "id": "SF11C14225236095807750",
@@ -581,9 +581,9 @@ would contain this output, agumented with emissions data:
                 ],
                 "growth": [
                     {
-                        "end": "20150120",
+                        "end": "2015-01-21T17:00:00",
                         "pct": 100,
-                        "start": "20150120"
+                        "start": "2015-01-20T17:00:00"
                     }
                 ],
                 "id": "SF11C14225236095807750",
@@ -779,8 +779,8 @@ assume is in fires.json):
                 "growth": [
                     {
                         "pct": 100.0,
-                        "start": "20150120",
-                        "end": "20150120"
+                        "start": "2015-01-20T17:00:00",
+                        "end": "2015-01-21T17:00:00"
                     }
                 ],
                 "bar": 123
@@ -803,9 +803,9 @@ you'll end up with this:
                 },
                 "growth": [
                     {
-                        "end": "20150120",
+                        "end": "2015-01-21T17:00:00",
                         "pct": 100.0,
-                        "start": "20150120"
+                        "start": "2015-01-20T17:00:00"
                     }
                 ],
                 "id": "SF11C14225236095807750",
@@ -831,9 +831,9 @@ you'll end up with this:
                         },
                         "growth": [
                             {
-                                "end": "20150120",
+                                "end": "2015-01-21T17:00:00",
                                 "pct": 100.0,
-                                "start": "20150120"
+                                "start": "2015-01-20T17:00:00"
                             }
                         ],
                         "id": "SF11C14225236095807750",
@@ -888,8 +888,8 @@ data. The following is an example of the former:
                 "growth": [
                     {
                         "pct": 100,
-                        "start": "20150120",
-                        "end": "20150120"
+                        "start": "2015-01-20T17:00:00",
+                        "end": "2015-01-21T17:00:00"
                     }
                 ]
             }
@@ -926,8 +926,8 @@ while the following is an example of the latter:
                 "growth": [
                     {
                         "pct": 100,
-                        "start": "20150120",
-                        "end": "20150120"
+                        "start": "2015-01-20T17:00:00",
+                        "end": "2015-01-21T17:00:00"
                     }
                 ]
             }
@@ -1604,8 +1604,8 @@ Now you're ready to run bsp:
                 "growth": [
                     {
                         "pct": 100,
-                        "start": "20150120",
-                        "end": "20150120"
+                        "start": "2015-01-20T17:00:00",
+                        "end": "2015-01-21T17:00:00"
                     }
                 ]
             }
@@ -1703,8 +1703,8 @@ use something like the following:
             },
             "growth": [{
                 "pct": 100,
-                "start": "20150120",
-                "end": "20150120"
+                "start": "2015-01-20T17:00:00",
+                "end": "2015-01-21T17:00:00"
             }]
         }]
     }' | docker run --rm -i bluesky bsp ingestion fuelbeds consumption emissions \

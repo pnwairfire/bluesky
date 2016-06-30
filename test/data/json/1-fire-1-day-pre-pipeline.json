@@ -26,12 +26,12 @@
                 "days_since_rain": 4,
                 "length_of_ignition": 23,
                 "output_units": "tons",
-                "utc_offset": "-07:00"
+                "utc_offset": "-05:00"
             },
             "growth": [
                 {
-                    "start": "20150120",
-                    "end": "20150120",
+                    "start": "2015-01-20T19:00:00",
+                    "end": "2015-01-21T19:00:00",
                     "pct": 100.0
                 }
             ]

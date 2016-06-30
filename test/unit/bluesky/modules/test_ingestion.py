@@ -108,8 +108,8 @@ class TestIngester(object):
                 "ecoregion": "southern"
             },
             "growth": [{
-                "start": "20150120",
-                "end": "20150120",
+                "start": "2015-01-20T17:00:00",
+                "end": "2015-01-21T17:00:00",
                 "pct": 100.0
             }]
         }
@@ -149,8 +149,8 @@ class TestIngester(object):
                 ]
             },
             "ecoregion": "southern",
-            "start": "20150120",
-            "end": "20150120",
+            "start": "2015-01-20T17:00:00",
+            "end": "2015-01-21T17:00:00",
             "utc_offset": "-07:00"
         }
         expected = {
@@ -180,8 +180,8 @@ class TestIngester(object):
             'growth': [
                 {
                     "pct": 100.0,
-                    "start": "20150120",
-                    "end": "20150120"
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00"
                 }
             ]
         }
@@ -216,8 +216,8 @@ class TestIngester(object):
             "ecoregion": "southern",
             "growth": [
                 {
-                    "start": "20150120",
-                    "end": "20150120",
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
                     "pct": 100.0
                 }
             ],
@@ -252,8 +252,8 @@ class TestIngester(object):
             },
             "growth": [
                 {
-                    "start": "20150120",
-                    "end": "20150120",
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
                     "pct": 100.0
                 }
             ],
@@ -293,8 +293,8 @@ class TestIngester(object):
             },
             "growth": [
                 {
-                    "start": "20150120",
-                    "end": "20150120",
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
                     "pct": 100.0
                 }
             ],
