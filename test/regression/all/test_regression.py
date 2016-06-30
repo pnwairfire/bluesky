@@ -28,7 +28,7 @@ sys.path.insert(0, app_root)
 
 # We're running bluesky via the package rather than by running the bsp script
 # to allow breaking into the code (with pdb)
-from bluesky import models
+from bluesky import models, exceptions
 
 MODULES = [ os.path.basename(m.rstrip('/'))
     for m in glob.glob(os.path.join(os.path.dirname(__file__), '*'))
@@ -71,24 +71,33 @@ def run_input(module, input_file):
         fires_manager.loads(input_file=input_file)
         fires_manager.modules = [module]
         fires_manager.run()
+    except exceptions.BlueSkyModuleError as e:
+        # The error was added to fires_manager's meta data, and will be
+        # included in the output data
+        pass
     except Exception as e:
         # if output file doesn't exist, it means this expection was expected
         # TODO: confirm that this is valid logic
         if os.path.isfile(output_file):
-            logging.error('Failed run: %s', e)
+            logging.error('Failed run %s - %s', input_file, e)
             return False
         else:
-            logging.debug('Expected run failure')
+            logging.debug('Caught expected exception')
             return True
 
-    logging.info('Loading expected output file %s', output_file)
-    with open(output_file, 'r') as f:
-        expected = json.loads(f.read())
+    try:
+        logging.info('Loading expected output file %s', output_file)
+        with open(output_file, 'r') as f:
+            expected = json.loads(f.read())
+    except FileNotFoundError as e:
+        logging.error('Failed run %s - missing output file', input_file)
+        return False
+
     # dumps and loads actual to convert datetimest, etc.
     actual = json.loads(json.dumps(fires_manager.dump(),
         cls=models.fires.FireEncoder))
     success = check(expected, actual)
-    logging.info('Success!') if success else logging.error('FAILED')
+    logging.info('Success!') if success else logging.error('Failed run %s', input_file)
     return success
 
 def run_module(module):
@@ -96,11 +105,12 @@ def run_module(module):
         os.path.dirname(__file__), module, 'input', '*')) ]
     return all([run_input(module, f) for f in files])
 
-def run(args):
-    if args.module:
-        return run_module(args.module)
+def test(module=None):
+    if module:
+        assert run_module(module)
     else:
-        return all([run_module(module) for module in MODULES])
+        results = [run_module(module) for module in MODULES]
+        assert all(results)
 
 if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
@@ -110,14 +120,13 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-        success = run(args)
+        test(module=args.module)
 
     except Exception as e:
         logging.error(e)
         logging.debug(traceback.format_exc())
         scripting.utils.exit_with_msg(e)
 
-    # No need to exit with code when we use the assertion here.
-    #  will return 0 if sucecss and 1 otherwise
+    # No need to exit with code when we use the assertions in `test`, above.
+    #  (script will return 0 if sucecss and 1 otherwise.)
     #sys.exit(int(not success))
-    assert success
