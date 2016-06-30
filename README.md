@@ -1751,10 +1751,11 @@ Another example:
         bluesky-base \
         ./bin/bsp --log-level=DEBUG \
         -i ./test/data/json/1-fire-24hr-post-ingestion.json \
+        -o ./test/data/json/1-fire-24hr-post-ingestion-output.json \
         -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM25-compute-grid-km.json \
         ingestion fuelbeds consumption emissions \
         timeprofiling findmetdata localmet plumerising \
-        dispersion visualization export | python -m json.tool > out.json
+        dispersion visualization export
 
 and another (runnin vsmoke):
 
@@ -1767,9 +1768,10 @@ and another (runnin vsmoke):
         bluesky-base \
         ./bin/bsp --log-level=DEBUG \
         -i ./test/data/json/1-fire-24hr-post-ingestion.json \
+        -o ./test/data/json/1-fire-24hr-post-ingestion-output.json \
         -c ./test/config/ingestion-through-visualization/vsmoke-24hr-PM25.json \
         ingestion fuelbeds consumption emissions \
-        timeprofiling dispersion export| python -m json.tool
+        timeprofiling dispersion export
 
 #### Executables needing to be manually installed
 
