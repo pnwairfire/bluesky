@@ -32,7 +32,7 @@ from bluesky import models, exceptions
 
 MODULES = [ os.path.basename(m.rstrip('/'))
     for m in glob.glob(os.path.join(os.path.dirname(__file__), '*'))
-    if os.path.isdir(m)]
+    if os.path.isdir(m) and not os.path.basename(m).startswith('__')]  # catches '__pycache__' dir
 
 REQUIRED_ARGS = [
 ]
