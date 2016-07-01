@@ -17,4 +17,8 @@ RUN pip3 install --trusted-host pypi.smoke.airfire.org \
 #     https://github.com/pnwairfire/bluesky/archive/branch-name.tar.gz \
 #     gdal==1.11.3
 
+# Install bluesky utils for merging emissions, etc.
+RUN pip3 install --trusted-host pypi.smoke.airfire.org \
+    -i http://pypi.smoke.airfire.org/simple blueskyutils>=0.1.2
+
 CMD ["bsp", "-h"]
