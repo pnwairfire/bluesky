@@ -8,6 +8,7 @@ import consume
 
 from bluesky import datautils
 from bluesky.consumeutils import _apply_settings, FuelLoadingsManager
+from bluesky import exceptions
 
 __all__ = [
     'run'
@@ -138,9 +139,18 @@ def _validate_input(fires_manager):
                 # import EcoregionLookup here so that, if fires do have
                 # ecoregion defined, consumption can be run without mapscript
                 # and other dependencies installed
-                from bluesky.ecoregion.lookup import EcoregionLookup
-                fire.location['ecoregion'] = EcoregionLookup().lookup(
-                    fire.latitude, fire.longitude)
+                try:
+                    from bluesky.ecoregion.lookup import EcoregionLookup
+                    fire.location['ecoregion'] = EcoregionLookup().lookup(
+                        fire.latitude, fire.longitude)
+                except exceptions.MissingDependencyError:
+                    default_ecoregion = fires_manager.get_config_value(
+                        'consumption', 'default_ecoregion')
+                    if default_ecoregion:
+                        fire.location['ecoregion'] = default_ecoregion
+                    else:
+                        raise
+
             for fb in fire.fuelbeds:
                 if not fb.get('fccs_id') or not fb.get('pct'):
                     raise ValueError("Each fuelbed must define 'id' and 'pct'")
