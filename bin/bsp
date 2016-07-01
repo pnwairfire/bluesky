@@ -23,7 +23,7 @@ except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from bluesky import exceptions, configuration, modules, models, __version__
+    from bluesky import exceptions, modules, models, __version__
 
 __author__ = "Joel Dubowy"
 
