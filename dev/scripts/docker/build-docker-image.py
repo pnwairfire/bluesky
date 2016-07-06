@@ -61,12 +61,6 @@ BINARIES = [
     'feps_weather'
 ]
 
-AUX_FILES = [
-    'dispersers/vsmoke/images/',
-    'dispersers/hysplit/bdyfiles/',
-    'ecoregion/data/'
-]
-
 REPO_ROOT_DIR = os.path.abspath(os.path.join(__file__, '../../../..'))
 
 FINAL_INSTRUCTIONS = """
@@ -131,15 +125,6 @@ def _copy_binaries(args):
         dest = '{}:/usr/local/bin/{}'.format(args.image_name, b)
         _call(['docker', 'cp', src, dest])
 
-def _copy_aux_files(args):
-    if args.image == 'complete':
-        for f in AUX_FILES:
-            src = os.path.join(REPO_ROOT_DIR, 'bluesky', f)
-            dest = '{}:{}'.format(args.image_name, os.path.join(
-                '/usr/local/lib/python3.5/dist-packages/bluesky', f))
-            _call(['mkdir', '-p', dest])
-            _call(['docker', 'cp', src, dest])
-
 def _commit(args):
     _call(['docker', 'commit', args.image_name, args.image_name])
 
@@ -163,7 +148,6 @@ if __name__ == "__main__":
     _build(args)
     _create(args)
     _copy_binaries(args)
-    _copy_aux_files(args)
     _commit(args)
 
     _post_clean()

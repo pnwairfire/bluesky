@@ -21,4 +21,14 @@ RUN pip3 install --trusted-host pypi.smoke.airfire.org \
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
     -i http://pypi.smoke.airfire.org/simple blueskyutils>=0.1.2
 
+# There's a bug in the bluesky installation that results in missing
+# auxliary files.  Manually copy these into the bluesky image:
+COPY bluesky/dispersers/vsmoke/images/* \
+    /usr/local/lib/python3.5/dist-packages/bluesky/dispersers/vsmoke/images/
+COPY bluesky/dispersers/hysplit/bdyfiles/* \
+    /usr/local/lib/python3.5/dist-packages/bluesky/dispersers/hysplit/bdyfiles/
+COPY bluesky/ecoregion/data/* \
+    /usr/local/lib/python3.5/dist-packages/bluesky/ecoregion/data/
+
+# default command is to display bsp help string
 CMD ["bsp", "-h"]

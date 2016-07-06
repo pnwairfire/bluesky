@@ -1805,14 +1805,6 @@ Copy the required executables to the bluesky-base container
     docker cp /path/to/vsmoke bluesky-base:/usr/local/bin/vsmoke
     docker cp /path/to/vsmkgs bluesky-base:/usr/local/bin/vsmkgs
 
-There's a bug in the bluesky installation that results in missing
-auxliary files.  Manually copy these into the bluesky image:
-
-    cd /path/to/bluesky/repo/
-    docker cp bluesky/dispersers/vsmoke/images/ bluesky:/usr/local/lib/python3.5/dist-packages/bluesky/dispersers/vsmoke/images/
-    docker cp bluesky/dispersers/hysplit/bdyfiles/ bluesky:/usr/local/lib/python3.5/dist-packages/bluesky/dispersers/hysplit/bdyfiles/
-    docker cp bluesky/ecoregion/data/ bluesky:/usr/local/lib/python3.5/dist-packages/bluesky/ecoregion/data/
-
 Once you've installed the executables, commit the containers' changes
 back to the images
 
