@@ -88,9 +88,11 @@ if __name__ == "__main__":
 
         cmd_args = [
             'cat', input_file,'|',
-            'docker', 'run', '-i',
+            'docker', 'run', '--rm', '-i',
             '-v', '{}:/bluesky-repo/'.format(args.repo_root),
-            '-w', '/bluesky-repo/'
+            '-w', '/bluesky-repo/',
+            '-e', 'PYTHONPATH=/bluesky-repo/',
+            '-e', 'PATH=/bluesky-repo/bin/:$PATH'
         ]
 
         if args.config_file:
@@ -103,7 +105,7 @@ if __name__ == "__main__":
                 '-v', '{}:{}'.format(h, c)
             ])
         cmd_args.extend([
-            'bluesky-base',
+            'bluesky',
             './bin/bsp',
             '--log-level', args.log_level
         ])
