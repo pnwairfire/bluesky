@@ -2,6 +2,20 @@
 
 # source this file
 
+# Ths following, using dvm (https://github.com/getcarina/dvm), allows us to
+# have Docker for Mac (native) and docker toolbox coexist on the same machine.
+# (source this file to use docker toolbox; without sourcing this file,
+# you get docker for Mac)
+# Note: use `brew update && brew install dvm` to install dvm
+# Note: You may need to:
+#   - change the path to dvm
+#   - change the version specified in the dvm commands
+#   - remove the following three dvm commands altogether (if you have
+#     either Docker of Mac or docker toolbox, but not both)
+source /usr/local/Cellar/dvm/0.6.2/dvm.sh
+dvm install 1.11.2
+dvm use 1.11.2
+
 docker-machine create --driver virtualbox docker-default
 docker-machine start docker-default
 eval "$(docker-machine env docker-default)"
