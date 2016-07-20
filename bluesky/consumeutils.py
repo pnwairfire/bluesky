@@ -8,7 +8,7 @@ __author__ = "Joel Dubowy"
 import copy
 import tempfile
 
-import numpy
+#import numpy
 import consume
 
 from bluesky.exceptions import BlueSkyConfigurationError
