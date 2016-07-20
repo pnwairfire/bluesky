@@ -33,6 +33,11 @@ REQUIRED_ARGS = [
 
 OPTIONAL_ARGS = [
     {
+        'short': '-c',
+        'long': '--config-file',
+        'help': "json input file"
+    },
+    {
         'short': '-p',
         'long': '--pretty-format',
         'help': "format json output",
@@ -56,6 +61,7 @@ a particular domain on the current server.
 Examples:
   $ ./dev/scripts/docker/run-in-docker.py \\
       -i /path/to/fire.json \\
+      -c /path/to/config.json \\
       -r /path/to/bluesky/repo/ \\
       -d /path/to/met/:/met/ \\
       -d /path/to/output/dir/ \\
@@ -86,6 +92,10 @@ if __name__ == "__main__":
             '-v', '{}:/bluesky-repo/'.format(args.repo_root),
             '-w', '/bluesky-repo/'
         ]
+
+        if args.config_file:
+            cmd_args.extend(['-c', args.config_file])
+
         for d in args.mount_dirs:
             dirs = d.split(':')
             h, c = (dirs[0], dirs[1]) if len(dirs) == 2 else (dirs, dirs)
