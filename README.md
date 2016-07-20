@@ -1616,9 +1616,8 @@ Now you're ready to run bsp:
 
 ## Docker
 
-Two Dockerfiles are included in this repo - one for running bluesky
-out of the box, and the other for use as a base environment for
-development.
+A Dockerfile is included in this repo. It can be used to run bluesky
+out of the box or as a base environment for development.
 
 ### Install Docker
 
@@ -1629,8 +1628,10 @@ installation instructions.
 
 #### Mac OSX
 
-On a Mac, the docker daemon runs inside a Linux VM. The first time
-you use docker, you'll need to create a vm:
+On a Mac, you have two options: Docker for Mac or docker toolbox, which runs
+the docker daemon inside a Linux VM.  These instructions cover using
+docker toolbox, because, at the time of writing, Docker for Mac is still
+beta. The first time you use docker, you'll need to create a vm:
 
     docker-machine create --driver virtualbox docker-default
 
@@ -1652,13 +1653,12 @@ the docker host:
 ...TODO: fill in insructions...
 
 
-### Build Bluesky Docker Images from Dockerfile
+### Build Bluesky Docker Image from Dockerfile
 
     cd /path/to/bluesky/repo/
-    docker build -t bluesky -f docker/base/Dockerfile .
-    docker build -t bluesky -f docker/complete/Dockerfile .
+    docker build -t bluesky -f docker/Dockerfile .
 
-### Obtain pre-built docker images
+### Obtain pre-built docker image
 
 As an alternative to building the image yourself, you can use the pre-built
 complete image.
@@ -1713,79 +1713,55 @@ use something like the following:
 
 To run bluesky with file input, you'll need to use the '-v' option to
 mount host machine directories in your container.  For example, suppose
-you've got fire json input data in /foo/bar/fires.json, you could run
-something like the following:
+you've got the bluesky git repo in $HOME/code/pnwairfire-bluesky/, you
+could run something like the following:
 
-    docker run --rm -v /home/foo/bar/:/input/ bluesky \
-        bsp -i /input/fires.json \
+    docker run --rm \
+        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
+        bluesky bsp \
+        -i /bluesky/test/data/json/fire_locations-2015080500-fromdailycsv-4fires-4days.json \
         ingestion fuelbeds consumption emissions
 
-### Using base image for development
+### Using image for development
 
-The bluesky-base image has everything except the bluesky
-package and it's python dependencies.  You can use it to run bluesky
-from your local repo. First install the python dependencies for your
-current version of the repo.  (The following instructions assume the
-repo is in ```$HOME/code/pnwairfire-bluesky/```.)
+To use the docker image to run bluesky from your local repo, you need to
+set PYTHONPATH and PATH variables in your docker run command.
 
-    docker run --name bluesky-base \
-        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ -w /bluesky/ \
-        bluesky-base bash -lc 'pip3 install --no-binary gdal \
-        --trusted-host pypi.smoke.airfire.org -r requirements.txt'
+For example
 
-then commit the container changes back to image
+    docker run --rm \
+        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
+        -e PYTHONPATH=/bluesky/ \
+        -e PATH=/bluesky/bin/:$PATH \
+        bluesky bsp -h
 
-    docker commit bluesky-base bluesky-base
 
-Then run bluesky:
-
-    docker run --rm -v $HOME/code/pnwairfire-bluesky/:/bluesky/ -w /bluesky/ bluesky-base ./bin/bsp -h
 
 Another example:
 
     docker run --rm -ti \
-        -v $HOME/docker-bsp-output/:/bsp-output/ \
-        -v $HOME/DRI_6km/:/DRI_6km/ \
-        -v $HOME/code/:/code/ \
-        -w /code/pnwairfire-bluesky/ \
-        -e PYTHONPATH=/code/pnwairfire-bluesky/ \
-        bluesky-base \
-        ./bin/bsp --log-level=DEBUG \
-        -i ./test/data/json/1-fire-24hr-post-ingestion.json \
-        -o ./test/data/json/1-fire-24hr-post-ingestion-output.json \
-        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM25-compute-grid-km.json \
-        ingestion fuelbeds consumption emissions \
-        timeprofiling findmetdata localmet plumerising \
-        dispersion visualization export
+        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
+        -e PYTHONPATH=/bluesky/ \
+        -e PATH=/bluesky/bin/:$PATH \
+        -w /bluesky/ \
+        bluesky \
+        bsp --log-level=DEBUG \
+        -i ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json \
+        -o ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion-output.json \
+        ingestion fuelbeds consumption emissions
 
-and another (runnin vsmoke):
-
-    docker run --rm -ti \
-        -v $HOME/docker-bsp-output/:/bsp-output/ \
-        -v $HOME/DRI_6km/:/DRI_6km/ \
-        -v $HOME/code/:/code/ \
-        -w /code/pnwairfire-bluesky/ \
-        -e PYTHONPATH=/code/pnwairfire-bluesky/ \
-        bluesky-base \
-        ./bin/bsp --log-level=DEBUG \
-        -i ./test/data/json/1-fire-24hr-post-ingestion.json \
-        -o ./test/data/json/1-fire-24hr-post-ingestion-output.json \
-        -c ./test/config/ingestion-through-visualization/vsmoke-24hr-PM25.json \
-        ingestion fuelbeds consumption emissions \
-        timeprofiling dispersion export
 
 #### Executables needing to be manually installed
 
-The Dockerfiles specify everything you need to to run bluesky through
+The Dockerfile specifys everything you need to to run bluesky through
 emissions.  If you want to run localmet and/or dispersion, you'll
 need to manually install the required executables.
 
-First create the base and complete containers, if not already created:
+First create the container, if not already created:
 
     docker create --name bluesky bluesky
-    docker create --name bluesky-base bluesky-base
 
-Copy the required executables to the bluesky container
+Copy the required executables:
 
     docker cp /path/to/profile bluesky:/usr/local/bin/profile
     docker cp /path/to/mpiexec bluesky:/usr/local/bin/mpiexec
@@ -1795,27 +1771,16 @@ Copy the required executables to the bluesky container
     docker cp /path/to/vsmoke bluesky:/usr/local/bin/vsmoke
     docker cp /path/to/vsmkgs bluesky:/usr/local/bin/vsmkgs
 
-Copy the required executables to the bluesky-base container
-
-    docker cp /path/to/profile bluesky-base:/usr/local/bin/profile
-    docker cp /path/to/mpiexec bluesky-base:/usr/local/bin/mpiexec
-    docker cp /path/to/hycm_std bluesky-base:/usr/local/bin/hycm_std
-    docker cp /path/to/hycs_std bluesky-base:/usr/local/bin/hycs_std
-    docker cp /path/to/hysplit2netcdf bluesky-base:/usr/local/bin/hysplit2netcdf
-    docker cp /path/to/vsmoke bluesky-base:/usr/local/bin/vsmoke
-    docker cp /path/to/vsmkgs bluesky-base:/usr/local/bin/vsmkgs
-
-Once you've installed the executables, commit the containers' changes
-back to the images
+Once you've installed the executables, commit the container's changes
+back to the image
 
     docker commit bluesky bluesky
-    docker commit bluesky-base bluesky-base
 
 Now, you can run commands relying on these executables. For example:
 
      docker run --rm -v $HOME/DRI_6km/:/DRI_6km/ bluesky arlprofiler -f '/DRI_6km/2014052900/wrfout_d2.2014052900.f00-11_12hr01.arl;2014-05-29T00:00:00;2014-05-29T02:00:00' -l 37 -g -119 -s 2014-05-29T00:00:00 -e 2014-05-29T02:00:00 -o -7
 
-Another example, running through vsmoke dispersion:
+Another example, running `bsp` through vsmoke dispersion:
 
     echo '{
         "config": {
@@ -1859,11 +1824,31 @@ Another example, running through vsmoke dispersion:
                 ]
             }
         ]
-    }' | docker run --rm -i -v $HOME/docker-bsp-output:/bsp-output/ bluesky bsp ingestion fuelbeds consumption emissions timeprofiling dispersion | python -m json.tool > out.json
+    }' | docker run --rm -i \
+    -v $HOME/docker-bsp-output:/bsp-output/ \
+    bluesky bsp \
+    ingestion fuelbeds consumption emissions timeprofiling dispersion \
+    | python -m json.tool > out.json
 
-Remember that the vsmoke output will be under
-$HOME/docker-bsp-output/bsp-dispersion-output/ on your host machine, not under
-/bsp-output/bsp-dispersion-output/.
+
+Another example, running `bsp` from the repo through HYSPLIT dispersion
+and KML visualization:
+
+    docker run --rm -ti \
+        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
+        -e PYTHONPATH=/bluesky/ \
+        -e PATH=/bluesky/bin/:$PATH \
+        -v $HOME/docker-bsp-output/:/bsp-output/ \
+        -v $HOME/DRI_6km/:/DRI_6km/ \
+        -w /bluesky/ \
+        bluesky \
+        bsp --log-level=DEBUG \
+        -i ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json \
+        -o ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion-output.json \
+        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM25-compute-grid-km.json \
+        ingestion fuelbeds consumption emissions \
+        timeprofiling findmetdata localmet plumerising \
+        dispersion visualization export
 
 Another example, running through hysplit dispersion:
 
@@ -1937,8 +1922,11 @@ Another example, running through hysplit dispersion:
         ]
     }' | docker run --rm -i -v $HOME/docker-bsp-output/:/bsp-output/ -v $HOME/DRI_6km/:/DRI_6km/ bluesky bsp --log-level=DEBUG ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
 
-Again, the dispersion output will be under $HOME/bsp-dispersion-output/ on your
-host machine, and the export directory will be under $HOME/bsp-local-exports.
+Remember that, in the last three dispersion examples, the dispersion output
+will be under `$HOME/docker-bsp-output/bsp-dispersion-output/` on your host
+machine, not under `/bsp-output/bsp-dispersion-output/`. The export
+directory (for the last two examples), will be under
+`$HOME/bsp-local-exports`.
 
 #### Docker wrapper script
 
@@ -1958,13 +1946,15 @@ $HOME/NAM84, and you want your bsp ouput in $HOME/docker-bsp-output/
 
 
     docker run --rm -ti \
-        -v $HOME/code/pnwairfire-bluesky/:/pnwairfire-bluesky/  \
+        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
+        -e PYTHONPATH=/bluesky/ \
+        -e PATH=/bluesky/bin/:$PATH \
         -v $HOME/NAM84/:/NAM84/ \
         -v $HOME/docker-bsp-output/:/bsp-output/ \
-        -w /pnwairfire-bluesky/ \
-        bluesky-base bash
+        -w /bluesky/ \
+        bluesky bash
 
-Note that the above command, with the '-w /pnwairfire-bluesky/' option, puts
+Note that the above command, with the '-w /bluesky/' option, puts
 you in the bluesky repo root directory. Now, you can run bsp and step into
 the code as you normally would in development. E.g.:
 
@@ -1973,6 +1963,10 @@ the code as you normally would in development. E.g.:
         -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM25-compute-grid-km.json \
          ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet \
          plumerising dispersion visualization export | python -m json.tool > out.json
+
+(The './bin/' is not actually necessary in this example, since we put the
+repo bin directory at the head of the PATH env var, but it doesn't hurt to
+have it.)
 
 ### Notes about using Docker
 
@@ -1983,6 +1977,7 @@ directory seems to result in the directories appearing empty in the
 docker container. Whether this is by design or not, you apparently need to
 mount directories under your home directory.  Sym links don't mount either, so
 you have to cp or mv directories under your home dir in order to mount them.
+(This may only be an issue when using docker toolbox on Mac or Windows.)
 
 #### Cleanup
 
