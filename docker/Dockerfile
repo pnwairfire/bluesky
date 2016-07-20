@@ -1,17 +1,19 @@
-# Container with all of bluesky's dependencies, to be used
-# as dev environment and as base for container in which bluesky
-# is to be installed.
+# Container with bluesky and all of it's dependencies.
 #
 # Example of how to use in dev environment, assuming you've built the
-# image with tag 'bluesky-base':
+# image with tag 'bluesky':
 #
-#   docker run --name bluesky-base \
-#      -v /path/to/bluesky/repo/:/bluesky/ -w /bluesky/ \
-#      bluesky-base pip3 install --no-binary gdal \
-#      --trusted-host pypi.smoke.airfire.org -r requirements.txt
-#   docker commit bluesky-base bluesky-base
-#   docker run -v /path/to/bluesky/repo/:/bluesky/ \
-#      bluesky-base /bluesky/bin/bsp ...
+#   docker run --rm -i \
+#      -v /path/to/bluesky/repo/:/bluesky/ \
+#      -e PYTHONPATH=/bluesky/ \
+#      -e PATH=/bluesky/bin/:$PATH \
+#      -w /bluesky/ \
+#      bluesky ./bin/bsp ...
+#
+# And an example of how to use already installed bsp
+#
+#  docker run --rm -i bluesky bsp ...
+
 
 FROM ubuntu:16.04
 MAINTAINER Joel Dubowy
