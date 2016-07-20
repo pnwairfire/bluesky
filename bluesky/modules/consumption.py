@@ -153,4 +153,4 @@ def _validate_input(fires_manager):
 
             for fb in fire.fuelbeds:
                 if not fb.get('fccs_id') or not fb.get('pct'):
-                    raise ValueError("Each fuelbed must define 'id' and 'pct'")
+                    raise ValueError("Each fuelbed must define 'fccs_id' and 'pct'")
