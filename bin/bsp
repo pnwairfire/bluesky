@@ -100,7 +100,7 @@ OPTIONAL_ARGS = [
         'long': '--version',
         'dest': 'version',
         'action': 'store_true',
-        'help': "Output bluesky version and exit.",
+        'help': "Output bluesky package version and exit.",
         'default': False
     },
     {
