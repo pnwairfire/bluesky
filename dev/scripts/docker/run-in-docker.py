@@ -95,20 +95,22 @@ if __name__ == "__main__":
             '-e', 'PATH=/bluesky-repo/bin/:$PATH'
         ]
 
-        if args.config_file:
-            cmd_args.extend(['-c', args.config_file])
-
         for d in args.mount_dirs:
             dirs = d.split(':')
             h, c = (dirs[0], dirs[1]) if len(dirs) == 2 else (dirs, dirs)
             cmd_args.extend([
                 '-v', '{}:{}'.format(h, c)
             ])
+
         cmd_args.extend([
             'bluesky',
             './bin/bsp',
             '--log-level', args.log_level
         ])
+
+        if args.config_file:
+            cmd_args.extend(['-c', args.config_file])
+
         cmd_args.extend(args.modules)
         if args.pretty_format:
             cmd_args.extend(['|', 'python', '-m', 'json.tool'])
