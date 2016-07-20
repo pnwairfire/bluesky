@@ -10,27 +10,14 @@ import traceback
 
 from pyairfire import scripting
 
-DOCKER_IMAGE_NAMES = {
-    "base": "bluesky-base",
-    "complete": "bluesky"
-}
-VALID_IMAGES_STR = ', '.join(list(DOCKER_IMAGE_NAMES.keys()))
-
-REQUIRED_ARGS = [
-    {
-        'short': '-i',
-        'long': '--image',
-        'help': "docker image to build ({})".format(VALID_IMAGES_STR)
-    }
-]
-
 DEFAULT_BIN_DIR = os.path.join(os.path.expanduser("~"), 'bin')
+REQUIRED_ARGS = []
 OPTIONAL_ARGS = [
     {
         'short': '-n',
         'long': '--image-name',
-        'help': "name for image (defaults: {})".format(', '.join([
-            k+" -> '"+v +"'" for k,v in DOCKER_IMAGE_NAMES.items()]))
+        'help': "name for image (default: 'bluesky')",
+        'default': 'bluesky'
     },
     {
         'short': '-b',
@@ -42,12 +29,10 @@ OPTIONAL_ARGS = [
 ]
 
 EXAMPLES_STR = """
-Valid images: {valid_images}
-
 Examples:
-  $ ./dev/scripts/docker/build-docker-image.py --log-level=DEBUG -i base
-  $ ./dev/scripts/docker/build-docker-image.py --log-level=DEBUG -i complete -n bluesky
- """.format(valid_images=VALID_IMAGES_STR)
+  $ ./dev/scripts/docker/build-docker-image.py --log-level=DEBUG
+  $ ./dev/scripts/docker/build-docker-image.py --log-level=DEBUG -n foo-bluesky
+ """
 
 BINARIES = [
     'profile',
@@ -79,18 +64,6 @@ def _call(cmd_args):
             "Command '{}' returned error code {}".format(' '.join(cmd_args), r),
             exit_code=r)
 
-def _check_image(args):
-    if args.image not in DOCKER_IMAGE_NAMES:
-        scripting.utils.exit_with_msg(
-            "Invalid image: {} (valid options: {})".format(
-            args.image, VALID_IMAGES_STR))
-
-    args.image_name = args.image_name or DOCKER_IMAGE_NAMES[args.image]
-
-    # TODO: check if image exists; if so, prompt to confirm if user
-    #   wants to continue or abort and ddelete first (don't have this script
-    #   delete image)
-
 def _check_binaries_list(args):
     # make sure bin dir exists and that each exe exists
     if not os.path.isdir(args.bin_dir):
@@ -111,8 +84,7 @@ def _pre_clean():
     pass
 
 def _build(args):
-    dockerfile_pathname = os.path.join(REPO_ROOT_DIR, 'docker', args.image,
-        'Dockerfile')
+    dockerfile_pathname = os.path.join(REPO_ROOT_DIR, 'docker', 'Dockerfile')
     _call(['docker','build', '-t', args.image_name, '-f', dockerfile_pathname,
         REPO_ROOT_DIR])
 
@@ -140,7 +112,6 @@ if __name__ == "__main__":
     parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
 
-    _check_image(args)
     _check_binaries_list(args)
 
     _pre_clean()
