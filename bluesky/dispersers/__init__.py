@@ -179,7 +179,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                 #   (just make sure each phase is defined, and set total to sum)
                 heat = None
                 heat_values = list(itertools.chain.from_iterable(
-                    [fb.get('heat', {}).get('total') for fb in fire.fuelbeds]))
+                    [fb.get('heat', {}).get('total', [None]) for fb in fire.fuelbeds]))
                 if not any([v is None for v in heat_values]):
                     heat = sum(heat_values)
                     if heat < 1.0e-6:
