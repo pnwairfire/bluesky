@@ -116,6 +116,8 @@ class FireIngester(object):
             if k.startswith(self.SPECIAL_FIELD_METHOD_PREFIX):
                 getattr(self, k)(fire)
 
+        self._process_location(fire)
+
         self._ingest_custom_fields(fire)
         self._set_defaults(fire)
         self._validate(fire)
@@ -205,25 +207,33 @@ class FireIngester(object):
     # remove dupes
     OPTIONAL_LOCATION_FIELDS = list(set(OPTIONAL_LOCATION_FIELDS))
 
-    def _ingest_nested_field_location(self, fire):
-        # TODO: validate fields
-        # TODO: look for fields either in 'location' key or at top level
-        perimeter = self._get_field('perimeter', 'location')
-        lat = self._get_field('latitude', 'location')
-        lng = self._get_field('longitude', 'location')
-        area = self._get_field('area', 'location')
+    def _get_base_location_object(perimeter, lat, lng, area):
         if perimeter:
-            fire['location'] = {
+            return {
                 'perimeter': perimeter
             }
-        elif lat and lng and area:
-            fire['location'] = {
+        elif lat is not None and lng is not None and area:
+            return {
                 'latitude': lat,
                 'longitude': lng,
                 'area': area
             }
         else:
-            raise ValueError("Fire object must define perimeter or lat+lng+area")
+            # We'll check later to ensure that lat/lng + area or perimeter is
+            # specified either in top level or per growth object (but not both)
+            return {}
+
+
+    def _ingest_nested_field_location(self, fire):
+        # TODO: validate fields
+
+        # look for fields either in 'location' key or at top level
+        fire['location'] = self._get_base_location_object(
+            self._get_field('perimeter', 'location'),
+            self._get_field('latitude', 'location'),
+            self._get_field('longitude', 'location'),
+            self._get_field('area', 'location')
+        )
 
         fire['location'].update(self._get_fields('location',
             self.OPTIONAL_LOCATION_FIELDS))
@@ -253,6 +263,24 @@ class FireIngester(object):
     GROWTH_FIELDS = ['start','end', 'pct']
     OPTIONAL_GROWTH_FIELDS = ['localmet', 'timeprofile', 'plumerise']
 
+    def _ingest_growth_location(self, src):
+        # only look in growth object for location fields; don't look
+        base_fields = []
+        for f in ['perimeter', 'lat', 'lng', 'area']:
+            v = src.get(f)
+            if v is None and 'location' in src:
+                v = src['location'].get(f)
+            base_fields.append(v)
+        location = self._get_base_location_object(base_fields)
+
+        for f in self.OPTIONAL_LOCATION_FIELDS:
+            v = src.get(f)
+            if v is None and 'location' in src:
+                v = src['location'].get(f)
+                if v is not None:
+                    location[f] = v
+        growth[-1]['location'] = location
+
     def _ingest_optional_growth_fields(self, growth, src):
         for f in self.OPTIONAL_GROWTH_FIELDS:
             v = src.get(f)
@@ -276,9 +304,13 @@ class FireIngester(object):
                 growth.append({})
                 for f in self.GROWTH_FIELDS:
                     if not g.get(f):
-                        raise ValueError("Missing groth field: '{}'".format(f))
+                        raise ValueError("Missing growth field: '{}'".format(f))
                     growth[-1][f] = g[f]
                 self._ingest_optional_growth_fields(growth, g)
+                self._ingest_growth_location(growth)
+                # TODO: make sure calling _ingest_nested_field_fuelbeds on g
+                #   has the desired effect
+                self._ingest_nested_field_fuelbeds(g)
 
         if growth:
             if len(growth) == 1 and 'pct' not in growth[0]:
@@ -387,3 +419,53 @@ class FireIngester(object):
                 except Exception as e:
                     logging.warn("Failed to parse 'date_time' value %s",
                         date_time)
+
+    ##
+    ## Special Field Ingest Methods
+    ##
+
+    def _process_location(self, fire):
+        """
+
+        """
+        def _has_base_location(obj):
+            return not not (obj['location'].get('perimeter')
+                or obj['location'].get('lat'))
+        # make sure lat+lng+area or perimeter is either defined
+        # at the top level location or in each of the growh object
+        # Note: just need to check one of 'lat', 'lng'm or 'area'
+        #  (since one being defined implies all are defined)
+        has_top_level_base_location = _has_base_location(fire)
+        if fire.get('growth'):
+            if fire['location'].get('perimeter') and len(fire['growth']) > 1:
+                raise ValueError("Can't assign fire perimeter to mutiple growth windows")
+            for g in fire.growth:
+                if has_top_level_base_location == _has_base_location(g):
+                    raise ValueError("Perimeter or lat+lng+area must be "
+                        "defined for the entire fire or for each growth "
+                        "object, not both")
+                if has_top_level_base_location:
+                    if fire['location'].get('perimeter'):
+                        g['location']['perimeter'] = fire['location']['perimeter']
+                    else:
+                        fire[''] ....
+
+                for f in self.OPTIONAL_LOCATION_FIELDS:
+                    if f in fire['location'] and f not in g['location']:
+                        g['location'][f] = fire['location'][f]
+        else:
+            if not has_top_level_base_location:
+                raise ValueError("Perimeter or lat+lng+area must be defined"
+                    "for the entire fire if no growth windows are defined")
+            # TODO: create growth object and copy over top level location
+
+        # delete top level location, since each growth obejct should have it now
+        fire.pop('location', None)
+
+
+    def _process_fuelbeds(self, fire):
+        """
+
+        """
+        if fire.get('fuelbeds'):
+            if any(growth)
