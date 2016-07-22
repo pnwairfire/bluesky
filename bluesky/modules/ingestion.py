@@ -544,6 +544,9 @@ class FireIngester(object):
 
         Makes sure either lat+lng+area or perimeter is defined either at the
         top level location or in each of the growh objects.
+
+        TODO: restructure this method; maybe break up into multiple methods
+        and encapsulate in a class
         """
         def _get_base_location(obj):
             if obj.get('location'):
@@ -603,7 +606,14 @@ class FireIngester(object):
                     g['location'] = g_base_location
                     _copy_optional_location_fields(old_g_location, g['location'])
 
-                # TODO: Move fuelbeds information into growth objects
+                if fire.get('fuelbeds'):
+                    # just copy over fuelbeds; there's no need to adjust
+                    # percentages, since they apply to the growth's area (not
+                    # the fire's total area), and we'll assume the same
+                    # percentages for each growth object
+                    g['fuelbeds'] = fire['fuelbeds']
+                # else, whether or not fuelbeds are defined in the growth
+                # object, do nothing (leave it as is if defined)
         else:
             if not top_level_base_location:
                 raise ValueError("Perimeter or lat+lng+area must be defined"
@@ -617,8 +627,10 @@ class FireIngester(object):
                 fire['growth'][0]['fuelbeds'] = fire['fuelbeds']
 
 
-        # delete top level location, since each growth obejct should have it now
+        # delete top level location and fuelbeds, since each growth obejct
+        # should have them now
         fire.pop('location', None)
+        fire.pop('fuelbeds', None)
 
     ##
     ## Validation
