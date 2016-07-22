@@ -344,7 +344,7 @@ class FireIngester(object):
 
     ## 'location'
 
-    def _get_base_location_object(perimeter, lat, lng, area):
+    def _get_base_location_object(self, perimeter, lat, lng, area):
         if perimeter:
             return {
                 'perimeter': perimeter
@@ -403,12 +403,12 @@ class FireIngester(object):
     def _ingest_growth_location(self, src):
         # only look in growth object for location fields; don't look
         base_fields = []
-        for f in ['perimeter', 'lat', 'lng', 'area']:
+        for f in ['perimeter', 'latitude', 'longitude', 'area']:
             v = src.get(f)
             if v is None and 'location' in src:
                 v = src['location'].get(f)
             base_fields.append(v)
-        location = self._get_base_location_object(base_fields)
+        location = self._get_base_location_object(*base_fields)
 
         for f in OPTIONAL_LOCATION_FIELDS:
             v = src.get(f)
@@ -416,7 +416,7 @@ class FireIngester(object):
                 v = src['location'].get(f)
                 if v is not None:
                     location[f] = v
-        growth[-1]['location'] = location
+        src['location'] = location
 
     def _ingest_optional_growth_fields(self, growth, src):
         for f in self.OPTIONAL_GROWTH_FIELDS:
@@ -444,7 +444,7 @@ class FireIngester(object):
                         raise ValueError(IngestionErrMsgs.MISSING_GROWH_FIELD.format(f))
                     growth[-1][f] = g[f]
                 self._ingest_optional_growth_fields(growth, g)
-                self._ingest_growth_location(growth)
+                self._ingest_growth_location(g)
                 # TODO: make sure calling _ingest_nested_field_fuelbeds on g
                 #   has the desired effect
                 self._ingest_nested_field_fuelbeds(g)
@@ -583,8 +583,8 @@ class FirePostProcessor(object):
             # Note: at this point in the code, the following should always be
             # true (since FireIngester wouldn't have createdd the 'location'
             # object unless either the perimeter or lat+lng+area was defined)
-            elif all([obj['location'].get(f) is not None for f in ('lat', 'lng', 'area')]):
-                return {f: obj['location'][f] for f in ('lat', 'lng', 'area'))
+            elif all([obj['location'].get(f) is not None for f in ('latitude', 'longitude', 'area')]):
+                return {f: obj['location'][f] for f in ('latitude', 'longitude', 'area')}
         # else returns None
 
     def _copy_optional_location_fields(self, fire_location, growth_location):
@@ -609,13 +609,14 @@ class FirePostProcessor(object):
         TODO: restructure this method; maybe break up into multiple methods
         and encapsulate in a class
         """
+        fire = self._fire
         top_level_base_location = self._get_base_location(fire)
         if fire.get('growth'):
             num_growth_objects = len(fire['growth'])
             if fire['location'].get('perimeter') and num_growth_objects > 1:
                 raise ValueError(IngestionErrMsgs.ONE_PERIMETER_MULTIPLE_GROWTH)
 
-            for g in fire.growth:
+            for g in fire['growth']:
                 g_pct = g.pop('pct', None)
                 g_base_location = self._get_base_location(g)
 
@@ -624,7 +625,7 @@ class FirePostProcessor(object):
                 if not not fire.get('fuelbeds') and not not g.get('fuelbeds'):
                     raise ValueError(IngestionErrMsgs.FUELBEDS_AT_TOP_OR_PER_GROWTH)
 
-                if has_top_level_base_location:
+                if top_level_base_location:
                     # initialize with base location; if it's a perimeter, then
                     # we know this is the only growth object given the check
                     # above; if it's lat+lng+area, we'll adjust the growth
