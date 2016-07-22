@@ -234,11 +234,13 @@ class FireIngester(object):
             if k.startswith(self.SPECIAL_FIELD_METHOD_PREFIX):
                 getattr(self, k)(fire)
 
-        self._process_location(fire)
+        self._process_growth_locations_and_fuelbeds(fire)
 
         self._ingest_custom_fields(fire)
         self._set_defaults(fire)
+
         self._validate(fire)
+
         return self._parsed_input
 
     ##
@@ -253,11 +255,6 @@ class FireIngester(object):
     def _set_defaults(self, fire):
         # TODO: set defaults for any fields that aren't defined; make the
         # defaults configurable, and maybe hard code any
-        pass
-
-    def _validate(self, fire):
-        # TODO: make sure required fields are all defined, and validate
-        # values not validated by nested field specific _ingest_* methods
         pass
 
     def _get_field(self, key, section=None):
@@ -378,8 +375,8 @@ class FireIngester(object):
 
     ## 'growth'
 
-    GROWTH_FIELDS = ['start','end', 'pct']
-    OPTIONAL_GROWTH_FIELDS = ['localmet', 'timeprofile', 'plumerise']
+    GROWTH_FIELDS = []
+    OPTIONAL_GROWTH_FIELDS = ['start','end', 'pct', 'localmet', 'timeprofile', 'plumerise']
 
     def _ingest_growth_location(self, src):
         # only look in growth object for location fields; don't look
@@ -539,51 +536,103 @@ class FireIngester(object):
                         date_time)
 
     ##
-    ## Special Field Ingest Methods
+    ## Post Processing of Ingested data
     ##
 
-    def _process_location(self, fire):
-        """
+    def _process_growth_locations_and_fuelbeds(self, fire):
+        """Move location information from top level into growth objects.
 
+        Makes sure either lat+lng+area or perimeter is defined either at the
+        top level location or in each of the growh objects.
         """
-        def _has_base_location(obj):
-            return not not (obj['location'].get('perimeter')
-                or obj['location'].get('lat'))
-        # make sure lat+lng+area or perimeter is either defined
-        # at the top level location or in each of the growh object
-        # Note: just need to check one of 'lat', 'lng'm or 'area'
-        #  (since one being defined implies all are defined)
-        has_top_level_base_location = _has_base_location(fire)
+        def _get_base_location(obj):
+            if obj.get('location'):
+                if obj['location'].get('perimeter'):
+                    return {'perimeter': obj['location'].get('perimeter')}
+                elif all([obj['location'].get(f) is not None for f in ('lat', 'lng', 'area')]):
+                    return {f: obj['location'][f] for f in ('lat', 'lng', 'area'))
+            # else returns None
+
+        def _copy_optional_location_fields(fire_location, growth_location):
+            if fire_location:
+                for f in self.OPTIONAL_LOCATION_FIELDS:
+                    if f in fire_location and f not in growth_location:
+                        growth_location[f] = fire_location[f]
+
+        top_level_base_location = _get_base_location(fire)
         if fire.get('growth'):
-            if fire['location'].get('perimeter') and len(fire['growth']) > 1:
+            num_growth_objects = len(fire['growth'])
+            if fire['location'].get('perimeter') and num_growth_objects > 1:
                 raise ValueError("Can't assign fire perimeter to mutiple growth windows")
+
             for g in fire.growth:
-                if has_top_level_base_location == _has_base_location(g):
+                g_pct = g.pop('pct', None)
+                g_base_location = _get_base_location(g)
+
+                if not not top_level_base_location == not not g_base_location:
                     raise ValueError("Perimeter or lat+lng+area must be "
                         "defined for the entire fire or for each growth "
                         "object, not both")
-                if has_top_level_base_location:
-                    if fire['location'].get('perimeter'):
-                        g['location']['perimeter'] = fire['location']['perimeter']
-                    else:
-                        fire[''] ....
+                if not not fire.get('fuelbeds') and not not g.get('fuelbeds'):
+                    raise ValueError("Fuelbeds may be defined for the entire "
+                        "fire or for each growth object, or for neither, not both")
 
-                for f in self.OPTIONAL_LOCATION_FIELDS:
-                    if f in fire['location'] and f not in g['location']:
-                        g['location'][f] = fire['location'][f]
+                if has_top_level_base_location:
+                    # initialize with base location; if it's a perimeter, then
+                    # we know this is the only growth object given the check
+                    # above; if it's lat+lng+area, we'll adjust the growth
+                    # objets portion of the area
+                    g['location'] = top_level_base_location
+                    if fire['location'].get('area'):
+                        # This must be the old, deprecated growth and location
+                        # structure, so the growth object should either have
+                        # 'pct' defined or be th eonly growth object
+                        if not g_pct and num_growth_objects == 1:
+                            g_pct = 100
+                        else:
+                            raise ValueError("Growth percentage, 'pct', must be"
+                                " defined if there are more than one growth objects"
+                                " and location is defined at the fire's top level.")
+                        g['location']['area'] *= g_pct / 100.0
+
+                    _copy_optional_location_fields(fire['location'], g['location'])
+                else:
+                    # prune growth object's location so that it has the base
+                    # location info plus optional fields
+                    old_g_location = g.pop('location')
+                    g['location'] = g_base_location
+                    _copy_optional_location_fields(old_g_location, g['location'])
+
+                # TODO: Move fuelbeds information into growth objects
         else:
-            if not has_top_level_base_location:
+            if not top_level_base_location:
                 raise ValueError("Perimeter or lat+lng+area must be defined"
                     "for the entire fire if no growth windows are defined")
-            # TODO: create growth object and copy over top level location
+            fire['growth'] = [{
+                'location': top_level_base_location
+            }]
+            _copy_optional_location_fields(fire['location'],
+                fire['growth'][0]['location'])
+            if fire.get('fuelbeds'):
+                fire['growth'][0]['fuelbeds'] = fire['fuelbeds']
+
 
         # delete top level location, since each growth obejct should have it now
         fire.pop('location', None)
 
+    ##
+    ## Validation
+    ##
 
-    def _process_fuelbeds(self, fire):
-        """
+    def _validate(self, fire):
+        # TODO: make sure required fields are all defined, and validate
+        # values not validated by nested field specific _ingest_* methods
+        self._validate_growth(fire)
 
+    def _validate_growth(self, fire):
+        """Provides extravalidation of growthinformation
+
+        The ingest_ and process_ methods, above, already provide some
+        validation
         """
-        if fire.get('fuelbeds'):
-            if any(growth)
+        pass
