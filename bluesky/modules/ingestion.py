@@ -1,4 +1,122 @@
-"""bluesky.modules.ingestion"""
+"""bluesky.modules.ingestion
+
+Inputs data in a variety of formats, and produces data structured like the
+following:
+
+{
+    "fire_information": [
+        {
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Yosemite, CA"
+            },
+            "id": "SF11C14225236095807750",
+            "type": "wildfire",
+            "growth": [
+                {
+                    "start": "2014-05-29T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "location": {
+                        "area": 10000,
+                        "ecoregion": "western",
+                        "latitude": 37.909644,
+                        "longitude": -119.7615805,
+                        "utc_offset": "-07:00"
+                    }
+                }
+            ]
+        },
+        {
+            "event_of": {
+                "id": "sdfkj234kljfd",
+                "name": "Natural Fire in North Tahoe"
+            },
+            "id": "sdk2risodijfdsf",
+            "type": "wildfire",
+            "growth": [
+                {
+                    "start": "2014-05-29T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "location": {
+                        "ecoregion": "western",
+                        "utc_offset": "-07:00",
+                        "perimeter": {
+                            "type": "MultiPolygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ]
+                                ]
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
+
+# Supported Input formats:
+
+ 1) Data already structured like that above
+ 2) Flat dict; e.g.:
+
+        {
+            "area": 199.999999503,
+            "latitude": 26.286,
+            "longitude": -77.118,
+            "date_time": "201405290000Z",
+            ...
+        }
+ 3) Deprecated bluesky fire structure; e.g.
+        {
+            "id": "SF11C14225236095807750",
+            "event_of": {
+                "id": "sdfkj234kljfd",
+                "name": "Prescribed burn in the bahamas"
+            },
+            "type": "Rx",
+            "location": {
+                "latitude": 25.041,
+                "longitude": -77.379,
+                "area": 99.9999997516,
+                "ecoregion": "western",
+                "utc_offset": "-05:00"
+            },
+            "growth": [
+                {
+                    "start": "2015-01-20T19:00:00",
+                    "end": "2015-01-21T19:00:00"
+                }
+            ]
+        }
+
+  4) Hybrids of the above formats; e.g.
+        {
+            "id": "SF11C14225236095807750",
+            "event_id": "SF11E826544",
+            "name": "Prescribed burn in the bahamas",
+            "type": "Rx",
+            "location": {
+                "latitude": 25.041,
+                "longitude": -77.379,
+                "area": 99.9999997516,
+                "ecoregion": "western",
+                "utc_offset": "-05:00"
+            },
+            "growth": [
+                {
+                    "start": "2015-01-20T19:00:00",
+                    "end": "2015-01-21T19:00:00"
+                }
+            ]
+        }
+"""
 
 __author__ = "Joel Dubowy"
 
