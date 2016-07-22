@@ -446,7 +446,7 @@ class FireIngester(object):
 
         if growth:
             if len(growth) == 1 and 'pct' not in growth[0]:
-                growth[0] = 100.0
+                growth[0]['pct'] = 100.0
             # TODO: make sure percentages add up to 100.0, with allowable error
             fire['growth'] = growth
 
