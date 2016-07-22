@@ -29,12 +29,14 @@ def run(fires_manager):
         fccsmap_version=fccsmap.__version__)
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            # TODO: instead of instantiating a new FccsLookUp and Estimator for
-            # each fire, create AK and non-AK lookup and estimator objects that
-            # are reused, and set reference to correct one here
-            lookup = FccsLookUp(is_alaska=fire['location'].get('state')=='AK',
-                fccs_version=FCCS_VERSION)
-            Estimator(lookup).estimate(fire)
+            for g in fire['growth']:
+                # TODO: instead of instantiating a new FccsLookUp and Estimator
+                #   for each growth object, create AK and non-AK lookup and
+                #   estimator objects that are reused, and set reference to
+                #   correct one here
+                lookup = FccsLookUp(is_alaska=g['location'].get('state')=='AK',
+                    fccs_version=FCCS_VERSION)
+                Estimator(lookup).estimate(g)
 
     # TODO: Add fuel loadings data to each fuelbed object (????)
     #  If we do so here, use bluesky.modules.consumption.FuelLoadingsManager
@@ -53,10 +55,12 @@ def summarize(fires):
         return []
 
     area_by_fccs_id = defaultdict(lambda: 0)
+    total_area = 0
     for fire in fires:
-        for fb in fire.fuelbeds:
-            area_by_fccs_id[fb['fccs_id']] += (fb['pct'] / 100.0) * fire['location']['area']
-    total_area = reduce(lambda a, b: a + b, [fire['location']['area'] for fire in fires])
+        for g in fire['growth']:
+            for fb in g.fuelbeds:
+                area_by_fccs_id[fb['fccs_id']] += (fb['pct'] / 100.0) * g['location']['area']
+                total_area += g['location']['area']
     summary = [{"fccs_id": fccs_id, "pct": (area / total_area) * 100.0}
         for fccs_id, area in area_by_fccs_id.items()]
     return sorted(summary, key=lambda a: a["fccs_id"])
@@ -76,11 +80,11 @@ class Estimator(object):
     def __init__(self, lookup):
         self.lookup = lookup
 
-    def estimate(self, fire):
+    def estimate(self, growth_obj):
         """Estimates fuelbed composition based on lat/lng or perimeter vector
         data.
 
-        If fire['location']['perimeter'] is defined, it will look something like
+        If growth_obj['location']['perimeter'] is defined, it will look something like
         the following:
 
             {
@@ -98,22 +102,22 @@ class Estimator(object):
                 ]
             }
         """
-        if not fire.get('location'):
+        if not growth_obj.get('location'):
             raise ValueError("Insufficient data for looking up fuelbed information")
 
         fuelbed_info = {}
-        if fire['location'].get('shape_file'):
+        if growth_obj['location'].get('shape_file'):
             raise NotImplementedError("Importing of shape data from file not implemented")
-        if fire['location'].get('perimeter'):
-            fuelbed_info = self.lookup.look_up(fire['location']['perimeter'])
+        if growth_obj['location'].get('perimeter'):
+            fuelbed_info = self.lookup.look_up(growth_obj['location']['perimeter'])
             # fuelbed_info['area'] is in m^2
-            # TDOO: only use fuelbed_info['area'] if fire['location']['area']
+            # TDOO: only use fuelbed_info['area'] if growth_obj['location']['area']
             # isn't already defined?
             if fuelbed_info:
-                fire['location']['area'] = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
-        elif fire['location'].get('latitude') and fire['location'].get('longitude'):
+                growth_obj['location']['area'] = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
+        elif growth_obj['location'].get('latitude') and growth_obj['location'].get('longitude'):
             fuelbed_info = self.lookup.look_up_by_lat_lng(
-                fire['location']['latitude'], fire['location']['longitude'])
+                growth_obj['location']['latitude'], growth_obj['location']['longitude'])
         else:
             raise ValueError("Insufficient data for looking up fuelbed information")
 
@@ -125,34 +129,34 @@ class Estimator(object):
             raise RuntimeError("Fuelbed percentages don't add up to 100% - {fuelbeds}".format(
                 fuelbeds=fuelbed_info['fuelbeds']))
 
-        fire['fuelbeds'] = [{'fccs_id':f, 'pct':d['percent']}
+        growth_obj['fuelbeds'] = [{'fccs_id':f, 'pct':d['percent']}
             for f,d in fuelbed_info['fuelbeds'].items()]
 
-        self._truncate(fire)
-        self._adjust_percentages(fire)
+        self._truncate(growth_obj)
+        self._adjust_percentages(growth_obj)
 
     TRUNCATION_PERCENTAGE_THRESHOLD = 10
-    def _truncate(self, fire):
+    def _truncate(self, growth_obj):
         """Sorts fuelbeds by decreasing percentage, and
 
         Sort fuelbeds by decreasing percentage, and then use all
         fuelbeds up to 90% coverage (make that configurable, but default to
-        90%), and then adjust percentages of included fires so that total is 100%.
-        ex. if 3 fires, 85%, 8%, and 7%, use only the first and second, and then
+        90%), and then adjust percentages of included growth_objs so that total is 100%.
+        ex. if 3 growth_objs, 85%, 8%, and 7%, use only the first and second, and then
           85% -> 85% * 100 / (100 - 7) = 91.4%
           8% -> 7% * 100 / (100 - 7) = 8.6%
         """
-        if not fire['fuelbeds']:
+        if not growth_obj['fuelbeds']:
             return
 
         # TDOO: make sure percentages add up to 100%
-        fire['fuelbeds'].sort(key=lambda fb: fb['pct'])
-        fire['fuelbeds'].reverse()
+        growth_obj['fuelbeds'].sort(key=lambda fb: fb['pct'])
+        growth_obj['fuelbeds'].reverse()
         total_popped_pct = 0
-        while total_popped_pct + fire['fuelbeds'][-1]['pct'] < self.TRUNCATION_PERCENTAGE_THRESHOLD:
-            total_popped_pct += fire['fuelbeds'].pop()['pct']
+        while total_popped_pct + growth_obj['fuelbeds'][-1]['pct'] < self.TRUNCATION_PERCENTAGE_THRESHOLD:
+            total_popped_pct += growth_obj['fuelbeds'].pop()['pct']
 
-    def _adjust_percentages(self, fire):
-        total_pct = sum([fb['pct'] for fb in fire['fuelbeds']])
-        for fb in fire['fuelbeds']:
+    def _adjust_percentages(self, growth_obj):
+        total_pct = sum([fb['pct'] for fb in growth_obj['fuelbeds']])
+        for fb in growth_obj['fuelbeds']:
             fb['pct'] *= 100.0 / total_pct
