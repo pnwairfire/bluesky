@@ -163,6 +163,28 @@ def run(fires_manager):
         raise
 
 
+class IngestionErrMsgs(object):
+    MULTIPLE_GROWTH_NO_PCT = ("Growth percentage, 'pct', must be"
+        " defined if there are more than one growth objects"
+        " and location is defined at the fire's top level.")
+
+    NO_DATA = "Fire contains no data"
+
+    ONE_PERIMETER_MULTIPLE_GROWTH = ("Can't assign fire perimeter to mutiple "
+        "growth windows")
+
+    BASE_LOCATION_AT_TOP_OR_PER_GROWTH = ("Perimeter or lat+lng+area must be "
+        "defined for the entire fire or for each growth object, not both")
+
+    FUELBEDS_AT_TOP_OR_PER_GROWTH = ("Fuelbeds may be defined for the entire "
+        "fire or for each growth object, or for neither, not both")
+
+    NO_GROWTH_OR_BASE_LOCATION = ("Perimeter or lat+lng+area must be defined"
+        "for the entire fire if no growth windows are defined")
+
+    MISSING_GROWH_FIELD = "Missing growth field: '{}'"
+
+
 OPTIONAL_LOCATION_FIELDS = [
     "ecoregion",
     # utc_offset is for the most part required by modules using met data
@@ -246,7 +268,7 @@ class FireIngester(object):
 
     def ingest(self, fire):
         if not fire:
-            raise ValueError("Fire contains no data")
+            raise ValueError(IngestionErrMsgs.NO_DATA)
 
         # move original data under 'input key'
         self._parsed_input = { k: fire.pop(k) for k in list(fire.keys()) }
@@ -419,7 +441,7 @@ class FireIngester(object):
                 growth.append({})
                 for f in self.GROWTH_FIELDS:
                     if not g.get(f):
-                        raise ValueError("Missing growth field: '{}'".format(f))
+                        raise ValueError(IngestionErrMsgs.MISSING_GROWH_FIELD.format(f))
                     growth[-1][f] = g[f]
                 self._ingest_optional_growth_fields(growth, g)
                 self._ingest_growth_location(growth)
@@ -591,19 +613,16 @@ class FirePostProcessor(object):
         if fire.get('growth'):
             num_growth_objects = len(fire['growth'])
             if fire['location'].get('perimeter') and num_growth_objects > 1:
-                raise ValueError("Can't assign fire perimeter to mutiple growth windows")
+                raise ValueError(IngestionErrMsgs.ONE_PERIMETER_MULTIPLE_GROWTH)
 
             for g in fire.growth:
                 g_pct = g.pop('pct', None)
                 g_base_location = self._get_base_location(g)
 
-                if not not top_level_base_location == not not g_base_location:
-                    raise ValueError("Perimeter or lat+lng+area must be "
-                        "defined for the entire fire or for each growth "
-                        "object, not both")
+                if (not not top_level_base_location) == (not not g_base_location):
+                    raise ValueError(IngestionErrMsgs.BASE_LOCATION_AT_TOP_OR_PER_GROWTH)
                 if not not fire.get('fuelbeds') and not not g.get('fuelbeds'):
-                    raise ValueError("Fuelbeds may be defined for the entire "
-                        "fire or for each growth object, or for neither, not both")
+                    raise ValueError(IngestionErrMsgs.FUELBEDS_AT_TOP_OR_PER_GROWTH)
 
                 if has_top_level_base_location:
                     # initialize with base location; if it's a perimeter, then
@@ -618,9 +637,8 @@ class FirePostProcessor(object):
                         if not g_pct and num_growth_objects == 1:
                             g_pct = 100
                         else:
-                            raise ValueError("Growth percentage, 'pct', must be"
-                                " defined if there are more than one growth objects"
-                                " and location is defined at the fire's top level.")
+                            raise ValueError(
+                                IngestionErrMsgs.MULTIPLE_GROWTH_NO_PCT)
                         g['location']['area'] *= g_pct / 100.0
 
                     self._copy_optional_location_fields(fire['location'], g['location'])
@@ -641,8 +659,7 @@ class FirePostProcessor(object):
                 # object, do nothing (leave it as is if defined)
         else:
             if not top_level_base_location:
-                raise ValueError("Perimeter or lat+lng+area must be defined"
-                    "for the entire fire if no growth windows are defined")
+                raise ValueError(IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION)
             fire['growth'] = [{
                 'location': top_level_base_location
             }]
