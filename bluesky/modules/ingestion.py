@@ -397,7 +397,6 @@ class FireIngester(object):
 
     ## 'growth'
 
-    GROWTH_FIELDS = []
     OPTIONAL_GROWTH_FIELDS = ['start','end', 'pct', 'localmet', 'timeprofile', 'plumerise']
 
     def _ingest_growth_location(self, src):
@@ -439,10 +438,6 @@ class FireIngester(object):
         else:
             for g in self._parsed_input['growth']:
                 growth.append({})
-                for f in self.GROWTH_FIELDS:
-                    if not g.get(f):
-                        raise ValueError(IngestionErrMsgs.MISSING_GROWH_FIELD.format(f))
-                    growth[-1][f] = g[f]
                 self._ingest_optional_growth_fields(growth, g)
                 self._ingest_growth_location(g)
                 # TODO: make sure calling _ingest_nested_field_fuelbeds on g
