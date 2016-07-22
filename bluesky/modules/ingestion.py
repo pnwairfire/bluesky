@@ -162,6 +162,39 @@ def run(fires_manager):
         fires_manager.processed(__name__, __version__)
         raise
 
+
+OPTIONAL_LOCATION_FIELDS = [
+    "ecoregion",
+    # utc_offset is for the most part required by modules using met data
+    # (but not exclusively; e.g. FEPS plumerise uses it)
+    "utc_offset",
+    # SF2 weather, moisture, etc. fields
+    'elevation','slope',
+    'state','county','country',
+    'fuel_1hr','fuel_10hr','fuel_100hr',
+    'fuel_1khr','fuel_10khr','fuel_gt10khr',
+    'canopy','shrub','grass','rot','duff', 'litter',
+    'moisture_1hr','moisture_10hr',
+    'moisture_100hr','moisture_1khr',
+    'moisture_live','moisture_duff',
+    'min_wind','max_wind',
+    'min_wind_aloft', 'max_wind_aloft',
+    'min_humid','max_humid',
+    'min_temp','max_temp',
+    'min_temp_hour','max_temp_hour',
+    'sunrise_hour','sunset_hour',
+    'snow_month','rain_days'
+    # TODO: fill in others
+]
+for a in list(consumeutils.SETTINGS.values()):
+    for b in a:
+        OPTIONAL_LOCATION_FIELDS.append(b['field'])
+        if 'synonyms' in b:
+            OPTIONAL_LOCATION_FIELDS.extend(b['synonyms'])
+# remove dupes
+OPTIONAL_LOCATION_FIELDS = list(set(OPTIONAL_LOCATION_FIELDS))
+
+
 class FireIngester(object):
     """Inputs, transforms, and validates fire data, recording original copy
     under 'input' key.
@@ -234,12 +267,10 @@ class FireIngester(object):
             if k.startswith(self.SPECIAL_FIELD_METHOD_PREFIX):
                 getattr(self, k)(fire)
 
-        self._process_growth_locations_and_fuelbeds(fire)
-
         self._ingest_custom_fields(fire)
         self._set_defaults(fire)
 
-        self._validate(fire)
+        FirePostProcessor(fire).process()
 
         return self._parsed_input
 
@@ -291,37 +322,6 @@ class FireIngester(object):
 
     ## 'location'
 
-    OPTIONAL_LOCATION_FIELDS = [
-        "ecoregion",
-        # utc_offset is for the most part required by modules using met data
-        # (but not exclusively; e.g. FEPS plumerise uses it)
-        "utc_offset",
-        # SF2 weather, moisture, etc. fields
-        'elevation','slope',
-        'state','county','country',
-        'fuel_1hr','fuel_10hr','fuel_100hr',
-        'fuel_1khr','fuel_10khr','fuel_gt10khr',
-        'canopy','shrub','grass','rot','duff', 'litter',
-        'moisture_1hr','moisture_10hr',
-        'moisture_100hr','moisture_1khr',
-        'moisture_live','moisture_duff',
-        'min_wind','max_wind',
-        'min_wind_aloft', 'max_wind_aloft',
-        'min_humid','max_humid',
-        'min_temp','max_temp',
-        'min_temp_hour','max_temp_hour',
-        'sunrise_hour','sunset_hour',
-        'snow_month','rain_days'
-        # TODO: fill in others
-    ]
-    for a in list(consumeutils.SETTINGS.values()):
-        for b in a:
-            OPTIONAL_LOCATION_FIELDS.append(b['field'])
-            if 'synonyms' in b:
-                OPTIONAL_LOCATION_FIELDS.extend(b['synonyms'])
-    # remove dupes
-    OPTIONAL_LOCATION_FIELDS = list(set(OPTIONAL_LOCATION_FIELDS))
-
     def _get_base_location_object(perimeter, lat, lng, area):
         if perimeter:
             return {
@@ -351,7 +351,7 @@ class FireIngester(object):
         )
 
         fire['location'].update(self._get_fields('location',
-            self.OPTIONAL_LOCATION_FIELDS))
+            OPTIONAL_LOCATION_FIELDS))
 
     ## 'event_of'
 
@@ -388,7 +388,7 @@ class FireIngester(object):
             base_fields.append(v)
         location = self._get_base_location_object(base_fields)
 
-        for f in self.OPTIONAL_LOCATION_FIELDS:
+        for f in OPTIONAL_LOCATION_FIELDS:
             v = src.get(f)
             if v is None and 'location' in src:
                 v = src['location'].get(f)
@@ -535,11 +535,46 @@ class FireIngester(object):
                     logging.warn("Failed to parse 'date_time' value %s",
                         date_time)
 
+
+
+class FirePostProcessor(object):
+
+    def __init__(self, fire):
+        self._fire = fire
+
     ##
-    ## Post Processing of Ingested data
+    ## Public Interface
     ##
 
-    def _process_growth_locations_and_fuelbeds(self, fire):
+    def process(self):
+        self._process_growth_locations_and_fuelbeds()
+        self._validate()
+
+
+    ##
+    ## Helper methods
+    ##
+
+    def _get_base_location(self, obj):
+        if obj.get('location'):
+            if obj['location'].get('perimeter'):
+                return {'perimeter': obj['location'].get('perimeter')}
+            elif all([obj['location'].get(f) is not None for f in ('lat', 'lng', 'area')]):
+                return {f: obj['location'][f] for f in ('lat', 'lng', 'area'))
+        # else returns None
+
+    def _copy_optional_location_fields(self, fire_location, growth_location):
+        if fire_location:
+            for f in OPTIONAL_LOCATION_FIELDS:
+                if f in fire_location and f not in growth_location:
+                    growth_location[f] = fire_location[f]
+
+
+    ##
+    ## Processing
+    ##
+
+    def _process_growth_locations_and_fuelbeds(self):
         """Move location information from top level into growth objects.
 
         Makes sure either lat+lng+area or perimeter is defined either at the
@@ -548,21 +583,7 @@ class FireIngester(object):
         TODO: restructure this method; maybe break up into multiple methods
         and encapsulate in a class
         """
-        def _get_base_location(obj):
-            if obj.get('location'):
-                if obj['location'].get('perimeter'):
-                    return {'perimeter': obj['location'].get('perimeter')}
-                elif all([obj['location'].get(f) is not None for f in ('lat', 'lng', 'area')]):
-                    return {f: obj['location'][f] for f in ('lat', 'lng', 'area'))
-            # else returns None
-
-        def _copy_optional_location_fields(fire_location, growth_location):
-            if fire_location:
-                for f in self.OPTIONAL_LOCATION_FIELDS:
-                    if f in fire_location and f not in growth_location:
-                        growth_location[f] = fire_location[f]
-
-        top_level_base_location = _get_base_location(fire)
+        top_level_base_location = self._get_base_location(fire)
         if fire.get('growth'):
             num_growth_objects = len(fire['growth'])
             if fire['location'].get('perimeter') and num_growth_objects > 1:
@@ -570,7 +591,7 @@ class FireIngester(object):
 
             for g in fire.growth:
                 g_pct = g.pop('pct', None)
-                g_base_location = _get_base_location(g)
+                g_base_location = self._get_base_location(g)
 
                 if not not top_level_base_location == not not g_base_location:
                     raise ValueError("Perimeter or lat+lng+area must be "
@@ -598,13 +619,13 @@ class FireIngester(object):
                                 " and location is defined at the fire's top level.")
                         g['location']['area'] *= g_pct / 100.0
 
-                    _copy_optional_location_fields(fire['location'], g['location'])
+                    self._copy_optional_location_fields(fire['location'], g['location'])
                 else:
                     # prune growth object's location so that it has the base
                     # location info plus optional fields
                     old_g_location = g.pop('location')
                     g['location'] = g_base_location
-                    _copy_optional_location_fields(old_g_location, g['location'])
+                    self._copy_optional_location_fields(old_g_location, g['location'])
 
                 if fire.get('fuelbeds'):
                     # just copy over fuelbeds; there's no need to adjust
@@ -621,11 +642,10 @@ class FireIngester(object):
             fire['growth'] = [{
                 'location': top_level_base_location
             }]
-            _copy_optional_location_fields(fire['location'],
+            self._copy_optional_location_fields(fire['location'],
                 fire['growth'][0]['location'])
             if fire.get('fuelbeds'):
                 fire['growth'][0]['fuelbeds'] = fire['fuelbeds']
-
 
         # delete top level location and fuelbeds, since each growth obejct
         # should have them now
@@ -636,12 +656,12 @@ class FireIngester(object):
     ## Validation
     ##
 
-    def _validate(self, fire):
+    def _validate(self):
         # TODO: make sure required fields are all defined, and validate
         # values not validated by nested field specific _ingest_* methods
-        self._validate_growth(fire)
+        self._validate_growth()
 
-    def _validate_growth(self, fire):
+    def _validate_growth(self):
         """Provides extravalidation of growthinformation
 
         The ingest_ and process_ methods, above, already provide some
