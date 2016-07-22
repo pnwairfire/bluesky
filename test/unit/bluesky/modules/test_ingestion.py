@@ -8,7 +8,7 @@ from py.test import raises
 
 from bluesky.modules import ingestion
 
-class TestIngester(object):
+class TestIngestionErrorScenarios(object):
 
     def setup(self):
         self.ingester = ingestion.FireIngester()
@@ -18,43 +18,40 @@ class TestIngester(object):
     ##
 
     def test_fire_missing_required_fields(self):
-        with raises(ValueError) as e:
+        with raises(ValueError) as e_info:
             self.ingester.ingest({})
+        assert e_info.value.args[0] ==  ingestion.IngestionErrMsgs.NO_DATA
 
         # location must have perimeter or lat+lng+area
-        with raises(ValueError) as e:
+        with raises(ValueError) as e_info:
             self.ingester.ingest({"location": {}})
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION
 
-    def test_fire_with_invalid_growth(self):
+    def test_multiple_growth_fields_missing_pct(self):
         # If growth is specified, each object in the array must have
         # 'start', 'end', and 'pct' defined
-        with raises(ValueError) as e:
+        with raises(ValueError) as e_info:
             self.ingester.ingest(
                 {
                     "location": {
-                        "perimeter": {
-                            "type": "MultiPolygon",
-                            "coordinates": [
-                                [
-                                    [
-                                        [-121.4522115, 47.4316976],
-                                        [-121.3990506, 47.4316976],
-                                        [-121.3990506, 47.4099293],
-                                        [-121.4522115, 47.4099293],
-                                        [-121.4522115, 47.4316976]
-                                    ]
-                                ]
-                            ]
-                        },
+                        "latitude": 47.0,
+                        "longitude": -122.0,
+                        "area": 100.0,
                         "ecoregion": "southern"
                     },
-                    "growth": [
-                        {
-                            "sdf": 1
-                        }
-                    ]
+                    "growth": [{},{}]
                 }
             )
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.MULTIPLE_GROWTH_NO_PCT
+
+    # TODO: test ONE_PERIMETER_MULTIPLE_GROWTH
+    # TODO: test BASE_LOCATION_AT_TOP_OR_PER_GROWTH
+    # TODO: test FUELBEDS_AT_TOP_OR_PER_GROWTH
+
+class TestIngestionValidInput(object):
+
+    def setup(self):
+        self.ingester = ingestion.FireIngester()
 
     def test_fire_with_minimum_fields(self):
         f = {
@@ -123,8 +120,11 @@ class TestIngester(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            'growth': copy.deepcopy(f['growth']).update(
-                location=copy.deepcopy(f['location']))
+            "growth": [{
+                "start": "2015-01-20T17:00:00",
+                "end": "2015-01-21T17:00:00",
+                "location": copy.deepcopy(f['location'])
+            }]
         }
         expected_parsed_input = copy.deepcopy(f)
         parsed_input = self.ingester.ingest(f)
@@ -165,9 +165,8 @@ class TestIngester(object):
             },
             'growth': [
                 {
-                    "pct": 100.0,
                     "start": "2015-01-20T17:00:00",
-                    "end": "2015-01-21T17:00:00"
+                    "end": "2015-01-21T17:00:00",
                     'location': {
                         "perimeter": {
                             "type": "MultiPolygon",
@@ -240,7 +239,6 @@ class TestIngester(object):
                 {
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
-                    "pct": 100.0,
                     'location': {
                         "perimeter": {
                             "type": "MultiPolygon",
@@ -312,7 +310,8 @@ class TestIngester(object):
             },
             'growth': copy.deepcopy(f['growth'])
         }
-        expected['location'].pop('foo')
+        expected['growth'][0].pop('pct')
+        expected['growth'][0]['location'].pop('foo')
         expected_parsed_input = copy.deepcopy(f)
         parsed_input = self.ingester.ingest(f)
         assert expected == f
@@ -377,7 +376,6 @@ class TestIngester(object):
             "growth":[{
                 "start": "2014-05-29T00:00:00",
                 "end": "2014-05-30T00:00:00",
-                "pct": 100.0,
                 "location":{
                     "latitude": 47.0,
                     "longitude": -122.0,
@@ -403,7 +401,6 @@ class TestIngester(object):
             "growth":[{
                 "start": "2015-08-04T00:00:00",
                 "end": "2015-08-05T00:00:00",
-                "pct": 100.0,
                 "location": {
                     "latitude": 47.0,
                     "longitude": -122.0,
@@ -497,7 +494,6 @@ class TestIngester(object):
             "growth":[{
                 "start": "2014-05-29T00:00:00",
                 "end": "2014-05-30T00:00:00",
-                "pct": 100.0,
                 "location":{
                     "latitude": 26.286,
                     "longitude": -77.118,
@@ -628,7 +624,6 @@ class TestIngester(object):
             "growth":[{
                 "start": "2015-08-04T00:00:00",
                 "end": "2015-08-05T00:00:00",
-                "pct": 100.0,
                 "location": {
                     "latitude": 27.303,
                     "longitude": -81.142,
@@ -702,6 +697,43 @@ class TestIngester(object):
                 }
             }]
         }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+    def test_no_change(self):
+        f = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "growth": [
+                {
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
+                    "location": {
+                        "perimeter": {
+                            "type": "MultiPolygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ]
+                                ]
+                            ]
+                        },
+                        "ecoregion": "southern",
+                    }
+                }
+            ]
+        }
+        expected = copy.deepcopy(f)
         expected_parsed_input = copy.deepcopy(f)
         parsed_input = self.ingester.ingest(f)
         assert expected == f
