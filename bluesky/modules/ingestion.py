@@ -399,7 +399,7 @@ class FireIngester(object):
 
     OPTIONAL_GROWTH_FIELDS = ['start','end', 'pct', 'localmet', 'timeprofile', 'plumerise']
 
-    def _ingest_growth_location(self, src):
+    def _ingest_growth_location(self, growth, src):
         # only look in growth object for location fields; don't look
         base_fields = []
         for f in ['perimeter', 'latitude', 'longitude', 'area']:
@@ -415,7 +415,7 @@ class FireIngester(object):
                 v = src['location'].get(f)
                 if v is not None:
                     location[f] = v
-        src['location'] = location
+        growth[-1]['location'] = location
 
     def _ingest_optional_growth_fields(self, growth, src):
         for f in self.OPTIONAL_GROWTH_FIELDS:
@@ -439,7 +439,7 @@ class FireIngester(object):
             for g in self._parsed_input['growth']:
                 growth.append({})
                 self._ingest_optional_growth_fields(growth, g)
-                self._ingest_growth_location(g)
+                self._ingest_growth_location(growth, g)
                 # TODO: make sure calling _ingest_nested_field_fuelbeds on g
                 #   has the desired effect
                 self._ingest_nested_field_fuelbeds(g)
@@ -630,11 +630,12 @@ class FirePostProcessor(object):
                         # This must be the old, deprecated growth and location
                         # structure, so the growth object should either have
                         # 'pct' defined or be th eonly growth object
-                        if not g_pct and num_growth_objects == 1:
-                            g_pct = 100
-                        else:
-                            raise ValueError(
-                                IngestionErrMsgs.MULTIPLE_GROWTH_NO_PCT)
+                        if not g_pct:
+                            if num_growth_objects == 1:
+                                g_pct = 100
+                            else:
+                                raise ValueError(
+                                    IngestionErrMsgs.MULTIPLE_GROWTH_NO_PCT)
                         g['location']['area'] *= g_pct / 100.0
 
                     self._copy_optional_location_fields(fire['location'], g['location'])
