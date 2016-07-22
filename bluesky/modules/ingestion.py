@@ -550,7 +550,6 @@ class FirePostProcessor(object):
         self._process_growth_locations_and_fuelbeds()
         self._validate()
 
-
     ##
     ## Helper methods
     ##
@@ -559,16 +558,21 @@ class FirePostProcessor(object):
         if obj.get('location'):
             if obj['location'].get('perimeter'):
                 return {'perimeter': obj['location'].get('perimeter')}
+            # Note: at this point in the code, the following should always be
+            # true (since FireIngester wouldn't have createdd the 'location'
+            # object unless either the perimeter or lat+lng+area was defined)
             elif all([obj['location'].get(f) is not None for f in ('lat', 'lng', 'area')]):
                 return {f: obj['location'][f] for f in ('lat', 'lng', 'area'))
         # else returns None
 
     def _copy_optional_location_fields(self, fire_location, growth_location):
+        # This is different than the copying of the optional fields in
+        # FireIngester in that, here, each field is copied over only if
+        # it's not alredy defined in the growth's location
         if fire_location:
             for f in OPTIONAL_LOCATION_FIELDS:
                 if f in fire_location and f not in growth_location:
                     growth_location[f] = fire_location[f]
-
 
     ##
     ## Processing
