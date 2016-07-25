@@ -58,9 +58,9 @@ def summarize(fires):
     total_area = 0
     for fire in fires:
         for g in fire['growth']:
+            total_area += g['location']['area']
             for fb in g['fuelbeds']:
                 area_by_fccs_id[fb['fccs_id']] += (fb['pct'] / 100.0) * g['location']['area']
-                total_area += g['location']['area']
     summary = [{"fccs_id": fccs_id, "pct": (area / total_area) * 100.0}
         for fccs_id, area in area_by_fccs_id.items()]
     return sorted(summary, key=lambda a: a["fccs_id"])
