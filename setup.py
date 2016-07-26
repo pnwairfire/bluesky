@@ -31,9 +31,13 @@ setup(
         #   b)  {'bluesky': ['hysplit/bdyfiles/*.']}
         #   c)  {'bluesky': {'hysplit': ['bdyfiles/*.']} }
         #   d)  some other way?
-        'hysplit': ['bdyfiles/*.'],
-        'vsmoke': ['images/*.'],
-        'ecoregion': ['data/*']
+        # Update: the following way seems to be the only way to work both
+        # via `python setup.py install` as well as via pip
+        'bluesky': [
+            'dispersers/hysplit/bdyfiles/*',
+            'dispersers/vsmoke/images/*',
+            'ecoregion/data/*'
+        ]
     },
     url='https://github.com/pnwairfire/bluesky',
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
