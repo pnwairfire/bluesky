@@ -121,7 +121,7 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
                 if 'fuelbeds' not in g:
                     raise ValueError(
                         "Missing fuelbed data required for computing emissions")
-                for fb in g.fuelbeds:
+                for fb in g['fuelbeds']:
                     if 'consumption' not in fb:
                         raise ValueError(
                             "Missing consumption data required for computing emissions")
