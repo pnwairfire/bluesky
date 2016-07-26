@@ -174,12 +174,12 @@ def _run_consume_on_fire(fuel_loadings_manager, species,
                 "Missing fuelbed data required for computing emissions")
 
 
-        for fb in fire.fuelbeds:
+        for fb in g['fuelbeds']:
             _run_consume_on_fuelbed(fuel_loadings_manager, species,
-                include_emissions_details, fb)
+                include_emissions_details, fb, g['location'], burn_type)
 
 def _run_consume_on_fuelbed(fuel_loadings_manager, species,
-        include_emissions_details, fb, location):
+        include_emissions_details, fb, location, burn_type):
     if 'consumption' not in fb:
         raise ValueError(
             "Missing consumption data required for computing emissions")
