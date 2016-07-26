@@ -68,15 +68,17 @@ BASE_FIRE = {
         "fuel_type": "natural"
         # "id" to be filled in
     },
-    "fuelbeds": [{
-        # "fccs_id" to be filled in
-        # "pct" to be filled in
-    }],
-    "location": {
-        "latitude": 47.4316976,
-        "longitude": -121.3990506,
-        "utc_offset": "-09:00"
-    }
+    'growth': [{
+        "fuelbeds": [{
+            # "fccs_id" to be filled in
+            # "pct" to be filled in
+        }],
+        "location": {
+            "latitude": 47.4316976,
+            "longitude": -121.3990506,
+            "utc_offset": "-09:00"
+        }
+    }]
 }
 
 
@@ -89,9 +91,13 @@ def load_scenario(input_filename):
     """Loads scenario input file and instantiates a fires_manager object
     to run bsp.
 
-    Note that we have two options:
-     - create one fire with N fuelbeds, or
-     - create N fires, each with 1 fuelbed
+    Note that we have various options:
+     - create one fire with one growth window and N fuelbeds, or
+     - create one fire with N growth windows, each with 1 fuelbed, or
+     - create N fires ,each with growth window, and each growth
+       window with with 1 fuelbed
+     - any other combination of fires, growth windows, and fuelbeds
+       that result in N total growth windows
 
     Either should work, assuming the ecoregion is the same for each row
     in the scenario (which is currently the case).  In case this changes
@@ -107,18 +113,18 @@ def load_scenario(input_filename):
         fire = models.fires.Fire(copy.deepcopy(BASE_FIRE))
         fire.event_of["id"] = str(uuid.uuid1())
         area = int(row_dict['area'])
-        fire.location['area'] = area
-        fire.location['ecoregion'] = row_dict['ecoregion']
-        fire.location['fuel_moisture_duff_pct'] = int(row_dict['fm_duff'])
-        fire.location['fuel_moisture_1000hr_pct'] = int(row_dict['fm_1000hr'])
-        fire.location['canopy_consumption_pct'] = int(row_dict['can_con_pct'])
-        fire.location['shrub_blackened_pct'] = int(row_dict['shrub_black_pct'])
-        fire.location['pile_blackened_pct'] = int(row_dict['pile_black_pct'])
-        fire.location['output_units'] = row_dict['units']
-        fire.fuelbeds[0]['fccs_id'] = row_dict['fuelbeds']
+        fire.growth[0]['location']['area'] = area
+        fire.growth[0]['location']['ecoregion'] = row_dict['ecoregion']
+        fire.growth[0]['location']['fuel_moisture_duff_pct'] = int(row_dict['fm_duff'])
+        fire.growth[0]['location']['fuel_moisture_1000hr_pct'] = int(row_dict['fm_1000hr'])
+        fire.growth[0]['location']['canopy_consumption_pct'] = int(row_dict['can_con_pct'])
+        fire.growth[0]['location']['shrub_blackened_pct'] = int(row_dict['shrub_black_pct'])
+        fire.growth[0]['location']['pile_blackened_pct'] = int(row_dict['pile_black_pct'])
+        fire.growth[0]['location']['output_units'] = row_dict['units']
+        fire.growth[0]['fuelbeds'][0]['fccs_id'] = row_dict['fuelbeds']
         # See note above about 1 fire + N fuelbeds vs N fires + 1 fuelbed each
-        #fire.fuelbeds[0]['pct'] = float(area) / float(total_area)
-        fire.fuelbeds[0]['pct'] = 100.0
+        #fire.growth[0]['fuelbeds'][0]['pct'] = float(area) / float(total_area)
+        fire.growth[0]['fuelbeds'][0]['pct'] = 100.0
         fires_manager.add_fire(fire)
     return fires_manager
 
@@ -363,7 +369,7 @@ def check(actual, expected_partials, expected_totals):
     }
 
     for fire in actual['fire_information']:
-        fb = fire['fuelbeds'][0]
+        fb = fire['growth'][0]['fuelbeds'][0]
         fccs_id = fb['fccs_id']
         fb_e = expected_partials[fccs_id]
 
