@@ -43,7 +43,7 @@ setup(
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
     install_requires=[
         "pyairfire>=1.2.3",
-        "eflookup>=1.0.1",
+        "eflookup>=1.0.2",
         "emitcalc>=1.0.1",
         "fccsmap>=1.0.1",
         "timeprofile>=1.0.0",
