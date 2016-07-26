@@ -2,6 +2,7 @@
 
 __author__ = "Joel Dubowy"
 
+import itertools
 import logging
 
 from emitcalc import __version__ as emitcalc_version
@@ -56,13 +57,15 @@ def run(fires_manager):
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             # TODO: validate that each fuelbed has emissions data (here, or below) ?
-            fire.emissions = datautils.summarize([fire], 'emissions',
+            fire.emissions = datautils.summarize(fire.growth, 'emissions',
                 include_details=False)
 
-    summary = dict(emissions=datautils.summarize(fires_manager.fires, 'emissions'))
+    all_growth = list(itertools.chain.from_iterable(
+        [f.growth for f in fires_manager.fires]))
+    summary = dict(emissions=datautils.summarize(all_growth, 'emissions'))
     if include_emissions_details:
         summary.update(emissions_details=datautils.summarize(
-            fires_manager.fires, 'emissions_details'))
+            all_growth, 'emissions_details'))
     fires_manager.summarize(**summary)
 
 ##
