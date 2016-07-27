@@ -126,7 +126,7 @@ class VSMOKEDispersion(DispersionBase):
                 self._kmz_files.append(kml_path)
                 self._my_kmz.add_kml(kml_name, fire, hr)
 
-                self._add_geo_json(in_var, iso_file, fire['id'], timezone, hr)
+                self._add_geo_json(in_var, iso_file, fire['id'], timezone, hr, fire.emissions['pm25'][hr].sum())
 
             # Write input files
             self._write_input(fire, in_var)
@@ -372,7 +372,7 @@ class VSMOKEDispersion(DispersionBase):
         mykml.close()
         mykml.write()
 
-    def _add_geo_json(self, in_var, iso_file, fire_id, timezone, hr):
+    def _add_geo_json(self, in_var, iso_file, fire_id, timezone, hr, pm25):
         if not self._create_json:
             return
 
@@ -383,7 +383,7 @@ class VSMOKEDispersion(DispersionBase):
 
         for c, interval in enumerate(self.ISOPLETHS):
             name = str(interval)
-            self._geo_json.add_linestring(fire_id, self.ISONAMES[c], self.ISOCOLORS[c], hr, isopleths[name], timezone)
+            self._geo_json.add_linestring(fire_id, self.ISONAMES[c], self.ISOCOLORS[c], hr, isopleths[name], timezone, pm25)
 
     def _create_geo_json(self, wdir):
         if self._create_json and self._geo_json:
@@ -403,7 +403,7 @@ class GeoJSON(object):
     def __init__(self):
         self.plume_rings = {}
 
-    def add_linestring(self, fire_id, aqi, color, hr, pts, timezone):
+    def add_linestring(self, fire_id, aqi, color, hr, pts, timezone, pm25):
         """ For a particular fire, at a particular time,
         add a new rint of points to the GeoJSON. """
         if fire_id not in self.plume_rings:
@@ -412,9 +412,12 @@ class GeoJSON(object):
             self.plume_rings[fire_id][aqi] = {}
         if hr not in self.plume_rings[fire_id][aqi]:
             self.plume_rings[fire_id][aqi][hr] = []
+        if 'pm25' not in self.plume_rings[fire_id][aqi]:
+            self.plume_rings[fire_id][aqi]['pm25'] = {}
 
         self.plume_rings[fire_id][aqi]['color'] = color
         self.plume_rings[fire_id][aqi]['timezone'] = timezone
+        self.plume_rings[fire_id][aqi]['pm25'][hr] = pm25
 
         pts.append(pts[0])
         for p in pts:
@@ -442,9 +445,7 @@ class GeoJSON(object):
                 max_pm25_hour = max(self.plume_rings[fire][aqi]['pm25'],
                     key=lambda x: self.plume_rings[fire][aqi]['pm25'][x])
                 # add a plume ring for each hour of the fire
-                hrs = sorted([h for h in self.plume_rings[fire][aqi].keys()
-                    if h not in ('color', 'timezone')])
-                for hr in hrs:
+                for hr in sorted(self.plume_rings[fire][aqi].keys())[:-2]:
                     # we need at least 4 points to guarantee our inputs are valid rings
                     if len(self.plume_rings[fire][aqi][hr]) <= 3:
                         continue
