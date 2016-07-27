@@ -126,7 +126,9 @@ class VSMOKEDispersion(DispersionBase):
                 self._kmz_files.append(kml_path)
                 self._my_kmz.add_kml(kml_name, fire, hr)
 
-                self._add_geo_json(in_var, iso_file, fire['id'], timezone, hr, fire.emissions['pm25'][hr].sum())
+                pm25 = fire.timeprofiled_emissions[local_dt]['PM25']
+
+                self._add_geo_json(in_var, iso_file, fire['id'], timezone, hr, pm25)
 
             # Write input files
             self._write_input(fire, in_var)
