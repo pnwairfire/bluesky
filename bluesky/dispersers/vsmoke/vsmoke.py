@@ -442,7 +442,10 @@ class GeoJSON(object):
         for fire in self.plume_rings:
             s = '{"fire_id": "' + fire + '", "geo_json": '
             s += '{"type": "FeatureCollection","features":['
+            max_pm25_hour = 0
             for aqi in self.plume_rings[fire]:
+                max_pm25_hour = max(self.plume_rings[fire][aqi]['pm25'],
+                    key=lambda x: self.plume_rings[fire][aqi]['pm25'][x])
                 # add a plume ring for each hour of the fire
                 hrs = sorted([h for h in self.plume_rings[fire][aqi].keys()
                     if h not in ('color', 'timezone', 'pm25')])
@@ -466,7 +469,7 @@ class GeoJSON(object):
                     new_feature += '}},'
                     s += new_feature
 
-            s = s[:-1] + ']}}'
+            s = s[:-1] + '], "max_pm25_hour": ' + str(max_pm25_hour) + '}}'
             fires.append(s)
 
         json += ','.join(fires) + ']}'
