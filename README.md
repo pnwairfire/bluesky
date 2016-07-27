@@ -277,7 +277,7 @@ running ```bsp-csv2json``` like so:
 
 would produce the following (written to stdout):
 
-    {"fire_information": [{"slope": 10.0, "max_humid": 80.0, "co": "", "veg": "", "consumption_flaming": "", "max_temp": 30.0, "scc": 2810015000, "county": "", "fuel_1hr": "", "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "utc_offset": -5.0, "owner": "", "min_temp": 13.1, "sunrise_hour": 7, "sunset_hour": 18, "rot": "", "id": "SF11C14225236095807750", "fuel_100hr": "", "fuel_10khr": "", "shrub": "", "min_wind_aloft": 6.0, "area": 99.9999997516, "event_id": "SF11E826544", "moisture_live": 130.0, "voc": "", "consumption_smoldering": "", "sf_stream_name": "realtime", "fuel_1khr": "", "min_humid": 40.0, "state": "Unknown", "rain_days": 8, "latitude": 25.041, "min_wind": 6.0, "type": "RX", "moisture_10hr": 12.0, "pm25": "", "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "elevation": 0.0, "co2": "", "consumption_residual": "", "moisture_1khr": 22.0, "heat": "", "min_temp_hour": 4, "fips": -9999, "nh3": "", "max_temp_hour": 14, "max_wind_aloft": 6.0, "canopy": "", "duff": "", "date_time": "201501200000Z", "fuel_10hr": "", "moisture_duff": 150.0, "fuel_gt10khr": "", "pm10": "", "country": "Unknown", "litter": "", "longitude": -77.379, "moisture_1hr": 10.0, "so2": "", "ch4": "", "fccs_number": "", "consumption_duff": "", "nox": "", "moisture_100hr": 12.0, "grass": "", "snow_month": 5, "sf_server": "playground.dri.edu", "max_wind": 6.0}]}
+    {"fire_information": [{"country": "Unknown", "pm25": "", "co2": "", "fuel_10khr": "", "moisture_duff": 150.0, "canopy": "", "consumption_smoldering": "", "longitude": -77.379, "min_wind": 6.0, "pm10": "", "voc": "", "rain_days": 8, "fuel_1hr": "", "shrub": "", "slope": 10.0, "consumption_duff": "", "grass": "", "sunrise_hour": 7, "type": "RX", "ch4": "", "timezone": -5.0, "id": "SF11C14225236095807750", "moisture_100hr": 12.0, "consumption_residual": "", "fuel_gt10khr": "", "consumption_flaming": "", "elevation": 0.0, "sf_server": "playground.dri.edu", "heat": "", "so2": "", "min_wind_aloft": 6.0, "fips": -9999, "latitude": 25.041, "max_humid": 80.0, "fuel_10hr": "", "moisture_10hr": 12.0, "scc": 2810015000, "max_temp": 30.0, "moisture_1khr": 22.0, "fuel_100hr": "", "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "litter": "", "max_wind": 6.0, "min_temp": 13.1, "max_wind_aloft": 6.0, "co": "", "area": 99.9999997516, "event_id": "SF11E826544", "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "fccs_number": "", "sunset_hour": 18, "moisture_live": 130.0, "min_humid": 40.0, "snow_month": 5, "sf_stream_name": "realtime", "state": "Unknown", "date_time": "201501200000Z", "duff": "", "nh3": "", "min_temp_hour": 4, "veg": "", "rot": "", "nox": "", "max_temp_hour": 14, "fuel_1khr": "", "moisture_1hr": 10.0, "owner": "", "county": ""}]}
 
 You can pipe the output of ```bsp-csv2json``` directly into ```bsp```, as long
 as you use the ingestions module, described below:
@@ -307,27 +307,26 @@ example, assume that you start with the following fire data:
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "location": {
-                    "perimeter": {
-                        "type": "MultiPolygon",
-                        "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
-                                ]
-                            ]
-                        ]
-                    },
-                    "ecoregion": "southern",
-                    "utc_offset": "-09:00"
-                },
                 "growth": [
                     {
-                        "pct": 100,
+                        "location": {
+                            "perimeter": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
+                                ]
+                            },
+                            "ecoregion": "southern",
+                            "utc_offset": "-09:00"
+                        },
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00"
                     }
@@ -342,89 +341,84 @@ it through the fuelbeds module, with the following:
     bsp -i fires.json fuelbeds
 
 You would get the following output (which is the input json with the addition
-of the 'fuelbeds' array in the fire object, plus 'processing' and 'summary'
+of the 'fuelbeds' array in the fire object, plus 'today', 'runtime', processing' and 'summary'
 fields):
 
+
     {
-        "fire_information": [
-            {
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Snoqualmie Pass, WA"
-                },
-                "fuelbeds": [
-                    {
-                        "fccs_id": "49",
-                        "pct": 50.0
-                    },
-                    {
-                        "fccs_id": "46",
-                        "pct": 50.0
-                    }
-                ],
-                "growth": [
-                    {
-                        "end": "2015-01-21T17:00:00",
-                        "pct": 100,
-                        "start": "2015-01-20T17:00:00"
-                    }
-                ],
-                "id": "SF11C14225236095807750",
-                "location": {
-                    "area": 2398.94477979842,
-                    "ecoregion": "southern",
-                    "perimeter": {
-                        "coordinates": [
-                            [
-                                [
-                                    [
-                                        -121.4522115,
-                                        47.4316976
-                                    ],
-                                    [
-                                        -121.3990506,
-                                        47.4316976
-                                    ],
-                                    [
-                                        -121.3990506,
-                                        47.4099293
-                                    ],
-                                    [
-                                        -121.4522115,
-                                        47.4099293
-                                    ],
-                                    [
-                                        -121.4522115,
-                                        47.4316976
-                                    ]
-                                ]
-                            ]
-                        ],
-                        "type": "MultiPolygon"
-                    },
-                    "utc_offset": "-09:00"
+        "today": "2016-07-27",
+        "runtime": {
+            "total": "0.0h 0.0m 0s",
+            "end": "2016-07-27T00:08:27Z",
+            "start": "2016-07-27T00:08:27Z",
+            "modules": [
+                {
+                    "module_name": "fuelbeds",
+                    "total": "0.0h 0.0m 0s",
+                    "end": "2016-07-27T00:08:27Z",
+                    "start": "2016-07-27T00:08:27Z"
                 }
-            }
-        ],
-        "processing": [
-            {
-                "fccsmap_version": "0.1.7",
-                "module": "bluesky.modules.fuelbeds",
-                "version": "0.1.0"
-            }
-        ],
+            ]
+        },
         "summary": {
             "fuelbeds": [
                 {
-                    "fccs_id": "46",
-                    "pct": 50.0
-                },
-                {
-                    "fccs_id": "49",
-                    "pct": 50.0
+                    "fccs_id": "9",
+                    "pct": 100.0
                 }
             ]
-        }
+        },
+        "processing": [
+            {
+                "module_name": "fuelbeds",
+                "fccsmap_version": "1.0.1",
+                "version": "0.1.0",
+                "module": "bluesky.modules.fuelbeds"
+            }
+        ],
+        "fire_information": [
+            {
+                "event_of": {
+                    "name": "Natural Fire near Snoqualmie Pass, WA",
+                    "id": "SF11E826544"
+                },
+                "id": "SF11C14225236095807750",
+                "growth": [
+                    {
+                        "fuelbeds": [
+                            {
+                                "fccs_id": "9",
+                                "pct": 100.0
+                            }
+                        ],
+                        "end": "2015-01-21T17:00:00",
+                        "start": "2015-01-20T17:00:00",
+                        "location": {
+                            "area": 2398.94477979842,
+                            "perimeter": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115,47.4316976],
+                                            [-121.3990506,47.4316976],
+                                            [-121.3990506,47.4099293],
+                                            [-121.4522115,47.4099293],
+                                            [-121.4522115,47.4316976]
+                                        ]
+                                    ]
+                                ]
+                            },
+                            "utc_offset": "-09:00",
+                            "ecoregion": "southern"
+                        }
+                    }
+                ],
+                "type": "wildfire",
+                "fuel_type": "natural"
+            }
+        ],
+        "config": {}
     }
 
 
@@ -436,92 +430,109 @@ module, like so:
 yielding the following augmented output:
 
     {
+        "runtime": {
+            "start": "2016-07-27T00:11:19Z",
+            "end": "2016-07-27T00:11:19Z",
+            "total": "0.0h 0.0m 0s",
+            "modules": [
+                {
+                    "start": "2016-07-27T00:11:19Z",
+                    "end": "2016-07-27T00:11:19Z",
+                    "total": "0.0h 0.0m 0s",
+                    "module_name": "consumption"
+                }
+            ]
+        },
         "fire_information": [
             {
+                "consumption": {
+                    "summary": {
+                        "smoldering": 15486.527840696326,
+                        "flaming": 21529.76935816931,
+                        "total": 57754.619595050404,
+                        "residual": 20738.322396184776
+                    }
+                },
+                "id": "SF11C14225236095807750",
                 "event_of": {
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "fuelbeds": [
-                    {
-                        "consumption": {
-                            /* ...consumption output... */
-                        },
-                        "fccs_id": "49",
-                        "pct": 50.0,
-                        "fuel_loadings": {
-                            /* ...fuel loadings... */
-                        }
-                    },
-                    {
-                        "consumption": {
-                            /* ...consumption output... */
-                        },
-                        "fccs_id": "46",
-                        "pct": 50.0,
-                        "fuel_loadings": {
-                            /* ...fuel loadings... */
-                        }
-                    }
-                ],
+                "fuel_type": "natural",
+                "type": "wildfire",
                 "growth": [
                     {
-                        "end": "2015-01-21T17:00:00",
-                        "pct": 100,
-                        "start": "2015-01-20T17:00:00"
-                    }
-                ],
-                "id": "SF11C14225236095807750",
-                "location": {
-                    "area": 2398.94477979842,
-                    "ecoregion": "southern",
-                    "perimeter": {
-                        "coordinates": [
-                            [
-                                [
-                                    [-121.4522115,47.4316976],
-                                    [-121.3990506,47.4316976],
-                                    [-121.3990506,47.4099293],
-                                    [-121.4522115,47.4099293],
-                                    [-121.4522115,47.4316976]
-                                ]
-                            ]
+                        "location": {
+                            "area": 2398.94477979842,
+                            "ecoregion": "southern",
+                            "utc_offset": "-09:00",
+                            "perimeter": {
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115,47.4316976],
+                                            [-121.3990506,47.4316976],
+                                            [-121.3990506,47.4099293],
+                                            [-121.4522115,47.4099293],
+                                            [-121.4522115,47.4316976]
+                                        ]
+                                    ]
+                                ],
+                                "type": "MultiPolygon"
+                            }
+                        },
+                        "fuelbeds": [
+                            {
+                                "heat": {
+                                    /* ...heat output... */
+                                },
+                                "pct": 100.0,
+                                "consumption": {
+                                    /* ...consumption output... */
+                                },
+                                "fuel_loadings": {
+                                    /* ...fuel loadings... */
+                                },
+                                "fccs_id": "9"
+                            }
                         ],
-                        "type": "MultiPolygon"
-                    },
-                    "utc_offset": "-09:00"
-                }
+                        "start": "2015-01-20T17:00:00",
+                        "end": "2015-01-21T17:00:00"
+                    }
+                ]
             }
         ],
         "processing": [
             {
-                "fccsmap_version": "0.1.7",
+                "fccsmap_version": "1.0.1",
                 "module": "bluesky.modules.fuelbeds",
-                "version": "0.1.0"
+                "version": "0.1.0",
+                "module_name": "fuelbeds"
             },
             {
-                "consume_version": "4.1.2",
                 "module": "bluesky.modules.consumption",
-                "version": "0.1.0"
+                "version": "0.1.0",
+                "consume_version": "4.1.2",
+                "module_name": "consumption"
             }
         ],
+        "today": "2016-07-27T00:00:00",
+        "config": {},
         "summary": {
-            "consumption": {
-                /* ...summary consumption data... */
-            },
             "fuelbeds": [
                 {
-                    "fccs_id": "46",
-                    "pct": 50.0
-                },
-                {
-                    "fccs_id": "49",
-                    "pct": 50.0
+                    "pct": 100.0,
+                    "fccs_id": "9"
                 }
-            ]
+            ],
+            "heat": {
+                /* ...heat summary... */
+            },
+            "consumption": {
+                /* ...consumption summary... */
+            }
         }
     }
-
 
 Though there would be no reason to do so in this situation, you could re-run
 the fuelbeds module in the second pass throgh ```bsp```, like so:
@@ -545,126 +556,138 @@ runs the output back through consumption and on through emissions:
 would contain this output, agumented with emissions data:
 
     {
+        "summary": {
+            "consumption": {
+                /* consumption output */
+            },
+            "fuelbeds": [
+                {
+                    "pct": 100.0,
+                    "fccs_id": "9"
+                }
+            ],
+            "heat": {
+                /* heat output */
+            },
+            "emissions": {
+                /* emissions output */
+            }
+        },
         "fire_information": [
             {
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Snoqualmie Pass, WA"
-                },
-                "fuelbeds": [
-                    {
-                        "consumption": {
-                            /* ...consumption output... */
-                        },
-                        "emissions": {
-                            /* ...emissions output... */
-                        },
-                        "fccs_id": "49",
-                        "pct": 50.0,
-                        "fuel_loadings": {
-                            /* ...fuel loadings... */
-                        }
-                    },
-                    {
-                        "consumption": {
-                            /* ...consumption output... */
-                        },
-                        "emissions": {
-                            /* ...emissions output... */
-                        },
-                        "fccs_id": "46",
-                        "pct": 50.0,
-                        "fuel_loadings": {
-                            /* ...fuel loadings... */
-                        }
-                    }
-                ],
                 "growth": [
                     {
+                        "fuelbeds": [
+                            {
+                                "emissions": {
+                                    /* emissions output */
+                                },
+                                "fccs_id": "9",
+                                "consumption": {
+                                    /* consumption output */
+                                },
+                                "pct": 100.0,
+                                "heat": {
+                                    /* heat output */
+                                },
+                                "fuel_loadings": {
+                                    /* fuel loadings */
+                                }
+                            }
+                        ],
+                        "location": {
+                            "area": 2398.94477979842,
+                            "ecoregion": "southern",
+                            "utc_offset": "-09:00",
+                            "perimeter": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115,47.4316976],
+                                            [-121.3990506,47.4316976],
+                                            [-121.3990506,47.4099293],
+                                            [-121.4522115,47.4099293],
+                                            [-121.4522115,47.4316976]
+                                        ]
+                                    ]
+                                ]
+                            }
+                        },
                         "end": "2015-01-21T17:00:00",
-                        "pct": 100,
                         "start": "2015-01-20T17:00:00"
                     }
                 ],
                 "id": "SF11C14225236095807750",
-                "location": {
-                    "area": 2398.94477979842,
-                    "ecoregion": "southern",
-                    "perimeter": {
-                        "coordinates": [
-                            [
-                                [
-                                    [
-                                        -121.4522115,
-                                        47.4316976
-                                    ],
-                                    [
-                                        -121.3990506,
-                                        47.4316976
-                                    ],
-                                    [
-                                        -121.3990506,
-                                        47.4099293
-                                    ],
-                                    [
-                                        -121.4522115,
-                                        47.4099293
-                                    ],
-                                    [
-                                        -121.4522115,
-                                        47.4316976
-                                    ]
-                                ]
-                            ]
-                        ],
-                        "type": "MultiPolygon"
-                    },
-                    "utc_offset": "-09:00"
-                }
+                "fuel_type": "natural",
+                "emissions": {
+                    "summary": {
+                        "NOx": 84.99420586185778,
+                        "VOC": 2149.3577478028947,
+                        "PM25": 759.2284300672793,
+                        "SO2": 56.5995272031494,
+                        "NH3": 149.52053897759265,
+                        "PM10": 895.8895474793892,
+                        "CO2": 85981.77487816624,
+                        "CH4": 439.71054108574947,
+                        "total": 99674.47838833414,
+                        "CO": 9157.402971690011
+                    }
+                },
+                "consumption": {
+                    "summary": {
+                        "residual": 20738.322396184776,
+                        "total": 57754.619595050404,
+                        "flaming": 21529.769358169302,
+                        "smoldering": 15486.527840696328
+                    }
+                },
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                },
+                "type": "wildfire"
             }
         ],
+        "today": "2016-07-27T00:00:00",
         "processing": [
             {
-                "fccsmap_version": "0.1.7",
                 "module": "bluesky.modules.fuelbeds",
+                "fccsmap_version": "1.0.1",
+                "module_name": "fuelbeds",
                 "version": "0.1.0"
             },
             {
-                "consume_version": "4.1.2",
                 "module": "bluesky.modules.consumption",
-                "version": "0.1.0"
-            },
-            {
+                "module_name": "consumption",
                 "consume_version": "4.1.2",
-                "module": "bluesky.modules.consumption",
                 "version": "0.1.0"
             },
             {
+                "emitcalc_version": "1.0.1",
                 "ef_set": "feps",
-                "emitcalc_version": "0.3.2",
+                "eflookup_version": "1.0.2",
+                "version": "0.1.0",
                 "module": "bluesky.modules.emissions",
-                "version": "0.1.0"
+                "module_name": "emissions"
             }
         ],
-        "summary": {
-            "consumption": {
-                /* ...summary consumption data... */
-            },
-            "emissions": {
-                /* ...summary emissions data... */
-            },
-            "fuelbeds": [
+        "runtime": {
+            "start": "2016-07-27T00:24:32Z",
+            "total": "0.0h 0.0m 0s",
+            "modules": [
                 {
-                    "fccs_id": "46",
-                    "pct": 50.0
-                },
-                {
-                    "fccs_id": "49",
-                    "pct": 50.0
+                    "total": "0.0h 0.0m 0s",
+                    "end": "2016-07-27T00:24:32Z",
+                    "module_name": "emissions",
+                    "start": "2016-07-27T00:24:32Z"
                 }
-            ]
-        }
+            ],
+            "end": "2016-07-27T00:24:32Z"
+        },
+        "config": {}
     }
+
 
 
 ##### Pretty-Printing JSON Output
@@ -699,14 +722,14 @@ Assume you start with the following data:
     {
         "fire_information": [
             {
-                    "location": {
-                        "latitude": 47.4316976,
-                        "longitude": -121.3990506
-                    },
-                    "area": 200,
-                    "utc_offset": "-09:00",
-                    "name": "event name",
-                    "event_id": "jfkhfdskj"
+                "location": {
+                    "latitude": 47.4316976,
+                    "longitude": -121.3990506
+                },
+                "area": 200,
+                "utc_offset": "-09:00",
+                "name": "event name",
+                "event_id": "jfkhfdskj"
             }
         ]
     }
@@ -714,45 +737,70 @@ Assume you start with the following data:
 It would become:
 
     {
+        "processing": [
+            {
+                "version": "0.1.0",
+                "parsed_input": [
+                    {
+                        "location": {
+                            "latitude": 47.4316976,
+                            "longitude": -121.3990506
+                        },
+                        "fuel_type": "natural",
+                        "name": "event name",
+                        "utc_offset": "-09:00",
+                        "type": "wildfire",
+                        "id": "ac226ee6",
+                        "event_id": "jfkhfdskj",
+                        "area": 200
+                    }
+                ],
+                "module_name": "ingestion",
+                "module": "bluesky.modules.ingestion"
+            }
+        ],
         "fire_information": [
             {
                 "event_of": {
                     "id": "jfkhfdskj",
                     "name": "event name"
                 },
-                "id": "7e10cd4a",
-                "location": {
-                    "area": 200,
-                    "latitude": 47.4316976,
-                    "longitude": -121.3990506,
-                    "utc_offset": "-09:00"
-                }
-            }
-        ],
-        "processing": [
-            {
-                "module": "bluesky.modules.ingestion",
-                "parsed_input": [
+                "fuel_type": "natural",
+                "type": "wildfire",
+                "id": "ac226ee6",
+                "growth": [
                     {
-                        "area": 200,
-                        "event_id": "jfkhfdskj",
-                        "id": "7e10cd4a",
                         "location": {
+                            "utc_offset": "-09:00",
+                            "area": 200,
                             "latitude": 47.4316976,
                             "longitude": -121.3990506
-                        },
-                        "name": "event name",
-                        "utc_offset": "-09:00"
+                        }
                     }
-                ],
-                "version": "0.1.0"
+                ]
             }
-        ]
+        ],
+        "config": {},
+        "today": "2016-07-27",
+        "runtime": {
+            "end": "2016-07-27T00:33:00Z",
+            "modules": [
+                {
+                    "end": "2016-07-27T00:33:00Z",
+                    "module_name": "ingestion",
+                    "total": "0.0h 0.0m 0s",
+                    "start": "2016-07-27T00:33:00Z"
+                }
+            ],
+            "start": "2016-07-27T00:33:00Z",
+            "total": "0.0h 0.0m 0s"
+        }
     }
 
+
 Notice:
- - The 'raw' input under processing isn't purely raw, as the fire has been assigned an id ("4b94a511").  This is the one auto-generated field that you will find under 'processing' > 'parsed_input'.  If the fire object already contains an id, it will be used, in which case the raw fire input is in fact exactly what the user input.
- - The 'area' and 'utc_offset' keys are initially defined at the top level, but, after ingestion, are under the 'location' object.  Similarly, 'name' gets moved under 'event_of' (since names apply to fire events, not to fire locations).
+ - The 'raw' input under processing isn't purely raw, as the fire has been assigned an id ("ac226ee6").  This is the one auto-generated field that you will find under 'processing' > 'parsed_input'.  If the fire object already contains an id, it will be used, in which case the raw fire input is in fact exactly what the user input.
+ - The 'area' and 'utc_offset' keys are initially defined at the top level, but, after ingestion, are under the 'growth' > 'location' object.  Similarly, 'name' gets moved under 'event_of' (since names apply to fire events, not to fire locations).
  - The 'event_id' key gets moved under 'event_of' and is renamed 'id'.
 
 ###### Example 2
@@ -778,7 +826,6 @@ assume is in fires.json):
                 "ecoregion": "southern",
                 "growth": [
                     {
-                        "pct": 100.0,
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00"
                     }
@@ -795,65 +842,83 @@ if you pass this data through ingestion:
 you'll end up with this:
 
     {
+        "today": "2016-07-27",
         "fire_information": [
             {
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Snoqualmie Pass, WA"
-                },
+                "fuel_type": "natural",
                 "growth": [
                     {
                         "end": "2015-01-21T17:00:00",
-                        "pct": 100.0,
-                        "start": "2015-01-20T17:00:00"
-                    }
-                ],
-                "id": "SF11C14225236095807750",
-                "location": {
-                    "area": 200,
-                    "ecoregion": "southern",
-                    "latitude": 47.4316976,
-                    "longitude": -121.3990506,
-                    "utc_offset": "-09:00"
-                }
-            }
-        ],
-        "processing": [
-            {
-                "module": "bluesky.modules.ingestion",
-                "parsed_input": [
-                    {
-                        "bar": 123,
-                        "ecoregion": "southern",
-                        "event_of": {
-                            "id": "SF11E826544",
-                            "name": "Natural Fire near Snoqualmie Pass, WA"
-                        },
-                        "growth": [
-                            {
-                                "end": "2015-01-21T17:00:00",
-                                "pct": 100.0,
-                                "start": "2015-01-20T17:00:00"
-                            }
-                        ],
-                        "id": "SF11C14225236095807750",
+                        "start": "2015-01-20T17:00:00",
                         "location": {
-                            "area": 200,
-                            "foo": "bar",
                             "latitude": 47.4316976,
                             "longitude": -121.3990506,
-                            "utc_offset": "-09:00"
+                            "utc_offset": "-09:00",
+                            "area": 200.0,
+                            "ecoregion": "southern"
                         }
                     }
                 ],
-                "version": "0.1.0"
+                "id": "SF11C14225236095807750",
+                "type": "wildfire",
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                }
             }
-        ]
+        ],
+        "config": {},
+        "processing": [
+            {
+                "module_name": "ingestion",
+                "version": "0.1.0",
+                "parsed_input": [
+                    {
+                        "growth": [
+                            {
+                                "end": "2015-01-21T17:00:00",
+                                "start": "2015-01-20T17:00:00"
+                            }
+                        ],
+                        "fuel_type": "natural",
+                        "ecoregion": "southern",
+                        "location": {
+                            "latitude": 47.4316976,
+                            "longitude": -121.3990506,
+                            "utc_offset": "-09:00",
+                            "area": 200,
+                            "foo": "bar"
+                        },
+                        "id": "SF11C14225236095807750",
+                        "type": "wildfire",
+                        "bar": 123,
+                        "event_of": {
+                            "id": "SF11E826544",
+                            "name": "Natural Fire near Snoqualmie Pass, WA"
+                        }
+                    }
+                ],
+                "module": "bluesky.modules.ingestion"
+            }
+        ],
+        "runtime": {
+            "end": "2016-07-27T00:37:01Z",
+            "total": "0.0h 0.0m 0s",
+            "start": "2016-07-27T00:37:01Z",
+            "modules": [
+                {
+                    "module_name": "ingestion",
+                    "total": "0.0h 0.0m 0s",
+                    "start": "2016-07-27T00:37:01Z",
+                    "end": "2016-07-27T00:37:01Z"
+                }
+            ]
+        }
     }
 
 Notice:
  - "foo" and "bar" were ignored (though left in the recorded raw input)
- - "ecoregion" got moved under "location"
+ - "ecoregion" got moved under "growth" > location"
 
 #### Merge
 
@@ -879,17 +944,16 @@ data. The following is an example of the former:
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "location": {
-                    "latitude": 47.123,
-                    "longitude": -120.379,
-                    "area": 200,
-                    "ecoregion": "southern"
-                },
                 "growth": [
                     {
-                        "pct": 100,
                         "start": "2015-01-20T17:00:00",
-                        "end": "2015-01-21T17:00:00"
+                        "end": "2015-01-21T17:00:00",
+                        "location": {
+                            "latitude": 47.123,
+                            "longitude": -120.379,
+                            "area": 200,
+                            "ecoregion": "southern"
+                        }
                     }
                 ]
             }
@@ -906,28 +970,27 @@ while the following is an example of the latter:
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "location": {
-                    "perimeter": {
-                        "type": "MultiPolygon",
-                        "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
-                                ]
-                            ]
-                        ]
-                    },
-                    "ecoregion": "southern"
-                },
                 "growth": [
                     {
-                        "pct": 100,
                         "start": "2015-01-20T17:00:00",
-                        "end": "2015-01-21T17:00:00"
+                        "end": "2015-01-21T17:00:00",
+                        "location": {
+                            "perimeter": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
+                                ]
+                            },
+                            "ecoregion": "southern"
+                        }
                     }
                 ]
             }
@@ -1038,7 +1101,6 @@ The following fields may be specified under a fire's "location" field or at the 
 
  - ***'fire_information' > 'growth' > 'start'*** -- *required if growth is specified* -- can be inferred from other fields
  - ***'fire_information' > 'growth' > 'end'*** -- *required if growth is specified* --
- - ***'fire_information' > 'growth' > 'pct'*** -- *required if growth is specified* --
  - ***'fire_information' > 'growth' > 'localmet'*** -- *optional* -- 'localmet' is generated by an internal module (localmet); ingestion passes this on if defined
  - ***'fire_information' > 'growth' > 'timeprofile'*** -- *optional* -- as with 'localmet', 'timeprofile' is generated by an internal module (timeprofiling); ingestion passes this on if defined
  - ***'fire_information' > 'growth' > 'plumerise'*** -- *optional* -- as with 'localmet' and 'timeprofile', 'plumerise' is generated by an internal module (plumerising); ingestion passes this on if defined
@@ -1046,7 +1108,7 @@ The following fields may be specified under a fire's "location" field or at the 
 
 If no growth objects are specified for a fire, but
 the fire has 'start' and 'end' keys, a growth object will be created with
-the 'start' and 'end' values and 'pct' set to 100.0
+the 'start' and 'end' values
 
 ###### 'fuelbeds'
 
@@ -1118,7 +1180,7 @@ TODO: fill in this section...
 
 ##### timeprofiling
 
- - ***'fire_information' > 'growth'*** -- *required* -- array of growth objects, each containing 'start', 'end', and 'pct'; if only one object, pct can be omitted and is assumed to be 100.0; note that percentages must add up to 100 (within 0.5%)
+ - ***'fire_information' > 'growth'*** -- *required* -- array of growth objects, each containing 'start' and 'end'
 
 ##### plumerising
 
@@ -1129,7 +1191,6 @@ TODO: fill in this section...
  - ***'fire_information' > 'location' > 'area'*** -- *required* --
  - ***'fire_information' > 'fuelbeds' > 'consumption'*** -- *required* --
  - ***'fire_information' > 'growth' > 'start'*** -- *required* --
- - ***'fire_information' > 'growth' > 'pct'*** -- *required* --
  - ***'fire_information' > 'growth' > 'timeprofile'*** -- *required* --
 
 FEPS uses a number of fire 'location' fields (listed in the ```ingestion```
@@ -1139,7 +1200,6 @@ defaults.
 ###### If running SEV model
 
  - ***'fire_information' > 'location' > 'area'*** -- *required* --
- - ***'fire_information' > 'growth' > 'pct'*** -- *required* --
  - ***'fire_information' > 'growth' > 'localmet'*** -- *required* --
  - ***'fire_information' > 'meta' > 'frp'*** -- *optional* --
 
@@ -1585,28 +1645,27 @@ Now you're ready to run bsp:
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "location": {
-                    "perimeter": {
-                        "type": "MultiPolygon",
-                        "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
-                                ]
-                            ]
-                        ]
-                    },
-                    "ecoregion": "southern"
-                },
                 "growth": [
                     {
-                        "pct": 100,
                         "start": "2015-01-20T17:00:00",
-                        "end": "2015-01-21T17:00:00"
+                        "end": "2015-01-21T17:00:00",
+                        "location": {
+                            "perimeter": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [-121.4522115, 47.4316976],
+                                            [-121.3990506, 47.4316976],
+                                            [-121.3990506, 47.4099293],
+                                            [-121.4522115, 47.4099293],
+                                            [-121.4522115, 47.4316976]
+                                        ]
+                                    ]
+                                ]
+                            },
+                            "ecoregion": "southern"
+                        }
                     }
                 ]
             }
@@ -1684,28 +1743,27 @@ use something like the following:
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            "location": {
-                "perimeter": {
-                    "type": "MultiPolygon",
-                    "coordinates": [
-                        [
+            "growth": [{
+                "start": "2015-01-20T17:00:00",
+                "end": "2015-01-21T17:00:00",
+                "location": {
+                    "perimeter": {
+                        "type": "MultiPolygon",
+                        "coordinates": [
                             [
-                                [-121.4522115, 47.4316976],
-                                [-121.3990506, 47.4316976],
-                                [-121.3990506, 47.4099293],
-                                [-121.4522115, 47.4099293],
-                                [-121.4522115, 47.4316976]
+                                [
+                                    [-121.4522115, 47.4316976],
+                                    [-121.3990506, 47.4316976],
+                                    [-121.3990506, 47.4099293],
+                                    [-121.4522115, 47.4099293],
+                                    [-121.4522115, 47.4316976]
+                                ]
                             ]
                         ]
-                    ]
-                },
-                "ecoregion": "southern",
-                "utc_offset": "-09:00"
-            },
-            "growth": [{
-                "pct": 100,
-                "start": "2015-01-20T17:00:00",
-                "end": "2015-01-21T17:00:00"
+                    },
+                    "ecoregion": "southern",
+                    "utc_offset": "-09:00"
+                }
             }]
         }]
     }' | docker run --rm -i bluesky bsp ingestion fuelbeds consumption emissions \
@@ -1808,18 +1866,17 @@ Another example, running `bsp` through vsmoke dispersion:
                 },
                 "id": "SF11C14225236095807750",
                 "type": "wildfire",
-                "location": {
-                    "area": 10000,
-                    "ecoregion": "western",
-                    "latitude": 48.4956218,
-                    "longitude": -120.2663579,
-                    "utc_offset": "-07:00"
-                },
                 "growth": [
                     {
                         "start": "2014-05-29T17:00:00",
                         "end": "2014-05-30T17:00:00",
-                        "pct": 100.0
+                        "location": {
+                            "area": 10000,
+                            "ecoregion": "western",
+                            "latitude": 48.4956218,
+                            "longitude": -120.2663579,
+                            "utc_offset": "-07:00"
+                        }
                     }
                 ]
             }
@@ -1904,18 +1961,17 @@ Another example, running through hysplit dispersion:
                 },
                 "id": "SF11C14225236095807750",
                 "type": "wildfire",
-                "location": {
-                    "area": 10000,
-                    "ecoregion": "western",
-                    "latitude": 37.909644,
-                    "longitude": -119.7615805,
-                    "utc_offset": "-07:00"
-                },
                 "growth": [
                     {
                         "start": "2014-05-29T17:00:00",
                         "end": "2014-05-30T17:00:00",
-                        "pct": 100.0
+                        "location": {
+                            "area": 10000,
+                            "ecoregion": "western",
+                            "latitude": 37.909644,
+                            "longitude": -119.7615805,
+                            "utc_offset": "-07:00"
+                        }
                     }
                 ]
             }
