@@ -68,19 +68,10 @@ def _run_fire(hourly_fractions, fire):
             g['timeprofile'][hr.isoformat()] = {
                 p: profiler.hourly_fractions[p][i] for p in fields }
 
-
-def _scale_emissions(data, pct):
-    for k in data:
-        if isinstance(data[k], dict):
-            _scale_emissions(data[k], pct)
-        else:
-            data[k] = [e * pct/100.0 for e in data[k]]
-
 # Allow summed growth percentages to be between 99.5% and 100.5%
 # TODO: Move to common constants module? (fuelbeds defines constant for
 # total fuelbeds percentage)
 TOTAL_PCT_THRESHOLD = 0.5
-
 def _validate_fire(fire):
     if 'growth' not in fire:
         raise ValueError("Missing growth data required for time profiling")
