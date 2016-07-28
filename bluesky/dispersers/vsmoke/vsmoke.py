@@ -474,7 +474,7 @@ class GeoJSON(object):
                     new_feature += '}},'
                     s += new_feature
 
-            s = s[:-1] + '], "max_pm25_hour": ' + str(max_pm25_hour) + ', "pm25_per_hour": ' + json.dumps(pm25) + '}}'
+            s = s[:-1] + '], "max_pm25_hour": ' + str(max_pm25_hour) + '}}'
 
             fires.append(s)
 
