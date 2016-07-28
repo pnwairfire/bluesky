@@ -9,6 +9,7 @@ __author__ = "Joel Dubowy and Sonoma Technology, Inc."
 
 __version__ = "0.1.0"
 
+import json
 import logging
 import math
 import os
@@ -432,10 +433,12 @@ class GeoJSON(object):
         f.close()
 
     def __str__(self):
-        """ Build a string of a single GeoJSON object for each fire,
-        inside a great JSON object. """
+        """Build a string of a single GeoJSON object for each fire,
+        inside a great JSON object.
+
+        TODO: Use json.dumps rather than manually create json string
+        """
         # create a master JSON object
-        json = '{"fires":['
 
         fires = []
         # for each fire, create a GeoJSON object
@@ -471,12 +474,11 @@ class GeoJSON(object):
                     new_feature += '}},'
                     s += new_feature
 
-            s = s[:-1] + '], "max_pm25_hour": ' + str(max_pm25_hour) + '}}'
+            s = s[:-1] + '], "max_pm25_hour": ' + str(max_pm25_hour) + ', "pm25_per_hour": ' + json.dumps(pm25) + '}}'
+
             fires.append(s)
 
-        json += ','.join(fires) + ']}'
-
-        return json
+        return '{"fires":[' + ','.join(fires) + ']}'
 
     def __repr__(self):
         return self.__str__()
