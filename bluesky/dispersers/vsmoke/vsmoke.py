@@ -435,50 +435,55 @@ class GeoJSON(object):
     def __str__(self):
         """Build a string of a single GeoJSON object for each fire,
         inside a great JSON object.
-
-        TODO: Use json.dumps rather than manually create json string
         """
         # create a master JSON object
 
         fires = []
         # for each fire, create a GeoJSON object
-        for fire in self.plume_rings:
-            s = '{"fire_id": "' + fire + '", "geo_json": '
-            s += '{"type": "FeatureCollection","features":['
+        for fire_id in self.plume_rings:
+            fire_obj = {
+                "fire_id": fire_id,
+                "geo_json": {
+                    "type": "FeatureCollection",
+                    "features":[]
+                }
+            }
             # Note: the way the code is written,
-            #   self.plume_rings[fire][aqi]['pm25'] is the same for each aqi;
+            #   self.plume_rings[fire_id][aqi]['pm25'] is the same for each aqi;
             #   So, we can compute max_pm25_hour using the first aqi
-            pm25 = list(self.plume_rings[fire].values())[0]['pm25']
-            max_pm25_hour = max(pm25, key=lambda x: pm25[x])
-            for aqi in self.plume_rings[fire]:
+            pm25 = list(self.plume_rings[fire_id].values())[0]['pm25']
+            fire_obj['max_pm25_hour'] = max(pm25, key=lambda x: pm25[x])
+            for aqi in self.plume_rings[fire_id]:
                 # add a plume ring for each hour of the fire
-                hrs = sorted([h for h in self.plume_rings[fire][aqi].keys()
+                hrs = sorted([h for h in self.plume_rings[fire_id][aqi].keys()
                     if h not in ('color', 'timezone', 'pm25')])
                 for hr in hrs:
                     # we need at least 4 points to guarantee our inputs are valid rings
-                    if len(self.plume_rings[fire][aqi][hr]) <= 3:
+                    if len(self.plume_rings[fire_id][aqi][hr]) <= 3:
                         continue
-                    new_feature = '{"type": "Feature","geometry":'
-                    new_feature += '{"type": "LineString","coordinates": ['
 
-                    coords = []
-                    for pt in self.plume_rings[fire][aqi][hr]:
-                        coords.append('[' + str(pt[0]) + ', ' + str(pt[1]) + ']')
+                    new_feature = {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "LineString",
+                            "coordinates": []
+                        },
+                        "properties": {
+                            "AQI": aqi,
+                            "color": self.plume_rings[fire_id][aqi]['color'],
+                            "timezone": self.plume_rings[fire_id][aqi]['timezone'],
+                            "hour": hr
+                        }
+                    }
 
-                    new_feature += ','.join(coords)
-                    new_feature += ']},"properties": {'
-                    new_feature += '"AQI": "' + aqi + '",'
-                    new_feature += '"color": "' + self.plume_rings[fire][aqi]['color'] + '",'
-                    new_feature += '"timezone": ' + str(self.plume_rings[fire][aqi]['timezone']) + ','
-                    new_feature += '"hour": ' + str(hr)
-                    new_feature += '}},'
-                    s += new_feature
+                    for pt in self.plume_rings[fire_id][aqi][hr]:
+                        new_feature['geometry']['coordinates'].append(pt)
 
-            s = s[:-1] + '], "max_pm25_hour": ' + str(max_pm25_hour) + '}}'
+                    fire_obj['geo_json']['features'].append(new_feature)
 
-            fires.append(s)
+            fires.append(fire_obj)
 
-        return '{"fires":[' + ','.join(fires) + ']}'
+        return json.dumps({"fires": fires})
 
     def __repr__(self):
         return self.__str__()
