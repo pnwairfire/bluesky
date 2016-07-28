@@ -445,7 +445,7 @@ class GeoJSON(object):
             # Note: the way the code is written,
             #   self.plume_rings[fire][aqi]['pm25'] is the same for each aqi;
             #   So, we can compute max_pm25_hour using the first aqi
-            pm25 = self.plume_rings[fire].values()[0]['pm25']
+            pm25 = list(self.plume_rings[fire].values())[0]['pm25']
             max_pm25_hour = max(pm25, key=lambda x: pm25[x])
             for aqi in self.plume_rings[fire]:
                 # add a plume ring for each hour of the fire
