@@ -42,7 +42,7 @@ setup(
     url='https://github.com/pnwairfire/bluesky',
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
     install_requires=[
-        "pyairfire>=1.2.3",
+        "pyairfire>=1.2.3,<2.0.0",
         "eflookup>=1.0.2",
         "emitcalc>=1.0.1",
         "fccsmap>=1.0.1",
