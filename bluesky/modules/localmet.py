@@ -38,32 +38,30 @@ def run(fires_manager):
         len(fires_manager.fires))
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            if 'growth' not in fire:
+            if not fire.get('growth'):
                 raise ValueError("Missing growth data required for localmet")
-            lat,lng = _fire_lat_lng(fire)
-            # parse_utc_offset makes sure utc offset is defined and valid
-            utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
-            for g in fire.growth:
+            for g in fire['growth']:
+                lat,lng = _fire_lat_lng(g)
+                # parse_utc_offset makes sure utc offset is defined and valid
+                utc_offset = parse_utc_offset(g.get('location', {}).get('utc_offset'))
                 tw = parse_datetimes(g, 'start', 'end')
                 g['localmet'] = arl_profiler.profile(lat, lng, tw['start'],
                     tw['end'], utc_offset)
 
     # fires_manager.summarize(...)
 
-def _fire_lat_lng(fire):
-    if not fire.get('location'):
-        raise ValueError(
-            "Missing location data required for looking up localmet data")
-
-    if fire['location'].get('perimeter'):
+def _fire_lat_lng(growth):
+    if not growth.get('location'):
+        raise ValueError("Missing location data required for localmet")
+    if growth['location'].get('perimeter'):
         # TODO: get centroid of perimeter(s); also, can'st assume 3-deep nested
         # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
-        lat = fire['location']['perimeter']['coordinates'][0][0][0][1]
-        lng = fire['location']['perimeter']['coordinates'][0][0][0][0]
-    elif fire['location'].get('latitude') and fire['location'].get('longitude'):
-        lat = fire['location']['latitude']
-        lng = fire['location']['longitude']
-    elif fire['location'].get('shape_file'):
+        lat = growth['location']['perimeter']['coordinates'][0][0][0][1]
+        lng = growth['location']['perimeter']['coordinates'][0][0][0][0]
+    elif growth['location'].get('latitude') and growth['location'].get('longitude'):
+        lat = growth['location']['latitude']
+        lng = growth['location']['longitude']
+    elif growth['location'].get('shape_file'):
         raise NotImplementedError("Importing of shape data from file not implemented")
     else:
         raise ValueError(
