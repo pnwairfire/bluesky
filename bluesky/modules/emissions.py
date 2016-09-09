@@ -60,6 +60,7 @@ def run(fires_manager):
             fire.emissions = datautils.summarize(fire.growth, 'emissions',
                 include_details=False)
 
+    # summarise over all growth objects
     all_growth = list(itertools.chain.from_iterable(
         [f.growth for f in fires_manager.fires]))
     summary = dict(emissions=datautils.summarize(all_growth, 'emissions'))
@@ -67,6 +68,11 @@ def run(fires_manager):
         summary.update(emissions_details=datautils.summarize(
             all_growth, 'emissions_details'))
     fires_manager.summarize(**summary)
+    # summarise per growth object (done after summarizing over all growths,
+    # to not include the per-growth summaries in the all-growth summary)
+    for g in fire.growth:
+        g['emissions'] = datautils.summarize([g], 'emissions',
+            include_details=False)
 
 ##
 ## FEPS
