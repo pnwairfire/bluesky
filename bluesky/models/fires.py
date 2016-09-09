@@ -63,11 +63,18 @@ class Fire(dict):
 
     @property
     def start(self):
-        # Don't memoize, in case growth windows are added/removed/modified
-        if 'growth' in self:
-            starts = [g['start'] for g in self.growth if g.get('start')]
-            if starts:
-                return datetimeutils.parse_datetime(sorted(starts)[0], 'start')
+        """Returns start of initial growth window
+
+        Doesn't memoize, in case growth windows are added/removed/modified
+        """
+        # consider only growth windows with start times
+        growths = [g for g in self.get('growth', []) if g.get('start')]
+        if growths:
+            growths = sorted(growths, key=lambda g: g['start'])
+            # record  utc offset of initial growth window, in case
+            # start_utc is being called
+            self.__utc_offset = growths[0].get('location', {}).get('utc_offset')
+            return datetimeutils.parse_datetime(growths[0], 'start')
 
     @property
     def start_utc(self):
@@ -75,21 +82,28 @@ class Fire(dict):
 
     @property
     def end(self):
-        # Don't memoize, in case growth windows are added/removed/modified
-        if 'growth' in self:
-            starts = [g['end'] for g in self.growth if g.get('end')]
-            if starts:
-                return datetimeutils.parse_datetime(sorted(starts)[-1], 'end')
+        """Returns end of final growth window
+
+        Doesn't memoize, in case growth windows are added/removed/modified
+        """
+        # consider only growth windows with end times
+        growths = [g for g in self.get('growth', []) if g.get('end')]
+        if growths:
+            growths = sorted(growths, key=lambda g: g['end'])
+            # record  utc offset of initial growth window, in case
+            # start_utc is being called
+            self.__utc_offset = growths[-1].get('location', {}).get('utc_offset')
+            return datetimeutils.parse_datetime(growths[-1], 'end')
+
     @property
     def end_utc(self):
         return self._to_utc(self.end)
 
     def _to_utc(self, dt):
         if dt:
-            utc_offset = self.get('location', {}).get('utc_offset')
-            if utc_offset:
+            if self.__utc_offset:
                 dt = dt - datetime.timedelta(
-                    hours=datetimeutils.parse_utc_offset(utc_offset))
+                    hours=datetimeutils.parse_utc_offset(self.__utc_offset))
             # else, assume zero offset
             return dt
 
