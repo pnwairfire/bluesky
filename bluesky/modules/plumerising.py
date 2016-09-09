@@ -82,7 +82,7 @@ class ComputeFunction(object):
                 # Fill in missing sunrise / sunset
                 if any([g['location'].get(k) is None for k in
                         ('sunrise_hour', 'sunset_hour')]):
-                    start = datetimeutils.parse_datetime(g, 'start')
+                    start = datetimeutils.parse_datetime(g['start'], 'start')
                     if not start:
                         raise ValueError("Missing fire growth start time "
                             "required by FEPS plumerise")
@@ -103,14 +103,11 @@ class ComputeFunction(object):
                     raise ValueError("Missing timeprofile data required for "
                         "computing FEPS plumerise")
 
-                g_pct = float(g['pct']) / 100.0
-
-
                 # TODO: if managing working dir here, pass it in
                 #   (I think we'll let plumerising package handle it,
                 #   since we don't need to keep the output files)
-                plumerise_data = pr.compute(g['timeprofile'], g['consumption'],
-                    fire.location)
+                plumerise_data = pr.compute(g['timeprofile'],
+                    g['consumption']['summary'], g['location'])
                 g['plumerise'] = plumerise_data['hours']
                 # TODO: do anything with plumerise_data['heat'] ?
 
