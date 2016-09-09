@@ -21,7 +21,7 @@ from datetime import timedelta
 from pyairfire import osutils
 from pyairfire.datetime import parsing as datetime_parsing
 
-from bluesky import datautils
+from bluesky import datautils, locationutils
 from bluesky.datetimeutils import parse_utc_offset
 from bluesky.models.fires import Fire
 from functools import reduce
@@ -164,82 +164,84 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                 if 'growth' not in fire:
                     raise ValueError(
                         "Missing timeprofile and plumerise data required for computing dispersion")
-                growth_fields = self._required_growth_fields()
+                growth_fields = self._required_growth_fields() + ('fuelbeds', 'location')
                 for g in fire.growth:
                     if any([not g.get(f) for f in growth_fields]):
                         raise ValueError("Each growth window must have {} in "
                             "order to compute {} dispersion".format(
                             ','.join(growth_fields), self.__class__.__name__))
-                if ('fuelbeds' not in fire or
-                        any([not fb.get('emissions') for fb in fire.fuelbeds])):
-                    raise ValueError(
-                        "Missing emissions data required for computing dispersion")
+                    if any([not fb.get('emissions') for fb in g['fuelbeds']]):
+                        raise ValueError(
+                            "Missing emissions data required for computing dispersion")
 
-                # TDOO: handle case where heat is defined by phase, but not total
-                #   (just make sure each phase is defined, and set total to sum)
-                heat = None
-                heat_values = list(itertools.chain.from_iterable(
-                    [fb.get('heat', {}).get('total', [None]) for fb in fire.fuelbeds]))
-                if not any([v is None for v in heat_values]):
-                    heat = sum(heat_values)
-                    if heat < 1.0e-6:
-                        logging.debug("Fire %s has less than 1.0e-6 total heat; skip...", fire.id)
-                        continue
-                # else, just forget about heat
+                    # TDOO: handle case where heat is defined by phase, but not total
+                    #   (just make sure each phase is defined, and set total to sum)
+                    heat = None
+                    heat_values = list(itertools.chain.from_iterable(
+                        [fb.get('heat', {}).get('total', [None]) for fb in g['fuelbeds']]))
+                    if not any([v is None for v in heat_values]):
+                        heat = sum(heat_values)
+                        if heat < 1.0e-6:
+                            logging.debug("Fire %s growth window %s - %s has "
+                                "less than 1.0e-6 total heat; skip...",
+                                fire.id, g['start'], g['end'])
+                            continue
+                    # else, just forget about heat
 
-                utc_offset = fire.get('location', {}).get('utc_offset')
-                utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
+                    utc_offset = g.get('location', {}).get('utc_offset')
+                    utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
 
-                # TODO: only include plumerise and timeprofile keys within model run
-                # time window; and somehow fill in gaps (is this possible?)
-                all_plumerise = self._convert_keys_to_datetime(
-                    reduce(lambda r, g: r.update(g.get('plumerise', {})) or r, fire.growth, {}))
-                all_timeprofile = self._convert_keys_to_datetime(
-                    reduce(lambda r, g: r.update(g['timeprofile']) or r, fire.growth, {}))
-                plumerise = {}
-                timeprofile = {}
-                for i in range(self._num_hours):
-                    local_dt = self._model_start + timedelta(hours=(i + utc_offset))
-                    plumerise[local_dt] = all_plumerise.get(local_dt) or self.MISSING_PLUMERISE_HOUR
-                    timeprofile[local_dt] = all_timeprofile.get(local_dt) or self.MISSING_TIMEPROFILE_HOUR
+                    # TODO: only include plumerise and timeprofile keys within model run
+                    # time window; and somehow fill in gaps (is this possible?)
+                    all_plumerise = g.get('plumerise', {})
+                    all_timeprofile = g.get('timeprofile', {})
+                    plumerise = {}
+                    timeprofile = {}
+                    for i in range(self._num_hours):
+                        local_dt = self._model_start + timedelta(hours=(i + utc_offset))
+                        plumerise[local_dt] = all_plumerise.get(local_dt) or self.MISSING_PLUMERISE_HOUR
+                        timeprofile[local_dt] = all_timeprofile.get(local_dt) or self.MISSING_TIMEPROFILE_HOUR
 
-                # sum the emissions across all fuelbeds, but keep them separate by phase
-                emissions = {p: {} for p in self.PHASES}
-                for fb in fire.fuelbeds:
-                    for p in self.PHASES:
-                        for s in fb['emissions'][p]:
-                            emissions[p][s] = (emissions[p].get(s, 0.0)
-                                + sum(fb['emissions'][p][s]))
+                    # sum the emissions across all fuelbeds, but keep them separate by phase
+                    emissions = {p: {} for p in self.PHASES}
+                    for fb in g['fuelbeds']:
+                        for p in self.PHASES:
+                            for s in fb['emissions'][p]:
+                                emissions[p][s] = (emissions[p].get(s, 0.0)
+                                    + sum(fb['emissions'][p][s]))
 
-                timeprofiled_emissions = {}
-                for dt in timeprofile:
-                    timeprofiled_emissions[dt] = {}
-                    for e in self.SPECIES:
-                        timeprofiled_emissions[dt][e] = sum([
-                            timeprofile[dt][p]*emissions[p].get('PM25', 0.0)
-                                for p in self.PHASES
-                        ])
+                    timeprofiled_emissions = {}
+                    for dt in timeprofile:
+                        timeprofiled_emissions[dt] = {}
+                        for e in self.SPECIES:
+                            timeprofiled_emissions[dt][e] = sum([
+                                timeprofile[dt][p]*emissions[p].get('PM25', 0.0)
+                                    for p in self.PHASES
+                            ])
 
-                consumption = datautils.sum_nested_data(
-                    [fb.get("consumption", {}) for fb in fire['fuelbeds']], 'summary', 'total')
+                    # consumption = datautils.sum_nested_data(
+                    #     [fb.get("consumption", {}) for fb in g['fuelbeds']], 'summary', 'total')
+                    consumption = g['consumption']['summary']
 
-                f = Fire(
-                    id=fire.id,
-                    meta=fire.get('meta', {}),
-                    start=fire.growth[0]['start'],
-                    area=fire.location['area'],
-                    latitude=fire.latitude,
-                    longitude=fire.longitude,
-                    utc_offset=utc_offset,
-                    plumerise=plumerise,
-                    timeprofile=timeprofile,
-                    emissions=emissions,
-                    timeprofiled_emissions=timeprofiled_emissions,
-                    consumption=consumption
-                )
-                if heat:
-                    f['heat'] = heat
-                self._fires.append(f)
+                    latlng = locationutils.LatLng(g['location'])
+
+                    f = Fire(
+                        id=fire.id,
+                        meta=fire.get('meta', {}),
+                        start=g['start'],
+                        area=g['location']['area'],
+                        latitude=latlng.latitude,
+                        longitude=latlng.longitude,
+                        utc_offset=utc_offset,
+                        plumerise=plumerise,
+                        timeprofile=timeprofile,
+                        emissions=emissions,
+                        timeprofiled_emissions=timeprofiled_emissions,
+                        consumption=consumption
+                    )
+                    if heat:
+                        f['heat'] = heat
+                    self._fires.append(f)
 
             except:
                 if self.config('skip_invalid_fires'):
