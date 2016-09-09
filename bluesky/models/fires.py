@@ -758,7 +758,6 @@ class FiresMerger(FiresActionBase):
                 #   with '_check_'; would need to change _check_keys'
                 #   signature to match the others
                 self._check_keys(fire)
-                self._check_location(fire, combined_fire)
                 self._check_growth_windows(fire, combined_fire)
                 self._check_event_of(fire, combined_fire)
                 self._check_fire_and_fuel_types(fire, combined_fire)
@@ -849,20 +848,6 @@ class FiresMerger(FiresActionBase):
         if (not self.REQUIRED_MERGE_FIELDS.issubset(keys) or
                 not keys.issubset(self.ALL_MERGEABLE_FIELDS)):
             self._fail(fire, self.INVALID_KEYS_MSG)
-
-    LOCATION_MISMATCH_MSG = "locations don't match"
-    def _check_location(self, fire, combined_fire):
-        """Makes sure the locations are the same
-
-        TODO: be more intelligent about comparing location; the
-          current logic could return false positives (e.g. if one
-          fire specifies a single coordinate and the other specifies
-          a polygon starting at that coord)
-        """
-        if combined_fire and (
-                fire.latitude != combined_fire.latitude or
-                fire.longitude != combined_fire.longitude):
-            self._fail(fire, self.LOCATION_MISMATCH_MSG)
 
     GROWTH_FOR_BOTH_OR_NONE_MSG = ("growth windows must be defined for both "
         "fires or neither in order to merge")
