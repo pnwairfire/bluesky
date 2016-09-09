@@ -10,6 +10,7 @@ import consume
 from bluesky import datautils
 from bluesky.consumeutils import _apply_settings, FuelLoadingsManager
 from bluesky import exceptions
+from bluesky.locationutils import LatLng
 
 __all__ = [
     'run'
@@ -157,9 +158,10 @@ def _validate_input(fires_manager):
                     # ecoregion defined, consumption can be run without mapscript
                     # and other dependencies installed
                     try:
+                        latlng = LatLng(g['location'])
                         from bluesky.ecoregion.lookup import EcoregionLookup
                         g['location']['ecoregion'] = EcoregionLookup().lookup(
-                            fire.latitude, fire.longitude)
+                            latlng.latitude, latlng.longitude)
                     except exceptions.MissingDependencyError:
                         default_ecoregion = fires_manager.get_config_value(
                             'consumption', 'default_ecoregion')
