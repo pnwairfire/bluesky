@@ -50,12 +50,19 @@ def run(fires_manager):
             _run_fire(fire, fuel_loadings_manager, msg_level)
 
 
+    # summarise over all growth objects
     all_growth = list(itertools.chain.from_iterable(
         [f.growth for f in fires_manager.fires]))
     fires_manager.summarize(
         consumption=datautils.summarize(all_growth, 'consumption'))
     fires_manager.summarize(
         heat=datautils.summarize(all_growth, 'heat'))
+    # summarise per growth object (done after summarizing over all growths,
+    # to not include the per-growth summaries in the all-growth summary)
+    for g in fire.growth:
+        g['consumption'] = datautils.summarize([g], 'consumption',
+            include_details=False)
+        g['heat'] = datautils.summarize([g], 'heat', include_details=False)
 
 def _run_fire(fire, fuel_loadings_manager, msg_level):
     logging.debug("Consume consumption - fire {}".format(fire.id))
