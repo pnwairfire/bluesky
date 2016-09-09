@@ -93,62 +93,7 @@ class Fire(dict):
             # else, assume zero offset
             return dt
 
-    # TODO: somehow clear out memoized _latitude/_longitude when location
-    #   changes (not sure where to do that); or maybe don't memoize
-
-    @property
-    def latitude(self):
-        # This is if latitude is a true top level key
-        if 'latitude' in self:
-            return self['latitude']
-        # This is if latitude is nested somewhere or needs to be derived
-        if not hasattr(self, '_latitude'):
-            if not self.get('location') or not isinstance(self.location, dict):
-                raise ValueError("Missing location data required for "
-                    "determining single lat/lng for fire")
-
-            if 'latitude' in self.location:
-                self._latitude = self.location['latitude']
-            elif 'perimeter' in self.location:
-                # TODO: get centroid of perimeter(s); also, can't assume 3-deep nested
-                # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
-                # see https://en.wikipedia.org/wiki/Centroid
-                self._latitude = self.location['perimeter']['coordinates'][0][0][0][1]
-                self._longitude = self.location['perimeter']['coordinates'][0][0][0][0]
-            elif 'shape_file' in self.location:
-                raise NotImplementedError("Importing of shape data from file not implemented")
-            else:
-                raise ValueError("Insufficient location data required for "
-                    "determining single lat/lng for fire")
-        return self._latitude
-
-    @property
-    def longitude(self):
-        # This is if longitude is a true top level key
-        if 'longitude' in self:
-            return self['longitude']
-        # This is if longitude is nested somewhere or needs to be derived
-        if not hasattr(self, '_longitude'):
-            if not self.get('location') or not isinstance(self.location, dict):
-                raise ValueError("Missing location data required for "
-                    "determining single lat/lng for fire")
-
-            if 'longitude' in self.location:
-                self._longitude = self.location['longitude']
-            elif 'perimeter' in self.location:
-                # TODO: get centroid of perimeter(s); also, can'st assume 3-deep nested
-                # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
-                # see https://en.wikipedia.org/wiki/Centroid
-                self._latitude = self.location['perimeter']['coordinates'][0][0][0][1]
-                self._longitude = self.location['perimeter']['coordinates'][0][0][0][0]
-            elif 'shape_file' in self.location:
-                raise NotImplementedError("Importing of shape data from file not implemented")
-            else:
-                raise ValueError("Insufficient location data required for "
-                    "determining single lat/lng for fire")
-        return self._longitude
-
-    ## Validation
+   ## Validation
 
     VALID_TYPES = {
         'wildfire': 'wildfire',
