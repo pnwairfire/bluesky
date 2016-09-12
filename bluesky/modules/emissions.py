@@ -52,11 +52,15 @@ def run(fires_manager):
         raise BlueSkyConfigurationError(
             "Invalid emissions factors set: '{}'".format(efs))
 
-    # For each fire, aggregate emissions over all fuelbeds; include only per-phase totals,
-    # not per category > sub-category > phase
+    # For each fire, aggregate emissions over all fuelbeds per growth
+    # window as well as across all growth windows;
+    # include only per-phase totals, not per category > sub-category > phase
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             # TODO: validate that each fuelbed has emissions data (here, or below) ?
+            for g in fire.growth:
+                g['emissions'] = datautils.summarize([g], 'emissions',
+                    include_details=False)
             fire.emissions = datautils.summarize(fire.growth, 'emissions',
                 include_details=False)
 
@@ -68,11 +72,6 @@ def run(fires_manager):
         summary.update(emissions_details=datautils.summarize(
             all_growth, 'emissions_details'))
     fires_manager.summarize(**summary)
-    # summarise per growth object (done after summarizing over all growths,
-    # to not include the per-growth summaries in the all-growth summary)
-    for g in fire.growth:
-        g['emissions'] = datautils.summarize([g], 'emissions',
-            include_details=False)
 
 ##
 ## FEPS

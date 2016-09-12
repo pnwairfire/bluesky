@@ -58,12 +58,6 @@ def run(fires_manager):
         consumption=datautils.summarize(all_growth, 'consumption'))
     fires_manager.summarize(
         heat=datautils.summarize(all_growth, 'heat'))
-    # summarise per growth object (done after summarizing over all growths,
-    # to not include the per-growth summaries in the all-growth summary)
-    for g in fire.growth:
-        g['consumption'] = datautils.summarize([g], 'consumption',
-            include_details=False)
-        g['heat'] = datautils.summarize([g], 'heat', include_details=False)
 
 def _run_fire(fire, fuel_loadings_manager, msg_level):
     logging.debug("Consume consumption - fire {}".format(fire.id))
@@ -80,10 +74,17 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
     for g in fire.growth:
         for fb in g['fuelbeds']:
             _run_fuelbed(fb, fuel_loadings_manager, g['location'], burn_type, msg_level)
+        # Aggregate consumption and heat over all fuelbeds in the growth window
+        # include only per-phase totals, not per category > sub-category > phase
+        g['consumption'] = datautils.summarize([g], 'consumption',
+            include_details=False)
+        g['heat'] = datautils.summarize([g], 'heat', include_details=False)
 
-    # Aggregate consumption over all fuelbeds; include only per-phase totals,
-    # not per category > sub-category > phase
+    # Aggregate consumption and heat over all fuelbeds in *all* growth windows;
+    # include only per-phase totals, not per category > sub-category > phase
     fire.consumption = datautils.summarize(fire.growth, 'consumption',
+        include_details=False)
+    fire.heat = datautils.summarize(fire.growth, 'heat',
         include_details=False)
 
 def _run_fuelbed(fb, fuel_loadings_manager, location, burn_type, msg_level):
