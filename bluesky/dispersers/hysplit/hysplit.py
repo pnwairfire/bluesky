@@ -55,6 +55,7 @@ import threading
 from datetime import timedelta
 
 from bluesky.exceptions import BlueSkyConfigurationError
+from bluesky.models.fires import Fire
 
 from .. import (
     DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE
