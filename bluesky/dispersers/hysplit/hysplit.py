@@ -99,6 +99,7 @@ class HYSPLITDispersion(DispersionBase):
         args:
          - wdir -- working directory
         """
+        self._set_grid_params()
         self._create_dummy_fire_if_necessary()
         self._set_reduction_factor()
         fire_sets, num_processes  = self._compute_tranches()
@@ -168,8 +169,8 @@ class HYSPLITDispersion(DispersionBase):
         f = Fire(
             # let fire autogenerate id
             area=1,
-            latitude=self.config("CENTER_LATITUDE"),
-            longitude=self.config("CENTER_LONGITUDE"),
+            latitude=self._grid_params['center_latitude'],
+            longitude=self._grid_params['center_longitude'],
             utc_offset=0, # since plumerise and timeprofile will have utc keys
             plumerise={},
             timeprofile={},
@@ -596,34 +597,7 @@ class HYSPLITDispersion(DispersionBase):
 
         return verticalMethod
 
-    def _write_control_file(self, control_file, concFile):
-        num_fires = len(self._fires)
-        num_heights = self.num_output_quantiles + 1  # number of quantiles used, plus ground level
-        num_sources = num_fires * num_heights
-
-        # An arbitrary height value.  Used for the default source height
-        # in the CONTROL file.  This can be anything we want, because
-        # the actual source heights are overridden in the EMISS.CFG file.
-        sourceHeight = 15.0
-
-        verticalMethod = self._get_vertical_method()
-
-        # Height of the top of the model domain
-        modelTop = self.config("TOP_OF_MODEL_DOMAIN")
-
-        #modelEnd = self._model_start + timedelta(hours=self._num_hours)
-
-        # Build the vertical Levels string
-        levels = self.config("VERTICAL_LEVELS")
-        numLevels = len(levels)
-        verticalLevels = " ".join(str(x) for x in levels)
-
-        # If not specified, projection is assumed to be 'LatLon'
-        is_deg = (self.config('projection') or 'LatLon') == 'LatLon'
-
-        # Warn about multiple sampling grid levels and KML/PNG image generation
-        if numLevels > 1:
-            logging.warn("KML and PNG images will be empty since more than 1 vertical level is selected")
+    def _set_grid_params(self):
 
         if self.config("USER_DEFINED_GRID"):
             # This supports BSF config settings
@@ -671,15 +645,45 @@ class HYSPLITDispersion(DispersionBase):
 
         logging.debug("grid_params: %s", grid_params)
 
-        self._grid_params = grid_params # to include in self._run's return data
+        self._grid_params = grid_params
+
+
+    def _write_control_file(self, control_file, concFile):
+        num_fires = len(self._fires)
+        num_heights = self.num_output_quantiles + 1  # number of quantiles used, plus ground level
+        num_sources = num_fires * num_heights
+
+        # An arbitrary height value.  Used for the default source height
+        # in the CONTROL file.  This can be anything we want, because
+        # the actual source heights are overridden in the EMISS.CFG file.
+        sourceHeight = 15.0
+
+        verticalMethod = self._get_vertical_method()
+
+        # Height of the top of the model domain
+        modelTop = self.config("TOP_OF_MODEL_DOMAIN")
+
+        #modelEnd = self._model_start + timedelta(hours=self._num_hours)
+
+        # Build the vertical Levels string
+        levels = self.config("VERTICAL_LEVELS")
+        numLevels = len(levels)
+        verticalLevels = " ".join(str(x) for x in levels)
+
+        # If not specified, projection is assumed to be 'LatLon'
+        is_deg = (self.config('projection') or 'LatLon') == 'LatLon'
+
+        # Warn about multiple sampling grid levels and KML/PNG image generation
+        if numLevels > 1:
+            logging.warn("KML and PNG images will be empty since more than 1 vertical level is selected")
 
         # To minimize change in the following code, set aliases
-        centerLat =  grid_params["center_latitude"]
-        centerLon = grid_params["center_longitude"]
-        widthLon = grid_params["width_longitude"]
-        heightLat = grid_params["height_latitude"]
-        spacingLon = grid_params["spacing_longitude"]
-        spacingLat = grid_params["spacing_latitude"]
+        centerLat =  self._grid_params["center_latitude"]
+        centerLon = self._grid_params["center_longitude"]
+        widthLon = self._grid_params["width_longitude"]
+        heightLat = self._grid_params["height_latitude"]
+        spacingLon = self._grid_params["spacing_longitude"]
+        spacingLat = self._grid_params["spacing_latitude"]
 
         # Decrease the grid resolution based on number of fires
         if self.config("OPTIMIZE_GRID_RESOLUTION"):
