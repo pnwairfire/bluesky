@@ -75,7 +75,7 @@ class Fire(dict):
             # record  utc offset of initial growth window, in case
             # start_utc is being called
             self.__utc_offset = growths[0].get('location', {}).get('utc_offset')
-            return datetimeutils.parse_datetime(growths[0], 'start')
+            return datetimeutils.parse_datetime(growths[0]['start'], 'start')
 
     @property
     def start_utc(self):
@@ -94,7 +94,7 @@ class Fire(dict):
             # record  utc offset of initial growth window, in case
             # start_utc is being called
             self.__utc_offset = growths[-1].get('location', {}).get('utc_offset')
-            return datetimeutils.parse_datetime(growths[-1], 'end')
+            return datetimeutils.parse_datetime(growths[-1]['end'], 'end')
 
     @property
     def end_utc(self):
