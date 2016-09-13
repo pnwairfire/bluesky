@@ -86,6 +86,11 @@ class Fire(dict):
         """Returns end of final growth window
 
         Doesn't memoize, in case growth windows are added/removed/modified
+
+        TODO: take into account possibility of growth objects having different
+          utc offsets.  (It's an extreme edge case where one start/end string
+          is gt/lt another when utc offset is ignored but not when utc offset
+          is considered, so this isn't a high priority)
         """
         # consider only growth windows with end times
         growths = [g for g in self.get('growth', []) if g.get('end')]
