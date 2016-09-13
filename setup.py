@@ -57,6 +57,9 @@ setup(
     ],
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/pyairfire/",
+        "https://pypi.smoke.airfire.org/simple/afconfig/",
+        "https://pypi.smoke.airfire.org/simple/afdatetime/",
+        "https://pypi.smoke.airfire.org/simple/afscripting/",
         "https://pypi.smoke.airfire.org/simple/eflookup/",
         "https://pypi.smoke.airfire.org/simple/emitcalc/",
         "https://pypi.smoke.airfire.org/simple/fccsmap/",
