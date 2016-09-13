@@ -43,15 +43,17 @@ setup(
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
     install_requires=[
         "pyairfire>=1.2.3,<2.0.0",
-        "afdatetime==1.0.0"
-        "eflookup>=1.0.2",
-        "emitcalc>=1.0.1",
-        "fccsmap>=1.0.1",
-        "timeprofile>=1.0.0",
-        "met>=1.0.1",
-        "plumerise>=1.0.0",
-        "blueskykml>=1.0.1",
-        "apps-consume4>=4.1.3"
+        "afconfig==1.*",
+        "afdatetime==1.*",
+        "afscripting==1.*",
+        "eflookup==1.*",
+        "emitcalc==1.*",
+        "fccsmap==1.*",
+        "timeprofile==1.*",
+        "met==1.*",
+        "plumerise==1.*",
+        "blueskykml==1.*",
+        "apps-consume4==4.1.*"
     ],
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/pyairfire/",

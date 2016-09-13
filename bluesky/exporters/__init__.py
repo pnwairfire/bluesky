@@ -11,7 +11,7 @@ import shutil
 import tarfile
 import tempfile
 
-from pyairfire import configuration
+import afconfig
 
 
 # TODO: Support exporting VSMOKE dispersion, which would include KMLs
@@ -25,7 +25,7 @@ class ExporterBase(object):
         self._extra_exports = extra_exports
 
     def config(self, *keys, **kwargs):
-        return configuration.get_config_value(self._config, *keys, **kwargs)
+        return afconfig.get_config_value(self._config, *keys, **kwargs)
 
     def export(self, fires_manager):
         raise NotImplementedError("Bluesky's {} exporter needs to "

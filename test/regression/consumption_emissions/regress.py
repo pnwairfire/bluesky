@@ -12,7 +12,7 @@ import sys
 import traceback
 import uuid
 
-from pyairfire import scripting
+import afscripting
 
 # Hack to put the repo root dir at the front of sys.path so that
 # the local bluesky package is found
@@ -436,7 +436,7 @@ def run(args):
     return success
 
 if __name__ == "__main__":
-    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+    parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
     if args.data_dir not in DATA_DIRS:
         logging.error("Invalid data directory: %s", args.data_dir)
@@ -448,6 +448,6 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(e)
         logging.debug(traceback.format_exc())
-        scripting.utils.exit_with_msg(e)
+        afscripting.utils.exit_with_msg(e)
 
     sys.exit(int(not success))

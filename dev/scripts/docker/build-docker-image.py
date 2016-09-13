@@ -8,7 +8,7 @@ import subprocess
 import sys
 import traceback
 
-from pyairfire import scripting
+import afscripting
 
 DEFAULT_BIN_DIR = os.path.join(os.path.expanduser("~"), 'bin')
 REQUIRED_ARGS = []
@@ -60,20 +60,20 @@ def _call(cmd_args):
     logging.info("Calling: {}".format(' '.join(cmd_args)))
     r = subprocess.call(cmd_args)
     if r:
-        scripting.utils.exit_with_msg(
+        afscripting.utils.exit_with_msg(
             "Command '{}' returned error code {}".format(' '.join(cmd_args), r),
             exit_code=r)
 
 def _check_binaries_list(args):
     # make sure bin dir exists and that each exe exists
     if not os.path.isdir(args.bin_dir):
-        scripting.utils.exit_with_msg("bin dir {} does not exist".format(
+        afscripting.utils.exit_with_msg("bin dir {} does not exist".format(
             args.bin_dir))
 
     for b in BINARIES:
         pathname = os.path.join(args.bin_dir, b)
         if not os.path.isfile(pathname):
-            scripting.utils.exit_with_msg(
+            afscripting.utils.exit_with_msg(
                 "binary {} does not exist".format(pathname))
 
 def _pre_clean():
@@ -109,7 +109,7 @@ def _print_final_instructions(args):
     sys.stdout.write(FINAL_INSTRUCTIONS)
 
 if __name__ == "__main__":
-    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+    parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
 
     _check_binaries_list(args)

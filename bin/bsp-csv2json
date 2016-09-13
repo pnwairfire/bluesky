@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pyairfire import scripting
+import afscripting
 
 try:
     from bluesky import io
@@ -48,7 +48,7 @@ Example calls:
  """
 
 def main():
-    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+    parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
     io.CSV2JSON(args.input_file, args.output_file,
         'id' if args.merge_fires else None, 'fire_information').convert()

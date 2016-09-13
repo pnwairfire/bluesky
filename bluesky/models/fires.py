@@ -14,7 +14,8 @@ import traceback
 import uuid
 from collections import OrderedDict
 
-from pyairfire import process, configuration
+import afconfig
+from pyairfire import process
 
 from bluesky import datautils, datetimeutils
 from bluesky.exceptions import (
@@ -370,14 +371,14 @@ class FiresManager(object):
         return val
 
     def get_config_value(self, *keys, **kwargs):
-        return configuration.get_config_value(self.config, *keys,
+        return afconfig.get_config_value(self.config, *keys,
             **kwargs)
 
     def set_config_value(self, value, *keys):
         self._meta['config'] = self._meta.get('config') or dict()
         value = self.replace_config_wildcards(value)
-        configuration.set_config_value(self._meta['config'], value, *keys)
-        self._im_config = configuration.ImmutableConfigDict(self._meta['config'])
+        afconfig.set_config_value(self._meta['config'], value, *keys)
+        self._im_config = afconfig.ImmutableConfigDict(self._meta['config'])
 
     @property
     def config(self):
@@ -387,12 +388,12 @@ class FiresManager(object):
     def config(self, config):
         self._raw_config = copy.deepcopy(config)
         self._meta['config'] = self.replace_config_wildcards(config)
-        self._im_config = configuration.ImmutableConfigDict(self._meta['config'])
+        self._im_config = afconfig.ImmutableConfigDict(self._meta['config'])
 
     def merge_config(self, config_dict):
         if config_dict:
             # Use setter to take care of resetting self._im_config
-            self.config = configuration.merge_configs(
+            self.config = afconfig.merge_configs(
                 self._meta.get('config') or dict(), config_dict)
 
     ##

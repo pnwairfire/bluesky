@@ -15,7 +15,8 @@ import logging
 import os
 from collections import namedtuple
 
-from pyairfire import osutils, configuration
+import afconfig
+from pyairfire import osutils
 from afdatetime import parsing as datetime_parsing
 
 from blueskykml import (
@@ -400,18 +401,18 @@ class HysplitVisualizer(object):
         # TODO: should we be using google's icon as the default?
         # Use google's fire icon instead of BlueSkyKml's built-in icon
         # (if an alternative isn't already specified)
-        if configuration.get_config_value(config_options,
+        if afconfig.get_config_value(config_options,
                 'SmokeDispersionKMLInput', 'FIRE_EVENT_ICON') is None:
-            configuration.set_config_value(config_options,
+            afconfig.set_config_value(config_options,
                 self.DEFAULT_FIRE_EVENT_ICON,
                 'SmokeDispersionKMLInput', 'FIRE_EVENT_ICON')
 
         # set output directory if not already specified
-        if configuration.get_config_value(config_options,
+        if afconfig.get_config_value(config_options,
                 'DispersionGridOutput', 'OUTPUT_DIR') is None:
             images_dir = str(os.path.join(output_directory,
                 self._config.get('images_dir') or ''))
-            configuration.set_config_value(config_options, images_dir,
+            afconfig.set_config_value(config_options, images_dir,
                 'DispersionGridOutput', 'OUTPUT_DIR')
 
         return config_options

@@ -8,7 +8,7 @@ import subprocess
 import sys
 import traceback
 
-from pyairfire import scripting
+import afscripting
 
 REQUIRED_ARGS = [
     {
@@ -78,7 +78,7 @@ you have to cp or mv directories under your home dir in order to mount them.
 
 
 if __name__ == "__main__":
-    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+    parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
 
     # TODO: if repo root is in args.input_file, replace it with ''
@@ -123,4 +123,4 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(e)
         logging.debug(traceback.format_exc())
-        scripting.utils.exit_with_msg(e)
+        afscripting.utils.exit_with_msg(e)

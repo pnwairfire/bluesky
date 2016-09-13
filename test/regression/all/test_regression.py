@@ -18,8 +18,8 @@ import subprocess
 import sys
 import traceback
 
+import afscripting
 from numpy.testing import assert_approx_equal
-from pyairfire import scripting
 
 # Hack to put the repo root dir at the front of sys.path so that
 # the local bluesky package is found
@@ -155,7 +155,7 @@ def test(module=None):
     assert all(results)
 
 if __name__ == "__main__":
-    parser, args = scripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+    parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
     if args.module and args.module not in MODULES:
         logging.error("Module '%s' has no test data or is invalid", args.module)
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     except Exception as e:
         logging.error(e)
         logging.debug(traceback.format_exc())
-        scripting.utils.exit_with_msg(e)
+        afscripting.utils.exit_with_msg(e)
 
     # No need to exit with code when we use the assertions in `test`, above.
     #  (script will return 0 if sucecss and 1 otherwise.)
