@@ -189,13 +189,22 @@ class TestFire:
         # multiple growth windows, all with 'start' & 'end' defined, out of
         # order, with utc_offset defined
         f = fires.Fire({
-            "location": {
-                "utc_offset": '-07:00'
-            },
             "growth": [
-                {'start': "2014-05-29T17:00:00", 'end': "2014-05-30T17:00:00"},
-                {'start': "2014-05-27T17:00:00", 'end': "2014-05-28T17:00:00"},
-                {'start': "2014-05-28T17:00:00", 'end': "2014-05-29T17:00:00"}
+                {
+                    "location": {"utc_offset": '-07:00'},
+                    'start': "2014-05-29T17:00:00",
+                    'end': "2014-05-30T17:00:00"
+                },
+                {
+                    "location": {"utc_offset": '-07:00'},
+                    'start': "2014-05-27T17:00:00",
+                    'end': "2014-05-28T17:00:00"
+                },
+                {
+                    "location": {"utc_offset": '-07:00'},
+                    'start': "2014-05-28T17:00:00",
+                    'end': "2014-05-29T17:00:00"
+                }
             ]
         })
         assert datetime.datetime(2014,5,27,17,0,0) == f.start
@@ -337,34 +346,31 @@ class TestFiresManager(object):
         fm = fires.FiresManager()
         f1 = fires.Fire({
             'id': '1',
-            'location': {'area': 34, 'latitude': 45.0, 'longitude': -120.0},
             'growth': [
                 {
                     "start": "2014-05-27T17:00:00",
                     "end": "2014-05-28T17:00:00",
-                    "pct": 100.0
+                    'location': {'area': 34, 'latitude': 45.0, 'longitude': -120.0},
                 },
                 {
                     "start": "2014-05-25T17:00:00",
                     "end": "2014-05-26T17:00:00",
-                    "pct": 100.0
+                    'location': {'area': 34, 'latitude': 45.0, 'longitude': -120.0},
                 }
             ]
         })
         f2 = fires.Fire({
             'id': '2',
-            'location': {'area': 132, 'latitude': 45.0, 'longitude': -120.0},
             "growth":[
                 {
                     "start": "2014-05-27T19:00:00",
                     "end": "2014-05-28T19:00:00",
-                    "pct": 100.0
+                    'location': {'area': 132, 'latitude': 45.0, 'longitude': -120.0},
                 }
             ]
         })
         f3 = fires.Fire({
             'id': '2',
-            'location': {'area': 300, 'latitude': 40.0, 'longitude': -120.0}
         })
         fm.fires = [f1, f2, f3]
         assert datetime.datetime(2014,5,25,17) == fm.earliest_start
@@ -857,12 +863,7 @@ class TestFiresManagerMergeFires(object):
             fm = fires.FiresManager()
             fm.set_config_value(s, 'merge', 'skip_failures')
             f = fires.Fire({
-                'id': '1',
-                'location': {
-                    'area': 34,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                'id': '1'
             })
             f2 = fires.Fire({
                 'id': '1',
@@ -870,14 +871,14 @@ class TestFiresManagerMergeFires(object):
                     {
                         "start": "2014-05-27T17:00:00",
                         "end": "2014-05-28T17:00:00",
-                        "pct": 100.0
+                        "pct": 100.0,
+                        'location': {
+                            'area': 132,
+                            'latitude': 45.0,
+                            'longitude': -120.0
+                        }
                     }
-                ],
-                'location': {
-                    'area': 132,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                ]
             })
             fm.fires = [f, f2]
             if not s:
@@ -904,22 +905,12 @@ class TestFiresManagerMergeFires(object):
                 'id': '1',
                 "event_of":{
                     "id": "ABC"
-                },
-                'location': {
-                    'area': 32,
-                    'latitude': 45.0,
-                    'longitude': -120.0
                 }
             })
             f2 = fires.Fire({
                 'id': '1',
                 "event_of":{
                     "id": "SDF"
-                },
-                'location': {
-                    'area': 132,
-                    'latitude': 45.0,
-                    'longitude': -120.0
                 }
             })
             fm.fires = [f, f2]
@@ -941,22 +932,12 @@ class TestFiresManagerMergeFires(object):
             f = fires.Fire({
                 'id': '1',
                 "type": "rx",
-                "fuel_type": "natural",
-                'location': {
-                    'area': 23,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                "fuel_type": "natural"
             })
             f2 = fires.Fire({
                 'id': '1',
                 "type": "wf",
-                "fuel_type": "natural",
-                'location': {
-                    'area': 132,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                "fuel_type": "natural"
             })
             fm.fires = [f, f2]
             assert fm.num_fires == 2
@@ -991,32 +972,17 @@ class TestFiresManagerMergeFires(object):
         f = fires.Fire({
             'id': '1',
             "type": "rx",
-            "fuel_type": "natural",
-            'location': {
-                'area': 50,
-                'latitude': 45.2,
-                'longitude': -120.0
-            }
+            "fuel_type": "natural"
         })
         f2 = fires.Fire({
             'id': '1',
             "type": "rx",
-            "fuel_type": "natural",
-            'location': {
-                'area': 132,
-                'latitude': 45.2,
-                'longitude': -120.0
-            }
+            "fuel_type": "natural"
         })
         f3 = fires.Fire({
             'id': '2',
             "type": "rx",
-            "fuel_type": "natural",
-            'location': {
-                'area': 136,
-                'latitude': 45.0,
-                'longitude': -120.0
-            }
+            "fuel_type": "natural"
         })
         fm.fires = [f, f2, f3]
         assert fm.num_fires == 3
@@ -1025,22 +991,12 @@ class TestFiresManagerMergeFires(object):
             fires.Fire({
                 'id': '1',
                 "type": "rx",
-                "fuel_type": "natural",
-                'location': {
-                    'area': 182.0,
-                    'latitude': 45.2,
-                    'longitude': -120.0
-                }
+                "fuel_type": "natural"
             }),
             fires.Fire({
                 'id': '2',
                 "type": "rx",
-                "fuel_type": "natural",
-                'location': {
-                    'area': 136,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                "fuel_type": "natural"
             })
         ]
         assert fm.num_fires == 2
@@ -1053,21 +1009,24 @@ class TestFiresManagerMergeFires(object):
             'id': '1',
             "type": "rx",
             "fuel_type": "natural",
-            'location': {
-                'area': 90,
-                'latitude': 45.0,
-                'longitude': -120.0
-            },
             "growth": [
                 {
                     "start": "2014-05-28T17:00:00",
                     "end": "2014-05-29T17:00:00",
-                    "pct": 60.0
+                    'location': {
+                        'area': 90,
+                        'latitude': 45.0,
+                        'longitude': -120.0
+                    }
                 },
                 {
                     "start": "2014-05-29T17:00:00",
                     "end": "2014-05-30T17:00:00",
-                    "pct": 40.0
+                    'location': {
+                        'area': 90,
+                        'latitude': 46.0,
+                        'longitude': -120.0
+                    }
                 }
             ]
         })
@@ -1075,16 +1034,15 @@ class TestFiresManagerMergeFires(object):
             'id': '1',
             "type": "rx",
             "fuel_type": "natural",
-            'location': {
-                'area': 10,
-                'latitude': 45.0,
-                'longitude': -120.0
-            },
             "growth": [
                 {
                     "start": "2014-05-27T17:00:00",
                     "end": "2014-05-28T17:00:00",
-                    "pct": 100.0
+                    'location': {
+                        'area': 10,
+                        'latitude': 45.0,
+                        'longitude': -120.0
+                    }
                 }
             ]
         })
@@ -1092,16 +1050,15 @@ class TestFiresManagerMergeFires(object):
             'id': '2',
             "type": "rx",
             "fuel_type": "natural",
-            'location': {
-                'area': 132,
-                'latitude': 45.0,
-                'longitude': -120.0
-            },
             "growth": [
                 {
                     "start": "2014-05-27T17:00:00",
                     "end": "2014-05-30T17:00:00",
-                    "pct": 100.0
+                    'location': {
+                        'area': 132,
+                        'latitude': 45.0,
+                        'longitude': -120.0
+                    }
                 }
             ]
         })
@@ -1114,26 +1071,33 @@ class TestFiresManagerMergeFires(object):
                 'id': '1',
                 "type": "rx",
                 "fuel_type": "natural",
-                'location': {
-                    'area': 100,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                },
                 "growth": [
                     {
                         "start": "2014-05-27T17:00:00",
                         "end": "2014-05-28T17:00:00",
-                        "pct": 10.0
+                        'location': {
+                            'area': 10,
+                            'latitude': 45.0,
+                            'longitude': -120.0
+                        }
                     },
                     {
                         "start": "2014-05-28T17:00:00",
                         "end": "2014-05-29T17:00:00",
-                        "pct": 54.0
+                        'location': {
+                            'area': 90,
+                            'latitude': 45.0,
+                            'longitude': -120.0
+                        }
                     },
                     {
                         "start": "2014-05-29T17:00:00",
                         "end": "2014-05-30T17:00:00",
-                        "pct": 36.0
+                        'location': {
+                            'area': 90,
+                            'latitude': 46.0,
+                            'longitude': -120.0
+                        }
                     }
                 ]
             }),
@@ -1141,16 +1105,15 @@ class TestFiresManagerMergeFires(object):
                 'id': '2',
                 "type": "rx",
                 "fuel_type": "natural",
-                'location': {
-                    'area': 132,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                },
                 "growth": [
                     {
                         "start": "2014-05-27T17:00:00",
                         "end": "2014-05-30T17:00:00",
-                        "pct": 100.0
+                        'location': {
+                            'area': 132,
+                            'latitude': 45.0,
+                            'longitude': -120.0
+                        }
                     }
                 ]
             })
