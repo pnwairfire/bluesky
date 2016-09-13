@@ -786,25 +786,17 @@ class TestFiresManagerMergeFires(object):
         assert fm.num_fires == 2
         assert fm.fires == [f, f2]
 
-    def test_pre_ingestion(self):
-        # test in both skip and no-skip modes
-        for s in (True, False):
-            # i.e. insufficient data to merge
-            fm = fires.FiresManager()
-            fm.set_config_value(s, 'merge', 'skip_failures')
-            f = fires.Fire({'id': '1'})
-            f2 = fires.Fire({'id': '1'})
-            fm.fires = [f, f2]
-            assert fm.num_fires == 2
-            if not s:
-                with raises(ValueError) as e_info:
-                    fm.merge_fires()
-                assert fm.num_fires == 2
-                assert e_info.value.args[0].index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
-            else:
-                fm.merge_fires()
-                assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.id))
+    def test_simple(self):
+        fm = fires.FiresManager()
+        f = fires.Fire({'id': '1'})
+        f2 = fires.Fire({'id': '1'})
+        fm.fires = [f, f2]
+        fm.num_fires == 1
+        assert dict(fm.fires[0]) == {
+            'id': '1',
+            'fuel_type': fires.Fire.DEFAULT_FUEL_TYPE,
+            'type': fires.Fire.DEFAULT_TYPE
+        }
 
     def test_post_fuelbeds(self):
         # test in both skip and no-skip modes
@@ -824,39 +816,6 @@ class TestFiresManagerMergeFires(object):
                 fm.merge_fires()
                 assert fm.num_fires == 2
                 assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.id))
-
-    def test_differing_locations(self):
-        # test in both skip and no-skip modes
-        for s in (True, False):
-            fm = fires.FiresManager()
-            fm.set_config_value(s, 'merge', 'skip_failures')
-            f = fires.Fire({
-                'id': '1',
-                'location': {
-                    'area': 12,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
-            })
-            f2 = fires.Fire({
-                'id': '1',
-                'location': {
-                    'area': 132,
-                    'latitude': 47.0,
-                    'longitude': -120.0
-                }
-            })
-            fm.fires = [f, f2]
-            if not s:
-                with raises(ValueError) as e_info:
-                    fm.merge_fires()
-                assert fm.num_fires == 2
-                assert e_info.value.args[0].index(fires.FiresMerger.LOCATION_MISMATCH_MSG) > 0
-            else:
-                fm.merge_fires()
-                # Sort by area since ids are the same
-                assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
 
     def test_growth_for_only_one_fire(self):
         # test in both skip and no-skip modes
@@ -891,7 +850,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int('growth' in e))
 
     def test_overlapping_growth(self):
         # TODO: implemented once check is in place
@@ -906,13 +865,17 @@ class TestFiresManagerMergeFires(object):
                 'id': '1',
                 "event_of":{
                     "id": "ABC"
-                }
+                },
+                # growth just used for assertion, below
+                "growth": [{"location":{'area': 123}}]
             })
             f2 = fires.Fire({
                 'id': '1',
                 "event_of":{
                     "id": "SDF"
-                }
+                },
+                # growth just used for assertion, below
+                "growth": [{"location":{'area': 456}}]
             })
             fm.fires = [f, f2]
             if not s:
@@ -923,7 +886,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.growth[0]['location']['area']))
 
     def test_different_fire_and_fuel_type(self):
         # test in both skip and no-skip modes
@@ -933,12 +896,16 @@ class TestFiresManagerMergeFires(object):
             f = fires.Fire({
                 'id': '1',
                 "type": "rx",
-                "fuel_type": "natural"
+                "fuel_type": "natural",
+                # growth just used for assertion, below
+                "growth": [{"location":{'area': 123}}]
             })
             f2 = fires.Fire({
                 'id': '1',
                 "type": "wf",
-                "fuel_type": "natural"
+                "fuel_type": "natural",
+                # growth just used for assertion, below
+                "growth": [{"location":{'area': 456}}]
             })
             fm.fires = [f, f2]
             assert fm.num_fires == 2
@@ -951,7 +918,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.growth[0]['location']['area']))
 
             f2.type = f.type
             f2.fuel_type = "activity"
@@ -965,7 +932,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.growth[0]['location']['area']))
 
     def test_merge_mixed_success_no_growth(self):
         fm = fires.FiresManager()
@@ -1120,12 +1087,6 @@ class TestFiresManagerMergeFires(object):
             })
         ]
         actual = sorted(fm.fires, key=lambda e: int(e.id))
-        # assert growth precentages for fire id 1 separately, using
-        # numpy's assert_approx_equal, to handle rounding errors
-        for i in range(3):
-            assert_approx_equal(
-                expected[0].growth[i].pop('pct'),
-                actual[0].growth[i].pop('pct'))
         assert expected == actual
 
 
