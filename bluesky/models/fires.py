@@ -795,7 +795,7 @@ class FiresMerger(FiresActionBase):
          - combined_fire -- in-progress combined fire (which could be None)
         """
         if not combined_fire:
-            # We need to instantiate a dict from fire in order to deepcopy id.
+            # We need to instantiate a dict from fire in order to deepcopy it.
             # We need to deepcopy so that that modifications to
             # new_combined_fire don't modify fire
             new_combined_fire = Fire(copy.deepcopy(dict(fire)))
@@ -805,8 +805,12 @@ class FiresMerger(FiresActionBase):
             # See note, above, regarding instantiating dict and then deep copying
             new_combined_fire = Fire(copy.deepcopy(dict(combined_fire)))
             try:
-                new_combined_fire.location['area'] += fire.location['area']
-                self._merge_growth_into_combined_fire(fire, combined_fire, new_combined_fire)
+                # merge growth; remember, at this point, growth will be
+                # defined for none or all of the fires to be merged
+                if new_combined_fire.get('growth'):
+                    new_combined_fire.growth.extend(copy.deepcopy(fire.growth))
+                    new_combined_fire.growth.sort(key=lambda e: e['start'])
+
                 # TODO: merge anything else?
 
                 # if remove_fire fails, combined_fire won't be updated
@@ -817,42 +821,18 @@ class FiresMerger(FiresActionBase):
 
         return new_combined_fire
 
-    def _merge_growth_into_combined_fire(self, fire, combined_fire,
-            new_combined_fire):
-        # factor by which we need to multiple combined_fire's growth pcts
-        # (at this point, growth windows are defined or not defined for
-        #  both fires)
-        if combined_fire.get('growth'):
-            c_growth_factor = float(combined_fire.location['area']) / float(
-                new_combined_fire.location['area'])
-            for g in new_combined_fire.growth:
-                g['pct'] *= c_growth_factor
-
-            # copy it to preserve old fire, in case theres a failure
-            # downstream and we abort this merge
-            new_growth = copy.deepcopy(fire.growth)
-            # factor by which we need to multiple to-merge fire's growth pcts
-            f_growth_factor = 1.0 - c_growth_factor
-            for g in new_growth:
-                g['pct'] *= f_growth_factor
-
-            new_combined_fire.growth.extend(new_growth)
-            new_combined_fire.growth.sort(key=lambda e: e['start'])
-
     ##
     ## Validation / Check Methods
     ##
 
     # TODO: maybe eventually be able to merge post-consumption, emissions,
     #   etc., but for now only support merging just-ingested fire data
-    REQUIRED_MERGE_FIELDS = set(['location'])
-    ALL_MERGEABLE_FIELDS = REQUIRED_MERGE_FIELDS.union(
+    ALL_MERGEABLE_FIELDS = set(
         ["id", "event_of", "type", "fuel_type", "growth"])
     INVALID_KEYS_MSG =  "invalid data set"
     def _check_keys(self, fire):
         keys = set(fire.keys())
-        if (not self.REQUIRED_MERGE_FIELDS.issubset(keys) or
-                not keys.issubset(self.ALL_MERGEABLE_FIELDS)):
+        if not keys.issubset(self.ALL_MERGEABLE_FIELDS):
             self._fail(fire, self.INVALID_KEYS_MSG)
 
     GROWTH_FOR_BOTH_OR_NONE_MSG = ("growth windows must be defined for both "
@@ -870,6 +850,8 @@ class FiresMerger(FiresActionBase):
             self._fail(fire, self.GROWTH_FOR_BOTH_OR_NONE_MSG)
 
         # TODO: check for overlaps
+        # TODO: additionally, take into account time zones when checking
+        #    for overlaps
 
     EVENT_MISMATCH_MSG = "fire event ids don't match"
     def _check_event_of(self, fire, combined_fire):
