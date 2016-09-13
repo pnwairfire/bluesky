@@ -19,7 +19,7 @@ import subprocess
 from datetime import timedelta
 
 from pyairfire import osutils
-from pyairfire.datetime import parsing as datetime_parsing
+from afdatetime import parsing as datetime_parsing
 
 from bluesky import datautils, locationutils
 from bluesky.datetimeutils import parse_utc_offset

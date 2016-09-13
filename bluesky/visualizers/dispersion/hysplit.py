@@ -16,7 +16,7 @@ import os
 from collections import namedtuple
 
 from pyairfire import osutils, configuration
-from pyairfire.datetime import parsing as datetime_parsing
+from afdatetime import parsing as datetime_parsing
 
 from blueskykml import (
     makedispersionkml, makeaquiptdispersionkml,

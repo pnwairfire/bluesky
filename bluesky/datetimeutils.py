@@ -1,7 +1,7 @@
 """bluesky.datetimeutils
 
 TODO: Remove this module and update all imports of this module to import
-  from pyairfire.datetime.parsing directly
+  from afdatetime.parsing directly
 """
 
 __author__ = "Joel Dubowy"
@@ -9,7 +9,7 @@ __author__ = "Joel Dubowy"
 import datetime
 import re
 
-from pyairfire.datetime.parsing import (
+from afdatetime.parsing import (
     parse_datetime,
     parse_datetimes,
     parse_utc_offset,

@@ -1,7 +1,7 @@
 """bluesky.datautils
 
 TODO: Remove this module and update all imports of this module to import
-  from pyairfire.datetime.parsing directly
+  from afdatetime.parsing directly
 """
 
 __author__ = "Joel Dubowy"
