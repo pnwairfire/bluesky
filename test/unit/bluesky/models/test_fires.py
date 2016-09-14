@@ -1429,16 +1429,16 @@ class TestFiresManagerFilterFires(object):
             'filter', 'location', 'boundary')
         scenarios = (
             # missing lat
-            (fires.Fire({'id': '1', 'location':{'longitude': -80.0}}),
+            (fires.Fire({'id': '1', 'growth': [{'location':{'longitude': -80.0}}]}),
              fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
             # missing lng
-            (fires.Fire({'id': '1', 'location':{'longitude': -80.0}}),
+            (fires.Fire({'id': '1', 'growth': [{'location':{'longitude': -80.0}}]}),
              fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
             # missing both lat and lng
-            (fires.Fire({'id': '1', 'location':{}}),
+            (fires.Fire({'id': '1', 'growth': [{'location':{}}]}),
              fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
             # missing location
-            (fires.Fire({'id': '1'}),
+            (fires.Fire({'id': '1', 'growth': [{}]}),
              fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
         )
         for f, err_msg in scenarios:
@@ -1461,14 +1461,14 @@ class TestFiresManagerFilterFires(object):
 
         fm = fires.FiresManager()
         init_fires = [
-            fires.Fire({'id': '1', 'location':{'area': 45}}),
-            fires.Fire({'id': '2', 'location':{'area': 95}}),
-            fires.Fire({'id': '3', 'location':{'area': 55}}),
-            fires.Fire({'id': '4', 'location':{'area': 65}}),
-            fires.Fire({'id': '5', 'location':{'area': 85}}),
-            fires.Fire({'id': '6', 'location':{'area': 75}}),
-            fires.Fire({'id': '7', 'location':{'area': 50}}),
-            fires.Fire({'id': '8', 'location':{'area': 30}})
+            fires.Fire({'id': '1', 'growth': [{'location':{'area': 45}}]}),
+            fires.Fire({'id': '2', 'growth': [{'location':{'area': 95}}]}),
+            fires.Fire({'id': '3', 'growth': [{'location':{'area': 55}}]}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'area': 65}}]}),
+            fires.Fire({'id': '5', 'growth': [{'location':{'area': 85}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'area': 75}}]}),
+            fires.Fire({'id': '7', 'growth': [{'location':{'area': 50}}]}),
+            fires.Fire({'id': '8', 'growth': [{'location':{'area': 30}}]})
         ]
         fm.fires = init_fires
         assert fm.num_fires == 8
@@ -1535,12 +1535,12 @@ class TestFiresManagerFilterFires(object):
         # min only
         fm.set_config_value({'min': 47}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '2', 'location':{'area': 95}}),
-            fires.Fire({'id': '3', 'location':{'area': 55}}),
-            fires.Fire({'id': '4', 'location':{'area': 65}}),
-            fires.Fire({'id': '5', 'location':{'area': 85}}),
-            fires.Fire({'id': '6', 'location':{'area': 75}}),
-            fires.Fire({'id': '7', 'location':{'area': 50}})
+            fires.Fire({'id': '2', 'growth': [{'location':{'area': 95}}]}),
+            fires.Fire({'id': '3', 'growth': [{'location':{'area': 55}}]}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'area': 65}}]}),
+            fires.Fire({'id': '5', 'growth': [{'location':{'area': 85}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'area': 75}}]}),
+            fires.Fire({'id': '7', 'growth': [{'location':{'area': 50}}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 6
@@ -1548,11 +1548,11 @@ class TestFiresManagerFilterFires(object):
         # max only
         fm.set_config_value({'max': 90}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '3', 'location':{'area': 55}}),
-            fires.Fire({'id': '4', 'location':{'area': 65}}),
-            fires.Fire({'id': '5', 'location':{'area': 85}}),
-            fires.Fire({'id': '6', 'location':{'area': 75}}),
-            fires.Fire({'id': '7', 'location':{'area': 50}})
+            fires.Fire({'id': '3', 'growth': [{'location':{'area': 55}}]}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'area': 65}}]}),
+            fires.Fire({'id': '5', 'growth': [{'location':{'area': 85}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'area': 75}}]}),
+            fires.Fire({'id': '7', 'growth': [{'location':{'area': 50}}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 5
@@ -1561,9 +1561,9 @@ class TestFiresManagerFilterFires(object):
         # both min and max
         fm.set_config_value({'min': 52, 'max': 77.0}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '3', 'location':{'area': 55}}),
-            fires.Fire({'id': '4', 'location':{'area': 65}}),
-            fires.Fire({'id': '6', 'location':{'area': 75}})
+            fires.Fire({'id': '3', 'growth': [{'location':{'area': 55}}]}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'area': 65}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'area': 75}}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 3
@@ -1572,7 +1572,7 @@ class TestFiresManagerFilterFires(object):
         # both min and max
         fm.set_config_value({'min': 65, 'max': 65.0}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '4', 'location':{'area': 65}}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'area': 65}}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 1
