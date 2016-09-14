@@ -29,10 +29,14 @@ def run(fires_manager):
         fccsmap_version=fccsmap.__version__)
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
+            if not fire.get('growth'):
+                raise ValueError(
+                    "Growth information required to look up fuelbeds")
+
             for g in fire['growth']:
                 if not g.get('location'):
                     raise ValueError(
-                        "Location information required to look up fuelbeds")
+                        "growth location information required to look up fuelbeds")
                 # TODO: instead of instantiating a new FccsLookUp and Estimator
                 #   for each growth object, create AK and non-AK lookup and
                 #   estimator objects that are reused, and set reference to
