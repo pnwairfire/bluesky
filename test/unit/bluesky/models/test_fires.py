@@ -798,14 +798,14 @@ class TestFiresManagerMergeFires(object):
             'type': fires.Fire.DEFAULT_TYPE
         }
 
-    def test_post_fuelbeds(self):
+    def test_invalid_keys(self):
         # test in both skip and no-skip modes
         for s in (True, False):
-            # i.e. too much data to merge
+            # i.e. top-level location is old structure
             fm = fires.FiresManager()
             fm.set_config_value(s, 'merge', 'skip_failures')
-            f = fires.Fire({'id': '1', 'location': {'area': 132}, 'fuelbeds': {}})
-            f2 = fires.Fire({'id': '1', 'location': {'area': 132}, 'fuelbeds': {}})
+            f = fires.Fire({'id': '1', 'location': {'area': 132}})
+            f2 = fires.Fire({'id': '1', 'location': {'area': 132}})
             fm.fires = [f, f2]
             if not s:
                 with raises(ValueError) as e_info:
