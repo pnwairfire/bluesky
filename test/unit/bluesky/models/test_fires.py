@@ -1093,7 +1093,7 @@ class TestFiresManagerMergeFires(object):
 ##
 ## Tests for Filtering
 ##
-## TODO: unit test fires.FiresFilter directly
+## TODO: unit test fires.FireGrowthFilter directly
 ##
 
 class TestFiresManagerFilterFires(object):
@@ -1110,10 +1110,10 @@ class TestFiresManagerFilterFires(object):
 
         ## No filters specifeid
         fm.set_config_value(False, 'filter', 'skip_failures')
-        with raises(fires.FiresFilter.FilterError) as e_info:
+        with raises(fires.FireGrowthFilter.FilterError) as e_info:
             fm.filter_fires()
         assert fm.num_fires == 1
-        assert e_info.value.args[0] == fires.FiresFilter.NO_FILTERS_MSG
+        assert e_info.value.args[0] == fires.FireGrowthFilter.NO_FILTERS_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
         assert fm.num_fires == 1
@@ -1141,10 +1141,10 @@ class TestFiresManagerFilterFires(object):
         ## empty config
         fm.set_config_value({}, 'filter', 'country')
         fm.set_config_value(False, 'filter', 'skip_failures')
-        with raises(fires.FiresFilter.FilterError) as e_info:
+        with raises(fires.FireGrowthFilter.FilterError) as e_info:
             fm.filter_fires()
         assert fm.num_fires == 11
-        assert e_info.value.args[0] == fires.FiresFilter.MISSING_FILTER_CONFIG_MSG
+        assert e_info.value.args[0] == fires.FireGrowthFilter.MISSING_FILTER_CONFIG_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
         assert fm.num_fires == 11
@@ -1153,10 +1153,10 @@ class TestFiresManagerFilterFires(object):
         ## Neither whitelist nor blacklist is specified
         fm.set_config_value({'foo': 'bar'}, 'filter', 'country')
         fm.set_config_value(False, 'filter', 'skip_failures')
-        with raises(fires.FiresFilter.FilterError) as e_info:
+        with raises(fires.FireGrowthFilter.FilterError) as e_info:
             fm.filter_fires()
         assert fm.num_fires == 11
-        assert e_info.value.args[0] == fires.FiresFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
+        assert e_info.value.args[0] == fires.FireGrowthFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
         assert fm.num_fires == 11
@@ -1166,10 +1166,10 @@ class TestFiresManagerFilterFires(object):
         fm.set_config_value(False, 'filter', 'skip_failures')
         fm.set_config_value(["ZZ"], 'filter', 'country', 'blacklist')
         fm.set_config_value(["YY"], 'filter', 'country', 'whitelist')
-        with raises(fires.FiresFilter.FilterError) as e_info:
+        with raises(fires.FireGrowthFilter.FilterError) as e_info:
             fm.filter_fires()
         assert fm.num_fires == 11
-        assert e_info.value.args[0] == fires.FiresFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
+        assert e_info.value.args[0] == fires.FireGrowthFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
         assert fm.num_fires == 11
@@ -1272,49 +1272,49 @@ class TestFiresManagerFilterFires(object):
         ## Failure situations
         scenarios = (
             # empty config
-            ({}, fires.FiresFilter.MISSING_FILTER_CONFIG_MSG),
+            ({}, fires.FireGrowthFilter.MISSING_FILTER_CONFIG_MSG),
             # boundary not specified
-            ({'foo': 'bar'}, fires.FiresFilter.SPECIFY_BOUNDARY_MSG),
+            ({'foo': 'bar'}, fires.FireGrowthFilter.SPECIFY_BOUNDARY_MSG),
 
             ## Invalid boundary
             # Invalid and insufficient keys
             ({'boundary': {"foo": "bar"}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_FIELDS_MSG),
             # Invalid keys
             ({'boundary': {
                 "sdfsdf": 123,
                 "ne": {"lat": 88.12, "lng": 40},
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_FIELDS_MSG),
             # insufficient keys
             ({'boundary': {
                 "ne": {"lng": 40},
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_FIELDS_MSG),
             ({'boundary': {
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_FIELDS_MSG),
             # lat/lng outside of valid range
             ({'boundary': {
                 "ne": {"lat": 98.12, "lng": 40},
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_MSG),
             # sw east of ne
             ({'boundary': {
                 "ne": {"lat": 68.12, "lng": 40},
                 "sw": {"lat": 50.75,"lng": 50.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_MSG),
             # sw north of ne
             ({'boundary': {
                 "ne": {"lat": 48.12, "lng": 40},
                 "sw": {"lat": 50.75,"lng": -50.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_MSG)
+                fires.FireGrowthFilter.INVALID_BOUNDARY_MSG)
         )
         for config, err_msg in scenarios:
             fm.set_config_value(config, 'filter', 'location')
             # don't skip failures
             fm.set_config_value(False, 'filter', 'skip_failures')
-            with raises(fires.FiresFilter.FilterError) as e_info:
+            with raises(fires.FireGrowthFilter.FilterError) as e_info:
                 fm.filter_fires()
             assert fm.num_fires == 9
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
@@ -1431,22 +1431,22 @@ class TestFiresManagerFilterFires(object):
         scenarios = (
             # missing lat
             (fires.Fire({'id': '1', 'location':{'longitude': -80.0}}),
-             fires.FiresFilter.MISSING_FIRE_LAT_LNG_MSG),
+             fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
             # missing lng
             (fires.Fire({'id': '1', 'location':{'longitude': -80.0}}),
-             fires.FiresFilter.MISSING_FIRE_LAT_LNG_MSG),
+             fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
             # missing both lat and lng
             (fires.Fire({'id': '1', 'location':{}}),
-             fires.FiresFilter.MISSING_FIRE_LAT_LNG_MSG),
+             fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
             # missing location
             (fires.Fire({'id': '1'}),
-             fires.FiresFilter.MISSING_FIRE_LAT_LNG_MSG),
+             fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
         )
         for f, err_msg in scenarios:
             fm.fires = [f]
             # don't skip failures
             fm.set_config_value(False, 'filter', 'skip_failures')
-            with raises(fires.FiresFilter.FilterError) as e_info:
+            with raises(fires.FireGrowthFilter.FilterError) as e_info:
                 fm.filter_fires()
             assert fm.num_fires == 1
             assert [f] == fm.fires
@@ -1476,33 +1476,33 @@ class TestFiresManagerFilterFires(object):
         ## Failure situations
         scenarios = (
             # empty config
-            ({}, fires.FiresFilter.MISSING_FILTER_CONFIG_MSG),
+            ({}, fires.FireGrowthFilter.MISSING_FILTER_CONFIG_MSG),
             # either min nor max is specified
-            ({'foo': 'bar'}, fires.FiresFilter.SPECIFY_MIN_OR_MAX_MSG),
+            ({'foo': 'bar'}, fires.FireGrowthFilter.SPECIFY_MIN_OR_MAX_MSG),
 
             ## Invalid min/max
             # both negative
             ({'min': -20, 'max': -2},
-                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
             # min is negative
             ({'min': -20, 'max': 2},
-                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
             ({'min': -20},
-                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
             # max is negative
             ({'min': 20, 'max': -2},
-                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
             ({'max': -2},
-                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
             # min > max
             ({'min': 20, 'max': 2},
-                fires.FiresFilter.INVALID_MIN_MUST_BE_LTE_MAX_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MUST_BE_LTE_MAX_MSG),
         )
         for config, err_msg in scenarios:
             fm.set_config_value(config, 'filter', 'area')
             # don't skip failures
             fm.set_config_value(False, 'filter', 'skip_failures')
-            with raises(fires.FiresFilter.FilterError) as e_info:
+            with raises(fires.FireGrowthFilter.FilterError) as e_info:
                 fm.filter_fires()
             assert fm.num_fires == 8
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
@@ -1594,19 +1594,19 @@ class TestFiresManagerFilterFires(object):
         scenarios = (
             # missing area
             (fires.Fire({'id': '1', 'location':{}}),
-             fires.FiresFilter.MISSING_FIRE_AREA_MSG),
+             fires.FireGrowthFilter.MISSING_FIRE_AREA_MSG),
             # missing location
             (fires.Fire({'id': '1'}),
-             fires.FiresFilter.MISSING_FIRE_AREA_MSG),
+             fires.FireGrowthFilter.MISSING_FIRE_AREA_MSG),
             # negative area
             (fires.Fire({'id': '1', 'location':{'area': -123}}),
-             fires.FiresFilter.NEGATIVE_FIRE_AREA_MSG),
+             fires.FireGrowthFilter.NEGATIVE_FIRE_AREA_MSG),
         )
         for f, err_msg in scenarios:
             fm.fires = [f]
             # don't skip failures
             fm.set_config_value(False, 'filter', 'skip_failures')
-            with raises(fires.FiresFilter.FilterError) as e_info:
+            with raises(fires.FireGrowthFilter.FilterError) as e_info:
                 fm.filter_fires()
             assert fm.num_fires == 1
             assert [f] == fm.fires

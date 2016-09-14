@@ -21,6 +21,7 @@ from bluesky import datautils, datetimeutils
 from bluesky.exceptions import (
     BlueSkyImportError, BlueSkyModuleError, BlueSkyDatetimeValueError
 )
+from bluesky.locationutils import LatLng
 
 __all__ = [
     'Fire',
@@ -520,7 +521,7 @@ class FiresManager(object):
     ## Filtering Fires
 
     def filter_fires(self):
-        with FiresFilter(self) as ff:
+        with FireGrowthFilter(self) as ff:
             ff.filter()
 
     ## Failures
@@ -879,8 +880,8 @@ class FiresMerger(FiresActionBase):
 ## Fires Filter
 ##
 
-class FiresFilter(FiresActionBase):
-    """Class for filtering fires by various criteria.
+class FireGrowthFilter(FiresActionBase):
+    """Class for filtering fire growth windows by various criteria.
 
     Note: The logic in this class is organized as a saparate class primarily
     for maintainability, testibility, and readability.  Some of it was
@@ -938,25 +939,39 @@ class FiresFilter(FiresActionBase):
                         raise
 
                 for fire in self._fires_manager.fires:
-                    try:
-                        if filter_func(fire):
-                            self._fires_manager.remove_fire(fire)
-                            if self._fires_manager.filtered_fires is None:
-                                self._fires_manager.filtered_fires  = []
-                            # TDOO: add reason for filtering (specify at least filed)
-                            self._fires_manager.filtered_fires.append(fire)
-                            logging.debug('Filtered fire %s (%s)', fire.id,
-                                fire._private_id)
-                    except self.FilterError as e:
-                        if self._skip_failures:
-                            # str(e) is already detailed
-                            logging.warn(str(e))
-                            continue
-                        else:
-                            raise
+                    if not fire.get('growth'):
+                        self._remove_fire(fire)
+                    else:
+                        i = 0
+                        while i < len(fire.get('growth', [])):
+                            try:
+                                if filter_func(fire, fire['growth'][i]):
+                                    fire['growth'].pop(i)
+                                    logging.debug('Filtered fire %s (%s)', fire.id,
+                                        fire._private_id)
+                                    if len(fire.get('growth')) == 0:
+                                        self._remove_fire(fire)
+                                        # Note: `i` must equal zero, and
+                                        #   while loop will terminate
+                                else:
+                                    i++
+                            except self.FilterError as e:
+                                if self._skip_failures:
+                                    # str(e) is already detailed
+                                    logging.warn(str(e))
+                                    continue
+                                else:
+                                    raise
 
                 logging.info("Number of fires after running %s filter: %d",
                     f, self._fires_manager.num_fires)
+
+    def _remove_fire(self, fire):
+        self._fires_manager.remove_fire(fire)
+        if self._fires_manager.filtered_fires is None:
+            self._fires_manager.filtered_fires  = []
+        # TDOO: add reason for filtering (specify at least filed)
+        self._fires_manager.filtered_fires.append(fire)
 
     ##
     ## Unterlying filter methods
@@ -974,23 +989,25 @@ class FiresFilter(FiresActionBase):
             # This will never happen if called internally
             raise self.FilterError(self.SPECIFY_FILTER_FIELD_MSG)
 
-        def _filter(fire):
+        def _filter(fire, g):
+            v = g.get('location', {}).get('filter_field'):
             if whitelist:
-                return not hasattr(fire, filter_field) or getattr(fire, filter_field) not in whitelist
+                return not v or v not in whitelist
             else:
-                return hasattr(fire, filter_field) and getattr(fire, filter_field) in blacklist
+                return v and v in blacklist
 
         return _filter
+
 
     SPECIFY_BOUNDARY_MSG = "Specify boundary to filter by location"
     INVALID_BOUNDARY_FIELDS_MSG = ("Filter boundary must specify 'ne' and 'sw',"
         " which each must have 'lat' and 'lng'")
     INVALID_BOUNDARY_MSG = "Invalid boundary for filtering"
     MISSING_FIRE_LAT_LNG_MSG = (
-        "Fire must have lat and lng defined to be filtered by location")
+        "Fire growth window must have lat and lng defined to be filtered by location")
     def _get_location_filter(self, **kwargs):
-        """Returns function that checks if fire is within boundary, which
-        should be of the form:
+        """Returns function that checks if fire growth window is within
+        boundary, which should be of the form:
 
             {
                 "ne": {
@@ -1018,10 +1035,11 @@ class FiresFilter(FiresActionBase):
                 any([b['ne'][k] < b['sw'][k] for k in ['lat','lng']])):
             raise self.FilterError(self.INVALID_BOUNDARY_MSG)
 
-        def _filter(fire):
+        def _filter(fire, g):
             try:
-                lat = fire.latitude
-                lng = fire.longitude
+                latlng = LatLng(g)
+                lat = g.latitude
+                lng = g.longitude
             except ValueError as e:
                 self._fail(fire, self.MISSING_FIRE_LAT_LNG_MSG)
             if not lat or not lng:
@@ -1035,8 +1053,8 @@ class FiresFilter(FiresActionBase):
     SPECIFY_MIN_OR_MAX_MSG = "Specify min and/or max area for filtering"
     INVALID_MIN_MAX_MUST_BE_POS_MSG = "Min and max areas must be positive for filtering"
     INVALID_MIN_MUST_BE_LTE_MAX_MSG = "Min area must be LTE max if both are specified"
-    MISSING_FIRE_AREA_MSG = "Fire must have area defined to be filtered by area"
-    NEGATIVE_FIRE_AREA_MSG = "Fire area can't be negative"
+    MISSING_GROWTH_AREA_MSG = "Fire growth window must have area defined to be filtered by area"
+    NEGATIVE_GROWTH_AREA_MSG = "Fire growth area can't be negative"
     def _get_area_filter(self, **kwargs):
         """Returns funciton that checks if a fire is smaller than some
         max threshold and/or larger than some min threshold.
@@ -1052,15 +1070,15 @@ class FiresFilter(FiresActionBase):
                 min_area > max_area):
             raise self.FilterError(self.INVALID_MIN_MUST_BE_LTE_MAX_MSG)
 
-        def _filter(fire):
-            if (not fire.get('location') or
-                    not isinstance(fire.location, dict) or
-                    not fire.location.get('area')):
-                self._fail(fire, self.MISSING_FIRE_AREA_MSG)
-            elif fire.location['area'] < 0.0:
-                self._fail(fire, self.NEGATIVE_FIRE_AREA_MSG)
+        def _filter(fire, g):
+            if (not g.get('location') or
+                    not isinstance(g['location'], dict) or
+                    not g['location'].get('area')):
+                self._fail(fire, self.MISSING_GROWTH_AREA_MSG)
+            elif g['location']['area'] < 0.0:
+                self._fail(fire, self.NEGATIVE_GROWTH_AREA_MSG)
 
-            return ((min_area is not None and fire.location['area'] < min_area) or
-                (max_area is not None and fire.location['area'] > max_area))
+            return ((min_area is not None and g['location']['area'] < min_area) or
+                (max_area is not None and g['location']['area'] > max_area))
 
         return _filter
