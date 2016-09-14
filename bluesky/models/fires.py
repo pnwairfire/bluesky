@@ -700,11 +700,17 @@ class FiresActionBase(object, metaclass=abc.ABCMeta):
     ## Helper methods
     ##
 
-    def _fail(self, fire, sub_msg):
+    def _fail_fire(self, fire, sub_msg):
         msg = "Failed to {} fire {} ({}): {}".format(
             self.ACTION, fire.id, fire._private_id, sub_msg)
         raise self._error_class(msg)
 
+    def _fail_or_skip(self, msg):
+        if self._skip_failures:
+            logging.warn(msg)
+            return
+        else:
+            raise self._error_class(msg)
 
 class FiresMerger(FiresActionBase):
     """Class for merging fires with the same id.
@@ -818,7 +824,7 @@ class FiresMerger(FiresActionBase):
                 self._fires_manager.remove_fire(fire)
 
             except Exception as e:
-                self._fail(fire, e)
+                self._fail_fire(fire, e)
 
         return new_combined_fire
 
@@ -834,7 +840,7 @@ class FiresMerger(FiresActionBase):
     def _check_keys(self, fire):
         keys = set(fire.keys())
         if not keys.issubset(self.ALL_MERGEABLE_FIELDS):
-            self._fail(fire, self.INVALID_KEYS_MSG)
+            self._fail_fire(fire, self.INVALID_KEYS_MSG)
 
     GROWTH_FOR_BOTH_OR_NONE_MSG = ("growth windows must be defined for both "
         "fires or neither in order to merge")
@@ -848,7 +854,7 @@ class FiresMerger(FiresActionBase):
         """
         if combined_fire and (
                 bool(combined_fire.get('growth')) != bool(fire.get('growth'))):
-            self._fail(fire, self.GROWTH_FOR_BOTH_OR_NONE_MSG)
+            self._fail_fire(fire, self.GROWTH_FOR_BOTH_OR_NONE_MSG)
 
         # TODO: check for overlaps
         # TODO: additionally, take into account time zones when checking
@@ -862,7 +868,7 @@ class FiresMerger(FiresActionBase):
             'event_of', {}).get('id')
         f_event_id = fire.get('event_of', {}).get('id')
         if c_event_id and f_event_id and c_event_id != f_event_id:
-            self._fail(fire, self.EVENT_MISMATCH_MSG)
+            self._fail_fire(fire, self.EVENT_MISMATCH_MSG)
 
     FIRE_TYPE_MISMATCH_MSG = "Fire types don't match"
     FUEL_TYPE_MISMATCH_MSG = "Fuel types don't match"
@@ -871,9 +877,9 @@ class FiresMerger(FiresActionBase):
         """
         if combined_fire:
             if fire.type != combined_fire.type:
-                self._fail(fire, self.FIRE_TYPE_MISMATCH_MSG)
+                self._fail_fire(fire, self.FIRE_TYPE_MISMATCH_MSG)
             if fire.fuel_type != combined_fire.fuel_type:
-                self._fail(fire, self.FUEL_TYPE_MISMATCH_MSG)
+                self._fail_fire(fire, self.FUEL_TYPE_MISMATCH_MSG)
 
 
 ##
@@ -887,6 +893,22 @@ class FireGrowthFilter(FiresActionBase):
     for maintainability, testibility, and readability.  Some of it was
     originally in the FiresManager class.
     """
+
+    def __init__(self, fires_manager):
+        """Constructor
+
+        args:
+         - fires_manager -- FiresManager object whose fires are to be merged
+        """
+        super(FireGrowthFilter, self).__init__(fires_manager)
+        self._filter_config = self._fires_manager.get_config_value('filter') or {}
+        self._filter_fields = set(self._filter_config.keys()) - set(['skip_failures'])
+        if not self._filter_fields:
+            if not self._skip_failures:
+                raise self.FilterError(self.NO_FILTERS_MSG)
+            # else, just log and return
+            logging.warn(self.NO_FILTERS_MSG)
+
 
     ACTION = 'filter'
     @property
@@ -904,69 +926,87 @@ class FireGrowthFilter(FiresActionBase):
     ##
 
     NO_FILTERS_MSG = "No filters specified"
-    MISSING_FILTER_CONFIG_MSG = "Specify config for each filter"
     def filter(self):
-        """Merges fires that have the same id.
+        """Runs all secified filtered
         """
-        filter_config = self._fires_manager.get_config_value('filter')
-        filter_fields = filter_config and [f for f in filter_config
-            if f != 'skip_failures']
-        if not filter_fields:
-            if not self._skip_failures:
-                raise self.FilterError(self.NO_FILTERS_MSG)
-            # else, just log and return
-            logging.warn(self.NO_FILTERS_MSG)
-        else:
-            for f in filter_fields:
-                logging.debug('About to run %s filter', f)
-                try:
-                    filter_getter = getattr(self, '_get_{}_filter'.format(f),
-                        self._get_filter)
-                    kwargs = filter_config.get(f)
-                    if not kwargs:
+        for filter_field in self._filter_fields:
+            logging.debug('About to run %s filter', filter_field)
+
+            # get filter function
+            try:
+                filter_func = self._get_filter_func(filter_field)
+            except self.FilterError as e:
+                if self._skip_failures:
+                    logging.warn("Failed to initialize %s filter: %s",
+                        filter_field, e)
+                    continue
+                else:
+                    raise
+
+            # run filter
+            self._filter(filter_func)
+            logging.info("Number of fires after running %s filter: %d",
+                filter_field, self._fires_manager.num_fires)
+
+    INVALID_FILTER_MSG = "Invalid filter"
+    MISSING_FILTER_CONFIG_MSG = "Specify config for each filter"
+    def _get_filter_func(self, filter_field):
+        """Filters by specified field
+
+        args
+         - filter_field -- field to filter by (e.g. 'country')
+        """
+        filter_getter = getattr(self, '_get_{}_filter'.format(filter_field),
+            self._get_filter)
+        if not filter_getter:
+            self._fail_or_skip(self.MISSING_FILTER_CONFIG_MSG)
+
+        kwargs = self._filter_config.get(filter_field)
+        if not kwargs:
+            self._fail_or_skip(self.MISSING_FILTER_CONFIG_MSG)
+
+        kwargs.update(filter_field=filter_field)
+        return filter_getter(**kwargs)
+
+    def _filter(self, filter_func):
+        """Filter by given filter func
+
+        args:
+         - filter_func -- function that takes fire and growth object and returns
+            boolean value indicating whether or not to remove growth object
+        """
+        for fire in self._fires_manager.fires:
+            if not fire.get('growth'):
+                self._remove_fire(fire)
+            else:
+                i = 0
+                while i < len(fire.get('growth', [])):
+                    try:
+                        if filter_func(fire, fire['growth'][i]):
+                            fire['growth'].pop(i)
+                            logging.debug('Filtered fire %s (%s)', fire.id,
+                                fire._private_id)
+                            if len(fire.get('growth')) == 0:
+                                self._remove_fire(fire)
+                                # Note: `i` must equal zero, and
+                                #   while loop will terminate
+                        else:
+                            i += 1
+                    except self.FilterError as e:
                         if self._skip_failures:
-                            logging.warn(self.MISSING_FILTER_CONFIG_MSG)
+                            # str(e) is already detailed
+                            logging.warn(str(e))
                             continue
                         else:
-                            raise self.FilterError(self.MISSING_FILTER_CONFIG_MSG)
-                    kwargs.update(filter_field=f)
-                    filter_func = filter_getter(**kwargs)
-                except self.FilterError as e:
-                    if self._skip_failures:
-                        logging.warn("Failed to initialize %s filter: %s", f, e)
-                        continue
-                    else:
-                        raise
-
-                for fire in self._fires_manager.fires:
-                    if not fire.get('growth'):
-                        self._remove_fire(fire)
-                    else:
-                        i = 0
-                        while i < len(fire.get('growth', [])):
-                            try:
-                                if filter_func(fire, fire['growth'][i]):
-                                    fire['growth'].pop(i)
-                                    logging.debug('Filtered fire %s (%s)', fire.id,
-                                        fire._private_id)
-                                    if len(fire.get('growth')) == 0:
-                                        self._remove_fire(fire)
-                                        # Note: `i` must equal zero, and
-                                        #   while loop will terminate
-                                else:
-                                    i++
-                            except self.FilterError as e:
-                                if self._skip_failures:
-                                    # str(e) is already detailed
-                                    logging.warn(str(e))
-                                    continue
-                                else:
-                                    raise
-
-                logging.info("Number of fires after running %s filter: %d",
-                    f, self._fires_manager.num_fires)
+                            raise
 
     def _remove_fire(self, fire):
+        """Removes fire from fires manager's `fire_information` list, and adds it
+        to `filtered_fires`
+
+        args
+         - fire -- fire to remove from active set
+        """
         self._fires_manager.remove_fire(fire)
         if self._fires_manager.filtered_fires is None:
             self._fires_manager.filtered_fires  = []
@@ -990,7 +1030,7 @@ class FireGrowthFilter(FiresActionBase):
             raise self.FilterError(self.SPECIFY_FILTER_FIELD_MSG)
 
         def _filter(fire, g):
-            v = g.get('location', {}).get('filter_field'):
+            v = g.get('location', {}).get('filter_field')
             if whitelist:
                 return not v or v not in whitelist
             else:
@@ -1041,9 +1081,9 @@ class FireGrowthFilter(FiresActionBase):
                 lat = g.latitude
                 lng = g.longitude
             except ValueError as e:
-                self._fail(fire, self.MISSING_FIRE_LAT_LNG_MSG)
+                self._fail_fire(fire, self.MISSING_FIRE_LAT_LNG_MSG)
             if not lat or not lng:
-                self._fail(fire, self.MISSING_FIRE_LAT_LNG_MSG)
+                self._fail_fire(fire, self.MISSING_FIRE_LAT_LNG_MSG)
 
             return (lat < b['sw']['lat'] or lat > b['ne']['lat'] or
                 lng < b['sw']['lng'] or lng > b['ne']['lng'])
@@ -1074,9 +1114,9 @@ class FireGrowthFilter(FiresActionBase):
             if (not g.get('location') or
                     not isinstance(g['location'], dict) or
                     not g['location'].get('area')):
-                self._fail(fire, self.MISSING_GROWTH_AREA_MSG)
+                self._fail_fire(fire, self.MISSING_GROWTH_AREA_MSG)
             elif g['location']['area'] < 0.0:
-                self._fail(fire, self.NEGATIVE_GROWTH_AREA_MSG)
+                self._fail_fire(fire, self.NEGATIVE_GROWTH_AREA_MSG)
 
             return ((min_area is not None and g['location']['area'] < min_area) or
                 (max_area is not None and g['location']['area'] > max_area))
