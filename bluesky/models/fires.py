@@ -1114,8 +1114,7 @@ class FireGrowthFilter(FiresActionBase):
             raise self.FilterError(self.INVALID_MIN_MUST_BE_LTE_MAX_MSG)
 
         def _filter(fire, g):
-            if (not g.get('location') or
-                    not isinstance(g['location'], dict) or
+            if (not isinstance(g.get('location'), dict) or
                     not g['location'].get('area')):
                 self._fail_fire(fire, self.MISSING_GROWTH_AREA_MSG)
             elif g['location']['area'] < 0.0:
