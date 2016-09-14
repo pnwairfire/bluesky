@@ -1077,6 +1077,8 @@ class FireGrowthFilter(FiresActionBase):
             raise self.FilterError(self.INVALID_BOUNDARY_MSG)
 
         def _filter(fire, g):
+            if not isinstance(g.get('location'), dict):
+                self._fail_fire(fire, self.MISSING_FIRE_LAT_LNG_MSG)
             try:
                 latlng = LatLng(g['location'])
                 lat = latlng.latitude
