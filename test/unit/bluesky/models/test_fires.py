@@ -1593,14 +1593,14 @@ class TestFiresManagerFilterFires(object):
         fm.set_config_value({'min': 0.0, 'max': 100.0}, 'filter', 'area')
         scenarios = (
             # missing area
-            (fires.Fire({'id': '1', 'location':{}}),
-             fires.FireGrowthFilter.MISSING_FIRE_AREA_MSG),
+            (fires.Fire({'id': '1', 'growth':[{'location':{}}]}),
+             fires.FireGrowthFilter.MISSING_GROWTH_AREA_MSG),
             # missing location
-            (fires.Fire({'id': '1'}),
-             fires.FireGrowthFilter.MISSING_FIRE_AREA_MSG),
+            (fires.Fire({'id': '1', 'growth':[{}]}),
+             fires.FireGrowthFilter.MISSING_GROWTH_AREA_MSG),
             # negative area
-            (fires.Fire({'id': '1', 'location':{'area': -123}}),
-             fires.FireGrowthFilter.NEGATIVE_FIRE_AREA_MSG),
+            (fires.Fire({'id': '1', 'growth':[{'location':{'area': -123}}]}),
+             fires.FireGrowthFilter.NEGATIVE_GROWTH_AREA_MSG),
         )
         for f, err_msg in scenarios:
             fm.fires = [f]
