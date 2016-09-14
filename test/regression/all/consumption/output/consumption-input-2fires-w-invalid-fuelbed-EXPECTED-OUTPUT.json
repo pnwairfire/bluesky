@@ -22,6 +22,14 @@
                     "residual": 0.0
                 }
             },
+            "heat": {
+                "summary": {
+                    "smoldering": 97145289.0437264,
+                    "residual": 0.0,
+                    "total": 1942905780.874528,
+                    "flaming": 1845760491.8308015
+                }
+            },
             "fuel_type": "natural",
             "event_of": {
                 "id": "ssdlfjsldfj",
@@ -29,6 +37,22 @@
             },
             "growth": [
                 {
+                    "consumption": {
+                        "summary": {
+                            "smoldering": 6.0715805652329005,
+                            "total": 121.43161130465798,
+                            "flaming": 115.36003073942508,
+                            "residual": 0.0
+                        }
+                    },
+                    "heat": {
+                        "summary": {
+                            "smoldering": 97145289.0437264,
+                            "residual": 0.0,
+                            "total": 1942905780.874528,
+                            "flaming": 1845760491.8308015
+                        }
+                    },
                     "start": "2015-01-20T15:00:00",
                     "end": "2015-01-21T15:00:00",
                     "fuelbeds": [

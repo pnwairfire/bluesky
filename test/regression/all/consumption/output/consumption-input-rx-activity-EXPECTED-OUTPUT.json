@@ -25,6 +25,22 @@
         {
             "growth": [
                 {
+                    "heat": {
+                        "summary": {
+                            "total": 32521406817.369915,
+                            "residual": 0.0,
+                            "smoldering": 1597084889.8008027,
+                            "flaming": 30924321927.56911
+                        }
+                    },
+                    "consumption": {
+                        "summary": {
+                            "total": 2032.5879260856193,
+                            "residual": 0.0,
+                            "smoldering": 99.81780561255016,
+                            "flaming": 1932.770120473069
+                        }
+                    },
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
                     "location": {
@@ -741,6 +757,14 @@
                 }
             ],
             "type": "rx",
+            "heat": {
+                "summary": {
+                    "total": 32521406817.369915,
+                    "residual": 0.0,
+                    "smoldering": 1597084889.8008027,
+                    "flaming": 30924321927.56911
+                }
+            },
             "consumption": {
                 "summary": {
                     "total": 2032.5879260856193,

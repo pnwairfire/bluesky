@@ -22,6 +22,14 @@
                     "residual": 113.49313429052381
                 }
             },
+            "heat": {
+                "summary": {
+                    "smoldering": 1712240003.4044595,
+                    "total": 9811672689.088081,
+                    "flaming": 6283542537.035241,
+                    "residual": 1815890148.6483805
+                }
+            },
             "fuel_type": "natural",
             "event_of": {
                 "id": "SF11E826544",
@@ -29,6 +37,22 @@
             },
             "growth": [
                 {
+                    "heat": {
+                        "summary": {
+                            "smoldering": 1712240003.4044595,
+                            "total": 9811672689.088081,
+                            "flaming": 6283542537.035241,
+                            "residual": 1815890148.6483805
+                        }
+                    },
+                    "consumption": {
+                        "summary": {
+                            "smoldering": 107.01500021277873,
+                            "total": 613.2295430680051,
+                            "flaming": 392.72140856470253,
+                            "residual": 113.49313429052381
+                        }
+                    },
                     "fuelbeds": [
                         {
                             "fccs_id": "10046",

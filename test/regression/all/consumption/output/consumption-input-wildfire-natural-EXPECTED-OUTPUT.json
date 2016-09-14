@@ -478,6 +478,14 @@
                     "residual": 4.022
                 }
             },
+            "heat":{
+                "summary": {
+                    "flaming": 31754439169.408424,
+                    "smoldering": 2140914805.560726,
+                    "total": 33959705974.96915,
+                    "residual": 64352000.000000015
+                }
+            },
             "event_of": {
                 "name": "Natural Fire near Snoqualmie Pass, WA",
                 "id": "SF11E826544"
@@ -485,6 +493,22 @@
             "type": "wildfire",
             "growth": [
                 {
+                    "heat":{
+                        "summary": {
+                            "flaming": 31754439169.408424,
+                            "smoldering": 2140914805.560726,
+                            "total": 33959705974.96915,
+                            "residual": 64352000.000000015
+                        }
+                    },
+                    "consumption": {
+                        "summary": {
+                            "flaming": 1984.652448088026,
+                            "smoldering": 133.80717534754538,
+                            "total": 2122.4816234355712,
+                            "residual": 4.022
+                        }
+                    },
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
                     "location": {

@@ -457,6 +457,22 @@
         {
             "growth": [
                 {
+                    "heat": {
+                        "summary": {
+                            "smoldering": 2140914805.560726,
+                            "flaming": 31754439169.408424,
+                            "total": 33959705974.96915,
+                            "residual": 64352000.000000015
+                        }
+                    },
+                    "consumption": {
+                        "summary": {
+                            "smoldering": 133.80717534754538,
+                            "flaming": 1984.652448088026,
+                            "total": 2122.4816234355712,
+                            "residual": 4.022
+                        }
+                    },
                     "start": "2014-05-29T22:00:00",
                     "end": "2014-05-30T01:00:00",
                     "localmet": {
@@ -2524,6 +2540,14 @@
             },
             "type": "wildfire",
             "fuel_type": "natural",
+            "heat": {
+                "summary": {
+                    "smoldering": 2140914805.560726,
+                    "flaming": 31754439169.408424,
+                    "total": 33959705974.96915,
+                    "residual": 64352000.000000015
+                }
+            },
             "consumption": {
                 "summary": {
                     "smoldering": 133.80717534754538,
