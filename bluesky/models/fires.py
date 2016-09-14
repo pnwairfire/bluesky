@@ -994,6 +994,7 @@ class FireGrowthFilter(FiresActionBase):
                             i += 1
                     except self.FilterError as e:
                         if self._skip_failures:
+                            i += 1
                             # str(e) is already detailed
                             logging.warn(str(e))
                             continue
@@ -1030,7 +1031,7 @@ class FireGrowthFilter(FiresActionBase):
             raise self.FilterError(self.SPECIFY_FILTER_FIELD_MSG)
 
         def _filter(fire, g):
-            v = g.get('location', {}).get('filter_field')
+            v = g.get('location', {}).get(filter_field)
             if whitelist:
                 return not v or v not in whitelist
             else:
@@ -1077,9 +1078,9 @@ class FireGrowthFilter(FiresActionBase):
 
         def _filter(fire, g):
             try:
-                latlng = LatLng(g)
-                lat = g.latitude
-                lng = g.longitude
+                latlng = LatLng(g['location'])
+                lat = latlng.latitude
+                lng = latlng.longitude
             except ValueError as e:
                 self._fail_fire(fire, self.MISSING_FIRE_LAT_LNG_MSG)
             if not lat or not lng:
