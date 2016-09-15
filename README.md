@@ -935,79 +935,80 @@ if you pass this data through ingestion:
 you'll end up with this:
 
     {
-        "today": "2016-07-27",
-        "fire_information": [
-            {
-                "fuel_type": "natural",
-                "growth": [
-                    {
-                        "end": "2015-01-21T17:00:00",
-                        "start": "2015-01-20T17:00:00",
-                        "location": {
-                            "latitude": 47.4316976,
-                            "longitude": -121.3990506,
-                            "utc_offset": "-09:00",
-                            "area": 200.0,
-                            "ecoregion": "southern"
-                        }
-                    }
-                ],
-                "id": "SF11C14225236095807750",
-                "type": "wildfire",
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Snoqualmie Pass, WA"
-                }
-            }
-        ],
         "config": {},
+        "today": "2016-09-15",
         "processing": [
             {
-                "module_name": "ingestion",
-                "version": "0.1.0",
                 "parsed_input": [
                     {
+                        "bar": 123,
                         "growth": [
                             {
                                 "end": "2015-01-21T17:00:00",
                                 "start": "2015-01-20T17:00:00"
                             }
                         ],
+                        "id": "SF11C14225236095807750",
                         "fuel_type": "natural",
+                        "event_of": {
+                            "name": "Natural Fire near Snoqualmie Pass, WA",
+                            "id": "SF11E826544"
+                        },
                         "ecoregion": "southern",
+                        "type": "wildfire",
                         "location": {
-                            "latitude": 47.4316976,
+                            "area": 200,
+                            "foo": "bar",
                             "longitude": -121.3990506,
                             "utc_offset": "-09:00",
-                            "area": 200,
-                            "foo": "bar"
-                        },
-                        "id": "SF11C14225236095807750",
-                        "type": "wildfire",
-                        "bar": 123,
-                        "event_of": {
-                            "id": "SF11E826544",
-                            "name": "Natural Fire near Snoqualmie Pass, WA"
+                            "latitude": 47.4316976
                         }
                     }
                 ],
-                "module": "bluesky.modules.ingestion"
+                "version": "0.1.0",
+                "module": "bluesky.modules.ingestion",
+                "module_name": "ingestion"
+            }
+        ],
+        "fire_information": [
+            {
+                "growth": [
+                    {
+                        "end": "2015-01-21T17:00:00",
+                        "location": {
+                            "area": 200.0,
+                            "ecoregion": "southern",
+                            "longitude": -121.3990506,
+                            "utc_offset": "-09:00",
+                            "latitude": 47.4316976
+                        },
+                        "start": "2015-01-20T17:00:00"
+                    }
+                ],
+                "fuel_type": "natural",
+                "id": "SF11C14225236095807750",
+                "event_of": {
+                    "name": "Natural Fire near Snoqualmie Pass, WA",
+                    "id": "SF11E826544"
+                },
+                "type": "wildfire"
             }
         ],
         "runtime": {
-            "end": "2016-07-27T00:37:01Z",
+            "end": "2016-09-15T18:56:21Z",
             "total": "0.0h 0.0m 0s",
-            "start": "2016-07-27T00:37:01Z",
             "modules": [
                 {
-                    "module_name": "ingestion",
+                    "end": "2016-09-15T18:56:21Z",
                     "total": "0.0h 0.0m 0s",
-                    "start": "2016-07-27T00:37:01Z",
-                    "end": "2016-07-27T00:37:01Z"
+                    "start": "2016-09-15T18:56:21Z",
+                    "module_name": "ingestion"
                 }
-            ]
+            ],
+            "start": "2016-09-15T18:56:21Z"
         }
     }
+
 
 Notice:
  - "foo" and "bar" were ignored (though left in the recorded raw input)
