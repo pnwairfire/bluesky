@@ -1136,57 +1136,10 @@ Ingestion requires that none of the fires in 'fire_information' are empty object
  - ***'fire_information' > 'type'*** -- *optional* -- fire type ('rx', 'wildfire', or 'wf' - 'wildfire' and 'wf' are equivalent); default 'wildfire'
  - ***'fire_information' > 'fuel_type'*** -- *optional* -- Fuel type ('natural', 'activity', or 'piles'); default 'natural'
 
-###### 'location'
-
-The following fields may be specified under a fire's "location" field or at the top level, in which case the ingestion module embeds it under 'location'
-
- - ***'fire_information' > 'location' > 'area'*** -- *required* if perimeter is not defined --
- - ***'fire_information' > 'location' > 'latitude'*** -- *required* if perimeter is not defined --
- - ***'fire_information' > 'location' > 'longitude'*** -- *required* if perimeter is not defined --
- - ***'fire_information' > 'location' > 'perimeter'*** -- *required* if single lat/lng + area aren't defined (if perimeter and lat/lng+area are specified, perimiter data is used and lat/lng+area are ignored) -- set of coordinates defining polygon representing fire perimeter
- - ***'fire_information' > 'location' > 'ecoregion'*** -- *optional* --
- - ***'fire_information' > 'location' > 'utc_offset'*** -- *optional* --
- - ***'fire_information' > 'location' > 'elevation'*** -- *optional* --
- - ***'fire_information' > 'location' > 'slope'*** -- *optional* --
- - ***'fire_information' > 'location' > 'state'*** -- *optional* --
- - ***'fire_information' > 'location' > 'county'*** -- *optional* --
- - ***'fire_information' > 'location' > 'country'*** -- *optional* --
- - ***'fire_information' > 'location' > 'fuel_1hr'*** -- *optional* --
- - ***'fire_information' > 'location' > 'fuel_10hr'*** -- *optional* --
- - ***'fire_information' > 'location' > 'fuel_100hr'*** -- *optional* --
- - ***'fire_information' > 'location' > 'fuel_1khr'*** -- *optional* --
- - ***'fire_information' > 'location' > 'fuel_10khr'*** -- *optional* --
- - ***'fire_information' > 'location' > 'fuel_gt10khr'*** -- *optional* --
- - ***'fire_information' > 'location' > 'canopy'*** -- *optional* --
- - ***'fire_information' > 'location' > 'shrub'*** -- *optional* --
- - ***'fire_information' > 'location' > 'grass'*** -- *optional* --
- - ***'fire_information' > 'location' > 'rot'*** -- *optional* --
- - ***'fire_information' > 'location' > 'duff'*** -- *optional* --
- - ***'fire_information' > 'location' > 'litter'*** -- *optional* --
- - ***'fire_information' > 'location' > 'moisture_1hr'*** -- *optional* --
- - ***'fire_information' > 'location' > 'moisture_10hr'*** -- *optional* --
- - ***'fire_information' > 'location' > 'moisture_100hr'*** -- *optional* --
- - ***'fire_information' > 'location' > 'moisture_1khr'*** -- *optional* --
- - ***'fire_information' > 'location' > 'moisture_live'*** -- *optional* --
- - ***'fire_information' > 'location' > 'moisture_duff'*** -- *optional* --
- - ***'fire_information' > 'location' > 'min_wind'*** -- *optional* --
- - ***'fire_information' > 'location' > 'max_wind'*** -- *optional* --
- - ***'fire_information' > 'location' > 'min_wind_aloft'*** -- *optional* --
- - ***'fire_information' > 'location' > 'max_wind_aloft'*** -- *optional* --
- - ***'fire_information' > 'location' > 'min_humid'*** -- *optional* --
- - ***'fire_information' > 'location' > 'max_humid'*** -- *optional* --
- - ***'fire_information' > 'location' > 'min_temp'*** -- *optional* --
- - ***'fire_information' > 'location' > 'max_temp'*** -- *optional* --
- - ***'fire_information' > 'location' > 'min_temp_hour'*** -- *optional* --
- - ***'fire_information' > 'location' > 'max_temp_hour'*** -- *optional* --
- - ***'fire_information' > 'location' > 'sunrise_hour'*** -- *optional* --
- - ***'fire_information' > 'location' > 'sunset_hour'*** -- *optional* --
- - ***'fire_information' > 'location' > 'snow_month'*** -- *optional* --
- - ***'fire_information' > 'location' > 'rain_days'*** -- *optional* --
-
 ###### 'event_of'
 
-The following fields may be specified under a fire's "location" field or at the top level, in which case the ingestion module embeds it under 'event_of'
+The following fields may be specified under a fire's "event_of" field or at
+the top level, in which case the ingestion module embeds it under 'event_of'
 
  - ***'fire_information' > 'event_of' > 'name'*** -- *optional* --
  - ***'fire_information' > 'event_of' > 'id'*** -- *optional* -- specified as 'event_id' if at the top level
@@ -1204,16 +1157,68 @@ If no growth objects are specified for a fire, but
 the fire has 'start' and 'end' keys, a growth object will be created with
 the 'start' and 'end' values
 
-###### 'fuelbeds'
+
+###### 'growth' > 'location'
+
+The following fields may be specified under a fire's "location" field or at the top level, in which case the ingestion module embeds it under 'location'
+The following fields may be specified within a fire growth window's "location"
+object or at the top level of the fire object, in which case the ingestion
+module embeds appropriately)
+
+ - ***'fire_information' > 'growth' > 'location' > 'area'*** -- *required* if perimeter is not defined --
+ - ***'fire_information' > 'growth' > 'location' > 'latitude'*** -- *required* if perimeter is not defined --
+ - ***'fire_information' > 'growth' > 'location' > 'longitude'*** -- *required* if perimeter is not defined --
+ - ***'fire_information' > 'growth' > 'location' > 'perimeter'*** -- *required* if single lat/lng + area aren't defined (if perimeter and lat/lng+area are specified, perimiter data is used and lat/lng+area are ignored) -- set of coordinates defining polygon representing fire perimeter
+ - ***'fire_information' > 'growth' > 'location' > 'ecoregion'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'utc_offset'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'elevation'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'slope'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'state'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'county'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'country'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'fuel_1hr'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'fuel_10hr'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'fuel_100hr'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'fuel_1khr'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'fuel_10khr'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'fuel_gt10khr'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'canopy'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'shrub'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'grass'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'rot'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'duff'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'litter'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'moisture_1hr'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'moisture_10hr'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'moisture_100hr'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'moisture_1khr'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'moisture_live'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'moisture_duff'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'min_wind'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'max_wind'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'min_wind_aloft'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'max_wind_aloft'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'min_humid'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'max_humid'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'min_temp'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'max_temp'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'min_temp_hour'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'max_temp_hour'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'sunrise_hour'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'sunset_hour'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'snow_month'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'location' > 'rain_days'*** -- *optional* --
+
+###### 'growth' > 'fuelbeds'
 
 No fuelbed data is required, but ingestion will pass on any fuelbeds defined
 
- - ***'fire_information' > 'fuelbeds' > 'fccs_id'*** -- *optional* --
- - ***'fire_information' > 'fuelbeds' > 'pct'*** -- *optional* --
- - ***'fire_information' > 'fuelbeds' > 'fuel_loadings'*** -- *optional* --
- - ***'fire_information' > 'fuelbeds' > 'consumption'*** -- *optional* --
- - ***'fire_information' > 'fuelbeds' > 'emissions'*** -- *optional* --
- - ***'fire_information' > 'fuelbeds' > 'emissions_details'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'fuelbeds' > 'fccs_id'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'fuelbeds' > 'pct'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'fuelbeds' > 'fuel_loadings'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'fuelbeds' > 'consumption'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'fuelbeds' > 'emissions'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'fuelbeds' > 'emissions_details'*** -- *optional* --
 
 ###### 'meta'
 
@@ -1233,35 +1238,35 @@ TODO: fill in this section...
 
 ##### fuelbeds
 
- - ***'fire_information' > 'location'*** -- *required* -- containing either single lat/lng + area or polygon perimeter coordinates
- - ***'fire_information' > 'location' > 'state'*** -- *required* if AK -- used to determine which FCCS version to use
+ - ***'fire_information' > 'growth' > 'location'*** -- *required* -- containing either single lat/lng + area or polygon perimeter coordinates
+ - ***'fire_information' > 'growth' > 'location' > 'state'*** -- *required* if AK -- used to determine which FCCS version to use
 
 ##### consumption
 
- - ***'fire_information' > 'fuelbeds'*** -- *required* -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
- - ***'fire_information' > 'location' > 'area'*** -- *required* -- fire's total area
- - ***'fire_information' > 'location' > 'ecoregion'*** -- *required*
- - ***'fire_information' > 'location' > 'fuel_moisture_1000hr_pct'*** -- *optional* -- default: 50
- - ***'fire_information' > 'location' > 'fuel_moisture_duff_pct'*** -- *optional* -- default: 50
- - ***'fire_information' > 'location' > 'canopy_consumption_pct'*** -- *optional* -- default: 0
- - ***'fire_information' > 'location' > 'shrub_blackened_pct'*** -- *optional* -- default: 50
- - ***'fire_information' > 'location' > 'output_units'*** -- *optional* -- default: "tons_ac"
- - ***'fire_information' > 'location' > 'pile_blackened_pct'*** -- *optional* -- default: 0
- - ***'fire_information' > 'type'*** -- *optional* -- fire type ('rx' vs. 'wildfire'); default: 'wildfire'
- - ***'fire_information' > 'fuel_type'*** -- *optional* -- fuel type ('natural', 'activity', or 'piles'); default: 'natural'
+ - ***'fire_information' > 'growth' > 'fuelbeds'*** -- *required* -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
+ - ***'fire_information' > 'growth' > 'location' > 'area'*** -- *required* -- fire's total area
+ - ***'fire_information' > 'growth' > 'location' > 'ecoregion'*** -- *required*
+ - ***'fire_information' > 'growth' > 'location' > 'fuel_moisture_1000hr_pct'*** -- *optional* -- default: 50
+ - ***'fire_information' > 'growth' > 'location' > 'fuel_moisture_duff_pct'*** -- *optional* -- default: 50
+ - ***'fire_information' > 'growth' > 'location' > 'canopy_consumption_pct'*** -- *optional* -- default: 0
+ - ***'fire_information' > 'growth' > 'location' > 'shrub_blackened_pct'*** -- *optional* -- default: 50
+ - ***'fire_information' > 'growth' > 'location' > 'output_units'*** -- *optional* -- default: "tons_ac"
+ - ***'fire_information' > 'growth' > 'location' > 'pile_blackened_pct'*** -- *optional* -- default: 0
+ - ***'fire_information' > 'growth' > 'type'*** -- *optional* -- fire type ('rx' vs. 'wildfire'); default: 'wildfire'
+ - ***'fire_information' > 'growth' > 'fuel_type'*** -- *optional* -- fuel type ('natural', 'activity', or 'piles'); default: 'natural'
 
 ###### if an 'rx' burn:
 
- - ***'fire_information' > 'location' > 'days_since_rain'*** -- *required* -- default: 1
- - ***'fire_information' > 'location' > 'length_of_ignition'*** -- *required* -- default: 1
- - ***'fire_information' > 'location' > 'slope'*** -- *optional* -- default: 5
- - ***'fire_information' > 'location' > 'windspeed'*** -- *optional* -- default: 5
- - ***'fire_information' > 'location' > 'fuel_moisture_10hr_pct'*** -- *optional* -- default: 50
- - ***'fire_information' > 'location' > 'fm_type'*** -- *optional* -- default: "MEAS-Th"
+ - ***'fire_information' > 'growth' > 'location' > 'days_since_rain'*** -- *required* -- default: 1
+ - ***'fire_information' > 'growth' > 'location' > 'length_of_ignition'*** -- *required* -- default: 1
+ - ***'fire_information' > 'growth' > 'location' > 'slope'*** -- *optional* -- default: 5
+ - ***'fire_information' > 'growth' > 'location' > 'windspeed'*** -- *optional* -- default: 5
+ - ***'fire_information' > 'growth' > 'location' > 'fuel_moisture_10hr_pct'*** -- *optional* -- default: 50
+ - ***'fire_information' > 'growth' > 'location' > 'fm_type'*** -- *optional* -- default: "MEAS-Th"
 
 ##### emissions
 
- - ***'fire_information' > 'fuelbeds' > 'consumption'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'fuelbeds' > 'consumption'*** -- *required* --
 
 ##### findmetdata
 
@@ -1270,7 +1275,7 @@ TODO: fill in this section...
 ##### localmet
 
  - ***'met' > 'files'*** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
- - ***'fire_information' > 'location'*** -- *required* -- fire location information containing 'utc_offset' and either single lat/lng or polygon shape data with multiple lat/lng coordinates
+ - ***'fire_information' > 'growth' > 'location'*** -- *required* -- fire location information containing 'utc_offset' and either single lat/lng or polygon shape data with multiple lat/lng coordinates
 
 ##### timeprofiling
 
@@ -1278,12 +1283,12 @@ TODO: fill in this section...
 
 ##### plumerising
 
- - ***'fire_information' > 'location' > 'area'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'location' > 'area'*** -- *required* --
 
 ###### If running FEPS model
 
- - ***'fire_information' > 'location' > 'area'*** -- *required* --
- - ***'fire_information' > 'fuelbeds' > 'consumption'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'location' > 'area'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'fuelbeds' > 'consumption'*** -- *required* --
  - ***'fire_information' > 'growth' > 'start'*** -- *required* --
  - ***'fire_information' > 'growth' > 'timeprofile'*** -- *required* --
 
@@ -1293,15 +1298,15 @@ defaults.
 
 ###### If running SEV model
 
- - ***'fire_information' > 'location' > 'area'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'location' > 'area'*** -- *required* --
  - ***'fire_information' > 'growth' > 'localmet'*** -- *required* --
  - ***'fire_information' > 'meta' > 'frp'*** -- *optional* --
 
 ##### dispersion
 
  - ***'fire_information' > 'growth' > 'timeprofile'*** -- *required* --
- - ***'fire_information' > 'fuelbeds' > 'emissions'*** -- *required* --
- - ***'fire_information' > 'location' > 'utc_offset'*** -- *optional* -- hours off UTC; default: 0.0
+ - ***'fire_information' > 'growth' > 'fuelbeds' > 'emissions'*** -- *required* --
+ - ***'fire_information' > 'growth' > 'location' > 'utc_offset'*** -- *optional* -- hours off UTC; default: 0.0
 
 ###### if running hysplit dispersion:
 
@@ -1338,12 +1343,12 @@ defaults.
  - ***'dispersion' > 'output' > 'directory'*** -- *required* --
  - ***'dispersion' > 'output' > 'grid_filename'*** -- *required* --
  - ***'fire_information' > 'id'*** -- *required* --
- - ***'fire_information' > 'location'*** -- *required* -- containing either single lat/lng + area or polygon perimeter coordinates + area
+ - ***'fire_information'> 'growth'  > 'location'*** -- *required* -- containing either single lat/lng + area or polygon perimeter coordinates + area
  - ***'fire_information' > 'type'*** -- *optional* --
  - ***'fire_information' > 'event_of' > 'name'*** -- *optional* --
  - ***'fire_information' > 'event_of' > 'id'*** -- *optional* --
- - ***'fire_information' > 'fuelbeds' > 'emissions'*** -- *optional* --
- - ***'fire_information' > 'fuelbeds' > 'fccs_id'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'fuelbeds' > 'emissions'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'fuelbeds' > 'fccs_id'*** -- *optional* --
  - ***'fire_information' > 'growth' > 'start'*** -- *required* --
  - ***'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, generates new guid
 
