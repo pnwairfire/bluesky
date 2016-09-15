@@ -1,0 +1,46 @@
+{
+    "config": {
+        "emissions": {
+            "species": ["PM25"]
+        },
+        "findmetdata": {
+            "met_root_dir": "/DRI_6km/"
+        },
+        "dispersion": {
+            "start": "2014-05-29T00:00:00",
+            "num_hours": 48,
+            "model": "hysplit",
+            "output_dir_name": "DRI6km-%Y%m%d-comptuted-grid-km-ZZZ",
+            "dest_dir": "/bsp-output/bsp-dispersion-output/",
+            "hysplit": {
+                "compute_grid": true,
+                "spacing_longitude": 6.0,
+                "spacing_latitude": 6.0,
+                "NUMPAR": 500,
+                "MAXPAR": 12000
+            }
+        },
+        "visualization": {
+            "target": "dispersion",
+            "hysplit": {
+                "images_dir": "images/",
+                "data_dir": "data/"
+            }
+        },
+        "export": {
+            "modes": ["email", "localsave"],
+            "extra_exports": ["dispersion", "visualization"],
+            "email": {
+                "recipients": ["jdubowy+blueskytest@gmail.com"],
+                "sender": "bsp@airfire.org",
+                "subject": "BSP output",
+                "smtp_server": "127.0.0.1",
+                "smtp_port": 1025
+            },
+            "localsave": {
+                "dest_dir": "/bsp-output/bsp-local-exports/",
+                "output_dir_name": "exported-{dispersion_output_dir_name}"
+            }
+        }
+    }
+}

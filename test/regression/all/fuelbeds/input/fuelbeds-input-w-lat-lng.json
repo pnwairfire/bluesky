@@ -7,13 +7,17 @@
             },
             "id": "SF11C14225236095807750",
             "type": "wildfire",
-            "location": {
-                "area": 500,
-                "ecoregion": "western",
-                "latitude": 45.0,
-                "longitude": -115.0,
-                "utc_offset": "-07:00"
-            }
+            "growth": [
+                {
+                    "location": {
+                        "area": 500,
+                        "ecoregion": "western",
+                        "latitude": 45.0,
+                        "longitude": -115.0,
+                        "utc_offset": "-07:00"
+                    }
+                }
+            ]
         }
     ]
 }

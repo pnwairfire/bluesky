@@ -82,9 +82,9 @@ def run(fires_manager):
                 if 'growth' not in fire:
                     raise ValueError("Missing growth data required for findmetdata")
                 # parse_utc_offset makes sure utc offset is defined and valid
-                utc_offset = parse_utc_offset(fire.get('location', {}).get('utc_offset'))
-                offset = datetime.timedelta(hours=utc_offset)
                 for g in fire.growth:
+                    utc_offset = parse_utc_offset(g.get('location', {}).get('utc_offset'))
+                    offset = datetime.timedelta(hours=utc_offset)
                     tw = parse_datetimes(g, 'start', 'end')
                     if tw['start'] > tw['end']:
                         raise ValueError("Invalid growth time window - start: {}, end: {}".format(

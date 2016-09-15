@@ -189,13 +189,22 @@ class TestFire:
         # multiple growth windows, all with 'start' & 'end' defined, out of
         # order, with utc_offset defined
         f = fires.Fire({
-            "location": {
-                "utc_offset": '-07:00'
-            },
             "growth": [
-                {'start': "2014-05-29T17:00:00", 'end': "2014-05-30T17:00:00"},
-                {'start': "2014-05-27T17:00:00", 'end': "2014-05-28T17:00:00"},
-                {'start': "2014-05-28T17:00:00", 'end': "2014-05-29T17:00:00"}
+                {
+                    "location": {"utc_offset": '-07:00'},
+                    'start': "2014-05-29T17:00:00",
+                    'end': "2014-05-30T17:00:00"
+                },
+                {
+                    "location": {"utc_offset": '-07:00'},
+                    'start': "2014-05-27T17:00:00",
+                    'end': "2014-05-28T17:00:00"
+                },
+                {
+                    "location": {"utc_offset": '-07:00'},
+                    'start': "2014-05-28T17:00:00",
+                    'end': "2014-05-29T17:00:00"
+                }
             ]
         })
         assert datetime.datetime(2014,5,27,17,0,0) == f.start
@@ -337,42 +346,40 @@ class TestFiresManager(object):
         fm = fires.FiresManager()
         f1 = fires.Fire({
             'id': '1',
-            'location': {'area': 34, 'latitude': 45.0, 'longitude': -120.0},
             'growth': [
                 {
                     "start": "2014-05-27T17:00:00",
                     "end": "2014-05-28T17:00:00",
-                    "pct": 100.0
+                    'location': {'area': 34, 'latitude': 45.0, 'longitude': -120.0},
                 },
                 {
                     "start": "2014-05-25T17:00:00",
                     "end": "2014-05-26T17:00:00",
-                    "pct": 100.0
+                    'location': {'area': 34, 'latitude': 45.0, 'longitude': -120.0},
                 }
             ]
         })
         f2 = fires.Fire({
             'id': '2',
-            'location': {'area': 132, 'latitude': 45.0, 'longitude': -120.0},
             "growth":[
                 {
                     "start": "2014-05-27T19:00:00",
                     "end": "2014-05-28T19:00:00",
-                    "pct": 100.0
+                    'location': {'area': 132, 'latitude': 45.0, 'longitude': -120.0},
                 }
             ]
         })
         f3 = fires.Fire({
             'id': '2',
-            'location': {'area': 300, 'latitude': 40.0, 'longitude': -120.0}
         })
         fm.fires = [f1, f2, f3]
         assert datetime.datetime(2014,5,25,17) == fm.earliest_start
         assert datetime.datetime(2014,5,28,19) == fm.latest_end
 
         # same thing, but with time zones specified for two of the fires
-        f1.location['utc_offset'] = '-07:00'
-        f3.location['utc_offset'] = '03:00' # no longer the latest time
+        f1.growth[0]['location']['utc_offset'] = '-07:00'
+        f1.growth[1]['location']['utc_offset'] = '-07:00'
+        f2.growth[0]['location']['utc_offset'] = '03:00' # no longer the latest time
         assert datetime.datetime(2014,5,26,0) == fm.earliest_start
         assert datetime.datetime(2014,5,29,0) == fm.latest_end
 
@@ -779,34 +786,26 @@ class TestFiresManagerMergeFires(object):
         assert fm.num_fires == 2
         assert fm.fires == [f, f2]
 
-    def test_pre_ingestion(self):
-        # test in both skip and no-skip modes
-        for s in (True, False):
-            # i.e. insufficient data to merge
-            fm = fires.FiresManager()
-            fm.set_config_value(s, 'merge', 'skip_failures')
-            f = fires.Fire({'id': '1'})
-            f2 = fires.Fire({'id': '1'})
-            fm.fires = [f, f2]
-            assert fm.num_fires == 2
-            if not s:
-                with raises(ValueError) as e_info:
-                    fm.merge_fires()
-                assert fm.num_fires == 2
-                assert e_info.value.args[0].index(fires.FiresMerger.INVALID_KEYS_MSG) > 0
-            else:
-                fm.merge_fires()
-                assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.id))
+    def test_simple(self):
+        fm = fires.FiresManager()
+        f = fires.Fire({'id': '1'})
+        f2 = fires.Fire({'id': '1'})
+        fm.fires = [f, f2]
+        fm.num_fires == 1
+        assert dict(fm.fires[0]) == {
+            'id': '1',
+            'fuel_type': fires.Fire.DEFAULT_FUEL_TYPE,
+            'type': fires.Fire.DEFAULT_TYPE
+        }
 
-    def test_post_fuelbeds(self):
+    def test_invalid_keys(self):
         # test in both skip and no-skip modes
         for s in (True, False):
-            # i.e. too much data to merge
+            # i.e. top-level location is old structure
             fm = fires.FiresManager()
             fm.set_config_value(s, 'merge', 'skip_failures')
-            f = fires.Fire({'id': '1', 'location': {'area': 132}, 'fuelbeds': {}})
-            f2 = fires.Fire({'id': '1', 'location': {'area': 132}, 'fuelbeds': {}})
+            f = fires.Fire({'id': '1', 'location': {'area': 132}})
+            f2 = fires.Fire({'id': '1', 'location': {'area': 132}})
             fm.fires = [f, f2]
             if not s:
                 with raises(ValueError) as e_info:
@@ -817,39 +816,6 @@ class TestFiresManagerMergeFires(object):
                 fm.merge_fires()
                 assert fm.num_fires == 2
                 assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.id))
-
-    def test_differing_locations(self):
-        # test in both skip and no-skip modes
-        for s in (True, False):
-            fm = fires.FiresManager()
-            fm.set_config_value(s, 'merge', 'skip_failures')
-            f = fires.Fire({
-                'id': '1',
-                'location': {
-                    'area': 12,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
-            })
-            f2 = fires.Fire({
-                'id': '1',
-                'location': {
-                    'area': 132,
-                    'latitude': 47.0,
-                    'longitude': -120.0
-                }
-            })
-            fm.fires = [f, f2]
-            if not s:
-                with raises(ValueError) as e_info:
-                    fm.merge_fires()
-                assert fm.num_fires == 2
-                assert e_info.value.args[0].index(fires.FiresMerger.LOCATION_MISMATCH_MSG) > 0
-            else:
-                fm.merge_fires()
-                # Sort by area since ids are the same
-                assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
 
     def test_growth_for_only_one_fire(self):
         # test in both skip and no-skip modes
@@ -857,12 +823,7 @@ class TestFiresManagerMergeFires(object):
             fm = fires.FiresManager()
             fm.set_config_value(s, 'merge', 'skip_failures')
             f = fires.Fire({
-                'id': '1',
-                'location': {
-                    'area': 34,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                'id': '1'
             })
             f2 = fires.Fire({
                 'id': '1',
@@ -870,14 +831,14 @@ class TestFiresManagerMergeFires(object):
                     {
                         "start": "2014-05-27T17:00:00",
                         "end": "2014-05-28T17:00:00",
-                        "pct": 100.0
+                        "pct": 100.0,
+                        'location': {
+                            'area': 132,
+                            'latitude': 45.0,
+                            'longitude': -120.0
+                        }
                     }
-                ],
-                'location': {
-                    'area': 132,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                ]
             })
             fm.fires = [f, f2]
             if not s:
@@ -889,7 +850,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int('growth' in e))
 
     def test_overlapping_growth(self):
         # TODO: implemented once check is in place
@@ -905,22 +866,16 @@ class TestFiresManagerMergeFires(object):
                 "event_of":{
                     "id": "ABC"
                 },
-                'location': {
-                    'area': 32,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                # growth just used for assertion, below
+                "growth": [{"location":{'area': 123}}]
             })
             f2 = fires.Fire({
                 'id': '1',
                 "event_of":{
                     "id": "SDF"
                 },
-                'location': {
-                    'area': 132,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                # growth just used for assertion, below
+                "growth": [{"location":{'area': 456}}]
             })
             fm.fires = [f, f2]
             if not s:
@@ -931,7 +886,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.growth[0]['location']['area']))
 
     def test_different_fire_and_fuel_type(self):
         # test in both skip and no-skip modes
@@ -942,21 +897,15 @@ class TestFiresManagerMergeFires(object):
                 'id': '1',
                 "type": "rx",
                 "fuel_type": "natural",
-                'location': {
-                    'area': 23,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                # growth just used for assertion, below
+                "growth": [{"location":{'area': 123}}]
             })
             f2 = fires.Fire({
                 'id': '1',
                 "type": "wf",
                 "fuel_type": "natural",
-                'location': {
-                    'area': 132,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                # growth just used for assertion, below
+                "growth": [{"location":{'area': 456}}]
             })
             fm.fires = [f, f2]
             assert fm.num_fires == 2
@@ -969,7 +918,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.growth[0]['location']['area']))
 
             f2.type = f.type
             f2.fuel_type = "activity"
@@ -983,7 +932,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.location['area']))
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.growth[0]['location']['area']))
 
     def test_merge_mixed_success_no_growth(self):
         fm = fires.FiresManager()
@@ -991,32 +940,17 @@ class TestFiresManagerMergeFires(object):
         f = fires.Fire({
             'id': '1',
             "type": "rx",
-            "fuel_type": "natural",
-            'location': {
-                'area': 50,
-                'latitude': 45.2,
-                'longitude': -120.0
-            }
+            "fuel_type": "natural"
         })
         f2 = fires.Fire({
             'id': '1',
             "type": "rx",
-            "fuel_type": "natural",
-            'location': {
-                'area': 132,
-                'latitude': 45.2,
-                'longitude': -120.0
-            }
+            "fuel_type": "natural"
         })
         f3 = fires.Fire({
             'id': '2',
             "type": "rx",
-            "fuel_type": "natural",
-            'location': {
-                'area': 136,
-                'latitude': 45.0,
-                'longitude': -120.0
-            }
+            "fuel_type": "natural"
         })
         fm.fires = [f, f2, f3]
         assert fm.num_fires == 3
@@ -1025,22 +959,12 @@ class TestFiresManagerMergeFires(object):
             fires.Fire({
                 'id': '1',
                 "type": "rx",
-                "fuel_type": "natural",
-                'location': {
-                    'area': 182.0,
-                    'latitude': 45.2,
-                    'longitude': -120.0
-                }
+                "fuel_type": "natural"
             }),
             fires.Fire({
                 'id': '2',
                 "type": "rx",
-                "fuel_type": "natural",
-                'location': {
-                    'area': 136,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                }
+                "fuel_type": "natural"
             })
         ]
         assert fm.num_fires == 2
@@ -1053,21 +977,24 @@ class TestFiresManagerMergeFires(object):
             'id': '1',
             "type": "rx",
             "fuel_type": "natural",
-            'location': {
-                'area': 90,
-                'latitude': 45.0,
-                'longitude': -120.0
-            },
             "growth": [
                 {
                     "start": "2014-05-28T17:00:00",
                     "end": "2014-05-29T17:00:00",
-                    "pct": 60.0
+                    'location': {
+                        'area': 90,
+                        'latitude': 45.0,
+                        'longitude': -120.0
+                    }
                 },
                 {
                     "start": "2014-05-29T17:00:00",
                     "end": "2014-05-30T17:00:00",
-                    "pct": 40.0
+                    'location': {
+                        'area': 90,
+                        'latitude': 46.0,
+                        'longitude': -120.0
+                    }
                 }
             ]
         })
@@ -1075,16 +1002,15 @@ class TestFiresManagerMergeFires(object):
             'id': '1',
             "type": "rx",
             "fuel_type": "natural",
-            'location': {
-                'area': 10,
-                'latitude': 45.0,
-                'longitude': -120.0
-            },
             "growth": [
                 {
                     "start": "2014-05-27T17:00:00",
                     "end": "2014-05-28T17:00:00",
-                    "pct": 100.0
+                    'location': {
+                        'area': 10,
+                        'latitude': 45.0,
+                        'longitude': -120.0
+                    }
                 }
             ]
         })
@@ -1092,16 +1018,15 @@ class TestFiresManagerMergeFires(object):
             'id': '2',
             "type": "rx",
             "fuel_type": "natural",
-            'location': {
-                'area': 132,
-                'latitude': 45.0,
-                'longitude': -120.0
-            },
             "growth": [
                 {
                     "start": "2014-05-27T17:00:00",
                     "end": "2014-05-30T17:00:00",
-                    "pct": 100.0
+                    'location': {
+                        'area': 132,
+                        'latitude': 45.0,
+                        'longitude': -120.0
+                    }
                 }
             ]
         })
@@ -1114,26 +1039,33 @@ class TestFiresManagerMergeFires(object):
                 'id': '1',
                 "type": "rx",
                 "fuel_type": "natural",
-                'location': {
-                    'area': 100,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                },
                 "growth": [
                     {
                         "start": "2014-05-27T17:00:00",
                         "end": "2014-05-28T17:00:00",
-                        "pct": 10.0
+                        'location': {
+                            'area': 10,
+                            'latitude': 45.0,
+                            'longitude': -120.0
+                        }
                     },
                     {
                         "start": "2014-05-28T17:00:00",
                         "end": "2014-05-29T17:00:00",
-                        "pct": 54.0
+                        'location': {
+                            'area': 90,
+                            'latitude': 45.0,
+                            'longitude': -120.0
+                        }
                     },
                     {
                         "start": "2014-05-29T17:00:00",
                         "end": "2014-05-30T17:00:00",
-                        "pct": 36.0
+                        'location': {
+                            'area': 90,
+                            'latitude': 46.0,
+                            'longitude': -120.0
+                        }
                     }
                 ]
             }),
@@ -1141,34 +1073,27 @@ class TestFiresManagerMergeFires(object):
                 'id': '2',
                 "type": "rx",
                 "fuel_type": "natural",
-                'location': {
-                    'area': 132,
-                    'latitude': 45.0,
-                    'longitude': -120.0
-                },
                 "growth": [
                     {
                         "start": "2014-05-27T17:00:00",
                         "end": "2014-05-30T17:00:00",
-                        "pct": 100.0
+                        'location': {
+                            'area': 132,
+                            'latitude': 45.0,
+                            'longitude': -120.0
+                        }
                     }
                 ]
             })
         ]
         actual = sorted(fm.fires, key=lambda e: int(e.id))
-        # assert growth precentages for fire id 1 separately, using
-        # numpy's assert_approx_equal, to handle rounding errors
-        for i in range(3):
-            assert_approx_equal(
-                expected[0].growth[i].pop('pct'),
-                actual[0].growth[i].pop('pct'))
         assert expected == actual
 
 
 ##
 ## Tests for Filtering
 ##
-## TODO: unit test fires.FiresFilter directly
+## TODO: unit test fires.FireGrowthFilter directly
 ##
 
 class TestFiresManagerFilterFires(object):
@@ -1185,10 +1110,10 @@ class TestFiresManagerFilterFires(object):
 
         ## No filters specifeid
         fm.set_config_value(False, 'filter', 'skip_failures')
-        with raises(fires.FiresFilter.FilterError) as e_info:
+        with raises(fires.FireGrowthFilter.FilterError) as e_info:
             fm.filter_fires()
         assert fm.num_fires == 1
-        assert e_info.value.args[0] == fires.FiresFilter.NO_FILTERS_MSG
+        assert e_info.value.args[0] == fires.FireGrowthFilter.NO_FILTERS_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
         assert fm.num_fires == 1
@@ -1200,54 +1125,67 @@ class TestFiresManagerFilterFires(object):
         init_fires = [
             fires.Fire({'id': '01', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '02', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '03', 'name': 'n3', 'country': "ZZ", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '04', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '05', 'name': 'n5', 'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '06', 'name': 'n6', 'country': '', 'bar1': 1 , 'baz':'baz1'}),
-            fires.Fire({'id': '07', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': '08', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
-            fires.Fire({'id': '09', 'name': 'n9', 'country': 'Unknown', 'bar2': 2 , 'baz':'baz2'}),
-            fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
-            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
+            fires.Fire({'id': '03', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "ZZ"}}, {"location": {'country': "ZZ"}}]}),
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "USA"}}]}),
+            fires.Fire({'id': '06', 'name': 'n6', 'bar1': 1 , 'baz':'baz1',
+                "growth": [{"location": {'country': ''}}]}),
+            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '09', 'name': 'n9', 'bar2': 2 , 'baz':'baz2',
+                "growth": [{"location": {'country': 'Unknown'}}]}),
+            fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "USA"}}]}),
+            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "BZ"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "ZZ"}}, {"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '13', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "ZZ"}}, {"location": {'country': "ZZ"}}]}),
         ]
         fm.fires = init_fires
-        assert fm.num_fires == 11
+        assert fm.num_fires == 13
 
         ## empty config
         fm.set_config_value({}, 'filter', 'country')
         fm.set_config_value(False, 'filter', 'skip_failures')
-        with raises(fires.FiresFilter.FilterError) as e_info:
+        with raises(fires.FireGrowthFilter.FilterError) as e_info:
             fm.filter_fires()
-        assert fm.num_fires == 11
-        assert e_info.value.args[0] == fires.FiresFilter.MISSING_FILTER_CONFIG_MSG
+        assert fm.num_fires == 13
+        assert e_info.value.args[0] == fires.FireGrowthFilter.MISSING_FILTER_CONFIG_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
-        assert fm.num_fires == 11
+        assert fm.num_fires == 13
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## Neither whitelist nor blacklist is specified
         fm.set_config_value({'foo': 'bar'}, 'filter', 'country')
         fm.set_config_value(False, 'filter', 'skip_failures')
-        with raises(fires.FiresFilter.FilterError) as e_info:
+        with raises(fires.FireGrowthFilter.FilterError) as e_info:
             fm.filter_fires()
-        assert fm.num_fires == 11
-        assert e_info.value.args[0] == fires.FiresFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
+        assert fm.num_fires == 13
+        assert e_info.value.args[0] == fires.FireGrowthFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
-        assert fm.num_fires == 11
+        assert fm.num_fires == 13
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## Both whitelist nor blacklist are specified
         fm.set_config_value(False, 'filter', 'skip_failures')
         fm.set_config_value(["ZZ"], 'filter', 'country', 'blacklist')
         fm.set_config_value(["YY"], 'filter', 'country', 'whitelist')
-        with raises(fires.FiresFilter.FilterError) as e_info:
+        with raises(fires.FireGrowthFilter.FilterError) as e_info:
             fm.filter_fires()
-        assert fm.num_fires == 11
-        assert e_info.value.args[0] == fires.FiresFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
+        assert fm.num_fires == 13
+        assert e_info.value.args[0] == fires.FireGrowthFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
-        assert fm.num_fires == 11
+        assert fm.num_fires == 13
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         fm.set_config_value(False, 'filter', 'skip_failures')
@@ -1255,18 +1193,26 @@ class TestFiresManagerFilterFires(object):
         fm.set_config_value(None, 'filter', 'country', 'whitelist')
         fm.filter_fires()
         expected = [
-            fires.Fire({'id': '01', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '02', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '04', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '05', 'name': 'n5', 'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '06', 'name': 'n6', 'country': '', 'bar1': 1 , 'baz':'baz1'}),
-            fires.Fire({'id': '07', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': '08', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
-            fires.Fire({'id': '09', 'name': 'n9', 'country': 'Unknown', 'bar2': 2 , 'baz':'baz2'}),
-            fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
-            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "USA"}}]}),
+            fires.Fire({'id': '06', 'name': 'n6', 'bar1': 1 , 'baz':'baz1',
+                "growth": [{"location": {'country': ''}}]}),
+            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '09', 'name': 'n9', 'bar2': 2 , 'baz':'baz2',
+                "growth": [{"location": {'country': 'Unknown'}}]}),
+            fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "USA"}}]}),
+            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "BZ"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
         ]
-        assert fm.num_fires == 10
+        assert fm.num_fires == 9
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         fm.set_config_value(["USA", "CA", "UK", "BZ"],
@@ -1274,46 +1220,68 @@ class TestFiresManagerFilterFires(object):
         fm.set_config_value(None, 'filter', 'country', 'blacklist')
         fm.filter_fires()
         expected = [
-            fires.Fire({'id': '04', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '05', 'name': 'n5', 'country': "USA", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '07', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': '08', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
-            fires.Fire({'id': '10', 'name': 'n10', "country": "USA", "barj": "jj", "baz": 99}),
-            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "USA"}}]}),
+            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "USA"}}]}),
+            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "BZ"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]})
         ]
-        assert fm.num_fires == 6
+        assert fm.num_fires == 7
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         fm.set_config_value(["USA"], 'filter', 'country', 'blacklist')
         fm.set_config_value(None, 'filter', 'country', 'whitelist')
         fm.filter_fires()
         expected = [
-            fires.Fire({'id': '04', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '07', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': '08', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'}),
-            fires.Fire({'id': '11', 'name': 'n11', "country": "BZ", "barj": "jj", "baz": 99})
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "BZ"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]})
         ]
-        assert fm.num_fires == 4
+        assert fm.num_fires == 5
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         fm.set_config_value(["USA", "CA", "UK"], 'filter', 'country', 'whitelist')
         fm.set_config_value(None, 'filter', 'country', 'blacklist')
         fm.filter_fires()
         expected = [
-            fires.Fire({'id': '04', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '07', 'name': 'n7', 'country': "CA", 'bar2':'a2', 'baz':'baz2'}),
-            fires.Fire({'id': '08', 'name': 'n8', 'country': "CA", 'bar2':'adfsdf', 'baz':'baz2'})
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]})
         ]
-        assert fm.num_fires == 3
+        assert fm.num_fires == 4
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         fm.set_config_value(["USA", "CA"], 'filter', 'country', 'blacklist')
         fm.set_config_value(None, 'filter', 'country', 'whitelist')
         fm.filter_fires()
         expected = [
-            fires.Fire({'id': '04', 'name': 'n4', 'country': "UK", 'bar1':'a1', 'baz':'baz1'}),
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]})
         ]
-        assert fm.num_fires == 1
+        assert fm.num_fires == 2
         assert expected == fm.fires
 
         fm.set_config_value(["UK", "CA"], 'filter', 'country', 'blacklist')
@@ -1331,73 +1299,77 @@ class TestFiresManagerFilterFires(object):
 
         fm = fires.FiresManager()
         init_fires = [
-            fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
-            fires.Fire({'id': '2', 'location':{'latitude': 50.0, 'longitude': -80.0}}),
-            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
-            fires.Fire({'id': '4', 'location':{'latitude': 70.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '5', 'location':{'latitude': 40.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '6', 'location':{'latitude': 61.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '7', 'location':{'latitude': 60.0, 'longitude': -50.0}}),
-            fires.Fire({'id': '8', 'location':{'latitude': 70.0, 'longitude': -120.0}}),
-            fires.Fire({'id': '9', 'location':{'latitude': -10.0, 'longitude': 10.0}})
+            fires.Fire({'id': '1', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
+            fires.Fire({'id': '2', 'growth': [{'location':{'latitude': 50.0, 'longitude': -80.0}}]}),
+            fires.Fire({'id': '3', 'growth': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'latitude': 70.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '5', 'growth': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '7', 'growth': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
+            fires.Fire({'id': '8', 'growth': [{'location':{'latitude': 70.0, 'longitude': -120.0}}]}),
+            fires.Fire({'id': '9', 'growth': [{'location':{'latitude': -10.0, 'longitude': 10.0}}]}),
+            fires.Fire({'id': '10', 'growth': [{'location':{'latitude': -10.0, 'longitude': 10.0}},
+                {'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
+            fires.Fire({'id': '10', 'growth': [{'location':{'latitude': -10.0, 'longitude': 10.0}},
+                {'location':{'latitude': -11.0, 'longitude': 9.0}}]})
         ]
         fm.fires = init_fires
-        assert fm.num_fires == 9
+        assert fm.num_fires == 11
 
         ## Failure situations
         scenarios = (
             # empty config
-            ({}, fires.FiresFilter.MISSING_FILTER_CONFIG_MSG),
+            ({}, fires.FireGrowthFilter.MISSING_FILTER_CONFIG_MSG),
             # boundary not specified
-            ({'foo': 'bar'}, fires.FiresFilter.SPECIFY_BOUNDARY_MSG),
+            ({'foo': 'bar'}, fires.FireGrowthFilter.SPECIFY_BOUNDARY_MSG),
 
             ## Invalid boundary
             # Invalid and insufficient keys
             ({'boundary': {"foo": "bar"}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_FIELDS_MSG),
             # Invalid keys
             ({'boundary': {
                 "sdfsdf": 123,
                 "ne": {"lat": 88.12, "lng": 40},
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_FIELDS_MSG),
             # insufficient keys
             ({'boundary': {
                 "ne": {"lng": 40},
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_FIELDS_MSG),
             ({'boundary': {
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_FIELDS_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_FIELDS_MSG),
             # lat/lng outside of valid range
             ({'boundary': {
                 "ne": {"lat": 98.12, "lng": 40},
                 "sw": {"lat": -50.75,"lng": -131.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_MSG),
             # sw east of ne
             ({'boundary': {
                 "ne": {"lat": 68.12, "lng": 40},
                 "sw": {"lat": 50.75,"lng": 50.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_MSG),
+                fires.FireGrowthFilter.INVALID_BOUNDARY_MSG),
             # sw north of ne
             ({'boundary': {
                 "ne": {"lat": 48.12, "lng": 40},
                 "sw": {"lat": 50.75,"lng": -50.5}}},
-                fires.FiresFilter.INVALID_BOUNDARY_MSG)
+                fires.FireGrowthFilter.INVALID_BOUNDARY_MSG)
         )
         for config, err_msg in scenarios:
             fm.set_config_value(config, 'filter', 'location')
             # don't skip failures
             fm.set_config_value(False, 'filter', 'skip_failures')
-            with raises(fires.FiresFilter.FilterError) as e_info:
+            with raises(fires.FireGrowthFilter.FilterError) as e_info:
                 fm.filter_fires()
-            assert fm.num_fires == 9
+            assert fm.num_fires == 11
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
             assert e_info.value.args[0] == err_msg
             # skip failures
             fm.set_config_value(True, 'filter', 'skip_failures')
             fm.filter_fires()
-            assert fm.num_fires == 9
+            assert fm.num_fires == 11
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## noops
@@ -1405,7 +1377,7 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": -50.75,"lng": -131.5}},
             'filter', 'location', 'boundary')
         fm.filter_fires()
-        assert fm.num_fires == 9
+        assert fm.num_fires == 11
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## successful filters
@@ -1414,17 +1386,18 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": -5.75,"lng": -131.5}},
             'filter', 'location', 'boundary')
         expected = [
-            fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
-            fires.Fire({'id': '2', 'location':{'latitude': 50.0, 'longitude': -80.0}}),
-            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
-            fires.Fire({'id': '4', 'location':{'latitude': 70.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '5', 'location':{'latitude': 40.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '6', 'location':{'latitude': 61.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '7', 'location':{'latitude': 60.0, 'longitude': -50.0}}),
-            fires.Fire({'id': '8', 'location':{'latitude': 70.0, 'longitude': -120.0}})
+            fires.Fire({'id': '1', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
+            fires.Fire({'id': '2', 'growth': [{'location':{'latitude': 50.0, 'longitude': -80.0}}]}),
+            fires.Fire({'id': '3', 'growth': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'latitude': 70.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '5', 'growth': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '7', 'growth': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
+            fires.Fire({'id': '8', 'growth': [{'location':{'latitude': 70.0, 'longitude': -120.0}}]}),
+            fires.Fire({'id': '10', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
         ]
         fm.filter_fires()
-        assert fm.num_fires == 8
+        assert fm.num_fires == 9
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze sw lng
@@ -1432,16 +1405,17 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": -5.75,"lng": -110.5}},
             'filter', 'location', 'boundary')
         expected = [
-            fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
-            fires.Fire({'id': '2', 'location':{'latitude': 50.0, 'longitude': -80.0}}),
-            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
-            fires.Fire({'id': '4', 'location':{'latitude': 70.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '5', 'location':{'latitude': 40.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '6', 'location':{'latitude': 61.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '7', 'location':{'latitude': 60.0, 'longitude': -50.0}})
+            fires.Fire({'id': '1', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
+            fires.Fire({'id': '2', 'growth': [{'location':{'latitude': 50.0, 'longitude': -80.0}}]}),
+            fires.Fire({'id': '3', 'growth': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'latitude': 70.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '5', 'growth': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '7', 'growth': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
+            fires.Fire({'id': '10', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
         ]
         fm.filter_fires()
-        assert fm.num_fires == 7
+        assert fm.num_fires == 8
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze ne lat
@@ -1449,15 +1423,16 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": -5.75,"lng": -110.5}},
             'filter', 'location', 'boundary')
         expected = [
-            fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
-            fires.Fire({'id': '2', 'location':{'latitude': 50.0, 'longitude': -80.0}}),
-            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
-            fires.Fire({'id': '5', 'location':{'latitude': 40.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '6', 'location':{'latitude': 61.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '7', 'location':{'latitude': 60.0, 'longitude': -50.0}})
+            fires.Fire({'id': '1', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
+            fires.Fire({'id': '2', 'growth': [{'location':{'latitude': 50.0, 'longitude': -80.0}}]}),
+            fires.Fire({'id': '3', 'growth': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
+            fires.Fire({'id': '5', 'growth': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '7', 'growth': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
+            fires.Fire({'id': '10', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
         ]
         fm.filter_fires()
-        assert fm.num_fires == 6
+        assert fm.num_fires == 7
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze ne lng
@@ -1465,14 +1440,15 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": -5.75,"lng": -110.5}},
             'filter', 'location', 'boundary')
         expected = [
-            fires.Fire({'id': '1', 'location':{'latitude': 40.0, 'longitude': -80.0}}),
-            fires.Fire({'id': '2', 'location':{'latitude': 50.0, 'longitude': -80.0}}),
-            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
-            fires.Fire({'id': '5', 'location':{'latitude': 40.0, 'longitude': -60.0}}),
-            fires.Fire({'id': '6', 'location':{'latitude': 61.0, 'longitude': -60.0}})
+            fires.Fire({'id': '1', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
+            fires.Fire({'id': '2', 'growth': [{'location':{'latitude': 50.0, 'longitude': -80.0}}]}),
+            fires.Fire({'id': '3', 'growth': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
+            fires.Fire({'id': '5', 'growth': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '10', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
         ]
         fm.filter_fires()
-        assert fm.num_fires == 5
+        assert fm.num_fires == 6
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze ne lng
@@ -1480,7 +1456,7 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": 58.75,"lng": -62}},
             'filter', 'location', 'boundary')
         expected = [
-            fires.Fire({'id': '3', 'location':{'latitude': 60.0, 'longitude': -62.0}}),
+            fires.Fire({'id': '3', 'growth': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 1
@@ -1505,23 +1481,23 @@ class TestFiresManagerFilterFires(object):
             'filter', 'location', 'boundary')
         scenarios = (
             # missing lat
-            (fires.Fire({'id': '1', 'location':{'longitude': -80.0}}),
-             fires.FiresFilter.MISSING_FIRE_LAT_LNG_MSG),
+            (fires.Fire({'id': '1', 'growth': [{'location':{'longitude': -80.0}}]}),
+             fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
             # missing lng
-            (fires.Fire({'id': '1', 'location':{'longitude': -80.0}}),
-             fires.FiresFilter.MISSING_FIRE_LAT_LNG_MSG),
+            (fires.Fire({'id': '1', 'growth': [{'location':{'longitude': -80.0}}]}),
+             fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
             # missing both lat and lng
-            (fires.Fire({'id': '1', 'location':{}}),
-             fires.FiresFilter.MISSING_FIRE_LAT_LNG_MSG),
+            (fires.Fire({'id': '1', 'growth': [{'location':{}}]}),
+             fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
             # missing location
-            (fires.Fire({'id': '1'}),
-             fires.FiresFilter.MISSING_FIRE_LAT_LNG_MSG),
+            (fires.Fire({'id': '1', 'growth': [{}]}),
+             fires.FireGrowthFilter.MISSING_FIRE_LAT_LNG_MSG),
         )
         for f, err_msg in scenarios:
             fm.fires = [f]
             # don't skip failures
             fm.set_config_value(False, 'filter', 'skip_failures')
-            with raises(fires.FiresFilter.FilterError) as e_info:
+            with raises(fires.FireGrowthFilter.FilterError) as e_info:
                 fm.filter_fires()
             assert fm.num_fires == 1
             assert [f] == fm.fires
@@ -1534,58 +1510,61 @@ class TestFiresManagerFilterFires(object):
 
 
     def test_filter_by_area(self):
+
         fm = fires.FiresManager()
         init_fires = [
-            fires.Fire({'id': '1', 'location':{'area': 45}}),
-            fires.Fire({'id': '2', 'location':{'area': 95}}),
-            fires.Fire({'id': '3', 'location':{'area': 55}}),
-            fires.Fire({'id': '4', 'location':{'area': 65}}),
-            fires.Fire({'id': '5', 'location':{'area': 85}}),
-            fires.Fire({'id': '6', 'location':{'area': 75}}),
-            fires.Fire({'id': '7', 'location':{'area': 50}}),
-            fires.Fire({'id': '8', 'location':{'area': 30}})
+            fires.Fire({'id': '1', 'growth': [{'location':{'area': 45}}]}),
+            fires.Fire({'id': '2', 'growth': [{'location':{'area': 95}}]}),
+            fires.Fire({'id': '3', 'growth': [{'location':{'area': 55}}]}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'area': 65}}]}),
+            fires.Fire({'id': '5', 'growth': [{'location':{'area': 85}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'area': 75}}]}),
+            fires.Fire({'id': '7', 'growth': [{'location':{'area': 50}}]}),
+            fires.Fire({'id': '8', 'growth': [{'location':{'area': 30}}]}),
+            fires.Fire({'id': '9', 'growth': [{'location':{'area': 45}},
+                {'location':{'area': 40}}]})
         ]
         fm.fires = init_fires
-        assert fm.num_fires == 8
+        assert fm.num_fires == 9
 
         ## Failure situations
         scenarios = (
             # empty config
-            ({}, fires.FiresFilter.MISSING_FILTER_CONFIG_MSG),
+            ({}, fires.FireGrowthFilter.MISSING_FILTER_CONFIG_MSG),
             # either min nor max is specified
-            ({'foo': 'bar'}, fires.FiresFilter.SPECIFY_MIN_OR_MAX_MSG),
+            ({'foo': 'bar'}, fires.FireGrowthFilter.SPECIFY_MIN_OR_MAX_MSG),
 
             ## Invalid min/max
             # both negative
             ({'min': -20, 'max': -2},
-                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
             # min is negative
             ({'min': -20, 'max': 2},
-                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
             ({'min': -20},
-                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
             # max is negative
             ({'min': 20, 'max': -2},
-                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
             ({'max': -2},
-                fires.FiresFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MAX_MUST_BE_POS_MSG),
             # min > max
             ({'min': 20, 'max': 2},
-                fires.FiresFilter.INVALID_MIN_MUST_BE_LTE_MAX_MSG),
+                fires.FireGrowthFilter.INVALID_MIN_MUST_BE_LTE_MAX_MSG),
         )
         for config, err_msg in scenarios:
             fm.set_config_value(config, 'filter', 'area')
             # don't skip failures
             fm.set_config_value(False, 'filter', 'skip_failures')
-            with raises(fires.FiresFilter.FilterError) as e_info:
+            with raises(fires.FireGrowthFilter.FilterError) as e_info:
                 fm.filter_fires()
-            assert fm.num_fires == 8
+            assert fm.num_fires == 9
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
             assert e_info.value.args[0] == err_msg
             # skip failures
             fm.set_config_value(True, 'filter', 'skip_failures')
             fm.filter_fires()
-            assert fm.num_fires == 8
+            assert fm.num_fires == 9
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## noops
@@ -1593,29 +1572,29 @@ class TestFiresManagerFilterFires(object):
         # min only
         fm.set_config_value({'min': 20}, 'filter', 'area')
         fm.filter_fires()
-        assert fm.num_fires == 8
+        assert fm.num_fires == 9
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
         # max only
         fm.set_config_value({'max': 120}, 'filter', 'area')
         fm.filter_fires()
-        assert fm.num_fires == 8
+        assert fm.num_fires == 9
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
         # both min and max
         fm.set_config_value({'min': 20, 'max': 120}, 'filter', 'area')
         fm.filter_fires()
-        assert fm.num_fires == 8
+        assert fm.num_fires == 9
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## successful filters
         # min only
         fm.set_config_value({'min': 47}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '2', 'location':{'area': 95}}),
-            fires.Fire({'id': '3', 'location':{'area': 55}}),
-            fires.Fire({'id': '4', 'location':{'area': 65}}),
-            fires.Fire({'id': '5', 'location':{'area': 85}}),
-            fires.Fire({'id': '6', 'location':{'area': 75}}),
-            fires.Fire({'id': '7', 'location':{'area': 50}})
+            fires.Fire({'id': '2', 'growth': [{'location':{'area': 95}}]}),
+            fires.Fire({'id': '3', 'growth': [{'location':{'area': 55}}]}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'area': 65}}]}),
+            fires.Fire({'id': '5', 'growth': [{'location':{'area': 85}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'area': 75}}]}),
+            fires.Fire({'id': '7', 'growth': [{'location':{'area': 50}}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 6
@@ -1623,11 +1602,11 @@ class TestFiresManagerFilterFires(object):
         # max only
         fm.set_config_value({'max': 90}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '3', 'location':{'area': 55}}),
-            fires.Fire({'id': '4', 'location':{'area': 65}}),
-            fires.Fire({'id': '5', 'location':{'area': 85}}),
-            fires.Fire({'id': '6', 'location':{'area': 75}}),
-            fires.Fire({'id': '7', 'location':{'area': 50}})
+            fires.Fire({'id': '3', 'growth': [{'location':{'area': 55}}]}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'area': 65}}]}),
+            fires.Fire({'id': '5', 'growth': [{'location':{'area': 85}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'area': 75}}]}),
+            fires.Fire({'id': '7', 'growth': [{'location':{'area': 50}}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 5
@@ -1636,9 +1615,9 @@ class TestFiresManagerFilterFires(object):
         # both min and max
         fm.set_config_value({'min': 52, 'max': 77.0}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '3', 'location':{'area': 55}}),
-            fires.Fire({'id': '4', 'location':{'area': 65}}),
-            fires.Fire({'id': '6', 'location':{'area': 75}})
+            fires.Fire({'id': '3', 'growth': [{'location':{'area': 55}}]}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'area': 65}}]}),
+            fires.Fire({'id': '6', 'growth': [{'location':{'area': 75}}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 3
@@ -1647,7 +1626,7 @@ class TestFiresManagerFilterFires(object):
         # both min and max
         fm.set_config_value({'min': 65, 'max': 65.0}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '4', 'location':{'area': 65}}),
+            fires.Fire({'id': '4', 'growth': [{'location':{'area': 65}}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 1
@@ -1668,20 +1647,20 @@ class TestFiresManagerFilterFires(object):
         fm.set_config_value({'min': 0.0, 'max': 100.0}, 'filter', 'area')
         scenarios = (
             # missing area
-            (fires.Fire({'id': '1', 'location':{}}),
-             fires.FiresFilter.MISSING_FIRE_AREA_MSG),
+            (fires.Fire({'id': '1', 'growth':[{'location':{}}]}),
+             fires.FireGrowthFilter.MISSING_GROWTH_AREA_MSG),
             # missing location
-            (fires.Fire({'id': '1'}),
-             fires.FiresFilter.MISSING_FIRE_AREA_MSG),
+            (fires.Fire({'id': '1', 'growth':[{}]}),
+             fires.FireGrowthFilter.MISSING_GROWTH_AREA_MSG),
             # negative area
-            (fires.Fire({'id': '1', 'location':{'area': -123}}),
-             fires.FiresFilter.NEGATIVE_FIRE_AREA_MSG),
+            (fires.Fire({'id': '1', 'growth':[{'location':{'area': -123}}]}),
+             fires.FireGrowthFilter.NEGATIVE_GROWTH_AREA_MSG),
         )
         for f, err_msg in scenarios:
             fm.fires = [f]
             # don't skip failures
             fm.set_config_value(False, 'filter', 'skip_failures')
-            with raises(fires.FiresFilter.FilterError) as e_info:
+            with raises(fires.FireGrowthFilter.FilterError) as e_info:
                 fm.filter_fires()
             assert fm.num_fires == 1
             assert [f] == fm.fires

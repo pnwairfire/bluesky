@@ -83,6 +83,15 @@ RUN apt-get install -y \
 #         but this failed on the `apt-get install` command with
 #         `E: Unable to locate package ubuntugis-unstable` errlr
 
+RUN pip3 install --upgrade pip
+
+# blueskykml is relatively static these days; so, install it here in order
+# to avoid reinstalling it and it's large dependencies (Pillow==2.8.1, 9.0MB,
+# and matplotlib==1.4.3, 50.4MB) everytime the the bluesky image is built
+# NOTE: this RUN command will need to be updated if 'blueskykml' is ever
+#   updated in setup.py
+RUN pip3 install --trusted-host pypi.smoke.airfire.org \
+    -i http://pypi.smoke.airfire.org/simple blueskykml==1.*
 
 ## Install The bluesky Package
 
@@ -93,7 +102,7 @@ RUN apt-get install -y \
 #    complete docker image, a cached older version of bluesky will be
 #    included in the image
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
-    -i http://pypi.smoke.airfire.org/simple bluesky==1.0.6
+    -i http://pypi.smoke.airfire.org/simple bluesky==1.2.1
 
 ### To install from github instead of from AirFire's pypi server
 # RUN pip3 install --no-binary gdal  \

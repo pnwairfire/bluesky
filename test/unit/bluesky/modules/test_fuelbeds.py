@@ -83,30 +83,37 @@ class TestSummarize(object):
     def test_one_fire(self):
         fires = [
             Fire({
-                "location":{"area": 10},
-                "fuelbeds":[
-                    {"fccs_id": "1", "pct": 40},
-                    {"fccs_id": "2", "pct": 60}
-                ]
+                'growth':[{
+                    "location":{"area": 10},
+                    "fuelbeds":[
+                        {"fccs_id": "1", "pct": 40},
+                        {"fccs_id": "2", "pct": 60}
+                    ]
+                }]
             })
         ]
         summary = fuelbeds.summarize(fires)
-        assert summary == fires[0]['fuelbeds']
+        assert summary == fires[0]['growth'][0]['fuelbeds']
+
     def test_two_fires(self):
         fires = [
             Fire({
-                "location":{"area": 10},
-                "fuelbeds":[
-                    {"fccs_id": "1", "pct": 30},
-                    {"fccs_id": "2", "pct": 70}
-                ]
+                'growth':[{
+                    "location":{"area": 10},
+                    "fuelbeds":[
+                        {"fccs_id": "1", "pct": 30},
+                        {"fccs_id": "2", "pct": 70}
+                    ]
+                }]
             }),
             Fire({
-                "location":{"area": 5},
-                "fuelbeds":[
-                    {"fccs_id": "2", "pct": 10},
-                    {"fccs_id": "3", "pct": 90}
-                ]
+                'growth':[{
+                    "location":{"area": 5},
+                    "fuelbeds":[
+                        {"fccs_id": "2", "pct": 10},
+                        {"fccs_id": "3", "pct": 90}
+                    ]
+                }]
             })
         ]
         expected_summary = [
@@ -117,7 +124,7 @@ class TestSummarize(object):
         summary = fuelbeds.summarize(fires)
         assert summary == expected_summary
 
-
+    # TODO: def test_two_fires_two_growth_each(self):
 ##
 ## Tests for Estimator.estimate
 ##
@@ -128,13 +135,17 @@ class TestEstimatorInsufficientDataForLookup(object):
         lookup = mock.Mock()
         self.estimator = fuelbeds.Estimator(lookup)
 
-    def test_no_location(self):
+    def test_no_growth(self):
         with raises(ValueError) as e:
             self.estimator.estimate({})
 
+    def test_no_location(self):
+        with raises(ValueError) as e:
+            self.estimator.estimate({'growth':[{}]})
+
     def test_no_perimeter_or_lat_or_lng(self):
         with raises(ValueError) as e:
-            self.estimator.estimate({"location":{}})
+            self.estimator.estimate({"growth":[{"location":{}}]})
 
 class BaseTestEstimatorEstimate(object):
     """Base class for testing Estimator.estimate
@@ -150,25 +161,25 @@ class BaseTestEstimatorEstimate(object):
         self.estimator.lookup.look_up = lambda p: None
         self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: None
         with raises(RuntimeError) as e:
-            self.estimator.estimate(self.fire)
+            self.estimator.estimate(self.growth_obj)
 
     def test_empty_lookup_info(self):
         self.estimator.lookup.look_up = lambda p: {}
         self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: {}
         with raises(RuntimeError) as e:
-            self.estimator.estimate(self.fire)
+            self.estimator.estimate(self.growth_obj)
 
     def test_lookup_info_percentages_less_than_100(self):
         self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_30
         self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: FUELBED_INFO_60_30
         with raises(RuntimeError) as e:
-            self.estimator.estimate(self.fire)
+            self.estimator.estimate(self.growth_obj)
 
     def test_lookup_info_percentages_greater_than_100(self):
         self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_40_10
         self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: FUELBED_INFO_60_40_10
         with raises(RuntimeError) as e:
-            self.estimator.estimate(self.fire)
+            self.estimator.estimate(self.growth_obj)
 
     # Test of valid lookup data
 
@@ -181,8 +192,8 @@ class BaseTestEstimatorEstimate(object):
         ]
         # Having 'perimeter' key will trigger call to self.estimator.lookup.look_up;
         # The value of PERIMETER is not actually used here
-        self.estimator.estimate(self.fire)
-        assert expected_fuelbeds == self.fire.get('fuelbeds')
+        self.estimator.estimate(self.growth_obj)
+        assert expected_fuelbeds == self.growth_obj.get('fuelbeds')
 
     def test_with_truncation(self):
         # TODO: implement
@@ -190,13 +201,13 @@ class BaseTestEstimatorEstimate(object):
 
 class TestEstimatorGetFromPerimeter(BaseTestEstimatorEstimate):
     def setup(self):
-        self.fire = {"location": {"perimeter": PERIMETER}}
+        self.growth_obj = {"location": {"perimeter": PERIMETER}}
         super(TestEstimatorGetFromPerimeter, self).setup()
 
 class TestEstimatorGetFromLatLng(BaseTestEstimatorEstimate):
 
     def setup(self):
-        self.fire = {"location": {"latitude": 46.0, 'longitude': -120.34}}
+        self.growth_obj = {"location": {"latitude": 46.0, 'longitude': -120.34}}
         super(TestEstimatorGetFromLatLng, self).setup()
 
 ##
@@ -214,62 +225,62 @@ class TestEstimatorTruncation(object):
 
 
     def test_truncate_empty_set(self):
-        fire = dict(fuelbeds=[])
-        self.estimator._truncate(fire)
-        assert [] == fire['fuelbeds']
+        growth_obj = dict(fuelbeds=[])
+        self.estimator._truncate(growth_obj)
+        assert [] == growth_obj['fuelbeds']
 
     def test_truncate_one_fuelbed(self):
-        fire = dict(fuelbeds=[{'fccs_id': 1, 'pct': 100}])
-        self.estimator._truncate(fire)
-        assert [{'fccs_id': 1, 'pct': 100}] == fire['fuelbeds']
+        growth_obj = dict(fuelbeds=[{'fccs_id': 1, 'pct': 100}])
+        self.estimator._truncate(growth_obj)
+        assert [{'fccs_id': 1, 'pct': 100}] == growth_obj['fuelbeds']
 
         # a single fuelbed's percentage should never be below 100%,
         # let alone the truncation percemtage threshold, but code
         # should handle it
         pct = 99 - fuelbeds.Estimator.TRUNCATION_PERCENTAGE_THRESHOLD
-        fire = dict(fuelbeds=[{'fccs_id': 1, 'pct': pct}])
-        self.estimator._truncate(fire)
-        assert [{'fccs_id': 1, 'pct': pct}] == fire['fuelbeds']
+        growth_obj = dict(fuelbeds=[{'fccs_id': 1, 'pct': pct}])
+        self.estimator._truncate(growth_obj)
+        assert [{'fccs_id': 1, 'pct': pct}] == growth_obj['fuelbeds']
 
     def test_truncate_multiple_fbs_no_truncation(self):
-        fire = dict(fuelbeds=[
+        growth_obj = dict(fuelbeds=[
             {'fccs_id': 1, 'pct': 50},
             {'fccs_id': 2, 'pct': 20},
             {'fccs_id': 3, 'pct': 30}
         ])
-        self.estimator._truncate(fire)
+        self.estimator._truncate(growth_obj)
         expected = [
             {'fccs_id': 1, 'pct': 50},
             {'fccs_id': 3, 'pct': 30},
             {'fccs_id': 2, 'pct': 20}
         ]
-        assert expected == fire['fuelbeds']
+        assert expected == growth_obj['fuelbeds']
 
     def test_truncate_multiple_fbs_truncated(self):
-        fire = dict(fuelbeds=[
+        growth_obj = dict(fuelbeds=[
             {'fccs_id': 3, 'pct': 20},
             {'fccs_id': 1, 'pct': 75},
             {'fccs_id': 2, 'pct': 5}
         ])
-        self.estimator._truncate(fire)
+        self.estimator._truncate(growth_obj)
         expected = [
             {'fccs_id': 1, 'pct': 75},
             {'fccs_id': 3, 'pct': 20}
         ]
-        assert expected == fire['fuelbeds']
-        fire = dict(fuelbeds=[
+        assert expected == growth_obj['fuelbeds']
+        growth_obj = dict(fuelbeds=[
             {'fccs_id': 5, 'pct': 16},
             {'fccs_id': 45, 'pct': 3},
             {'fccs_id': 1, 'pct': 75},
             {'fccs_id': 223, 'pct': 5},
             {'fccs_id': 3, 'pct': 1}
         ])
-        self.estimator._truncate(fire)
+        self.estimator._truncate(growth_obj)
         expected = [
             {'fccs_id': 1, 'pct': 75},
             {'fccs_id': 5, 'pct': 16}
         ]
-        assert expected == fire['fuelbeds']
+        assert expected == growth_obj['fuelbeds']
 
 # ##
 # ## Tests for Estimator._adjust_percentages

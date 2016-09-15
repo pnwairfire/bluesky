@@ -9,57 +9,61 @@ from bluesky.visualizers.dispersion import hysplit
 class TestHysplitVisualizerPickRepresentativeFuelbed(object):
 
     def test_invalid_fuelbed(self):
-        f = {
+        g = {
             "fuelbeds": 'sdf'
         }
         with raises(TypeError) as e_info:
-            hysplit._pick_representative_fuelbed(f, {})
+            hysplit._pick_representative_fuelbed({}, g)
         # TODO: assert e_info.value.args[0] == '...''
 
-        f = {
+        g = {
             "fuelbeds": [
                 {"sdf_fccs_id": "46","pct": 100.0}
             ]
         }
         with raises(KeyError) as e_info:
-            hysplit._pick_representative_fuelbed(f, {})
+            hysplit._pick_representative_fuelbed({}, g)
         # TODO: assert e_info.value.args[0] == '...''
-        f = {
+        g = {
             "fuelbeds": [
                 {"fccs_id": "46","sdfsdfpct": 100.0}
             ]
         }
         with raises(KeyError) as e_info:
-            hysplit._pick_representative_fuelbed(f, {})
+            hysplit._pick_representative_fuelbed({}, g)
         # TODO: assert e_info.value.args[0] == '...''
 
     def test_no_fuelbeds(self):
-        f = {}
-        assert None == hysplit._pick_representative_fuelbed(f, {})
+        g = {}
+        assert None == hysplit._pick_representative_fuelbed({}, g)
+        g = {
+            "growth": []
+        }
+        assert None == hysplit._pick_representative_fuelbed({}, g)
 
     def test_one_fuelbed(self):
-        f = {
+        g = {
             "fuelbeds": [
                 {"fccs_id": "46","pct": 100.0}
             ]
         }
-        assert "46" == hysplit._pick_representative_fuelbed(f, {})
+        assert "46" == hysplit._pick_representative_fuelbed({}, g)
 
     def test_three_fuelbed(self):
-        f = {
+        g = {
             "fuelbeds": [
                 {"fccs_id": "46","pct": 10.0},
                 {"fccs_id": "47","pct": 60.0},
                 {"fccs_id": "48","pct": 30.0}
             ]
         }
-        assert "47" == hysplit._pick_representative_fuelbed(f, {})
+        assert "47" == hysplit._pick_representative_fuelbed({}, g)
 
     def test_two_equal_size_fuelbeds(self):
-        f = {
+        g = {
             "fuelbeds": [
                 {"fccs_id": "46","pct": 100.0},
                 {"fccs_id": "44","pct": 100.0}
             ]
         }
-        assert "46" == hysplit._pick_representative_fuelbed(f, {})
+        assert "46" == hysplit._pick_representative_fuelbed({}, g)

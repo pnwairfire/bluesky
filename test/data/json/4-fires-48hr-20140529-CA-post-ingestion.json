@@ -9,6 +9,17 @@
             "type": "wildfire",
             "growth": [
                 {
+                    "start": "2014-05-28T17:00:00",
+                    "end": "2014-05-29T17:00:00",
+                    "location": {
+                        "area": 9000.0,
+                        "ecoregion": "western",
+                        "latitude": 37.0,
+                        "longitude": -119.0,
+                        "utc_offset": "-07:00"
+                    }
+                },
+                {
                     "start": "2014-05-29T17:00:00",
                     "end": "2014-05-30T17:00:00",
                     "location": {
@@ -29,6 +40,17 @@
             "id": "sdk2risodijfdsf",
             "type": "wildfire",
             "growth": [
+                {
+                    "start": "2014-05-28T17:00:00",
+                    "end": "2014-05-29T17:00:00",
+                    "location": {
+                        "area": 18000.0,
+                        "ecoregion": "western",
+                        "latitude":  39.0,
+                        "longitude": -120.0,
+                        "utc_offset": "-07:00"
+                    }
+                },
                 {
                     "start": "2014-05-29T17:00:00",
                     "end": "2014-05-30T17:00:00",

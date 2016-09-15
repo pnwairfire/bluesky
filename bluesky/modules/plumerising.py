@@ -12,7 +12,7 @@ import logging
 from plumerise import sev, feps, __version__ as plumerise_version
 from pyairfire import sun
 
-from bluesky import datautils, datetimeutils
+from bluesky import datautils, datetimeutils, locationutils
 
 __all__ = [
     'run'
@@ -60,8 +60,8 @@ class ComputeFunction(object):
     def __call__(self, fire):
         if 'growth' not in fire:
             raise ValueError("Missing growth data required for plumerise")
-        if not fire.get('location', {}).get('area'):
-            raise ValueError("Missing fire area required for plumerise")
+        if any([not g.get('location', {}).get('area') for g in fire.growth]):
+            raise ValueError("Missing fire growth area required for plumerise")
         self._compute_func(fire)
 
     ## compute function generators
@@ -74,44 +74,40 @@ class ComputeFunction(object):
             #   above (one working dir per all fires), or below (per growth
             #   window)...or just let plumerise create temp workingdir (as
             #   it's currently doing?
-
-            if not fire.get('consumption', {}).get('summary'):
-                raise ValueError("Missing fire consumption data required for "
-                    "FEPS plumerise")
-
-            start = fire.start
-            if not start:
-                raise ValueError("Missing fire start time FEPS plumerise")
-
-            # Fill in missing sunrise / sunset
-            if any([fire.location.get(k) is None for k in
-                    ('sunrise_hour', 'sunset_hour')]):
-                # default: UTC
-                utc_offset = datetimeutils.parse_utc_offset(
-                    fire.location.get('utc_offset', 0.0))
-
-                # Use NOAA-standard sunrise/sunset calculations
-                s = sun.Sun(lat=fire.latitude, lng=fire.longitude)
-                d = start.date()
-                # just set them both, even if one is already set
-                fire.location["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
-                fire.location["sunset_hour"] = s.sunset_hr(d, utc_offset)
-
             for g in fire.growth:
+                if not g.get('consumption', {}).get('summary'):
+                    raise ValueError("Missing fire growth consumption data "
+                        "required for FEPS plumerise")
+
+                # Fill in missing sunrise / sunset
+                if any([g['location'].get(k) is None for k in
+                        ('sunrise_hour', 'sunset_hour')]):
+                    start = datetimeutils.parse_datetime(g['start'], 'start')
+                    if not start:
+                        raise ValueError("Missing fire growth start time "
+                            "required by FEPS plumerise")
+
+                    # default: UTC
+                    utc_offset = datetimeutils.parse_utc_offset(
+                        g['location'].get('utc_offset', 0.0))
+
+                    # Use NOAA-standard sunrise/sunset calculations
+                    latlng = locationutils.LatLng(g['location'])
+                    s = sun.Sun(lat=latlng.latitude, lng=latlng.longitude)
+                    d = start.date()
+                    # just set them both, even if one is already set
+                    g['location']["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
+                    g['location']["sunset_hour"] = s.sunset_hr(d, utc_offset)
+
                 if not g.get('timeprofile'):
                     raise ValueError("Missing timeprofile data required for "
                         "computing FEPS plumerise")
 
-                g_pct = float(g['pct']) / 100.0
-                g_area = fire.location['area'] * g_pct
-                g_consumption = copy.deepcopy(fire.consumption['summary'])
-                datautils.multiply_nested_data(g_consumption, g_pct)
-
                 # TODO: if managing working dir here, pass it in
                 #   (I think we'll let plumerising package handle it,
                 #   since we don't need to keep the output files)
-                plumerise_data = pr.compute(g['timeprofile'], g_consumption,
-                    fire.location)
+                plumerise_data = pr.compute(g['timeprofile'],
+                    g['consumption']['summary'], g['location'])
                 g['plumerise'] = plumerise_data['hours']
                 # TODO: do anything with plumerise_data['heat'] ?
 
@@ -126,10 +122,11 @@ class ComputeFunction(object):
                 if not g.get('localmet'):
                     raise ValueError(
                         "Missing localmet data required for computing SEV plumerise")
-                g_pct = float(g['pct']) / 100.0
-                g_area = fire.location['area'] * g_pct
-                g_frp = frp and frp * g_pct  # TODO: is this appropriate?
-                plumerise_data = pr.compute(g['localmet'], g_area, frp=g_frp)
+                # TODO: if frp is defined, do we need to multiple by growth's
+                #   percentage of the fire's total area?
+                g_frp = frp
+                plumerise_data = pr.compute(g['localmet'],
+                    g['location']['area'], frp=g_frp)
                 g['plumerise'] = plumerise_data['hours']
 
         return _f

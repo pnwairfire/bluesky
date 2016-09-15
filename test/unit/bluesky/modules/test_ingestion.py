@@ -8,7 +8,7 @@ from py.test import raises
 
 from bluesky.modules import ingestion
 
-class TestIngester(object):
+class TestIngestionErrorScenarios(object):
 
     def setup(self):
         self.ingester = ingestion.FireIngester()
@@ -18,43 +18,40 @@ class TestIngester(object):
     ##
 
     def test_fire_missing_required_fields(self):
-        with raises(ValueError) as e:
+        with raises(ValueError) as e_info:
             self.ingester.ingest({})
+        assert e_info.value.args[0] ==  ingestion.IngestionErrMsgs.NO_DATA
 
         # location must have perimeter or lat+lng+area
-        with raises(ValueError) as e:
+        with raises(ValueError) as e_info:
             self.ingester.ingest({"location": {}})
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION
 
-    def test_fire_with_invalid_growth(self):
+    def test_multiple_growth_fields_missing_pct(self):
         # If growth is specified, each object in the array must have
         # 'start', 'end', and 'pct' defined
-        with raises(ValueError) as e:
+        with raises(ValueError) as e_info:
             self.ingester.ingest(
                 {
                     "location": {
-                        "perimeter": {
-                            "type": "MultiPolygon",
-                            "coordinates": [
-                                [
-                                    [
-                                        [-121.4522115, 47.4316976],
-                                        [-121.3990506, 47.4316976],
-                                        [-121.3990506, 47.4099293],
-                                        [-121.4522115, 47.4099293],
-                                        [-121.4522115, 47.4316976]
-                                    ]
-                                ]
-                            ]
-                        },
+                        "latitude": 47.0,
+                        "longitude": -122.0,
+                        "area": 100.0,
                         "ecoregion": "southern"
                     },
-                    "growth": [
-                        {
-                            "sdf": 1
-                        }
-                    ]
+                    "growth": [{},{}]
                 }
             )
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.MULTIPLE_GROWTH_NO_PCT
+
+    # TODO: test ONE_PERIMETER_MULTIPLE_GROWTH
+    # TODO: test BASE_LOCATION_AT_TOP_OR_PER_GROWTH
+    # TODO: test FUELBEDS_AT_TOP_OR_PER_GROWTH
+
+class TestIngestionValidInput(object):
+
+    def setup(self):
+        self.ingester = ingestion.FireIngester()
 
     def test_fire_with_minimum_fields(self):
         f = {
@@ -76,7 +73,11 @@ class TestIngester(object):
             }
         }
         expected = {
-            'location': copy.deepcopy(f['location'])
+            'growth': [
+                {
+                    'location': copy.deepcopy(f['location'])
+                }
+            ]
         }
         expected_parsed_input = copy.deepcopy(f)
         parsed_input = self.ingester.ingest(f)
@@ -119,8 +120,11 @@ class TestIngester(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            'location': copy.deepcopy(f['location']),
-            'growth': copy.deepcopy(f['growth'])
+            "growth": [{
+                "start": "2015-01-20T17:00:00",
+                "end": "2015-01-21T17:00:00",
+                "location": copy.deepcopy(f['location'])
+            }]
         }
         expected_parsed_input = copy.deepcopy(f)
         parsed_input = self.ingester.ingest(f)
@@ -159,29 +163,28 @@ class TestIngester(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            'location': {
-                "perimeter": {
-                    "type": "MultiPolygon",
-                    "coordinates": [
-                        [
-                            [
-                                [-121.4522115, 47.4316976],
-                                [-121.3990506, 47.4316976],
-                                [-121.3990506, 47.4099293],
-                                [-121.4522115, 47.4099293],
-                                [-121.4522115, 47.4316976]
-                            ]
-                        ]
-                    ]
-                },
-                "ecoregion": "southern",
-                "utc_offset": "-07:00"
-            },
             'growth': [
                 {
-                    "pct": 100.0,
                     "start": "2015-01-20T17:00:00",
-                    "end": "2015-01-21T17:00:00"
+                    "end": "2015-01-21T17:00:00",
+                    'location': {
+                        "perimeter": {
+                            "type": "MultiPolygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ]
+                                ]
+                            ]
+                        },
+                        "ecoregion": "southern",
+                        "utc_offset": "-07:00"
+                    }
                 }
             ]
         }
@@ -232,29 +235,28 @@ class TestIngester(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            'location': {
-                "perimeter": {
-                    "type": "MultiPolygon",
-                    "coordinates": [
-                        [
-                            [
-                                [-121.4522115, 47.4316976],
-                                [-121.3990506, 47.4316976],
-                                [-121.3990506, 47.4099293],
-                                [-121.4522115, 47.4099293],
-                                [-121.4522115, 47.4316976]
-                            ]
-                        ]
-                    ]
-                },
-                "ecoregion": "southern",
-                "utc_offset": "-07:00"
-            },
             "growth": [
                 {
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
-                    "pct": 100.0
+                    'location': {
+                        "perimeter": {
+                            "type": "MultiPolygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ]
+                                ]
+                            ]
+                        },
+                        "ecoregion": "southern",
+                        "utc_offset": "-07:00"
+                    }
                 }
             ],
             "meta": {
@@ -273,29 +275,29 @@ class TestIngester(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            "location": {
-                "perimeter": {
-                    "type": "MultiPolygon",
-                    "coordinates": [
-                        [
-                            [
-                                [-121.4522115, 47.4316976],
-                                [-121.3990506, 47.4316976],
-                                [-121.3990506, 47.4099293],
-                                [-121.4522115, 47.4099293],
-                                [-121.4522115, 47.4316976]
-                            ]
-                        ]
-                    ]
-                },
-                "ecoregion": "southern",
-                "foo": "bar"
-            },
             "growth": [
                 {
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
-                    "pct": 100.0
+                    "pct": 100.0,
+                    "location": {
+                        "perimeter": {
+                            "type": "MultiPolygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ]
+                                ]
+                            ]
+                        },
+                        "ecoregion": "southern",
+                        "foo": "bar"
+                    }
                 }
             ],
             "bar": "baz"
@@ -306,10 +308,10 @@ class TestIngester(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            'location': copy.deepcopy(f['location']),
             'growth': copy.deepcopy(f['growth'])
         }
-        expected['location'].pop('foo')
+        expected['growth'][0].pop('pct')
+        expected['growth'][0]['location'].pop('foo')
         expected_parsed_input = copy.deepcopy(f)
         parsed_input = self.ingester.ingest(f)
         assert expected == f
@@ -348,9 +350,13 @@ class TestIngester(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            'location': {
-                'perimeter': copy.deepcopy(f['location']['perimeter'])
-            }
+            'growth': [
+                {
+                    'location': {
+                        'perimeter': copy.deepcopy(f['location']['perimeter'])
+                    }
+                }
+            ]
         }
         expected_parsed_input = copy.deepcopy(f)
         parsed_input = self.ingester.ingest(f)
@@ -367,15 +373,14 @@ class TestIngester(object):
         }
         expected = {
             "id": "SF11C14225236095807750",
-            "location":{
-                "latitude": 47.0,
-                "longitude": -122.0,
-                "area": 100.0
-            },
             "growth":[{
                 "start": "2014-05-29T00:00:00",
                 "end": "2014-05-30T00:00:00",
-                "pct": 100.0
+                "location":{
+                    "latitude": 47.0,
+                    "longitude": -122.0,
+                    "area": 100.0
+                }
             }]
         }
         expected_parsed_input = copy.deepcopy(f)
@@ -393,16 +398,15 @@ class TestIngester(object):
         }
         expected = {
             "id": "SF11C14225236095807750",
-            "location": {
-                "latitude": 47.0,
-                "longitude": -122.0,
-                "area": 100.0,
-                "utc_offset": "-04:00",
-            },
             "growth":[{
                 "start": "2015-08-04T00:00:00",
                 "end": "2015-08-05T00:00:00",
-                "pct": 100.0
+                "location": {
+                    "latitude": 47.0,
+                    "longitude": -122.0,
+                    "area": 100.0,
+                    "utc_offset": "-04:00",
+                }
             }]
         }
         expected_parsed_input = copy.deepcopy(f)
@@ -487,52 +491,51 @@ class TestIngester(object):
                 "url": "http://playground.dri.edu/smartfire/events/bd1af2ca-a09d-4b1b-9135-ac41132d2e49"
             },
             "type": "RX",
-            "location":{
-                "latitude": 26.286,
-                "longitude": -77.118,
-                "area": 199.999999503,
-                "canopy": "",
-                "country": "Unknown",
-                "county": "",
-                "duff": "",
-                "elevation": 0.0,
-                "fuel_100hr": "",
-                "fuel_10hr": "",
-                "fuel_10khr": "",
-                "fuel_1hr": "",
-                "fuel_1khr": "",
-                "fuel_gt10khr": "",
-                "grass": "",
-                "litter": "",
-                "max_humid": 80.0,
-                "max_temp": 30.0,
-                "max_temp_hour": 14,
-                "max_wind": 6.0,
-                "max_wind_aloft": 6.0,
-                "min_humid": 40.0,
-                "min_temp": 13.0,
-                "min_temp_hour": 4,
-                "min_wind": 6.0,
-                "min_wind_aloft": 6.0,
-                "moisture_100hr": 12.0,
-                "moisture_10hr": 12.0,
-                "moisture_1hr": 10.0,
-                "moisture_1khr": 22.0,
-                "moisture_duff": 150.0,
-                "moisture_live": 130.0,
-                "rain_days": 8,
-                "rot": "",
-                "shrub": "",
-                "slope": 10.0,
-                "snow_month": 5,
-                "state": "Unknown",
-                "sunrise_hour": 6,
-                "sunset_hour": 18
-            },
             "growth":[{
                 "start": "2014-05-29T00:00:00",
                 "end": "2014-05-30T00:00:00",
-                "pct": 100.0
+                "location":{
+                    "latitude": 26.286,
+                    "longitude": -77.118,
+                    "area": 199.999999503,
+                    "canopy": "",
+                    "country": "Unknown",
+                    "county": "",
+                    "duff": "",
+                    "elevation": 0.0,
+                    "fuel_100hr": "",
+                    "fuel_10hr": "",
+                    "fuel_10khr": "",
+                    "fuel_1hr": "",
+                    "fuel_1khr": "",
+                    "fuel_gt10khr": "",
+                    "grass": "",
+                    "litter": "",
+                    "max_humid": 80.0,
+                    "max_temp": 30.0,
+                    "max_temp_hour": 14,
+                    "max_wind": 6.0,
+                    "max_wind_aloft": 6.0,
+                    "min_humid": 40.0,
+                    "min_temp": 13.0,
+                    "min_temp_hour": 4,
+                    "min_wind": 6.0,
+                    "min_wind_aloft": 6.0,
+                    "moisture_100hr": 12.0,
+                    "moisture_10hr": 12.0,
+                    "moisture_1hr": 10.0,
+                    "moisture_1khr": 22.0,
+                    "moisture_duff": 150.0,
+                    "moisture_live": 130.0,
+                    "rain_days": 8,
+                    "rot": "",
+                    "shrub": "",
+                    "slope": 10.0,
+                    "snow_month": 5,
+                    "state": "Unknown",
+                    "sunrise_hour": 6,
+                    "sunset_hour": 18
+                }
             }]
         }
         expected_parsed_input = copy.deepcopy(f)
@@ -618,53 +621,52 @@ class TestIngester(object):
                 "id": "SF11E120478",
                 "url": "http://128.208.123.111/smartfire/events/623343d2-ad25-4532-acd2-4db6cd75068a",
             },
-            "location": {
-                "latitude": 27.303,
-                "longitude": -81.142,
-                "area": 99.9999997516,
-                "utc_offset": "-04:00",
-                "canopy": 1.99,
-                "country": "USA",
-                "county": "",
-                "duff": 0.4,
-                "elevation": 0.0,
-                "fuel_100hr": 0.4,
-                "fuel_10hr": 0.35,
-                "fuel_10khr": 0.0,
-                "fuel_1hr": 0.08,
-                "fuel_1khr": 1.0,
-                "fuel_gt10khr": 0.0,
-                "grass": 0.16,
-                "litter": 0.04,
-                "max_humid": 80.0,
-                "max_temp": 30.0,
-                "max_temp_hour": 14,
-                "max_wind": 6.0,
-                "max_wind_aloft": 6.0,
-                "min_humid": 40.0,
-                "min_temp": 13.0,
-                "min_temp_hour": 4,
-                "min_wind": 6.0,
-                "min_wind_aloft": 6.0,
-                "moisture_100hr": 12.0,
-                "moisture_10hr": 12.0,
-                "moisture_1hr": 10.0,
-                "moisture_1khr": 22.0,
-                "moisture_duff": 150.0,
-                "moisture_live": 130.0,
-                "rain_days": 8,
-                "rot": 0.0,
-                "shrub": 4.86,
-                "slope": 10.0,
-                "snow_month": 5,
-                "state": "FL",
-                "sunrise_hour": 6,
-                "sunset_hour": 19
-            },
             "growth":[{
                 "start": "2015-08-04T00:00:00",
                 "end": "2015-08-05T00:00:00",
-                "pct": 100.0
+                "location": {
+                    "latitude": 27.303,
+                    "longitude": -81.142,
+                    "area": 99.9999997516,
+                    "utc_offset": "-04:00",
+                    "canopy": 1.99,
+                    "country": "USA",
+                    "county": "",
+                    "duff": 0.4,
+                    "elevation": 0.0,
+                    "fuel_100hr": 0.4,
+                    "fuel_10hr": 0.35,
+                    "fuel_10khr": 0.0,
+                    "fuel_1hr": 0.08,
+                    "fuel_1khr": 1.0,
+                    "fuel_gt10khr": 0.0,
+                    "grass": 0.16,
+                    "litter": 0.04,
+                    "max_humid": 80.0,
+                    "max_temp": 30.0,
+                    "max_temp_hour": 14,
+                    "max_wind": 6.0,
+                    "max_wind_aloft": 6.0,
+                    "min_humid": 40.0,
+                    "min_temp": 13.0,
+                    "min_temp_hour": 4,
+                    "min_wind": 6.0,
+                    "min_wind_aloft": 6.0,
+                    "moisture_100hr": 12.0,
+                    "moisture_10hr": 12.0,
+                    "moisture_1hr": 10.0,
+                    "moisture_1khr": 22.0,
+                    "moisture_duff": 150.0,
+                    "moisture_live": 130.0,
+                    "rain_days": 8,
+                    "rot": 0.0,
+                    "shrub": 4.86,
+                    "slope": 10.0,
+                    "snow_month": 5,
+                    "state": "FL",
+                    "sunrise_hour": 6,
+                    "sunset_hour": 19
+                }
             }]
         }
         expected_parsed_input = copy.deepcopy(f)
@@ -684,15 +686,54 @@ class TestIngester(object):
         }
         expected = {
             "id": "SF11C14225236095807750",
-            "location": {
-                "latitude": 47.0,
-                "longitude": -122.0,
-                "area": 100.0,
-                "rain_days": 10,
-                "days_since_rain": 10,
-                "moisture_10hr": 23.23
-            }
+            'growth': [{
+                "location": {
+                    "latitude": 47.0,
+                    "longitude": -122.0,
+                    "area": 100.0,
+                    "rain_days": 10,
+                    "days_since_rain": 10,
+                    "moisture_10hr": 23.23
+                }
+            }]
         }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+    def test_no_change(self):
+        f = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "growth": [
+                {
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
+                    "location": {
+                        "perimeter": {
+                            "type": "MultiPolygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ]
+                                ]
+                            ]
+                        },
+                        "ecoregion": "southern",
+                    }
+                }
+            ]
+        }
+        expected = copy.deepcopy(f)
         expected_parsed_input = copy.deepcopy(f)
         parsed_input = self.ingester.ingest(f)
         assert expected == f

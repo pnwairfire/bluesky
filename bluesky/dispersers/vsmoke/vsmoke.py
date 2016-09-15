@@ -17,7 +17,7 @@ import zipfile
 import shutil
 from datetime import timedelta
 
-from pyairfire.datetime import parsing as datetime_parsing
+from afdatetime import parsing as datetime_parsing
 
 from bluesky.datetimeutils import parse_utc_offset
 
