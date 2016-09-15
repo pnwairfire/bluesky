@@ -1121,34 +1121,44 @@ class TestFiresManagerFilterFires(object):
 
 
     def test_filter_by_country(self):
-
         fm = fires.FiresManager()
         init_fires = [
             fires.Fire({'id': '01', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '02', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
-            fires.Fire({'id': '03', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',"growth": [{"location": {'country': "ZZ"}}]}),
-            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',"growth": [{"location": {'country': "UK"}}]}),
-            fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',"growth": [{"location": {'country': "USA"}}]}),
-            fires.Fire({'id': '06', 'name': 'n6', 'bar1': 1 , 'baz':'baz1',"growth": [{"location": {'country': ''}}]}),
-            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',"growth": [{"location": {'country': "CA"}}]}),
-            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',"growth": [{"location": {'country': "CA"}}]}),
-            fires.Fire({'id': '09', 'name': 'n9', 'bar2': 2 , 'baz':'baz2',"growth": [{"location": {'country': 'Unknown'}}]}),
-            fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,"growth": [{"location": {"country": "USA"}}]}),
-            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,"growth": [{"location": {"country": "BZ"}}]})
+            fires.Fire({'id': '03', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "ZZ"}}, {"location": {'country': "ZZ"}}]}),
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "USA"}}]}),
+            fires.Fire({'id': '06', 'name': 'n6', 'bar1': 1 , 'baz':'baz1',
+                "growth": [{"location": {'country': ''}}]}),
+            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '09', 'name': 'n9', 'bar2': 2 , 'baz':'baz2',
+                "growth": [{"location": {'country': 'Unknown'}}]}),
+            fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "USA"}}]}),
+            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "BZ"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "ZZ"}}, {"location": {'country': "UK"}}]}),
         ]
         fm.fires = init_fires
-        assert fm.num_fires == 11
+        assert fm.num_fires == 12
 
         ## empty config
         fm.set_config_value({}, 'filter', 'country')
         fm.set_config_value(False, 'filter', 'skip_failures')
         with raises(fires.FireGrowthFilter.FilterError) as e_info:
             fm.filter_fires()
-        assert fm.num_fires == 11
+        assert fm.num_fires == 12
         assert e_info.value.args[0] == fires.FireGrowthFilter.MISSING_FILTER_CONFIG_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
-        assert fm.num_fires == 11
+        assert fm.num_fires == 12
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## Neither whitelist nor blacklist is specified
@@ -1156,11 +1166,11 @@ class TestFiresManagerFilterFires(object):
         fm.set_config_value(False, 'filter', 'skip_failures')
         with raises(fires.FireGrowthFilter.FilterError) as e_info:
             fm.filter_fires()
-        assert fm.num_fires == 11
+        assert fm.num_fires == 12
         assert e_info.value.args[0] == fires.FireGrowthFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
-        assert fm.num_fires == 11
+        assert fm.num_fires == 12
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## Both whitelist nor blacklist are specified
@@ -1169,11 +1179,11 @@ class TestFiresManagerFilterFires(object):
         fm.set_config_value(["YY"], 'filter', 'country', 'whitelist')
         with raises(fires.FireGrowthFilter.FilterError) as e_info:
             fm.filter_fires()
-        assert fm.num_fires == 11
+        assert fm.num_fires == 12
         assert e_info.value.args[0] == fires.FireGrowthFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
         fm.set_config_value(True, 'filter', 'skip_failures')
         fm.filter_fires()
-        assert fm.num_fires == 11
+        assert fm.num_fires == 12
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         fm.set_config_value(False, 'filter', 'skip_failures')
@@ -1181,16 +1191,26 @@ class TestFiresManagerFilterFires(object):
         fm.set_config_value(None, 'filter', 'country', 'whitelist')
         fm.filter_fires()
         expected = [
-            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',"growth": [{"location": {'country': "UK"}}]}),
-            fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',"growth": [{"location": {'country': "USA"}}]}),
-            fires.Fire({'id': '06', 'name': 'n6', 'bar1': 1 , 'baz':'baz1',"growth": [{"location": {'country': ''}}]}),
-            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',"growth": [{"location": {'country': "CA"}}]}),
-            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',"growth": [{"location": {'country': "CA"}}]}),
-            fires.Fire({'id': '09', 'name': 'n9', 'bar2': 2 , 'baz':'baz2',"growth": [{"location": {'country': 'Unknown'}}]}),
-            fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,"growth": [{"location": {"country": "USA"}}]}),
-            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,"growth": [{"location": {"country": "BZ"}}]})
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "USA"}}]}),
+            fires.Fire({'id': '06', 'name': 'n6', 'bar1': 1 , 'baz':'baz1',
+                "growth": [{"location": {'country': ''}}]}),
+            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '09', 'name': 'n9', 'bar2': 2 , 'baz':'baz2',
+                "growth": [{"location": {'country': 'Unknown'}}]}),
+            fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "USA"}}]}),
+            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "BZ"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
         ]
-        assert fm.num_fires == 8
+        assert fm.num_fires == 9
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         fm.set_config_value(["USA", "CA", "UK", "BZ"],
@@ -1198,46 +1218,68 @@ class TestFiresManagerFilterFires(object):
         fm.set_config_value(None, 'filter', 'country', 'blacklist')
         fm.filter_fires()
         expected = [
-            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',"growth": [{"location": {'country': "UK"}}]}),
-            fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',"growth": [{"location": {'country': "USA"}}]}),
-            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',"growth": [{"location": {'country': "CA"}}]}),
-            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',"growth": [{"location": {'country': "CA"}}]}),
-            fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,"growth": [{"location": {"country": "USA"}}]}),
-            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,"growth": [{"location": {"country": "BZ"}}]})
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "USA"}}]}),
+            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "USA"}}]}),
+            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "BZ"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]})
         ]
-        assert fm.num_fires == 6
+        assert fm.num_fires == 7
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         fm.set_config_value(["USA"], 'filter', 'country', 'blacklist')
         fm.set_config_value(None, 'filter', 'country', 'whitelist')
         fm.filter_fires()
         expected = [
-            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',"growth": [{"location": {'country': "UK"}}]}),
-            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',"growth": [{"location": {'country': "CA"}}]}),
-            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',"growth": [{"location": {'country': "CA"}}]}),
-            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,"growth": [{"location": {"country": "BZ"}}]})
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
+                "growth": [{"location": {"country": "BZ"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]})
         ]
-        assert fm.num_fires == 4
+        assert fm.num_fires == 5
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         fm.set_config_value(["USA", "CA", "UK"], 'filter', 'country', 'whitelist')
         fm.set_config_value(None, 'filter', 'country', 'blacklist')
         fm.filter_fires()
         expected = [
-            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',"growth": [{"location": {'country': "UK"}}]}),
-            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',"growth": [{"location": {'country': "CA"}}]}),
-            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',"growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
+                "growth": [{"location": {'country': "CA"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]})
         ]
-        assert fm.num_fires == 3
+        assert fm.num_fires == 4
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         fm.set_config_value(["USA", "CA"], 'filter', 'country', 'blacklist')
         fm.set_config_value(None, 'filter', 'country', 'whitelist')
         fm.filter_fires()
         expected = [
-            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',"growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]}),
+            fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
+                "growth": [{"location": {'country': "UK"}}]})
         ]
-        assert fm.num_fires == 1
+        assert fm.num_fires == 2
         assert expected == fm.fires
 
         fm.set_config_value(["UK", "CA"], 'filter', 'country', 'blacklist')
