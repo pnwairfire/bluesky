@@ -8,7 +8,7 @@ import tempfile
 
 from py.test import raises
 
-from bluesky.loaders.smartfire2 import csv as sf2csv
+from bluesky.loaders import smartfire2
 
 FIRES_JSON = """id,event_id,latitude,longitude,type,area,date_time,slope,state,country,fips,scc,fuel_1hr,fuel_10hr,fuel_100hr,fuel_1khr,fuel_10khr,fuel_gt10khr,shrub,grass,rot,duff,litter,moisture_1hr,moisture_10hr,moisture_100hr,moisture_1khr,moisture_live,moisture_duff,consumption_flaming,consumption_smoldering,consumption_residual,consumption_duff,min_wind,max_wind,min_wind_aloft,max_wind_aloft,min_humid,max_humid,min_temp,max_temp,min_temp_hour,max_temp_hour,sunrise_hour,sunset_hour,snow_month,rain_days,heat,pm25,pm10,co,co2,ch4,nox,nh3,so2,voc,VEG,canopy,event_url,fccs_number,sf_event_guid,sf_server,sf_stream_name,timezone
 SF11C112212114042848520,SF11E726370,26.313,-77.123,RX,99.9999997516,201604120000-05:00,10.0,Unknown,Unknown,-9999,2810015000,,,,,,,,,,,,10.0,12.0,12.0,22.0,130.0,150.0,,,,,6.0,6.0,6.0,6.0,40.0,80.0,13.0,30.0,4,14,6,19,5,8,,,,,,,,,,,,,http://128.208.123.111/smartfire/events/ff7c6ee9-5f54-4fd3-bd22-ebff53b429f9,,ff7c6ee9-5f54-4fd3-bd22-ebff53b429f9,128.208.123.111,realtime,-5.0
@@ -170,7 +170,7 @@ class TestSmartfire2CsvFileLoader(object):
         with open(filename, 'w') as f:
             f.write(FIRES_JSON)
 
-        l = sf2csv.FileLoader(file=filename)
+        l = smartfire2.CsvFileLoader(file=filename)
         assert l._filename == filename
         assert l._events_filename == None
 
@@ -185,7 +185,7 @@ class TestSmartfire2CsvFileLoader(object):
         with open(events_filename, 'w') as f:
             f.write(EVENTS_JSON)
 
-        l = sf2csv.FileLoader(file=filename, events_file=events_filename)
+        l = smartfire2.CsvFileLoader(file=filename, events_file=events_filename)
         assert l._filename == filename
         assert l._events_filename == events_filename
 

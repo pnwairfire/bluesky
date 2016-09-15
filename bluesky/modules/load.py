@@ -79,15 +79,17 @@ def _import_loader(source):
             "Specify 'name', 'format', and 'type' for each source of fire data")
 
     try:
-        loader_module = importlib.import_module('bluesky.loaders.{}.{}'.format(
-            source['name'].lower(), source['format'].lower()))
+        loader_module = importlib.import_module(
+            'bluesky.loaders.{}'.format(source['name'].lower()))
     except ImportError as e:
-        raise BlueSkyConfigurationError("Invalid source and/or format: {},{}".format(
-            source['name'], source['format']))
+        raise BlueSkyConfigurationError(
+            "Invalid source: {}".format(source['name']))
 
-    loader = getattr(loader_module, '{}Loader'.format(source['type'].capitalize()))
+    loader = getattr(loader_module, '{}{}Loader'.format(
+        source['format'].capitalize(), source['type'].capitalize()))
     if not loader:
-        raise BlueSkyConfigurationError("Invalid source type: {},{},{}".format(
+        raise BlueSkyConfigurationError(
+            "Invalid source format or type: {},{},{}".format(
             source['name'], source['format'], source['type']))
 
     return loader

@@ -1,25 +1,25 @@
-"""bluesky.loaders.smartfire.csv
+"""bluesky.loaders.smartfire
 """
 
 __author__ = "Joel Dubowy"
 
 import os
 
-from bluesky.loaders import BaseFileLoader
+from . import BaseFileLoader
 
 __all__ = [
     'FileLoader'
 ]
 
-class FileLoader(BaseFileLoader):
+class CsvFileLoader(BaseFileLoader):
     """Loads csv formatted SF2 fire and events data from filename
 
     TODO: move code into base class (BaseFileLoader, or maybe some into
-    BaseCsvLoader, and have FileLoader inherit from both)
+    BaseCsvLoader, and have CsvFileLoader inherit from both)
     """
 
     def __init__(self, **config):
-        super(FileLoader, self).__init__(**config)
+        super(CsvFileLoader, self).__init__(**config)
 
     def load(self):
         fires = self._load_csv_file(self._filename)
