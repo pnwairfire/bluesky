@@ -1,0 +1,51 @@
+#!/usr/bin/env python
+
+import copy
+import json
+import os
+import subprocess
+
+import afscripting
+
+def process_fire(fire):
+    if 'growth' not in fire:
+        fire['growth'] = [{'pct': 100.0}]
+    for g in fire['growth']:
+        g['location'] = copy.deepcopy(fire['location'])
+        g['location']['area'] = g['location']['area'] * (g['pct'] / 100.0)
+        if 'fuelbeds' in fire:
+            g['fuelbeds'] = copy.deepcopy(fire['fuelbeds'])
+        g.pop('pct')
+    fire.pop('location')
+    fire.pop('fuelbeds', None)
+
+
+def go(directory):
+    cur_dir = os.path.abspath(directory)
+    print("Current dir: {}".format(cur_dir))
+    input_files = subprocess.check_output(['ls', os.path.join(cur_dir)]).decode('ascii').split('\n')
+    for f in input_files:
+        if f.endswith('.json'):
+            print("Processing {}".format(f))
+            filename = os.path.join(cur_dir, f)
+            with open(filename, 'r') as _f:
+                 data = _f.read()
+            data = json.loads(data)
+            for fire in data.get('fire_information', []):
+                process_fire(fire)
+            for fire in data.get('failed_fires', []):
+                process_fire(fire)
+            with open(filename, 'w') as _f:
+                _f.write(json.dumps(data, indent=4))
+
+
+POSITIONAL_ARGS = [
+    {
+        'long': 'directory'
+    }
+]
+
+if __name__ == "__main__":
+    parser, args = afscripting.args.parse_args([], [],
+        positional_args=POSITIONAL_ARGS)
+    go(args.directory)
