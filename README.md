@@ -277,7 +277,7 @@ running ```bsp-csv2json``` like so:
 
 would produce the following (written to stdout):
 
-    {"fire_information": [{"country": "Unknown", "pm25": "", "co2": "", "fuel_10khr": "", "moisture_duff": 150.0, "canopy": "", "consumption_smoldering": "", "longitude": -77.379, "min_wind": 6.0, "pm10": "", "voc": "", "rain_days": 8, "fuel_1hr": "", "shrub": "", "slope": 10.0, "consumption_duff": "", "grass": "", "sunrise_hour": 7, "type": "RX", "ch4": "", "timezone": -5.0, "id": "SF11C14225236095807750", "moisture_100hr": 12.0, "consumption_residual": "", "fuel_gt10khr": "", "consumption_flaming": "", "elevation": 0.0, "sf_server": "playground.dri.edu", "heat": "", "so2": "", "min_wind_aloft": 6.0, "fips": -9999, "latitude": 25.041, "max_humid": 80.0, "fuel_10hr": "", "moisture_10hr": 12.0, "scc": 2810015000, "max_temp": 30.0, "moisture_1khr": 22.0, "fuel_100hr": "", "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "litter": "", "max_wind": 6.0, "min_temp": 13.1, "max_wind_aloft": 6.0, "co": "", "area": 99.9999997516, "event_id": "SF11E826544", "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "fccs_number": "", "sunset_hour": 18, "moisture_live": 130.0, "min_humid": 40.0, "snow_month": 5, "sf_stream_name": "realtime", "state": "Unknown", "date_time": "201501200000Z", "duff": "", "nh3": "", "min_temp_hour": 4, "veg": "", "rot": "", "nox": "", "max_temp_hour": 14, "fuel_1khr": "", "moisture_1hr": 10.0, "owner": "", "county": ""}]}
+    {"fire_information": [{"date_time": "201501200000Z", "litter": "", "county": "", "timezone": -5.0, "co": "", "elevation": 0.0, "pm10": "", "slope": 10.0, "state": "Unknown", "nh3": "", "moisture_duff": 150.0, "fuel_10khr": "", "fuel_gt10khr": "", "veg": "", "snow_month": 5, "min_temp_hour": 4, "min_wind": 6.0, "ch4": "", "moisture_1hr": 10.0, "id": "SF11C14225236095807750", "grass": "", "fuel_1hr": "", "duff": "", "max_humid": 80.0, "latitude": 25.041, "fuel_1khr": "", "heat": "", "area": 99.9999997516, "consumption_smoldering": "", "owner": "", "longitude": -77.379, "fuel_10hr": "", "rain_days": 8, "sf_server": "playground.dri.edu", "canopy": "", "min_humid": 40.0, "min_wind_aloft": 6.0, "rot": "", "fuel_100hr": "", "moisture_live": 130.0, "min_temp": 13.1, "pm25": "", "consumption_residual": "", "moisture_10hr": 12.0, "sunrise_hour": 7, "voc": "", "event_id": "SF11E826544", "moisture_1khr": 22.0, "so2": "", "max_wind": 6.0, "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "moisture_100hr": 12.0, "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "shrub": "", "country": "Unknown", "max_temp": 30.0, "sunset_hour": 18, "co2": "", "scc": 2810015000, "consumption_duff": "", "fccs_number": "", "nox": "", "max_temp_hour": 14, "consumption_flaming": "", "fips": -9999, "max_wind_aloft": 6.0, "type": "RX", "sf_stream_name": "realtime"}]}
 
 You can pipe the output of ```bsp-csv2json``` directly into ```bsp```, as long
 as you use the ingestions module, described below:
@@ -338,28 +338,13 @@ example, assume that you start with the following fire data:
 Assume that this data is in a file called fires.json, and that you run
 it through the fuelbeds module, with the following:
 
-    bsp -i fires.json fuelbeds
+    bsp -i fires.json fuelbeds |python -m json.tool
 
 You would get the following output (which is the input json with the addition
 of the 'fuelbeds' array in the fire object, plus 'today', 'runtime', processing' and 'summary'
 fields):
 
-
     {
-        "today": "2016-07-27",
-        "runtime": {
-            "total": "0.0h 0.0m 0s",
-            "end": "2016-07-27T00:08:27Z",
-            "start": "2016-07-27T00:08:27Z",
-            "modules": [
-                {
-                    "module_name": "fuelbeds",
-                    "total": "0.0h 0.0m 0s",
-                    "end": "2016-07-27T00:08:27Z",
-                    "start": "2016-07-27T00:08:27Z"
-                }
-            ]
-        },
         "summary": {
             "fuelbeds": [
                 {
@@ -368,33 +353,149 @@ fields):
                 }
             ]
         },
-        "processing": [
-            {
-                "module_name": "fuelbeds",
-                "fccsmap_version": "1.0.1",
-                "version": "0.1.0",
-                "module": "bluesky.modules.fuelbeds"
-            }
-        ],
         "fire_information": [
             {
-                "event_of": {
-                    "name": "Natural Fire near Snoqualmie Pass, WA",
-                    "id": "SF11E826544"
-                },
                 "id": "SF11C14225236095807750",
+                "type": "wildfire",
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                },
+                "fuel_type": "natural",
                 "growth": [
                     {
+                        "start": "2015-01-20T17:00:00",
+                        "end": "2015-01-21T17:00:00",
                         "fuelbeds": [
                             {
                                 "fccs_id": "9",
                                 "pct": 100.0
                             }
                         ],
-                        "end": "2015-01-21T17:00:00",
-                        "start": "2015-01-20T17:00:00",
                         "location": {
+                            "utc_offset": "-09:00",
+                            "perimeter": {
+                                "type": "MultiPolygon",
+                                "coordinates": [
+                                    [
+                                        [
+                                            [
+                                                -121.4522115,
+                                                47.4316976
+                                            ],
+                                            [
+                                                -121.3990506,
+                                                47.4316976
+                                            ],
+                                            [
+                                                -121.3990506,
+                                                47.4099293
+                                            ],
+                                            [
+                                                -121.4522115,
+                                                47.4099293
+                                            ],
+                                            [
+                                                -121.4522115,
+                                                47.4316976
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            },
                             "area": 2398.94477979842,
+                            "ecoregion": "southern"
+                        }
+                    }
+                ]
+            }
+        ],
+        "runtime": {
+            "start": "2016-09-15T18:47:13Z",
+            "end": "2016-09-15T18:47:13Z",
+            "modules": [
+                {
+                    "start": "2016-09-15T18:47:13Z",
+                    "end": "2016-09-15T18:47:13Z",
+                    "module_name": "fuelbeds",
+                    "total": "0.0h 0.0m 0s"
+                }
+            ],
+            "total": "0.0h 0.0m 0s"
+        },
+        "today": "2016-09-15",
+        "config": {},
+        "processing": [
+            {
+                "version": "0.1.0",
+                "fccsmap_version": "1.0.1",
+                "module_name": "fuelbeds",
+                "module": "bluesky.modules.fuelbeds"
+            }
+        ]
+    }
+
+
+This output could be piped back into ```bsp``` and run through the consumption
+module, like so:
+
+    bsp -i fires.json fuelbeds | bsp consumption
+
+yielding the following augmented output:
+
+    {
+        "processing": [
+            {
+                "module": "bluesky.modules.fuelbeds",
+                "fccsmap_version": "1.0.1",
+                "module_name": "fuelbeds",
+                "version": "0.1.0"
+            },
+            {
+                "module": "bluesky.modules.consumption",
+                "module_name": "consumption",
+                "consume_version": "4.1.2",
+                "version": "0.1.0"
+            }
+        ],
+        "fire_information": [
+            {
+                "growth": [
+                    {
+                        "fuelbeds": [
+                            {
+                                "fccs_id": "9",
+                                "consumption": {
+                                    /* ...consumption output... */
+                                },
+                                "pct": 100.0,
+                                "heat": {
+                                    /* ...heat output... */
+                                },
+                                "fuel_loadings": {
+                                    /* ...consumption output... */
+                                }
+                            }
+                        ],
+                        "heat": {
+                            "summary": {
+                                "flaming": 344476309730.7089,
+                                "smoldering": 247784445451.14124,
+                                "residual": 331813158338.9564,
+                                "total": 924073913520.8065
+                            }
+                        },
+                        "consumption": {
+                            "summary": {
+                                "flaming": 21529.769358169302,
+                                "smoldering": 15486.527840696328,
+                                "residual": 20738.322396184776,
+                                "total": 57754.61959505042
+                            }
+                        },
+                        "end": "2015-01-21T17:00:00",
+                        "location": {
+                            "utc_offset": "-09:00",
                             "perimeter": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
@@ -409,130 +510,74 @@ fields):
                                     ]
                                 ]
                             },
-                            "utc_offset": "-09:00",
+                            "area": 2398.94477979842,
                             "ecoregion": "southern"
-                        }
+                        },
+                        "start": "2015-01-20T17:00:00"
                     }
                 ],
-                "type": "wildfire",
-                "fuel_type": "natural"
-            }
-        ],
-        "config": {}
-    }
-
-
-This output could be piped back into ```bsp``` and run through the consumption
-module, like so:
-
-    bsp -i fires.json fuelbeds | bsp consumption
-
-yielding the following augmented output:
-
-    {
-        "runtime": {
-            "start": "2016-07-27T00:11:19Z",
-            "end": "2016-07-27T00:11:19Z",
-            "total": "0.0h 0.0m 0s",
-            "modules": [
-                {
-                    "start": "2016-07-27T00:11:19Z",
-                    "end": "2016-07-27T00:11:19Z",
-                    "total": "0.0h 0.0m 0s",
-                    "module_name": "consumption"
-                }
-            ]
-        },
-        "fire_information": [
-            {
+                "heat": {
+                    "summary": {
+                        "flaming": 344476309730.7089,
+                        "smoldering": 247784445451.14124,
+                        "residual": 331813158338.9564,
+                        "total": 924073913520.8065
+                    }
+                },
+                "fuel_type": "natural",
                 "consumption": {
                     "summary": {
-                        "smoldering": 15486.527840696326,
-                        "flaming": 21529.76935816931,
-                        "total": 57754.619595050404,
-                        "residual": 20738.322396184776
+                        "flaming": 21529.769358169302,
+                        "smoldering": 15486.527840696328,
+                        "residual": 20738.322396184776,
+                        "total": 57754.61959505042
                     }
                 },
                 "id": "SF11C14225236095807750",
+                "type": "wildfire",
                 "event_of": {
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
-                },
-                "fuel_type": "natural",
-                "type": "wildfire",
-                "growth": [
-                    {
-                        "location": {
-                            "area": 2398.94477979842,
-                            "ecoregion": "southern",
-                            "utc_offset": "-09:00",
-                            "perimeter": {
-                                "coordinates": [
-                                    [
-                                        [
-                                            [-121.4522115,47.4316976],
-                                            [-121.3990506,47.4316976],
-                                            [-121.3990506,47.4099293],
-                                            [-121.4522115,47.4099293],
-                                            [-121.4522115,47.4316976]
-                                        ]
-                                    ]
-                                ],
-                                "type": "MultiPolygon"
-                            }
-                        },
-                        "fuelbeds": [
-                            {
-                                "heat": {
-                                    /* ...heat output... */
-                                },
-                                "pct": 100.0,
-                                "consumption": {
-                                    /* ...consumption output... */
-                                },
-                                "fuel_loadings": {
-                                    /* ...fuel loadings... */
-                                },
-                                "fccs_id": "9"
-                            }
-                        ],
-                        "start": "2015-01-20T17:00:00",
-                        "end": "2015-01-21T17:00:00"
-                    }
-                ]
+                }
             }
         ],
-        "processing": [
-            {
-                "fccsmap_version": "1.0.1",
-                "module": "bluesky.modules.fuelbeds",
-                "version": "0.1.0",
-                "module_name": "fuelbeds"
-            },
-            {
-                "module": "bluesky.modules.consumption",
-                "version": "0.1.0",
-                "consume_version": "4.1.2",
-                "module_name": "consumption"
-            }
-        ],
-        "today": "2016-07-27T00:00:00",
         "config": {},
+        "today": "2016-09-15",
         "summary": {
+            "consumption": {
+                /* ...consumption summary... */
+            },
             "fuelbeds": [
                 {
-                    "pct": 100.0,
-                    "fccs_id": "9"
+                    "fccs_id": "9",
+                    "pct": 100.0
                 }
             ],
             "heat": {
                 /* ...heat summary... */
-            },
-            "consumption": {
-                /* ...consumption summary... */
             }
+        },
+        "runtime": {
+            "end": "2016-09-15T18:48:22Z",
+            "start": "2016-09-15T18:48:22Z",
+            "modules": [
+                {
+                    "end": "2016-09-15T18:48:22Z",
+                    "module_name": "fuelbeds",
+                    "start": "2016-09-15T18:48:22Z",
+                    "total": "0.0h 0.0m 0s"
+                },
+                {
+                    "end": "2016-09-15T18:48:22Z",
+                    "module_name": "consumption",
+                    "start": "2016-09-15T18:48:22Z",
+                    "total": "0.0h 0.0m 0s"
+                }
+            ],
+            "total": "0.0h 0.0m 0s"
         }
     }
+
 
 Though there would be no reason to do so in this situation, you could re-run
 the fuelbeds module in the second pass throgh ```bsp```, like so:
@@ -556,49 +601,125 @@ runs the output back through consumption and on through emissions:
 would contain this output, agumented with emissions data:
 
     {
-        "summary": {
-            "consumption": {
-                /* consumption output */
+        "processing": [
+            {
+                "fccsmap_version": "1.0.1",
+                "module": "bluesky.modules.fuelbeds",
+                "module_name": "fuelbeds",
+                "version": "0.1.0"
             },
-            "fuelbeds": [
-                {
-                    "pct": 100.0,
-                    "fccs_id": "9"
-                }
-            ],
-            "heat": {
-                /* heat output */
+            {
+                "module": "bluesky.modules.consumption",
+                "module_name": "consumption",
+                "version": "0.1.0",
+                "consume_version": "4.1.2"
             },
-            "emissions": {
-                /* emissions output */
+            {
+                "emitcalc_version": "1.0.1",
+                "module": "bluesky.modules.emissions",
+                "eflookup_version": "1.0.2",
+                "ef_set": "feps",
+                "module_name": "emissions",
+                "version": "0.1.0"
             }
+        ],
+        "runtime": {
+            "total": "0.0h 0.0m 0s",
+            "end": "2016-09-15T18:52:10Z",
+            "start": "2016-09-15T18:52:10Z",
+            "modules": [
+                {
+                    "total": "0.0h 0.0m 0s",
+                    "end": "2016-09-15T18:52:10Z",
+                    "module_name": "fuelbeds",
+                    "start": "2016-09-15T18:52:10Z"
+                },
+                {
+                    "total": "0.0h 0.0m 0s",
+                    "end": "2016-09-15T18:52:10Z",
+                    "module_name": "consumption",
+                    "start": "2016-09-15T18:52:10Z"
+                },
+                {
+                    "total": "0.0h 0.0m 0s",
+                    "end": "2016-09-15T18:52:10Z",
+                    "module_name": "emissions",
+                    "start": "2016-09-15T18:52:10Z"
+                }
+            ]
         },
+        "config": {},
         "fire_information": [
             {
+                "fuel_type": "natural",
+                "emissions": {
+                    "summary": {
+                        "total": 99674.47838833416,
+                        "CH4": 439.71054108574947,
+                        "NOx": 84.99420586185778,
+                        "PM25": 759.2284300672792,
+                        "CO": 9157.402971690011,
+                        "PM10": 895.8895474793892,
+                        "SO2": 56.59952720314939,
+                        "VOC": 2149.357747802895,
+                        "NH3": 149.52053897759265,
+                        "CO2": 85981.77487816624
+                    }
+                },
+                "heat": {
+                    "summary": {
+                        "total": 924073913520.8066,
+                        "smoldering": 247784445451.14124,
+                        "flaming": 344476309730.7089,
+                        "residual": 331813158338.9564
+                    }
+                },
+                "type": "wildfire",
                 "growth": [
                     {
                         "fuelbeds": [
                             {
-                                "emissions": {
-                                    /* emissions output */
-                                },
-                                "fccs_id": "9",
-                                "consumption": {
-                                    /* consumption output */
-                                },
                                 "pct": 100.0,
+                                "fccs_id": "9",
                                 "heat": {
-                                    /* heat output */
+                                    /* ...heat output... */
+                                },
+                                "emissions": {
+                                    /* ...emissions output... */
                                 },
                                 "fuel_loadings": {
-                                    /* fuel loadings */
+                                    /* ...fuel loadings... */
+                                },
+                                "consumption": {
+                                    /* ...consumption output... */
                                 }
                             }
                         ],
+                        "heat": {
+                            "summary": {
+                                "total": 924073913520.8066,
+                                "smoldering": 247784445451.14124,
+                                "flaming": 344476309730.7089,
+                                "residual": 331813158338.9564
+                            }
+                        },
+                        "emissions": {
+                            "summary": {
+                                "total": 99674.47838833416,
+                                "CH4": 439.71054108574947,
+                                "NOx": 84.99420586185778,
+                                "PM25": 759.2284300672792,
+                                "CO": 9157.402971690011,
+                                "PM10": 895.8895474793892,
+                                "SO2": 56.59952720314939,
+                                "VOC": 2149.357747802895,
+                                "NH3": 149.52053897759265,
+                                "CO2": 85981.77487816624
+                            }
+                        },
                         "location": {
-                            "area": 2398.94477979842,
                             "ecoregion": "southern",
-                            "utc_offset": "-09:00",
+                            "area": 2398.94477979842,
                             "perimeter": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
@@ -612,83 +733,55 @@ would contain this output, agumented with emissions data:
                                         ]
                                     ]
                                 ]
-                            }
+                            },
+                            "utc_offset": "-09:00"
                         },
                         "end": "2015-01-21T17:00:00",
-                        "start": "2015-01-20T17:00:00"
+                        "start": "2015-01-20T17:00:00",
+                        "consumption": {
+                            "summary": {
+                                "total": 57754.619595050404,
+                                "smoldering": 15486.527840696328,
+                                "flaming": 21529.76935816931,
+                                "residual": 20738.322396184776
+                            }
+                        }
                     }
                 ],
-                "id": "SF11C14225236095807750",
-                "fuel_type": "natural",
-                "emissions": {
-                    "summary": {
-                        "NOx": 84.99420586185778,
-                        "VOC": 2149.3577478028947,
-                        "PM25": 759.2284300672793,
-                        "SO2": 56.5995272031494,
-                        "NH3": 149.52053897759265,
-                        "PM10": 895.8895474793892,
-                        "CO2": 85981.77487816624,
-                        "CH4": 439.71054108574947,
-                        "total": 99674.47838833414,
-                        "CO": 9157.402971690011
-                    }
-                },
                 "consumption": {
                     "summary": {
-                        "residual": 20738.322396184776,
                         "total": 57754.619595050404,
-                        "flaming": 21529.769358169302,
-                        "smoldering": 15486.527840696328
+                        "smoldering": 15486.527840696328,
+                        "flaming": 21529.76935816931,
+                        "residual": 20738.322396184776
                     }
                 },
                 "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                    "name": "Natural Fire near Snoqualmie Pass, WA",
+                    "id": "SF11E826544"
                 },
-                "type": "wildfire"
+                "id": "SF11C14225236095807750"
             }
         ],
-        "today": "2016-07-27T00:00:00",
-        "processing": [
-            {
-                "module": "bluesky.modules.fuelbeds",
-                "fccsmap_version": "1.0.1",
-                "module_name": "fuelbeds",
-                "version": "0.1.0"
+        "today": "2016-09-15",
+        "summary": {
+            "heat": {
+                /* ...heat summary... */
             },
-            {
-                "module": "bluesky.modules.consumption",
-                "module_name": "consumption",
-                "consume_version": "4.1.2",
-                "version": "0.1.0"
-            },
-            {
-                "emitcalc_version": "1.0.1",
-                "ef_set": "feps",
-                "eflookup_version": "1.0.2",
-                "version": "0.1.0",
-                "module": "bluesky.modules.emissions",
-                "module_name": "emissions"
-            }
-        ],
-        "runtime": {
-            "start": "2016-07-27T00:24:32Z",
-            "total": "0.0h 0.0m 0s",
-            "modules": [
+            "fuelbeds": [
                 {
-                    "total": "0.0h 0.0m 0s",
-                    "end": "2016-07-27T00:24:32Z",
-                    "module_name": "emissions",
-                    "start": "2016-07-27T00:24:32Z"
+                    "pct": 100.0,
+                    "fccs_id": "9"
                 }
             ],
-            "end": "2016-07-27T00:24:32Z"
-        },
-        "config": {}
+            "consumption": {
+                /* ...consumption summary... */
+            },
+            "emissions": {
+                /* ...emissions summary... */
+            }
+        }
     }
-
-
 
 ##### Pretty-Printing JSON Output
 
@@ -737,64 +830,64 @@ Assume you start with the following data:
 It would become:
 
     {
-        "processing": [
-            {
-                "version": "0.1.0",
-                "parsed_input": [
-                    {
-                        "location": {
-                            "latitude": 47.4316976,
-                            "longitude": -121.3990506
-                        },
-                        "fuel_type": "natural",
-                        "name": "event name",
-                        "utc_offset": "-09:00",
-                        "type": "wildfire",
-                        "id": "ac226ee6",
-                        "event_id": "jfkhfdskj",
-                        "area": 200
-                    }
-                ],
-                "module_name": "ingestion",
-                "module": "bluesky.modules.ingestion"
-            }
-        ],
+        "config": {},
+        "runtime": {
+            "start": "2016-09-15T18:55:48Z",
+            "end": "2016-09-15T18:55:48Z",
+            "total": "0.0h 0.0m 0s",
+            "modules": [
+                {
+                    "start": "2016-09-15T18:55:48Z",
+                    "total": "0.0h 0.0m 0s",
+                    "module_name": "ingestion",
+                    "end": "2016-09-15T18:55:48Z"
+                }
+            ]
+        },
+        "today": "2016-09-15",
         "fire_information": [
             {
+                "type": "wildfire",
+                "fuel_type": "natural",
+                "id": "03d58ba6",
                 "event_of": {
                     "id": "jfkhfdskj",
                     "name": "event name"
                 },
-                "fuel_type": "natural",
-                "type": "wildfire",
-                "id": "ac226ee6",
                 "growth": [
                     {
                         "location": {
-                            "utc_offset": "-09:00",
                             "area": 200,
-                            "latitude": 47.4316976,
-                            "longitude": -121.3990506
+                            "longitude": -121.3990506,
+                            "utc_offset": "-09:00",
+                            "latitude": 47.4316976
                         }
                     }
                 ]
             }
         ],
-        "config": {},
-        "today": "2016-07-27",
-        "runtime": {
-            "end": "2016-07-27T00:33:00Z",
-            "modules": [
-                {
-                    "end": "2016-07-27T00:33:00Z",
-                    "module_name": "ingestion",
-                    "total": "0.0h 0.0m 0s",
-                    "start": "2016-07-27T00:33:00Z"
-                }
-            ],
-            "start": "2016-07-27T00:33:00Z",
-            "total": "0.0h 0.0m 0s"
-        }
+        "processing": [
+            {
+                "version": "0.1.0",
+                "parsed_input": [
+                    {
+                        "area": 200,
+                        "type": "wildfire",
+                        "utc_offset": "-09:00",
+                        "name": "event name",
+                        "location": {
+                            "longitude": -121.3990506,
+                            "latitude": 47.4316976
+                        },
+                        "event_id": "jfkhfdskj",
+                        "id": "03d58ba6",
+                        "fuel_type": "natural"
+                    }
+                ],
+                "module_name": "ingestion",
+                "module": "bluesky.modules.ingestion"
+            }
+        ]
     }
 
 
