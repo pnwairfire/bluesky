@@ -625,7 +625,7 @@ class FirePostProcessor(object):
                     # we know this is the only growth object given the check
                     # above; if it's lat+lng+area, we'll adjust the growth
                     # objets portion of the area
-                    g['location'] = top_level_base_location
+                    g['location'] = copy.deepcopy(top_level_base_location)
                     if fire['location'].get('area'):
                         # This must be the old, deprecated growth and location
                         # structure, so the growth object should either have
