@@ -1,66 +1,64 @@
 {
     "fire_information": [
         {
-            "id": "SF11C14225236095807750",
             "event_id": "SF11E826544",
             "name": "Some Rx Fire in the Bahamas with consumption inputs provided",
-            "type": "Rx",
-            "location": {
-                "latitude": 25.041,
-                "longitude": -77.379,
-                "area": 99.9999997516,
-                "ecoregion": "western",
-                "fuel_moisture_1000hr_pct": 50,
-                "fuel_moisture_10hr_pct": 60,
-                "fuel_moisture_duff_pct": 45,
-                "county": "",
-                "country": "BS",
-                "slope": 10.0,
-                "windspeed": 8,
-                "canopy_consumption_pct": 2,
-                "shrub_blackened_pct": 45,
-                "fm_type": "ADJ-Th",
-                "days_since_rain": 4,
-                "length_of_ignition": 23,
-                "max_humid": 80.0,
-                "elevation": 0.0,
-                "state": "KS",
-                "output_units": "tons",
-                "utc_offset": "-05:00"
-            },
             "growth": [
                 {
-                    "start": "2015-01-20T19:00:00",
+                    "location": {
+                        "slope": 10.0,
+                        "ecoregion": "western",
+                        "latitude": 25.041,
+                        "max_humid": 80.0,
+                        "fuel_moisture_duff_pct": 45,
+                        "elevation": 0.0,
+                        "canopy_consumption_pct": 2,
+                        "state": "KS",
+                        "fuel_moisture_10hr_pct": 60,
+                        "fm_type": "ADJ-Th",
+                        "longitude": -77.379,
+                        "fuel_moisture_1000hr_pct": 50,
+                        "country": "BS",
+                        "county": "",
+                        "utc_offset": "-05:00",
+                        "windspeed": 8,
+                        "length_of_ignition": 23,
+                        "area": 99.9999997516,
+                        "days_since_rain": 4,
+                        "output_units": "tons",
+                        "shrub_blackened_pct": 45
+                    },
                     "end": "2015-01-21T19:00:00",
-                    "pct": 100.0
+                    "start": "2015-01-20T19:00:00"
                 }
-            ]
+            ],
+            "id": "SF11C14225236095807750",
+            "type": "Rx"
         },
         {
-            "id": "fkjsdflkjsdflkjsdlkfj",
             "event_id": "SF11E826544",
             "name": "Natural Fire in WA lacking consumption inputs",
-            "location": {
-                "shape": "This needs to be filled in with real shape data",
-                "latitude": 47.123,
-                "longitude": -120.379,
-                "area": 200,
-                "ecoregion": "southern",
-                "county": "",
-                "country": "USA",
-                "slope": 20.0,
-                "max_humid": 70.0,
-                "elevation": 2320.0,
-                "state": "KS",
-                "utc_offset": "-07:00"
-            },
             "growth": [
                 {
-                    "start": "2015-01-20T17:00:00",
+                    "location": {
+                        "slope": 20.0,
+                        "ecoregion": "southern",
+                        "area": 200.0,
+                        "max_humid": 70.0,
+                        "latitude": 47.123,
+                        "state": "KS",
+                        "longitude": -120.379,
+                        "country": "USA",
+                        "county": "",
+                        "utc_offset": "-07:00",
+                        "elevation": 2320.0,
+                        "shape": "This needs to be filled in with real shape data"
+                    },
                     "end": "2015-01-21T17:00:00",
-                    "pct": 100.0
+                    "start": "2015-01-20T17:00:00"
                 }
-            ]
+            ],
+            "id": "fkjsdflkjsdflkjsdlkfj"
         }
     ]
 }

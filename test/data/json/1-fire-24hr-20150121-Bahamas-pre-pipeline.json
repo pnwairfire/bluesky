@@ -1,39 +1,39 @@
 {
     "fire_information": [
         {
-            "id": "SF11C14225236095807750",
             "event_id": "SF11E826544",
             "name": "Some Rx Fire in the Bahamas with consumption inputs provided",
-            "type": "Rx",
-            "location": {
-                "latitude": 25.041,
-                "longitude": -77.379,
-                "area": 99.9999997516,
-                "max_humid": 80.0,
-                "elevation": 0.0,
-                "state": "KS",
-                "county": "",
-                "country": "BS",
-                "fuel_moisture_1000hr_pct": 50,
-                "fuel_moisture_10hr_pct": 60,
-                "fuel_moisture_duff_pct": 45,
-                "ecoregion": "western",
-                "slope": 10.0,
-                "windspeed": 8,
-                "canopy_consumption_pct": 2,
-                "shrub_blackened_pct": 45,
-                "fm_type": "ADJ-Th",
-                "days_since_rain": 4,
-                "length_of_ignition": 23,
-                "output_units": "tons",
-                "utc_offset": "-05:00"
-            },
             "growth": [
                 {
-                    "start": "2015-01-20T19:00:00",
-                    "end": "2015-01-21T19:00:00"
+                    "location": {
+                        "slope": 10.0,
+                        "ecoregion": "western",
+                        "area": 99.9999997516,
+                        "county": "",
+                        "max_humid": 80.0,
+                        "fuel_moisture_duff_pct": 45,
+                        "state": "KS",
+                        "fuel_moisture_10hr_pct": 60,
+                        "fm_type": "ADJ-Th",
+                        "longitude": -77.379,
+                        "fuel_moisture_1000hr_pct": 50,
+                        "country": "BS",
+                        "elevation": 0.0,
+                        "utc_offset": "-05:00",
+                        "length_of_ignition": 23,
+                        "windspeed": 8,
+                        "latitude": 25.041,
+                        "canopy_consumption_pct": 2,
+                        "days_since_rain": 4,
+                        "output_units": "tons",
+                        "shrub_blackened_pct": 45
+                    },
+                    "end": "2015-01-21T19:00:00",
+                    "start": "2015-01-20T19:00:00"
                 }
-            ]
+            ],
+            "id": "SF11C14225236095807750",
+            "type": "Rx"
         }
     ]
 }

@@ -1,38 +1,53 @@
 {
     "fire_information": [
         {
-            "id": "fkjsdflkjsflkjsdlkfj",
             "event_id": "SF11E826544",
             "name": "Natural Fire in WA lacking consumption inputs",
-            "location": {
-                "perimeter": {
-                    "type": "MultiPolygon",
-                    "coordinates": [
-                        [
-                            [
-                                [-121.4522115, 47.4316976],
-                                [-121.3990506, 47.4316976],
-                                [-121.3990506, 47.4099293],
-                                [-121.4522115, 47.4099293],
-                                [-121.4522115, 47.4316976]
-                            ]
-                        ]
-                    ]
-                },
-                "ecoregion": "southern",
-                "state": "KS",
-                "country": "USA",
-                "slope": 20.0,
-                "elevation": 2320.0,
-                "max_humid": 70.0,
-                "utc_offset": "-07:00"
-            },
             "growth": [
                 {
-                    "start": "2015-01-20T17:00:00",
-                    "end": "2015-01-21T17:00:00"
+                    "location": {
+                        "slope": 20.0,
+                        "country": "USA",
+                        "state": "KS",
+                        "utc_offset": "-07:00",
+                        "perimeter": {
+                            "type": "MultiPolygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        [
+                                            -121.4522115,
+                                            47.4316976
+                                        ],
+                                        [
+                                            -121.3990506,
+                                            47.4316976
+                                        ],
+                                        [
+                                            -121.3990506,
+                                            47.4099293
+                                        ],
+                                        [
+                                            -121.4522115,
+                                            47.4099293
+                                        ],
+                                        [
+                                            -121.4522115,
+                                            47.4316976
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        },
+                        "max_humid": 70.0,
+                        "ecoregion": "southern",
+                        "elevation": 2320.0
+                    },
+                    "end": "2015-01-21T17:00:00",
+                    "start": "2015-01-20T17:00:00"
                 }
-            ]
+            ],
+            "id": "fkjsdflkjsflkjsdlkfj"
         }
     ]
 }

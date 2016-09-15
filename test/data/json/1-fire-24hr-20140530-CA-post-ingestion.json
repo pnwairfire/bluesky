@@ -1,25 +1,25 @@
 {
     "fire_information": [
         {
-            "event_of": {
-                "id": "SF11E826544",
-                "name": "Natural Fire near Yosemite, CA"
-            },
-            "id": "SF11C14225236095807750",
             "type": "wildfire",
+            "id": "SF11C14225236095807750",
             "growth": [
                 {
-                    "start": "2014-05-29T17:00:00",
-                    "end": "2014-05-30T17:00:00",
                     "location": {
-                        "area": 10000,
-                        "ecoregion": "western",
-                        "latitude": 37.909644,
                         "longitude": -119.7615805,
-                        "utc_offset": "-07:00"
-                    }
+                        "ecoregion": "western",
+                        "utc_offset": "-07:00",
+                        "latitude": 37.909644,
+                        "area": 10000
+                    },
+                    "end": "2014-05-30T17:00:00",
+                    "start": "2014-05-29T17:00:00"
                 }
-            ]
+            ],
+            "event_of": {
+                "name": "Natural Fire near Yosemite, CA",
+                "id": "SF11E826544"
+            }
         }
     ]
 }
