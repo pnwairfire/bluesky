@@ -126,7 +126,7 @@ class ComputeFunction(object):
                 #   percentage of the fire's total area?
                 g_frp = frp
                 plumerise_data = pr.compute(g['localmet'],
-                    g.location['area'], frp=g_frp)
+                    g['location']['area'], frp=g_frp)
                 g['plumerise'] = plumerise_data['hours']
 
         return _f
