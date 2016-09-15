@@ -1,0 +1,17 @@
+{
+    "config":{
+        "load": {
+            "sources": [
+                {
+                    "name": "firespider",
+                    "format": "JSON",
+                    "type": "API",
+                    "endpoint": "http://<HOSTNAME>/api/v1/fires/raw/",
+                    "key": "<KEY>",
+                    "secret": "<SECRET>",
+                    "query": {}
+                }
+            ]
+        }
+    }
+}
