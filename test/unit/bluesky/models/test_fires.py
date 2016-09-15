@@ -1305,10 +1305,12 @@ class TestFiresManagerFilterFires(object):
             fires.Fire({'id': '6', 'growth': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
             fires.Fire({'id': '7', 'growth': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
             fires.Fire({'id': '8', 'growth': [{'location':{'latitude': 70.0, 'longitude': -120.0}}]}),
-            fires.Fire({'id': '9', 'growth': [{'location':{'latitude': -10.0, 'longitude': 10.0}}]})
+            fires.Fire({'id': '9', 'growth': [{'location':{'latitude': -10.0, 'longitude': 10.0}}]}),
+            fires.Fire({'id': '10', 'growth': [{'location':{'latitude': -10.0, 'longitude': 10.0}},
+                {'location':{'latitude': 40.0, 'longitude': -80.0}}]})
         ]
         fm.fires = init_fires
-        assert fm.num_fires == 9
+        assert fm.num_fires == 10
 
         ## Failure situations
         scenarios = (
@@ -1357,13 +1359,13 @@ class TestFiresManagerFilterFires(object):
             fm.set_config_value(False, 'filter', 'skip_failures')
             with raises(fires.FireGrowthFilter.FilterError) as e_info:
                 fm.filter_fires()
-            assert fm.num_fires == 9
+            assert fm.num_fires == 10
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
             assert e_info.value.args[0] == err_msg
             # skip failures
             fm.set_config_value(True, 'filter', 'skip_failures')
             fm.filter_fires()
-            assert fm.num_fires == 9
+            assert fm.num_fires == 10
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## noops
@@ -1371,7 +1373,7 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": -50.75,"lng": -131.5}},
             'filter', 'location', 'boundary')
         fm.filter_fires()
-        assert fm.num_fires == 9
+        assert fm.num_fires == 10
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## successful filters
@@ -1387,10 +1389,11 @@ class TestFiresManagerFilterFires(object):
             fires.Fire({'id': '5', 'growth': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
             fires.Fire({'id': '6', 'growth': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
             fires.Fire({'id': '7', 'growth': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
-            fires.Fire({'id': '8', 'growth': [{'location':{'latitude': 70.0, 'longitude': -120.0}}]})
+            fires.Fire({'id': '8', 'growth': [{'location':{'latitude': 70.0, 'longitude': -120.0}}]}),
+            fires.Fire({'id': '10', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
         ]
         fm.filter_fires()
-        assert fm.num_fires == 8
+        assert fm.num_fires == 9
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze sw lng
@@ -1404,10 +1407,11 @@ class TestFiresManagerFilterFires(object):
             fires.Fire({'id': '4', 'growth': [{'location':{'latitude': 70.0, 'longitude': -60.0}}]}),
             fires.Fire({'id': '5', 'growth': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
             fires.Fire({'id': '6', 'growth': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '7', 'growth': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]})
+            fires.Fire({'id': '7', 'growth': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
+            fires.Fire({'id': '10', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
         ]
         fm.filter_fires()
-        assert fm.num_fires == 7
+        assert fm.num_fires == 8
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze ne lat
@@ -1420,10 +1424,11 @@ class TestFiresManagerFilterFires(object):
             fires.Fire({'id': '3', 'growth': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
             fires.Fire({'id': '5', 'growth': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
             fires.Fire({'id': '6', 'growth': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '7', 'growth': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]})
+            fires.Fire({'id': '7', 'growth': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
+            fires.Fire({'id': '10', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
         ]
         fm.filter_fires()
-        assert fm.num_fires == 6
+        assert fm.num_fires == 7
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze ne lng
@@ -1435,10 +1440,11 @@ class TestFiresManagerFilterFires(object):
             fires.Fire({'id': '2', 'growth': [{'location':{'latitude': 50.0, 'longitude': -80.0}}]}),
             fires.Fire({'id': '3', 'growth': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
             fires.Fire({'id': '5', 'growth': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '6', 'growth': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]})
+            fires.Fire({'id': '6', 'growth': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
+            fires.Fire({'id': '10', 'growth': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
         ]
         fm.filter_fires()
-        assert fm.num_fires == 5
+        assert fm.num_fires == 6
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze ne lng
