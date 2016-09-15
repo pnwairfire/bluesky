@@ -46,6 +46,7 @@ setup(
         "afconfig==1.*",
         "afdatetime==1.*",
         "afscripting==1.*",
+        "afweb==1.*",
         "eflookup==1.*",
         "emitcalc==1.*",
         "fccsmap==1.*",
