@@ -1520,10 +1520,12 @@ class TestFiresManagerFilterFires(object):
             fires.Fire({'id': '5', 'growth': [{'location':{'area': 85}}]}),
             fires.Fire({'id': '6', 'growth': [{'location':{'area': 75}}]}),
             fires.Fire({'id': '7', 'growth': [{'location':{'area': 50}}]}),
-            fires.Fire({'id': '8', 'growth': [{'location':{'area': 30}}]})
+            fires.Fire({'id': '8', 'growth': [{'location':{'area': 30}}]}),
+            fires.Fire({'id': '9', 'growth': [{'location':{'area': 45}},
+                {'location':{'area': 40}}]})
         ]
         fm.fires = init_fires
-        assert fm.num_fires == 8
+        assert fm.num_fires == 9
 
         ## Failure situations
         scenarios = (
@@ -1556,13 +1558,13 @@ class TestFiresManagerFilterFires(object):
             fm.set_config_value(False, 'filter', 'skip_failures')
             with raises(fires.FireGrowthFilter.FilterError) as e_info:
                 fm.filter_fires()
-            assert fm.num_fires == 8
+            assert fm.num_fires == 9
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
             assert e_info.value.args[0] == err_msg
             # skip failures
             fm.set_config_value(True, 'filter', 'skip_failures')
             fm.filter_fires()
-            assert fm.num_fires == 8
+            assert fm.num_fires == 9
             assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## noops
@@ -1570,17 +1572,17 @@ class TestFiresManagerFilterFires(object):
         # min only
         fm.set_config_value({'min': 20}, 'filter', 'area')
         fm.filter_fires()
-        assert fm.num_fires == 8
+        assert fm.num_fires == 9
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
         # max only
         fm.set_config_value({'max': 120}, 'filter', 'area')
         fm.filter_fires()
-        assert fm.num_fires == 8
+        assert fm.num_fires == 9
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
         # both min and max
         fm.set_config_value({'min': 20, 'max': 120}, 'filter', 'area')
         fm.filter_fires()
-        assert fm.num_fires == 8
+        assert fm.num_fires == 9
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## successful filters
