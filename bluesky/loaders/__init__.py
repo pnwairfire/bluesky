@@ -57,12 +57,13 @@ class BaseFileLoader(object):
 
 class BaseApiLoader(object):
 
+    DEFAULT_KEY_PARAM = "_k"
     DEFAULT_AUTH_PROTOCOL = "afweb"
     DEFAULT_REQUEST_TIMEOUT = 10 # seconds
 
     def __init__(self, **config):
-        self._endpoint = confit.get('endpoint'):
-        if not self._url:
+        self._endpoint = confit.get('endpoint')
+        if not self._endpoint:
             raise BlueSkyConfigurationError(
                 "Json API not specified")
 
@@ -72,16 +73,17 @@ class BaseApiLoader(object):
         if self._secret and not self._key:
             raise BlueSkyConfigurationError(
                 "Api key must be specified if secret is specified")
-        self._key_param = config.get('key_param') or "_k"
+
+        self._key_param = config.get('key_param',
+            self.DEFAULT_KEY_PARAM)
         self._auth_protocol = config.get('auth_protocol',
             self.DEFAULT_AUTH_PROTOCOL)
-
         self._request_timeout = config.get('request_timeout',
             self.DEFAULT_REQUEST_TIMEOUT)
 
     def get(self, **query):
         if self._secret:
-            if self._auth_protocol = 'afweb'
+            if self._auth_protocol == 'afweb':
                 url = auth.sign_url(self._form_url(query))
             else:
                 raise NotImplementedError(
@@ -89,13 +91,20 @@ class BaseApiLoader(object):
                     self._auth_protocol))
         else:
             if self._key:
-                params.update(self._key_param=self._key)
+                params[self._key_param] = self._key
             url = self._form_url(query)
 
         req = urllib.request.Request(url)
         resp = urllib.request.urlopen(req, None, self._timeout)
         return resp.write()
 
-    def _form_url(self, *query):
+    def _form_url(self, **query):
+        query_param_tuples = []
+        for k, v in query.items():
+            if isinstance(v, list):
+                query_param_tuples.extend([(k, _v) for _v in v])
+            else:
+                query_param_tuples.append((k, v))
         query_string = '&'.join(sorted([
-            "%s=%s"%(k, _v) for k, v in query.items() for _v in v]))
+            "%s=%s"%(k, _v) for k, v in query_param_tuples]))
+        return "{}?{}".format(self._endpoint, query_string)
