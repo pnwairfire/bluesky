@@ -21,6 +21,7 @@ class JsonApiLoader(BaseApiLoader):
 
     def __init__(self, **config):
         super(JsonApiLoader, self).__init__(**config)
+        self._query = config.get('query', {})
 
     def load(self):
-        return json.loads(self.get(**self._config.get('query', {}))
+        return json.loads(self.get(**self._query))

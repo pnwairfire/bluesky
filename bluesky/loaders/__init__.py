@@ -18,6 +18,7 @@ bluesky.loaders.smartfire.csv and is called FileLoader
 import datetime
 import logging
 import os
+import urllib
 
 from afweb import auth
 from pyairfire.io import CSV2JSON
@@ -62,7 +63,7 @@ class BaseApiLoader(object):
     DEFAULT_REQUEST_TIMEOUT = 10 # seconds
 
     def __init__(self, **config):
-        self._endpoint = confit.get('endpoint')
+        self._endpoint = config.get('endpoint')
         if not self._endpoint:
             raise BlueSkyConfigurationError(
                 "Json API not specified")
@@ -84,7 +85,8 @@ class BaseApiLoader(object):
     def get(self, **query):
         if self._secret:
             if self._auth_protocol == 'afweb':
-                url = auth.sign_url(self._form_url(query))
+                url = auth.sign_url(self._key, self._secret,
+                    self._form_url(**query))
             else:
                 raise NotImplementedError(
                     "{} auth protocol not supported".format(
@@ -92,7 +94,7 @@ class BaseApiLoader(object):
         else:
             if self._key:
                 params[self._key_param] = self._key
-            url = self._form_url(query)
+            url = self._form_url(**query)
 
         req = urllib.request.Request(url)
         resp = urllib.request.urlopen(req, None, self._timeout)
@@ -106,5 +108,5 @@ class BaseApiLoader(object):
             else:
                 query_param_tuples.append((k, v))
         query_string = '&'.join(sorted([
-            "%s=%s"%(k, _v) for k, v in query_param_tuples]))
+            "%s=%s"%(k, v) for k, v in query_param_tuples]))
         return "{}?{}".format(self._endpoint, query_string)
