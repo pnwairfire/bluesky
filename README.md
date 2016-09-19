@@ -194,15 +194,15 @@ First, install pip (with sudo if necessary):
     apt-get install python-pip
     pip install --upgrade pip
 
-Then, to install, for example, v2.1.0, use the following (with sudo if necessary):
+Then, to install, for example, v2.1.1, use the following (with sudo if necessary):
 
-    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==2.1.0
+    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==2.1.1
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
     -i http://pypi.smoke.airfire.org/simple/
-    bluesky==2.1.0
+    bluesky==2.1.1
 
 See the Development > Install Dependencies > Notes section, above, for
 notes on resolving pip and gdal issues.
@@ -1168,7 +1168,7 @@ module embeds appropriately)
  - ***'fire_information' > 'growth' > 'location' > 'area'*** -- *required* if perimeter is not defined --
  - ***'fire_information' > 'growth' > 'location' > 'latitude'*** -- *required* if perimeter is not defined --
  - ***'fire_information' > 'growth' > 'location' > 'longitude'*** -- *required* if perimeter is not defined --
- - ***'fire_information' > 'growth' > 'location' > 'perimeter'*** -- *required* if single lat/lng + area aren't defined (if perimeter and lat/lng+area are specified, perimiter data is used and lat/lng+area are ignored) -- set of coordinates defining polygon representing fire perimeter
+ - ***'fire_information' > 'growth' > 'location' > 'perimeter'*** -- *required* if single lat/lng + area aren't defined (if perimeter and lat/lng+area are specified, perimeter data is used and lat/lng+area are ignored) -- set of coordinates defining polygon representing fire perimeter
  - ***'fire_information' > 'growth' > 'location' > 'ecoregion'*** -- *optional* --
  - ***'fire_information' > 'growth' > 'location' > 'utc_offset'*** -- *optional* --
  - ***'fire_information' > 'growth' > 'location' > 'elevation'*** -- *optional* --
