@@ -8,6 +8,7 @@ import json
 import os
 
 from . import BaseApiLoader
+from bluesky.datetimeutils import parse_datetime, parse_utc_offset
 
 __all__ = [
     'FileLoader'
@@ -34,4 +35,62 @@ class JsonApiLoader(BaseApiLoader):
                 # TODO: if no timezone info, add 'Z' to end of string ?
 
     def load(self):
-        return json.loads(self.get(**self._query))
+        fires = json.loads(self.get(**self._query))
+        return self._marshal(fires)
+
+    def _marshal(self, fires):
+        """Marshals FireSpider data into bsp's internal structure
+
+        FireSpider structure:
+            {
+                "id": "HMS_sdfsdfsdf",
+                "fuel_type": "natural",
+                "type": "wildfire",
+                "growth": [
+                    {
+                        "end": "2015-08-10T07:00:00Z",
+                        "start": "2015-08-09T07:00:00Z",
+                        "location": {
+                            "area": 900,
+                            "geojson": {
+                                "type": "MultiPoint",
+                                "coordinates": [
+                                    [-120.2, 48.1],
+                                    [-120.4, 48.2],
+                                    [-120.2, 48.2]
+                                ]
+                            },
+                            "utc_offset": "-07:00"
+                        }
+                    }
+                ],
+                "source": "HMS",
+                "name": "HMS_sdfsdfsdf"
+            }
+        """
+        for f in fires:
+            for g in f.get('growth', []):
+                if 'geojson' in g.get('location', {}):
+                    # TODO: eventually refactor bsp to expect 'geojson' or
+                    #   something more generic than 'perimeter', and then
+                    #   either remove the following line or update it to
+                    #   rename 'geojson' to whatever the new expected key is
+                    g['location']['perimeter'] = g['location'].pop('geojson')
+
+                # 'start' and will be in UTC; convert to local
+
+                utc_offset = g.get('location', {}).get('utc_offset')
+                if utc_offset:
+                    utc_offset = parse_utc_offset(utc_offset)
+                g['start'] = self._marshal_time(g.get('start'), utc_offset)
+                g['end'] = self._marshal_time(g.get('end'), utc_offset)
+
+        return fires
+
+    def _marshal_time(self, t, utc_offset):
+        if t:
+            t = parse_datetime(t)
+            if utc_offset:
+                t = t + datetime.timedelta(hours=utc_offset)
+            return t
+        # else, leave undefined
