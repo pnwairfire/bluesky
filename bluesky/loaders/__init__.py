@@ -85,8 +85,8 @@ class BaseApiLoader(object):
     def get(self, **query):
         if self._secret:
             if self._auth_protocol == 'afweb':
-                url = auth.sign_url(self._key, self._secret,
-                    self._form_url(**query))
+                url = self._form_url(**query)
+                url = auth.sign_url(url, self._key, self._secret)
             else:
                 raise NotImplementedError(
                     "{} auth protocol not supported".format(
@@ -97,8 +97,8 @@ class BaseApiLoader(object):
             url = self._form_url(**query)
 
         req = urllib.request.Request(url)
-        resp = urllib.request.urlopen(req, None, self._timeout)
-        return resp.write()
+        resp = urllib.request.urlopen(req, None, self._request_timeout)
+        return resp.read().decode('ascii')
 
     def _form_url(self, **query):
         query_param_tuples = []
