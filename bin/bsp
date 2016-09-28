@@ -15,7 +15,8 @@ import os
 import sys
 import traceback
 
-import afscripting
+from afscripting import args as scripting_args
+from afscripting.utils import exit_with_msg
 from pyairfire import process
 
 try:
@@ -59,42 +60,42 @@ OPTIONAL_ARGS = [
         'long': '--config-option',
         'dest': 'config_options',
         'help': "Config option override, formatted like 'section.*.key=stringvalue'",
-        'action': afscripting.args.ConfigOptionAction
+        'action': scripting_args.ConfigOptionAction
     },
     {
         'short': "-B",
         'long': '--boolean-config-option',
         'dest': 'config_options',
         'help': "Config option override, formatted like 'section.*.key=boolvalue'",
-        'action': afscripting.args.BooleanConfigOptionAction
+        'action': scripting_args.BooleanConfigOptionAction
     },
     {
         'short': "-I",
         'long': '--integer-config-option',
         'dest': 'config_options',
         'help': "Config option override, formatted like 'section.*.key=intvalue'",
-        'action': afscripting.args.IntegerConfigOptionAction
+        'action': scripting_args.IntegerConfigOptionAction
     },
     {
         'short': "-F",
         'long': '--float-config-option',
         'dest': 'config_options',
         'help': "Config option override, formatted like 'section.*.key=floatvalue'",
-        'action': afscripting.args.FloatConfigOptionAction
+        'action': scripting_args.FloatConfigOptionAction
     },
     {
         'short': "-J",
         'long': '--json-config-option',
         'dest': 'config_options',
         'help': "Config option override supporting any json formatted value, formatted like 'section.*.key=jsonvalue'",
-        'action': afscripting.args.JSONConfigOptionAction
+        'action': scripting_args.JSONConfigOptionAction
     },
     {
         'short': '-c',
         'long': '--config-file',
         'dest': 'config_file_options',
         'help': 'config file comtaining JSON formatted overrides for default config values',
-        'action': afscripting.args.ConfigFileAction
+        'action': scripting_args.ConfigFileAction
     },
     {
         #'short': "-v",
@@ -114,7 +115,7 @@ OPTIONAL_ARGS = [
         'help': ("What's considered the current day in the context of the "
             "run; defaults to current UTC day; used to replace config "
             "wildcards ('{today}', etc.)")
-        # Note: not using afscripting.args.ParseDatetimeAction because
+        # Note: not using scripting_args.ParseDatetimeAction because
         #  bsp supports things like '{today}', '{yesterday}', etc.
     }
 
@@ -197,16 +198,16 @@ def validate_args(args):
     # messages specific to each bad combination
     is_po = is_piped_input()
     if is_po and args.no_input and args.input_file:
-        afscripting.utils.exit_with_msg("Specify '-n'/'--no-input' or "
+        exit_with_msg("Specify '-n'/'--no-input' or "
             "'-i'/'--input-file', or pipe input - not all three.")
     elif args.no_input and args.input_file:
-        afscripting.utils.exit_with_msg("Options '-n'/'--no-input' and "
+        exit_with_msg("Options '-n'/'--no-input' and "
             "'-i'/'--input-file' can't be specified simultaneously")
     elif args.no_input and is_po:
-        afscripting.utils.exit_with_msg("Option '-n'/'--no-input' can't be "
+        exit_with_msg("Option '-n'/'--no-input' can't be "
             "specified if there's piped input")
     elif args.input_file and is_po:
-        afscripting.utils.exit_with_msg("Option '-i'/'--input-file' can't be "
+        exit_with_msg("Option '-i'/'--input-file' can't be "
             "specified if there's piped input")
 
     # TODO: validate other args values as necessary
@@ -214,7 +215,7 @@ def validate_args(args):
 def exit_with_traceback(e):
     logging.error(e)
     logging.debug(traceback.format_exc())
-    afscripting.utils.exit_with_msg(e)
+    exit_with_msg(e)
 
 def output_version(parser, args):
     if args.version:
@@ -240,7 +241,7 @@ def load_fires(args):
     return fires_manager
 
 def main():
-    parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
+    parser, args = scripting_args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         positional_args=POSITIONAL_ARGS, epilog=EPILOG_STR,
         pre_validation=output_version)
     validate_args(args)
