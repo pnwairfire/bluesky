@@ -20,7 +20,7 @@ Assume you have the following input data:
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00",
                         "location": {
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -43,7 +43,7 @@ Assume you have the following input data:
                         "start": "20150121",
                         "end": "20150122",
                         "location": {
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -82,7 +82,7 @@ would give you:
                     {
                         "location": {
                             "ecoregion": "southern",
-                            "perimeter": {
+                            "geojson": {
                                 "coordinates": [
                                     [
                                         [
@@ -119,7 +119,7 @@ would give you:
                     {
                         "location": {
                             "ecoregion": "southern",
-                            "perimeter": {
+                            "geojson": {
                                 "coordinates": [
                                     [
                                         [
@@ -173,7 +173,7 @@ would give you:
                             {
                                 "location": {
                                     "ecoregion": "southern",
-                                    "perimeter": {
+                                    "geojson": {
                                         "coordinates": [
                                             [
                                                 [
@@ -210,7 +210,7 @@ would give you:
                             {
                                 "location": {
                                     "ecoregion": "southern",
-                                    "perimeter": {
+                                    "geojson": {
                                         "coordinates": [
                                             [
                                                 [
@@ -308,7 +308,7 @@ would give you:
                                 "start": "2015-01-20T17:00:00",
                                 "location": {
                                     "utc_offset": "-09:00",
-                                    "perimeter": {
+                                    "geojson": {
                                         "coordinates": [
                                             [
                                                 [
@@ -346,7 +346,7 @@ would give you:
                                 "end": "20150122",
                                 "location": {
                                     "utc_offset": "-09:00",
-                                    "perimeter": {
+                                    "geojson": {
                                         "coordinates": [
                                             [
                                                 [
@@ -413,7 +413,7 @@ would give you:
                         ],
                         "location": {
                             "utc_offset": "-09:00",
-                            "perimeter": {
+                            "geojson": {
                                 "coordinates": [
                                     [
                                         [
@@ -457,7 +457,7 @@ would give you:
                         ],
                         "location": {
                             "utc_offset": "-09:00",
-                            "perimeter": {
+                            "geojson": {
                                 "coordinates": [
                                     [
                                         [
@@ -1000,7 +1000,7 @@ would give you:
                             }
                         },
                         "location": {
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -1758,7 +1758,7 @@ would give you:
                             }
                         },
                         "location": {
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -2539,7 +2539,7 @@ would give you:
                                 "end": "2015-01-21T17:00:00",
                                 "start": "2015-01-20T17:00:00",
                                 "location": {
-                                    "perimeter": {
+                                    "geojson": {
                                         "type": "MultiPolygon",
                                         "coordinates": [
                                             [
@@ -2577,7 +2577,7 @@ would give you:
                                 "pct": 40,
                                 "start": "20150121",
                                 "location": {
-                                    "perimeter": {
+                                    "geojson": {
                                         "type": "MultiPolygon",
                                         "coordinates": [
                                             [
@@ -3228,7 +3228,7 @@ would give you:
                     {
                         "location": {
                             "ecoregion": "southern",
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -3907,7 +3907,7 @@ would give you:
                     {
                         "location": {
                             "ecoregion": "southern",
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -4666,7 +4666,7 @@ would give you:
                             {
                                 "location": {
                                     "ecoregion": "southern",
-                                    "perimeter": {
+                                    "geojson": {
                                         "type": "MultiPolygon",
                                         "coordinates": [
                                             [
@@ -4703,7 +4703,7 @@ would give you:
                             {
                                 "location": {
                                     "ecoregion": "southern",
-                                    "perimeter": {
+                                    "geojson": {
                                         "type": "MultiPolygon",
                                         "coordinates": [
                                             [

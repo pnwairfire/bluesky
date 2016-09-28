@@ -67,18 +67,13 @@ class JsonApiLoader(BaseApiLoader):
                 "source": "HMS",
                 "name": "HMS_sdfsdfsdf"
             }
+
+        The only thing that needs to be done is conversion of 'start'
+        and 'end' to local time.
         """
         for f in fires:
             for g in f.get('growth', []):
-                if 'geojson' in g.get('location', {}):
-                    # TODO: eventually refactor bsp to expect 'geojson' or
-                    #   something more generic than 'perimeter', and then
-                    #   either remove the following line or update it to
-                    #   rename 'geojson' to whatever the new expected key is
-                    g['location']['perimeter'] = g['location'].pop('geojson')
-
-                # 'start' and will be in UTC; convert to local
-
+                # 'start' and 'end' will be in UTC; convert to local
                 utc_offset = g.get('location', {}).get('utc_offset')
                 if utc_offset:
                     utc_offset = parse_utc_offset(utc_offset)

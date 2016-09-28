@@ -310,7 +310,7 @@ example, assume that you start with the following fire data:
                 "growth": [
                     {
                         "location": {
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -374,7 +374,7 @@ fields):
                         ],
                         "location": {
                             "utc_offset": "-09:00",
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -496,7 +496,7 @@ yielding the following augmented output:
                         "end": "2015-01-21T17:00:00",
                         "location": {
                             "utc_offset": "-09:00",
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -720,7 +720,7 @@ would contain this output, agumented with emissions data:
                         "location": {
                             "ecoregion": "southern",
                             "area": 2398.94477979842,
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -1069,7 +1069,7 @@ while the following is an example of the latter:
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00",
                         "location": {
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -1168,7 +1168,7 @@ module embeds appropriately)
  - ***'fire_information' > 'growth' > 'location' > 'area'*** -- *required* if perimeter is not defined --
  - ***'fire_information' > 'growth' > 'location' > 'latitude'*** -- *required* if perimeter is not defined --
  - ***'fire_information' > 'growth' > 'location' > 'longitude'*** -- *required* if perimeter is not defined --
- - ***'fire_information' > 'growth' > 'location' > 'perimeter'*** -- *required* if single lat/lng + area aren't defined (if perimeter and lat/lng+area are specified, perimeter data is used and lat/lng+area are ignored) -- set of coordinates defining polygon representing fire perimeter
+ - ***'fire_information' > 'growth' > 'location' > 'geojson'*** -- *required* if single lat/lng + area aren't defined (if perimeter and lat/lng+area are specified, perimeter data is used and lat/lng+area are ignored) -- set of coordinates defining polygon representing fire perimeter
  - ***'fire_information' > 'growth' > 'location' > 'ecoregion'*** -- *optional* --
  - ***'fire_information' > 'growth' > 'location' > 'utc_offset'*** -- *optional* --
  - ***'fire_information' > 'growth' > 'location' > 'elevation'*** -- *optional* --
@@ -1749,7 +1749,7 @@ Now you're ready to run bsp:
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00",
                         "location": {
-                            "perimeter": {
+                            "geojson": {
                                 "type": "MultiPolygon",
                                 "coordinates": [
                                     [
@@ -1846,7 +1846,7 @@ use something like the following:
                 "start": "2015-01-20T17:00:00",
                 "end": "2015-01-21T17:00:00",
                 "location": {
-                    "perimeter": {
+                    "geojson": {
                         "type": "MultiPolygon",
                         "coordinates": [
                             [

@@ -91,7 +91,7 @@ class Estimator(object):
         """Estimates fuelbed composition based on lat/lng or perimeter vector
         data.
 
-        If growth_obj['location']['perimeter'] is defined, it will look something like
+        If growth_obj['location']['geojson'] is defined, it will look something like
         the following:
 
             {
@@ -115,8 +115,8 @@ class Estimator(object):
         fuelbed_info = {}
         if growth_obj['location'].get('shape_file'):
             raise NotImplementedError("Importing of shape data from file not implemented")
-        if growth_obj['location'].get('perimeter'):
-            fuelbed_info = self.lookup.look_up(growth_obj['location']['perimeter'])
+        if growth_obj['location'].get('geojson'):
+            fuelbed_info = self.lookup.look_up(growth_obj['location']['geojson'])
             # fuelbed_info['area'] is in m^2
             # TDOO: only use fuelbed_info['area'] if growth_obj['location']['area']
             # isn't already defined?

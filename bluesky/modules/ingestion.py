@@ -40,7 +40,7 @@ following:
                     "location": {
                         "ecoregion": "western",
                         "utc_offset": "-07:00",
-                        "perimeter": {
+                        "geojson": {
                             "type": "MultiPolygon",
                             "coordinates": [
                                 [
@@ -347,7 +347,7 @@ class FireIngester(object):
     def _get_base_location_object(self, perimeter, lat, lng, area):
         if perimeter:
             return {
-                'perimeter': perimeter
+                'geojson': perimeter
             }
         elif lat is not None and lng is not None and area:
             return {
@@ -366,7 +366,7 @@ class FireIngester(object):
 
         # look for fields either in 'location' key or at top level
         fire['location'] = self._get_base_location_object(
-            self._get_field('perimeter', 'location'),
+            self._get_field('geojson', 'location'),
             self._get_field('latitude', 'location'),
             self._get_field('longitude', 'location'),
             self._get_field('area', 'location')
@@ -402,7 +402,7 @@ class FireIngester(object):
     def _ingest_growth_location(self, growth, src):
         # only look in growth object for location fields; don't look
         base_fields = []
-        for f in ['perimeter', 'latitude', 'longitude', 'area']:
+        for f in ['geojson', 'latitude', 'longitude', 'area']:
             v = src.get(f)
             if v is None and 'location' in src:
                 v = src['location'].get(f)
@@ -573,8 +573,8 @@ class FirePostProcessor(object):
 
     def _get_base_location(self, obj):
         if obj.get('location'):
-            if obj['location'].get('perimeter'):
-                return {'perimeter': obj['location'].get('perimeter')}
+            if obj['location'].get('geojson'):
+                return {'geojson': obj['location'].get('geojson')}
             # Note: at this point in the code, the following should always be
             # true (since FireIngester wouldn't have createdd the 'location'
             # object unless either the perimeter or lat+lng+area was defined)
@@ -608,7 +608,7 @@ class FirePostProcessor(object):
         top_level_base_location = self._get_base_location(fire)
         if fire.get('growth'):
             num_growth_objects = len(fire['growth'])
-            if fire['location'].get('perimeter') and num_growth_objects > 1:
+            if fire['location'].get('geojson') and num_growth_objects > 1:
                 raise ValueError(IngestionErrMsgs.ONE_PERIMETER_MULTIPLE_GROWTH)
 
             for g in fire['growth']:

@@ -56,7 +56,7 @@ class TestIngestionValidInput(object):
     def test_fire_with_minimum_fields(self):
         f = {
             "location": {
-                "perimeter": {
+                "geojson": {
                     "type": "MultiPolygon",
                     "coordinates": [
                         [
@@ -92,7 +92,7 @@ class TestIngestionValidInput(object):
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
             "location": {
-                "perimeter": {
+                "geojson": {
                     "type": "MultiPolygon",
                     "coordinates": [
                         [
@@ -138,7 +138,7 @@ class TestIngestionValidInput(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            "perimeter": {
+            "geojson": {
                 "type": "MultiPolygon",
                 "coordinates": [
                     [
@@ -168,7 +168,7 @@ class TestIngestionValidInput(object):
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
                     'location': {
-                        "perimeter": {
+                        "geojson": {
                             "type": "MultiPolygon",
                             "coordinates": [
                                 [
@@ -201,7 +201,7 @@ class TestIngestionValidInput(object):
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
             "location": {
-                "perimeter": {
+                "geojson": {
                     "type": "MultiPolygon",
                     "coordinates": [
                         [
@@ -240,7 +240,7 @@ class TestIngestionValidInput(object):
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
                     'location': {
-                        "perimeter": {
+                        "geojson": {
                             "type": "MultiPolygon",
                             "coordinates": [
                                 [
@@ -281,7 +281,7 @@ class TestIngestionValidInput(object):
                     "end": "2015-01-21T17:00:00",
                     "pct": 100.0,
                     "location": {
-                        "perimeter": {
+                        "geojson": {
                             "type": "MultiPolygon",
                             "coordinates": [
                                 [
@@ -325,7 +325,7 @@ class TestIngestionValidInput(object):
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
             "location": {
-                "perimeter": {
+                "geojson": {
                     "type": "MultiPolygon",
                     "coordinates": [
                         [
@@ -353,7 +353,7 @@ class TestIngestionValidInput(object):
             'growth': [
                 {
                     'location': {
-                        'perimeter': copy.deepcopy(f['location']['perimeter'])
+                        'geojson': copy.deepcopy(f['location']['geojson'])
                     }
                 }
             ]
@@ -714,7 +714,7 @@ class TestIngestionValidInput(object):
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
                     "location": {
-                        "perimeter": {
+                        "geojson": {
                             "type": "MultiPolygon",
                             "coordinates": [
                                 [

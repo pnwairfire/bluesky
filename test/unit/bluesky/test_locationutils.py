@@ -45,7 +45,7 @@ class TestLatLng:
 
     def test_perimeter(self):
         latlng = locationutils.LatLng({
-            "perimeter": {
+            "geojson": {
                 "type": "MultiPolygon",
                 "coordinates": [
                     [

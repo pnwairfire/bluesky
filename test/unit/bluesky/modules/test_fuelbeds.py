@@ -190,7 +190,7 @@ class BaseTestEstimatorEstimate(object):
             {'fccs_id': '46', 'pct': 60},
             {'fccs_id': '47', 'pct': 40}
         ]
-        # Having 'perimeter' key will trigger call to self.estimator.lookup.look_up;
+        # Having 'geojson' key will trigger call to self.estimator.lookup.look_up;
         # The value of PERIMETER is not actually used here
         self.estimator.estimate(self.growth_obj)
         assert expected_fuelbeds == self.growth_obj.get('fuelbeds')
@@ -201,7 +201,7 @@ class BaseTestEstimatorEstimate(object):
 
 class TestEstimatorGetFromPerimeter(BaseTestEstimatorEstimate):
     def setup(self):
-        self.growth_obj = {"location": {"perimeter": PERIMETER}}
+        self.growth_obj = {"location": {"geojson": PERIMETER}}
         super(TestEstimatorGetFromPerimeter, self).setup()
 
 class TestEstimatorGetFromLatLng(BaseTestEstimatorEstimate):

@@ -53,11 +53,11 @@ def run(fires_manager):
 def _fire_lat_lng(growth):
     if not growth.get('location'):
         raise ValueError("Missing location data required for localmet")
-    if growth['location'].get('perimeter'):
+    if growth['location'].get('geojson'):
         # TODO: get centroid of perimeter(s); also, can'st assume 3-deep nested
         # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
-        lat = growth['location']['perimeter']['coordinates'][0][0][0][1]
-        lng = growth['location']['perimeter']['coordinates'][0][0][0][0]
+        lat = growth['location']['geojson']['coordinates'][0][0][0][1]
+        lng = growth['location']['geojson']['coordinates'][0][0][0][0]
     elif growth['location'].get('latitude') and growth['location'].get('longitude'):
         lat = growth['location']['latitude']
         lng = growth['location']['longitude']
