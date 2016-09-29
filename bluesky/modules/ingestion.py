@@ -216,6 +216,8 @@ for a in list(consumeutils.SETTINGS.values()):
 # remove dupes
 OPTIONAL_LOCATION_FIELDS = list(set(OPTIONAL_LOCATION_FIELDS))
 
+GEOJSON_AREA_GEOMETRIES = ('Polygon', 'MultiPolygon')
+
 
 class FireIngester(object):
     """Inputs, transforms, and validates fire data, recording original copy
@@ -344,11 +346,20 @@ class FireIngester(object):
 
     ## 'location'
 
-    def _get_base_location_object(self, perimeter, lat, lng, area):
-        if perimeter:
-            return {
-                'geojson': perimeter
+    def _get_base_location_object(self, GeoJSON, lat, lng, area):
+        if GeoJSON:
+            l = {
+                'geojson': GeoJSON
             }
+            if area:
+                l['area'] = area
+                return l
+            elif GeoJSON.get('type') in GEOJSON_AREA_GEOMETRIES:
+                return l
+            else:
+                # other geometry types require area, so this is invalid
+                return {}
+
         elif lat is not None and lng is not None and area:
             return {
                 'latitude': lat,
@@ -574,7 +585,13 @@ class FirePostProcessor(object):
     def _get_base_location(self, obj):
         if obj.get('location'):
             if obj['location'].get('geojson'):
-                return {'geojson': obj['location'].get('geojson')}
+                l = {'geojson': obj['location']['geojson']}
+                if obj['location'].get('area'):
+                    l['area'] = obj['location']['area']
+                    return l
+                elif obj['location']['geojson'].get('type') in GEOJSON_AREA_GEOMETRIES:
+                    return l
+                # other geometry types require area, so this is invalid
             # Note: at this point in the code, the following should always be
             # true (since FireIngester wouldn't have createdd the 'location'
             # object unless either the GeoJSON or lat+lng+area was defined)
