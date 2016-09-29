@@ -84,7 +84,7 @@ class JsonApiLoader(BaseApiLoader):
 
     def _marshal_time(self, t, utc_offset):
         if t:
-            t = parse_datetime(t)
+            t = parse_datetime(t, 'start/end')
             if utc_offset:
                 t = t + datetime.timedelta(hours=utc_offset)
             return t
