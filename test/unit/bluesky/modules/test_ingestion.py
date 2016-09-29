@@ -44,8 +44,99 @@ class TestIngestionErrorScenarios(object):
             )
         assert e_info.value.args[0] == ingestion.IngestionErrMsgs.MULTIPLE_GROWTH_NO_PCT
 
-    # TODO: test ONE_GEOJSON_MULTIPLE_GROWTH
-    # TODO: test BASE_LOCATION_AT_TOP_OR_PER_GROWTH
+    def test_multiple_growth_one_geojson(self):
+        with raises(ValueError) as e_info:
+            self.ingester.ingest(
+                {
+                    "location": {
+                        "geojson": {
+                            "coordinates": [[-101.683, 38.666]],
+                            "type": "MultiPoint"
+                        },
+                        "area": 100.0,
+                    },
+                    "growth": [{
+                        "start": "2015-01-20T17:00:00",
+                        "end": "2015-01-21T17:00:00",
+                        "pct": 20.0
+                    },{
+                        "start": "2015-01-20T17:00:00",
+                        "end": "2015-01-21T17:00:00",
+                        "pct": 80.0
+                    }]
+                }
+            )
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.ONE_GEOJSON_MULTIPLE_GROWTH
+
+    def test_invalid_top_level_location(self):
+        # missing area
+        with raises(ValueError) as e_info:
+            self.ingester.ingest(
+                {
+                    "location": {
+                        "latitude": 47.0,
+                        "longitude": -122.0,
+                        "ecoregion": "southern"
+                    }
+                }
+            )
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION
+
+        # GeoJOSN types other than Polygon and MultiPolygon require area
+        with raises(ValueError) as e_info:
+            self.ingester.ingest(
+                {
+                    "location": {
+                        "geojson": {
+                            "coordinates": [[-101.683, 38.666]],
+                            "type": "MultiPoint"
+                        }
+                    }
+                }
+            )
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION
+
+    def test_invalid_growth_level_location(self):
+        # missing area
+        with raises(ValueError) as e_info:
+            self.ingester.ingest(
+                {
+                    "growth": [{
+                        "start": "2015-01-20T17:00:00",
+                        "end": "2015-01-21T17:00:00",
+                        "location": {
+                            "latitude": 47.0,
+                            "longitude": -122.0,
+                            "ecoregion": "southern"
+                        }
+                    }]
+                }
+            )
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.BASE_LOCATION_AT_TOP_OR_PER_GROWTH
+
+        # missing area
+        with raises(ValueError) as e_info:
+            self.ingester.ingest(
+                {
+                    "growth": [{
+                        "start": "2015-01-20T17:00:00",
+                        "end": "2015-01-21T17:00:00",
+                        "location": {
+                            "geojson": {
+                                "coordinates": [
+                                    [
+                                        -101.683,
+                                        38.666
+                                    ]
+                                ],
+                                "type": "MultiPoint"
+                            }
+                        }
+                    }]
+                }
+            )
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.BASE_LOCATION_AT_TOP_OR_PER_GROWTH
+
     # TODO: test FUELBEDS_AT_TOP_OR_PER_GROWTH
 
 class TestIngestionValidInput(object):

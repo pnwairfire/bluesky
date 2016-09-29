@@ -180,7 +180,7 @@ class IngestionErrMsgs(object):
         "fire or for each growth object, or for neither, not both")
 
     NO_GROWTH_OR_BASE_LOCATION = ("GeoJSON or lat+lng+area must be defined"
-        "for the entire fire if no growth windows are defined")
+        " for the entire fire if no growth windows are defined")
 
     MISSING_GROWH_FIELD = "Missing growth field: '{}'"
 
