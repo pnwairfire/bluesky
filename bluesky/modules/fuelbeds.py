@@ -119,7 +119,7 @@ class Estimator(object):
             # fuelbed_info['area'] is in m^2
             # TDOO: only use fuelbed_info['area'] if growth_obj['location']['area']
             # isn't already defined?
-            if fuelbed_info:
+            if fuelbed_info and fuelbed_info.get('area'):
                 growth_obj['location']['area'] = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
         elif growth_obj['location'].get('latitude') and growth_obj['location'].get('longitude'):
             fuelbed_info = self.lookup.look_up_by_lat_lng(
