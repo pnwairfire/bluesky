@@ -22,7 +22,7 @@ class TestIngestionErrorScenarios(object):
             self.ingester.ingest({})
         assert e_info.value.args[0] ==  ingestion.IngestionErrMsgs.NO_DATA
 
-        # location must have perimeter or lat+lng+area
+        # location must have geojson or lat+lng+area
         with raises(ValueError) as e_info:
             self.ingester.ingest({"location": {}})
         assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION
@@ -44,7 +44,7 @@ class TestIngestionErrorScenarios(object):
             )
         assert e_info.value.args[0] == ingestion.IngestionErrMsgs.MULTIPLE_GROWTH_NO_PCT
 
-    # TODO: test ONE_PERIMETER_MULTIPLE_GROWTH
+    # TODO: test ONE_GEOJSON_MULTIPLE_GROWTH
     # TODO: test BASE_LOCATION_AT_TOP_OR_PER_GROWTH
     # TODO: test FUELBEDS_AT_TOP_OR_PER_GROWTH
 
@@ -317,7 +317,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_fire_with_perimeter_and_lat_lng(self):
+    def test_fire_with_geojson_and_lat_lng(self):
         f = {
             "id": "SF11C14225236095807750",
             "event_of":{

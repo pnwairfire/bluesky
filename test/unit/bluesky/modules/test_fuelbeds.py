@@ -10,7 +10,7 @@ from py.test import raises
 from bluesky.models.fires import Fire
 from bluesky.modules import fuelbeds
 
-PERIMETER = {
+GEOJSON = {
     "type": "MultiPolygon",
     "coordinates": [
         [
@@ -143,7 +143,7 @@ class TestEstimatorInsufficientDataForLookup(object):
         with raises(ValueError) as e:
             self.estimator.estimate({'growth':[{}]})
 
-    def test_no_perimeter_or_lat_or_lng(self):
+    def test_no_geojson_or_lat_or_lng(self):
         with raises(ValueError) as e:
             self.estimator.estimate({"growth":[{"location":{}}]})
 
@@ -191,7 +191,7 @@ class BaseTestEstimatorEstimate(object):
             {'fccs_id': '47', 'pct': 40}
         ]
         # Having 'geojson' key will trigger call to self.estimator.lookup.look_up;
-        # The value of PERIMETER is not actually used here
+        # The value of GeoJSON is not actually used here
         self.estimator.estimate(self.growth_obj)
         assert expected_fuelbeds == self.growth_obj.get('fuelbeds')
 
@@ -199,10 +199,10 @@ class BaseTestEstimatorEstimate(object):
         # TODO: implement
         pass
 
-class TestEstimatorGetFromPerimeter(BaseTestEstimatorEstimate):
+class TestEstimatorGetFromGeoJSON(BaseTestEstimatorEstimate):
     def setup(self):
-        self.growth_obj = {"location": {"geojson": PERIMETER}}
-        super(TestEstimatorGetFromPerimeter, self).setup()
+        self.growth_obj = {"location": {"geojson": GEOJSON}}
+        super(TestEstimatorGetFromGeoJSON, self).setup()
 
 class TestEstimatorGetFromLatLng(BaseTestEstimatorEstimate):
 

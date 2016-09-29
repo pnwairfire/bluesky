@@ -170,16 +170,16 @@ class IngestionErrMsgs(object):
 
     NO_DATA = "Fire contains no data"
 
-    ONE_PERIMETER_MULTIPLE_GROWTH = ("Can't assign fire perimeter to mutiple "
+    ONE_GEOJSON_MULTIPLE_GROWTH = ("Can't assign fire GeoJSON to mutiple "
         "growth windows")
 
-    BASE_LOCATION_AT_TOP_OR_PER_GROWTH = ("Perimeter or lat+lng+area must be "
+    BASE_LOCATION_AT_TOP_OR_PER_GROWTH = ("GeoJSON or lat+lng+area must be "
         "defined for the entire fire or for each growth object, not both")
 
     FUELBEDS_AT_TOP_OR_PER_GROWTH = ("Fuelbeds may be defined for the entire "
         "fire or for each growth object, or for neither, not both")
 
-    NO_GROWTH_OR_BASE_LOCATION = ("Perimeter or lat+lng+area must be defined"
+    NO_GROWTH_OR_BASE_LOCATION = ("GeoJSON or lat+lng+area must be defined"
         "for the entire fire if no growth windows are defined")
 
     MISSING_GROWH_FIELD = "Missing growth field: '{}'"
@@ -356,7 +356,7 @@ class FireIngester(object):
                 'area': area
             }
         else:
-            # We'll check later to ensure that lat/lng + area or perimeter is
+            # We'll check later to ensure that lat/lng + area or GeoJSON is
             # specified either in top level or per growth object (but not both)
             return {}
 
@@ -577,7 +577,7 @@ class FirePostProcessor(object):
                 return {'geojson': obj['location'].get('geojson')}
             # Note: at this point in the code, the following should always be
             # true (since FireIngester wouldn't have createdd the 'location'
-            # object unless either the perimeter or lat+lng+area was defined)
+            # object unless either the GeoJSON or lat+lng+area was defined)
             elif all([obj['location'].get(f) is not None for f in ('latitude', 'longitude', 'area')]):
                 return {f: obj['location'][f] for f in ('latitude', 'longitude', 'area')}
         # else returns None
@@ -598,7 +598,7 @@ class FirePostProcessor(object):
     def _process_growth_locations_and_fuelbeds(self):
         """Move location information from top level into growth objects.
 
-        Makes sure either lat+lng+area or perimeter is defined either at the
+        Makes sure either lat+lng+area or GeoJSON is defined either at the
         top level location or in each of the growh objects.
 
         TODO: restructure this method; maybe break up into multiple methods
@@ -609,7 +609,7 @@ class FirePostProcessor(object):
         if fire.get('growth'):
             num_growth_objects = len(fire['growth'])
             if fire['location'].get('geojson') and num_growth_objects > 1:
-                raise ValueError(IngestionErrMsgs.ONE_PERIMETER_MULTIPLE_GROWTH)
+                raise ValueError(IngestionErrMsgs.ONE_GEOJSON_MULTIPLE_GROWTH)
 
             for g in fire['growth']:
                 g_pct = g.pop('pct', None)
@@ -621,7 +621,7 @@ class FirePostProcessor(object):
                     raise ValueError(IngestionErrMsgs.FUELBEDS_AT_TOP_OR_PER_GROWTH)
 
                 if top_level_base_location:
-                    # initialize with base location; if it's a perimeter, then
+                    # initialize with base location; if it's a GeoJSON, then
                     # we know this is the only growth object given the check
                     # above; if it's lat+lng+area, we'll adjust the growth
                     # objets portion of the area

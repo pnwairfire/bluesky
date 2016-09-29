@@ -88,8 +88,7 @@ class Estimator(object):
         self.lookup = lookup
 
     def estimate(self, growth_obj):
-        """Estimates fuelbed composition based on lat/lng or perimeter vector
-        data.
+        """Estimates fuelbed composition based on lat/lng or GeoJSON data.
 
         If growth_obj['location']['geojson'] is defined, it will look something like
         the following:

@@ -1024,11 +1024,12 @@ TODO: fill in this section...
 
 #### Notes About Input Fire Data
 
-##### Perimeter vs. Lat + Lng + Area
+##### GeoJSON vs. Lat + Lng + Area
 
 One thing to note about the fire data is that the location can be specified by
-a single lat/lng pair with area (assumed to be acres) or by perimeter polygon
-data. The following is an example of the former:
+a single lat/lng pair with area (assumed to be acres) or by GeoJSON
+data, such as a polygon or multi-polygon representing the perimeter.
+The following is an example of the former:
 
     {
         "fire_information": [
@@ -1165,10 +1166,10 @@ The following fields may be specified within a fire growth window's "location"
 object or at the top level of the fire object, in which case the ingestion
 module embeds appropriately)
 
- - ***'fire_information' > 'growth' > 'location' > 'area'*** -- *required* if perimeter is not defined --
- - ***'fire_information' > 'growth' > 'location' > 'latitude'*** -- *required* if perimeter is not defined --
- - ***'fire_information' > 'growth' > 'location' > 'longitude'*** -- *required* if perimeter is not defined --
- - ***'fire_information' > 'growth' > 'location' > 'geojson'*** -- *required* if single lat/lng + area aren't defined (if perimeter and lat/lng+area are specified, perimeter data is used and lat/lng+area are ignored) -- set of coordinates defining polygon representing fire perimeter
+ - ***'fire_information' > 'growth' > 'location' > 'area'*** -- *required* if GeoJSON is not defined --
+ - ***'fire_information' > 'growth' > 'location' > 'latitude'*** -- *required* if GeoJSON is not defined --
+ - ***'fire_information' > 'growth' > 'location' > 'longitude'*** -- *required* if GeoJSON is not defined --
+ - ***'fire_information' > 'growth' > 'location' > 'geojson'*** -- *required* if single lat/lng + area aren't defined (if GeoJSON and lat/lng+area are specified, GeoJSON data is used and lat/lng+area are ignored) -- set of coordinates defining polygon representing fire GeoJSON
  - ***'fire_information' > 'growth' > 'location' > 'ecoregion'*** -- *optional* --
  - ***'fire_information' > 'growth' > 'location' > 'utc_offset'*** -- *optional* --
  - ***'fire_information' > 'growth' > 'location' > 'elevation'*** -- *optional* --
@@ -1238,7 +1239,7 @@ TODO: fill in this section...
 
 ##### fuelbeds
 
- - ***'fire_information' > 'growth' > 'location'*** -- *required* -- containing either single lat/lng + area or polygon perimeter coordinates
+ - ***'fire_information' > 'growth' > 'location'*** -- *required* -- containing either single lat/lng + area or GeoJSON data
  - ***'fire_information' > 'growth' > 'location' > 'state'*** -- *required* if AK -- used to determine which FCCS version to use
 
 ##### consumption
@@ -1343,7 +1344,7 @@ defaults.
  - ***'dispersion' > 'output' > 'directory'*** -- *required* --
  - ***'dispersion' > 'output' > 'grid_filename'*** -- *required* --
  - ***'fire_information' > 'id'*** -- *required* --
- - ***'fire_information'> 'growth'  > 'location'*** -- *required* -- containing either single lat/lng + area or polygon perimeter coordinates + area
+ - ***'fire_information'> 'growth'  > 'location'*** -- *required* -- containing either single lat/lng + area or GeoJSON data + area
  - ***'fire_information' > 'type'*** -- *optional* --
  - ***'fire_information' > 'event_of' > 'name'*** -- *optional* --
  - ***'fire_information' > 'event_of' > 'id'*** -- *optional* --

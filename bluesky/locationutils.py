@@ -28,7 +28,7 @@ class LatLng(object):
             self._latitude = self._location['latitude']
             self._longitude = self._location['longitude']
         elif 'geojson' in self._location:
-            # TODO: get centroid of perimeter(s); also, can't assume 3-deep nested
+            # TODO: get centroid; also, can't assume 3-deep nested
             # array (it's 3-deep for MultiPolygon, but not necessarily other shape types)
             # see https://en.wikipedia.org/wiki/Centroid
             self._latitude = self._location['geojson']['coordinates'][0][0][0][1]

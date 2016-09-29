@@ -43,7 +43,7 @@ class TestLatLng:
         assert latlng.latitude == 37.909644
         assert latlng.longitude == -119.7615805
 
-    def test_perimeter(self):
+    def test_geojson(self):
         latlng = locationutils.LatLng({
             "geojson": {
                 "type": "MultiPolygon",
