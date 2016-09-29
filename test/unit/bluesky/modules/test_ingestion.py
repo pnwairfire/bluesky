@@ -353,7 +353,8 @@ class TestIngestionValidInput(object):
             'growth': [
                 {
                     'location': {
-                        'geojson': copy.deepcopy(f['location']['geojson'])
+                        'geojson': copy.deepcopy(f['location']['geojson']),
+                        "area": 200
                     }
                 }
             ]
