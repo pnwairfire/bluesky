@@ -45,7 +45,7 @@ setup(
         "pyairfire==2.*",
         "afconfig==1.*",
         "afdatetime>=1.0.2,<2.0.0",
-        "afscripting==1.*",
+        "afscripting>=1.0.2,<2.0.0",
         "afweb==1.*",
         "eflookup==1.*",
         "emitcalc==1.*",
