@@ -113,7 +113,7 @@ RUN pip3 install --trusted-host pypi.smoke.airfire.org \
 
 # Install bluesky utils for merging emissions, etc.
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
-    -i http://pypi.smoke.airfire.org/simple blueskyutils>=0.1.2
+    -i http://pypi.smoke.airfire.org/simple blueskyutils>=0.2.0
 
 # # There's a bug in the bluesky installation that results in missing
 # # auxliary files.  Manually copy these into the bluesky image:
