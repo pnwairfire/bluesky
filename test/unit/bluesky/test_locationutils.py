@@ -11,7 +11,7 @@ class TestLatLng:
 
     def test_invalid(self):
         expected_err_msg = ("Invalid location data required for "
-            "determining single lat/lng for fire")
+            "determining single lat/lng for growth window")
         with raises(ValueError) as e_info:
             locationutils.LatLng(None)
         assert e_info.value.args[0] == expected_err_msg
