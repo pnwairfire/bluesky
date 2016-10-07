@@ -35,7 +35,7 @@ class JsonApiLoader(BaseApiLoader):
                 # TODO: if no timezone info, add 'Z' to end of string ?
 
     def load(self):
-        fires = json.loads(self.get(**self._query))
+        fires = json.loads(self.get(**self._query))['data']
         return self._marshal(fires)
 
     def _marshal(self, fires):
