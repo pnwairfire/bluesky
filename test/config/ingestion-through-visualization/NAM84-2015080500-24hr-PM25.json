@@ -23,12 +23,12 @@
                     "projection": "LatLon",
                     "boundary": {
                         "ne": {
-                            "lat": 45.25,
-                            "lng": -106.5
+                            "lat": 49.25,
+                            "lng": -67.0
                         },
                         "sw": {
-                            "lat": 27.75,
-                            "lng": -131.5
+                            "lat": 25.0,
+                            "lng": -125.5
                         }
                     }
                 },
