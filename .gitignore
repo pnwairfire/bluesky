@@ -8,3 +8,6 @@ logs/
 MESSAGE
 profile.txt
 .cache
+data/
+output/
+input/
