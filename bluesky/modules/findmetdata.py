@@ -100,6 +100,7 @@ def run(fires_manager):
 
     if not time_window or not time_window.get('start') or not time_window.get('end'):
         raise BlueSkyConfigurationError(
-            "Start and end times required to finding met data")
+            "Start and end times required for finding met data. They"
+            "wheren't specied and couldn't be inferred from the fire data.")
 
     fires_manager.met = arl_finder.find(time_window['start'], time_window['end'])
