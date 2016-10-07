@@ -13,9 +13,6 @@ __all__ = [
 
 class CsvFileLoader(BaseFileLoader):
     """Loads csv formatted SF2 fire and events data from filename
-
-    TODO: move code into base class (BaseFileLoader, or maybe some into
-    BaseCsvLoader, and have CsvFileLoader inherit from both)
     """
 
     def __init__(self, **config):

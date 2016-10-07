@@ -7,36 +7,14 @@ import datetime
 import json
 import os
 
-from . import BaseApiLoader
+from . import BaseApiLoader, BaseFileLoader
 from bluesky.datetimeutils import parse_datetime, parse_utc_offset
 
 __all__ = [
     'FileLoader'
 ]
 
-class JsonApiLoader(BaseApiLoader):
-    """Loads csv formatted SF2 fire and events data from filename
-
-    TODO: move code into base class(es) - BaseApiLoader and/or
-    BaseJsonLoader - and have JsonApiLoader inherit from one or both
-    """
-
-    DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%Z'
-
-    def __init__(self, **config):
-        super(JsonApiLoader, self).__init__(**config)
-        self._query = config.get('query', {})
-
-        # Convert datetime.date objects to strings
-        for k in self._query:
-            if isinstance(self._query[k], datetime.date):
-                self._query[k] = self._query[k].strftime(
-                    self.DATETIME_FORMAT)
-                # TODO: if no timezone info, add 'Z' to end of string ?
-
-    def load(self):
-        fires = json.loads(self.get(**self._query))['data']
-        return self._marshal(fires)
+class BaseFireSpiderLoader(object):
 
     def _marshal(self, fires):
         """Marshals FireSpider data into bsp's internal structure
@@ -89,3 +67,34 @@ class JsonApiLoader(BaseApiLoader):
                 t = t + datetime.timedelta(hours=utc_offset)
             return t
         # else, leave undefined
+
+class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
+    """Loads json formatted fire data from the FireSpider web service
+    """
+
+    DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%Z'
+
+    def __init__(self, **config):
+        super(JsonApiLoader, self).__init__(**config)
+        self._query = config.get('query', {})
+
+        # Convert datetime.date objects to strings
+        for k in self._query:
+            if isinstance(self._query[k], datetime.date):
+                self._query[k] = self._query[k].strftime(
+                    self.DATETIME_FORMAT)
+                # TODO: if no timezone info, add 'Z' to end of string ?
+
+    def load(self):
+        fires = json.loads(self.get(**self._query))['data']
+        return self._marshal(fires)
+
+class JsonFileLoader(BaseFileLoader, BaseFireSpiderLoader):
+    """Loads json formatted fire data from the FireSpider web service
+    """
+
+    DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%Z'
+
+    def load(self):
+        fires = self._load_json_file(self._filename)['data']
+        return self._marshal(fires)

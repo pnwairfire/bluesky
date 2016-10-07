@@ -16,6 +16,7 @@ bluesky.loaders.smartfire.csv and is called FileLoader
 """
 
 import datetime
+import json
 import logging
 import os
 import urllib
@@ -27,6 +28,11 @@ from bluesky import datetimeutils
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __author__ = "Joel Dubowy"
+
+__all__ = [
+    'BaseApiLoader',
+    'BaseFileLoader'
+]
 
 class BaseFileLoader(object):
 
@@ -53,6 +59,10 @@ class BaseFileLoader(object):
     def _load_csv_file(self, filename):
         csv_loader = CSV2JSON(input_file=filename)
         return csv_loader._load()
+
+    def _load_json_file(self, filename):
+        with open(filename, 'r') as f:
+            return json.loads(f.read())
 
     # TODO: provide other file reading functionality as needed
 
