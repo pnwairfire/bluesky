@@ -6,7 +6,7 @@
                     "name": "firespider",
                     "format": "JSON",
                     "type": "File",
-                    "file": "/bluesky/data/fires/fires-spider-{today}.json"
+                    "file": "/bluesky/data/fires/spider-fires-{today:%Y-%m-%d}.json"
                 }
             ]
         }

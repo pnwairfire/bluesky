@@ -9,7 +9,11 @@
                     "endpoint": "http://<HOSTNAME>/api/v1/fires/raw/",
                     "key": "<KEY>",
                     "secret": "<SECRET>",
-                    "query": {}
+                    "query": {
+                        "start": "{today-10}",
+                        "end": "{today+4}"
+                    }
+
                 }
             ]
         }

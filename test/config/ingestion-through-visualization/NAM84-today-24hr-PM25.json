@@ -1,5 +1,9 @@
 {
     "config": {
+        "skip_failed_fires": true,
+        "consumption": {
+            "default_ecoregion": "western"
+        },
         "emissions": {
             "species": ["PM25"]
         },
@@ -13,7 +17,7 @@
             "time_step": 3
         },
         "dispersion": {
-            "start": "2015-08-05T00:00:00",
+            "start": "{today}",
             "num_hours": 24,
             "model": "hysplit",
             "dest_dir": "/bsp-output/bsp-dispersion-output/",
