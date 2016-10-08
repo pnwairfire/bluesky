@@ -199,6 +199,9 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                     timeprofile = {}
                     for i in range(self._num_hours):
                         local_dt = self._model_start + timedelta(hours=(i + utc_offset))
+                        # TODO: will all_plumerise and all_timeprofile always
+                        #    have string value keys
+                        local_dt = local_dt.strftime('%Y-%m-%dT%H:%M:%S')
                         plumerise[local_dt] = all_plumerise.get(local_dt) or self.MISSING_PLUMERISE_HOUR
                         timeprofile[local_dt] = all_timeprofile.get(local_dt) or self.MISSING_TIMEPROFILE_HOUR
 

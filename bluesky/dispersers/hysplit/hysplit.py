@@ -495,6 +495,9 @@ class HYSPLITDispersion(DispersionBase):
                         dummy = True
                     else:
                         local_dt = dt + timedelta(hours=fire.utc_offset)
+                        # TODO: will fire.plumerise and fire.timeprofile always
+                        #    have string value keys
+                        local_dt = local_dt.strftime('%Y-%m-%dT%H:%M:%S')
                         plumerise_hour = fire.plumerise.get(local_dt)
                         timeprofile_hour = fire.timeprofile.get(local_dt)
 
