@@ -592,17 +592,29 @@ class TestFiresManagerSetAndMergeConfig(object):
     RAW_CONFIG = {
         "foo":"bar",
         "bar": "{today}-sdf-{yesterday:%Y-%m-%d}T12Z-%Y__%m-%d-{today-2:%m_%d}-",
-        "baz": 234
+        "baz": 234,
+        "foobar": "2016-10-11",
+        "barbaz": "{today-1}",
+        "foobarbaz": "{datetime-parse-buster}2016-10-11",
+        "barbazfoo": "{datetime-parse-buster}{today-1}"
     }
     CONFIG_2016_05_04 = {
         "foo":"bar",
         "bar": "20160504-sdf-2016-05-03T12Z-%Y__%m-%d-05_02-",
-        "baz": 234
+        "baz": 234,
+        "foobar": datetime.datetime(2016,10,11),
+        "barbaz": datetime.datetime(2016,5,3),
+        "foobarbaz": "2016-10-11",
+        "barbazfoo": "20160503"
     }
     CONFIG_2016_05_05 = {
         "foo":"bar",
         "bar": "20160505-sdf-2016-05-04T12Z-%Y__%m-%d-05_03-",
-        "baz": 234
+        "baz": 234,
+        "foobar": datetime.datetime(2016,10,11),
+        "barbaz": datetime.datetime(2016,5,4),
+        "foobarbaz": "2016-10-11",
+        "barbazfoo": "20160504"
     }
     def test_setting_config_manually(self):
         fm = fires.FiresManager()

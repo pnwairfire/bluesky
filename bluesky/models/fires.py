@@ -372,6 +372,11 @@ class FiresManager(object):
                 except BlueSkyDatetimeValueError:
                     pass
 
+                # This gets rid of datetime parsing busters embedded
+                # in strings to prevent conversion to datetime object
+                if hasattr(val, 'capitalize'):
+                    val = val.replace('{datetime-parse-buster}', '')
+
                 # TODO: any other replacements?
 
         return val

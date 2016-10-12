@@ -13,7 +13,6 @@
                         "start": "{today-10}",
                         "end": "{today+4}"
                     }
-
                 }
             ]
         }
