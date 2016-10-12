@@ -192,6 +192,32 @@ def is_piped_input():
     """
     return False
 
+def parse_args():
+    """Parses args - required, optional, and positional
+
+    Note: We're doing this manually, rather than call
+    scripting_args.parse_args, because we want to be able
+    to replace datetime format chars in the log file name.
+    """
+    parser = scripting_args.ArgumentParser()
+    parser.epilog = EPILOG_STR
+    parser.formatter_class = scripting_args.RawTextHelpFormatter
+    scripting_args.add_arguments(parser, REQUIRED_ARGS, required=True)
+    scripting_args.add_arguments(parser, OPTIONAL_ARGS)
+    scripting_args.add_arguments(parser, POSITIONAL_ARGS)
+    scripting_args.add_logging_options(parser)
+    args = parser.parse_args()
+    if args.log_file:
+        # fill in datetime format chars in log file name
+        args.log_file = datetime.datetime.utcnow().strftime(args.log_file)
+    scripting_args.configure_logging_from_args(args, parser)
+    output_version(parser, args)
+    scripting_args.output_args(args)
+    validate_args(args)
+    #afscripting.utils.log_config(args.config_options)
+
+    return args
+
 def validate_args(args):
     # Only one of three input scenarios allowed at a time - 1) piped, 2) read
     # from file, 3) --no-input.  There's extra logic here to return error
@@ -241,11 +267,7 @@ def load_fires(args):
     return fires_manager
 
 def main():
-    parser, args = scripting_args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
-        positional_args=POSITIONAL_ARGS, epilog=EPILOG_STR,
-        pre_validation=output_version)
-    validate_args(args)
-    #afscripting.utils.log_config(args.config_options)
+    args = parse_args()
 
     try:
         fires_manager = load_fires(args)
