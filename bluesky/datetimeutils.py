@@ -34,8 +34,18 @@ def yesterday_utc():
     return yesterday_midnight_utc().date()
 
 
-DATETIME_WILDCARD_MATCHER = re.compile(r'{(today|yesterday)([-+]{1}[0-9]+)?(:(?P<format_string>[^}]+))?}')
-DEFAULT_DATE_FORMAT_STRING = '%Y%m%d'
+DATETIME_WILDCARD_MATCHER = re.compile(
+    r'{(today|yesterday|timestamp)([-+]{1}[0-9]+)?(:(?P<format_string>[^}]+))?}')
+DEFAULT_DATE_FORMAT_STRINGS = {
+    'today': '%Y%m%d',
+    'yesterday': '%Y%m%d',
+    'timestamp': '%Y%m%d%H%M%S'
+}
+DATE_RETURNER = {
+    'today': lambda today: today,
+    'yesterday': lambda today: today - ONE_DAY,
+    'timestamp': lambda today: datetime.datetime.utcnow(),
+}
 def fill_in_datetime_strings(val, today=None):
     """Replaces strftime control codes and special wildcards if input is a string
 
@@ -58,8 +68,8 @@ def fill_in_datetime_strings(val, today=None):
                 break
 
             offset = m.group(2) and int(m.group(2))
-            pattern = m.group(4) or DEFAULT_DATE_FORMAT_STRING
-            day = (today - ONE_DAY) if (m.group(1) == 'yesterday') else today
+            pattern = m.group(4) or DEFAULT_DATE_FORMAT_STRINGS[m.group(1)]
+            day = DATE_RETURNER[m.group(1)](today)
             if offset:
                 day = day + datetime.timedelta(days=int(offset))
 
