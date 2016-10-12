@@ -298,26 +298,14 @@ class FiresManager(object):
     def modules(self):
         return self._module_names
 
-    RUN_ID_WILDCARDS = [
-        (re.compile('{timestamp}'),
-            lambda: datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S'))
-        # TDOO: any other?
-    ]
-
     @property
     def run_id(self):
         if not self._meta.get('run_id'):
             self._meta['run_id'] = str(uuid.uuid1())
         elif not self._processed_run_id_wildcards:
             logging.debug('filling in run_id wildcards')
-            for m, f in self.RUN_ID_WILDCARDS:
-                if m.search(self._meta['run_id']):
-                    self._meta['run_id'] = self._meta['run_id'].replace(
-                        m.pattern, f())
-            # support strftime format codes to fill with current time
-            #   (this is an alternative to {timestamp})
-            self._meta['run_id'] = datetimeutils.today_utc().strftime(
-                self._meta['run_id'])
+            self._meta['run_id'] = datetimeutils.fill_in_datetime_strings(
+                self._meta['run_id'], today=self.today)
             self._processed_run_id_wildcards = True
         return self._meta['run_id']
 
