@@ -20,12 +20,18 @@ from afscripting.utils import exit_with_msg
 from pyairfire import process
 
 try:
-    from bluesky import exceptions, modules, models, __version__
+    from bluesky import (
+        datetimeutils, exceptions,
+        modules, models, __version__
+    )
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
-    from bluesky import exceptions, modules, models, __version__
+    from bluesky import (
+        datetimeutils, exceptions,
+        modules, models, __version__
+    )
 
 __author__ = "Joel Dubowy"
 
@@ -197,7 +203,8 @@ def parse_args():
 
     Note: We're doing this manually, rather than call
     scripting_args.parse_args, because we want to be able
-    to replace datetime format chars in the log file name.
+    to replace datetime format chars in the log file name
+    (which is done after FiresManager.today is set).
     """
     parser = scripting_args.ArgumentParser()
     parser.epilog = EPILOG_STR
@@ -207,14 +214,8 @@ def parse_args():
     scripting_args.add_arguments(parser, POSITIONAL_ARGS)
     scripting_args.add_logging_options(parser)
     args = parser.parse_args()
-    if args.log_file:
-        # fill in datetime format chars in log file name
-        args.log_file = datetime.datetime.utcnow().strftime(args.log_file)
-    scripting_args.configure_logging_from_args(args, parser)
     output_version(parser, args)
-    scripting_args.output_args(args)
     validate_args(args)
-    #afscripting.utils.log_config(args.config_options)
 
     return args
 
@@ -248,11 +249,24 @@ def output_version(parser, args):
         sys.stdout.write("bsp (bluesky) version {}\n".format(__version__))
         sys.exit(0)
 
-def load_fires(args):
-    # Note: Calling code handles exception
+def setup(args):
     fires_manager = models.fires.FiresManager()
     if args.today:
         fires_manager.today = args.today
+
+    # configure logging as soon as possible, before any log messages
+    # are written
+    if args.log_file:
+        args.log_file = datetimeutils.fill_in_datetime_strings(
+                args.log_file, today=fires_manager.today)
+    # Note: The second argument to configure_logging_from_args
+    #  is not used. It must be left over from a previous version
+    #  of the function. So just pass in None.
+    scripting_args.configure_logging_from_args(args, None)
+    scripting_args.output_args(args)
+    #afscripting.utils.log_config(args.config_options)
+
+    # Note: Calling code handles exception
     if not args.no_input:
         fires_manager.loads(input_file=args.input_file)
 
@@ -270,7 +284,8 @@ def main():
     args = parse_args()
 
     try:
-        fires_manager = load_fires(args)
+        fires_manager = setup(args)
+
         # modules may be specified either in the input json or as command line
         # args, but not in both places
         if args.module:
