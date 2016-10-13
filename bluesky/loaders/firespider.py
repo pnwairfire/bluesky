@@ -16,7 +16,7 @@ __all__ = [
 
 class BaseFireSpiderLoader(object):
 
-    def _marshal(self, fires):
+    def _marshal(self, fires, start=None, end=None):
         """Marshals FireSpider data into bsp's internal structure
 
         FireSpider structure:
@@ -49,24 +49,37 @@ class BaseFireSpiderLoader(object):
         The only thing that needs to be done is conversion of 'start'
         and 'end' to local time.
         """
+        start = start and parse_datetime(t, 'start')
+        end = end and parse_datetime(t, 'end')
         for f in fires:
-            for g in f.get('growth', []):
-                # 'start' and 'end' will be in UTC; convert to local
-                utc_offset = g.get('location', {}).get('utc_offset')
-                if utc_offset:
-                    utc_offset = parse_utc_offset(utc_offset)
-                g['start'] = self._marshal_time(g.get('start'), utc_offset)
-                g['end'] = self._marshal_time(g.get('end'), utc_offset)
-
+            growth = f.pop('growth', [])
+            f['growth'] = []
+            for g in growth:
+                # the growth object's 'start' and 'end' will be in UTC;
+                # Keep them in UTC to compare with start/end query parameters
+                # and then convert to local if growth object is within range
+                if g.get('start') and g.get('end'):
+                    g['start'] = parse_datetime(g.get('start'), 'start')
+                    g['end'] = parse_datetime(g.get('end'), 'end')
+                    if self._within_time_range(g, start, end):
+                        utc_offset = self._get_utc_offset(g)
+                        g['start'] += utc_offset
+                        g['end'] += utc_offset
+                        f['growth'].append(g)
         return fires
 
-    def _marshal_time(self, t, utc_offset):
-        if t:
-            t = parse_datetime(t, 'start/end')
-            if utc_offset:
-                t = t + datetime.timedelta(hours=utc_offset)
-            return t
-        # else, leave undefined
+    def _get_utc_offset(self, g):
+        utc_offset = g.get('location', {}).get('utc_offset')
+        if utc_offset:
+            return datetime.timedelta(hours=parse_utc_offset(utc_offset))
+        else:
+            return datetime.timedelta(0)
+
+    def _within_time_range(self, g, start, end):
+        # at this point, we know g['start'] and g['end'] are defined,
+        # and they are still in UTC
+        return ((not start or g['end'] >= start) and
+            (not end or g['start'] <= end ))
 
 class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
     """Loads json formatted fire data from the FireSpider web service
@@ -87,7 +100,7 @@ class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
 
     def load(self):
         fires = json.loads(self.get(**self._query))['data']
-        return self._marshal(fires)
+        return self._marshal(fires, start=start, end=end)
 
 class JsonFileLoader(BaseFileLoader, BaseFireSpiderLoader):
     """Loads json formatted fire data from the FireSpider web service
