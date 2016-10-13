@@ -33,12 +33,20 @@ def run(fires_manager):
         module, klass = _get_module_and_class(model)
         model_config = fires_manager.get_config_value(
             'dispersion', model, default={})
-        disperser = klass(fires_manager.met, **model_config)
+
+        start, num_hours = _get_time(fires_manager)
+
+        # limit met to what covers
+        end = start + datfetime.timedelta(hours=num_hours)
+        met = [m for m in fires_manager.met
+            if parse_datetime(m['first_hour']) <= end
+            and parse_datetime(m['last_hour']) >= start]
+
+        disperser = klass(met, **model_config)
         processed_kwargs.update({
             "{}_version".format(model): module.__version__
         })
 
-        start, num_hours = _get_time(fires_manager)
         dest_dir, output_dir_name = _get_dirs(fires_manager)
 
         # further validation of start and num_hours done in 'run'

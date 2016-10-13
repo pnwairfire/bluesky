@@ -311,6 +311,8 @@ class HYSPLITDispersion(DispersionBase):
         # The only things that change from call to call are context and fires
 
         for f in self._met_info['files']:
+            # bluesky.modules.dispersion.run will have weeded out met
+            # files that aren't relevant to this dispersion run
             os.symlink(f, os.path.join(working_dir, os.path.basename(f)))
 
         # Create sym links to ancillary data files (note: HYSPLIT49 balks
