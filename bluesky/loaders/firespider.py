@@ -100,7 +100,8 @@ class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
 
     def load(self):
         fires = json.loads(self.get(**self._query))['data']
-        return self._marshal(fires, start=start, end=end)
+        return self._marshal(fires, start=self._query.get('start'),
+            end=self._query.get('end'))
 
 class JsonFileLoader(BaseFileLoader, BaseFireSpiderLoader):
     """Loads json formatted fire data from the FireSpider web service
