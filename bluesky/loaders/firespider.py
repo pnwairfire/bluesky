@@ -49,8 +49,8 @@ class BaseFireSpiderLoader(object):
         The only thing that needs to be done is conversion of 'start'
         and 'end' to local time.
         """
-        start = start and parse_datetime(t, 'start')
-        end = end and parse_datetime(t, 'end')
+        start = start and parse_datetime(start, 'start')
+        end = end and parse_datetime(end, 'end')
         for f in fires:
             growth = f.pop('growth', [])
             f['growth'] = []
