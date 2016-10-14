@@ -38,13 +38,7 @@ def run(fires_manager):
             'dispersion', model, default={})
 
         start, num_hours = _get_time(fires_manager)
-
-        # limit met to what covers
-        end = start + datetime.timedelta(hours=num_hours)
-        met = copy.deepcopy(fires_manager.met)
-        met["files"] = [m for m in met["files"]
-            if parse_datetime(m['first_hour']) <= end
-            and parse_datetime(m['last_hour']) >= start]
+        met = _filter_met(fires_manager.met, start, num_hours)
 
         disperser = klass(met, **model_config)
         processed_kwargs.update({
@@ -69,6 +63,20 @@ def run(fires_manager):
 
     # TODO: add information to fires_manager indicating where to find the hysplit output
 
+def _filter_met(met, start, num_hours):
+    # limit met to only what's needed to cover dispersion window
+    end = start + datetime.timedelta(hours=num_hours)
+
+    # the passed-in met is a reference to the fires_manager's met, so copy it
+    met = copy.deepcopy(met)
+
+    # Note: we don't store the parsed first and last hour values
+    # because they aren't used outside of this method, and they'd
+    # just have to be dumped back to string values when bsp exits
+    met["files"] = [m for m in met["files"]
+        if parse_datetime(m['first_hour']) <= end
+        and parse_datetime(m['last_hour']) >= start]
+    return met
 
 def _get_module_and_class(model):
     module_name = "bluesky.dispersers.{}".format(model)
