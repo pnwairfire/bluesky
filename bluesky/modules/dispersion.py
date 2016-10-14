@@ -14,6 +14,7 @@ import logging
 from bluesky import datetimeutils
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.dispersers.hysplit import hysplit
+from bluesky.datetimeutils import parse_datetime
 
 __all__ = [
     'run'
