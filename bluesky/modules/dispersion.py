@@ -73,9 +73,15 @@ def _filter_met(met, start, num_hours):
     # Note: we don't store the parsed first and last hour values
     # because they aren't used outside of this method, and they'd
     # just have to be dumped back to string values when bsp exits
-    met["files"] = [m for m in met["files"]
-        if parse_datetime(m['first_hour']) <= end
-        and parse_datetime(m['last_hour']) >= start]
+    logging.debug('Determinig met files needed for dispersion')
+    met_files = met.pop('files', [])
+    met["files"] = []
+    for m in met_files:
+        if (parse_datetime(m['first_hour']) <= end
+                and parse_datetime(m['last_hour']) >= start):
+            met["files"].append(m)
+        else:
+            logging.debug('Dropping met file %s - not needed for dispersion')
     return met
 
 def _get_module_and_class(model):
