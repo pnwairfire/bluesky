@@ -9,12 +9,15 @@ import os
 
 from . import BaseApiLoader, BaseFileLoader
 from bluesky.datetimeutils import parse_datetime, parse_utc_offset
+from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
     'FileLoader'
 ]
 
 class BaseFireSpiderLoader(object):
+
+    START_AFTER_END_ERROR_MSG = "Start must be before end"
 
     def _marshal(self, fires, start=None, end=None):
         """Marshals FireSpider data into bsp's internal structure
@@ -51,6 +54,9 @@ class BaseFireSpiderLoader(object):
         """
         start = start and parse_datetime(start, 'start')
         end = end and parse_datetime(end, 'end')
+        if start and end and start > end:
+            raise BlueSkyConfigurationError(self.START_AFTER_END_ERROR_MSG)
+
         for f in fires:
             growth = f.pop('growth', [])
             f['growth'] = []
