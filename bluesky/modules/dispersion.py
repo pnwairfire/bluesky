@@ -7,6 +7,7 @@ Executables. See the repo README.md for more information.
 __author__ = "Joel Dubowy"
 
 import consume
+import copy
 import datetime
 import importlib
 import logging
@@ -40,7 +41,8 @@ def run(fires_manager):
 
         # limit met to what covers
         end = start + datetime.timedelta(hours=num_hours)
-        met = [m for m in fires_manager.met
+        met = copy.deepcopy(fires_manager.met)
+        met["files"] = [m for m in met["files"]
             if parse_datetime(m['first_hour']) <= end
             and parse_datetime(m['last_hour']) >= start]
 
