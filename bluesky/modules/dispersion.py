@@ -81,7 +81,8 @@ def _filter_met(met, start, num_hours):
                 and parse_datetime(m['last_hour']) >= start):
             met["files"].append(m)
         else:
-            logging.debug('Dropping met file %s - not needed for dispersion')
+            logging.debug('Dropping met file %s - not needed for dispersion',
+                m["file"])
     return met
 
 def _get_module_and_class(model):
