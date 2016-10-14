@@ -37,7 +37,7 @@ def run(fires_manager):
         start, num_hours = _get_time(fires_manager)
 
         # limit met to what covers
-        end = start + datfetime.timedelta(hours=num_hours)
+        end = start + datetime.timedelta(hours=num_hours)
         met = [m for m in fires_manager.met
             if parse_datetime(m['first_hour']) <= end
             and parse_datetime(m['last_hour']) >= start]
