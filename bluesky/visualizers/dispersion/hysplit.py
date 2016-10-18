@@ -209,8 +209,8 @@ class HysplitVisualizer(object):
             raise RuntimeError("hysplit output file {} does not exist".format(
                 hysplit_output_file))
 
-        if self._config.get('dest_dir'):
-            output_directory = os.path.join(self._config['dest_dir'], self._run_id)
+        if self._config.get('output_dir'):
+            output_directory = self._config['output_dir']
         else:
             output_directory =  hysplit_output_directory
         data_dir = os.path.join(output_directory, self._config.get('data_dir') or '')
@@ -377,7 +377,7 @@ class HysplitVisualizer(object):
             "visualization": {
                 "target": "dispersion",
                 "hysplit": {
-                    "dest_dir": "/sdf/sdf/",
+                    "output_dir": "/sdf/sdf/",
                     ...,
                     "blueskykml_config": {
                         "SmokeDispersionKMLInput": {

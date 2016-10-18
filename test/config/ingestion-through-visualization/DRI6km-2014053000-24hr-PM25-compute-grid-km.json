@@ -10,8 +10,7 @@
             "start": "2014-05-30T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
-            "output_dir_name": "DRI6km-%Y%m%d-comptuted-grid-km-ZZZ",
-            "dest_dir": "/bsp-output/bsp-dispersion-output/",
+            "output_dir": "/bsp-output/bsp-dispersion-output/DRI6km-%Y%m%d-comptuted-grid-km-ZZZ",
             "hysplit": {
                 "compute_grid": true,
                 "spacing_longitude": 6.0,

@@ -45,11 +45,11 @@ def run(fires_manager):
             "{}_version".format(model): module.__version__
         })
 
-        dest_dir, output_dir_name = _get_dirs(fires_manager)
+        output_dir, working_dir = _get_dirs(fires_manager)
 
         # further validation of start and num_hours done in 'run'
         dispersion_info = disperser.run(fires_manager.fires, start,
-            num_hours, dest_dir, output_dir_name)
+            num_hours, output_dir, working_dir=working_dir)
         dispersion_info.update(model=model)
         # TODO: store dispersion into in summary?
         #   > fires_manager.summarize(disperion=disperser.run(...))
@@ -130,11 +130,10 @@ def _get_time(fires_manager):
 
 
 def _get_dirs(fires_manager):
-    dest_dir = fires_manager.get_config_value('dispersion', 'dest_dir')
-    if not dest_dir:
-        raise ValueError("Specify directory to save dispersion run output")
+    output_dir = fires_manager.get_config_value('dispersion', 'output_dir')
+    if not output_dir:
+        raise ValueError("Specify dispersion output directory")
 
-    output_dir_name = (fires_manager.get_config_value('dispersion',
-        'output_dir_name') or fires_manager.run_id)
+    working_dir = fires_manager.get_config_value('dispersion', 'working_dir')
 
-    return dest_dir, output_dir_name
+    return output_dir, working_dir

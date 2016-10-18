@@ -7,7 +7,7 @@
             "start": "2014-05-30T00:00:00",
             "num_hours": 24,
             "model": "vsmoke",
-            "dest_dir": "/bsp-output/bsp-dispersion-output/"
+            "output_dir": "/bsp-output/bsp-dispersion-output/{run_id}/"
         },
         "export": {
             "modes": ["email", "localsave"],

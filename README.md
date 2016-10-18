@@ -1472,8 +1472,7 @@ emissions config
 
  - ***'config' > 'dispersion' > 'start'*** -- *required* (unless it can be determined from fire growth windows) -- modeling start time (ex. "2015-01-21T00:00:00Z"); 'today' is also recognized, in which case start is set to midnight of the current utc date
  - ***'config' > 'dispersion' > 'num_hours'*** -- *required* (unless it can be determined from fire growth windows) -- number of hours in model run
- - ***'config' > 'dispersion' > 'dest_dir'*** -- *required* -- destination directory to contain output dir
- - ***'config' > 'dispersion' > 'output_dir_name'*** -- *optional* -- name of output directory; defaults to run_id, which is generated if not defined
+ - ***'config' > 'dispersion' > 'output_dir'*** -- *required* -- directory to contain output
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
 
 ###### if running hysplit dispersion:
@@ -1619,8 +1618,7 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
  - ***'config' > 'visualization' > 'hysplit' > 'layer'*** -- *optional* -- defaults to 1
  - ***'config' > 'visualization' >  'hysplit' > 'prettykml'*** -- *optional* -- whether or not to make the kml human readable; defaults to false
  - ***'config' > 'visualization' >  'hysplit' > 'is_aquipt'*** -- *optional* -- defaults to false
- - ***'config' > 'visualization' >  'hysplit' > 'dest_dir' -- *optional* -- where to create visualization output directory (i.e. the parent directory to contain the ouput directory); if not specified, visualization output will go in hysplit output directory
- - ***'config' > 'visualization' >  'hysplit' > 'output_dir_name' -- *optional* --name of output directory to create in dest_dir; only used if dest_dir is defined; defaults to run_id, which is generated if not defined
+ - ***'config' > 'visualization' >  'hysplit' > 'output_dir' -- *optional* -- where to create visualization output; if not specified, visualization output will go in hysplit output directory
  - ***'config' > 'visualization' >  'hysplit' > 'images_dir' -- *optional* -- sub-directory to contain images (relative to output direcotry); default is 'graphics/''
  - ***'config' > 'visualization' >  'hysplit' > 'data_dir' -- *optional* -- sub-directory to contain data files (relative to output direcotry); default is output directory root
  - ***'config' > 'visualization' >  'hysplit' > 'blueskykml_config' -- *optional* -- sub-directory to contain configuration to pass directly into blueskykml; expected to be nested with top level section keys and second level option keys; see https://github.com/pnwairfire/blueskykml/ for configuration options
@@ -1872,7 +1870,7 @@ Another example, running `bsp` through vsmoke dispersion:
                 "start": "2014-05-30T00:00:00",
                 "num_hours": 24,
                 "model": "vsmoke",
-                "dest_dir": "/bsp-output/bsp-dispersion-output/"
+                "output_dir": "/bsp-output/bsp-dispersion-output/{run_id}"
             }
         },
         "fire_information": [
@@ -1944,7 +1942,7 @@ Another example, running through hysplit dispersion:
                 "start": "2014-05-30T00:00:00",
                 "num_hours": 24,
                 "model": "hysplit",
-                "dest_dir": "/bsp-output/bsp-dispersion-output/",
+                "output_dir": "/bsp-output/bsp-dispersion-output/{run_id}",
                 "hysplit": {
                     "grid": {
                         "spacing": 6.0,

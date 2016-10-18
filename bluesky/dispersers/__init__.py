@@ -88,15 +88,19 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         return self._config.get(key.lower(),
             getattr(self.DEFAULTS, key.upper(), None))
 
-    def run(self, fires, start, num_hours, dest_dir, output_dir_name):
+    def run(self, fires, start, num_hours, output_dir, working_dir=None):
         """Runs hysplit
 
         args:
          - fires - list of fires to run through hysplit
          - start - model run start hour
          - num_hours - number of hours in model run
-         - dest_dir - directory to contain output dir
-         - output_dir_name - name of output dir
+         - output_dir - directory to contain output
+
+        kwargs:
+         - working_dir -- working directory to write input files and output
+            files (before they're copied over to final output directory);
+            if not specified, a temp directory is created
         """
         logging.info("Running %s", self.__class__.__name__)
         if start.minute or start.second or start.microsecond:
@@ -106,14 +110,14 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         self._model_start = start
         self._num_hours = num_hours
 
-        self._run_output_dir = start.strftime(
-            os.path.join(os.path.abspath(dest_dir), output_dir_name))
-
+        self._run_output_dir = os.path.abspath(output_dir)
+        self._run_working_dir = working_dir and os.path.abspath(working_dir)
         os.makedirs(self._run_output_dir)
+        # osutils.create_working_dir will create working dir if necessary
 
         self._set_fire_data(fires)
 
-        with osutils.create_working_dir() as wdir:
+        with osutils.create_working_dir(working_dir=self._working_dir) as wdir:
             r = self._run(wdir)
 
         r["output"].update({
@@ -121,6 +125,9 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             "start_time": self._model_start.isoformat(),
             "num_hours": self._num_hours
         })
+        if self._working_dir:
+            r["output"]["working_dir"] = self._working_dir
+
         return r
 
 
