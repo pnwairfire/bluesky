@@ -19,13 +19,15 @@ BSP = os.path.abspath(
         os.path.dirname(__file__), '../../bin/bsp'))
 
 INPUT = {
+    "run_id": 'abcdefg123',
     "config": {
         "foo": {
             "a": 111,
             "b": 222,
             "c": 333,
             "d": 444
-        }
+        },
+        'echo_run_id': '{run_id}'
     },
     "fire_information": []
 }
@@ -41,7 +43,8 @@ CONFIG_1 = {
         "bar": {
             "b": "b"
         },
-        "b": "b"
+        "b": "b",
+        "e": '{run_id}__{_run_id}'
     }
 }
 
@@ -75,6 +78,7 @@ EXPECTED = {
             "cc": "cc",
             "dd": "dd"
         },
+        'echo_run_id': 'abcdefg123',
         "bar": {
             "b": "b"
         },
@@ -92,7 +96,9 @@ EXPECTED = {
         "di": 23,
         "df": 123.23,
         "dci": "23",
-        "dcf": "123.23"
+        "dcf": "123.23",
+        "e": 'abcdefg123__{_run_id}',
+        #"f": 'sdfdsf__abcdefg123'
     },
     "fire_information": []
 }
@@ -118,12 +124,14 @@ cmd_args = [
     '-C', 'foo.dd=dd',
     '-C', 'boo.d=d',
     '-C', 'd=d',
+    #'-C', 'f="sdfdsf__{run_id}"'
     '-B', 'dbt=true',
     '-B', 'dbf=0',
     '-I', 'di=23',
     '-F', 'df=123.23',
     '-C', 'dci=23',
     '-C', 'dcf=123.23'
+
 ]
 output = subprocess.check_output(cmd_args)
 actual = json.loads(output.decode())
@@ -134,6 +142,8 @@ logging.info("expected: {}".format(EXPECTED))
 today = actual.pop('today')
 assert today == datetime.datetime.utcnow().strftime('%Y-%m-%d')
 #assert actual == EXPECTED
-assert set(actual.keys()) == set(['config', 'fire_information'])
+assert set(actual.keys()) == set(['config', 'fire_information', 'run_id'])
 assert actual['fire_information'] == EXPECTED['fire_information']
 assert actual['config'] == EXPECTED['config']
+
+print("\n*** PASSED ***\n")
