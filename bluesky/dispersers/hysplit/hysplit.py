@@ -413,7 +413,11 @@ class HYSPLITDispersion(DispersionBase):
         try:
             # Run HYSPLIT
             if self.config("MPI"):
-                self._execute(self.BINARIES['MPI'], "-n", str(NCPUS), self.BINARIES['HYSPLIT_MPI'], working_dir=working_dir)
+                # use '--allow-run-as-root' in case docker is being used
+                self._execute(self.BINARIES['MPI'],
+                    "--allow-run-as-root",
+                    "-n", str(NCPUS),
+                    self.BINARIES['HYSPLIT_MPI'], working_dir=working_dir)
             else:  # standard serial run
                 self._execute(self.BINARIES['HYSPLIT'], working_dir=working_dir)
 
