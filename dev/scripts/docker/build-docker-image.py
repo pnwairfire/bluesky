@@ -36,7 +36,6 @@ Examples:
 
 BINARIES = [
     'profile',
-    'mpiexec',
     'hycm_std',
     'hycs_std',
     'hysplit2netcdf',

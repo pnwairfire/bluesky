@@ -60,6 +60,14 @@ RUN apt-get install -y \
     && apt-get install -y \
         gdal-bin # install gdal-bin for gdalwarp and gdal_translate
 
+# TODO: install libopenmpi1.10 and libmpich12 instead of the dev versions
+RUN apt-get update \
+    && apt-get install -y \
+        libopenmpi-dev \
+        libmpich-dev \
+    && apt-get install -y \
+        openmpi-bin
+
 # mapserver and mapscript are needed to lookup ecoregion in consume, if fire
 # doesn't already have it defined.
 # TODO: figure out way to install mapscript for python 3, and install it with
