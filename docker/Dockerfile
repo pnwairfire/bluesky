@@ -110,7 +110,7 @@ RUN pip3 install --trusted-host pypi.smoke.airfire.org \
 #    complete docker image, a cached older version of bluesky will be
 #    included in the image
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
-    -i http://pypi.smoke.airfire.org/simple bluesky==2.2.12
+    -i http://pypi.smoke.airfire.org/simple bluesky==2.2.13
 
 ### To install from github instead of from AirFire's pypi server
 # RUN pip3 install --no-binary gdal  \
