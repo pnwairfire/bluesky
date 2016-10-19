@@ -21,6 +21,7 @@
             "num_hours": 24,
             "model": "hysplit",
             "output_dir": "/bluesky/output/bsp-dispersion-output/{run_id}/",
+            "working_dir": "/bluesky/working/bsp-dispersion-working/{run_id}/",
             "hysplit": {
                 "grid": {
                     "spacing": 0.15,
