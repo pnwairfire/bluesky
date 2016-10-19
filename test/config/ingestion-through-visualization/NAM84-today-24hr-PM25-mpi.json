@@ -1,0 +1,75 @@
+{
+    "config": {
+        "skip_failed_fires": true,
+        "consumption": {
+            "default_ecoregion": "western"
+        },
+        "emissions": {
+            "species": ["PM25"]
+        },
+        "findmetdata": {
+            "met_root_dir": "/NAM84/",
+            "arl": {
+                "index_filename_pattern": "NAM84_ARL_index.csv"
+            }
+        },
+        "localmet":{
+            "time_step": 3
+        },
+        "dispersion": {
+            "start": "{today}",
+            "num_hours": 24,
+            "model": "hysplit",
+            "output_dir": "/bluesky/output/bsp-dispersion-output/{run_id}/",
+            "working_dir": "/bluesky/working/bsp-dispersion-working/{run_id}/",
+            "hysplit": {
+                "grid": {
+                    "spacing": 0.15,
+                    "projection": "LatLon",
+                    "boundary": {
+                        "ne": {
+                            "lat": 49.25,
+                            "lng": -67.0
+                        },
+                        "sw": {
+                            "lat": 25.0,
+                            "lng": -125.5
+                        }
+                    }
+                },
+                "NUMPAR": 1000,
+                "MAXPAR": 10000000,
+                "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
+                "VERTICAL_LEVELS": [100],
+                "INITD": 0,
+                "NINIT": 0,
+                "DELT": -15,
+                "KHMAX": 24,
+                "MPI": true,
+                "NCPUS": 2
+
+            }
+        },
+        "visualization": {
+            "target": "dispersion",
+            "hysplit": {
+                "images_dir": "images/",
+                "data_dir": "data/"
+            }
+        },
+        "export": {
+            "modes": ["email", "localsave"],
+            "extra_exports": ["dispersion", "visualization"],
+            "email": {
+                "recipients": ["jdubowy+blueskytest@gmail.com"],
+                "sender": "bsp@airfire.org",
+                "subject": "BSP output",
+                "smtp_server": "127.0.0.1",
+                "smtp_port": 1025
+            },
+            "localsave": {
+                "dest_dir": "/bluesky/output/bsp-local-exports/"
+            }
+        }
+    }
+}
