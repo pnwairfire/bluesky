@@ -101,6 +101,9 @@ RUN pip3 install --upgrade pip
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
     -i http://pypi.smoke.airfire.org/simple blueskykml==1.*
 
+RUN apt-get install -y \
+        vim
+
 ## Install The bluesky Package
 
 # Notes:
