@@ -49,8 +49,8 @@ REPO_ROOT_DIR = os.path.abspath(os.path.join(__file__, '../../../..'))
 
 FINAL_INSTRUCTIONS = """
     To upload:
-        docker tag -f <IMAGE_ID> pnwairfire/bluesky:latest
-        docker tag <IMAGE_ID> pnwairfire/bluesky:v<VERSION>
+        docker tag {image_name} pnwairfire/bluesky:latest
+        docker tag {image_name} pnwairfire/bluesky:v<VERSION>
         docker push pnwairfire/bluesky:latest
         docker push pnwairfire/bluesky:v<VERSION>
 """
@@ -105,7 +105,7 @@ def _post_clean():
     pass
 
 def _print_final_instructions(args):
-    sys.stdout.write(FINAL_INSTRUCTIONS)
+    sys.stdout.write(FINAL_INSTRUCTIONS.format(image_name=args.image_name))
 
 if __name__ == "__main__":
     parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
