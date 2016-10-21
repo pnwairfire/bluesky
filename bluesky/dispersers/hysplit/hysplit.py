@@ -608,6 +608,9 @@ class HYSPLITDispersion(DispersionBase):
 
     def _set_grid_params(self):
 
+        # If not specified, projection is assumed to be 'LatLon'
+        is_deg = (self.config('projection') or 'LatLon') == 'LatLon'
+
         if self.config("USER_DEFINED_GRID"):
             # This supports BSF config settings
             # User settings that can override the default concentration grid info
@@ -678,9 +681,6 @@ class HYSPLITDispersion(DispersionBase):
         levels = self.config("VERTICAL_LEVELS")
         numLevels = len(levels)
         verticalLevels = " ".join(str(x) for x in levels)
-
-        # If not specified, projection is assumed to be 'LatLon'
-        is_deg = (self.config('projection') or 'LatLon') == 'LatLon'
 
         # Warn about multiple sampling grid levels and KML/PNG image generation
         if numLevels > 1:
