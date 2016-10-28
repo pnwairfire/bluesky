@@ -435,7 +435,7 @@ class HYSPLITDispersion(DispersionBase):
             # if STOP_IF_NO_PARINIT is False and all/some files don't exist,
             # set ninit_val to 0 and issue warning.
             for f in parinitFiles:
-                if not context.file_exists(f):
+                if not os.path.exists(f):
                     if self.config("STOP_IF_NO_PARINIT"):
                         msg = "Matching particle init file, %s, not found. Stop." % f
                         raise Exception(msg)
