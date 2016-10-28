@@ -67,6 +67,84 @@ __all__ = [
     'HYSPLITDispersion'
 ]
 
+DEFAULT_BINARIES = {
+    'HYSPLIT': {
+        "old_config_key": "HYSPLIT_BINARY",
+        "default":"hycs_std"
+    },
+    'HYSPLIT_MPI': {
+        "old_config_key": "HYSPLIT_MPI_BINARY",
+        "default":"hycm_std"
+    },
+    'NCEA': {
+        "old_config_key": "NCEA_EXECUTABLE",
+        "default":"ncea"
+    },
+    'NCKS': {
+        "old_config_key": "NCKS_EXECUTABLE",
+        "default":"ncks"
+    },
+    'MPI': {
+        "old_config_key": "MPIEXEC",
+        "default":"mpiexec"
+    },
+    'HYSPLIT2NETCDF': {
+        "old_config_key": "HYSPLIT2NETCDF_BINARY",
+        "default":"hysplit2netcdf"
+    }
+}
+
+def _get_binaries(config):
+    """The various executables can be specified either
+    using the old BSF config keys or the new keys nested
+    under 'binaries'. e.g.
+
+    Old:
+        {
+            ...,
+            "config": {
+                "hysplit": {
+                    "HYSPLIT_BINARY": "hycs_std",
+                    "HYSPLIT_MPI_BINARY": "hycm_std",
+                    "NCEA_EXECUTABLE": "ncea",
+                    "NCKS_EXECUTABLE": "ncks",
+                    "MPIEXEC": "mpiexec",
+                    "HYSPLIT2NETCDF_BINARY": "hysplit2netcdf"
+                }
+            }
+            ...
+        }
+
+    New:
+        {
+            ...,
+            "config": {
+                "hysplit": {
+                    "binaries" : {
+                        'hysplit': "hycs_std",
+                        'hysplit_mpi': "hycm_std",
+                        'ncea': "ncea",
+                        'ncks': "ncks",
+                        'mpi': "mpiexec",
+                        'hysplit2netcdf': "hysplit2netcdf"
+                    }
+                }
+            }
+            ...
+        }
+
+    The new way takes precedence over the old.
+    """
+    binaries_config = {
+        k.lower(): v for k, v in config.get('binaries', {}).items()
+    }
+    binaries = {}
+    for k, d in DEFAULT_BINARIES.items():
+        binaries[k] = (binaries_config.get(k.lower())
+            or config.get(d['old_config_key'].lower())
+            or d['default'])
+    return binaries
+
 class HYSPLITDispersion(DispersionBase):
     """ HYSPLIT Dispersion model
 
@@ -74,20 +152,18 @@ class HYSPLITDispersion(DispersionBase):
 
     TODO: determine which config options we'll support
     """
-    BINARIES = {
-        'HYSPLIT': "hycs_std",
-        'HYSPLIT_MPI': "hycm_std",
-        'NCEA': "ncea",
-        'NCKS': "ncks",
-        'MPI': "mpiexec",
-        'HYSPLIT2NETCDF': "hysplit2netcdf"
-    }
+
     DEFAULTS = defaults
 
     # Note: 'PHASES' and TIMEPROFILE_FIELDS defined in HYSPLITDispersion
 
     def __init__(self, met_info, **config):
         super(HYSPLITDispersion, self).__init__(met_info, **config)
+
+        # pass in self._config, since it's keys were already
+        # converted to lowercase
+        self.BINARIES = _get_binaries(self._config)
+
         self._set_met_info(copy.deepcopy(met_info))
 
     def _required_growth_fields(self):
