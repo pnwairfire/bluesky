@@ -489,11 +489,14 @@ class HYSPLITDispersion(DispersionBase):
         try:
             # Run HYSPLIT
             if self.config("MPI"):
-                # use '--allow-run-as-root' in case docker is being used
-                self._execute(self.BINARIES['MPI'],
-                    "--allow-run-as-root",
-                    "-n", str(NCPUS),
-                    self.BINARIES['HYSPLIT_MPI'], working_dir=working_dir)
+                args = [self.BINARIES['MPI']]
+                if self.BINARIES['MPI'] == 'mpiexec':
+                    # In case docker is being used, use '--allow-run-as-root'
+                    # with `mpiexec` binary.  (mpiexec.hydra doesn't need
+                    # or even support it.)
+                    args.append("--allow-run-as-root")
+                args.extend(["-n", str(NCPUS), self.BINARIES['HYSPLIT_MPI']])
+                self._execute(*args, working_dir=working_dir)
             else:  # standard serial run
                 self._execute(self.BINARIES['HYSPLIT'], working_dir=working_dir)
 
