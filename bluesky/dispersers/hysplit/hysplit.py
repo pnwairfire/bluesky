@@ -425,8 +425,8 @@ class HYSPLITDispersion(DispersionBase):
 
             # if an MPI run need to create the full list of expected files
             # based on the number of CPUs
-            if self.config("MPI",bool):
-                NCPUS = self.config("NCPUS", int)
+            if self.config("MPI"):
+                NCPUS = self.config("NCPUS")
                 parinitFiles = ["%s.%3.3i" % ( pinpf, (i+1)) for i in range(NCPUS)]
 
             # loop over parinitFiles check if exists.
@@ -436,7 +436,7 @@ class HYSPLITDispersion(DispersionBase):
             # set ninit_val to 0 and issue warning.
             for f in parinitFiles:
                 if not context.file_exists(f):
-                    if self.config("STOP_IF_NO_PARINIT", bool):
+                    if self.config("STOP_IF_NO_PARINIT"):
                         msg = "Matching particle init file, %s, not found. Stop." % f
                         raise Exception(msg)
                     else:
