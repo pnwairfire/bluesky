@@ -118,6 +118,13 @@ def _run_feps(fires_manager, species, include_emissions_details):
 ## Urbanski
 ##
 
+def _fix_pm25_key(emissions):
+    for k in emissions:
+        if k == 'PM2.5':
+            emissions['PM25'] = emissions.pop('PM2.5')
+        elif isinstance(emissions[k], dict):
+            _fix_pm25_key(emissions[k])
+
 def _run_urbanski(fires_manager, species, include_emissions_details):
     logging.debug("Running emissions module with Urbanski EFs")
 
@@ -147,7 +154,9 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
                     #   b) just after instantiating look-up objects, above,
                     #   or c) just before calling EmissionsCalculator, above
                     datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
+                    _fix_pm25_key(fb['emissions'])
                     if include_emissions_details:
+                        _fix_pm25_key(fb['emissions_details'])
                         datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
 
 ##
