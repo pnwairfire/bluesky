@@ -142,9 +142,13 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
                     calculator = EmissionsCalculator([fccs2ef[fb["fccs_id"]]],
                         species=species)
                     _calculate(calculator, fb, include_emissions_details)
-                    # TODO: are these emissions factors in something other than tons
-                    #  per tons consumed?  if so, we need to multiply to convert
-                    #  values to tons
+                    # Convert from lbs to tons
+                    # TODO: Update EFs to be tons/ton in a) eflookup package,
+                    #   b) just after instantiating look-up objects, above,
+                    #   or c) just before calling EmissionsCalculator, above
+                    datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
+                    if include_emissions_details:
+                        datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
 
 ##
 ## CONSUME
