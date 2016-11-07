@@ -5,7 +5,8 @@
             "default_ecoregion": "western"
         },
         "emissions": {
-            "species": ["PM25"]
+            "species": ["pm25"],
+            "efs": "urbanski"
         },
         "findmetdata": {
             "met_root_dir": "/NAM84/",
