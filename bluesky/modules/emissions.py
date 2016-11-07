@@ -32,6 +32,15 @@ def run(fires_manager):
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
+
+    Config options:
+     - emissions > efs -- emissions factors model to use
+     - emissions > species -- whitelist of species to compute emissions for
+     - emissions > include_emissions_details -- whether or not to include
+        emissions per fuel category per phase, as opposed to just per phase
+     - emissions > fuel_loadings --
+     - consumption > fuel_loadings -- considered if fuel loadings aren't
+        specified emissions config
     """
     # TODO: rename 'efs' config field as 'model', since 'consume' isn't really
     #   just a different set of EFs - uisng 'model' is more general and
