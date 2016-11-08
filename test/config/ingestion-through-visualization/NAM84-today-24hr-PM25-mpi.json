@@ -47,6 +47,7 @@
                 "DELT": -15,
                 "KHMAX": 24,
                 "MPI": true,
+                "MPIEXEC": "mpiexec.hydra",
                 "NCPUS": 2
 
             }
