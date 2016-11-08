@@ -93,38 +93,36 @@ RUN apt-get update \
 
 RUN pip3 install --upgrade pip
 
-# blueskykml is relatively static these days; so, install it here in order
-# to avoid reinstalling it and it's large dependencies (Pillow==2.8.1, 9.0MB,
-# and matplotlib==1.4.3, 50.4MB) everytime the the bluesky image is built
-# NOTE: this RUN command will need to be updated if 'blueskykml' is ever
-#   updated in setup.py
+# blueskykml and consume are relatively static these days; so, install them
+# here in order to avoid reinstalling them and their large dependencies
+# (Pillow==2.8.1, 9.0MB, and matplotlib==1.4.3, 50.4MB, for blueskykml;
+# pandas, etc. for consume) everytime the the bluesky image is built
+# NOTE: these RUN commands will need to be updated if 'blueskykml'
+#   and/or consume are ever updated in setup.py
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
     -i http://pypi.smoke.airfire.org/simple blueskykml==1.*
+RUN pip3 install --trusted-host pypi.smoke.airfire.org \
+    -i http://pypi.smoke.airfire.org/simple apps-consume4==4.1.*
 
 RUN apt-get install -y \
         vim
 
-## Install The bluesky Package
-
-# Notes:
-#  - if you don't specify gdal==1.11.3, version pip will try to install version
-#    2.* for rasterstats, which will fail.
-#  - if you don't specify bluesky version, and if you've already built the
-#    complete docker image, a cached older version of bluesky will be
-#    included in the image
-RUN pip3 install --trusted-host pypi.smoke.airfire.org \
-    -i http://pypi.smoke.airfire.org/simple bluesky==2.3.0
-
-### To install from github instead of from AirFire's pypi server
-# RUN pip3 install --no-binary gdal  \
-#     --trusted-host pypi.smoke.airfire.org \
-#     -i http://pypi.smoke.airfire.org/simple \
-#     https://github.com/pnwairfire/bluesky/archive/branch-name.tar.gz \
-#     gdal==1.11.3
-
 # Install bluesky utils for merging emissions, etc.
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
     -i http://pypi.smoke.airfire.org/simple blueskyutils>=0.2.0
+
+## Install The bluesky Package
+
+RUN mkdir /tmp/bluesky/
+WORKDIR /tmp/bluesky/
+COPY bluesky/ /tmp/bluesky/bluesky/
+COPY bin/ /tmp/bluesky/bin/
+COPY setup.py /tmp/bluesky/setup.py
+COPY requirements.txt /tmp/bluesky/requirements.txt
+COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
+RUN pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
+RUN python3 setup.py install
+
 
 # default command is to display bsp help string
 CMD ["bsp", "-h"]
