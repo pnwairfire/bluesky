@@ -122,9 +122,10 @@ def _fix_pm25_key(emissions):
     for k in emissions:
         if k == 'PM2.5':
             emissions['PM25'] = emissions.pop('PM2.5')
-        elif k == 'NMOC':
-            # Total non-methane VOCs
-            emissions['VOC'] = emissions.pop('NMOC')
+        # TODO: find out if NMOC can be interpreted as VOC
+        # elif k == 'NMOC':
+        #     # Total non-methane VOCs
+        #     emissions['VOC'] = emissions.pop('NMOC')
         elif isinstance(emissions[k], dict):
             _fix_pm25_key(emissions[k])
 
