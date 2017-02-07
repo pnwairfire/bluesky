@@ -68,29 +68,6 @@ RUN apt-get update \
     && apt-get install -y \
         openmpi-bin
 
-# mapserver and mapscript are needed to lookup ecoregion in consume, if fire
-# doesn't already have it defined.
-# TODO: figure out way to install mapscript for python 3, and install it with
-# `mapserver-bin`. I tried:
-#   1) `apt` to install python-mapscript
-#         RUN apt-get install -y \
-#             python-mapscript
-#      but this is the python 2 binding
-#   2) Using alternate PPA, gwibber-daily/ppa, to install ubuntugis-stable
-#      a) tried add-apt-repository
-#           RUN add-apt-repository ppa:gwibber-daily/ppa \
-#               && apt-get update \
-#               && apt-get install -y ubuntugis-stable
-#         but this failed because add-apt-repository doesn't exist
-#      b) tried manually adding repository:
-#           RUN echo 'deb http://ppa.launchpad.net/ubuntugis/ppa/ubuntu trusty main' >> /etc/apt/sources.list \
-#               && echo 'deb-src http://ppa.launchpad.net/ubuntugis/ppa/ubuntu trusty main' >> /etc/apt/sources.list \
-#               && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 089EBE08314DF160 \
-#               && apt-get update \
-#               && apt-get install -y ubuntugis-stable
-#         but this failed on the `apt-get install` command with
-#         `E: Unable to locate package ubuntugis-unstable` errlr
-
 RUN pip3 install --upgrade pip
 
 # blueskykml and consume are relatively static these days; so, install them

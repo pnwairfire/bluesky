@@ -25,29 +25,6 @@ Additionally, on ubuntu, you'll need to install libxml
 
     sudo apt-get install libxml2-dev libxslt1-dev
 
-### consumption
-
-The CONSUME consumption model requires ecoregion to be defined for each fire.
-If not defined, ecoregion is looked up by a module that has various
-dependencies, include ```gdal```, ```freetype```, ```mapserver```, and the
-```mapscript``` python package.
-
-On Mac OSX, you can find installers for mapserver
-[here](http://www.kyngchaos.com/software/mapserver) and the other
-[dependencies](http://www.kyngchaos.com/software/frameworks#other_frameworks).
-on http://www.kyngchaos.com/software/unixport.
-
-On Ubuntu, install freetype, mapserver and mapscript with apt:
-
-    RUN apt-get install -y \
-        libfreetype6-dev \
-        mapserver-bin \
-        python-mapscript
-
-(The [fccsmap github page](https://github.com/pnwairfire/fccsmap)
-covers installing gdal and other dependencies that are also required
-for ecoregion lookup.)
-
 ### localmet
 
 The localmet module relies on the fortran arl profile utility. It is
@@ -1413,7 +1390,7 @@ the fire data, each module has its own set of required and optional fields.
 ##### consumption
 
  - ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
-  - ***'config' > 'consumption' > 'default_ecoregion'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails (such as due to missing `mapscript` library); e.g. 'western', 'southern', 'boreal'
+  - ***'config' > 'consumption' > 'default_ecoregion'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
 
 ##### emissions
 
