@@ -43,6 +43,7 @@ class EcoregionLookup(object):
                 "Invalid lat,lng: {},{}".format(lat, lng))
 
     def lookup(self, lat, lng):
+        logging.debug("Looking up ecoregion for %s, %s", lat, lng)
         self._validate_lat_lng(lat, lng)
 
         # TODO: Handle exceptions here or in calling code ?
@@ -70,8 +71,8 @@ class EcoregionLookup(object):
 
         ecoregion = None
         for sr in self._input:
-            shape = geometry.asShape(sr['geometry'])
-            if shape.contains(point):
+            polygon = geometry.asShape(sr['geometry'])
+            if polygon.contains(point):
                 return sr['properties']['DOMAIN']
 
     ## Ogr
@@ -88,13 +89,12 @@ class EcoregionLookup(object):
             self._input = ogr.GetDriverByName('ESRI Shapefile').Open(
                 ECOREGION_SHAPEFILE)
 
-        lyr_in = self._input.GetLayer(0)
-        idx_reg = lyr_in.GetLayerDefn().GetFieldIndex("DOMAIN")
-        pt = ogr.Geometry(ogr.wkbPoint)
-        pt.SetPoint_2D(0, lng, lat)
-        lyr_in.SetSpatialFilter(pt)
-        for feat_in in lyr_in:
-            # roughly subsets features, instead of go over everything
-            ply = feat_in.GetGeometryRef()
-            if ply.Contains(pt):
-                return feat_in.GetFieldAsString(idx_reg)
+        layer = self._input.GetLayer(0)
+        field_index = layer.GetLayerDefn().GetFieldIndex("DOMAIN")
+        point = ogr.Geometry(ogr.wkbPoint)
+        point.SetPoint_2D(0, lng, lat)
+        layer.SetSpatialFilter(point)
+        for shape in layer:
+            polygon = shape.GetGeometryRef()
+            if polygon.Contains(point):
+                return shape.GetFieldAsString(field_index)
