@@ -52,7 +52,7 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    logging.debug("Running load module")
+    logging.info("Running load module")
     successfully_loaded_sources = []
     sources = fires_manager.get_config_value('load', 'sources', default=[])
     if not sources:

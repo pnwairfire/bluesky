@@ -147,7 +147,7 @@ def run(fires_manager):
     Note: Ingestion typically should only be run once, but the code does *not*
       enforce this.
     """
-    logging.debug("Running ingestion module")
+    logging.info("Running ingestion module")
     try:
         parsed_input = []
         fire_ingester = FireIngester()

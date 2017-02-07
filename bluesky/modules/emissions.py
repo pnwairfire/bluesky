@@ -87,7 +87,7 @@ def run(fires_manager):
 ##
 
 def _run_feps(fires_manager, species, include_emissions_details):
-    logging.debug("Running emissions module FEPS EFs")
+    logging.info("Running emissions module FEPS EFs")
 
     # The same lookup object is used for both Rx and WF
     calculator = EmissionsCalculator(FepsEFLookup(), species=species)
@@ -129,7 +129,7 @@ def _fix_pm25_key(emissions):
             _fix_pm25_key(emissions[k])
 
 def _run_urbanski(fires_manager, species, include_emissions_details):
-    logging.debug("Running emissions module with Urbanski EFs")
+    logging.info("Running emissions module with Urbanski EFs")
 
     # Instantiate two lookup object, one Rx and one WF, to be reused
     fccs2ef_wf = Fccs2Ef(is_rx=False)
@@ -167,7 +167,7 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
 ##
 
 def _run_consume(fires_manager, species, include_emissions_details):
-    logging.debug("Running emissions module with CONSUME")
+    logging.info("Running emissions module with CONSUME")
 
     # look for custom fuel loadings first in the emissions config and then
     # in the consumption config
