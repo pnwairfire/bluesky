@@ -160,8 +160,8 @@ def _validate_input(fires_manager):
                     # and other dependencies installed
                     try:
                         latlng = LatLng(g['location'])
-                        from bluesky.ecoregion.lookup import EcoregionLookup
-                        g['location']['ecoregion'] = EcoregionLookup().lookup(
+                        from bluesky.ecoregion.lookup import lookup_ecoregion
+                        g['location']['ecoregion'] = lookup_ecoregion(
                             latlng.latitude, latlng.longitude)
                     except exceptions.MissingDependencyError:
                         default_ecoregion = fires_manager.get_config_value(
