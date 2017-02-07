@@ -71,7 +71,6 @@ class EcoregionLookup(object):
         ecoregion = None
         for sr in self._input:
             shape = geometry.asShape(sr['geometry'])
-            #import pdb;pdb.set_trace()
             if shape.contains(point):
                 return sr['properties']['DOMAIN']
 

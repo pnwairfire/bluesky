@@ -19,8 +19,7 @@ class BaseLookupEcoregionTest(object):
     def test_valid(self):
         assert 'western' == self.ecoregion_lookup.lookup(45, -118)
         assert 'southern' == self.ecoregion_lookup.lookup(32, -88)
-        # TODO: add a boreal example
-
+        assert 'boreal' == self.ecoregion_lookup.lookup(66, -149)
 
     def test_invalid(self):
         # TODO: raise specific exception in lookup_ecoregion and
