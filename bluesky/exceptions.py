@@ -27,3 +27,7 @@ class MissingDependencyError(ValueError):
 
 class BlueSkyDatetimeValueError(ImportError):
     pass
+
+# TODO: rename this
+class BlueSkyGeographyValueError(ImportError):
+    pass

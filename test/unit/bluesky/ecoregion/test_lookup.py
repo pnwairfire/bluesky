@@ -3,19 +3,28 @@
 
 from py.test import raises
 
-from bluesky.ecoregion import lookup
+from bluesky.ecoregion.lookup import lookup_ecoregion
+from bluesky.exceptions import BlueSkyGeographyValueError
 
 class TestEcoregionLookup(object):
 
     def test_valid(self):
-        ecoregion = lookup_ecoregion(45, -122)
-        # TODO: assert ecoregion is correct
+        assert 'western' == lookup_ecoregion(45, -118)
+        assert 'southern' == lookup_ecoregion(32, -88)
+        # TODO: add a boreal example
 
-    def test_file_doesnt_exist(self):
+
+    def test_invalid(self):
         # TODO: raise specific exception in lookup_ecoregion and
         #   update this code with that exception class
-        with raises(Exception) as e_info:
-            lookup(45, -130) # TODO: make sure this is in the ocean
+        with raises(BlueSkyGeographyValueError) as e_info:
+            lookup_ecoregion(28, -182)
 
-        # TODO: another example on land but outside of shapefile area
+        with raises(BlueSkyGeographyValueError) as e_info:
+            lookup_ecoregion(99, -122)
 
+        # water
+        assert None == lookup_ecoregion(28, -88)
+
+        # on land but outside of shapefile area
+        assert None == lookup_ecoregion(19, -100)

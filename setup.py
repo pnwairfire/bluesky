@@ -54,7 +54,9 @@ setup(
         "met>=1.1.0,<2.0.0",
         "plumerise==1.*",
         "blueskykml==1.*",
-        "apps-consume4==4.1.*"
+        "apps-consume4==4.1.*",
+        "Fiona==1.7.2",
+        "shapely==1.5.7"
     ],
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/pyairfire/",
