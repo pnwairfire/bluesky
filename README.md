@@ -2016,10 +2016,11 @@ the base docker container.  Use its '-h' option for usage and options.
 #### Running docker in interactive mode
 
 Sometimes, it's useful to open a terminal within the docker container. For
-example, you may want to use pdb to debug your code.  To do so, use the '-t'
-and '-i' options and run bash. The follosing example assumes that your bluesky
-repo is in $HOME/code/pnwairfire-bluesky/, you've got NAM84 met data in
-$HOME/NAM84, and you want your bsp ouput in $HOME/docker-bsp-output/
+example, you may want to use pdb or ipdb to debug your code.  To do so,
+use the '-t' and '-i' options and run bash. The following example assumes
+that your bluesky repo is in $HOME/code/pnwairfire-bluesky/, that you've got
+NAM84 met data in $HOME/NAM84, and that you want your bsp ouput in
+$HOME/docker-bsp-output/
 
 
     docker run --rm -ti \
