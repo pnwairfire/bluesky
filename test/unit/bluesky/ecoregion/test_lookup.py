@@ -3,14 +3,22 @@
 
 from py.test import raises
 
-from bluesky.ecoregion.lookup import lookup_ecoregion_shapely, lookup_ecoregion_ogr
-from bluesky.exceptions import BlueSkyGeographyValueError
+from bluesky.ecoregion.lookup import EcoregionLookup
+from bluesky.exceptions import (
+    BlueSkyGeographyValueError,
+    BlueSkyConfigurationError
+)
 
-class TestLookupEcoregion(object):
+class TestInvalidImplemenation(object):
+    def test(self):
+        with raises(BlueSkyConfigurationError) as e_info:
+            EcoregionLookup(implementation='sdfsd')
+
+class BaseLookupEcoregionTest(object):
 
     def test_valid(self):
-        assert 'western' == lookup_ecoregion_shapely(45, -118)
-        assert 'southern' == lookup_ecoregion_shapely(32, -88)
+        assert 'western' == self.ecoregion_lookup.lookup(45, -118)
+        assert 'southern' == self.ecoregion_lookup.lookup(32, -88)
         # TODO: add a boreal example
 
 
@@ -18,36 +26,23 @@ class TestLookupEcoregion(object):
         # TODO: raise specific exception in lookup_ecoregion and
         #   update this code with that exception class
         with raises(BlueSkyGeographyValueError) as e_info:
-            lookup_ecoregion_shapely(28, -182)
+            self.ecoregion_lookup.lookup(28, -182)
 
         with raises(BlueSkyGeographyValueError) as e_info:
-            lookup_ecoregion_shapely(99, -122)
+            self.ecoregion_lookup.lookup(99, -122)
 
         # water
-        assert None == lookup_ecoregion_shapely(28, -88)
+        assert None == self.ecoregion_lookup.lookup(28, -88)
 
         # on land but outside of shapefile area
-        assert None == lookup_ecoregion_shapely(19, -100)
+        assert None == self.ecoregion_lookup.lookup(19, -100)
 
-class TestLookupEcoregionOgr(object):
+class TestLookupEcoregionShapely(BaseLookupEcoregionTest):
 
-    def test_valid(self):
-        assert 'western' == lookup_ecoregion_ogr(45, -118)
-        assert 'southern' == lookup_ecoregion_ogr(32, -88)
-        # TODO: add a boreal example
+    def setup(self):
+        self.ecoregion_lookup = EcoregionLookup(implementation='shapely')
 
+class TestLookupEcoregionOgr(BaseLookupEcoregionTest):
 
-    def test_invalid(self):
-        # TODO: raise specific exception in lookup_ecoregion and
-        #   update this code with that exception class
-        with raises(BlueSkyGeographyValueError) as e_info:
-            lookup_ecoregion_ogr(28, -182)
-
-        with raises(BlueSkyGeographyValueError) as e_info:
-            lookup_ecoregion_ogr(99, -122)
-
-        # water
-        assert None == lookup_ecoregion_ogr(28, -88)
-
-        # on land but outside of shapefile area
-        assert None == lookup_ecoregion_ogr(19, -100)
+    def setup(self):
+        self.ecoregion_lookup = EcoregionLookup(implementation='ogr')

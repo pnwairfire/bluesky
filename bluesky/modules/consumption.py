@@ -139,7 +139,9 @@ def _run_fuelbed(fb, fuel_loadings_manager, location, burn_type, msg_level):
             "{} fuelbed {}".format(fire.id, fb['fccs_id']))
 
 
+
 def _validate_input(fires_manager):
+    ecoregion_lookup = None # instantiate only if necessary
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             if not fire.get('growth'):
@@ -160,8 +162,13 @@ def _validate_input(fires_manager):
                     # and other dependencies installed
                     try:
                         latlng = LatLng(g['location'])
-                        from bluesky.ecoregion.lookup import lookup_ecoregion
-                        g['location']['ecoregion'] = lookup_ecoregion(
+                        if not ecoregion_lookup:
+                            from bluesky.ecoregion.lookup import EcoregionLookup
+                            implemenation = fires_manager.get_config_value(
+                                'consumption', 'ecoregion_lookup_implemenation',
+                                default='ogr')
+                            ecoregion_lookup = EcoregionLookup(implemenation)
+                        g['location']['ecoregion'] = ecoregion_lookup.lookup(
                             latlng.latitude, latlng.longitude)
                     except exceptions.MissingDependencyError:
                         default_ecoregion = fires_manager.get_config_value(
