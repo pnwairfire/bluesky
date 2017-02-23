@@ -1820,12 +1820,13 @@ First create the container, if not already created:
 Copy the required executables:
 
     docker cp /path/to/profile bluesky:/usr/local/bin/profile
-    docker cp /path/to/mpiexec bluesky:/usr/local/bin/mpiexec
     docker cp /path/to/hycm_std bluesky:/usr/local/bin/hycm_std
     docker cp /path/to/hycs_std bluesky:/usr/local/bin/hycs_std
     docker cp /path/to/hysplit2netcdf bluesky:/usr/local/bin/hysplit2netcdf
     docker cp /path/to/vsmoke bluesky:/usr/local/bin/vsmoke
     docker cp /path/to/vsmkgs bluesky:/usr/local/bin/vsmkgs
+    docker cp /path/to/feps_plumerise bluesky:/usr/local/bin/feps_plumerise
+    docker cp /path/to/feps_weather bluesky:/usr/local/bin/feps_weather
 
 Once you've installed the executables, commit the container's changes
 back to the image
