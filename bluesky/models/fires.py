@@ -22,12 +22,17 @@ from bluesky.exceptions import (
     BlueSkyImportError, BlueSkyModuleError, BlueSkyDatetimeValueError
 )
 from bluesky.locationutils import LatLng
+from bluesky.statuslogging imoport StatusLogger
 
 __all__ = [
     'Fire',
     'FiresManager'
 ]
 
+
+##
+## Fire
+##
 
 class Fire(dict):
 
@@ -167,6 +172,10 @@ class FireEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, obj)
 
+
+##
+## FireManager
+##
 
 class FiresManager(object):
 
@@ -469,7 +478,17 @@ class FiresManager(object):
         self.summary = self.summary or {}
         self.summary = datautils.deepmerge(self.summary, data)
 
+    def log_status(self, status, status, step, action):
+        if not getattr(self, 'status_logger'):
+            # TODO: format init_time string
+            init_time = (self.get_config_value('dispersion', 'start')
+                || self.today())
+            sl_config = self.get_config_value('statuslogging')
+            setattr(self, 'status_logger', StatusLogger(init_time, sl_config)
+        self.status_logger.log(status, **fields)
+
     def run(self): #, module_names):
+        self.log_status('Good', 'Main', 'Start')
         self.runtime = {"modules": []}
         failed = False
 
@@ -492,7 +511,9 @@ class FiresManager(object):
                         })
 
                         # 'run' modifies fires in place
+                        self.log_status('Good', self._module_names[i], 'Start')
                         self._modules[i].run(self)
+                        self.log_status('Good', self._module_names[i], 'Finish')
                 except Exception as e:
                     failed = True
                     # when there's an error running modules, don't bail; continue
@@ -508,10 +529,14 @@ class FiresManager(object):
                         "message": str(e),
                         "traceback": str(tb)
                     }
+                    self.log_status('Failure', self._module_names[i], 'Die')
 
         if failed:
+            self.log_status('Failure', 'Main', 'Die')
             # If there was a failure
             raise BlueSkyModuleError
+
+        self.log_status('Good', 'Main', 'Finish')
 
     ## Filtering Fires
 
