@@ -1,4 +1,3 @@
-
 """bluesky.modules.consumption"""
 
 __author__ = "Joel Dubowy"
