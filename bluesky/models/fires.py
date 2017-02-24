@@ -22,7 +22,7 @@ from bluesky.exceptions import (
     BlueSkyImportError, BlueSkyModuleError, BlueSkyDatetimeValueError
 )
 from bluesky.locationutils import LatLng
-from bluesky.statuslogging imoport StatusLogger
+from bluesky.statuslogging import StatusLogger
 
 __all__ = [
     'Fire',
@@ -478,14 +478,14 @@ class FiresManager(object):
         self.summary = self.summary or {}
         self.summary = datautils.deepmerge(self.summary, data)
 
-    def log_status(self, status, status, step, action):
-        if not getattr(self, 'status_logger'):
+    def log_status(self, status, step, action, **extra_fields):
+        if not getattr(self, '_status_logger'):
             # TODO: format init_time string
             init_time = (self.get_config_value('dispersion', 'start')
-                || self.today())
+                or self.today())
             sl_config = self.get_config_value('statuslogging')
-            setattr(self, 'status_logger', StatusLogger(init_time, sl_config)
-        self.status_logger.log(status, **fields)
+            setattr(self, '_status_logger', StatusLogger(init_time, **sl_config))
+        self._status_logger.log(status, step, action, **extra_fields)
 
     def run(self): #, module_names):
         self.log_status('Good', 'Main', 'Start')
