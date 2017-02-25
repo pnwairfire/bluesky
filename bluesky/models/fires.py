@@ -480,7 +480,7 @@ class FiresManager(object):
 
     def log_status(self, status, step, action, **extra_fields):
         if not getattr(self, '_status_logger'):
-            # TODO: format init_time string
+            # init_time will be converted to string if it's datetime.date[time]
             init_time = (self.get_config_value('dispersion', 'start')
                 or self.today())
             sl_config = self.get_config_value('statuslogging')

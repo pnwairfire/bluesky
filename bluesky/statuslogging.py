@@ -8,6 +8,8 @@ import logging
 
 from pyairfire import statuslogging
 
+from bluesky.datetimeutils import parse_datetime
+
 __all__ = [
     'StatusLogger'
 ]
@@ -17,7 +19,9 @@ class StatusLogger(object):
     def __init__(self, init_time, **config): #, log_level):
         self.enabled = config and config.get('enabled')
         if self.enabled:
-            self.init_time = init_time
+            # parse to datetime if necessary and then format appropriately
+            self.init_time = parse_datetime(init_time).strftime('%Y%m%d%H')
+
             # TODO: error handling to catch undefined fields
             self.sl = statuslogging.StatusLogger(
                 config.get('api_endpoint'), config.get('api_key'),
