@@ -33,9 +33,12 @@ class StatusLogger(object):
     #     if name in ('debug', 'info', 'warn', 'error'):
 
     async def _log_async(self, status, **fields):
+        def error_handler(e):
+            logging.warn('Failed to submit status log: %s', e)
+
         try:
             logging.debug('Submitting status log')
-            self.sl.log(status, **fields)
+            self.sl.log(status, error_handler=error_handler, **fields)
             logging.debug('Submitted status log')
         except Exception as e:
             logging.warn('Failed to submit status log: %s', e)
