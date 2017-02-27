@@ -2,6 +2,9 @@ from setuptools import setup, find_packages
 
 from bluesky import __version__
 
+requirements = []
+with open('requirements.txt') as f:
+    requirements = [r for r in f.read().splitlines() if not r.startswith('-')]
 test_requirements = []
 with open('requirements-test.txt') as f:
     test_requirements = [r for r in f.read().splitlines()]
@@ -41,23 +44,7 @@ setup(
     },
     url='https://github.com/pnwairfire/bluesky',
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
-    install_requires=[
-        "pyairfire==3.*",
-        "afconfig==1.*",
-        "afdatetime>=1.0.2,<2.0.0",
-        "afscripting>=1.0.2,<2.0.0",
-        "afweb>=1.1.1,<2.0.0",
-        "eflookup>=1.1.2,<2.0.0",
-        "emitcalc==1.*",
-        "fccsmap==1.*",
-        "timeprofile==1.*",
-        "met>=1.1.1,<2.0.0",
-        "plumerise==1.*",
-        "blueskykml==1.*",
-        "apps-consume4==4.1.*",
-        "Fiona==1.7.2",
-        "shapely==1.5.7"
-    ],
+    install_requires=requirements,
     dependency_links=[
         "https://pypi.smoke.airfire.org/simple/pyairfire/",
         "https://pypi.smoke.airfire.org/simple/afconfig/",
