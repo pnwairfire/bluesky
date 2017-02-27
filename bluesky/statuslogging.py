@@ -61,7 +61,6 @@ class StatusLogger(object):
                 'step': step,
                 'action': action,
                 'timestamp': ts,
-                'machine':  'DETERMINE MACHINE',
                 'domain': self.domain
             }
             fields.update(extra_fields)
