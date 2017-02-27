@@ -51,7 +51,7 @@ setup(
         "emitcalc==1.*",
         "fccsmap==1.*",
         "timeprofile==1.*",
-        "met>=1.1.0,<2.0.0",
+        "met>=1.1.1,<2.0.0",
         "plumerise==1.*",
         "blueskykml==1.*",
         "apps-consume4==4.1.*",
