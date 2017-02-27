@@ -92,16 +92,12 @@ RUN pip3 install --trusted-host pypi.smoke.airfire.org \
 
 RUN mkdir /tmp/bluesky/
 WORKDIR /tmp/bluesky/
-COPY requirements.txt /tmp/bluesky/requirements.txt
-COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
-COPY setup.py /tmp/bluesky/setup.py
-# copy just __init__.py for now to be able to load setup.py for
-# installing dependencies
-COPY bluesky/__init__.py /tmp/bluesky/bluesky/__init__.py
-RUN pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
-# now copy over the the rest of the sourve files
 COPY bluesky/ /tmp/bluesky/bluesky/
 COPY bin/ /tmp/bluesky/bin/
+COPY setup.py /tmp/bluesky/setup.py
+COPY requirements.txt /tmp/bluesky/requirements.txt
+COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
+RUN pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
 RUN python3 setup.py install
 
 
