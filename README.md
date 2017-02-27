@@ -1634,6 +1634,19 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
  - ***'config' > 'export' > 'upload' > 'scp' > 'port'*** - *optional* if uploading via scp (which is currently the only supported upload mode) -- port to use in scp; defaults to 22
  - ***'config' > 'export' > 'upload' > 'scp' > 'dest_dir'*** - *required* if uploading via scp (which is currently the only supported upload mode) -- destination directory on remote host to contain output directory
 
+##### statuslogging
+
+Bluesky supports posting statuses to statuslogging web service.  The
+source code for this service is not yet available, so ignore this section
+unless you have access to it.
+
+ - ***'config' > 'statuslogging' > 'enabled'*** - on/off switch
+ - ***'config' > 'statuslogging' > 'api_endpoint'*** - i.e. http://HOSTNAME/status-logs/",
+ - ***'config' > 'statuslogging' > 'api_key'*** - api key
+ - ***'config' > 'statuslogging' > 'api_secret'*** - api secret
+ - ***'config' > 'statuslogging' > 'process'*** - how you want to identify the process to the status logger
+ - ***'config' > 'statuslogging' > 'domain'*** - how you want to identify the met domain to the status logger
+
 
 ## Datetime Substitutions
 
