@@ -32,14 +32,18 @@ class StatusLogger(object):
     # def __getattr__(self, name):
     #     if name in ('debug', 'info', 'warn', 'error'):
 
-    async def _log_async(self, status, **fields):
+    def _log_async(self, status, **fields):
         def error_handler(e):
             logging.warn('Failed to submit status log: %s', e)
 
-        try:
-            logging.debug('Submitting status log')
+        def _log():
             self.sl.log(status, error_handler=error_handler, **fields)
-            logging.debug('Submitted status log')
+            logging.debug('Submitted status log: %s', fields)
+
+        try:
+            loop = asyncio.get_event_loop()
+            loop.run_in_executor(None, _log)
+
         except Exception as e:
             logging.warn('Failed to submit status log: %s', e)
 
@@ -55,8 +59,6 @@ class StatusLogger(object):
                 'domain': self.domain
             }
             fields.update(extra_fields)
-            logging.debug('Before submitting status log')
-            asyncio.get_event_loop().run_until_complete(self._log_async(**fields))
-            logging.debug('After submitting status log')
+            self._log_async(**fields)
         else:
             logging.debug('Status logging disabled.')
