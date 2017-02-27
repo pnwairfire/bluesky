@@ -98,12 +98,12 @@ RUN pip3 install --trusted-host pypi.smoke.airfire.org \
 
 RUN mkdir /tmp/bluesky/
 WORKDIR /tmp/bluesky/
-COPY bluesky/ /tmp/bluesky/bluesky/
-COPY bin/ /tmp/bluesky/bin/
-COPY setup.py /tmp/bluesky/setup.py
 COPY requirements.txt /tmp/bluesky/requirements.txt
 COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
 RUN pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
+COPY bluesky/ /tmp/bluesky/bluesky/
+COPY bin/ /tmp/bluesky/bin/
+COPY setup.py /tmp/bluesky/setup.py
 RUN python3 setup.py install
 
 
