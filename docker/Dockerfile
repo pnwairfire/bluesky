@@ -81,6 +81,12 @@ RUN pip3 install --trusted-host pypi.smoke.airfire.org \
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
     -i http://pypi.smoke.airfire.org/simple apps-consume4==4.1.*
 
+# Same thing for Fiona (which is 39.7MB)
+# NOTE: asame as above - update this command if we upgrade to a newer version
+#   in setup.py
+RUN pip3 install Fiona==1.7.2
+
+# Having vim is handy
 RUN apt-get install -y \
         vim
 
