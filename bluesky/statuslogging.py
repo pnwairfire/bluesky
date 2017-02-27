@@ -37,24 +37,30 @@ class StatusLogger(object):
             logging.warn('Failed to submit status log: %s', e)
 
         def _log():
-            self.sl.log(status, error_handler=error_handler, **fields)
-            logging.debug('Submitted status log: %s', fields)
+            # We don't need to catch exceptions here, but if we don't,
+            # the failures are silent.
+            try:
+                self.sl.log(status, error_handler=error_handler, **fields)
+                logging.debug('Submitted status log: %s', fields)
+            except Exception as e:
+                logging.warn('Failed to submit status log: %s', e)
 
         try:
             loop = asyncio.get_event_loop()
             loop.run_in_executor(None, _log)
 
         except Exception as e:
-            logging.warn('Failed to submit status log: %s', e)
+            logging.warn('Failed to asynchronously submit status log: %s', e)
 
     def log(self, status, step, action, **extra_fields):
         if self.enabled:
+            ts = datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
             fields = {
                 'initialization_time': self.init_time,
                 'status': status,
                 'step': step,
                 'action': action,
-                'timestamp': datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ'),
+                'timestamp': ts,
                 'machine':  'DETERMINE MACHINE',
                 'domain': self.domain
             }
