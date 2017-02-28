@@ -193,12 +193,18 @@ OPTIONAL_LOCATION_FIELDS = [
     # SF2 weather, moisture, etc. fields
     'elevation','slope',
     'state','county','country',
+    # TODO: should we ignore 'fuel_*' and other fuel category fields, unless
+    #   we're going to translate them to a formate that bsp recognizes?
     'fuel_1hr','fuel_10hr','fuel_100hr',
     'fuel_1khr','fuel_10khr','fuel_gt10khr',
-    'canopy','shrub','grass','rot','duff', 'litter',
+    'canopy','shrub','grass','rot','duff', 'litter', 'VEG',
+    # TODO: should we ignore moisture fields, unless we're going to
+    #   translate them to a formate that bsp recognizes?
     'moisture_1hr','moisture_10hr',
     'moisture_100hr','moisture_1khr',
     'moisture_live','moisture_duff',
+    # TODO: should we ignore meteorological fields, unless we're going to
+    #   translate them to a formate that bsp recognizes?
     'min_wind','max_wind',
     'min_wind_aloft', 'max_wind_aloft',
     'min_humid','max_humid',
@@ -206,7 +212,13 @@ OPTIONAL_LOCATION_FIELDS = [
     'min_temp_hour','max_temp_hour',
     'sunrise_hour','sunset_hour',
     'snow_month','rain_days'
-    # TODO: fill in others
+    # Ignore SF2 consumption, heat, and emissions fields, since bsp
+    # will calculate them:
+    #   'consumption_flaming', 'consumption_smoldering',
+    #   'consumption_residual', 'consumption_duff', 'heat',
+    #   'pm25', 'pm10', 'co', 'co2', 'ch4', 'nox', 'nh3', 'so2', 'voc'
+    # Ignore 'timezone' here. (There's a TODO, below, to use it)
+    # Other SF2 fields are mentioned in a TODO, below
 ]
 for a in list(consumeutils.SETTINGS.values()):
     for b in a:
