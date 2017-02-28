@@ -482,7 +482,7 @@ class FiresManager(object):
         if not getattr(self, '_status_logger'):
             # init_time will be converted to string if it's datetime.date[time]
             init_time = (self.get_config_value('dispersion', 'start')
-                or self.today())
+                or self.today)
             sl_config = self.get_config_value('statuslogging') or {}
             setattr(self, '_status_logger', StatusLogger(init_time, **sl_config))
         self._status_logger.log(status, step, action, **extra_fields)
