@@ -80,11 +80,15 @@ def _get_heat(fire, g):
 
 def _get_emissions_species(species):
     def f(fire, g):
-        if fire.get('fuelbeds'):
-            species_array = [
-                fb.get('emissions', {}).get('total', {}).get(species)
-                    for fb in fire['fuelbeds']
-            ]
+        if g.get('fuelbeds'):
+            species_array = []
+            for fb in g['fuelbeds']:
+                total = fb.get('emissions', {}).get('total', {})
+                # Try species as is, as all lowercase, and as all uppercase
+                # append even if not defined, since we check bdlow if all or none
+                species_array.append(
+                    total.get(species) or total.get(species.lower()) or total.get(species.upper())
+                )
             # non-None value will be returned if species is defined for all fuelbeds
             if not any([v is None for v in species_array]):
                 return sum([sum(a) for a in species_array])
