@@ -193,11 +193,6 @@ OPTIONAL_LOCATION_FIELDS = [
     # SF2 weather, moisture, etc. fields
     'elevation','slope',
     'state','county','country',
-    # TODO: should we ignore 'fuel_*' and other fuel category fields, unless
-    #   we're going to translate them to a formate that bsp recognizes?
-    'fuel_1hr','fuel_10hr','fuel_100hr',
-    'fuel_1khr','fuel_10khr','fuel_gt10khr',
-    'canopy','shrub','grass','rot','duff', 'litter', 'VEG',
     # TODO: should we ignore moisture fields, unless we're going to
     #   translate them to a formate that bsp recognizes?
     'moisture_1hr','moisture_10hr',
@@ -212,6 +207,10 @@ OPTIONAL_LOCATION_FIELDS = [
     'min_temp_hour','max_temp_hour',
     'sunrise_hour','sunset_hour',
     'snow_month','rain_days'
+    # Ignore SF2 fuel category fields, since bsp computes them
+    #   'fuel_1hr','fuel_10hr','fuel_100hr',
+    #   'fuel_1khr','fuel_10khr','fuel_gt10khr',
+    #   'canopy','shrub','grass','rot','duff', 'litter', 'VEG',
     # Ignore SF2 consumption, heat, and emissions fields, since bsp
     # will calculate them:
     #   'consumption_flaming', 'consumption_smoldering',
