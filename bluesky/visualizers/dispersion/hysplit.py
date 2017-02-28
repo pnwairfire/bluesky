@@ -118,7 +118,7 @@ SIMPLE_GROWTH_LOCATION_FIELDS = [
 FIRE_LOCATIONS_CSV_FIELDS = (
     [
         ('id', lambda f, g: f.id),
-        ('event_guid', lambda f, g: f.get('event_of', {}).get('id')),
+        ('event_id', lambda f, g: f.get('event_of', {}).get('id')),
         ('latitude', lambda f, g: locationutils.LatLng(g['location']).latitude),
         ('longitude', lambda f, g: locationutils.LatLng(g['location']).longitude),
         # Note: We're keeping the 'type' field consistent with the csv files
