@@ -206,6 +206,9 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
             # consume.FuelConsumption must be instantiated with fccs_file=""
             return ""
 
+        # TODO: wrap self._generate(fccs_id) in try/except, and return
+        #   empty string on failure?  (maybe not, since we might not want
+        #   to silently use default fuel_loadings when alternate is specified)
         return self._generate(fccs_id)
 
     ##
