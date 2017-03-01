@@ -168,7 +168,13 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
 """
 
     def __init__(self, all_fuel_loadings={}):
-        self._all_fuel_loadings = all_fuel_loadings
+        # convert all keys to lowercase (e.g. in case
+        # 'Total_available_fuel_loading' is used instead of
+        # 'total_available_fuel_loading')
+        self._all_fuel_loadings = {}
+        for fccs_id, loadings in all_fuel_loadings.items():
+            self._all_fuel_loadings[fccs_id] = {k.lower(): v for k, v in loadings.items()}
+
         self._default_fuel_loadings = {}
         self._default_fccsdb_obj = None # lazy instantiate
         self._custom = {}
