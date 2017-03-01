@@ -1,0 +1,24 @@
+{
+    "fire_information": [
+        {
+            "type": "wildfire",
+            "id": "klajsdhfaksjdhfk",
+            "growth": [
+                {
+                    "location": {
+                        "longitude": -122.3125869,
+                        "utc_offset": "-07:00",
+                        "latitude": 47.6093896,
+                        "area": 1000
+                    },
+                    "end": "2015-01-21T17:00:00",
+                    "start": "2015-01-20T17:00:00"
+                }
+            ],
+            "event_of": {
+                "name": "Fake Fire in Seattle, WA",
+                "id": "sdlkjfsdl"
+            }
+        }
+    ]
+}
