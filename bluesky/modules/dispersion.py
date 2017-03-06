@@ -64,11 +64,15 @@ def run(fires_manager):
     # TODO: add information to fires_manager indicating where to find the hysplit output
 
 def _filter_met(met, start, num_hours):
-    # limit met to only what's needed to cover dispersion window
-    end = start + datetime.timedelta(hours=num_hours)
-
     # the passed-in met is a reference to the fires_manager's met, so copy it
     met = copy.deepcopy(met)
+
+    if not met:
+        # return `met` in case it's a dict and dict is expected downstream
+        return met
+
+    # limit met to only what's needed to cover dispersion window
+    end = start + datetime.timedelta(hours=num_hours)
 
     # Note: we don't store the parsed first and last hour values
     # because they aren't used outside of this method, and they'd
