@@ -76,6 +76,12 @@ class VSMOKEDispersion(DispersionBase):
         self._my_kmz = KMZAnimation(doc_kml, self.config("OVERLAY_TITLE"),
             self._legend_image)
 
+    def _compute_local_dt(self, fire, hr):
+        dt = self._model_start + timedelta(hours=hr)
+        local_dt = dt + timedelta(hours=fire.utc_offset)
+        # TODO: will fire.timeprofiled_emissions always have string value keys
+        return local_dt.strftime('%Y-%m-%dT%H:%M:%S')
+
     def _run(self, wdir):
         """Runs vsmoke
 
@@ -106,13 +112,12 @@ class VSMOKEDispersion(DispersionBase):
 
             # Run VSMOKE GIS for each hour
             for hr in range(self._num_hours):
-                dt = self._model_start + timedelta(hours=hr)
-                local_dt = dt + timedelta(hours=fire.utc_offset)
+                local_dt = self._compute_local_dt(fire, hr)
                 self._write_iso_input(fire, local_dt, in_var)
 
                 self._execute(self.BINARIES['VSMOKEGIS'], working_dir=wdir)
 
-                # TODO: replace 'hr' with 'local_dt.isoformat()'
+                # TODO: replace 'hr' with 'local_dt'
                 suffix = "{}_hour{}".format(fire.id, str(hr+1))
                 self._archive_file("vsmkgs.iso", src_dir=wdir, suffix=suffix)
                 self._archive_file("vsmkgs.opt", src_dir=wdir, suffix=suffix)
@@ -244,8 +249,7 @@ class VSMOKEDispersion(DispersionBase):
                 )
 
             for hour in range(self._num_hours):
-                dt = self._model_start + timedelta(hours=hour)
-                local_dt = dt + timedelta(hours=fire.utc_offset)
+                local_dt = self._compute_local_dt(fire, hour)
 
                 heat = fire.get('heat', 0.0)
                 emtqh = (heat) / 3414425.94972     # Btu to MW
