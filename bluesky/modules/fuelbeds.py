@@ -114,16 +114,25 @@ class Estimator(object):
         fuelbed_info = {}
         if growth_obj['location'].get('shape_file'):
             raise NotImplementedError("Importing of shape data from file not implemented")
-        if growth_obj['location'].get('geojson'):
+
+        elif growth_obj['location'].get('geojson'):
             fuelbed_info = self.lookup.look_up(growth_obj['location']['geojson'])
             # fuelbed_info['area'] is in m^2
             # TDOO: only use fuelbed_info['area'] if growth_obj['location']['area']
             # isn't already defined?
             if fuelbed_info and fuelbed_info.get('area'):
                 growth_obj['location']['area'] = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
+
         elif growth_obj['location'].get('latitude') and growth_obj['location'].get('longitude'):
-            fuelbed_info = self.lookup.look_up_by_lat_lng(
-                growth_obj['location']['latitude'], growth_obj['location']['longitude'])
+            geo_data = {
+                "type": "Point",
+                "coordinates": [
+                    growth_obj['location']['longitude'],
+                    growth_obj['location']['latitude']
+                ]
+            }
+            fuelbed_info = self.lookup.look_up(geo_data)
+
         else:
             raise ValueError("Insufficient data for looking up fuelbed information")
 

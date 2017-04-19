@@ -159,25 +159,21 @@ class BaseTestEstimatorEstimate(object):
 
     def test_none_lookup_info(self):
         self.estimator.lookup.look_up = lambda p: None
-        self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: None
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.growth_obj)
 
     def test_empty_lookup_info(self):
         self.estimator.lookup.look_up = lambda p: {}
-        self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: {}
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.growth_obj)
 
     def test_lookup_info_percentages_less_than_100(self):
         self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_30
-        self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: FUELBED_INFO_60_30
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.growth_obj)
 
     def test_lookup_info_percentages_greater_than_100(self):
         self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_40_10
-        self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: FUELBED_INFO_60_40_10
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.growth_obj)
 
@@ -185,7 +181,6 @@ class BaseTestEstimatorEstimate(object):
 
     def test_no_truncation(self):
         self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_40
-        self.estimator.lookup.look_up_by_lat_lng = lambda lat, lng: FUELBED_INFO_60_40
         expected_fuelbeds = [
             {'fccs_id': '46', 'pct': 60},
             {'fccs_id': '47', 'pct': 40}

@@ -7,7 +7,7 @@ afscripting>=1.0.2,<2.0.0
 afweb>=1.1.1,<2.0.0
 eflookup>=1.1.2,<2.0.0
 emitcalc==1.*
-fccsmap==1.*
+fccsmap==2.1.0
 timeprofile==1.*
 met>=1.1.1,<2.0.0
 plumerise==1.*
