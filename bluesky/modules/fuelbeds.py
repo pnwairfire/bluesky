@@ -131,6 +131,7 @@ class Estimator(object):
                     growth_obj['location']['latitude']
                 ]
             }
+            logging.debug("Converted lat,lng to geojson: %s", geo_data)
             fuelbed_info = self.lookup.look_up(geo_data)
 
         else:
