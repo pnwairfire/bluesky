@@ -667,7 +667,7 @@ class FiresManager(object):
         # were in the input
 
         counts = {
-            'fires': len(self._fires)
+            'fires': len(self.fires)
         }
         if self.skip_failed_fires:
             counts['failed_fires'] = len(self.failed_fires or [])
