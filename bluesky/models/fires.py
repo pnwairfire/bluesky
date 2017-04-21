@@ -665,7 +665,14 @@ class FiresManager(object):
         # TODO: keep track of whether modules were specified in the input
         # json or on the command line, and add them to the output if they
         # were in the input
-        return dict(self._meta, fire_information=self.fires)
+
+        counts = {
+            'fires': len(self._fires)
+        }
+        if self.skip_failed_fires:
+            counts['failed_fires'] = len(self.failed_fires or [])
+
+        return dict(self._meta, fire_information=self.fires, counts=counts)
 
     def dumps(self, output_stream=None, output_file=None):
         if output_stream and output_file:
