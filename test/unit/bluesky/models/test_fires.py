@@ -516,7 +516,10 @@ class TestFiresManager(object):
             "today": "2016-04-20",
             "config": {},
             "fire_information": fire_objects,
-            "foo": {"bar": "baz"}
+            "foo": {"bar": "baz"},
+            "counts": {
+                "fires": 2
+            }
         }
 
         assert expected == json.loads(self._output.getvalue())
