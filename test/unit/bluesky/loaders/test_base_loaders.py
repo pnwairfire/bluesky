@@ -8,7 +8,7 @@ import tempfile
 from py.test import raises
 
 from bluesky.exceptions import BlueSkyConfigurationError
-from bluesky.loaders import BaseFileLoader
+from bluesky.loaders import BaseJsonFileLoader, BaseCsvFileLoader
 
 class TestBaseFileLoader(object):
 
@@ -17,21 +17,37 @@ class TestBaseFileLoader(object):
 
     def test_file_not_defined(self):
         filename = os.path.join(self._temp_dir, "fires.json")
+
         with raises(BlueSkyConfigurationError) as e_info:
-            l = BaseFileLoader()
+            l = BaseJsonFileLoader()
+        assert e_info.value.args[0] == 'Fires file to load not specified'.format(filename)
+
+        with raises(BlueSkyConfigurationError) as e_info:
+            l = BaseCsvFileLoader()
         assert e_info.value.args[0] == 'Fires file to load not specified'.format(filename)
 
     def test_file_doesnt_exist(self):
         filename = os.path.join(self._temp_dir, "fires.json")
         with raises(BlueSkyConfigurationError) as e_info:
-            l = BaseFileLoader(file=filename)
+            l = BaseJsonFileLoader(file=filename)
+        assert e_info.value.args[0] == 'Fires file to load {} does not exist'.format(filename)
+
+        with raises(BlueSkyConfigurationError) as e_info:
+            l = BaseJsonFileLoader(file=filename)
         assert e_info.value.args[0] == 'Fires file to load {} does not exist'.format(filename)
 
     def test_file_exists(self):
         filename = os.path.join(self._temp_dir, "fires.json")
+
         with open(filename, 'w') as f:
             f.write('{}')
-        l = BaseFileLoader(file=filename)
+        l = BaseJsonFileLoader(file=filename)
+        assert l._filename == filename
+        assert l._events_filename == None
+
+        with open(filename, 'w') as f:
+            f.write('{}')
+        l = BaseCsvFileLoader(file=filename)
         assert l._filename == filename
         assert l._events_filename == None
 
