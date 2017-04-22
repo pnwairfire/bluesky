@@ -424,6 +424,17 @@ class FiresManager(object):
             return sorted(end_times)[-1]
         # TODO: else try to determine from "met", if defined (?)
 
+    @property
+    def counts(self):
+        counts = {
+            'fires': len(self.fires)
+        }
+        if self.skip_failed_fires:
+            counts['failed_fires'] = len(self.failed_fires or [])
+        logging.info("Fire counts: %s", counts)
+        return counts
+
+
     ##
     ## Meta Properties
     ##
@@ -666,14 +677,7 @@ class FiresManager(object):
         # json or on the command line, and add them to the output if they
         # were in the input
 
-        counts = {
-            'fires': len(self.fires)
-        }
-        if self.skip_failed_fires:
-            counts['failed_fires'] = len(self.failed_fires or [])
-        logging.info("Final counts: %s", counts)
-
-        return dict(self._meta, fire_information=self.fires, counts=counts)
+        return dict(self._meta, fire_information=self.fires, counts=self.counts)
 
     def dumps(self, output_stream=None, output_file=None):
         if output_stream and output_file:
