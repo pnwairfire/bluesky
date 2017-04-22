@@ -671,6 +671,7 @@ class FiresManager(object):
         }
         if self.skip_failed_fires:
             counts['failed_fires'] = len(self.failed_fires or [])
+        logging.info("Final counts: %s", counts)
 
         return dict(self._meta, fire_information=self.fires, counts=counts)
 
