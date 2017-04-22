@@ -40,7 +40,7 @@ class BaseLoader(object):
     def __init__(self, **config):
         self._config = config
 
-    def _write(self, saved_data_filename, data):
+    def _write_data(self, saved_data_filename, data):
         if filename:
             try:
                 with open(filename) as f:
@@ -147,7 +147,7 @@ class BaseApiLoader(BaseLoader):
         resp = urllib.request.urlopen(req, None, self._request_timeout)
         body =  resp.read().decode('ascii')
 
-        self._write(saved_data_filename, body)
+        self._write_data(saved_data_filename, body)
 
         return body
 
