@@ -1,0 +1,14 @@
+{
+    "config":{
+        "load": {
+            "sources": [
+                {
+                    "name": "smartfire2",
+                    "format": "CSV",
+                    "type": "File",
+                    "file": "/bluesky/data/fires/fire_locations_{today:%Y%m%d}.csv"
+                }
+            ]
+        }
+    }
+}
