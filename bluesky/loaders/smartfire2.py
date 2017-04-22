@@ -19,7 +19,8 @@ class CsvFileLoader(BaseFileLoader):
         super(CsvFileLoader, self).__init__(**config)
 
     def load(self):
-        fires = self._load_csv_file(self._filename)
+        fires = self._load_csv_file(self._filename,
+            saved_copy_filename=self._saved_copy_filename)
         if self._events_filename:
             events_by_id = self._load_events_file(self._events_filename)
             for f in fires:
@@ -33,5 +34,7 @@ class CsvFileLoader(BaseFileLoader):
     def _load_events_file(self, events_filename):
         # Note: events_filename's existence was already verified by
         #  self._get_filename
-        events = self._load_csv_file(events_filename)
+        events = self._load_csv_file(events_filename,
+            saved_copy_filename=self._saved_copy_events_filename)
         return { e.pop('id'): e for e in events}
+

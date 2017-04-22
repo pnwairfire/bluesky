@@ -20,6 +20,7 @@ import json
 import logging
 import os
 import urllib
+import shutil
 
 from afweb import auth
 from pyairfire.io import CSV2JSON
@@ -34,7 +35,34 @@ __all__ = [
     'BaseFileLoader'
 ]
 
-class BaseFileLoader(object):
+class BaseLoader(object):
+
+    def __init__(self, **config):
+        self._config = config
+
+    def _write(self, saved_data_filename, data):
+        if filename:
+            try:
+                with open(filename) as f:
+                    f.write(data)
+            except Exception as e:
+                logging.warn(
+                    "Failed to write loaded data to %s - %s", filename, e)
+
+    def _copy_file(self, original, saved_copy_filename):
+        if saved_copy_filename:
+            try:
+                shutil.copyfile(original, saved_copy_filename)
+            except Exception as e:
+                logging.warn("Failed to copy %s to %s - %s",
+                    original, saved_copy_filename, e)
+
+
+##
+## Files
+##
+
+class BaseFileLoader(BaseLoader):
 
     def __init__(self, **config):
         self._filename = config.get('file')
@@ -44,6 +72,7 @@ class BaseFileLoader(object):
         if not os.path.isfile(self._filename):
             raise BlueSkyConfigurationError("Fires file to "
                 "load {} does not exist".format(self._filename))
+        self._saved_copy_filename = config.get('saved_copy_file')
 
         self._events_filename = None
         if config.get('events_file'):
@@ -51,22 +80,30 @@ class BaseFileLoader(object):
             if not os.path.isfile(self._events_filename):
                 raise BlueSkyConfigurationError("Fire events file to load {} "
                     "does not exist".format(self._events_filename))
+        self._saved_copy_events_filename = config.get('saved_copy_events_file')
 
     ##
     ## File IO
     ##
 
-    def _load_csv_file(self, filename):
+
+    def _load_csv_file(self, filename, saved_copy_filename=None):
+        self._copy_file(filename, saved_copy_filename)
         csv_loader = CSV2JSON(input_file=filename)
         return csv_loader._load()
 
-    def _load_json_file(self, filename):
+    def _load_json_file(self, filename, saved_copy_filename=None):
+        self._copy_file(filename, saved_copy_filename)
         with open(filename, 'r') as f:
             return json.loads(f.read())
 
     # TODO: provide other file reading functionality as needed
 
-class BaseApiLoader(object):
+##
+## API
+##
+
+class BaseApiLoader(BaseLoader):
 
     DEFAULT_KEY_PARAM = "_k"
     DEFAULT_AUTH_PROTOCOL = "afweb"
@@ -92,7 +129,7 @@ class BaseApiLoader(object):
         self._request_timeout = config.get('request_timeout',
             self.DEFAULT_REQUEST_TIMEOUT)
 
-    def get(self, **query):
+    def get(self, saved_data_filename=None, **query):
         if self._secret:
             if self._auth_protocol == 'afweb':
                 url = self._form_url(**query)
@@ -108,7 +145,11 @@ class BaseApiLoader(object):
 
         req = urllib.request.Request(url)
         resp = urllib.request.urlopen(req, None, self._request_timeout)
-        return resp.read().decode('ascii')
+        body =  resp.read().decode('ascii')
+
+        self._write(saved_data_filename, body)
+
+        return body
 
     def _form_url(self, **query):
         query_param_tuples = []
