@@ -7,12 +7,13 @@ import datetime
 import json
 import os
 
-from . import BaseApiLoader, BaseFileLoader
+from . import BaseApiLoader, BaseJsonFileLoader
 from bluesky.datetimeutils import parse_datetime, parse_utc_offset
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
-    'FileLoader'
+    'JsonApiLoader',
+    'JsonFileLoader'
 ]
 
 class BaseFireSpiderLoader(object):
@@ -109,12 +110,10 @@ class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
         return self._marshal(fires, start=self._query.get('start'),
             end=self._query.get('end'))
 
-class JsonFileLoader(BaseFileLoader, BaseFireSpiderLoader):
+class JsonFileLoader(BaseJsonFileLoader, BaseFireSpiderLoader):
     """Loads json formatted fire data from the FireSpider web service
     """
 
-    DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%Z'
-
     def load(self):
-        fires = self._load_json_file(self._filename)['data']
-        return self._marshal(fires)
+        fires_data = super(JsonFileLoader, self).load()
+        return self._marshal(fires_data['data'])

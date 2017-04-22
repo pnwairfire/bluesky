@@ -15,6 +15,7 @@ For example, the smartfire csv file loader is in module
 bluesky.loaders.smartfire.csv and is called FileLoader
 """
 
+import abc
 import datetime
 import json
 import logging
@@ -49,20 +50,12 @@ class BaseLoader(object):
                 logging.warn(
                     "Failed to write loaded data to %s - %s", filename, e)
 
-    def _copy_file(self, original, saved_copy_filename):
-        if saved_copy_filename:
-            try:
-                shutil.copyfile(original, saved_copy_filename)
-            except Exception as e:
-                logging.warn("Failed to copy %s to %s - %s",
-                    original, saved_copy_filename, e)
-
 
 ##
 ## Files
 ##
 
-class BaseFileLoader(BaseLoader):
+class BaseFileLoader(BaseLoader, metaclass=abc.ABCMeta):
 
     def __init__(self, **config):
         self._filename = config.get('file')
@@ -82,22 +75,62 @@ class BaseFileLoader(BaseLoader):
                     "does not exist".format(self._events_filename))
         self._saved_copy_events_filename = config.get('saved_copy_events_file')
 
-    ##
-    ## File IO
-    ##
+    def _copy_file(self, original, saved_copy_filename):
+        if saved_copy_filename:
+            try:
+                shutil.copyfile(original, saved_copy_filename)
+            except Exception as e:
+                logging.warn("Failed to copy %s to %s - %s",
+                    original, saved_copy_filename, e)
+
+    def load(self):
+        fires = self._load(self._filename)
+        self._copy_file(self._filename, self._saved_copy_filename)
+        if self._events_filename:
+            events_by_id = self._load_events_file(self._events_filename)
+            for f in fires:
+                if f.get('event_id') and f['event_id'] in events_by_id:
+                    name = events_by_id[f['event_id']].get('event_name')
+                    if name:
+                        f["name"] = name
+                    # TODO: set any other fields
+        return fires
+
+    def _load_events_file(self, events_filename):
+        # Note: events_filename's existence was already verified by
+        #  self._get_filename
+        events = self._load(events_filename)
+        self._copy_file(events_filename, self._saved_copy_events_filename)
+        return { e.pop('id'): e for e in events}
+
+    @abc.abstractmethod
+    def _load(self):
+        raise NotImplementedError("Implemented by base class")
 
 
-    def _load_csv_file(self, filename, saved_copy_filename=None):
-        self._copy_file(filename, saved_copy_filename)
-        csv_loader = CSV2JSON(input_file=filename)
-        return csv_loader._load()
+class BaseJsonFileLoader(BaseFileLoader):
+    """Loads JSON formatted fire and events data from file
+    """
 
-    def _load_json_file(self, filename, saved_copy_filename=None):
-        self._copy_file(filename, saved_copy_filename)
+    def __init__(self, **config):
+        super(BaseJsonFileLoader, self).__init__(**config)
+
+    def _load(self, filename, saved_copy_filename=None):
         with open(filename, 'r') as f:
             return json.loads(f.read())
 
-    # TODO: provide other file reading functionality as needed
+
+class BaseCsvFileLoader(BaseFileLoader):
+    """Loads csv formatted fire and events data from file
+    """
+
+    def __init__(self, **config):
+        super(BaseCsvFileLoader, self).__init__(**config)
+
+    def _load(self, filename, saved_copy_filename=None):
+        csv_loader = CSV2JSON(input_file=filename)
+        return csv_loader._load()
+
 
 ##
 ## API
