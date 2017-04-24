@@ -1385,7 +1385,7 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### fuelbeds
 
-(None)
+- ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- default ['0', '900']
 
 ##### consumption
 

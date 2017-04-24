@@ -27,6 +27,9 @@ def run(fires_manager):
     logging.info("Running fuelbeds module")
     fires_manager.processed(__name__, __version__,
         fccsmap_version=fccsmap.__version__)
+    fuelbeds_config = dict(fires_manager.get_config_value('fuelbeds'),
+        fccs_version=FCCS_VERSION)
+
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             if not fire.get('growth'):
@@ -42,7 +45,7 @@ def run(fires_manager):
                 #   estimator objects that are reused, and set reference to
                 #   correct one here
                 lookup = FccsLookUp(is_alaska=g['location'].get('state')=='AK',
-                    fccs_version=FCCS_VERSION)
+                    **fuelbeds_config)
                 Estimator(lookup).estimate(g)
 
     # TODO: Add fuel loadings data to each fuelbed object (????)
