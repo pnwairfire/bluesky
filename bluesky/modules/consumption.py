@@ -170,14 +170,25 @@ def _validate_input(fires_manager):
                             ecoregion_lookup = EcoregionLookup(implemenation)
                         g['location']['ecoregion'] = ecoregion_lookup.lookup(
                             latlng.latitude, latlng.longitude)
-                    except exceptions.MissingDependencyError:
-                        default_ecoregion = fires_manager.get_config_value(
-                            'consumption', 'default_ecoregion')
-                        if default_ecoregion:
-                            g['location']['ecoregion'] = default_ecoregion
-                        else:
-                            raise
+                        if not g['location']['ecoregion']:
+                            logging.warn("Failed to look up ecoregion for "
+                                "{}, {}".format(latlng.latitude, latlng.longitude))
+                            _use_default_ecoreion(fires_manager, g)
+
+                    except exceptions.MissingDependencyError as e:
+                        _use_default_ecoreion(fires_manager, g, e)
 
                 for fb in g['fuelbeds'] :
                     if not fb.get('fccs_id') or not fb.get('pct'):
                         raise ValueError("Each fuelbed must define 'fccs_id' and 'pct'")
+
+def _use_default_ecoreion(fires_manager, g, exc=None):
+    default_ecoregion = fires_manager.get_config_value(
+        'consumption', 'default_ecoregion')
+    if default_ecoregion:
+        g['location']['ecoregion'] = default_ecoregion
+    else:
+        if exc:
+            raise exc
+        else:
+            raise ValueError("No default ecoregion specified.")
