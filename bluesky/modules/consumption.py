@@ -186,8 +186,10 @@ def _use_default_ecoreion(fires_manager, g, exc=None):
     default_ecoregion = fires_manager.get_config_value(
         'consumption', 'default_ecoregion')
     if default_ecoregion:
+        logging.debug('Using default ecoregion %s', default_ecoregion)
         g['location']['ecoregion'] = default_ecoregion
     else:
+        logging.debug('No default ecoregion')
         if exc:
             raise exc
         else:
