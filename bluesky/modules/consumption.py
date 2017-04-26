@@ -135,8 +135,8 @@ def _run_fuelbed(fb, fuel_loadings_manager, location, burn_type, msg_level):
         #            fm_type
         #   it would be nice to access that error message here and
         #   include it in the exception message
-        raise RuntimeError("Failed to calculate consumption for fire "
-            "{} fuelbed {}".format(fire.id, fb['fccs_id']))
+        raise RuntimeError("Failed to calculate consumption for "
+            "fuelbed {}".format(fb['fccs_id']))
 
 
 
