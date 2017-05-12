@@ -124,7 +124,8 @@ class Fire(dict):
     VALID_TYPES = {
         'wildfire': 'wildfire',
         'wf': 'wildfire',
-        'rx':'rx'
+        'rx':'rx',
+        'unknown': 'unknown'
     }
     INVALID_TYPE_MSG = "Invalid fire 'type': {}"
 
