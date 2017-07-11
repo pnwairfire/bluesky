@@ -1726,7 +1726,7 @@ the docker host:
 ### Build Bluesky Docker Image from Dockerfile
 
     cd /path/to/bluesky/repo/
-    docker build -t bluesky -f docker/Dockerfile .
+    docker build -t bluesky .
 
 ### Obtain pre-built docker image
 

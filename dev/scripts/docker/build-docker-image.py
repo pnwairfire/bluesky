@@ -83,9 +83,8 @@ def _pre_clean():
     pass
 
 def _build(args):
-    dockerfile_pathname = os.path.join(REPO_ROOT_DIR, 'docker', 'Dockerfile')
-    _call(['docker','build', '-t', args.image_name, '-f', dockerfile_pathname,
-        REPO_ROOT_DIR])
+    dockerfile_pathname = os.path.join(REPO_ROOT_DIR, 'Dockerfile')
+    _call(['docker','build', '-t', args.image_name, REPO_ROOT_DIR])
 
 def _create(args):
     _call(['docker', 'create', '--name', args.image_name, args.image_name])
