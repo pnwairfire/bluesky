@@ -28,7 +28,7 @@ def run(fires_manager):
     fires_manager.processed(__name__, __version__,
         fccsmap_version=fccsmap.__version__)
 
-    fuelbeds_config = dict(fires_manager.get_config_value('fuelbeds'))
+    fuelbeds_config = dict(fires_manager.get_config_value('fuelbeds') or {})
     if 'fccs_version' not in fuelbeds_config:
         fuelbeds_config['fccs_version'] = FCCS_VERSION
     logging.debug('Using FCCS version %s', FCCS_VERSION)
