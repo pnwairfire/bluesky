@@ -105,18 +105,18 @@ COPY bin/profile /usr/local/bin/profile
 COPY bin/vsmkgs /usr/local/bin/vsmkgs
 COPY bin/vsmoke /usr/local/bin/vsmoke
 
-# Install The bluesky Package
-
+# Install python dependencies
 RUN mkdir /tmp/bluesky/
 WORKDIR /tmp/bluesky/
 COPY requirements.txt /tmp/bluesky/requirements.txt
 COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
 RUN pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
+
+# Install bluesky package
 COPY bluesky/ /tmp/bluesky/bluesky/
 COPY bin/ /tmp/bluesky/bin/
 COPY setup.py /tmp/bluesky/setup.py
 RUN python3 setup.py install
-
 
 # default command is to display bsp help string
 CMD ["bsp", "-h"]
