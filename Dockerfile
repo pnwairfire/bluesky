@@ -94,7 +94,18 @@ RUN apt-get install -y \
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
     -i http://pypi.smoke.airfire.org/simple blueskyutils>=0.2.0
 
-## Install The bluesky Package
+# Install binary dependencies - for localmet, plumerise,
+# dipersion, and visualization
+COPY bin/feps_plumerise /usr/local/bin/feps_plumerise
+COPY bin/feps_weather /usr/local/bin/feps_weather
+COPY bin/hycm_std /usr/local/bin/hycm_std
+COPY bin/hycs_std /usr/local/bin/hycs_std
+COPY bin/hysplit2netcdf /usr/local/bin/hysplit2netcdf
+COPY bin/profile /usr/local/bin/profile
+COPY bin/vsmkgs /usr/local/bin/vsmkgs
+COPY bin/vsmoke /usr/local/bin/vsmoke
+
+# Install The bluesky Package
 
 RUN mkdir /tmp/bluesky/
 WORKDIR /tmp/bluesky/

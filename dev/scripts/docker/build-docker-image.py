@@ -34,17 +34,6 @@ Examples:
   $ ./dev/scripts/docker/build-docker-image.py --log-level=DEBUG -n foo-bluesky
  """
 
-BINARIES = [
-    'profile',
-    'hycm_std',
-    'hycs_std',
-    'hysplit2netcdf',
-    'vsmoke',
-    'vsmkgs',
-    'feps_plumerise',
-    'feps_weather'
-]
-
 REPO_ROOT_DIR = os.path.abspath(os.path.join(__file__, '../../../..'))
 
 FINAL_INSTRUCTIONS = """
@@ -63,18 +52,6 @@ def _call(cmd_args):
             "Command '{}' returned error code {}".format(' '.join(cmd_args), r),
             exit_code=r)
 
-def _check_binaries_list(args):
-    # make sure bin dir exists and that each exe exists
-    if not os.path.isdir(args.bin_dir):
-        afscripting.utils.exit_with_msg("bin dir {} does not exist".format(
-            args.bin_dir))
-
-    for b in BINARIES:
-        pathname = os.path.join(args.bin_dir, b)
-        if not os.path.isfile(pathname):
-            afscripting.utils.exit_with_msg(
-                "binary {} does not exist".format(pathname))
-
 def _pre_clean():
     # TODO: call:
     #    docker ps -a | awk 'NR > 1 {print $1}' | xargs docker rm
@@ -88,12 +65,6 @@ def _build(args):
 
 def _create(args):
     _call(['docker', 'create', '--name', args.image_name, args.image_name])
-
-def _copy_binaries(args):
-    for b in BINARIES:
-        src = os.path.join(args.bin_dir, b)
-        dest = '{}:/usr/local/bin/{}'.format(args.image_name, b)
-        _call(['docker', 'cp', src, dest])
 
 def _commit(args):
     _call(['docker', 'commit', args.image_name, args.image_name])
@@ -110,13 +81,10 @@ if __name__ == "__main__":
     parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
 
-    _check_binaries_list(args)
-
     _pre_clean()
 
     _build(args)
     _create(args)
-    _copy_binaries(args)
     _commit(args)
 
     _post_clean()
