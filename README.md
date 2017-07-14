@@ -1820,36 +1820,6 @@ Another example:
         ingestion fuelbeds consumption emissions
 
 
-#### Executables needing to be manually installed
-
-The Dockerfile specifys everything you need to to run bluesky through
-emissions.  If you want to run localmet and/or dispersion, you'll
-need to manually install the required executables.
-
-First create the container, if not already created:
-
-    docker create --name bluesky bluesky
-
-Copy the required executables:
-
-    docker cp /path/to/profile bluesky:/usr/local/bin/profile
-    docker cp /path/to/hycm_std bluesky:/usr/local/bin/hycm_std
-    docker cp /path/to/hycs_std bluesky:/usr/local/bin/hycs_std
-    docker cp /path/to/hysplit2netcdf bluesky:/usr/local/bin/hysplit2netcdf
-    docker cp /path/to/vsmoke bluesky:/usr/local/bin/vsmoke
-    docker cp /path/to/vsmkgs bluesky:/usr/local/bin/vsmkgs
-    docker cp /path/to/feps_plumerise bluesky:/usr/local/bin/feps_plumerise
-    docker cp /path/to/feps_weather bluesky:/usr/local/bin/feps_weather
-
-Once you've installed the executables, commit the container's changes
-back to the image
-
-    docker commit bluesky bluesky
-
-Now, you can run commands relying on these executables. For example:
-
-     docker run --rm -v $HOME/DRI_6km/:/DRI_6km/ bluesky arlprofiler -f '/DRI_6km/2014052900/wrfout_d2.2014052900.f00-11_12hr01.arl;2014-05-29T00:00:00;2014-05-29T02:00:00' -l 37 -g -119 -s 2014-05-29T00:00:00 -e 2014-05-29T02:00:00 -o -7
-
 Another example, running `bsp` through vsmoke dispersion:
 
     echo '{
