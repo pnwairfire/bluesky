@@ -1624,7 +1624,7 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 ###### if saving locally:
 
  - ***'config' > 'export' > 'localsave' > 'dest_dir'*** - *required* -- destination directory to contain output directory
- - ***'config' > 'export' > 'localsave' > 'do_not_overwrite'*** - *optional* -- if true, raises exception if output dir already exists; defaults to false
+ - ***'config' > 'export' > 'localsave' > 'handle_existing'*** - *optional* -- how to handle case where output dir already exists; options: 'replace', 'write_in_place', 'fail'; defaults to 'fail'
 
 ###### if uploading:
 

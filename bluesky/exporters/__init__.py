@@ -13,6 +13,7 @@ import tempfile
 
 import afconfig
 
+from bluesky.exceptions import BlueSkyConfigurationError
 
 # TODO: Support exporting VSMOKE dispersion, which would include KMLs
 #   and not have separate visualization section
@@ -90,18 +91,33 @@ class ExporterBase(object):
         # to allow overwriting
         output_dir = os.path.join(dest, self._output_dir_name)
         if os.path.exists(output_dir):
-            if self.config('do_not_overwrite'):
+            handle_existing = (
+                self.config('handle_existing', default='fail').lower())
+            if handle_existing == 'fail':
                 raise RuntimeError("{} already exists".format(output_dir))
-            else:
+            elif handle_existing == 'write_in_place':
+                # TODO: make this work recursively. see
+                #    https://docs.python.org/3.5/distutils/apiref.html#distutils.dir_util.copy_tree
+                #   and
+                #    https://docs.python.org/3.5/library/shutil.html
+                #   For now, this only works if only the top level directory
+                #   exists
+                pass
+            elif handle_existing == 'replace':
                 # delete it; otherwise, exception will be raised by shutil.copytree
                 if os.path.isdir(output_dir):
                     shutil.rmtree(output_dir)
                 else:
                     # this really shouldn't ever be the case
                     os.remove(output_dir)
+            else:
+                raise BlueSkyConfigurationError("Invalid value for "
+                    "handle_existing config option: {}".format(
+                    handle_existing))
 
-        # create fresh empty dir
-        os.mkdir(output_dir)
+        else:
+            # create fresh empty dir
+            os.mkdir(output_dir)
 
         return output_dir
 
