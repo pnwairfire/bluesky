@@ -52,6 +52,8 @@ def run(fires_manager):
     if met_format == "arl":
         arl_config = fires_manager.get_config_value('findmetdata', 'arl',
             default={})
+        logging.debug("Met root dir: %s", met_root_dir)
+        logging.debug("ARL config: %s", arl_config)
         arl_finder = arlfinder.ArlFinder(met_root_dir, **arl_config)
     else:
         raise BlueSkyConfigurationError(
@@ -103,4 +105,5 @@ def run(fires_manager):
             "Start and end times required for finding met data. They"
             "wheren't specied and couldn't be inferred from the fire data.")
 
+    logging.debug("Findmetdata time window: %s to %s", time_window['start'], time_window['end'])
     fires_manager.met = arl_finder.find(time_window['start'], time_window['end'])
