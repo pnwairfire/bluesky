@@ -56,10 +56,15 @@ Examples:
 
 def check_value(expected, actual):
     if type(expected) != type(actual):
+        logging.error("types don't match: %s vs. %s",
+            type(expected), type(actual))
         return False
 
     if type(expected) == dict:
         if set(expected.keys()) != set(actual.keys()):
+            logging.error("Keys don't match: %s vs. %s",
+                ','.join(list(set(expected.keys()))),
+                ','.join(list(set(actual.keys()))))
             return False
         for k in expected:
             if not check_value(expected[k], actual[k]):
@@ -68,6 +73,7 @@ def check_value(expected, actual):
 
     elif type(expected) == list:
         if len(expected) != len(actual):
+            logging.error("list lengths don't match")
             return False
         for i in range(len(expected)):
             if not check_value(expected[i], actual[i]):
@@ -79,11 +85,18 @@ def check_value(expected, actual):
             # if failure, we want to return False rather than have AssertionError raised
             assert_approx_equal(expected, actual)
         except AssertionError:
+            logging.error("Float values don't match: %s vs. %s",
+                expected, actual)
             return False
         return True
 
     else:
-        return expected == actual
+        if expected == actual:
+            return True
+        else:
+            logging.error("Values don't match: %s vs. %s",
+                expected, actual)
+            return False
 
 
 def check(expected, actual):
