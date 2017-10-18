@@ -245,7 +245,7 @@ If you have csv formatted fire data, you can use ```bsp-csv2json``` to convert
 your data to json format.  For example, assume fires.csv contains the
 following data:
 
-    id,event_id,latitude,longitude,type,area,date_time,elevation,slope,state,county,country,fips,scc,fuel_1hr,fuel_10hr,fuel_100hr,fuel_1khr,fuel_10khr,fuel_gt10khr,shrub,grass,rot,duff,litter,moisture_1hr,moisture_10hr,moisture_100hr,moisture_1khr,moisture_live,moisture_duff,consumption_flaming,consumption_smoldering,consumption_residual,consumption_duff,min_wind,max_wind,min_wind_aloft,max_wind_aloft,min_humid,max_humid,min_temp,max_temp,min_temp_hour,max_temp_hour,sunrise_hour,sunset_hour,snow_month,rain_days,heat,pm25,pm10,co,co2,ch4,nox,nh3,so2,voc,canopy,event_url,fccs_number,owner,sf_event_guid,sf_server,sf_stream_name,timezone,veg
+    id,event_id,latitude,longitude,type,area,date_time,elevation,slope,state,county,country,fips,scc,fuel_1hr,fuel_10hr,fuel_100hr,fuel_1khr,fuel_10khr,fuel_gt10khr,shrub,grass,rot,duff,litter,moisture_1hr,moisture_10hr,moisture_100hr,moisture_1khr,moisture_live,moisture_duff,consumption_flaming,consumption_smoldering,consumption_residual,consumption_duff,min_wind,max_wind,min_wind_aloft,max_wind_aloft,min_humid,max_humid,min_temp,max_temp,min_temp_hour,max_temp_hour,sunrise_hour,sunset_hour,snow_month,rain_days,heat,pm2.5,pm10,co,co2,ch4,nox,nh3,so2,voc,canopy,event_url,fccs_number,owner,sf_event_guid,sf_server,sf_stream_name,timezone,veg
     SF11C14225236095807750,SF11E826544,25.041,-77.379,RX,99.9999997516,201501200000Z,0.0,10.0,Unknown,,Unknown,-9999,2810015000,,,,,,,,,,,,10.0,12.0,12.0,22.0,130.0,150.0,,,,,6.0,6.0,6.0,6.0,40.0,80.0,13.1,30.0,4,14,7,18,5,8,,,,,,,,,,,,http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020,,,17cde405-cc3a-4555-97d2-77004435a020,playground.dri.edu,realtime,-5.0,
 
 running ```bsp-csv2json``` like so:
@@ -254,7 +254,7 @@ running ```bsp-csv2json``` like so:
 
 would produce the following (written to stdout):
 
-    {"fire_information": [{"date_time": "201501200000Z", "litter": "", "county": "", "timezone": -5.0, "co": "", "elevation": 0.0, "pm10": "", "slope": 10.0, "state": "Unknown", "nh3": "", "moisture_duff": 150.0, "fuel_10khr": "", "fuel_gt10khr": "", "veg": "", "snow_month": 5, "min_temp_hour": 4, "min_wind": 6.0, "ch4": "", "moisture_1hr": 10.0, "id": "SF11C14225236095807750", "grass": "", "fuel_1hr": "", "duff": "", "max_humid": 80.0, "latitude": 25.041, "fuel_1khr": "", "heat": "", "area": 99.9999997516, "consumption_smoldering": "", "owner": "", "longitude": -77.379, "fuel_10hr": "", "rain_days": 8, "sf_server": "playground.dri.edu", "canopy": "", "min_humid": 40.0, "min_wind_aloft": 6.0, "rot": "", "fuel_100hr": "", "moisture_live": 130.0, "min_temp": 13.1, "pm25": "", "consumption_residual": "", "moisture_10hr": 12.0, "sunrise_hour": 7, "voc": "", "event_id": "SF11E826544", "moisture_1khr": 22.0, "so2": "", "max_wind": 6.0, "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "moisture_100hr": 12.0, "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "shrub": "", "country": "Unknown", "max_temp": 30.0, "sunset_hour": 18, "co2": "", "scc": 2810015000, "consumption_duff": "", "fccs_number": "", "nox": "", "max_temp_hour": 14, "consumption_flaming": "", "fips": -9999, "max_wind_aloft": 6.0, "type": "RX", "sf_stream_name": "realtime"}]}
+    {"fire_information": [{"date_time": "201501200000Z", "litter": "", "county": "", "timezone": -5.0, "co": "", "elevation": 0.0, "pm10": "", "slope": 10.0, "state": "Unknown", "nh3": "", "moisture_duff": 150.0, "fuel_10khr": "", "fuel_gt10khr": "", "veg": "", "snow_month": 5, "min_temp_hour": 4, "min_wind": 6.0, "ch4": "", "moisture_1hr": 10.0, "id": "SF11C14225236095807750", "grass": "", "fuel_1hr": "", "duff": "", "max_humid": 80.0, "latitude": 25.041, "fuel_1khr": "", "heat": "", "area": 99.9999997516, "consumption_smoldering": "", "owner": "", "longitude": -77.379, "fuel_10hr": "", "rain_days": 8, "sf_server": "playground.dri.edu", "canopy": "", "min_humid": 40.0, "min_wind_aloft": 6.0, "rot": "", "fuel_100hr": "", "moisture_live": 130.0, "min_temp": 13.1, "pm2.5": "", "consumption_residual": "", "moisture_10hr": 12.0, "sunrise_hour": 7, "voc": "", "event_id": "SF11E826544", "moisture_1khr": 22.0, "so2": "", "max_wind": 6.0, "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "moisture_100hr": 12.0, "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "shrub": "", "country": "Unknown", "max_temp": 30.0, "sunset_hour": 18, "co2": "", "scc": 2810015000, "consumption_duff": "", "fccs_number": "", "nox": "", "max_temp_hour": 14, "consumption_flaming": "", "fips": -9999, "max_wind_aloft": 6.0, "type": "RX", "sf_stream_name": "realtime"}]}
 
 You can pipe the output of ```bsp-csv2json``` directly into ```bsp```, as long
 as you use the ingestions module, described below:
@@ -634,7 +634,7 @@ would contain this output, agumented with emissions data:
                         "total": 99674.47838833416,
                         "CH4": 439.71054108574947,
                         "NOx": 84.99420586185778,
-                        "PM25": 759.2284300672792,
+                        "PM2.5": 759.2284300672792,
                         "CO": 9157.402971690011,
                         "PM10": 895.8895474793892,
                         "SO2": 56.59952720314939,
@@ -685,7 +685,7 @@ would contain this output, agumented with emissions data:
                                 "total": 99674.47838833416,
                                 "CH4": 439.71054108574947,
                                 "NOx": 84.99420586185778,
-                                "PM25": 759.2284300672792,
+                                "PM2.5": 759.2284300672792,
                                 "CO": 9157.402971690011,
                                 "PM10": 895.8895474793892,
                                 "SO2": 56.59952720314939,
@@ -1825,7 +1825,7 @@ Another example, running `bsp` through vsmoke dispersion:
     echo '{
         "config": {
             "emissions": {
-                "species": ["PM25"]
+                "species": ["PM2.5"]
             },
             "dispersion": {
                 "start": "2014-05-30T00:00:00",
@@ -1884,7 +1884,7 @@ and KML visualization:
         bsp --log-level=DEBUG \
         -i ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json \
         -o ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion-output.json \
-        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM25-compute-grid-km.json \
+        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
         ingestion fuelbeds consumption emissions \
         timeprofiling findmetdata localmet plumerising \
         dispersion visualization export
@@ -1894,7 +1894,7 @@ Another example, running through hysplit dispersion:
     echo '{
         "config": {
             "emissions": {
-                "species": ["PM25"]
+                "species": ["PM2.5"]
             },
             "findmetdata": {
                 "met_root_dir": "/DRI_6km/"
@@ -1999,7 +1999,7 @@ the code as you normally would in development. E.g.:
 
     ./bin/bsp --log-level=DEBUG \
         -i ./test/data/json/1-fire-24hr-post-ingestion.json \
-        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM25-compute-grid-km.json \
+        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
          ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet \
          plumerising dispersion visualization export | python -m json.tool > out.json
 

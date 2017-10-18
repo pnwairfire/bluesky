@@ -151,7 +151,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         smolder_fraction=0.0)
     MISSING_TIMEPROFILE_HOUR = dict({p: 0.0 for p in PHASES}, area_fraction=0.0)
 
-    SPECIES = ('PM25', 'CO')
+    SPECIES = ('PM2.5', 'CO')
 
     def _set_fire_data(self, fires):
         self._fires = []
@@ -226,7 +226,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                         timeprofiled_emissions[dt] = {}
                         for e in self.SPECIES:
                             timeprofiled_emissions[dt][e] = sum([
-                                timeprofile[dt][p]*emissions[p].get('PM25', 0.0)
+                                timeprofile[dt][p]*emissions[p].get('PM2.5', 0.0)
                                     for p in self.PHASES
                             ])
 

@@ -52,6 +52,7 @@ BLUESKYKML_DATE_FORMAT = smokedispersionkml.FireData.date_time_format
 
 # as of blueskykml v0.2.5, this list is:
 #  'pm25', 'pm10', 'co', 'co2', 'ch4', 'nox', 'nh3', 'so2', 'voc'
+# Note that blueskykml expects 'pm25', not 'pm2.5'
 BLUESKYKML_SPECIES_LIST = [s.upper() for s in smokedispersionkml.FireData.emission_fields]
 if 'NOX' in BLUESKYKML_SPECIES_LIST:
     BLUESKYKML_SPECIES_LIST.remove('NOX')
@@ -140,7 +141,8 @@ FIRE_LOCATIONS_CSV_FIELDS = (
     ]
     # emissions
     + [
-        (s.lower(), _get_emissions_species(s)) for s in BLUESKYKML_SPECIES_LIST
+        (s.lower(), _get_emissions_species('PM2.5' if s is 'pm25' else s))
+            for s in BLUESKYKML_SPECIES_LIST if s
     ]
     # float value location fields
     + [

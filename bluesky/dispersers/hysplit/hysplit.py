@@ -229,7 +229,7 @@ class HYSPLITDispersion(DispersionBase):
             self._fires = [self._generate_dummy_fire()]
 
     DUMMY_EMISSIONS = (
-        "pm25", "pm10", "co", "co2", "ch4", "nox",
+        "pm2.5", "pm10", "co", "co2", "ch4", "nox",
         "nh3", "so2", "voc", "pm", "nmhc"
     )
     DUMMY_EMISSIONS_VALUE = 0.00001
@@ -360,7 +360,7 @@ class HYSPLITDispersion(DispersionBase):
             raise exc
 
         #  'ttl' is sum of values; see http://nco.sourceforge.net/nco.html#Operation-Types
-        # sum together all the PM25 fields then append the TFLAG field from
+        # sum together all the PM2.5 fields then append the TFLAG field from
         # one of the individual runs (they're all the same)
         # using run 0 as it should always be present regardless of how many
         # processes were used....
@@ -603,9 +603,9 @@ class HYSPLITDispersion(DispersionBase):
                         # phase-specific hourly fractions for this hour to get the
                         # hourly emissions by phase for this hour, and then summing
                         # the three values to get the total emissions for this hour
-                        # TODO: use fire.timeprofiled_emissions[local_dt]['PM25']
+                        # TODO: use fire.timeprofiled_emissions[local_dt]['PM2.5']
                         pm25_emitted = sum([
-                            timeprofile_hour[p]*fire.emissions[p].get('PM25', 0.0)
+                            timeprofile_hour[p]*fire.emissions[p].get('PM2.5', 0.0)
                                 for p in self.PHASES
                         ])
                         pm25_emitted *= GRAMS_PER_TON

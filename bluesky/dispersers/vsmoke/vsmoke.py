@@ -132,7 +132,7 @@ class VSMOKEDispersion(DispersionBase):
                 self._kmz_files.append(kml_path)
                 self._my_kmz.add_kml(kml_name, fire, hr)
 
-                pm25 = fire.timeprofiled_emissions[local_dt]['PM25']
+                pm25 = fire.timeprofiled_emissions[local_dt]['PM2.5']
 
                 self._add_geo_json(in_var, iso_file, fire['id'], timezone, hr, pm25)
 
@@ -254,7 +254,7 @@ class VSMOKEDispersion(DispersionBase):
                 heat = fire.get('heat', 0.0)
                 emtqh = (heat) / 3414425.94972     # Btu to MW
 
-                emtqpm = (fire.timeprofiled_emissions[local_dt]['PM25']
+                emtqpm = (fire.timeprofiled_emissions[local_dt]['PM2.5']
                     * TONS_PER_HR_TO_GRAMS_PER_SEC)  # tons/hr to g/s
                 emtqco = (fire.timeprofiled_emissions[local_dt]['CO']
                     * TONS_PER_HR_TO_GRAMS_PER_SEC)    # tons/hr to g/s
@@ -311,7 +311,7 @@ class VSMOKEDispersion(DispersionBase):
             heat = fire.get('heat', 0.0)
             emtqh = (heat) / 3414425.94972     # Btu to MW
 
-            emtqpm = (fire.timeprofiled_emissions[local_dt]['PM25']
+            emtqpm = (fire.timeprofiled_emissions[local_dt]['PM2.5']
                 * TONS_PER_HR_TO_GRAMS_PER_SEC)  # tons/hr to g/s
 
             f.write("%s\n" % in_var.title)

@@ -215,7 +215,7 @@ OPTIONAL_LOCATION_FIELDS = [
     # will calculate them:
     #   'consumption_flaming', 'consumption_smoldering',
     #   'consumption_residual', 'consumption_duff', 'heat',
-    #   'pm25', 'pm10', 'co', 'co2', 'ch4', 'nox', 'nh3', 'so2', 'voc'
+    #   'pm2.5', 'pm10', 'co', 'co2', 'ch4', 'nox', 'nh3', 'so2', 'voc'
     # Ignore 'timezone' here. (There's a TODO, below, to use it)
     # Other SF2 fields are mentioned in a TODO, below
 ]

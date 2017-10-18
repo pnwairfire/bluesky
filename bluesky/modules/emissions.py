@@ -120,9 +120,7 @@ def _run_feps(fires_manager, species, include_emissions_details):
 
 def _fix_pm25_key(emissions):
     for k in emissions:
-        if k == 'PM2.5':
-            emissions['PM25'] = emissions.pop('PM2.5')
-        elif k == 'NMOC':
+        if k == 'NMOC':
             # Total non-methane VOCs
             emissions['VOC'] = emissions.pop('NMOC')
         elif isinstance(emissions[k], dict):
