@@ -61,6 +61,15 @@ def run(fires_manager):
         raise BlueSkyConfigurationError(
             "Invalid emissions factors set: '{}'".format(efs))
 
+    # fix keys
+    for fire in fires_manager.fires:
+        with fires_manager.fire_failure_handler(fire):
+            for g in fire.growth:
+                for fb in g['fuelbeds']:
+                    _fix_keys(fb['emissions'])
+                    if include_emissions_details:
+                        _fix_keys(fb['emissions_details'])
+
     # For each fire, aggregate emissions over all fuelbeds per growth
     # window as well as across all growth windows;
     # include only per-phase totals, not per category > sub-category > phase
@@ -81,6 +90,17 @@ def run(fires_manager):
         summary.update(emissions_details=datautils.summarize(
             all_growth, 'emissions_details'))
     fires_manager.summarize(**summary)
+
+def _fix_keys(emissions):
+    for k in emissions:
+        # in case someone spcifies custom EF's with 'PM25'
+        if k == 'PM25':
+            emissions['PM2.5'] = emissions.pop('PM25')
+        elif k == 'NMOC':
+            # Total non-methane VOCs
+            emissions['VOC'] = emissions.pop('NMOC')
+        elif isinstance(emissions[k], dict):
+            _fix_keys(emissions[k])
 
 ##
 ## FEPS
@@ -118,14 +138,6 @@ def _run_feps(fires_manager, species, include_emissions_details):
 ## Urbanski
 ##
 
-def _fix_pm25_key(emissions):
-    for k in emissions:
-        if k == 'NMOC':
-            # Total non-methane VOCs
-            emissions['VOC'] = emissions.pop('NMOC')
-        elif isinstance(emissions[k], dict):
-            _fix_pm25_key(emissions[k])
-
 def _run_urbanski(fires_manager, species, include_emissions_details):
     logging.info("Running emissions module with Urbanski EFs")
 
@@ -155,9 +167,7 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
                     #   b) just after instantiating look-up objects, above,
                     #   or c) just before calling EmissionsCalculator, above
                     datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
-                    _fix_pm25_key(fb['emissions'])
                     if include_emissions_details:
-                        _fix_pm25_key(fb['emissions_details'])
                         datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
 
 ##
@@ -230,8 +240,6 @@ def _run_consume_on_fuelbed(fuel_loadings_manager, species,
     # r's key hierarchy is species > phase; we want phase > species
     for k in r:
         upper_k = k.upper()
-        if upper_k == 'PM25':
-            upper_k = 'PM2.5'
         if k != 'stratum' and (not species or upper_k in species):
             for p in r[k]:
                 fb['emissions'][p][upper_k] = r[k][p]
@@ -246,8 +254,6 @@ def _run_consume_on_fuelbed(fuel_loadings_manager, species,
         fb['emissions_details'] = { "summary": {} }
         for k in r.get('stratum', {}):
             upper_k = k.upper()
-            if upper_k == 'PM25':
-                upper_k = 'PM2.5'
             if not species or upper_k in species:
                 for c in r['stratum'][k]:
                     fb['emissions_details']['summary'][c] = fb['emissions_details']['summary'].get(c, {})
