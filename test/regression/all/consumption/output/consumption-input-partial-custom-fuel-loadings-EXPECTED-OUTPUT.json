@@ -1243,7 +1243,7 @@
         },
         "emissions": {
             "species": [
-                "PM25"
+                "PM2.5"
             ]
         }
     }

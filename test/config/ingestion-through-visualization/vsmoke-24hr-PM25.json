@@ -1,7 +1,7 @@
 {
     "config": {
         "emissions": {
-            "species": ["PM25"]
+            "species": ["PM2.5"]
         },
         "dispersion": {
             "start": "2014-05-30T00:00:00",

@@ -5,7 +5,7 @@
             "default_ecoregion": "western"
         },
         "emissions": {
-            "species": ["pm25"],
+            "species": ["PM2.5"],
             "efs": "urbanski"
         },
         "findmetdata": {

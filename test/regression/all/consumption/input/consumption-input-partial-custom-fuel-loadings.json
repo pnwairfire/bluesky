@@ -14,7 +14,7 @@
             }
         },
         "emissions": {
-            "species": ["PM25"]
+            "species": ["PM2.5"]
         }
     },
     "fire_information": [

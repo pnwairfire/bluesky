@@ -5,7 +5,7 @@
             "skip_failures": true
         },
         "emissions": {
-            "species": ["PM25"]
+            "species": ["PM2.5"]
         },
         "findmetdata": {
             "met_root_dir": "/NAM84/",
