@@ -206,28 +206,28 @@ EMISSIONS_OUTPUT_HEADER_TRANSLATIONS = {
     "NMHC Emissions": ["total", "NMHC"],
     "PM Emissions": ["total", "PM"],
     "PM10 Emissions": ["total", "PM10"],
-    "PM25 Emissions": ["total", "PM25"],
+    "PM25 Emissions": ["total", "PM2.5"],
     "E_ch4_F": ["flaming", "CH4"],
     "E_co_F": ["flaming", "CO"],
     "E_co2_F": ["flaming", "CO2"],
     "E_nmhc_F": ["flaming", "NMHC"],
     "E_pm_F": ["flaming", "PM"],
     "E_pm10_F": ["flaming", "PM10"],
-    "E_pm25_F": ["flaming", "PM25"],
+    "E_pm25_F": ["flaming", "PM2.5"],
     "E_ch4_S": ["smoldering", "CH4"],
     "E_co_S": ["smoldering", "CO"],
     "E_co2_S": ["smoldering", "CO2"],
     "E_nmhc_S": ["smoldering", "NMHC"],
     "E_pm_S": ["smoldering", "PM"],
     "E_pm10_S": ["smoldering", "PM10"],
-    "E_pm25_S": ["smoldering", "PM25"],
+    "E_pm25_S": ["smoldering", "PM2.5"],
     "E_ch4_R": ["residual", "CH4"],
     "E_co_R": ["residual", "CO"],
     "E_co2_R": ["residual", "CO2"],
     "E_nmhc_R": ["residual", "NMHC"],
     "E_pm_R": ["residual", "PM"],
     "E_pm10_R": ["residual", "PM10"],
-    "E_pm25_R": ["residual", "PM25"]
+    "E_pm25_R": ["residual", "PM2.5"]
 }
 EMISSIONS_DETAILS_OUTPUT_HEADER_TRANSLATIONS = {
     "CH4_canopy": ["summary", "canopy", "total", "CH4"],
@@ -266,12 +266,12 @@ EMISSIONS_DETAILS_OUTPUT_HEADER_TRANSLATIONS = {
     "PM10_wood": ["summary", "woody fuels", "total", "PM10"],
     "PM10_llm": ["summary", "litter-lichen-moss", "total", "PM10"],
     "PM10_ground": ["summary", "ground fuels", "total", "PM10"],
-    "PM25_canopy": ["summary", "canopy", "total", "PM25"],
-    "PM25_shrub": ["summary", "shrub", "total", "PM25"],
-    "PM25_herb": ["summary", "nonwoody", "total", "PM25"],
-    "PM25_wood": ["summary", "woody fuels", "total", "PM25"],
-    "PM25_llm": ["summary", "litter-lichen-moss", "total", "PM25"],
-    "PM25_ground": ["summary", "ground fuels", "total", "PM25"]
+    "PM25_canopy": ["summary", "canopy", "total", "PM2.5"],
+    "PM25_shrub": ["summary", "shrub", "total", "PM2.5"],
+    "PM25_herb": ["summary", "nonwoody", "total", "PM2.5"],
+    "PM25_wood": ["summary", "woody fuels", "total", "PM2.5"],
+    "PM25_llm": ["summary", "litter-lichen-moss", "total", "PM2.5"],
+    "PM25_ground": ["summary", "ground fuels", "total", "PM2.5"]
 }
 HEAT_OUTPUT_HEADER_TRANSLATIONS = {
     "Total Heat Release": "total",
