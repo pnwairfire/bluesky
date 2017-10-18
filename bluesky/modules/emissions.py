@@ -230,6 +230,8 @@ def _run_consume_on_fuelbed(fuel_loadings_manager, species,
     # r's key hierarchy is species > phase; we want phase > species
     for k in r:
         upper_k = k.upper()
+        if upper_k == 'PM25':
+            upper_k = 'PM2.5'
         if k != 'stratum' and (not species or upper_k in species):
             for p in r[k]:
                 fb['emissions'][p][upper_k] = r[k][p]
@@ -244,6 +246,8 @@ def _run_consume_on_fuelbed(fuel_loadings_manager, species,
         fb['emissions_details'] = { "summary": {} }
         for k in r.get('stratum', {}):
             upper_k = k.upper()
+            if upper_k == 'PM25':
+                upper_k = 'PM2.5'
             if not species or upper_k in species:
                 for c in r['stratum'][k]:
                     fb['emissions_details']['summary'][c] = fb['emissions_details']['summary'].get(c, {})
