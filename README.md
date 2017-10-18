@@ -6,11 +6,19 @@ BlueSky Framework rearchitected as a pipeable collection of standalone modules.
 not accurately reflect actual smoke due to numerous reasons. Data are
 provisional; use at own risk.***
 
+
+
+
+
 ## Python 2 and 3 Support
 
 This package was originally developed to support python 2.7, but has since
 been refactored to support 3.5. Attempts to support both 2.7 and 3.5 have
 been made but are not guaranteed.
+
+
+
+
 
 ## External Dependencies
 
@@ -67,6 +75,10 @@ Forest Service.  You can download it
 [here](http://webcam.srs.fs.fed.us/tools/vsmoke/download.shtml).
 As with the hysplit executables, the vsmoke binaries (```vsmoke``` and
 ```vsmkgs```) are assumed to reside in a directory in the search path.
+
+
+
+
 
 ## Development
 
@@ -137,6 +149,10 @@ package in development, you'll have to add the repo root directory to the
 search path. The ```bsp``` script does this automatically, if
 necessary.
 
+
+
+
+
 ## Running tests
 
 Use pytest:
@@ -150,6 +166,10 @@ You can also use the ```--collect-only``` option to see a list of all tests.
 
 See [pytest](http://pytest.org/latest/getting-started.html#getstarted) for more information about using pytest.
 
+
+
+
+
 ## Testing export emails
 
 requirements-dev.txt includes the maildump package, which has an smtp server
@@ -161,6 +181,10 @@ the package, you can run the server with
 Theoretically, you should be able to run it by simply invoking ```maildump```,
 but that doesn't seem to always work within virtual environments (e.g. if you
 use pyenv + virtualenv).
+
+
+
+
 
 ## Installation
 
@@ -183,6 +207,10 @@ requirements.txt:
 
 See the Development > Install Dependencies > Notes section, above, for
 notes on resolving pip and gdal issues.
+
+
+
+
 
 ## Usage:
 
@@ -1079,6 +1107,10 @@ the bluesky package includes three other executables:
 
 For usage and examples, use the ```-h``` with each script.
 
+
+
+
+
 ## Required and Optional Fields for ```bsp```
 
 The top level input data fields that bsp recognizes are: ```run_id```,
@@ -1648,6 +1680,10 @@ unless you have access to it.
  - ***'config' > 'statuslogging' > 'domain'*** - how you want to identify the met domain to the status logger
 
 
+
+
+
+
 ## Datetime Substitutions
 
 Configuration settings, run id, and log file name (set with the
@@ -1682,6 +1718,9 @@ by an empty string:
 
     '{datetime-parse-buster}2016-10-02T13:00:00' -> '2016-10-02T13:00:00'
     '{datetime-parse-buster}{today}' -> '20161002'
+
+
+
 
 
 ## Docker
