@@ -14,6 +14,7 @@ import freezegun
 from py.test import raises
 from numpy.testing import assert_approx_equal
 
+from bluesky import __version__
 from bluesky.models import fires
 
 ##
@@ -519,7 +520,8 @@ class TestFiresManager(object):
             "foo": {"bar": "baz"},
             "counts": {
                 "fires": 2
-            }
+            },
+            "bluesky_version": __version__
         }
 
         assert expected == json.loads(self._output.getvalue())
