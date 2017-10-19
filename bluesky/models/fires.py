@@ -17,7 +17,7 @@ from collections import OrderedDict
 import afconfig
 from pyairfire import process
 
-from bluesky import datautils, datetimeutils
+from bluesky import datautils, datetimeutils, __version__
 from bluesky.exceptions import (
     BlueSkyImportError, BlueSkyModuleError, BlueSkyDatetimeValueError
 )
@@ -678,7 +678,8 @@ class FiresManager(object):
         # json or on the command line, and add them to the output if they
         # were in the input
 
-        return dict(self._meta, fire_information=self.fires, counts=self.counts)
+        return dict(self._meta, fire_information=self.fires,
+            counts=self.counts, bluesky_version=__version__)
 
     def dumps(self, output_stream=None, output_file=None):
         if output_stream and output_file:

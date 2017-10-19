@@ -263,6 +263,7 @@ def setup(args):
     #  is not used. It must be left over from a previous version
     #  of the function. So just pass in None.
     scripting_args.configure_logging_from_args(args, None)
+    logging.info("BlueSky v%s", __version__)
     scripting_args.output_args(args)
     #afscripting.utils.log_config(args.config_options)
 
