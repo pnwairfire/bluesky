@@ -20,18 +20,16 @@ except:
 
 REQUIRED_ARGS = []
 OPTIONAL_ARGS = [
-    {
-        'short': '-n',
-        'long': '--image-name',
-        'help': "name for image (default: 'bluesky')",
-        'default': 'bluesky'
-    }
+    # TODO: add option to specify version, to avoid prompt ?
+    # TODO: add option to upload to docker hub, to avoid prompt ?
+    # TODO: add back option to override image name to use instead of 'bluesky' ?
+    #    (This option was removed because I never used it)
 ]
 
 EXAMPLES_STR = """
 Examples:
-  $ ./dev/scripts/docker/build-docker-image.py --log-level=DEBUG
-  $ ./dev/scripts/docker/build-docker-image.py --log-level=DEBUG -n foo-bluesky
+  $ ./dev/scripts/docker/build-docker-image.py
+  $ ./dev/scripts/docker/build-docker-image.py
  """
 
 REPO_ROOT_DIR = os.path.abspath(os.path.join(__file__, '../../../..'))
@@ -41,18 +39,18 @@ FINAL_INSTRUCTIONS = """
 """.format(version=__version__)
 
 def _call(cmd_args):
-    logging.info("Calling: {}".format(' '.join(cmd_args)))
+    sys.stdout.write("Calling '{}'\n".format(' '.join(cmd_args)))
     r = subprocess.call(cmd_args)
     if r:
         afscripting.utils.exit_with_msg(
             "Command '{}' returned error code {}".format(' '.join(cmd_args), r),
             exit_code=r)
 
-def build(image_name):
+def build():
     dockerfile_pathname = os.path.join(REPO_ROOT_DIR, 'Dockerfile')
-    _call(['docker','build', '-t', image_name, REPO_ROOT_DIR])
+    _call(['docker','build', '-t', 'bluesky', REPO_ROOT_DIR])
 
-def tag(image_name):
+def tag():
     tag_version = None
     while not tag_version or not re.compile('^v\d+\.\d+\.\d+$').match(tag_version):
         if tag_version:
@@ -60,21 +58,21 @@ def tag(image_name):
                 " enter to use the default\n".format(__version__))
         sys.stdout.write('Tag version [v{}]: '.format(__version__))
         tag_version = input().strip() or 'v' + __version__
-    _call(['docker', 'tag', image_name, 'pnwairfire/bluesky:latest'])
-    _call(['docker', 'tag', image_name, 'pnwairfire/bluesky:' + tag_version])
+    _call(['docker', 'tag', 'bluesky', 'pnwairfire/bluesky:latest'])
+    _call(['docker', 'tag', 'bluesky', 'pnwairfire/bluesky:' + tag_version])
     return tag_version
 
 def upload(tag_version):
     sys.stdout.write('Upload to hub.docker.com?: [y/N]: ')
     r = input().strip()
     if r and r.lower() in ('y', 'yes'):
-        logging.info("Pushing to docker up")
+        sys.stdout.write("Pushing to docker hub.\n")
         _call(['docker', 'push', 'pnwairfire/bluesky:latest'])
         _call(['docker', 'push', 'pnwairfire/bluesky:' + tag_version])
 
 if __name__ == "__main__":
     parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
-    build(args.image_name)
-    tag_version = tag(args.image_name)
+    build()
+    tag_version = tag()
     upload(tag_version)
