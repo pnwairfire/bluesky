@@ -10,7 +10,13 @@ import traceback
 
 import afscripting
 
-DEFAULT_BIN_DIR = os.path.join(os.path.expanduser("~"), 'bin')
+try:
+    from bluesky import  __version__
+except:
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
+    sys.path.insert(0, root_dir)
+    from bluesky import __version__
+
 REQUIRED_ARGS = []
 OPTIONAL_ARGS = [
     {
@@ -18,13 +24,6 @@ OPTIONAL_ARGS = [
         'long': '--image-name',
         'help': "name for image (default: 'bluesky')",
         'default': 'bluesky'
-    },
-    {
-        'short': '-b',
-        'long': '--bin-dir',
-        'help': "dir containing exe's to copy to image; default: {}".format(
-            DEFAULT_BIN_DIR),
-        'default': DEFAULT_BIN_DIR
     }
 ]
 
@@ -38,11 +37,7 @@ REPO_ROOT_DIR = os.path.abspath(os.path.join(__file__, '../../../..'))
 
 FINAL_INSTRUCTIONS = """
     To upload:
-        docker tag {image_name} pnwairfire/bluesky:latest
-        docker tag {image_name} pnwairfire/bluesky:v<VERSION>
-        docker push pnwairfire/bluesky:latest
-        docker push pnwairfire/bluesky:v<VERSION>
-"""
+""".format(version=__version__)
 
 def _call(cmd_args):
     logging.info("Calling: {}".format(' '.join(cmd_args)))
@@ -52,41 +47,25 @@ def _call(cmd_args):
             "Command '{}' returned error code {}".format(' '.join(cmd_args), r),
             exit_code=r)
 
-def _pre_clean():
-    # TODO: call:
-    #    docker ps -a | awk 'NR > 1 {print $1}' | xargs docker rm
-    # _call(["docker", "ps", "-a", "|", "awk", "'NR", ">", "1", "{print", "$1}'",
-    #     "|", "xargs", "docker", "rm"])
-    pass
-
 def _build(args):
     dockerfile_pathname = os.path.join(REPO_ROOT_DIR, 'Dockerfile')
     _call(['docker','build', '-t', args.image_name, REPO_ROOT_DIR])
 
-def _create(args):
-    _call(['docker', 'create', '--name', args.image_name, args.image_name])
+def _tag(args):
+    _call(['docker', 'tag', args.image_name, 'pnwairfire/bluesky:latest'])
+    _call(['docker', 'tag', args.image_name, 'pnwairfire/bluesky:v' + __version__])
 
-def _commit(args):
-    _call(['docker', 'commit', args.image_name, args.image_name])
-
-def _post_clean():
-    # TODO: call:
-    #   docker images | grep "<none>" | awk '{print $3}' | xargs docker rmi
-    pass
-
-def _print_final_instructions(args):
-    sys.stdout.write(FINAL_INSTRUCTIONS.format(image_name=args.image_name))
+def _push(args):
+    sys.stdout.write('Push to hub.docker.com?: [y/N]: ')
+    r = input().strip()
+    if r and r.lower() in ('y', 'yes'):
+        logging.info("Pushing to docker up")
+        _call(['docker', 'push', 'pnwairfire/bluesky:latest'])
+        _call(['docker', 'push', 'pnwairfire/bluesky:v' + __version__])
 
 if __name__ == "__main__":
     parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
-
-    _pre_clean()
-
     _build(args)
-    _create(args)
-    _commit(args)
-
-    _post_clean()
-
-    _print_final_instructions(args)
+    _tag(args)
+    _push(args)
