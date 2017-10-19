@@ -14,7 +14,7 @@ import afscripting
 try:
     from bluesky import  __version__
 except:
-    root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../../../'))
     sys.path.insert(0, root_dir)
     from bluesky import __version__
 
