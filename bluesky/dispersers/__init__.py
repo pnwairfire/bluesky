@@ -143,12 +143,11 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         pass
 
 
-    # This will set values for every 5th percentile (0th, 5th, ..., 100th),
-    # which will be sufficient for whatever reduction factor is used by
-    # hysplit.  (Vsmoke doesn't use plumerise data.)
     MISSING_PLUMERISE_HOUR = dict(
-        {'percentile_%03d'%(5*e): 0.0 for e in range(21)},
-        smolder_fraction=0.0)
+        heights=[0.0] * 21, # everthing emitted at the ground
+        emissions_fractions=[0.5] * 20,
+        smolder_fraction=0.0
+    )
     MISSING_TIMEPROFILE_HOUR = dict({p: 0.0 for p in PHASES}, area_fraction=0.0)
 
     SPECIES = ('PM2.5', 'CO')

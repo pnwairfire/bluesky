@@ -235,8 +235,11 @@ class HYSPLITDispersion(DispersionBase):
     DUMMY_EMISSIONS_VALUE = 0.00001
     DUMMY_HOURS = 24
     # TODO: make sure these dummy plumerise values don't have unexpected consequences
-    DUMMY_PLUMERISE_HOUR = dict({'percentile_%03d'%(5*e): 0.05*e for e in range(21)},
-        smolder_fraction=0.0)
+    DUMMY_PLUMERISE_HOUR = dict(
+        heights=[1000 + 100*n for n in range(21)],
+        emissions_fractions=[0.5] * 20,
+        smolder_fraction=0.0
+    )
 
     def _generate_dummy_fire(self):
         """Returns dummy fire formatted like
@@ -627,27 +630,24 @@ class HYSPLITDispersion(DispersionBase):
                     record_fmt = "%s 00 0100 %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
                     emis.write(record_fmt % (dt_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
 
-                    #for pct in range(0, 100, 5):
-                    for pct in range(0, 100, self._reduction_factor*5):
+                    for level in range(0, len(plumerise_hour['heights']) - 1, self._reduction_factor):
                         height_meters = 0.0
                         pm25_injected = 0.0
-
                         if not dummy:
                             # Loop through the heights (20 quantiles of smoke density)
                             # For the unreduced case, we loop through 20 quantiles, but we have
                             # 21 quantile-edge measurements.  So for each
                             # quantile gap, we need to find a point halfway
-                            # between the two edges and inject 1/20th of the
-                            # total emissions there.
+                            # between the two edges and inject that quantile's fraction of total emissions
 
                             # KJC optimization...
                             # Reduce the number of vertical emission levels by a reduction factor
                             # and place the appropriate fraction of emissions at each level.
                             # ReductionFactor MUST evenly divide into the number of quantiles
 
-                            lower_height = plumerise_hour["percentile_%03d" % (pct)]
-                            #upper_height = plumerise_hour["percentile_%03d" % (pct + 5)]
-                            upper_height = plumerise_hour["percentile_%03d" % (pct + (self._reduction_factor*5))]
+                            lower_height = plumerise_hour['heights'][level]
+                            upper_height_index = min(level + self._reduction_factor, len(plumerise_hour['heights']) - 1)
+                            upper_height = plumerise_hour['heights'][upper_height_index]
                             if self._reduction_factor == 1:
                                 height_meters = (lower_height + upper_height) / 2.0  # original approach
                             else:
@@ -655,8 +655,8 @@ class HYSPLITDispersion(DispersionBase):
                             # Total PM2.5 entrained (lofted in the plume)
                             pm25_entrained = pm25_emitted * entrainment_fraction
                             # Inject the proper fraction of the entrained PM2.5 in each quantile gap.
-                            #pm25_injected = pm25_entrained * 0.05  # 1/20 = 0.05
-                            pm25_injected = pm25_entrained * (float(self._reduction_factor)/float(self.num_output_quantiles))
+                            fraction = sum(plumerise_hour[level:level+self._reduction_factor])
+                            pm25_injected = pm25_entrained * fraction
 
                         # Write the record to the file
                         emis.write(record_fmt % (dt_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
