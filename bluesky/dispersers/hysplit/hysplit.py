@@ -655,7 +655,7 @@ class HYSPLITDispersion(DispersionBase):
                             # Total PM2.5 entrained (lofted in the plume)
                             pm25_entrained = pm25_emitted * entrainment_fraction
                             # Inject the proper fraction of the entrained PM2.5 in each quantile gap.
-                            fraction = sum(plumerise_hour[level:level+self._reduction_factor])
+                            fraction = sum(plumerise_hour['emission_fractions'][level:level+self._reduction_factor])
                             pm25_injected = pm25_entrained * fraction
 
                         # Write the record to the file
