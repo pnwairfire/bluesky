@@ -100,7 +100,7 @@ OPTIONAL_ARGS = [
         'short': '-c',
         'long': '--config-file',
         'dest': 'config_file_options',
-        'help': 'config file comtaining JSON formatted overrides for default config values',
+        'help': 'config file containing JSON formatted overrides for default config values',
         'action': scripting_args.ConfigFileAction
     },
     {
