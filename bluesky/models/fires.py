@@ -686,7 +686,7 @@ class FiresManager(object):
             raise RuntimeError("Don't specify both output_stream and output_file")
         if not output_stream:
             output_stream = self._stream(output_file, 'w')
-        fire_json = json.dumps(self.dump(), cls=FireEncoder)
+        fire_json = json.dumps(self.dump(), sort_keys=True, cls=FireEncoder)
         output_stream.write(fire_json)
 
 
