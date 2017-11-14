@@ -501,7 +501,7 @@ class FiresManager(object):
 
     def run(self): #, module_names):
         self.log_status('Good', 'Main', 'Start')
-        self.runtime = {"modules": []}
+        self.runtime = self.runtime or {"modules": []}
         failed = False
 
         with process.RunTimeRecorder(self.runtime):
