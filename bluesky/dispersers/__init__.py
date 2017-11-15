@@ -145,7 +145,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
     MISSING_PLUMERISE_HOUR = dict(
         heights=[0.0] * 21, # everthing emitted at the ground
-        emissions_fractions=[0.5] * 20,
+        emission_fractions=[0.5] * 20,
         smolder_fraction=0.0
     )
     MISSING_TIMEPROFILE_HOUR = dict({p: 0.0 for p in PHASES}, area_fraction=0.0)

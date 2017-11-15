@@ -237,7 +237,7 @@ class HYSPLITDispersion(DispersionBase):
     # TODO: make sure these dummy plumerise values don't have unexpected consequences
     DUMMY_PLUMERISE_HOUR = dict(
         heights=[1000 + 100*n for n in range(21)],
-        emissions_fractions=[0.5] * 20,
+        emission_fractions=[0.5] * 20,
         smolder_fraction=0.0
     )
 
