@@ -1,4 +1,4 @@
--i http://pypi.smoke.airfire.org/simple/
+--extra-index http://pypi.smoke.airfire.org/simple/
 -f http://pypi.smoke.airfire.org/simple/
 pyairfire==3.*
 afconfig==1.*
