@@ -183,40 +183,11 @@ class ExporterBase(object):
 
     IMAGE_PATTERN = '*.png'
 
-    ## ******************** TO DELETE - BEGIN
-
-    HOURLY_IMG_MATCHER = re.compile('.*/hourly_.*')
-    THREE_HOUR_IMG_MATCHER = re.compile('.*/three_hour_.*')
-    DAILY_AVG_IMG_MATCHER = re.compile('.*/daily_average_.*')
-    DAILY_MAX_IMG_MATCHER = re.compile('.*/daily_maximum_.*')
-
-    def _process_images_v1(self, d):
-        """Produces original image results json structure
-
-        TODO: delete once v2 has been adopted.
-        """
-        images = self._find_files(d['output']['directory'], self.IMAGE_PATTERN)
-        hourly = [e for e in images if self.HOURLY_IMG_MATCHER.match(e)]
-        three_hour = [e for e in images if self.THREE_HOUR_IMG_MATCHER.match(e)]
-        daily_max = [e for e in images if self.DAILY_MAX_IMG_MATCHER.match(e)]
-        daily_avg = [e for e in images if self.DAILY_AVG_IMG_MATCHER.match(e)]
-        return {
-            "hourly": hourly,
-            "three_hour": three_hour,
-            "daily": {
-               "average": daily_avg,
-               "maximum": daily_max
-            },
-            "other": list(set(images) - set(hourly) - set(three_hour)
-                - set(daily_max) - set(daily_avg)),
-        }
-
-    ## ******************** TO DELETE - END
 
     SERIES_IMG_MATCHER = re.compile('.*_\d+.png')
     LEGEND_IMG_MATCHER = re.compile('.*colorbar_.*.png')
 
-    def _process_images_v2(self, d):
+    def _process_images(self, d):
         """Produces new image results json structure
 
         TODO: update README and other examples with new structure
@@ -269,15 +240,7 @@ class ExporterBase(object):
         r['visualization']['kmzs'] = self._pick_out_files(kmzs,
             smoke=self.SMOKE_KMZ_MATCHER, fire=self.FIRE_KMZ_MATCHER)
 
-        # TODO: remove v1 once v2 has been adopted, and replace the following
-        #   code with:
-        #     r['visualization']['images'] = self._process_images(d)
-        img_ver = self.config('image_results_version') or 'v1'
-        _f = getattr(self, '_process_images_{}'.format(img_ver), None)
-        if not _f:
-            raise RuntimeError("Invalid image_results_version: {}".format(img_ver))
-        r['visualization']['images'] = _f(d)
-
+        r['visualization']['images'] = self._process_images(d)
 
         csvs = self._find_files(d['output']['directory'], self.CSV_PATTERN)
         r['visualization']['csvs'] = self._pick_out_files(csvs,
