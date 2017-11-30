@@ -1624,7 +1624,7 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
  - ***'config' > 'visualization' > 'hysplit' > 'fire_kmz_filename'*** -- *optional* -- defaults to 'smoke_dispersion.kmz'
  - ***'config' > 'visualization' > 'hysplit' > 'fire_locations_csv_filename'*** -- *optional* -- defaults to 'fire_locations.csv'
  - ***'config' > 'visualization' > 'hysplit' > 'fire_events_csv_filename'*** -- *optional* -- defaults to 'fire_events.csv'
- - ***'config' > 'visualization' > 'hysplit' > 'layer'*** -- *optional* -- defaults to 1
+ - ***'config' > 'visualization' > 'hysplit' > 'layers'*** -- *optional* -- defaults to [0]
  - ***'config' > 'visualization' >  'hysplit' > 'prettykml'*** -- *optional* -- whether or not to make the kml human readable; defaults to false
  - ***'config' > 'visualization' >  'hysplit' > 'is_aquipt'*** -- *optional* -- defaults to false
  - ***'config' > 'visualization' >  'hysplit' > 'output_dir' -- *optional* -- where to create visualization output; if not specified, visualization output will go in hysplit output directory

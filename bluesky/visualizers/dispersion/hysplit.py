@@ -287,7 +287,7 @@ class HysplitVisualizer(object):
 
         config_options = self._get_config_options(output_directory)
 
-        layer = self._config.get('layer')
+        layers = self._config.get('layers')
         args = BlueskyKmlArgs(
             output_directory=str(output_directory),
             configfile=None, # TODO: allow this to be configurable?
@@ -303,11 +303,8 @@ class HysplitVisualizer(object):
             fire_events_csv=str(files['fire_events_csv']['pathname']),
             smoke_dispersion_kmz_file=str(files['smoke_dispersion_kmz']['pathname']),
             fire_kmz_file=str(files['fire_kmz']['pathname']),
-            # even though 'layer' is an integer index, the option must be of type
-            # string or else config.get(section, "LAYER") will fail with error:
-            #  > TypeError: argument of type 'int' is not iterable
-            # it will be cast to int if specified
-            layer=str(layer) if layer else None
+            # blueskykml now supports layers specified as list of ints
+            layer=layers
         )
 
         try:
@@ -399,7 +396,7 @@ class HysplitVisualizer(object):
                 pass
 
             contents = {
-                 "output_version": "1.0.0",
+                 "output_version": "2.0.0",
                  # TODO: populate with real values
                  "dispersion_period": {
                     "from": d_from and d_from.strftime("%Y%m%d %HZ"),
