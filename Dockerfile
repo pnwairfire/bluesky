@@ -77,9 +77,9 @@ RUN pip3 install --upgrade pip
 # NOTE: these RUN commands will need to be updated if 'blueskykml'
 #   and/or consume are ever updated in setup.py
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
-    -i http://pypi.smoke.airfire.org/simple blueskykml==2.*
+    --extra-index http://pypi.smoke.airfire.org/simple blueskykml==2.*
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
-    -i http://pypi.smoke.airfire.org/simple apps-consume4==4.1.*
+    --extra-index http://pypi.smoke.airfire.org/simple apps-consume4==4.1.*
 
 # Same thing for Fiona (which is 39.7MB)
 # NOTE: asame as above - update this command if we upgrade to a newer version
@@ -92,7 +92,7 @@ RUN apt-get install -y \
 
 # Install bluesky utils for merging emissions, etc.
 RUN pip3 install --trusted-host pypi.smoke.airfire.org \
-    -i http://pypi.smoke.airfire.org/simple blueskyutils>=0.2.0
+    --extra-index http://pypi.smoke.airfire.org/simple blueskyutils>=0.2.0
 
 # Install binary dependencies - for localmet, plumerise,
 # dipersion, and visualization
