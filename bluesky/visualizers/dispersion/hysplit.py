@@ -20,8 +20,7 @@ from pyairfire import osutils
 from afdatetime import parsing as datetime_parsing
 
 from blueskykml import (
-    makedispersionkml, makeaquiptdispersionkml,
-    configuration as blueskykml_configuration,
+    makedispersionkml, configuration as blueskykml_configuration,
     smokedispersionkml, __version__ as blueskykml_version
 )
 
@@ -311,10 +310,7 @@ class HysplitVisualizer(object):
             # Note: using create_working_dir effectively marks any
             #  intermediate outputs for cleanup
             with osutils.create_working_dir() as wdir:
-                if self._config.get('is_aquipt'):
-                    makeaquiptdispersionkml.main(args)
-                else:
-                    makedispersionkml.main(args)
+                makedispersionkml.main(args)
         except blueskykml_configuration.ConfigurationError as e:
             raise BlueSkyConfigurationError(".....")
 
