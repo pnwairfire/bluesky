@@ -197,11 +197,13 @@ class ExporterBase(object):
             directory, image_name = os.path.split(i)
             _, color_scheme = os.path.split(directory)
             _, time_series = os.path.split(_)
-            images[time_series] = images.get(time_series, {})
-            images[time_series][color_scheme] = images[time_series].get(
+            _, height = os.path.split(_)
+            images[height] = images.get(height, {})
+            images[height][time_series] = images[height].get(time_series, {})
+            images[height][time_series][color_scheme] = images[height][time_series].get(
                 color_scheme, {"directory": directory, "legend": None,
                 "series": [], "other_images": []})
-            if images[time_series][color_scheme]['directory'] != directory:
+            if images[height][time_series][color_scheme]['directory'] != directory:
                 # TODO: somehow handle this; e.g. we could have 'images'
                 #   reference an array of image directory group objects, and
                 #   add 'time_series' and 'color_scheme' keys to each object
@@ -209,17 +211,17 @@ class ExporterBase(object):
                 #   since their values can be extracted from the directory)
                 raise RuntimeError("Multiple image directories with the same "
                     "time series and color scheme identifiers - {} vs. {}".format(
-                    images[time_series][color_scheme]['directory'], directory))
+                    images[height][time_series][color_scheme]['directory'], directory))
 
             if self.SERIES_IMG_MATCHER.match(image_name):
-                images[time_series][color_scheme]['series'].append(image_name)
-            elif (images[time_series][color_scheme]['legend'] is None and
+                images[height][time_series][color_scheme]['series'].append(image_name)
+            elif (images[height][time_series][color_scheme]['legend'] is None and
                     self.LEGEND_IMG_MATCHER.match(image_name)):
-                images[time_series][color_scheme]['legend'] = image_name
+                images[height][time_series][color_scheme]['legend'] = image_name
             else:
-                images[time_series][color_scheme]['other_images'].append(image_name)
-        images[time_series][color_scheme]['series'].sort()
-        images[time_series][color_scheme]['other_images'].sort()
+                images[height][time_series][color_scheme]['other_images'].append(image_name)
+        images[height][time_series][color_scheme]['series'].sort()
+        images[height][time_series][color_scheme]['other_images'].sort()
         return images
 
     JSON_PATTERN = '*.json'
