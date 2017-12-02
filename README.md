@@ -197,12 +197,12 @@ First, install pip (with sudo if necessary):
 
 Then, to install, for example, v3.0.0, use the following (with sudo if necessary):
 
-    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -i http://pypi.smoke.airfire.org/simple bluesky==3.0.0
+    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org --extra-index http://pypi.smoke.airfire.org/simple bluesky==3.0.0
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
-    -i http://pypi.smoke.airfire.org/simple/
+    --extra-index http://pypi.smoke.airfire.org/simple/
     bluesky==3.0.0
 
 See the Development > Install Dependencies > Notes section, above, for
