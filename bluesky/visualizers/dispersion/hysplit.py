@@ -36,7 +36,7 @@ ARGS = [
     "prettykml", "verbose", "config_options",
     "inputfile","fire_locations_csv",
     "fire_events_csv", "smoke_dispersion_kmz_file",
-    "fire_kmz_file","layer"
+    "fire_kmz_file","layers"
 ]
 BlueskyKmlArgs = namedtuple('BlueskyKmlArgs', ARGS)
 
@@ -303,7 +303,7 @@ class HysplitVisualizer(object):
             smoke_dispersion_kmz_file=str(files['smoke_dispersion_kmz']['pathname']),
             fire_kmz_file=str(files['fire_kmz']['pathname']),
             # blueskykml now supports layers specified as list of ints
-            layer=layers
+            layers=layers
         )
 
         try:
