@@ -201,7 +201,7 @@ class ExporterBase(object):
                 _set(parent_path, *(list(path_elements) + [directory]))
             else:
                 image_name = path_elements[0]
-                directory = os.path.join(*list(reversed(path_elements[1:-1])))
+                directory = os.path.join(*list(reversed(path_elements[1:])))
                 color_scheme_dict = images
                 for e in reversed(path_elements[1:-1]):
                     color_scheme_dict[e] = color_scheme_dict.get(e, {})
