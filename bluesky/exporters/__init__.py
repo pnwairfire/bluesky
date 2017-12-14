@@ -190,39 +190,68 @@ class ExporterBase(object):
     def _process_images(self, d):
         """Produces new image results json structure
 
-        TODO: update README and other examples with new structure
+        Note: This method uses recursion in order to handle variable
+        image nesting depth. (e.g. The daily max and avg image sets have
+        extra nesting due to possibly multiple UTC offsets.)
         """
         images = {}
-        for i in self._find_files(d['output']['directory'], self.IMAGE_PATTERN):
-            directory, image_name = os.path.split(i)
-            _, color_scheme = os.path.split(directory)
-            _, time_series = os.path.split(_)
-            _, height = os.path.split(_)
-            images[height] = images.get(height, {})
-            images[height][time_series] = images[height].get(time_series, {})
-            images[height][time_series][color_scheme] = images[height][time_series].get(
-                color_scheme, {"directory": directory, "legend": None,
-                "series": [], "other_images": []})
-            if images[height][time_series][color_scheme]['directory'] != directory:
-                # TODO: somehow handle this; e.g. we could have 'images'
-                #   reference an array of image directory group objects, and
-                #   add 'time_series' and 'color_scheme' keys to each object
-                #   (though these extra keys wouldn't really be necessary
-                #   since their values can be extracted from the directory)
-                raise RuntimeError("Multiple image directories with the same "
-                    "time series and color scheme identifiers - {} vs. {}".format(
-                    images[height][time_series][color_scheme]['directory'], directory))
-
-            if self.SERIES_IMG_MATCHER.match(image_name):
-                images[height][time_series][color_scheme]['series'].append(image_name)
-            elif (images[height][time_series][color_scheme]['legend'] is None and
-                    self.LEGEND_IMG_MATCHER.match(image_name)):
-                images[height][time_series][color_scheme]['legend'] = image_name
+        def _set(remaining_path, *path_elements):
+            if remaining_path:
+                parent_path, directory = os.path.split(remaining_path)
+                _set(parent_path, *(list(path_elements) + [directory]))
             else:
-                images[height][time_series][color_scheme]['other_images'].append(image_name)
-        images[height][time_series][color_scheme]['series'].sort()
-        images[height][time_series][color_scheme]['other_images'].sort()
+                image_name = path_elements[0]
+                directory = os.path.join(*list(reversed(path_elements[1:-1])))
+                color_scheme_dict = images
+                for e in reversed(path_elements[1:-1]):
+                    color_scheme_dict[e] = color_scheme_dict.get(e, {})
+                    color_scheme_dict = color_scheme_dict[e]
+                if color_scheme_dict == {}:
+                    color_scheme_dict.update({
+                        "directory": directory,
+                        "legend": None,
+                        "series": [],
+                        "other_images": []
+                    })
+                if color_scheme_dict['directory'] != directory:
+                    # TODO: somehow handle this; e.g. we could have 'images'
+                    #   reference an array of image directory group objects, and
+                    #   add 'time_series' and 'color_scheme' keys to each object
+                    #   (though these extra keys wouldn't really be necessary
+                    #   since their values can be extracted from the directory)
+                    raise RuntimeError("Multiple image directories with the same "
+                        "time series and color scheme identifiers - {} vs. {}".format(
+                        color_scheme_dict['directory'], directory))
+
+                if self.SERIES_IMG_MATCHER.match(image_name):
+                    color_scheme_dict['series'].append(image_name)
+                elif (color_scheme_dict['legend'] is None and
+                        self.LEGEND_IMG_MATCHER.match(image_name)):
+                    color_scheme_dict['legend'] = image_name
+                else:
+                    color_scheme_dict['other_images'].append(image_name)
+
+
+        for i in self._find_files(d['output']['directory'], self.IMAGE_PATTERN):
+            _set(i)
+
         return images
+
+
+    def _sort_images(self, images):
+        """Sorts any 'series' and 'other_images' in images dict.
+
+        Note: See note in _process_images regarding recursion and variable
+        image nesting depth.
+        """
+        if 'series' in images:
+            images['series'].sort()
+            images['other_images'].sort()
+        else:
+            for v in images.values():
+                self._sort_images(v)
+
+
 
     JSON_PATTERN = '*.json'
     KMZ_PATTERN = '*.kmz'
@@ -243,6 +272,7 @@ class ExporterBase(object):
             smoke=self.SMOKE_KMZ_MATCHER, fire=self.FIRE_KMZ_MATCHER)
 
         r['visualization']['images'] = self._process_images(d)
+        self._sort_images(r['visualization']['images'])
 
         csvs = self._find_files(d['output']['directory'], self.CSV_PATTERN)
         r['visualization']['csvs'] = self._pick_out_files(csvs,
