@@ -217,7 +217,7 @@ notes on resolving pip and gdal issues.
 The rest of BlueSky's documentation can be found under the `docs/`
 dir in this repo.
 
- - [usage](docs/usage)
+ - [usage](docs/usage.md)
  - [input data](docs/input-data.md)
  - [configuration](docs/configuration.md)
  - [datetime substitutions](docs/datetime-substitutions.md)
