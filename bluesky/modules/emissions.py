@@ -142,15 +142,12 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
     logging.info("Running emissions module with Urbanski EFs")
 
     # Instantiate two lookup object, one Rx and one WF, to be reused
-    fccs2ef_wf = Fccs2Ef(is_rx=False)
-    fccs2ef_rx = Fccs2Ef(is_rx=True)
-
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             if 'growth' not in fire:
                 raise ValueError(
                     "Missing growth data required for computing emissions")
-            fccs2ef = fccs2ef_rx if fire.type == "rx" else fccs2ef_wf
+
             for g in fire.growth:
                 if 'fuelbeds' not in g:
                     raise ValueError(
@@ -159,8 +156,8 @@ def _run_urbanski(fires_manager, species, include_emissions_details):
                     if 'consumption' not in fb:
                         raise ValueError(
                             "Missing consumption data required for computing emissions")
-                    calculator = EmissionsCalculator([fccs2ef[fb["fccs_id"]]],
-                        species=species)
+                    fccs2ef = Fccs2Ef(fb["fccs_id"], is_rx=(fire.type=="rx"))
+                    calculator = EmissionsCalculator(fccs2ef, species=species)
                     _calculate(calculator, fb, include_emissions_details)
                     # Convert from lbs to tons
                     # TODO: Update EFs to be tons/ton in a) eflookup package,
