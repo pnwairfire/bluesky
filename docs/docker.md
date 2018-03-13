@@ -1,41 +1,12 @@
-
-## Docker
+## Using Docker to run BlueSky
 
 A Dockerfile is included in this repo. It can be used to run bluesky
 out of the box or as a base environment for development.
 
-### Install Docker
+### Install and Start Docker
 
-See https://docs.docker.com/engine/installation/ for platform specific
+See https://www.docker.com/community-edition for platform specific
 installation instructions.
-
-### Start Docker
-
-#### Mac OSX
-
-On a Mac, you have two options: Docker for Mac or docker toolbox, which runs
-the docker daemon inside a Linux VM.  These instructions cover using
-docker toolbox, because, at the time of writing, Docker for Mac is still
-beta. The first time you use docker, you'll need to create a vm:
-
-    docker-machine create --driver virtualbox docker-default
-
-Check that it was created:
-
-    docker-machine ls
-
-Subsequently, you'll need to start the vm with:
-
-    docker-machine start docker-default
-
-Once it's running, set env vars so that your docker knows how to find
-the docker host:
-
-    eval "$(docker-machine env docker-default)"
-
-#### Ubuntu
-
-...TODO: fill in insructions...
 
 
 ### Build Bluesky Docker Image from Dockerfile
@@ -52,6 +23,7 @@ complete image.
 
 See the [bluesky docker hub page](https://hub.docker.com/r/pnwairfire/bluesky/)
 for more information.
+
 
 ### Run Complete Container
 

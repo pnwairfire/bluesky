@@ -1,3 +1,4 @@
+## Input Data
 
 The top level input data fields that bsp recognizes are: ```run_id```,
 ```today```, ```config```, and ```fire_information```.

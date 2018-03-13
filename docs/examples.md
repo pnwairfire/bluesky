@@ -1,9 +1,9 @@
-# Examples
+## Examples
 
 The examples listed here are based on **proposed** changes to the code base.  They
 do not represent the current behavior.
 
-## Through Emissions
+### Through Emissions
 
 Assume you have the following input data:
 
