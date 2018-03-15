@@ -1,0 +1,47 @@
+{
+    "config": {
+        "emissions": {
+            "species": ["PM2.5"]
+        },
+        "findmetdata": {
+            "met_root_dir": "/DRI_6km/"
+        },
+        "dispersion": {
+            "start": "2014-05-30T00:00:00",
+            "num_hours": 3,
+            "model": "hysplit",
+            "output_dir": "/bsp-output/bsp-dispersion-output/DRI6km-2014-05-30-comptuted-grid-km-{run_id}",
+            "hysplit": {
+                "compute_grid": true,
+                "spacing_longitude": 6.0,
+                "spacing_latitude": 6.0,
+                "NUMPAR": 500,
+                "MAXPAR": 12000,
+                "VERTICAL_LEVELS": [100, 500, 1000]
+            }
+        },
+        "visualization": {
+            "target": "dispersion",
+            "hysplit": {
+                "images_dir": "images/",
+                "data_dir": "data/",
+                "blueskykml_config": {
+                    "DispersionGridInput": {
+                        "LAYERS": [0,2]
+                    },
+                    "DispersionImages": {
+                        "DAILY_IMAGES_UTC_OFFSETS": [-7, 0]
+                    }
+                }
+            }
+        },
+        "export": {
+            "modes": ["localsave"],
+            "extra_exports": ["dispersion", "visualization"],
+            "localsave": {
+                "dest_dir": "/bsp-output/bsp-local-exports/",
+                "output_dir_name": "exported-{dispersion_output_dir_name}"
+            }
+        }
+    }
+}
