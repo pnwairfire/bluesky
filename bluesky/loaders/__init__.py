@@ -42,9 +42,9 @@ class BaseLoader(object):
         self._config = config
 
     def _write_data(self, saved_data_filename, data):
-        if filename:
+        if saved_data_filename:
             try:
-                with open(filename) as f:
+                with open(saved_data_filename) as f:
                     f.write(data)
             except Exception as e:
                 logging.warn(
