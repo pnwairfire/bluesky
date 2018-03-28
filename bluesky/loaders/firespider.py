@@ -88,8 +88,6 @@ class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
     """Loads json formatted fire data from the FireSpider web service
     """
 
-    DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%Z'
-
     def load(self):
         fires = json.loads(self.get(**self._query))['data']
         return self._marshal(fires)

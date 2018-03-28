@@ -151,6 +151,8 @@ class BaseApiLoader(BaseLoader):
     DEFAULT_AUTH_PROTOCOL = "afweb"
     DEFAULT_REQUEST_TIMEOUT = 10 # seconds
 
+    DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%Z'
+
     def __init__(self, **config):
         super(BaseApiLoader, self).__init__(**config)
 
