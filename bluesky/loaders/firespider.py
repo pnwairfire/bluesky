@@ -9,7 +9,6 @@ import os
 
 from . import BaseApiLoader, BaseJsonFileLoader
 from bluesky.datetimeutils import parse_datetime, parse_utc_offset
-from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
     'JsonApiLoader',
@@ -19,14 +18,6 @@ __all__ = [
 class BaseFireSpiderLoader(object):
 
     START_AFTER_END_ERROR_MSG = "Start must be before end"
-
-    def __init__(self, **config):
-        self._start = self._config.get('start')
-        self._end = self._config.get('end')
-        self._start = self._start and parse_datetime(self._start, 'start')
-        self._end = self._end and parse_datetime(self._end, 'end')
-        if self._start and self._end and self._start > self._end:
-            raise BlueSkyConfigurationError(self.START_AFTER_END_ERROR_MSG)
 
     def _marshal(self, fires):
         """Marshals FireSpider data into bsp's internal structure

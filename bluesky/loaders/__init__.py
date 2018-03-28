@@ -41,6 +41,14 @@ class BaseLoader(object):
     def __init__(self, **config):
         self._config = config
 
+        # start and end times, to use in filtering growth windows
+        self._start = self._config.get('start')
+        self._end = self._config.get('end')
+        self._start = self._start and parse_datetime(self._start, 'start')
+        self._end = self._end and parse_datetime(self._end, 'end')
+        if self._start and self._end and self._start > self._end:
+            raise BlueSkyConfigurationError(self.START_AFTER_END_ERROR_MSG)
+
     def _write_data(self, saved_data_filename, data):
         if saved_data_filename:
             try:
