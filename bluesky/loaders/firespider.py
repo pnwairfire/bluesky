@@ -30,8 +30,8 @@ class BaseFireSpiderLoader(object):
                 "type": "wildfire",
                 "growth": [
                     {
-                        "end": "2015-08-10T07:00:00Z",
-                        "start": "2015-08-09T07:00:00Z",
+                        "start": "2015-08-09T00:00:00Z",
+                        "end": "2015-08-10T00:00:00Z",
                         "location": {
                             "area": 900,
                             "geojson": {
