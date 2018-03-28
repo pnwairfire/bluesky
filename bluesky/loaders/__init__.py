@@ -27,6 +27,7 @@ from afweb import auth
 from pyairfire.io import CSV2JSON
 
 from bluesky import datetimeutils
+from bluesky.datetimeutils import parse_datetime
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __author__ = "Joel Dubowy"
