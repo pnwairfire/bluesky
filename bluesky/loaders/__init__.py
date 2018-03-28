@@ -143,6 +143,8 @@ class BaseApiLoader(BaseLoader):
     DEFAULT_REQUEST_TIMEOUT = 10 # seconds
 
     def __init__(self, **config):
+        super(BaseApiLoader, self).__init__(**config)
+
         self._endpoint = config.get('endpoint')
         if not self._endpoint:
             raise BlueSkyConfigurationError(
@@ -161,6 +163,15 @@ class BaseApiLoader(BaseLoader):
             self.DEFAULT_AUTH_PROTOCOL)
         self._request_timeout = config.get('request_timeout',
             self.DEFAULT_REQUEST_TIMEOUT)
+
+        self._query = config.get('query', {})
+        # Convert datetime.date objects to strings
+        for k in self._query:
+            if isinstance(self._query[k], datetime.date):
+                self._query[k] = self._query[k].strftime(
+                    self.DATETIME_FORMAT)
+                # TODO: if no timezone info, add 'Z' to end of string ?
+
 
     def get(self, saved_data_filename=None, **query):
         if self._secret:
