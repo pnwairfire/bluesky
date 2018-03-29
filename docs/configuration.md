@@ -127,6 +127,7 @@ emissions config
 
  ####### Config settings adopted from BlueSky Framework
 
+ - ***'config' > 'dispersion' > 'hysplit' > 'DISPERSION_OFFSET'*** -- *optional* -- number of hours to offset start of dispersion
  - ***'config' > 'dispersion' > 'hysplit' > 'ASCDATA_FILE'*** -- *optional* -- default: use default file in package
  - ***'config' > 'dispersion' > 'hysplit' > 'CENTER_LATITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none
  - ***'config' > 'dispersion' > 'hysplit' > 'CENTER_LONGITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none

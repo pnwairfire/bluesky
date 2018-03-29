@@ -7,12 +7,8 @@
                     "format": "JSON",
                     "type": "API",
                     "endpoint": "http://<HOSTNAME>/api/v1/fires/raw/",
-                    "key": "<KEY>",
-                    "secret": "<SECRET>",
-                    "query": {
-                        "start": "{today-10}",
-                        "end": "{today+4}"
-                    }
+                    "start": "{today-10}",
+                    "end": "{today+4}"
                 }
             ]
         }

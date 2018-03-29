@@ -175,6 +175,10 @@ class HYSPLITDispersion(DispersionBase):
         args:
          - wdir -- working directory
         """
+        dispersion_offset = int(self.config("DISPERSION_OFFSET") or 0)
+        self._model_start_after_offset = self._model_start + timedelta(hours=dispersion_offset)
+        self._num_hours_after_offset = self._num_hours - dispersion_offset
+
         self._set_grid_params()
         self._create_dummy_fire_if_necessary()
         self._set_reduction_factor()
@@ -420,10 +424,10 @@ class HYSPLITDispersion(DispersionBase):
 
         # need an input file if ninit_val > 0
         if ninit_val > 0:
-             # name of pardump input file, pinpf (check for strftime strings)
+            # name of pardump input file, pinpf (check for strftime strings)
             pinpf = self.config("PINPF")
             if "%" in pinpf:
-                pinpf = self._model_start.strftime(pinpf)
+                pinpf = self._model_start_after_offset.strftime(pinpf)
             parinitFiles = [ "%s" % pinpf ]
 
             # if an MPI run need to create the full list of expected files
@@ -452,7 +456,7 @@ class HYSPLITDispersion(DispersionBase):
         # Prepare for run ... get pardump name just in case needed
         poutf = self.config("POUTF")
         if "%" in poutf:
-            poutf = self._model_start.strftime(poutf)
+            poutf = self._model_start_after_offset.strftime(poutf)
         pardumpFiles = [ "%s" % poutf ]
 
         # If MPI run
@@ -549,8 +553,8 @@ class HYSPLITDispersion(DispersionBase):
             emis.write("each emission's source: YYYY MM DD HH MM DUR_HHMM LAT LON HT RATE AREA HEAT\n")
 
             # Loop through the timesteps
-            for hour in range(self._num_hours):
-                dt = self._model_start + timedelta(hours=hour)
+            for hour in range(self._num_hours_after_offset):
+                dt = self._model_start_after_offset + timedelta(hours=hour)
                 dt_str = dt.strftime("%y %m %d %H")
 
                 num_fires = len(self._fires)
@@ -831,7 +835,7 @@ class HYSPLITDispersion(DispersionBase):
 
         with open(control_file, "w") as f:
             # Starting time (year, month, day hour)
-            f.write(self._model_start.strftime("%y %m %d %H") + "\n")
+            f.write(self._model_start_after_offset.strftime("%y %m %d %H") + "\n")
 
             # Number of sources
             f.write("%d\n" % num_sources)
@@ -842,7 +846,7 @@ class HYSPLITDispersion(DispersionBase):
                     f.write("%9.3f %9.3f %9.3f\n" % (fire.latitude, fire.longitude, sourceHeight))
 
             # Total run time (hours)
-            f.write("%04d\n" % self._num_hours)
+            f.write("%04d\n" % self._num_hours_after_offset)
 
             # Method to calculate vertical motion
             f.write("%d\n" % verticalMethod)
@@ -864,9 +868,9 @@ class HYSPLITDispersion(DispersionBase):
             # Emissions rate (per hour) (Ken's code says "Emissions source strength (mass per second)" -- which is right?)
             f.write("0.001\n")
             # Duration of emissions (hours)
-            f.write(" %9.3f\n" % self._num_hours)
+            f.write(" %9.3f\n" % self._num_hours_after_offset)
             # Source release start time (year, month, day, hour, minute)
-            f.write("%s\n" % self._model_start.strftime("%y %m %d %H %M"))
+            f.write("%s\n" % self._model_start_after_offset.strftime("%y %m %d %H %M"))
 
             # Number of simultaneous concentration grids
             f.write("1\n")
@@ -889,10 +893,16 @@ class HYSPLITDispersion(DispersionBase):
             f.write("%s\n" % verticalLevels)
 
             # Sampling start time (year month day hour minute)
-            f.write("%s\n" % self._model_start.strftime("%y %m %d %H %M"))
+            f.write("%s\n" % self._model_start_after_offset.strftime("%y %m %d %H %M"))
+
             # Sampling stop time (year month day hour minute)
-            model_end = self._model_start + timedelta(hours=self._num_hours)
+            # The following would be the same as
+            # model_end = self._model_start + timedelta(
+            #     hours=self._num_hours)
+            model_end = self._model_start_after_offset + timedelta(
+                hours=self._num_hours_after_offset)
             f.write("%s\n" % model_end.strftime("%y %m %d %H %M"))
+
             # Sampling interval (type hour minute)
             # A type of 0 gives an average over the interval.
             sampling_interval_type = int(self.config("SAMPLING_INTERVAL_TYPE"))
@@ -954,7 +964,7 @@ class HYSPLITDispersion(DispersionBase):
         # pardump vars
         ndump_val = int(self.config("NDUMP"))
         ncycl_val = int(self.config("NCYCL"))
-        dump_datetime = self._model_start + timedelta(hours=ndump_val)
+        dump_datetime = self._model_start_after_offset + timedelta(hours=ndump_val)
 
         # emission cycle time
         qcycle_val =self.config("QCYCLE")
@@ -985,12 +995,12 @@ class HYSPLITDispersion(DispersionBase):
         # name of the particle input file (check for strftime strings)
         pinpf = self.config("PINPF")
         if "%" in pinpf:
-            pinpf = self._model_start.strftime(pinpf)
+            pinpf = self._model_start_after_offset.strftime(pinpf)
 
         # name of the particle output file (check for strftime strings)
         poutf = self.config("POUTF")
         if "%" in poutf:
-            poutf = self._model_start.strftime(poutf)
+            poutf = self._model_start_after_offset.strftime(poutf)
 
         # conversion module
         ichem_val = int(self.config("ICHEM"))
