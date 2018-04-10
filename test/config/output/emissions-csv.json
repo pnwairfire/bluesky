@@ -1,0 +1,10 @@
+{
+    "config": {
+        "output": {
+            "sets": ["emissionscsv"],
+            "emissionscsv": {
+                "output_file": "{run_id}/emissions.csv"
+            }
+        }
+    }
+}
