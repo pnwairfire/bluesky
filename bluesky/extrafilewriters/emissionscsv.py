@@ -15,7 +15,7 @@ import os
 
 from bluesky.exceptions import BlueSkyConfigurationError
 
-class EmissionsCsvOutputter(object):
+class EmissionsCsvWriter(object):
 
     def __init__(self, dest_dir, **config):
         self._filename = config.get('filename')
@@ -43,7 +43,7 @@ class EmissionsCsvOutputter(object):
     PIPELINE_PHASES = ('smoldering', 'flaming','residual')
     EMIS_FILE_PHASES = ('smold', 'flame', 'resid')
 
-    def output(self, fires_manager):
+    def write(self, fires_manager):
         logging.info('Saving emissions csv output to %s', self._filename)
         with open(self._filename, 'w') as f:
             self.emissions_writer = csv.writer(f)
