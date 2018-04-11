@@ -10,9 +10,9 @@ __all__ = [
 __version__ = "0.1.0"
 
 from bluesky.exceptions import BlueSkyConfigurationError
-from bluesky.outputter import emissionscsv
+from bluesky.outputters import emissionscsv
 
-OUTPUTTER = {
+OUTPUTTERS = {
     'emissionscsv': emissionscsv.EmissionsCsvOutputter
 }
 
@@ -24,10 +24,10 @@ def run(fires_manager):
     """
     output_sets = [m.lower() for m in
         fires_manager.get_config_value('output', 'sets', default=[])]
-    fires_manager.processed(__name__, __version__, sets=sets)
+    fires_manager.processed(__name__, __version__, sets=output_sets)
 
     outputters = []
-    for output_set in sets:
+    for output_set in output_sets:
         outputter_klass = OUTPUTTERS.get(output_set)
         if not outputter_klass:
             raise BlueSkyConfigurationError("Invalid outputter - {}".format(
