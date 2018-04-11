@@ -26,6 +26,21 @@ class EmissionsCsvOutputter(object):
     SPECIES = [
         "PM2.5", "PM10", "CO",  'CO2', 'CH4', 'NOX', 'NH3', 'SO2', 'VOC'
     ]
+    HEADERS = [
+        'fire_id', 'hour', 'ignition_date_time', 'date_time', 'area_fract',
+        'flame_profile', 'smolder_profile', 'residual_profile'
+    ]
+    HEADERS.extend([s + '_emitted' for s in SPECIES])
+    HEADERS.extend([s + '_flame' for s in SPECIES])
+    HEADERS.extend([s + '_smold' for s in SPECIES])
+    HEADERS.extend([s + '_resid' for s in SPECIES])
+    HEADERS.extend([
+        'smoldering_fraction', 'heat'
+    ])
+    # TODO: are 21 heights columns enough?
+    HEADERS.extend(['height_' + str(i) for i in range(21)])
+    PIPELINE_PHASES = ('smoldering', 'flaming','residual')
+    EMIS_FILE_PHASES = ('smold', 'flame', 'resid')
     def output(self, fires_manager):
         self._make_output_dir()
 
@@ -35,28 +50,9 @@ class EmissionsCsvOutputter(object):
             # Write header row
             # TODO: only include plume rise columns if plumerise
             #   has already been calcualted
-            headers = [
-                'fire_id',
-                'hour',
-                'ignition_date_time',
-                'date_time',
-                'area_fract',
-                'flame_profile',
-                'smolder_profile',
-                'residual_profile'
-            ]
-            headers.extend([s + '_emitted' for s in self.SPECIES])
-            headers.extend([s + '_flame' for s in self.SPECIES])
-            headers.extend([s + '_smold' for s in self.SPECIES])
-            headers.extend([s + '_resid' for s in self.SPECIES])
-            headers.extend([
-                'smoldering_fraction', 'heat'
-            ])
 
-            # TODO: determine number of heights from first fire
-            headers.extend(['height_' + str(i) for i in range(21)])
-            emissions_writer.writerow(headers)
 
+            emissions_writer.writerow(self.HEADERS)
 
             for fire in fires_manager.fires:
                 with fires_manager.fire_failure_handler(fire):
@@ -68,31 +64,47 @@ class EmissionsCsvOutputter(object):
                         if not g.get('timeprofile'):
                             raise ValueError("growth timeprofile information "
                                 "required to output emissions csv")
-                        if not g.get('emissions'):
+
+                        # Total emissions values may be in g['emissions'], but
+                        # we also need per-phase values, so we need the
+                        # emissions data in the fuelbeds objects
+                        if not g.get('fuelbeds') or not g['fuelbeds'][0].get('emissions'):
                             raise ValueError("growth emissions information "
                                 "required to output emissions csv")
+
                         for i, ts in enumerate(sorted(list(g.get('timeprofile').keys()))):
-                            row = [
-                                fire.get('id', ''),
-                                str(i),
-                                '', # TODO: fill in ignition_date_time
-                                ts,
-                                g['timeprofile'][ts]['area_fraction'],
-                                g['timeprofile'][ts]['flaming'],
-                                g['timeprofile'][ts]['smoldering'],
-                                g['timeprofile'][ts]['residual']
-                            ]
+                            tp = g['timeprofile'][ts]
+                            utc_offset = g['location']['utc_offset'] or 'Z'
+                            row = {
+                                "fire_id": fire.get('id', ''),
+                                "hour": str(i),
+                                "ignition_date_time": '', # TODO: fill in
+                                "date_time": ts + utc_offset,
+                                "area_fract": tp['area_fraction'],
+                                "flame_profile": tp['flaming'],
+                                "smolder_profile": tp['smoldering'],
+                                "residual_profile": tp['residual']
+                            }
 
-                            # TODO: '_emitted' species fields
-                            # TODO: '_flame' species fields
-                            # TODO: '_smold' species fields
-                            # TODO: '_resid' species fields
-                            # TODO: smoldering_fraction
-                            # TODO: timeprofiled heat ???
-                            #    row.append(g['heat']['summary']['total'])
-                            # TODO: plume heights
+                            # Iterate through SPECIES to compute totals
+                            # by phase; then write out columns in BSF's order
+                            for s in self.SPECIES:
+                                if s in g['fuelbeds'][0]['emissions']['total']:
+                                    for f1, f2 in zip(self.PIPELINE_PHASES, self.EMIS_FILE_PHASES):
+                                        row[s + '_' + f2] = sum([
+                                            f['emissions'][f1][s][0] for f in g['fuelbeds']
+                                        ]) * tp[f1]
+                                    row[s + '_emitted'] = sum([row[s + '_' + f2]
+                                        for f2 in self.EMIS_FILE_PHASES])
 
-                            emissions_writer.writerow(row)
+                            pr = g['plumerise'][ts]
+                            row['smoldering_fraction'] = pr['smolder_fraction']
+                            row['heat'] = g['heat']['summary']['total'] * tp['area_fraction']
+                            for i, h in enumerate(pr['heights']):
+                                row['height_' + str(i)] = h
+
+                            emissions_writer.writerow(
+                                [row.get(k, '') for k in self.HEADERS])
 
     def _make_output_dir(self):
         output_dir = os.path.dirname(self._output_file)
