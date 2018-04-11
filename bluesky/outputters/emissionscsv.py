@@ -22,6 +22,7 @@ class EmissionsCsvOutputter(object):
         if not self._output_file:
             raise BlueSkyConfigurationError("Specify destination "
                 "('config' > 'output' > 'emissionscsv' > 'output_file')")
+        self._output_file = os.path.abspath(self._output_file)
 
     SPECIES = [
         "PM2.5", "PM10", "CO",  'CO2', 'CH4', 'NOX', 'NH3', 'SO2', 'VOC'
@@ -105,6 +106,8 @@ class EmissionsCsvOutputter(object):
 
                             emissions_writer.writerow(
                                 [row.get(k, '') for k in self.HEADERS])
+
+        return {'output_file': self._output_file}
 
     def _make_output_dir(self):
         output_dir = os.path.dirname(self._output_file)

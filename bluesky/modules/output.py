@@ -35,9 +35,10 @@ def run(fires_manager):
 
         outputter_config = fires_manager.get_config_value(
             'output', output_set, default={})
-        outputters.append(outputter_klass(**outputter_config))
+        outputters.append((output_set, outputter_klass(**outputter_config)))
 
     # Note: output modules update fires_manager with output info, since that
     # info needs to be in the fires_manager before it's dumped to json
-    for outputter in outputters:
-        outputter.output(fires_manager)
+    fires_manager.output = {}
+    for output_set, outputter in outputters:
+        fires_manager.output[output_set] = outputter.output(fires_manager)
