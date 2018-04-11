@@ -27,6 +27,9 @@ class EmissionsCsvWriter(object):
     SPECIES = [
         "PM2.5", "PM10", "CO",  'CO2', 'CH4', 'NOX', 'NH3', 'SO2', 'VOC'
     ]
+
+    # Note: HEADERS contains the columns in the desired output order
+    #  (to match the old BlueSky framework output)
     HEADERS = [
         'fire_id', 'hour', 'ignition_date_time', 'date_time', 'area_fract',
         'flame_profile', 'smolder_profile', 'residual_profile'
@@ -40,6 +43,7 @@ class EmissionsCsvWriter(object):
     ])
     # TODO: are 21 heights columns enough?
     HEADERS.extend(['height_' + str(i) for i in range(21)])
+
     PIPELINE_PHASES = ('smoldering', 'flaming','residual')
     EMIS_FILE_PHASES = ('smold', 'flame', 'resid')
 
@@ -101,11 +105,16 @@ class EmissionsCsvWriter(object):
                 row[s + '_emitted'] = sum([row[s + '_' + f2]
                     for f2 in self.EMIS_FILE_PHASES])
 
-        pr = g['plumerise'][ts]
-        row['smoldering_fraction'] = pr['smolder_fraction']
+        # Note: plumerise might not be defined for the timestamp
+        # (e.g. bluesky playground only defines plumerise for the
+        #  hours in the dispersion time window)
+        if ts in g['plumerise']:
+            pr = g['plumerise'][ts]
+            row['smoldering_fraction'] = pr['smolder_fraction']
+            for i, h in enumerate(pr['heights']):
+                row['height_' + str(i)] = h
+
         row['heat'] = g['heat']['summary']['total'] * tp['area_fraction']
-        for i, h in enumerate(pr['heights']):
-            row['height_' + str(i)] = h
 
         self.emissions_writer.writerow(
             [row.get(k, '') for k in self.HEADERS])
