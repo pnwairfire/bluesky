@@ -123,7 +123,6 @@ class ExporterBase(object):
 
     def _gather_bundle(self, fires_manager, output_dir):
         r = {}
-
         dirs_to_copy = {}
         for k in self._extra_exports:
             d = getattr(fires_manager, k)
@@ -140,6 +139,11 @@ class ExporterBase(object):
                 if processor:
                     processor(getattr(fires_manager, k), r)
         return r
+
+
+    ##
+    ## Extra export - Dispersion
+    ##
 
     def _process_dispersion(self, d, r):
         # TODO: look in 'd' to see what model of dispersion was run, what files
@@ -181,9 +185,11 @@ class ExporterBase(object):
         return {}
 
 
+    ##
+    ## Extra export - Visualization
+    ##
+
     IMAGE_PATTERN = '*.png'
-
-
     SERIES_IMG_MATCHER = re.compile('.*_\d+.png')
     LEGEND_IMG_MATCHER = re.compile('.*colorbar_.*.png')
 
@@ -237,7 +243,6 @@ class ExporterBase(object):
 
         return images
 
-
     def _sort_images(self, images):
         """Sorts any 'series' and 'other_images' in images dict.
 
@@ -250,8 +255,6 @@ class ExporterBase(object):
         else:
             for v in images.values():
                 self._sort_images(v)
-
-
 
     JSON_PATTERN = '*.json'
     KMZ_PATTERN = '*.kmz'
@@ -279,6 +282,18 @@ class ExporterBase(object):
             fire_locations=self.FIRE_LOCATIONS_CSV_MATCHER,
             fire_events=self.FIRE_EVENTS_CSV_MATCHER,
             fire_emissions=self.FIRE_EMISSIONS_CSV_MATCHER)
+
+
+    ##
+    ## Extra Exports - Output
+    ##
+
+    # Note: we don't need any extra code to process 'output' module output
+
+
+    ##
+    ## General helpers
+    ##
 
     def _pick_out_files(self, found_files, **patterns):
         found_files = set(found_files)
