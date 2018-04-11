@@ -57,15 +57,42 @@ class EmissionsCsvOutputter(object):
             headers.extend(['height_' + str(i) for i in range(21)])
             emissions_writer.writerow(headers)
 
+
             for fire in fires_manager.fires:
+                with fires_manager.fire_failure_handler(fire):
+                    if not fire.get('growth'):
+                        raise ValueError("Growth information required to "
+                            "output emissions csv")
 
-                # TODO: sum time profiled values across all groth windows
-                # for t in
-                #     emissions_writer.writerow([
-                #         fire.get('id',''),
+                    for g in fire['growth']:
+                        if not g.get('timeprofile'):
+                            raise ValueError("growth timeprofile information "
+                                "required to output emissions csv")
+                        if not g.get('emissions'):
+                            raise ValueError("growth emissions information "
+                                "required to output emissions csv")
+                        for i, ts in enumerate(sorted(list(g.get('timeprofile').keys()))):
+                            row = [
+                                fire.get('id', ''),
+                                str(i),
+                                '', # TODO: fill in ignition_date_time
+                                ts,
+                                g['timeprofile'][ts]['area_fraction'],
+                                g['timeprofile'][ts]['flaming'],
+                                g['timeprofile'][ts]['smoldering'],
+                                g['timeprofile'][ts]['residual']
+                            ]
 
-                #     ])
-                pass
+                            # TODO: '_emitted' species fields
+                            # TODO: '_flame' species fields
+                            # TODO: '_smold' species fields
+                            # TODO: '_resid' species fields
+                            # TODO: smoldering_fraction
+                            # TODO: timeprofiled heat ???
+                            #    row.append(g['heat']['summary']['total'])
+                            # TODO: plume heights
+
+                            emissions_writer.writerow(row)
 
     def _make_output_dir(self):
         output_dir = os.path.dirname(self._output_file)
