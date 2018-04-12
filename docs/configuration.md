@@ -105,6 +105,17 @@ emissions config
  - ***'config' > 'plumerising' > 'sev' > 'gravity'*** -- *optional* -- default: 9.8
  - ***'config' > 'plumerising' > 'sev' > 'plume_bottom_over_top'*** -- *optional* -- default: 0.5
 
+
+##### extrafiles
+
+- ***'config' > 'extrafiles' > 'dest_dir' -- *required* -- where to write extra files
+- ***'config' > 'extrafiles' > 'sets' -- *optional* (though nothing happens if not defined) -- array of file sets to write
+
+###### if writing emissionscsv:
+
+- ***'config' > 'extrafiles' > 'emissionscsv' > 'filename'*** -- *required* --
+
+
 ##### dispersion
 
  - ***'config' > 'dispersion' > 'start'*** -- *required* (unless it can be determined from fire growth windows) -- modeling start time (ex. "2015-01-21T00:00:00Z"); 'today' is also recognized, in which case start is set to midnight of the current utc date
