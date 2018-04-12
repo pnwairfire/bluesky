@@ -55,7 +55,7 @@ class ExporterBase(object):
             fires_manager.dumps(output_stream=f)
 
         if create_tarball:
-            self._create_tarball(dest, output_dir)
+            return self._create_tarball(dest, output_dir)
 
         return output_dir
 
