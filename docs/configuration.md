@@ -290,6 +290,7 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 ###### if saving locally or uploading:
 
  - ***'config' > 'export' > ['localsave'|'upload'] > 'output_dir_name'*** -- *optional* -- defaults to run_id, which is generated if not defined
+ - ***'config' > 'export' > ['localsave'|'upload'] > 'extra_exports_dir_name'*** -- *optional* -- generated from extra_exports mode name(s) if not defined
  - ***'config' > 'export' > ['localsave'|'upload'] > 'json_output_filename'*** -- *optional* -- defaults to 'output.json'
 
 ###### if saving locally:

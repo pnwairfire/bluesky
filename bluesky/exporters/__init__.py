@@ -122,6 +122,7 @@ class ExporterBase(object):
         return output_dir
 
     def _gather_bundle(self, fires_manager, output_dir):
+        extra_exports_dir_name = self.config('extra_exports_dir_name')
         r = {}
         dirs_to_copy = {}
         for k in self._extra_exports:
@@ -130,10 +131,10 @@ class ExporterBase(object):
                 dirs_to_copy[d['output']['directory']] = dirs_to_copy.get(
                     d['output']['directory'], [])
                 dirs_to_copy[d['output']['directory']].append(k)
-        for directory, extra_imports in list(dirs_to_copy.items()):
-            new_dirname = '-'.join(extra_imports)
+        for directory, extra_exports in list(dirs_to_copy.items()):
+            new_dirname = extra_exports_dir_name or '-'.join(extra_exports)
             shutil.copytree(directory, os.path.join(output_dir, new_dirname))
-            for k in extra_imports:
+            for k in extra_exports:
                 r[k] = {'sub_directory': new_dirname}
                 processor = getattr(self, '_process_{}'.format(k), None)
                 if processor:
