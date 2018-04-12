@@ -1,4 +1,4 @@
-"""bluesky.outputter.emissionscsv
+"""bluesky.extrafilewriters.emissionscsv
 
 Writes fire emissions csv file in the form:
 
@@ -21,7 +21,7 @@ class EmissionsCsvWriter(object):
         self._filename = config.get('filename')
         if not self._filename:
             raise BlueSkyConfigurationError("Specify destination "
-                "('config' > 'output' > 'emissionscsv' > 'filename')")
+                "('config' > 'extrafiles' > 'emissionscsv' > 'filename')")
         self._filename = os.path.join(dest_dir, self._filename)
 
     SPECIES = [
@@ -48,7 +48,7 @@ class EmissionsCsvWriter(object):
     EMIS_FILE_PHASES = ('smold', 'flame', 'resid')
 
     def write(self, fires_manager):
-        logging.info('Saving emissions csv output to %s', self._filename)
+        logging.info('Writing emissions csv to %s', self._filename)
         with open(self._filename, 'w') as f:
             self.emissions_writer = csv.writer(f)
             self.emissions_writer.writerow(self.HEADERS)
@@ -60,7 +60,7 @@ class EmissionsCsvWriter(object):
     def _write_fire(self, fire):
         if not fire.get('growth'):
             raise ValueError("Growth information required to "
-                "output emissions csv")
+                "write emissions csv")
 
         for g in fire['growth']:
             self._write_growth(fire, g)
@@ -68,14 +68,14 @@ class EmissionsCsvWriter(object):
     def _write_growth(self, fire, g):
         if not g.get('timeprofile'):
             raise ValueError("growth timeprofile information "
-                "required to output emissions csv")
+                "required to write emissions csv")
 
         # Total emissions values may be in g['emissions'], but
         # we also need per-phase values, so we need the
         # emissions data in the fuelbeds objects
         if not g.get('fuelbeds') or not g['fuelbeds'][0].get('emissions'):
             raise ValueError("growth emissions information "
-                "required to output emissions csv")
+                "required to write emissions csv")
 
         for i, ts in enumerate(sorted(list(g.get('timeprofile').keys()))):
             self._write_row(fire, g, i, ts)
