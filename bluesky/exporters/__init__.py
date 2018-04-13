@@ -3,6 +3,7 @@
 __author__ = "Joel Dubowy"
 
 import fnmatch
+import glob
 import json
 import logging
 import os
@@ -123,6 +124,11 @@ class ExporterBase(object):
 
     def _gather_bundle(self, fires_manager, output_dir):
         extra_exports_dir_name = self.config('extra_exports_dir_name')
+        if extra_exports_dir_name:
+            extra_exports_path_name = os.path.join(output_dir,
+                extra_exports_dir_name)
+            if not os.path.exists(extra_exports_path_name):
+                os.makedirs(extra_exports_path_name)
         r = {}
         dirs_to_copy = {}
         for k in self._extra_exports:
@@ -132,8 +138,19 @@ class ExporterBase(object):
                     d['output']['directory'], [])
                 dirs_to_copy[d['output']['directory']].append(k)
         for directory, extra_exports in list(dirs_to_copy.items()):
-            new_dirname = extra_exports_dir_name or '-'.join(extra_exports)
-            shutil.copytree(directory, os.path.join(output_dir, new_dirname))
+            if extra_exports_dir_name:
+                new_dirname = extra_exports_dir_name
+                for f in glob.glob(os.path.join(directory, '*')):
+                    if os.path.isdir(f):
+                        shutil.copytree(f, os.path.join(
+                            extra_exports_path_name, os.path.basename(f)))
+                    else:
+                        shutil.copy(f, extra_exports_path_name)
+                # TODO: use something other than shutil.copytree,
+                #   which fails when dir already exists
+            else:
+                new_dirname = '-'.join(extra_exports)
+                shutil.copytree(directory, os.path.join(output_dir, new_dirname))
             for k in extra_exports:
                 r[k] = {'sub_directory': new_dirname}
                 processor = getattr(self, '_process_{}'.format(k), None)
