@@ -1,5 +1,5 @@
---extra-index http://pypi.smoke.airfire.org/simple/
--f http://pypi.smoke.airfire.org/simple/
+--extra-index https://pypi.airfire.org/simple/
+-f https://pypi.airfire.org/simple/
 pyairfire>=3.0.1,<4.0.0
 afconfig==1.*
 afdatetime>=1.0.2,<2.0.0

@@ -46,18 +46,18 @@ setup(
     description='BlueSky Framework rearchitected as a pipeable collection of standalone modules.',
     install_requires=requirements,
     dependency_links=[
-        "https://pypi.smoke.airfire.org/simple/pyairfire/",
-        "https://pypi.smoke.airfire.org/simple/afconfig/",
-        "https://pypi.smoke.airfire.org/simple/afdatetime/",
-        "https://pypi.smoke.airfire.org/simple/afscripting/",
-        "https://pypi.smoke.airfire.org/simple/eflookup/",
-        "https://pypi.smoke.airfire.org/simple/emitcalc/",
-        "https://pypi.smoke.airfire.org/simple/fccsmap/",
-        "https://pypi.smoke.airfire.org/simple/timeprofile/",
-        "https://pypi.smoke.airfire.org/simple/met/",
-        "https://pypi.smoke.airfire.org/simple/plumerise/",
-        "https://pypi.smoke.airfire.org/simple/blueskykml/",
-        "https://pypi.smoke.airfire.org/simple/apps-consume4/"
+        "https://pypi.airfire.org/simple/pyairfire/",
+        "https://pypi.airfire.org/simple/afconfig/",
+        "https://pypi.airfire.org/simple/afdatetime/",
+        "https://pypi.airfire.org/simple/afscripting/",
+        "https://pypi.airfire.org/simple/eflookup/",
+        "https://pypi.airfire.org/simple/emitcalc/",
+        "https://pypi.airfire.org/simple/fccsmap/",
+        "https://pypi.airfire.org/simple/timeprofile/",
+        "https://pypi.airfire.org/simple/met/",
+        "https://pypi.airfire.org/simple/plumerise/",
+        "https://pypi.airfire.org/simple/blueskykml/",
+        "https://pypi.airfire.org/simple/apps-consume4/"
     ],
     tests_require=test_requirements
 )

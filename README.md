@@ -101,7 +101,7 @@ First, install pip (with sudo if necessary):
 
 Run the following to install python dependencies:
 
-    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
+    pip install --no-binary gdal -r requirements.txt
 
 Run the following to install packages required for development and testing:
 
@@ -197,12 +197,12 @@ First, install pip (with sudo if necessary):
 
 Then, to install, for example, v3.3.2, use the following (with sudo if necessary):
 
-    pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org --extra-index http://pypi.smoke.airfire.org/simple bluesky==3.3.2
+    pip install --no-binary gdal --extra-index https://pypi.airfire.org/simple bluesky==3.3.2
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
-    --extra-index http://pypi.smoke.airfire.org/simple/
+    --extra-index https://pypi.airfire.org/simple/
     bluesky==3.3.2
 
 See the Development > Install Dependencies > Notes section, above, for

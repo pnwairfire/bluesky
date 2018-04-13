@@ -76,10 +76,10 @@ RUN pip3 install --upgrade pip
 # pandas, etc. for consume) everytime the the bluesky image is built
 # NOTE: these RUN commands will need to be updated if 'blueskykml'
 #   and/or consume are ever updated in setup.py
-RUN pip3 install --trusted-host pypi.smoke.airfire.org \
-    --extra-index http://pypi.smoke.airfire.org/simple blueskykml==2.*
-RUN pip3 install --trusted-host pypi.smoke.airfire.org \
-    --extra-index http://pypi.smoke.airfire.org/simple apps-consume4==4.1.*
+RUN pip3 install \
+    --extra-index https://pypi.airfire.org/simple blueskykml==2.*
+RUN pip3 install \
+    --extra-index https://pypi.airfire.org/simple apps-consume4==4.1.*
 
 # Same thing for Fiona (which is 39.7MB)
 # NOTE: asame as above - update this command if we upgrade to a newer version
@@ -91,8 +91,8 @@ RUN apt-get install -y \
         vim
 
 # Install bluesky utils for merging emissions, etc.
-RUN pip3 install --trusted-host pypi.smoke.airfire.org \
-    --extra-index http://pypi.smoke.airfire.org/simple blueskyutils>=0.2.0
+RUN pip3 install \
+    --extra-index https://pypi.airfire.org/simple blueskyutils>=0.2.0
 
 # Install binary dependencies - for localmet, plumerise,
 # dipersion, and visualization
@@ -110,7 +110,7 @@ RUN mkdir /tmp/bluesky/
 WORKDIR /tmp/bluesky/
 COPY requirements.txt /tmp/bluesky/requirements.txt
 COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
-RUN pip install --no-binary gdal --trusted-host pypi.smoke.airfire.org -r requirements.txt
+RUN pip install --no-binary gdal -r requirements.txt
 
 # Install bluesky package
 COPY bluesky/ /tmp/bluesky/bluesky/
