@@ -78,7 +78,8 @@ class ComputeFunction(object):
 
         def _get_working_dir(fire):
             if 'working_dir' in config:
-                working_dir = os.path.join(config['working_dir'], fire.id)
+                working_dir = os.path.join(config['working_dir'],
+                    "feps-plumerise-{}".format(fire.id))
                 if not os.path.exists(working_dir):
                     os.makedirs(working_dir)
                 return working_dir
