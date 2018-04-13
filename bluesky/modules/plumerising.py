@@ -8,6 +8,7 @@ __author__ = "Joel Dubowy"
 import copy
 import datetime
 import logging
+import os
 
 from plumerise import sev, feps, __version__ as plumerise_version
 from pyairfire import sun
@@ -40,7 +41,6 @@ def run(fires_manager):
     # TODO: set summary?
     # fires_manager.summarize(plumerise=...)
 
-
 class ComputeFunction(object):
     def __init__(self, fires_manager):
         model = fires_manager.get_config_value('plumerising', 'model',
@@ -57,6 +57,13 @@ class ComputeFunction(object):
         config = fires_manager.get_config_value('plumerising', model, default={})
         self._compute_func = generator(config)
 
+        if 'working_dir' in config:
+            fires_manager.plumerising = {
+                'output': {
+                    'directory': config['working_dir']
+                }
+            }
+
     def __call__(self, fire):
         if 'growth' not in fire:
             raise ValueError("Missing growth data required for plumerise")
@@ -68,6 +75,13 @@ class ComputeFunction(object):
 
     def _feps(self, config):
         pr = feps.FEPSPlumeRise(**config)
+
+        def _get_working_dir(fire):
+            if 'working_dir' in config:
+                working_dir = os.path.join(config['working_dir'], fire.id)
+                if not os.path.exists(working_dir):
+                    os.makedirs(working_dir)
+                return working_dir
 
         def _f(fire):
             # TODO: create and change to working directory here (per fire),
@@ -103,11 +117,9 @@ class ComputeFunction(object):
                     raise ValueError("Missing timeprofile data required for "
                         "computing FEPS plumerise")
 
-                # TODO: if managing working dir here, pass it in
-                #   (I think we'll let plumerising package handle it,
-                #   since we don't need to keep the output files)
                 plumerise_data = pr.compute(g['timeprofile'],
-                    g['consumption']['summary'], g['location'])
+                    g['consumption']['summary'], g['location'],
+                    working_dir=_get_working_dir(fire))
                 g['plumerise'] = plumerise_data['hours']
                 # TODO: do anything with plumerise_data['heat'] ?
 
