@@ -170,8 +170,60 @@ class TestSquareGridFromLatLng(object):
     # TODO: test any invalid cases
 
 class TestGridParamsFromGrid(object):
-    # TODO: add tests
-    pass
+
+    def test_llc_projection(self):
+        grid = {
+            "spacing": 6.0,
+            #"projection": 'LLC',
+            "boundary": {
+                "ne": {
+                    "lat": 45.25,
+                    "lng": -106.5
+                },
+                "sw": {
+                    "lat": 27.75,
+                    "lng": -131.5
+                }
+            }
+        }
+
+        # 0.06705008458604998 == 6.0 / (111.32 * math.cos(math.pi / 180.0 * 36.5))
+        spacing = 0.06705008458604998
+        expected = {
+            "spacing_latitude": spacing,
+            "spacing_longitude": spacing,
+            "center_latitude": 36.5,
+            "center_longitude": -119.0,
+            "height_latitude": 17.5,
+            "width_longitude": 25.0
+        }
+        assert expected == hysplit_utils.grid_params_from_grid(grid)
+
+    def test_latlong_projection(self):
+        grid = {
+            "spacing": 0.06,
+            "projection": "LatLon",
+            "boundary": {
+                "ne": {
+                    "lat": 45.25,
+                    "lng": -106.5
+                },
+                "sw": {
+                    "lat": 27.75,
+                    "lng": -131.5
+                }
+            }
+        }
+        expected = {
+            "spacing_latitude": 0.06,
+            "spacing_longitude": 0.06,
+            "center_latitude": 36.5,
+            "center_longitude": -119.0,
+            "height_latitude": 17.5,
+            "width_longitude": 25.0
+        }
+        assert expected == hysplit_utils.grid_params_from_grid(grid)
+
 
 if __name__ == '__main__':
     test_main(verbose=True)
