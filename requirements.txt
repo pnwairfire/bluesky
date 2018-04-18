@@ -2,7 +2,7 @@
 -f https://pypi.airfire.org/simple/
 pyairfire>=3.0.1,<4.0.0
 afconfig==1.*
-afdatetime>=1.0.2,<2.0.0
+afdatetime>=1.0.3,<2.0.0
 afscripting>=1.1.2,<2.0.0
 afweb>=1.1.1,<2.0.0
 eflookup>=3.1.1,<4.0.0
