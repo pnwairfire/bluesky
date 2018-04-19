@@ -25,7 +25,7 @@ class EmissionsCsvWriter(object):
         self._filename = os.path.join(dest_dir, self._filename)
 
     SPECIES = [
-        "PM2.5", "PM10", "CO",  'CO2', 'CH4', 'NOX', 'NH3', 'SO2', 'VOC'
+        "PM2.5", "PM10", "CO",  'CO2', 'CH4', 'NOx', 'NH3', 'SO2', 'VOC'
     ]
 
     # Note: HEADERS contains the columns in the desired output order
