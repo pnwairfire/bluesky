@@ -10,7 +10,7 @@ emitcalc>=2.0.1,<3.0.0
 fccsmap==2.1.0
 timeprofile==1.*
 met>=1.1.9,<2.0.0
-plumerise>=2.0.1,<3.0.0
+plumerise>=2.0.2,<3.0.0
 blueskykml>=2.2.0,<3.0.0
 apps-consume4==4.1.*
 Fiona==1.7.2
