@@ -270,7 +270,7 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
  - ***'config' > 'visualization' >  'hysplit' > 'output_dir' -- *optional* -- where to create visualization output; if not specified, visualization output will go in hysplit output directory
  - ***'config' > 'visualization' >  'hysplit' > 'images_dir' -- *optional* -- sub-directory to contain images (relative to output direcotry); default is 'graphics/''
  - ***'config' > 'visualization' >  'hysplit' > 'data_dir' -- *optional* -- sub-directory to contain data files (relative to output direcotry); default is output directory root
- - ***'config' > 'visualization' >  'hysplit' > 'blueskykml_config' -- *optional* -- sub-directory to contain configuration to pass directly into blueskykml; expected to be nested with top level section keys and second level option keys; see https://github.com/pnwairfire/blueskykml/ for configuration options
+ - ***'config' > 'visualization' >  'hysplit' > 'blueskykml_config' -- *optional* -- contains configuration to pass directly into blueskykml; expected to be nested with top level section keys and second level option keys; see https://github.com/pnwairfire/blueskykml/ for configuration options
 
 ##### export
 

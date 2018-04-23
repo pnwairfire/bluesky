@@ -77,7 +77,7 @@ RUN pip3 install --upgrade pip
 # NOTE: these RUN commands will need to be updated if 'blueskykml'
 #   and/or consume are ever updated in setup.py
 RUN pip3 install \
-    --extra-index https://pypi.airfire.org/simple blueskykml==2.*
+    --extra-index https://pypi.airfire.org/simple blueskykml>=2.3.0,<3.0.0
 RUN pip3 install \
     --extra-index https://pypi.airfire.org/simple apps-consume4==4.1.*
 
