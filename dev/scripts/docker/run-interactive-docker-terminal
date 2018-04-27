@@ -2,8 +2,8 @@
 
 docker run --rm -ti \
        -v $HOME/code/:/code/ \
-       -v $HOME/NAM84/:/NAM84/ \
-       -v $HOME/DRI_6km/:/DRI_6km/  \
+       -v $HOME/Met/NAM/12km/ARL/:/data/Met/NAM/12km/ARL/ \
+       -v $HOME/Met/CANSAC/6km/ARL/:/data/Met/CANSAC/6km/ARL/  \
        -v $HOME/docker-bsp-output/:/bsp-output/ \
        -e PYTHONPATH=/code/pnwairfire-bluesky/ \
        -e PATH=/code/pnwairfire-bluesky/bin/:$PATH \

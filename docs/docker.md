@@ -165,7 +165,7 @@ and KML visualization:
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:$PATH \
         -v $HOME/docker-bsp-output/:/bsp-output/ \
-        -v $HOME/DRI_6km/:/DRI_6km/ \
+        -v $HOME/Met/CANSAC/6km/ARL/:/Met/CANSAC/6km/ARL/ \
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG \
@@ -184,7 +184,7 @@ Another example, running through hysplit dispersion:
                 "species": ["PM2.5"]
             },
             "findmetdata": {
-                "met_root_dir": "/DRI_6km/"
+                "met_root_dir": "/Met/CANSAC/6km/ARL/"
             },
             "dispersion": {
                 "start": "2014-05-30T00:00:00",
@@ -245,7 +245,7 @@ Another example, running through hysplit dispersion:
                 ]
             }
         ]
-    }' | docker run --rm -i -v $HOME/docker-bsp-output/:/bsp-output/ -v $HOME/DRI_6km/:/DRI_6km/ bluesky bsp --log-level=DEBUG ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
+    }' | docker run --rm -i -v $HOME/docker-bsp-output/:/bsp-output/ -v $HOME/Met/CANSAC/6km/ARL/:/Met/CANSAC/6km/ARL/ bluesky bsp --log-level=DEBUG ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
 
 Remember that, in the last three dispersion examples, the dispersion output
 will be under `$HOME/docker-bsp-output/bsp-dispersion-output/` on your host
@@ -267,7 +267,7 @@ Sometimes, it's useful to open a terminal within the docker container. For
 example, you may want to use pdb or ipdb to debug your code.  To do so,
 use the '-t' and '-i' options and run bash. The following example assumes
 that your bluesky repo is in $HOME/code/pnwairfire-bluesky/, that you've got
-NAM84 met data in $HOME/NAM84, and that you want your bsp ouput in
+NAM84 met data in $HOME/Met/NAM/12km/ARL/, and that you want your bsp ouput in
 $HOME/docker-bsp-output/
 
 
@@ -275,7 +275,7 @@ $HOME/docker-bsp-output/
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:$PATH \
-        -v $HOME/NAM84/:/NAM84/ \
+        -v $HOME/Met/NAM/12km/ARL/:/data/Met/NAM/12km/ARL/ \
         -v $HOME/docker-bsp-output/:/bsp-output/ \
         -w /bluesky/ \
         bluesky bash
