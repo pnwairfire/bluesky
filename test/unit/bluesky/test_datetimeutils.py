@@ -304,10 +304,15 @@ class TestToDatetime(object):
 
         dt = datetimeutils.to_datetime('20160114')
         assert dt == datetime.datetime(2016, 1, 14)
-        dt = datetimeutils.to_datetime('20160114121100')
-        assert dt == datetime.datetime(2016, 1, 14, 12, 11, 00)
-        dt = datetimeutils.to_datetime('20160114121100Z')
-        assert dt == datetime.datetime(2016, 1, 14, 12, 11, 00)
+
+        with raises(BlueSkyDatetimeValueError) as e_info:
+            datetimeutils.to_datetime('20160114121100')
+        assert e_info.value.args[0] == "Invalid datetime string value: 20160114121100"
+
+        with raises(BlueSkyDatetimeValueError) as e_info:
+            dt = datetimeutils.to_datetime('20160114121100Z')
+        assert e_info.value.args[0] == "Invalid datetime string value: 20160114121100Z"
+
         dt = datetimeutils.to_datetime('20160114T121100')
         assert dt == datetime.datetime(2016, 1, 14, 12, 11, 00)
         dt = datetimeutils.to_datetime('20160114T121100Z')
@@ -324,10 +329,15 @@ class TestToDatetime(object):
 
         dt = datetimeutils.to_datetime('20160113')
         assert dt == datetime.datetime(2016, 1, 13)
-        dt = datetimeutils.to_datetime('20160113121100')
-        assert dt == datetime.datetime(2016, 1, 13, 12, 11, 00)
-        dt = datetimeutils.to_datetime('20160113121100Z')
-        assert dt == datetime.datetime(2016, 1, 13, 12, 11, 00)
+
+        with raises(BlueSkyDatetimeValueError) as e_info:
+            dt = datetimeutils.to_datetime('20160113121100')
+        assert e_info.value.args[0] == "Invalid datetime string value: 20160113121100"
+
+        with raises(BlueSkyDatetimeValueError) as e_info:
+            dt = datetimeutils.to_datetime('20160113121100Z')
+        assert e_info.value.args[0] == "Invalid datetime string value: 20160113121100Z"
+
         dt = datetimeutils.to_datetime('20160113T121100')
         assert dt == datetime.datetime(2016, 1, 13, 12, 11, 00)
         dt = datetimeutils.to_datetime('20160113T121100Z')
