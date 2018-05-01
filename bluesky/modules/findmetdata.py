@@ -36,13 +36,7 @@ def run(fires_manager):
     # for this scenario.  Otherwise, use more complicated logic in
     # arlfinder.ArlFinder (or put both code paths in ArlFinder?)
 
-    # Note: ArlFinder will raise an exception if met_root_dir is undefined
-    # or is not a valid directory
-    # TODO: specify domain instead of met_root_dir, and somehow configure (not
-    # in the code, since this is open source), per domain, the root dir, arl file
-    # name pattern, etc.
-    met_root_dir = _get_met_root_dir(fires_manager)
-    met_format = _get_met_format(fires_manager)
+    met_finder = _get_met_finder(fires_manager)
 
     time_windows = _get_time_windows(fires_manager)
 
@@ -50,30 +44,35 @@ def run(fires_manager):
     for time_window in time_windows:
         logging.debug("Findmetdata time window: %s to %s",
             time_window['start'], time_window['end'])
-        fires_manager.met.append(arl_finder.find(
+        fires_manager.met.append(met_finder.find(
             time_window['start'], time_window['end']))
 
 def _get_met_root_dir(fires_manager):
+    # Note: ArlFinder will raise an exception if met_root_dir is undefined
+    # or is not a valid directory
+    # TODO: specify domain instead of met_root_dir, and somehow configure (not
+    # in the code, since this is open source), per domain, the root dir, arl file
+    # name pattern, etc.
     met_root_dir = fires_manager.get_config_value('findmetdata',
         'met_root_dir')
     if not met_root_dir:
         raise BlueSkyConfigurationError("Config setting 'met_root_dir' "
             "required by findmetdata module")
+    logging.debug("Met root dir: %s", met_root_dir)
     return met_root_dir
 
-def _get_met_format(fires_manager):
+def _get_met_finder(fires_manager):
+    met_root_dir = _get_met_root_dir(fires_manager)
     met_format = fires_manager.get_config_value('findmetdata', 'met_format',
         default="arl").lower()
     if met_format == "arl":
         arl_config = fires_manager.get_config_value('findmetdata', 'arl',
             default={})
-        logging.debug("Met root dir: %s", met_root_dir)
         logging.debug("ARL config: %s", arl_config)
-        arl_finder = arlfinder.ArlFinder(met_root_dir, **arl_config)
+        return arlfinder.ArlFinder(met_root_dir, **arl_config)
     else:
         raise BlueSkyConfigurationError(
             "Invalid or unsupported met data format: '{}'".format(met_format))
-    return met_format
 
 def _get_time_windows(fires_manager):
     time_windows = [
