@@ -40,11 +40,11 @@ def run(fires_manager):
 
     time_windows = _get_time_windows(fires_manager)
 
-    fires_manager.met = []
+    fires_manager.met = {"files": []}
     for time_window in time_windows:
         logging.debug("Findmetdata time window: %s to %s",
             time_window['start'], time_window['end'])
-        fires_manager.met.append(met_finder.find(
+        fires_manager.met['files'].append(met_finder.find(
             time_window['start'], time_window['end']))
 
 def _get_met_root_dir(fires_manager):
