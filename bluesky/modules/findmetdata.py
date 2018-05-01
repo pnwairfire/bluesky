@@ -41,12 +41,27 @@ def run(fires_manager):
     # TODO: specify domain instead of met_root_dir, and somehow configure (not
     # in the code, since this is open source), per domain, the root dir, arl file
     # name pattern, etc.
+    met_root_dir = _get_met_root_dir(fires_manager)
+    met_format = _get_met_format(fires_manager)
+
+    time_windows = _get_time_windows(fires_manager)
+
+    fires_manager.met = []
+    for time_window in time_windows:
+        logging.debug("Findmetdata time window: %s to %s",
+            time_window['start'], time_window['end'])
+        fires_manager.met.append(arl_finder.find(
+            time_window['start'], time_window['end']))
+
+def _get_met_root_dir(fires_manager):
     met_root_dir = fires_manager.get_config_value('findmetdata',
         'met_root_dir')
     if not met_root_dir:
         raise BlueSkyConfigurationError("Config setting 'met_root_dir' "
             "required by findmetdata module")
+    return met_root_dir
 
+def _get_met_format(fires_manager):
     met_format = fires_manager.get_config_value('findmetdata', 'met_format',
         default="arl").lower()
     if met_format == "arl":
@@ -58,7 +73,32 @@ def run(fires_manager):
     else:
         raise BlueSkyConfigurationError(
             "Invalid or unsupported met data format: '{}'".format(met_format))
+    return met_format
 
+def _get_time_windows(fires_manager):
+    time_windows = [
+        _get_configured_time_windows(fires_manager),
+        _get_dispersion_time_window(fires_manager)
+    ] + _infer_time_windows_from_fires(fires_manager)
+    time_windows = [tw for tw in time_windows
+        if tw and tw.get('start') and tw.get('end')]
+    if not time_windows:
+        raise BlueSkyConfigurationError(
+            "Start and end times required for finding met data. They"
+            "wheren't specied and couldn't be inferred from the fire "
+            "and configuration data.")
+
+    merged_time_windows = []
+    for tw in sorted(time_windows, key=lambda e: e['start']):
+        if (not merged_time_windows
+                or merged_time_windows[-1]['end']< tw['start']):
+            merged_time_windows.append(tw)
+        else:
+            merged_time_windows[-1]['end'] = tw['end']
+
+    return merged_time_windows
+
+def _get_configured_time_windows(fires_manager):
     time_window = fires_manager.get_config_value('findmetdata', 'time_window')
     if time_window:
         logging.debug("Met time window specified in the config")
@@ -72,38 +112,39 @@ def run(fires_manager):
             'start': time_window['first_hour'],
             'end': time_window['last_hour'] # TODO: round this up to the next hour?
         }
+        return time_window
 
-    elif fires_manager.fires:
+def _infer_time_windows_from_fires(fires_manager):
+    time_windows = []
+
+    if fires_manager.fires:
         logging.debug("Met time window determined from fire growth data")
         # Find earliest and latest datetimes that include all fire growth periods
         # TODO: be more intelligent with possible gaps, so that met files for times
         #  when no fire is growing are excluded ?
-        time_window = {}
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
-                if 'growth' not in fire:
-                    raise ValueError("Missing growth data required for findmetdata")
-                # parse_utc_offset makes sure utc offset is defined and valid
-                for g in fire.growth:
-                    utc_offset = parse_utc_offset(g.get('location', {}).get('utc_offset'))
-                    offset = datetime.timedelta(hours=utc_offset)
-                    tw = parse_datetimes(g, 'start', 'end')
-                    if tw['start'] > tw['end']:
-                        raise ValueError("Invalid growth time window - start: {}, end: {}".format(
-                            tw['start'], tw['end']))
-                    start = tw['start'] - offset
-                    end = tw['end'] - offset
-                    if not time_window:
-                        time_window = {'start': start, 'end': end}
-                    else:
-                        time_window['start'] = min(time_window['start'], start)
-                        # TODO: round end down to previous hour if it's a round hour
-                        time_window['end'] = max(time_window['end'], end)
+                if 'growth' in fire:
+                    # parse_utc_offset makes sure utc offset is defined and valid
+                    for g in fire.growth:
+                        utc_offset = parse_utc_offset(g.get('location', {}).get('utc_offset'))
+                        offset = datetime.timedelta(hours=utc_offset)
+                        tw = parse_datetimes(g, 'start', 'end')
+                        if tw['start'] > tw['end']:
+                            raise ValueError("Invalid growth time window - start: {}, end: {}".format(
+                                tw['start'], tw['end']))
+                        start = tw['start'] - offset
+                        end = tw['end'] - offset
+                        time_windows.append({'start': start, 'end': end})
 
-    if not time_window or not time_window.get('start') or not time_window.get('end'):
-        raise BlueSkyConfigurationError(
-            "Start and end times required for finding met data. They"
-            "wheren't specied and couldn't be inferred from the fire data.")
+    return time_windows
 
-    logging.debug("Findmetdata time window: %s to %s", time_window['start'], time_window['end'])
-    fires_manager.met = arl_finder.find(time_window['start'], time_window['end'])
+
+def _get_dispersion_time_window(fires_manager):
+    start = fires_manager.get_config_value('dispersion', 'start')
+    num_hours = fires_manager.get_config_value('dispersion', 'num_hours')
+    if start and num_hours:
+        return {
+            'start': start,
+            'end': start + datetime.timedelta(hours=num_hours)
+        }
