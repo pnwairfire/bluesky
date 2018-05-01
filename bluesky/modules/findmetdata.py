@@ -44,8 +44,8 @@ def run(fires_manager):
     for time_window in time_windows:
         logging.debug("Findmetdata time window: %s to %s",
             time_window['start'], time_window['end'])
-        fires_manager.met['files'].append(met_finder.find(
-            time_window['start'], time_window['end']))
+        fires_manager.met['files'].extend(met_finder.find(
+            time_window['start'], time_window['end']).get('files', []))
 
 def _get_met_root_dir(fires_manager):
     # Note: ArlFinder will raise an exception if met_root_dir is undefined
