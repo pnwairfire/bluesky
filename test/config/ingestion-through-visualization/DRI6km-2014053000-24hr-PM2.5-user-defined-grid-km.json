@@ -4,7 +4,7 @@
             "species": ["PM2.5"]
         },
         "findmetdata": {
-            "met_root_dir": "/DRI_6km/"
+            "met_root_dir": "/data/Met/CANSAC/6km/ARL/"
         },
         "dispersion": {
             "start": "2014-05-30T00:00:00",
