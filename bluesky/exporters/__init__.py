@@ -112,6 +112,9 @@ class ExporterBase(object):
                     d['output']['directory'], [])
                 dirs_to_copy[d['output']['directory']].append(k)
         for directory, extra_exports in list(dirs_to_copy.items()):
+            # TODO: See comment in bluesky.io.create_dir_or_handle_existing
+            #   about getting shutil.copytree to work in the case
+            #   where self._handle_existing=='write_in_place'
             if extra_exports_dir_name:
                 new_dirname = extra_exports_dir_name
                 for f in glob.glob(os.path.join(directory, '*')):
