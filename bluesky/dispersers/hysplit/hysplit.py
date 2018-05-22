@@ -387,6 +387,13 @@ class HYSPLITDispersion(DispersionBase):
         ncks_args.append(output_file)
         self._execute(self.BINARIES['NCKS'], *ncks_args, working_dir=working_dir)
 
+    def _create_sym_link(self, dest, link):
+        try:
+            os.symlink(dest, link)
+        except FileExistsError as e:
+            # ignore existing sym link error
+            pass
+
     def _run_process(self, fires, working_dir):
         logging.info("Running one HYSPLIT49 Dispersion model process")
         # TODO: set all but fires and working_dir as instance properties in self.run
@@ -396,13 +403,17 @@ class HYSPLITDispersion(DispersionBase):
         for f in self._met_info['files']:
             # bluesky.modules.dispersion.run will have weeded out met
             # files that aren't relevant to this dispersion run
-            os.symlink(f, os.path.join(working_dir, os.path.basename(f)))
+            self._create_sym_link(f,
+                os.path.join(working_dir, os.path.basename(f)))
 
         # Create sym links to ancillary data files (note: HYSPLIT49 balks
         # if it can't find ASCDATA.CFG).
-        os.symlink(self.config("ASCDATA_FILE"), os.path.join(working_dir, 'ASCDATA.CFG'))
-        os.symlink(self.config("LANDUSE_FILE"), os.path.join(working_dir, 'LANDUSE.ASC'))
-        os.symlink(self.config("ROUGLEN_FILE"), os.path.join(working_dir, 'ROUGLEN.ASC'))
+        self._create_sym_link(self.config("ASCDATA_FILE"),
+            os.path.join(working_dir, 'ASCDATA.CFG'))
+        self._create_sym_link(self.config("LANDUSE_FILE"),
+            os.path.join(working_dir, 'LANDUSE.ASC'))
+        self._create_sym_link(self.config("ROUGLEN_FILE"),
+            os.path.join(working_dir, 'ROUGLEN.ASC'))
 
         emissions_file = os.path.join(working_dir, "EMISS.CFG")
         control_file = os.path.join(working_dir, "CONTROL")
