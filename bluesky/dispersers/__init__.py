@@ -110,8 +110,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         self._model_start = start
         self._num_hours = num_hours
 
-        self._run_output_dir = os.path.abspath(output_dir)
-        os.makedirs(self._run_output_dir)
+        self._run_output_dir = output_dir # already created
 
         self._working_dir = working_dir and os.path.abspath(working_dir)
         # osutils.create_working_dir will create working dir if necessary

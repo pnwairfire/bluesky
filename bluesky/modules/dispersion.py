@@ -16,6 +16,7 @@ from bluesky import datetimeutils
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.dispersers.hysplit import hysplit
 from bluesky.datetimeutils import parse_datetime
+from bluesky.io import create_dir_or_handle_existing
 
 __all__ = [
     'run'
@@ -134,10 +135,16 @@ def _get_time(fires_manager):
 
 
 def _get_dirs(fires_manager):
+    handle_existing = fires_manager.get_config_value('dispersion',
+        'handle_existing', default='fail')
+
     output_dir = fires_manager.get_config_value('dispersion', 'output_dir')
     if not output_dir:
         raise ValueError("Specify dispersion output directory")
+    create_dir_or_handle_existing(output_dir, handle_existing)
 
     working_dir = fires_manager.get_config_value('dispersion', 'working_dir')
+    if working_dir:
+        create_dir_or_handle_existing(working_dir, handle_existing)
 
     return output_dir, working_dir
