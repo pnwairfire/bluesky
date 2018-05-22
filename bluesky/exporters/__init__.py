@@ -25,6 +25,7 @@ class ExporterBase(object):
     def __init__(self, extra_exports, **config):
         self._config = config
         self._extra_exports = extra_exports
+        self._handle_existing = self.config('handle_existing', default='fail')
 
     def config(self, *keys, **kwargs):
         return afconfig.get_config_value(self._config, *keys, **kwargs)
@@ -90,7 +91,7 @@ class ExporterBase(object):
 
         output_dir = create_dir_or_handle_existing(
             os.path.join(dest, self._output_dir_name),
-            handle_existing=self.config('handle_existing', default='fail'))
+            handle_existing=self._handle_existing)
 
         return output_dir
 
