@@ -175,7 +175,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             try:
                 if 'growth' not in fire:
                     raise ValueError(
-                        "Missing timeprofile and plumerise data required for computing dispersion")
+                        "Missing fire growth data required for computing dispersion")
                 growth_fields = self._required_growth_fields() + ('fuelbeds', 'location')
                 for g in fire.growth:
                     if any([not g.get(f) for f in growth_fields]):
