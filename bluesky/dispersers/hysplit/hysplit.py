@@ -253,10 +253,12 @@ class HYSPLITDispersion(DispersionBase):
                 break
             n += 1
         if n == 0:
-            raise ValueError("Not ARL met data for first hour of dispersion window")
+            raise ValueError(
+                "No ARL met data for first hour of dispersion window")
         elif n < self._num_hours:
+            self._record_warning("Incomplete met. Running dispersion met for"
+                " {} hours instead of {}".format(n, self._num_hours))
             self._num_hours = n
-            self.record_warning("Met")
 
     def _create_dummy_fire_if_necessary(self):
         # TODO: create a dummy fire no matter what (in case whatever fires
