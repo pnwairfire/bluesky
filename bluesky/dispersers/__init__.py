@@ -140,12 +140,12 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def _run(wdir):
+    def _run(self, wdir):
         """Underlying run method to be implemented by subclasses
         """
         pass
 
-    def _record_warning(msg, **kwargs):
+    def _record_warning(self, msg, **kwargs):
         self._warnings.append(dict(message=msg, **kwargs))
 
     MISSING_PLUMERISE_HOUR = dict(
