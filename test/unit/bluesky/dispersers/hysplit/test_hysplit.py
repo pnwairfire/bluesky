@@ -4,6 +4,8 @@
 import datetime
 import os
 
+from py.test import raises
+
 from bluesky.dispersers.hysplit import hysplit
 
 class TestGetBinaries(object):
@@ -134,43 +136,91 @@ class TestAdjustDispersionWindowForAvailableMet(object):
         self.hysplitDisperser._met_info = {
             'files': [ 'f', 'f2'],
             'hours': set([
-                datetime.datetime(2014, 5, 29, 0, 0, 0),
                 datetime.datetime(2014, 5, 29, 1, 0, 0),
                 datetime.datetime(2014, 5, 29, 2, 0, 0),
                 datetime.datetime(2014, 5, 29, 3, 0, 0),
+                datetime.datetime(2014, 5, 30, 10, 0, 0),
                 datetime.datetime(2014, 5, 30, 11, 0, 0),
                 datetime.datetime(2014, 5, 30, 12, 0, 0),
             ])
         }
+        self.hysplitDisperser._warnings = []
 
 
     def test_complete_met_for_dispersion_window(self, monkeypatch):
         self.set_up_monkey_patched_disperser(monkeypatch)
 
         self.hysplitDisperser._model_start = datetime.datetime(
-            2014, 5, 29, 1, 0, 0),
+            2014, 5, 29, 1, 0, 0)
         self.hysplitDisperser._num_hours = 2
         self.hysplitDisperser._adjust_dispersion_window_for_available_met()
-        assert self.hysplitDisperser_model_start == datetime.datetime(
+        assert self.hysplitDisperser._model_start == datetime.datetime(
             2014, 5, 29, 1, 0, 0)
         assert self.hysplitDisperser._num_hours == 2
+        assert self.hysplitDisperser._warnings == []
 
     def test_no_met_for_dispersion_window(self, monkeypatch):
         self.set_up_monkey_patched_disperser(monkeypatch)
 
-        pass
+        self.hysplitDisperser._model_start = datetime.datetime(
+            2014, 5, 29, 5, 0, 0)
+        self.hysplitDisperser._num_hours = 2
+        with raises(ValueError) as e_info:
+            self.hysplitDisperser._adjust_dispersion_window_for_available_met()
+        assert e_info.value.args[0] == "No ARL met data for first hour of dispersion window"
 
     def test_met_missing_at_begining_of_dispersion_window(self, monkeypatch):
         self.set_up_monkey_patched_disperser(monkeypatch)
 
-        pass
+        self.hysplitDisperser._model_start = datetime.datetime(
+            2014, 5, 29, 0, 0, 0)
+        self.hysplitDisperser._num_hours = 2
+        with raises(ValueError) as e_info:
+            self.hysplitDisperser._adjust_dispersion_window_for_available_met()
+        assert e_info.value.args[0] == "No ARL met data for first hour of dispersion window"
 
     def test_met_missing_in_middle_of_dispersion_window(self, monkeypatch):
         self.set_up_monkey_patched_disperser(monkeypatch)
 
-        pass
+        self.hysplitDisperser._model_start = datetime.datetime(
+            2014, 5, 29, 1, 0, 0)
+        self.hysplitDisperser._num_hours = 35
+        self.hysplitDisperser._adjust_dispersion_window_for_available_met()
+        assert self.hysplitDisperser._model_start == datetime.datetime(
+            2014, 5, 29, 1, 0, 0)
+        assert self.hysplitDisperser._num_hours == 3
+        assert self.hysplitDisperser._warnings == [
+            {"message": "Incomplete met. Running dispersion met for"
+                " 3 hours instead of 35"}
+        ]
 
     def test_met_missing_at_end_of_dispersion_window(self, monkeypatch):
         self.set_up_monkey_patched_disperser(monkeypatch)
 
-        pass
+        self.hysplitDisperser._model_start = datetime.datetime(
+            2014, 5, 29, 1, 0, 0)
+        self.hysplitDisperser._num_hours = 5
+        self.hysplitDisperser._adjust_dispersion_window_for_available_met()
+        assert self.hysplitDisperser._model_start == datetime.datetime(
+            2014, 5, 29, 1, 0, 0)
+        assert self.hysplitDisperser._num_hours == 3
+        assert self.hysplitDisperser._warnings == [
+            {"message": "Incomplete met. Running dispersion met for"
+                " 3 hours instead of 5"}
+        ]
+
+
+    def test_met_missing_in_middle_and_at_end_of_dispersion_window(self, monkeypatch):
+        self.set_up_monkey_patched_disperser(monkeypatch)
+
+        self.hysplitDisperser._model_start = datetime.datetime(
+            2014, 5, 29, 1, 0, 0)
+        self.hysplitDisperser._num_hours = 48
+        self.hysplitDisperser._adjust_dispersion_window_for_available_met()
+        assert self.hysplitDisperser._model_start == datetime.datetime(
+            2014, 5, 29, 1, 0, 0)
+        assert self.hysplitDisperser._num_hours == 3
+        assert self.hysplitDisperser._warnings == [
+            {"message": "Incomplete met. Running dispersion met for"
+                " 3 hours instead of 48"}
+        ]
