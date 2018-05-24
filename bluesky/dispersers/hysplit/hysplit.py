@@ -52,11 +52,12 @@ import os
 import shutil
 # import tarfile
 import threading
-from datetime import timedelta
+import datetime
+
+from afdatetime.parsing import parse_datetime
 
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models.fires import Fire
-
 from .. import (
     DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE
 )
@@ -176,8 +177,9 @@ class HYSPLITDispersion(DispersionBase):
          - wdir -- working directory
         """
         dispersion_offset = int(self.config("DISPERSION_OFFSET") or 0)
-        self._model_start_after_offset = self._model_start + timedelta(hours=dispersion_offset)
-        self._num_hours_after_offset = self._num_hours - dispersion_offset
+        self._model_start += datetime.timedelta(hours=dispersion_offset)
+        self._num_hours -= dispersion_offset
+        self._adjust_dispersion_window_for_available_met()
 
         self._set_grid_params()
         self._create_dummy_fire_if_necessary()
@@ -203,6 +205,25 @@ class HYSPLITDispersion(DispersionBase):
             "met_info": self._met_info
         }
 
+    ##
+    ## Seting met info
+    ##
+
+    def _get_met_file(self, met_file_info):
+        if not met_file_info.get('file'):
+            raise ValueError("ARL file not defined for specified date range")
+        if not os.path.exists(met_file_info['file']):
+            raise ValueError("ARL file does not exist: {}".format(
+                met_file_info['file']))
+        return met_file_info['file']
+
+    def _get_met_hours(self, met_file_info):
+        first_hour = parse_datetime(met_file_info['first_hour'], 'first_hour')
+        last_hour = parse_datetime(met_file_info['last_hour'], 'last_hour')
+        hours = [first_hour + datetime.timedelta(hours=n)
+            for n in range(int((last_hour-first_hour).seconds / 3600) + 1)]
+        return hours
+
     def _set_met_info(self, met_info):
         # TODO: move validation code into common module met.arl.validation ?
         self._met_info = {}
@@ -213,18 +234,29 @@ class HYSPLITDispersion(DispersionBase):
         # defined either in the met object or in the hsyplit config. Expections
         # will be raised downstream if not defined in either place
 
-        # hysplit just needs the name
+        # hysplit just needs the name, but we need to know the hours with
+        # met data for adjusting dispersion time dinwow
         self._met_info['files'] = set()
+        self._met_info['hours'] = set()
+
         if not met_info.get('files'):
             raise ValueError("Met info lacking arl file information")
-        for met_file in met_info.pop('files'):
-            if not met_file.get('file'):
-                raise ValueError("ARL file not defined for specified date range")
-            if not os.path.exists(met_file['file']):
-                raise ValueError("ARL file does not exist: {}".format(
-                    met_file['file']))
-            self._met_info['files'].add(met_file['file'])
-        self._met_info['files'] = list(self._met_info['files'])
+        for met_file_info in met_info.pop('files'):
+            self._met_info['files'].add(self._get_met_file(met_file_info))
+            self._met_info['hours'].update(self._get_met_hours(met_file_info))
+
+    def _adjust_dispersion_window_for_available_met(self):
+        n = 0
+        while n < self._num_hours:
+            hr = self._model_start + datetime.timedelta(hours=n)
+            if hr not in self._met_info['hours']:
+                break
+            n += 1
+        if n == 0:
+            raise ValueError("Not ARL met data for first hour of dispersion window")
+        elif n < self._num_hours:
+            self._num_hours = n
+            self.record_warning("Met")
 
     def _create_dummy_fire_if_necessary(self):
         # TODO: create a dummy fire no matter what (in case whatever fires
@@ -264,7 +296,7 @@ class HYSPLITDispersion(DispersionBase):
             }
         )
         for hour in range(self._num_hours):
-            dt = self._model_start + timedelta(hours=hour)
+            dt = self._model_start + datetime.timedelta(hours=hour)
             f['plumerise'][dt] = self.DUMMY_PLUMERISE_HOUR
             f['timeprofile'][dt] = {d: 1.0 / float(self._num_hours) for d in self.TIMEPROFILE_FIELDS}
 
@@ -438,7 +470,7 @@ class HYSPLITDispersion(DispersionBase):
             # name of pardump input file, pinpf (check for strftime strings)
             pinpf = self.config("PINPF")
             if "%" in pinpf:
-                pinpf = self._model_start_after_offset.strftime(pinpf)
+                pinpf = self._model_start.strftime(pinpf)
             parinitFiles = [ "%s" % pinpf ]
 
             # if an MPI run need to create the full list of expected files
@@ -467,7 +499,7 @@ class HYSPLITDispersion(DispersionBase):
         # Prepare for run ... get pardump name just in case needed
         poutf = self.config("POUTF")
         if "%" in poutf:
-            poutf = self._model_start_after_offset.strftime(poutf)
+            poutf = self._model_start.strftime(poutf)
         pardumpFiles = [ "%s" % poutf ]
 
         # If MPI run
@@ -564,8 +596,8 @@ class HYSPLITDispersion(DispersionBase):
             emis.write("each emission's source: YYYY MM DD HH MM DUR_HHMM LAT LON HT RATE AREA HEAT\n")
 
             # Loop through the timesteps
-            for hour in range(self._num_hours_after_offset):
-                dt = self._model_start_after_offset + timedelta(hours=hour)
+            for hour in range(self._num_hours):
+                dt = self._model_start + datetime.timedelta(hours=hour)
                 dt_str = dt.strftime("%y %m %d %H")
 
                 num_fires = len(self._fires)
@@ -597,7 +629,7 @@ class HYSPLITDispersion(DispersionBase):
                         noEmis += 1
                         dummy = True
                     else:
-                        local_dt = dt + timedelta(hours=fire.utc_offset)
+                        local_dt = dt + datetime.timedelta(hours=fire.utc_offset)
                         # TODO: will fire.plumerise and fire.timeprofile always
                         #    have string value keys
                         local_dt = local_dt.strftime('%Y-%m-%dT%H:%M:%S')
@@ -769,7 +801,7 @@ class HYSPLITDispersion(DispersionBase):
         # Height of the top of the model domain
         modelTop = self.config("TOP_OF_MODEL_DOMAIN")
 
-        #modelEnd = self._model_start + timedelta(hours=self._num_hours)
+        #modelEnd = self._model_start + datetime.timedelta(hours=self._num_hours)
 
         # Build the vertical Levels string
         levels = self.config("VERTICAL_LEVELS")
@@ -846,7 +878,7 @@ class HYSPLITDispersion(DispersionBase):
 
         with open(control_file, "w") as f:
             # Starting time (year, month, day hour)
-            f.write(self._model_start_after_offset.strftime("%y %m %d %H") + "\n")
+            f.write(self._model_start.strftime("%y %m %d %H") + "\n")
 
             # Number of sources
             f.write("%d\n" % num_sources)
@@ -857,7 +889,7 @@ class HYSPLITDispersion(DispersionBase):
                     f.write("%9.3f %9.3f %9.3f\n" % (fire.latitude, fire.longitude, sourceHeight))
 
             # Total run time (hours)
-            f.write("%04d\n" % self._num_hours_after_offset)
+            f.write("%04d\n" % self._num_hours)
 
             # Method to calculate vertical motion
             f.write("%d\n" % verticalMethod)
@@ -879,9 +911,9 @@ class HYSPLITDispersion(DispersionBase):
             # Emissions rate (per hour) (Ken's code says "Emissions source strength (mass per second)" -- which is right?)
             f.write("0.001\n")
             # Duration of emissions (hours)
-            f.write(" %9.3f\n" % self._num_hours_after_offset)
+            f.write(" %9.3f\n" % self._num_hours)
             # Source release start time (year, month, day, hour, minute)
-            f.write("%s\n" % self._model_start_after_offset.strftime("%y %m %d %H %M"))
+            f.write("%s\n" % self._model_start.strftime("%y %m %d %H %M"))
 
             # Number of simultaneous concentration grids
             f.write("1\n")
@@ -904,14 +936,14 @@ class HYSPLITDispersion(DispersionBase):
             f.write("%s\n" % verticalLevels)
 
             # Sampling start time (year month day hour minute)
-            f.write("%s\n" % self._model_start_after_offset.strftime("%y %m %d %H %M"))
+            f.write("%s\n" % self._model_start.strftime("%y %m %d %H %M"))
 
             # Sampling stop time (year month day hour minute)
             # The following would be the same as
-            # model_end = self._model_start + timedelta(
+            # model_end = self._model_start + datetime.timedelta(
             #     hours=self._num_hours)
-            model_end = self._model_start_after_offset + timedelta(
-                hours=self._num_hours_after_offset)
+            model_end = self._model_start + datetime.timedelta(
+                hours=self._num_hours)
             f.write("%s\n" % model_end.strftime("%y %m %d %H %M"))
 
             # Sampling interval (type hour minute)
@@ -975,7 +1007,7 @@ class HYSPLITDispersion(DispersionBase):
         # pardump vars
         ndump_val = int(self.config("NDUMP"))
         ncycl_val = int(self.config("NCYCL"))
-        dump_datetime = self._model_start_after_offset + timedelta(hours=ndump_val)
+        dump_datetime = self._model_start + datetime.timedelta(hours=ndump_val)
 
         # emission cycle time
         qcycle_val =self.config("QCYCLE")
@@ -1006,12 +1038,12 @@ class HYSPLITDispersion(DispersionBase):
         # name of the particle input file (check for strftime strings)
         pinpf = self.config("PINPF")
         if "%" in pinpf:
-            pinpf = self._model_start_after_offset.strftime(pinpf)
+            pinpf = self._model_start.strftime(pinpf)
 
         # name of the particle output file (check for strftime strings)
         poutf = self.config("POUTF")
         if "%" in poutf:
-            poutf = self._model_start_after_offset.strftime(poutf)
+            poutf = self._model_start.strftime(poutf)
 
         # conversion module
         ichem_val = int(self.config("ICHEM"))
