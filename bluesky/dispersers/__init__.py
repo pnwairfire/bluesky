@@ -103,6 +103,9 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             if not specified, a temp directory is created
         """
         logging.info("Running %s", self.__class__.__name__)
+
+        self._warnings = []
+
         if start.minute or start.second or start.microsecond:
             raise ValueError("Dispersion start time must be on the hour.")
         if type(num_hours) != int:
@@ -127,9 +130,10 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         })
         if self._working_dir:
             r["output"]["working_dir"] = self._working_dir
+        if self._wawrnings:
+            r["warnings"] = self._warnings
 
         return r
-
 
     @abc.abstractmethod
     def _required_growth_fields(self):
@@ -141,6 +145,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         """
         pass
 
+    def _record_warning(msg, **kwargs):
+        self._warnings.append(dict(message=msg, **kwargs))
 
     MISSING_PLUMERISE_HOUR = dict(
         heights=[0.0] * 21, # everthing emitted at the ground
