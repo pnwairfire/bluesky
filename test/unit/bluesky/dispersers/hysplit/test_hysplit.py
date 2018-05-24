@@ -120,3 +120,57 @@ class TestSetMetInfo(object):
         hysplitDisperser = hysplit.HYSPLITDispersion(met_info)
         assert hysplitDisperser._met_info == expected
 
+class TestAdjustDispersionWindowForAvailableMet(object):
+
+    # class HYSPLITDispersionWithoutSetMetInfo(hysplit.HYSPLITDispersion):
+
+    #     def _set_met_info(self, met_info):
+    #         pass
+
+    def set_up_monkey_patched_disperser(self, monkeypatch):
+        monkeypatch.setattr(hysplit.HYSPLITDispersion, '_set_met_info',
+            lambda self, met_info: None)
+        self.hysplitDisperser = hysplit.HYSPLITDispersion({})
+        self.hysplitDisperser._met_info = {
+            'files': [ 'f', 'f2'],
+            'hours': set([
+                datetime.datetime(2014, 5, 29, 0, 0, 0),
+                datetime.datetime(2014, 5, 29, 1, 0, 0),
+                datetime.datetime(2014, 5, 29, 2, 0, 0),
+                datetime.datetime(2014, 5, 29, 3, 0, 0),
+                datetime.datetime(2014, 5, 30, 11, 0, 0),
+                datetime.datetime(2014, 5, 30, 12, 0, 0),
+            ])
+        }
+
+
+    def test_complete_met_for_dispersion_window(self, monkeypatch):
+        self.set_up_monkey_patched_disperser(monkeypatch)
+
+        self.hysplitDisperser._model_start = datetime.datetime(
+            2014, 5, 29, 1, 0, 0),
+        self.hysplitDisperser._num_hours = 2
+        self.hysplitDisperser._adjust_dispersion_window_for_available_met()
+        assert self.hysplitDisperser_model_start == datetime.datetime(
+            2014, 5, 29, 1, 0, 0)
+        assert self.hysplitDisperser._num_hours == 2
+
+    def test_no_met_for_dispersion_window(self, monkeypatch):
+        self.set_up_monkey_patched_disperser(monkeypatch)
+
+        pass
+
+    def test_met_missing_at_begining_of_dispersion_window(self, monkeypatch):
+        self.set_up_monkey_patched_disperser(monkeypatch)
+
+        pass
+
+    def test_met_missing_in_middle_of_dispersion_window(self, monkeypatch):
+        self.set_up_monkey_patched_disperser(monkeypatch)
+
+        pass
+
+    def test_met_missing_at_end_of_dispersion_window(self, monkeypatch):
+        self.set_up_monkey_patched_disperser(monkeypatch)
+
+        pass
