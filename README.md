@@ -195,15 +195,15 @@ First, install pip (with sudo if necessary):
     apt-get install python-pip
     pip install --upgrade pip
 
-Then, to install, for example, v3.4.1, use the following (with sudo if necessary):
+Then, to install, for example, v3.4.2, use the following (with sudo if necessary):
 
-    pip install --no-binary gdal --extra-index https://pypi.airfire.org/simple bluesky==3.4.1
+    pip install --no-binary gdal --extra-index https://pypi.airfire.org/simple bluesky==3.4.2
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
     --extra-index https://pypi.airfire.org/simple/
-    bluesky==3.4.1
+    bluesky==3.4.2
 
 See the Development > Install Dependencies > Notes section, above, for
 notes on resolving pip and gdal issues.
