@@ -259,7 +259,7 @@ class HYSPLITDispersion(DispersionBase):
             raise ValueError(
                 "No ARL met data for first hour of dispersion window")
         elif n < self._num_hours:
-            self._record_warning("Incomplete met. Running dispersion met for"
+            self._record_warning("Incomplete met. Running dispersion for"
                 " {} hours instead of {}".format(n, self._num_hours))
             self._num_hours = n
 
