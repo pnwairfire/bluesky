@@ -123,6 +123,7 @@ emissions config
  - ***'config' > 'dispersion' > 'num_hours'*** -- *required* (unless it can be determined from fire growth windows) -- number of hours in model run
  - ***'config' > 'dispersion' > 'output_dir'*** -- *required* -- directory to contain output
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
+ - ***'config' > 'dispersion' > 'handle_existing'*** - *optional* -- how to handle case where output dir already exists; options: 'replace', 'write_in_place', 'fail'; defaults to 'fail'
 
 ###### if running hysplit dispersion:
 
