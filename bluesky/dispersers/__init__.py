@@ -130,7 +130,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         })
         if self._working_dir:
             r["output"]["working_dir"] = self._working_dir
-        if self._wawrnings:
+        if self._warnings:
             r["warnings"] = self._warnings
 
         return r
