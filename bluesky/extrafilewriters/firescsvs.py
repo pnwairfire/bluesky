@@ -1,4 +1,4 @@
-"""bluesky.extrafilewriters.emissionscsv
+"""bluesky.extrafilewriters.firescsvs
 
 Writes fire emissions csv file in the form:
 
