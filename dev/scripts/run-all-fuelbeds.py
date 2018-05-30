@@ -52,8 +52,24 @@ def main():
     input_data = {
         "run_id": ("one-fire-per-fccsid-" +
             datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')),
+        "config": {
+            "extrafiles":{
+                "dest_dir": "/data/",
+                "sets": ["firescsvs"], #, "emissionscsv"],
+                "firescsvs": {
+                    "fire_locations_filename": "fire_locations.csv",
+                    "fire_events_filename": "fire_events.csv"
+                },
+                # "emissionscsv": {
+                #     "filename": "fire_emissions.csv"
+                # }
+            }
+        },
         "fire_information": []
     }
+    today = datetime.date.today()
+    start = today.strftime('%Y-%m-%dT%H:%M:%SZ')
+    end = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
     for fccs_id in fccs_ids:
         input_data['fire_information'].append({
             "type": args.fire_type,
@@ -71,33 +87,33 @@ def main():
                             "pct": 100.0,
                             "fccs_id": str(fccs_id)
                         }
-                    ]
-                    # "start": ,
-                    # "end":
+                    ],
+                    "start": start,
+                    "end": end
                 }
             ]
         })
-    if not os.path.exists('run-all-fuelbeds/'):
-        os.makedirs('run-all-fuelbeds/')
-    with open('./run-all-fuelbeds/' + input_data['run_id'] + '-input.json', 'w') as f:
+    if not os.path.exists('tmp/run-all-fuelbeds/'):
+        os.makedirs('tmp/run-all-fuelbeds/')
+    with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-input.json', 'w') as f:
         f.write(json.dumps(input_data))
 
     cmd = ("docker run -ti --rm"
-        " -v $PWD/run-all-fuelbeds/:/data/"
+        " -v $PWD/tmp/run-all-fuelbeds/:/data/"
         " bluesky"
         " bsp --log-level=DEBUG"
         " -i /data/" + input_data['run_id'] + "-input.json"
         " -o /data/" + input_data['run_id'] + "-output.json"
-        " consumption emissions")
+        " consumption emissions extrafiles")
 
     subprocess.run(cmd, shell=True, check=True)
 
     if args.indented_output:
-        with open('./run-all-fuelbeds/' + input_data['run_id'] + '-output.json', 'r') as f_in:
+        with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-output.json', 'r') as f_in:
             data = json.loads(f_in.read())
-            with open('./run-all-fuelbeds/' + input_data['run_id'] + '-output-indented.json', 'w') as f_out:
+            with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-output-indented.json', 'w') as f_out:
                 f_out.write(json.dumps(data, indent=4))
-        os.remove('./run-all-fuelbeds/' + input_data['run_id'] + '-output.json')
+        os.remove('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-output.json')
 
 
 if __name__ == "__main__":
