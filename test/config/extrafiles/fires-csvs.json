@@ -4,7 +4,8 @@
             "dest_dir": "tmp/{run_id}/extrafiles/",
             "sets": ["firescsvs"],
             "firescsvs": {
-                "filename": "fire_locations.csv"
+                "fire_locations_filename": "fire_locations.csv",
+                "fire_events_filename": "fire_events.csv"
             }
         }
     }
