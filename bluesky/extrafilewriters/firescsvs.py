@@ -51,6 +51,31 @@ def _get_heat(fire, g):
             # heat is array of arrays
             return sum([sum(h) for h in heat])
 
+def _get_consumption_field(field):
+    def f(fire, g):
+        # If consumption is already summarized for this growth
+        # window, return summary value
+        if g.get('consumption') and g['consumption'].get('summary'):
+            return g['consumption']['summary'].get(field)
+
+        # Otherwise, iterate through fuelbeds, fuel categories, and
+        # fuel subcategories
+        elif g.get('fuelbeds'):
+            try:
+                val = 0.0
+                for fb in g['fuelbeds']:
+                    for cat_dict in fb['consumption'].values():
+                        for subcat_dict in cat_dict.values():
+                            if field == 'total':
+                                val = sum([e[0] for e in subcat_dict.values()])
+                            else:
+                                val += subcat_dict[field][0]
+                return val
+            except Exception as e:
+                logging.warn("Failed to sum '{}' consumption "
+                    "for fire {}: {}".format(field, fire.id, e))
+    return f
+
 def _get_emissions_species(species):
     def f(fire, g):
         if g.get('fuelbeds'):
@@ -113,6 +138,12 @@ FIRE_LOCATIONS_CSV_FIELDS = (
         (s.lower(), _get_emissions_species('PM2.5' if s is 'pm25' else s))
             for s in BLUESKYKML_SPECIES_LIST if s
     ]
+    # consumption
+    + [
+        ('consumption_' + k,  _get_consumption_field(k)) for k in [
+            'total', 'duff', 'flaming', 'smoldering', 'residual'
+        ]
+    ]
     # float value location fields
     + [
         (k,  _get_location_value(k, True)) for k in [
@@ -140,9 +171,8 @@ FIRE_LOCATIONS_CSV_FIELDS = (
     #    'fuel_1hr', 'fuel_10hr', 'fuel_100hr',
     #    'fuel_1khr', 'fuel_10khr', 'fuel_gt10khr'
     #    'canopy','shrub','grass','rot','duff', 'litter', 'VEG',
-    #    'consumption_flaming', 'consumption_smoldering',
-    #    'consumption_residual', 'consumption_duff', 'heat',
-    #    'owner','sf_event_guid','sf_server','sf_stream_name','fips','scc'
+    #    'heat','owner','sf_event_guid','sf_server',
+    #    'sf_stream_name','fips','scc'
 )
 """List of fire location csv fields, with function to extract from fire object"""
 
