@@ -12,10 +12,13 @@ __version__ = "0.1.0"
 import os
 
 from bluesky.exceptions import BlueSkyConfigurationError
-from bluesky.extrafilewriters import emissionscsv
+from bluesky.extrafilewriters import (
+    emissionscsv, firescsvs
+)
 
 EXTRA_FILE_WRITERS = {
-    'emissionscsv': emissionscsv.EmissionsCsvWriter
+    'emissionscsv': emissionscsv.EmissionsCsvWriter,
+    'firescsvs': firescsvs.FiresCsvsWriter
 }
 
 def run(fires_manager):

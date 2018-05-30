@@ -38,11 +38,8 @@ def run(fires_manager):
                 # TODO: look under 'visualization' > 'dispersion' > 'hysplit',
                 #   but support 'visualization' > 'hysplit' for backwards
                 #   compatibility ?
-                hysplit_visualization_config = fires_manager.get_config_value(
-                    'visualization', 'hysplit', default={})
                 visualizer = visualizers.dispersion.hysplit.HysplitVisualizer(
-                    fires_manager.dispersion['output'], fires_manager.fires,
-                    fires_manager.run_id, **hysplit_visualization_config)
+                    fires_manager)
                 processed_kwargs.update(
                     hysplit_visualizer_version=visualizers.dispersion.hysplit.__version__)
             else:

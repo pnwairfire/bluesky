@@ -116,6 +116,11 @@ emissions config
 
 - ***'config' > 'extrafiles' > 'emissionscsv' > 'filename'*** -- *required* --
 
+###### if writing firescsvs:
+
+- ***'config' > 'extrafiles' > 'firescsvs' > 'fire_locations_filename'*** -- *optional* -- default: 'fire_locations.csv'
+- ***'config' > 'extrafiles' > 'firescsvs' > 'fire_events_filename'*** -- *optiona* -- default: 'fire_events.csv'
+
 
 ##### dispersion
 
