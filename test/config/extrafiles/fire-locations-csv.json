@@ -1,0 +1,11 @@
+{
+    "config": {
+        "extrafiles":{
+            "dest_dir": "tmp/{run_id}/extrafiles/",
+            "sets": ["firescsvs"],
+            "firescsvs": {
+                "filename": "fire_locations.csv"
+            }
+        }
+    }
+}
