@@ -24,7 +24,6 @@ from blueskykml import (
     smokedispersionkml, __version__ as blueskykml_version
 )
 
-from bluesky import locationutils
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.extrafilewriters.firescsvs import FiresCsvsWriter
 
