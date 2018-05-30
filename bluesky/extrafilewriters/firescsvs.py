@@ -211,32 +211,33 @@ class FiresCsvsWriter(object):
 
     def __init__(self, dest_dir, **config):
         fl = config.get('fire_locations_filename') or 'fire_locations.csv'
-        self._fire_locations_filename = os.path.join(dest_dir, fl)
+        self._fire_locations_pathname = os.path.join(dest_dir, fl)
 
         fe = config.get('fire_events_filename') or 'fire_events.csv'
-        self._fire_events_filename = os.path.join(dest_dir, fe)
+        self._fire_events_pathname = os.path.join(dest_dir, fe)
 
     def write(self, fires_manager):
-        fires, events = self._collect_csv_fields()
-        with open(fire_locations_csv_pathname, 'w') as _f:
+        fires, events = self._collect_csv_fields(fires_manager)
+
+        with open(self._fire_locations_pathname, 'w') as _f:
             f = csv.writer(_f)
             f.writerow([k for k, l in FIRE_LOCATIONS_CSV_FIELDS])
             for fire in fires:
                 f.writerow([str(fire[k] or '') for k, l in FIRE_LOCATIONS_CSV_FIELDS])
 
-        with open(fire_events_csv_pathname, 'w') as _f:
+        with open(self._fire_events_pathname, 'w') as _f:
             f = csv.writer(_f)
             f.writerow(['id'] + [k for k, l in FIRE_EVENTS_CSV_FIELDS])
             for e_id, event in list(events.items()):
                 f.writerow([e_id] +
                     [str(event[k] or '') for k, l in FIRE_EVENTS_CSV_FIELDS])
 
-    def _collect_csv_fields(self):
+    def _collect_csv_fields(self, fires_manager):
         # As we iterate through fires, collecting necessary fields, collect
         # events information as well
         fires = []
         events = {}
-        for fire in self._fires:
+        for fire in fires_manager.fires:
             for g in fire.growth:
                 fires.append({k: l(fire, g) or '' for k, l in FIRE_LOCATIONS_CSV_FIELDS})
             event_id = fire.get('event_of', {}).get('id')
