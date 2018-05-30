@@ -190,7 +190,7 @@ class TestAdjustDispersionWindowForAvailableMet(object):
             2014, 5, 29, 1, 0, 0)
         assert self.hysplitDisperser._num_hours == 3
         assert self.hysplitDisperser._warnings == [
-            {"message": "Incomplete met. Running dispersion met for"
+            {"message": "Incomplete met. Running dispersion for"
                 " 3 hours instead of 35"}
         ]
 
@@ -205,7 +205,7 @@ class TestAdjustDispersionWindowForAvailableMet(object):
             2014, 5, 29, 1, 0, 0)
         assert self.hysplitDisperser._num_hours == 3
         assert self.hysplitDisperser._warnings == [
-            {"message": "Incomplete met. Running dispersion met for"
+            {"message": "Incomplete met. Running dispersion for"
                 " 3 hours instead of 5"}
         ]
 
@@ -221,6 +221,6 @@ class TestAdjustDispersionWindowForAvailableMet(object):
             2014, 5, 29, 1, 0, 0)
         assert self.hysplitDisperser._num_hours == 3
         assert self.hysplitDisperser._warnings == [
-            {"message": "Incomplete met. Running dispersion met for"
+            {"message": "Incomplete met. Running dispersion for"
                 " 3 hours instead of 48"}
         ]
