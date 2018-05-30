@@ -141,7 +141,9 @@ FIRE_LOCATIONS_CSV_FIELDS = (
     # consumption
     + [
         ('consumption_' + k,  _get_consumption_field(k)) for k in [
-            'total', 'duff', 'flaming', 'smoldering', 'residual'
+            # Note: BSF included 'consumption_duff', but duff values
+            # aren't readily available in pipeline output
+            'total', 'flaming', 'smoldering', 'residual'
         ]
     ]
     # float value location fields
