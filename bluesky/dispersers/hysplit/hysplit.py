@@ -196,6 +196,7 @@ class HYSPLITDispersion(DispersionBase):
         # Note: DispersionBase.run will add directory, start_time,
         #  and num_hours to the response dict
         self._met_info.pop('hours')
+        self._met_info['files'] = list(self._met_info['files'])
         return {
             "output": {
                 "grid_filetype": "NETCDF",
@@ -245,8 +246,6 @@ class HYSPLITDispersion(DispersionBase):
         for met_file_info in met_info.pop('files'):
             self._met_info['files'].add(self._get_met_file(met_file_info))
             self._met_info['hours'].update(self._get_met_hours(met_file_info))
-
-        self._met_info['files'] = list(self._met_info['files'])
 
     def _adjust_dispersion_window_for_available_met(self):
         n = 0
