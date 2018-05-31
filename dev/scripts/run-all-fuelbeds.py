@@ -5,6 +5,7 @@ import datetime
 import json
 import os
 import subprocess
+import sys
 
 FCCS_IDS = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
@@ -41,6 +42,9 @@ def parse_args():
         help="ecoregion; default 'western'")
     parser.add_argument('--indented-output', default=False,
         action="store_true", help="produce indented output")
+    parser.add_argument('-l', '--local-code',
+        default=False, action="store_true",
+        help="Run with local code mounted in docker container")
 
     return parser.parse_args()
 
@@ -97,6 +101,10 @@ def main():
         os.makedirs('tmp/run-all-fuelbeds/')
     with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-input.json', 'w') as f:
         f.write(json.dumps(input_data))
+
+    if args.local_code:
+        sys.stderr.write("\n*** '--local-code' option not yet implemented.\n\n")
+        sys.exit(1)
 
     cmd = ("docker run -ti --rm"
         " -v $PWD/tmp/run-all-fuelbeds/:/data/"
