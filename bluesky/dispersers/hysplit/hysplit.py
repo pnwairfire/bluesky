@@ -596,6 +596,20 @@ class HYSPLITDispersion(DispersionBase):
                     self._archive_file(f)
                     #shutil.copy2(os.path.join(working_dir, f), self._run_output_dir)
 
+    def _get_hour_data(self, dt, fire):
+        if fire.plumerise and fire.timeprofile:
+            local_dt = dt + datetime.timedelta(hours=fire.utc_offset)
+            # TODO: will fire.plumerise and fire.timeprofile always
+            #    have string value keys
+            local_dt = local_dt.strftime('%Y-%m-%dT%H:%M:%S')
+            plumerise_hour = fire.plumerise.get(local_dt)
+            timeprofile_hour = fire.timeprofile.get(local_dt)
+            if plumerise_hour and timeprofile_hour:
+                return False, plumerise_hour, timeprofile_hour
+
+        return True, self.DUMMY_PLUMERISE_HOUR, self.DUMMY_TIMEPROFILE_HOUR
+
+
     def _write_emissions(self, emissions_file):
         # A value slightly above ground level at which to inject smoldering
         # emissions into the model.
@@ -627,25 +641,16 @@ class HYSPLITDispersion(DispersionBase):
 
                 # Loop through the fire locations
                 for fire in self._fires:
-                    dummy = False
-
                     # Get some properties from the fire location
                     lat = fire.latitude
                     lon = fire.longitude
 
                     # If we don't have real data for the given timestep, we apparently need
                     # to stick in dummy records anyway (so we have the correct number of sources).
-                    if not fire.plumerise or not fire.timeprofile:
+                    dummy, plumerise_hour, timeprofile_hour = self._get_hour_data(dt, fire)
+                    if dummy:
                         logging.debug("Fire %s has no emissions for hour %s", fire.id, hour)
                         fires_wo_emissions += 1
-                        dummy = True
-                    else:
-                        local_dt = dt + datetime.timedelta(hours=fire.utc_offset)
-                        # TODO: will fire.plumerise and fire.timeprofile always
-                        #    have string value keys
-                        local_dt = local_dt.strftime('%Y-%m-%dT%H:%M:%S')
-                        plumerise_hour = fire.plumerise.get(local_dt)
-                        timeprofile_hour = fire.timeprofile.get(local_dt)
 
                     area_meters = 0.0
                     smoldering_fraction = 0.0
