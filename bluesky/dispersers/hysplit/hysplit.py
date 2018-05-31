@@ -617,7 +617,7 @@ class HYSPLITDispersion(DispersionBase):
                 # Write the header line for this timestep
                 emis.write("%s %02d %04d\n" % (dt_str, qinc, num_sources))
 
-                noEmis = 0
+                fires_wo_emissions = 0
 
                 # Loop through the fire locations
                 for fire in self._fires:
@@ -631,7 +631,7 @@ class HYSPLITDispersion(DispersionBase):
                     # to stick in dummy records anyway (so we have the correct number of sources).
                     if not fire.plumerise or not fire.timeprofile:
                         logging.debug("Fire %s has no emissions for hour %s", fire.id, hour)
-                        noEmis += 1
+                        fires_wo_emissions += 1
                         dummy = True
                     else:
                         local_dt = dt + datetime.timedelta(hours=fire.utc_offset)
@@ -713,8 +713,8 @@ class HYSPLITDispersion(DispersionBase):
                         # Write the record to the file
                         emis.write(record_fmt % (dt_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
 
-                if noEmis > 0:
-                    logging.debug("%d of %d fires had no emissions for hour %d", noEmis, num_fires, hour)
+                if fires_wo_emissions > 0:
+                    logging.debug("%d of %d fires had no emissions for hour %d", fires_wo_emissions, num_fires, hour)
 
 
     VERTICAL_CHOICES = {
