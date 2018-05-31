@@ -265,6 +265,7 @@ class HYSPLITDispersion(DispersionBase):
     def _create_dummy_fire_if_necessary(self):
         # TODO: create a dummy fire no matter what (in case whatever fires
         #   are in the list are filtered by hysplit?)
+        # TODO: produce max(NPROCESSES, NPROCESSES_MAX) fires?
         if not self._fires:
             self._fires = [self._generate_dummy_fire()]
 
@@ -274,6 +275,9 @@ class HYSPLITDispersion(DispersionBase):
     )
     DUMMY_EMISSIONS_VALUE = 0.00001
     DUMMY_HOURS = 24
+    # Note: DUMMY_PLUMERISE_HOUR is slightly different than
+    #    MISSING_PLUMERISE_HOUR
+    # TODO: should they be the same and thus consolidated?
     # TODO: make sure these dummy plumerise values don't have unexpected consequences
     DUMMY_PLUMERISE_HOUR = dict(
         heights=[1000 + 100*n for n in range(21)],
@@ -281,6 +285,9 @@ class HYSPLITDispersion(DispersionBase):
         smolder_fraction=0.0
     )
 
+    # Note: DUMMY_TIMEPROFILE_HOUR is slightly different than
+    #    MISSING_TIMEPROFILE_HOUR
+    # TODO: should they be the same and thus consolidated?
     @property
     def DUMMY_TIMEPROFILE_HOUR(self):
         return {
