@@ -281,6 +281,12 @@ class HYSPLITDispersion(DispersionBase):
         smolder_fraction=0.0
     )
 
+    @property
+    def DUMMY_TIMEPROFILE_HOUR(self):
+        return {
+            d: 1.0 / float(self._num_hours) for d in self.TIMEPROFILE_FIELDS
+        }
+
     def _generate_dummy_fire(self):
         """Returns dummy fire formatted like
         """
@@ -303,7 +309,7 @@ class HYSPLITDispersion(DispersionBase):
             dt = self._model_start + datetime.timedelta(hours=hour)
             dt = dt.strftime('%Y-%m-%dT%H:%M:%S')
             f['plumerise'][dt] = self.DUMMY_PLUMERISE_HOUR
-            f['timeprofile'][dt] = {d: 1.0 / float(self._num_hours) for d in self.TIMEPROFILE_FIELDS}
+            f['timeprofile'][dt] = self.DUMMY_TIMEPROFILE_HOUR
 
         return f
 
