@@ -70,25 +70,23 @@ RUN apt-get update \
 
 RUN pip3 install --upgrade pip
 
-# blueskykml and consume are relatively static these days; so, install them
-# here in order to avoid reinstalling them and their large dependencies
-# (Pillow==2.8.1, 9.0MB, and matplotlib==1.4.3, 50.4MB, for blueskykml;
-# pandas, etc. for consume) everytime the the bluesky image is built
-# NOTE: these RUN commands will need to be updated if 'blueskykml'
-#   and/or consume are ever updated in setup.py
-RUN pip3 install \
-    --extra-index https://pypi.airfire.org/simple blueskykml==2.3.1
-RUN pip3 install \
-    --extra-index https://pypi.airfire.org/simple apps-consume4==4.1.*
-
-# Same thing for Fiona (which is 39.7MB)
-# NOTE: asame as above - update this command if we upgrade to a newer version
-#   in setup.py
-RUN pip3 install Fiona==1.7.2
-
 # Having vim is handy
 RUN apt-get install -y \
         vim
+
+# blueskykml, consume, and fiona are relatively static these days; so, install them
+# here in order to avoid reinstalling them and their large dependencies
+# (Pillow==2.8.1, 9.0MB, and matplotlib==1.4.3, 50.4MB, for blueskykml;
+# pandas, etc. for consume; 39.7MB for fiona itself) everytime the the bluesky image is built
+# Note: these RUN commands will need to be updated if fiona,
+#   consume, and or blueskykml are ever updated in setup.py
+# Note: install fiona, then consume, then blueskykml, based on
+#   likelyhood of upgrade
+RUN pip3 install Fiona==1.7.2
+RUN pip3 install \
+    --extra-index https://pypi.airfire.org/simple apps-consume4==4.1.*
+RUN pip3 install \
+    --extra-index https://pypi.airfire.org/simple blueskykml==2.3.1
 
 # Install bluesky utils for merging emissions, etc.
 RUN pip3 install \
