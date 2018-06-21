@@ -55,4 +55,4 @@ BSP_CMD=$BSP_CMD' '$MODULES_STR
 
 echo "About to run:  $BSP_CMD"
 
-$BSP_CMD
+eval $BSP_CMD
