@@ -86,7 +86,7 @@ RUN pip3 install Fiona==1.7.2
 RUN pip3 install \
     --extra-index https://pypi.airfire.org/simple apps-consume4==4.1.*
 RUN pip3 install \
-    --extra-index https://pypi.airfire.org/simple blueskykml==2.3.1
+    --extra-index https://pypi.airfire.org/simple blueskykml==2.3.2
 
 # Install bluesky utils for merging emissions, etc.
 RUN pip3 install \
