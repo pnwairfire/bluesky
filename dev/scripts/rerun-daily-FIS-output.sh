@@ -25,6 +25,7 @@ do
 done
 
 echo "Output root dir: $HOST_OUTPUT_ROOT_DIR"
+echo "Domain: $DOMAIN"
 echo "Init time: $INIT_TIME"
 echo "Mount local code: $MOUNT_LOCAL"
 echo "Modules to run: $MODULES_STR"
