@@ -27,7 +27,7 @@ VERTICAL_METHOD = "DATA"
 TOP_OF_MODEL_DOMAIN = 30000.0
 
 # List of vertical levels for output sampling grid
-VERTICAL_LEVELS = [10]
+VERTICAL_LEVELS = [100]
 
 # Factor for reducing the number of vertical emission levels
 VERTICAL_EMISLEVELS_REDUCTION_FACTOR = 1
