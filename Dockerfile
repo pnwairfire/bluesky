@@ -90,7 +90,7 @@ RUN pip3 install \
 
 # Install bluesky utils for merging emissions, etc.
 RUN pip3 install \
-    --extra-index https://pypi.airfire.org/simple blueskyutils>=0.2.0
+    --extra-index https://pypi.airfire.org/simple blueskyutils>=0.4.0
 
 # Install binary dependencies - for localmet, plumerise,
 # dipersion, and visualization
