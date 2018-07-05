@@ -388,6 +388,8 @@ class HYSPLITDispersion(DispersionBase):
                 super(T, self).__init__()
                 self.fires = fires
                 self.working_dir = working_dir
+                if not os.path.exists(working_dir):
+                    os.makedirs(working_dir)
                 self.exc = None
 
             def run(self):
