@@ -138,7 +138,7 @@ class ComputeFunction(object):
                 # TODO: if fire_frp is defined but growth's frp isn't,
                 #   do we need to multiple by growth's
                 #   percentage of the fire's total area?
-                g_frp = growth.get('frp', fire_frp)
+                g_frp = g.get('frp', fire_frp)
                 plumerise_data = pr.compute(g['localmet'],
                     g['location']['area'], frp=g_frp)
                 g['plumerise'] = plumerise_data['hours']
