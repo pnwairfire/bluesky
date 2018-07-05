@@ -197,7 +197,8 @@ defaults.
 
  - ***'fire_information' > 'growth' > 'location' > 'area'*** -- *required* --
  - ***'fire_information' > 'growth' > 'localmet'*** -- *required* --
- - ***'fire_information' > 'meta' > 'frp'*** -- *optional* --
+ - ***'fire_information' > 'growth' > 'frp'*** -- *optional* --
+ - ***'fire_information' > 'meta' > 'frp'*** -- *optional* -- used if frp isn't defined in growth object
 
 ##### dispersion
 

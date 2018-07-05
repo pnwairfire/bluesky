@@ -130,14 +130,15 @@ class ComputeFunction(object):
         pr = sev.SEVPlumeRise(**config)
 
         def _f(fire):
-            frp = fire.get('meta', {}).get('frp')
+            fire_frp = fire.get('meta', {}).get('frp')
             for g in fire.growth:
                 if not g.get('localmet'):
                     raise ValueError(
                         "Missing localmet data required for computing SEV plumerise")
-                # TODO: if frp is defined, do we need to multiple by growth's
+                # TODO: if fire_frp is defined but growth's frp isn't,
+                #   do we need to multiple by growth's
                 #   percentage of the fire's total area?
-                g_frp = frp
+                g_frp = growth.get('frp', fire_frp)
                 plumerise_data = pr.compute(g['localmet'],
                     g['location']['area'], frp=g_frp)
                 g['plumerise'] = plumerise_data['hours']

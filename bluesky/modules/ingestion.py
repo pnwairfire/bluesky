@@ -419,7 +419,10 @@ class FireIngester(object):
 
     ## 'growth'
 
-    OPTIONAL_GROWTH_FIELDS = ['start','end', 'pct', 'localmet', 'timeprofile', 'plumerise']
+    OPTIONAL_GROWTH_FIELDS = [
+        'start','end', 'pct', 'localmet',
+        'timeprofile', 'plumerise', 'frp'
+    ]
 
     def _ingest_growth_location(self, growth, src):
         # only look in growth object for location fields; don't look
