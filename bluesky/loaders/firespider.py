@@ -49,14 +49,16 @@ class BaseFireSpiderLoader(object):
                 "name": "HMS_sdfsdfsdf"
             }
 
-        The only thing that needs to be done is conversion of 'start'
-        and 'end' to local time.
+        The only thing that needs to be done is conversion of times from
+        utc to local.  This includes growth 'start' and 'end' times, as well
+        as timeprofile and hourly_frp keys
         """
 
         for f in fires:
             growth = f.pop('growth', [])
             f['growth'] = []
             for g in growth:
+                utc_offset = self._get_utc_offset(g)
                 # the growth object's 'start' and 'end' will be in UTC;
                 # Keep them in UTC to compare with start/end query parameters
                 # and then convert to local if growth object is within range
@@ -64,12 +66,28 @@ class BaseFireSpiderLoader(object):
                     g['start'] = parse_datetime(g.get('start'), 'start')
                     g['end'] = parse_datetime(g.get('end'), 'end')
                     if self._within_time_range(g):
-                        utc_offset = self._get_utc_offset(g)
                         g['start'] += utc_offset
                         g['end'] += utc_offset
                         f['growth'].append(g)
 
+                # do the same for timeprofile keys
+                self._convert_keys_to_local_time(g, 'timeprofile', utc_offset)
+
+                # and again for hourly FRP values
+                self._convert_keys_to_local_time(g, 'hourly_frp', utc_offset)
+
         return fires
+
+    def _convert_keys_to_local_time(self, g, key, utc_offset):
+        # Even if utc_offset is zero hours, we want to process g[key]
+        # to make sure keys are in appropriate datetime string format
+        d = g.pop(key, None)
+        if d:
+            g[key] = {}
+            for k, b in d.items():
+                new_k = parse_datetime(k, key + ' key') + utc_offset
+                new_k = new_k.isoformat()
+                g[key][new_k] = b
 
     def _get_utc_offset(self, g):
         utc_offset = g.get('location', {}).get('utc_offset')
