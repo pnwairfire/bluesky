@@ -67,6 +67,7 @@ class BaseLoader(object):
 class BaseFileLoader(BaseLoader, metaclass=abc.ABCMeta):
 
     def __init__(self, **config):
+        super(BaseFileLoader, self).__init__(**config)
         self._filename = config.get('file')
         if not self._filename:
             raise BlueSkyConfigurationError(
