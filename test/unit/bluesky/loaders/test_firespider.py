@@ -18,22 +18,22 @@ FT_FIRES = [
         "type": "wildfire",
         "growth": [
             {
-                "start": "2015-08-09T07:00:00Z",
-                "end": "2015-08-10T07:00:00Z",
+                "start": "2015-08-09T00:00:00",
+                "end": "2015-08-10T00:00:00",
                 "timeprofile": {
-                    "2015-08-09T07:00:00Z": {
+                    "2015-08-09T00:00:00": {
                         'area_fraction': 0.4118236472945892,
                         'flaming': 0.4118236472945892,
                         'smoldering': 0.4118236472945892,
                         'residual': 0.4118236472945892
                     },
-                    "2015-08-09T13:00:00Z":  {
+                    "2015-08-09T06:00:00":  {
                         'area_fraction': 0.30661322645290584,
                         'flaming': 0.30661322645290584,
                         'smoldering': 0.30661322645290584,
                         'residual': 0.30661322645290584
                     },
-                    "2015-08-10T09:00:00Z": {
+                    "2015-08-10T02:00:00": {
                         'area_fraction': 0.28156312625250507,
                         'flaming': 0.28156312625250507,
                         'smoldering': 0.28156312625250507,
@@ -41,9 +41,9 @@ FT_FIRES = [
                     },
                 },
                 "hourly_frp": {
-                    "2015-08-09T07:00:00Z": 47.333333333333336,
-                    "2015-08-09T13:00:00Z":  45.0,
-                    "2015-08-10T09:00:00Z": 53.166666666666664
+                    "2015-08-09T00:00:00": 47.333333333333336,
+                    "2015-08-09T06:00:00":  45.0,
+                    "2015-08-10T02:00:00": 53.166666666666664
                 },
                 "location": {
                     "area": 900,
@@ -59,8 +59,8 @@ FT_FIRES = [
                 }
             },
             {
-                "start": "2015-08-10T07:00:00Z",
-                "end": "2015-08-11T07:00:00Z",
+                "start": "2015-08-10T00:00:00",
+                "end": "2015-08-11T00:00:00",
                 "location": {
                     "area": 300,
                     "geojson": {
@@ -166,7 +166,7 @@ class TestBaseFireSpiderLoader(object):
             start=datetime.datetime(2015,8,8,7,0,0))
         assert expected == self._call_marshal(
             copy.deepcopy(FT_FIRES),
-            start="2015-08-08T07:00:00Z")
+            start="2015-08-08T00:00:00Z")
 
         # start is in the middle of first growth window
         assert expected == self._call_marshal(
@@ -186,8 +186,7 @@ class TestBaseFireSpiderLoader(object):
             start="2015-08-10T14:00:00Z")
 
         # start is after all growth windows
-        expected[0]['growth'].pop(0)
-        assert expected[0]['growth'] == [] # for sanity
+        expected = []
         assert expected == self._call_marshal(
             copy.deepcopy(FT_FIRES),
             start=datetime.datetime(2015,8,12,14,0,0))
@@ -204,7 +203,7 @@ class TestBaseFireSpiderLoader(object):
             end=datetime.datetime(2015,8,12,7,0,0))
         assert expected == self._call_marshal(
             copy.deepcopy(FT_FIRES),
-            end="2015-08-12T07:00:00Z")
+            end="2015-08-12T00:00:00Z")
 
         # start is in the middle of second growth window
         assert expected == self._call_marshal(
@@ -224,8 +223,7 @@ class TestBaseFireSpiderLoader(object):
             end="2015-08-09T14:00:00Z")
 
         # start is before all growth windows
-        expected[0]['growth'].pop()
-        assert expected[0]['growth'] == [] # for sanity
+        expected = []
         assert expected == self._call_marshal(
             copy.deepcopy(FT_FIRES),
             end=datetime.datetime(2015,8,8,14,0,0))
@@ -243,8 +241,8 @@ class TestBaseFireSpiderLoader(object):
             end=datetime.datetime(2015,8,12,7,0,0))
         assert expected == self._call_marshal(
             copy.deepcopy(FT_FIRES),
-            start="2015-08-08T07:00:00Z",
-            end="2015-08-12T07:00:00Z")
+            start="2015-08-08T00:00:00",
+            end="2015-08-12T00:00:00Z")
 
         # start/end are inside, but including all growth windows
         assert expected == self._call_marshal(
@@ -253,7 +251,7 @@ class TestBaseFireSpiderLoader(object):
             end=datetime.datetime(2015,8,10,14,0,0))
         assert expected == self._call_marshal(
             copy.deepcopy(FT_FIRES),
-            start="2015-08-09T14:00:00Z",
+            start="2015-08-09T14:00:00",
             end="2015-08-10T14:00:00Z")
 
         # start/end are inside first growth window
@@ -264,19 +262,18 @@ class TestBaseFireSpiderLoader(object):
             end=datetime.datetime(2015,8,10,1,0,0))
         assert expected == self._call_marshal(
             copy.deepcopy(FT_FIRES),
-            start="2015-08-09T14:00:00Z",
+            start="2015-08-09T14:00:00",
             end="2015-08-10T01:00:00Z")
 
         # exclude all growth windows
-        expected[0]['growth'].pop()
-        assert expected[0]['growth'] == [] # for sanity
+        expected = []
         assert expected == self._call_marshal(
             copy.deepcopy(FT_FIRES),
             start=datetime.datetime(2015,8,7,14,0,0),
             end=datetime.datetime(2015,8,8,1,0,0))
         assert expected == self._call_marshal(
             copy.deepcopy(FT_FIRES),
-            start="2015-08-07T14:00:00Z",
+            start="2015-08-07T14:00:00",
             end="2015-08-08T01:00:00Z")
 
 
@@ -289,79 +286,6 @@ class TestBaseFireSpiderLoader(object):
         with raises(BlueSkyConfigurationError) as e_info:
             self._call_marshal(
                 copy.deepcopy(FT_FIRES),
-                start="2015-08-07T14:00:00Z",
+                start="2015-08-07T14:00:00",
                 end="2015-08-04T01:00:00Z")
         assert e_info.value.args[0] == firespider.BaseFireSpiderLoader.START_AFTER_END_ERROR_MSG
-
-
-    ##
-    ## Helper methods
-    ##
-
-    def test_convert_keys_to_local_time(self):
-        d = {
-            "timeprofile": {
-                "2015-08-09T07:00:00Z": {
-                    'area_fraction': 0.4118236472945892,
-                    'flaming': 0.4118236472945892,
-                    'smoldering': 0.4118236472945892,
-                    'residual': 0.4118236472945892
-                },
-                "2015-08-09T13:00:00Z":  {
-                    'area_fraction': 0.30661322645290584,
-                    'flaming': 0.30661322645290584,
-                    'smoldering': 0.30661322645290584,
-                    'residual': 0.30661322645290584
-                },
-                "2015-08-10T09:00:00Z": {
-                    'area_fraction': 0.28156312625250507,
-                    'flaming': 0.28156312625250507,
-                    'smoldering': 0.28156312625250507,
-                    'residual': 0.28156312625250507
-                },
-            },
-            "hourly_frp": {
-                "2015-08-09T07:00:00Z": 47.333333333333336,
-                "2015-08-09T13:00:00Z":  45.0,
-                "2015-08-10T09:00:00Z": 53.166666666666664
-            }
-        }
-        expected = {
-            "timeprofile": {
-                "2015-08-09T03:00:00": {
-                    'area_fraction': 0.4118236472945892,
-                    'flaming': 0.4118236472945892,
-                    'smoldering': 0.4118236472945892,
-                    'residual': 0.4118236472945892
-                },
-                "2015-08-09T09:00:00":  {
-                    'area_fraction': 0.30661322645290584,
-                    'flaming': 0.30661322645290584,
-                    'smoldering': 0.30661322645290584,
-                    'residual': 0.30661322645290584
-                },
-                "2015-08-10T05:00:00": {
-                    'area_fraction': 0.28156312625250507,
-                    'flaming': 0.28156312625250507,
-                    'smoldering': 0.28156312625250507,
-                    'residual': 0.28156312625250507
-                },
-            },
-            "hourly_frp": {
-                "2015-08-09T00:00:00": 47.333333333333336,
-                "2015-08-09T06:00:00":  45.0,
-                "2015-08-10T02:00:00": 53.166666666666664
-            }
-        }
-
-        loader = firespider.JsonApiLoader(endpoint="sdf",
-            start=datetime.datetime(2015,8,9,0,0,0),
-            end=datetime.datetime(2015,8,11,0,0,0))
-        # Note: using different offsets for timeporfile and hourly_frp
-        loader._convert_keys_to_local_time(d, 'timeprofile',
-            datetime.timedelta(hours=-4))
-        loader._convert_keys_to_local_time(d, 'hourly_frp',
-            datetime.timedelta(hours=-7))
-
-        # d should have been modified in place
-        assert d == expected

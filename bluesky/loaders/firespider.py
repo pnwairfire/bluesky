@@ -23,71 +23,89 @@ class BaseFireSpiderLoader(object):
         """Marshals FireSpider data into bsp's internal structure
 
         FireSpider structure:
+
             {
-                "id": "HMS_sdfsdfsdf",
-                "fuel_type": "natural",
-                "type": "wildfire",
-                "growth": [
-                    {
-                        "start": "2015-08-09T00:00:00Z",
-                        "end": "2015-08-10T00:00:00Z",
-                        "location": {
-                            "area": 900,
-                            "geojson": {
-                                "type": "MultiPoint",
-                                "coordinates": [
-                                    [-120.2, 48.1],
-                                    [-120.4, 48.2],
-                                    [-120.2, 48.2]
-                                ]
-                            },
-                            "utc_offset": "-07:00"
-                        }
-                    }
+                "growth_modules": [
+                    "persistence"
                 ],
-                "source": "HMS",
-                "name": "HMS_sdfsdfsdf"
+                "count": 6,
+                "data": [
+                    {
+                        "source": "GOES-16",
+                        "growth": [
+                            {
+                                "frp": 55.416666666666664,
+                                "timeprofile": {
+                                    "2018-06-27T20:00:00": {
+                                        "residual": 1.0,
+                                        "area_fraction": 1.0,
+                                        "smoldering": 1.0,
+                                        "flaming": 1.0
+                                    }
+                                },
+                                "hourly_frp": {
+                                    "2018-06-27T20:00:00": 55.416666666666664
+                                },
+                                "location": {
+                                    "area": 11663.592000000002,
+                                    "geojson": {
+                                        "coordinates": [
+                                            -71.362,
+                                            50.632
+                                        ],
+                                        "type": "Point"
+                                    },
+                                    "utc_offset": "-04:00"
+                                },
+                                "end": "2018-06-28T00:00:00",
+                                "start": "2018-06-27T00:00:00"
+                            }
+                        ],
+                        "type": "WF",
+                        "id": "91736f4b-c013-424a-badb-35fa6a771d5b"
+                    },
+                    ...,
+                ],
+                "boundary": {
+                    "west_lng": null,
+                    "south_lat": null,
+                    "north_lat": null,
+                    "east_lng": null
+                },
+                "end": "2018-07-03T00:00:00Z",
+                "start": "2018-06-28T00:00:00Z",
+                "source": "goes16"
             }
 
-        The only thing that needs to be done is conversion of times from
-        utc to local.  This includes growth 'start' and 'end' times, as well
-        as timeprofile and hourly_frp keys
+        The only thing that needs to be done is to filter out growth
+        windows that are outside of time range. Nothing else needs to
+        be done since all times in the growth objects (growth 'start'
+        and 'end' times, as well as timeprofile and hourly_frp keys)
+        are already in local time.
         """
-
         for f in fires:
-            growth = f.pop('growth', [])
-            f['growth'] = []
-            for g in growth:
-                utc_offset = self._get_utc_offset(g)
-                # the growth object's 'start' and 'end' will be in UTC;
-                # Keep them in UTC to compare with start/end query parameters
-                # and then convert to local if growth object is within range
-                if g.get('start') and g.get('end'):
-                    g['start'] = parse_datetime(g.get('start'), 'start')
-                    g['end'] = parse_datetime(g.get('end'), 'end')
-                    if self._within_time_range(g):
-                        g['start'] += utc_offset
-                        g['end'] += utc_offset
-                        f['growth'].append(g)
+            f['growth'] = [g for g in f.pop('growth', [])
+                if self._within_time_range(g)]
 
-                # do the same for timeprofile keys
-                self._convert_keys_to_local_time(g, 'timeprofile', utc_offset)
-
-                # and again for hourly FRP values
-                self._convert_keys_to_local_time(g, 'hourly_frp', utc_offset)
+        fires = [f for f in fires if f['growth']]
 
         return fires
 
-    def _convert_keys_to_local_time(self, g, key, utc_offset):
-        # Even if utc_offset is zero hours, we want to process g[key]
-        # to make sure keys are in appropriate datetime string format
-        d = g.pop(key, None)
-        if d:
-            g[key] = {}
-            for k, b in d.items():
-                new_k = parse_datetime(k, key + ' key') + utc_offset
-                new_k = new_k.isoformat()
-                g[key][new_k] = b
+    def _within_time_range(self, g):
+        utc_offset = self._get_utc_offset(g)
+        if g.get('start') and g.get('end'):
+            # convert to datetime objects in place
+            g['start'] = parse_datetime(g.get('start'), 'start')
+            g['end'] = parse_datetime(g.get('end'), 'end')
+            # the growth object's 'start' and 'end' will be in local time;
+            # convert them to UTC to compare with start/end query parameters
+            utc_start = g['start'] - utc_offset
+            utc_end = g['end'] - utc_offset
+
+            return ((not self._start or utc_end >= self._start) and
+                (not self._end or utc_start <= self._end ))
+
+        return False # not necessary, but makes code more readable
 
     def _get_utc_offset(self, g):
         utc_offset = g.get('location', {}).get('utc_offset')
@@ -95,12 +113,6 @@ class BaseFireSpiderLoader(object):
             return datetime.timedelta(hours=parse_utc_offset(utc_offset))
         else:
             return datetime.timedelta(0)
-
-    def _within_time_range(self, g):
-        # at this point, we know g['start'] and g['end'] are defined,
-        # and they are still in UTC
-        return ((not self._start or g['end'] >= self._start) and
-            (not self._end or g['start'] <= self._end ))
 
 class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
     """Loads json formatted fire data from the FireSpider web service
