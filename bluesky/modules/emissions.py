@@ -29,6 +29,8 @@ __version__ = "0.1.0"
 
 TONS_PER_POUND = 0.0005 # 1.0 / 2000.0
 
+INCLUDE_EMISSIONS_DETAILS_DEFAULT = False
+
 def run(fires_manager):
     """Runs emissions module
 
@@ -52,14 +54,14 @@ def run(fires_manager):
         or 'feps').lower()
 
     include_emissions_details = fires_manager.get_config_value('emissions',
-        'include_emissions_details', default=False)
+        'include_emissions_details', default=INCLUDE_EMISSIONS_DETAILS_DEFAULT)
     fires_manager.processed(__name__, __version__, model=model,
         emitcalc_version=emitcalc_version, eflookup_version=eflookup_version)
 
     try:
         klass = getattr(sys.modules[__name__], model.capitalize())
         e = klass(fires_manager.fire_failure_handler,
-            include_emissions_details,fires_manager.get_config_value)
+            fires_manager.get_config_value)
     except AttributeError:
         raise BlueSkyConfigurationError(
             "Invalid emissions model: '{}'".format(model))
@@ -114,10 +116,11 @@ def _fix_keys(emissions):
 
 class EmissionsBase(object, metaclass=abc.ABCMeta):
 
-    def __init__(self, fire_failure_handler,
-            include_emissions_details, config_getter):
+    def __init__(self, fire_failure_handler, config_getter):
         self.fire_failure_handler = fire_failure_handler
-        self.include_emissions_details = include_emissions_details
+        self.include_emissions_details = config_getter(
+            'emissions', 'include_emissions_details',
+            default=INCLUDE_EMISSIONS_DETAILS_DEFAULT)
         self.config_getter = config_getter
         self.species = config_getter('emissions', 'species', default=[])
 
@@ -132,10 +135,8 @@ class EmissionsBase(object, metaclass=abc.ABCMeta):
 
 class Feps(EmissionsBase):
 
-    def __init__(self, fire_failure_handler,
-            include_emissions_details, config_getter):
-        super(Feps, self).__init__(fire_failure_handler, species,
-            include_emissions_details, config_getter)
+    def __init__(self, fire_failure_handler, config_getter):
+        super(Feps, self).__init__(fire_failure_handler, config_getter)
 
         # The same lookup object is used for both Rx and WF
         self.calculator = EmissionsCalculator(FepsEFLookup(), species=species)
@@ -175,10 +176,8 @@ class Feps(EmissionsBase):
 
 class Urbanski(EmissionsBase):
 
-    def __init__(self, fire_failure_handler,
-            include_emissions_details, config_getter):
-        super(Urbanski, self).__init__(fire_failure_handler, species,
-            include_emissions_details, config_getter)
+    def __init__(self, fire_failure_handler, config_getter):
+        super(Urbanski, self).__init__(fire_failure_handler, config_getter)
 
     def run(self, fires):
         logging.info("Running emissions module with Urbanski EFs")
@@ -219,10 +218,8 @@ class Urbanski(EmissionsBase):
 
 class Consume(EmissionsBase):
 
-    def __init__(self, fire_failure_handler,
-            include_emissions_details, config_getter):
-        super(Consume, self).__init__(fire_failure_handler, species,
-            include_emissions_details, config_getter)
+    def __init__(self, fire_failure_handler, config_getter):
+        super(Consume, self).__init__(fire_failure_handler, config_getter)
 
         self.species = species and [e.upper() for e in species]
 
