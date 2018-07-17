@@ -52,9 +52,11 @@ def run(fires_manager):
     fires_manager.processed(__name__, __version__, ef_set=efs,
         emitcalc_version=emitcalc_version, eflookup_version=eflookup_version)
     if efs == 'urbanski':
-        _run_urbanski(fires_manager, species, include_emissions_details)
+        Urbanski(fires_manager.fire_failure_handler, species,
+            include_emissions_details).run(fires_manager.fires)
     elif efs == 'feps':
-        _run_feps(fires_manager, species, include_emissions_details)
+        Feps(fires_manager.fire_failure_handler, species,
+            include_emissions_details).run(fires_manager.fires)
     elif efs == 'consume':
         _run_consume(fires_manager, species, include_emissions_details)
     else:
@@ -106,66 +108,87 @@ def _fix_keys(emissions):
 ## FEPS
 ##
 
-def _run_feps(fires_manager, species, include_emissions_details):
-    logging.info("Running emissions module FEPS EFs")
+class Feps(object):
 
-    # The same lookup object is used for both Rx and WF
-    calculator = EmissionsCalculator(FepsEFLookup(), species=species)
-    for fire in fires_manager.fires:
-        with fires_manager.fire_failure_handler(fire):
-            if 'growth' not in fire:
-                raise ValueError(
-                    "Missing growth data required for computing emissions")
-            for g in fire.growth:
-                if 'fuelbeds' not in g:
-                   raise ValueError(
-                        "Missing fuelbed data required for computing emissions")
-                for fb in g['fuelbeds']:
-                    if 'consumption' not in fb:
-                        raise ValueError(
-                            "Missing consumption data required for computing emissions")
-                    _calculate(calculator, fb, include_emissions_details)
-                    # TODO: Figure out if we should indeed convert from lbs to tons;
-                    #   if so, uncomment the following
-                    # Note: According to BSF, FEPS emissions are in lbs/ton consumed.  Since
-                    # consumption is in tons, and since we want emissions in tons, we need
-                    # to divide each value by 2000.0
-                    # datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
-                    # if include_emissions_details:
-                    #     datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
+    def __init__(self, fire_failure_handler, species,
+            include_emissions_details):
+        self.fire_failure_handler = fire_failure_handler
+        self.include_emissions_details = include_emissions_details
+        # The same lookup object is used for both Rx and WF
+        self.calculator = EmissionsCalculator(FepsEFLookup(), species=species)
+
+    def run(self, fires):
+        logging.info("Running emissions module FEPS EFs")
+
+        for fire in fires.fires:
+            with self.fire_failure_handler(fire):
+                self._run_on_fire(fire)
+
+    def _run_on_fire(self, fire):
+        if 'growth' not in fire:
+            raise ValueError(
+                "Missing growth data required for computing emissions")
+        for g in fire.growth:
+            if 'fuelbeds' not in g:
+               raise ValueError(
+                    "Missing fuelbed data required for computing emissions")
+            for fb in g['fuelbeds']:
+                if 'consumption' not in fb:
+                    raise ValueError(
+                        "Missing consumption data required for computing emissions")
+                _calculate(self.calculator, fb, self.include_emissions_details)
+                # TODO: Figure out if we should indeed convert from lbs to tons;
+                #   if so, uncomment the following
+                # Note: According to BSF, FEPS emissions are in lbs/ton consumed.  Since
+                # consumption is in tons, and since we want emissions in tons, we need
+                # to divide each value by 2000.0
+                # datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
+                # if self.include_emissions_details:
+                #     datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
 
 ##
 ## Urbanski
 ##
 
-def _run_urbanski(fires_manager, species, include_emissions_details):
-    logging.info("Running emissions module with Urbanski EFs")
+class Urbanski(object):
 
-    # Instantiate two lookup object, one Rx and one WF, to be reused
-    for fire in fires_manager.fires:
-        with fires_manager.fire_failure_handler(fire):
-            if 'growth' not in fire:
+    def __init__(self, fire_failure_handler, species,
+            include_emissions_details):
+        self.fire_failure_handler = fire_failure_handler
+        self.include_emissions_details = include_emissions_details
+        self.species = species
+
+    def run(self, fires):
+        logging.info("Running emissions module with Urbanski EFs")
+
+        # Instantiate two lookup object, one Rx and one WF, to be reused
+        for fire in fires:
+            with self.fire_failure_handler(fire):
+                self._run_on_fire(fire)
+
+    def _run_on_fire(self, fire):
+        if 'growth' not in fire:
+            raise ValueError(
+                "Missing growth data required for computing emissions")
+
+        for g in fire.growth:
+            if 'fuelbeds' not in g:
                 raise ValueError(
-                    "Missing growth data required for computing emissions")
-
-            for g in fire.growth:
-                if 'fuelbeds' not in g:
+                    "Missing fuelbed data required for computing emissions")
+            for fb in g['fuelbeds']:
+                if 'consumption' not in fb:
                     raise ValueError(
-                        "Missing fuelbed data required for computing emissions")
-                for fb in g['fuelbeds']:
-                    if 'consumption' not in fb:
-                        raise ValueError(
-                            "Missing consumption data required for computing emissions")
-                    fccs2ef = Fccs2Ef(fb["fccs_id"], is_rx=(fire.type=="rx"))
-                    calculator = EmissionsCalculator(fccs2ef, species=species)
-                    _calculate(calculator, fb, include_emissions_details)
-                    # Convert from lbs to tons
-                    # TODO: Update EFs to be tons/ton in a) eflookup package,
-                    #   b) just after instantiating look-up objects, above,
-                    #   or c) just before calling EmissionsCalculator, above
-                    datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
-                    if include_emissions_details:
-                        datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
+                        "Missing consumption data required for computing emissions")
+                fccs2ef = Fccs2Ef(fb["fccs_id"], is_rx=(fire.type=="rx"))
+                calculator = EmissionsCalculator(fccs2ef, species=self.species)
+                _calculate(calculator, fb, self.include_emissions_details)
+                # Convert from lbs to tons
+                # TODO: Update EFs to be tons/ton in a) eflookup package,
+                #   b) just after instantiating look-up objects, above,
+                #   or c) just before calling EmissionsCalculator, above
+                datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
+                if self.include_emissions_details:
+                    datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
 
 ##
 ## CONSUME
