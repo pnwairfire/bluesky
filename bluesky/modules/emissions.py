@@ -5,6 +5,7 @@ __author__ = "Joel Dubowy"
 import abc
 import itertools
 import logging
+import sys
 
 from emitcalc import __version__ as emitcalc_version
 from emitcalc.calculator import EmissionsCalculator
@@ -35,7 +36,8 @@ def run(fires_manager):
      - fires_manager -- bluesky.models.fires.FiresManager object
 
     Config options:
-     - emissions > efs -- emissions factors model to use
+     - emissions > model -- emissions model to use
+     - emissions > efs -- deprecated synonym for 'model'
      - emissions > species -- whitelist of species to compute emissions for
      - emissions > include_emissions_details -- whether or not to include
         emissions per fuel category per phase, as opposed to just per phase
@@ -43,26 +45,26 @@ def run(fires_manager):
      - consumption > fuel_loadings -- considered if fuel loadings aren't
         specified emissions config
     """
-    # TODO: rename 'efs' config field as 'model', since 'consume' isn't really
-    #   just a different set of EFs - uisng 'model' is more general and
-    #   appropriate given the three options. (maybe still support 'efs' as an alias)
-    efs = fires_manager.get_config_value('emissions', 'efs', default='feps').lower()
-    species = fires_manager.get_config_value('emissions', 'species', default=[])
+    # Supporting 'efs' for backwards compatibility
+    # TODO: deprecate and remove support for 'efs'
+    model = (fires_manager.get_config_value('emissions', 'model')
+        or fires_manager.get_config_value('emissions', 'efs')
+        or 'feps').lower()
+
     include_emissions_details = fires_manager.get_config_value('emissions',
         'include_emissions_details', default=False)
-    fires_manager.processed(__name__, __version__, ef_set=efs,
+    fires_manager.processed(__name__, __version__, model=model,
         emitcalc_version=emitcalc_version, eflookup_version=eflookup_version)
-    if efs == 'urbanski':
-        Urbanski(fires_manager.fire_failure_handler, species,
-            include_emissions_details).run(fires_manager.fires)
-    elif efs == 'feps':
-        Feps(fires_manager.fire_failure_handler, species,
-            include_emissions_details).run(fires_manager.fires)
-    elif efs == 'consume':
-        _run_consume(fires_manager, species, include_emissions_details)
-    else:
+
+    try:
+        klass = getattr(sys.modules[__name__], model.capitalize())
+        e = klass(fires_manager.fire_failure_handler,
+            include_emissions_details,fires_manager.get_config_value)
+    except AttributeError:
         raise BlueSkyConfigurationError(
-            "Invalid emissions factors set: '{}'".format(efs))
+            "Invalid emissions model: '{}'".format(model))
+
+    e.run(fires_manager.fires)
 
     # fix keys
     for fire in fires_manager.fires:
@@ -112,12 +114,12 @@ def _fix_keys(emissions):
 
 class EmissionsBase(object, metaclass=abc.ABCMeta):
 
-    def __init__(self, fire_failure_handler, species,
+    def __init__(self, fire_failure_handler,
             include_emissions_details, config_getter):
         self.fire_failure_handler = fire_failure_handler
-        self.species = species
         self.include_emissions_details = include_emissions_details
         self.config_getter = config_getter
+        self.species = config_getter('emissions', 'species', default=[])
 
     @abc.abstractmethod
     def run(self, fires):
@@ -130,7 +132,7 @@ class EmissionsBase(object, metaclass=abc.ABCMeta):
 
 class Feps(EmissionsBase):
 
-    def __init__(self, fire_failure_handler, species,
+    def __init__(self, fire_failure_handler,
             include_emissions_details, config_getter):
         super(Feps, self).__init__(fire_failure_handler, species,
             include_emissions_details, config_getter)
@@ -173,7 +175,7 @@ class Feps(EmissionsBase):
 
 class Urbanski(EmissionsBase):
 
-    def __init__(self, fire_failure_handler, species,
+    def __init__(self, fire_failure_handler,
             include_emissions_details, config_getter):
         super(Urbanski, self).__init__(fire_failure_handler, species,
             include_emissions_details, config_getter)
@@ -217,7 +219,7 @@ class Urbanski(EmissionsBase):
 
 class Consume(EmissionsBase):
 
-    def __init__(self, fire_failure_handler, species,
+    def __init__(self, fire_failure_handler,
             include_emissions_details, config_getter):
         super(Consume, self).__init__(fire_failure_handler, species,
             include_emissions_details, config_getter)
