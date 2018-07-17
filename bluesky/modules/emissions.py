@@ -2,6 +2,7 @@
 
 __author__ = "Joel Dubowy"
 
+import abc
 import itertools
 import logging
 
@@ -104,16 +105,36 @@ def _fix_keys(emissions):
         elif isinstance(emissions[k], dict):
             _fix_keys(emissions[k])
 
+
+##
+## Emissions base class
+##
+
+class EmissionsBase(object, metaclass=abc.ABCMeta):
+
+    def __init__(self, fire_failure_handler, species,
+            include_emissions_details, config_getter):
+        self.fire_failure_handler = fire_failure_handler
+        self.species = species
+        self.include_emissions_details = include_emissions_details
+        self.config_getter = config_getter
+
+    @abc.abstractmethod
+    def run(self, fires):
+        pass
+
+
 ##
 ## FEPS
 ##
 
-class Feps(object):
+class Feps(EmissionsBase):
 
     def __init__(self, fire_failure_handler, species,
-            include_emissions_details):
-        self.fire_failure_handler = fire_failure_handler
-        self.include_emissions_details = include_emissions_details
+            include_emissions_details, config_getter):
+        super(Feps, self).__init__(fire_failure_handler, species,
+            include_emissions_details, config_getter)
+
         # The same lookup object is used for both Rx and WF
         self.calculator = EmissionsCalculator(FepsEFLookup(), species=species)
 
@@ -150,13 +171,12 @@ class Feps(object):
 ## Urbanski
 ##
 
-class Urbanski(object):
+class Urbanski(EmissionsBase):
 
     def __init__(self, fire_failure_handler, species,
-            include_emissions_details):
-        self.fire_failure_handler = fire_failure_handler
-        self.include_emissions_details = include_emissions_details
-        self.species = species
+            include_emissions_details, config_getter):
+        super(Urbanski, self).__init__(fire_failure_handler, species,
+            include_emissions_details, config_getter)
 
     def run(self, fires):
         logging.info("Running emissions module with Urbanski EFs")
@@ -195,12 +215,13 @@ class Urbanski(object):
 ##
 
 
-class Consume(object):
+class Consume(EmissionsBase):
 
     def __init__(self, fire_failure_handler, species,
             include_emissions_details, config_getter):
-        self.fire_failure_handler = fire_failure_handler
-        self.include_emissions_details = include_emissions_details
+        super(Consume, self).__init__(fire_failure_handler, species,
+            include_emissions_details, config_getter)
+
         self.species = species and [e.upper() for e in species]
 
         all_fuel_loadings = (config_getter('emissions','fuel_loadings')
