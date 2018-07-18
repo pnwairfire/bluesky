@@ -5,6 +5,7 @@ __author__ = "Joel Dubowy"
 import copy
 #from unittest import mock
 
+from numpy import array
 from numpy.testing import assert_approx_equal
 from py.test import raises
 
@@ -73,13 +74,15 @@ FIRES = [
                             [-120.3, 45.22]
                         ]
                     },
-                    "utc_offset": "-07:00"
+                    "utc_offset": "-07:00",
+                    "ecoregion": "western" # needed by CONSUME
                 },
                 "start": "2018-06-27T00:00:00",
                 "end": "2018-06-28T00:00:00",
                 "fuelbeds": [
                     {
                         "fccs_id": "52",
+                        "pct": 100.0,
                         "consumption": {
                             "foo": {
                                 "bar": {
@@ -100,6 +103,21 @@ FIRES = [
                                     "flaming": [200]
                                 }
                             }
+                        },
+                        # heat required by CONSUME
+                        "heat": {
+                            "flaming": [
+                                159765789.2311308
+                            ],
+                            "residual": [
+                                0.0
+                            ],
+                            "smoldering": [
+                                13157759.100788476
+                            ],
+                            "total": [
+                                172923548.3319193
+                            ]
                         }
                     }
                 ]
@@ -116,8 +134,9 @@ class fire_failure_manager(object):
         pass
 
     def __exit__(self, e_type, value, tb):
-        self._fire['error'] = str(value)
-        return True # just skip
+        if e_type:
+            self._fire['error'] = str(value)
+        return True # return true even if there's an error
 
 def create_config_getter(config):
     def _get(*keys, **kwargs):
@@ -352,4 +371,130 @@ class TestUrbanskiEmissions(BaseEmissionsTest):
 
         assert 'emissions_details' in self.fires[1]['growth'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
+            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+
+class TestConsumeEmissions(BaseEmissionsTest):
+
+    EXPECTED_FIRE1_EMISSIONS = {
+        'flaming': {
+            'PM': array([ 77.0587785]),
+            'PM2.5': array([ 40.98871197]),
+            'NMHC': array([ 14.75593631]),
+            'PM10': array([ 47.13701877]),
+            'CH4': array([ 12.29661359]),
+            'CO': array([ 364.79953653]),
+            'CO2': array([ 13940.26094093])
+        },
+        'residual': {
+            'PM': array([ 67.18167148]),
+            'PM2.5': array([ 47.27599104]),
+            'NMHC': array([ 13.27045363]),
+            'PM10': array([ 50.73183834]),
+            'CH4': array([ 20.18214822]),
+            'CO': array([ 393.96659204]),
+            'CO2': array([ 4106.9289296])
+        },
+        'smoldering': {
+            'PM': array([ 105.52324034]),
+            'PM2.5': array([ 74.25709505]),
+            'NMHC': array([ 20.84409686]),
+            'PM10': array([ 79.68524528]),
+            'CH4': array([ 31.7003973]),
+            'CO': array([ 618.80912543]),
+            'CO2': array([ 6450.81372514])
+        },
+        'total': {
+            'PM': array([ 249.76369032]),
+            'PM2.5': array([ 162.52179807]),
+            'NMHC': array([ 48.87048679]),
+            'PM10': array([ 177.55410238]),
+            'CH4': array([ 64.17915912]),
+            'CO': array([ 1377.575254]),
+            'CO2': array([ 24498.00359567])
+        }
+    }
+
+    EXPECTED_FIRE1_EMISSIONS_PM_ONLY = {
+        'flaming': {
+            'PM2.5': array([ 40.98871197]),
+            'PM10': array([ 47.13701877])
+        },
+        'residual': {
+            'PM2.5': array([ 47.27599104]),
+            'PM10': array([ 50.73183834])
+        },
+        'smoldering': {
+            'PM2.5': array([ 74.25709505]),
+            'PM10': array([ 79.68524528])
+        },
+        'total': {
+            'PM2.5': array([ 162.52179807]),
+            'PM10': array([ 177.55410238])
+        }
+    }
+
+    def test_wo_details(self):
+        config_getter = create_config_getter({
+            "emissions": {
+                "model": "consume",
+                "include_emissions_details": False
+            }
+        })
+        emissions.Consume(fire_failure_manager, config_getter).run(self.fires)
+
+        assert self.fires[0]['error'] == (
+            'Missing fuelbed data required for computing emissions')
+
+        assert 'emissions_details' not in self.fires[1]['growth'][0]['fuelbeds'][0]
+        self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
+            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+
+    def test_with_details(self):
+        config_getter = create_config_getter({
+            "emissions": {
+                "model": "consume",
+                "include_emissions_details": True
+            }
+        })
+        emissions.Consume(fire_failure_manager, config_getter).run(self.fires)
+
+        assert self.fires[0]['error'] == (
+            'Missing fuelbed data required for computing emissions')
+
+        assert 'emissions_details' in self.fires[1]['growth'][0]['fuelbeds'][0]
+        self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
+            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+
+    def test_wo_details_PM_only(self):
+        config_getter = create_config_getter({
+            "emissions": {
+                "model": "consume",
+                "include_emissions_details": False,
+                'species': ['PM2.5', 'PM10']
+            }
+        })
+        emissions.Consume(fire_failure_manager, config_getter).run(self.fires)
+
+        assert self.fires[0]['error'] == (
+            'Missing fuelbed data required for computing emissions')
+
+        assert 'emissions_details' not in self.fires[1]['growth'][0]['fuelbeds'][0]
+        self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
+            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+
+    def test_with_details_PM_only(self):
+        config_getter = create_config_getter({
+            "emissions": {
+                "model": "consume",
+                "include_emissions_details": True,
+                'species': ['PM2.5', 'PM10']
+            }
+        })
+        emissions.Consume(fire_failure_manager, config_getter).run(self.fires)
+
+        assert self.fires[0]['error'] == (
+            'Missing fuelbed data required for computing emissions')
+
+        assert 'emissions_details' in self.fires[1]['growth'][0]['fuelbeds'][0]
+        self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
