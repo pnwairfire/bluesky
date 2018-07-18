@@ -245,11 +245,11 @@ class Consume(EmissionsBase):
                 self._run_on_fire(fire)
 
     def _run_on_fire(self, fire):
-        logging.debug("Consume emissions - fire {}".format(fire.id))
+        logging.debug("Consume emissions - fire {}".format(fire.get("id")))
 
         if 'growth' not in fire:
             raise ValueError(
-                "Missing growth data required for computing emissions")
+                "Missing growth data required for computing consume emissions")
 
         burn_type = fire.get("fuel_type") or 'natural'
         # TODO: set burn type to 'activity' if fire["fuel_type"] == 'piles' ?
