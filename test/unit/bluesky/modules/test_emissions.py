@@ -79,8 +79,8 @@ FIRES = [
                 "end": "2018-06-28T00:00:00",
                 "fuelbeds": [
                     {
+                        "fccs_id": "52",
                         "consumption": {
-
                             "foo": {
                                 "bar": {
                                     "smoldering": [0.0],
@@ -268,4 +268,88 @@ class TestFepsEmissions(BaseEmissionsTest):
 
         assert 'emissions_details' in self.fires[1]['growth'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
+            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+
+class TestUrbanskiEmissions(BaseEmissionsTest):
+
+    EXPECTED_FIRE1_EMISSIONS = {
+        'flaming': {
+            'CH4': [0.7294860000000001],
+            'CO': [15.7605],
+            'CO2': [239.8598],
+            'NH3': [0.22965300000000002],
+            'NOx': [0.30920600000000004],
+            'PM10': [3.1119632600000005],
+            'PM2.5': [2.637257],
+            'SO2': [0.159106]
+        },
+        'residual': {
+            'CH4': [0.0],
+            'CO': [0.0],
+            'CO2': [0.0],
+            'NH3': [0.0],
+            'NOx': [0.0],
+            'PM10': [0.0],
+            'PM2.5': [0.0],
+            'SO2': [0.0]
+        },
+        'smoldering': {
+            'CH4': [2.188215],
+            'CO': [47.27625],
+            'CO2': [719.4995],
+            'NH3': [0.6888825000000001],
+            'NOx': [0.927515],
+            'PM10': [9.33485315],
+            'PM2.5': [7.9108925],
+            'SO2': [0.47726500000000005]
+        },
+        'total': {
+            'CH4': [2.917701],
+            'CO': [63.03675],
+            'CO2': [959.3593000000001],
+            'NH3': [0.9185355000000001],
+            'NOx': [1.236721],
+            'PM10': [12.446816410000002],
+            'PM2.5': [10.5481495],
+            'SO2': [0.6363710000000001]
+        }
+    }
+
+    SPECIES = ['CH4','CO','CO2','NH3','NOx','PM10','PM2.5','SO2','VOC']
+
+    # Note: no tests with all emissions species, since that would be
+    # a huge set
+
+    def test_wo_details_PM_only(self):
+        config_getter = create_config_getter({
+            "emissions": {
+                "model": "Urbanski",
+                "include_emissions_details": False,
+                'species': self.SPECIES
+            }
+        })
+        emissions.Urbanski(fire_failure_manager, config_getter).run(self.fires)
+
+        assert self.fires[0]['error'] == (
+            'Missing fuelbed data required for computing emissions')
+
+        assert 'emissions_details' not in self.fires[1]['growth'][0]['fuelbeds'][0]
+        self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
+            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+
+    def test_with_details_PM_only(self):
+        config_getter = create_config_getter({
+            "emissions": {
+                "model": "Urbanski",
+                "include_emissions_details": True,
+                'species': self.SPECIES
+            }
+        })
+        emissions.Urbanski(fire_failure_manager, config_getter).run(self.fires)
+
+        assert self.fires[0]['error'] == (
+            'Missing fuelbed data required for computing emissions')
+
+        assert 'emissions_details' in self.fires[1]['growth'][0]['fuelbeds'][0]
+        self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
