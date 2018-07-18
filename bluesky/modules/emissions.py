@@ -202,6 +202,9 @@ class Urbanski(EmissionsBase):
                 if 'consumption' not in fb:
                     raise ValueError(
                         "Missing consumption data required for computing emissions")
+                if 'fccs_id' not in fb:
+                    raise ValueError(
+                        "Missing FCCS Id required for computing emissions")
                 fccs2ef = Fccs2Ef(fb["fccs_id"], is_rx=(fire["type"]=="rx"))
                 calculator = EmissionsCalculator(fccs2ef, species=self.species)
                 _calculate(calculator, fb, self.include_emissions_details)
