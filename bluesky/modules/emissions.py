@@ -251,10 +251,10 @@ class Consume(EmissionsBase):
             raise ValueError(
                 "Missing growth data required for computing emissions")
 
-        # TODO: set burn type to 'activity' if fire.fuel_type == 'piles' ?
-        if fire.fuel_type == 'piles':
+        burn_type = fire.get("fuel_type") or 'natural'
+        # TODO: set burn type to 'activity' if fire["fuel_type"] == 'piles' ?
+        if burn_type == 'piles':
             raise ValueError("Consume can't be used for fuel type 'piles'")
-        burn_type = fire.fuel_type
 
         for g in fire['growth']:
             if 'fuelbeds' not in g:
