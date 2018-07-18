@@ -272,6 +272,12 @@ class Consume(EmissionsBase):
         if 'heat' not in fb:
             raise ValueError(
                 "Missing heat data required for computing emissions")
+        if 'pct' not in fb:
+            raise ValueError(
+                "Missing fuelbed 'ptc' required for computing emissions")
+        if 'ecoregion' not in location:
+            raise ValueError(
+                "Missing ecoregion required for computing emissions")
 
         fuel_loadings_csv_filename = self.fuel_loadings_manager.generate_custom_csv(
              fb['fccs_id'])
