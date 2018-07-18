@@ -62,6 +62,11 @@ OPTIONAL_ARGS = [
         'default': None
     },
     {
+        'long': '--indent',
+        'help': 'Format output json with newlines and given indent',
+        'type': int
+    },
+    {
         'short': "-C",
         'long': '--config-option',
         'dest': 'config_options',
@@ -319,7 +324,7 @@ def main():
     if args.output_file:
         args.output_file = datetimeutils.fill_in_datetime_strings(
             args.output_file, today=fires_manager.today)
-    fires_manager.dumps(output_file=args.output_file)
+    fires_manager.dumps(output_file=args.output_file, indent=args.indent)
 
 if __name__ == "__main__":
     main()

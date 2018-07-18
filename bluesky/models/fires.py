@@ -681,12 +681,13 @@ class FiresManager(object):
         return dict(self._meta, fire_information=self.fires,
             counts=self.counts, bluesky_version=__version__)
 
-    def dumps(self, output_stream=None, output_file=None):
+    def dumps(self, output_stream=None, output_file=None, indent=None):
         if output_stream and output_file:
             raise RuntimeError("Don't specify both output_stream and output_file")
         if not output_stream:
             output_stream = self._stream(output_file, 'w')
-        fire_json = json.dumps(self.dump(), sort_keys=True, cls=FireEncoder)
+        fire_json = json.dumps(self.dump(), sort_keys=True, cls=FireEncoder,
+            indent=indent)
         output_stream.write(fire_json)
 
 
