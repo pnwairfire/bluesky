@@ -45,7 +45,7 @@ def run(fires_manager):
         emissions per fuel category per phase, as opposed to just per phase
      - emissions > fuel_loadings --
      - consumption > fuel_loadings -- considered if fuel loadings aren't
-        specified emissions config
+        specified in the emissions config
     """
     # Supporting 'efs' for backwards compatibility
     # TODO: deprecate and remove support for 'efs'
