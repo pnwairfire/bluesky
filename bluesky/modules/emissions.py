@@ -226,7 +226,7 @@ class Consume(EmissionsBase):
     def __init__(self, fire_failure_handler, config_getter):
         super(Consume, self).__init__(fire_failure_handler, config_getter)
 
-        self.species = species and [e.upper() for e in species]
+        self.species = self.species and [e.upper() for e in self.species]
 
         all_fuel_loadings = (config_getter('emissions','fuel_loadings')
             or config_getter('consumption','fuel_loadings'))
@@ -244,7 +244,7 @@ class Consume(EmissionsBase):
             with self.fire_failure_handler(fire):
                 self._run_on_fire(fire)
 
-    def _run_on_fire(fire):
+    def _run_on_fire(self, fire):
         logging.debug("Consume emissions - fire {}".format(fire.id))
 
         if 'growth' not in fire:
@@ -265,7 +265,7 @@ class Consume(EmissionsBase):
             for fb in g['fuelbeds']:
                 self._run_on_fuelbed(fb, g['location'], burn_type)
 
-    def _run_on_fuelbed(fb, location, burn_type):
+    def _run_on_fuelbed(self, fb, location, burn_type):
         if 'consumption' not in fb:
             raise ValueError(
                 "Missing consumption data required for computing emissions")
