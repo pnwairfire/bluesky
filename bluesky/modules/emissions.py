@@ -3,6 +3,7 @@
 __author__ = "Joel Dubowy"
 
 import abc
+import copy
 import itertools
 import logging
 import sys
@@ -323,6 +324,6 @@ class Consume(EmissionsBase):
 
 def _calculate(calculator, fb, include_emissions_details):
     emissions_details = calculator.calculate(fb["consumption"])
-    fb['emissions'] = emissions_details['summary']['total']
+    fb['emissions'] = copy.deepcopy(emissions_details['summary']['total'])
     if include_emissions_details:
         fb['emissions_details'] = emissions_details
