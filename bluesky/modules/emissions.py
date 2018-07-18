@@ -139,12 +139,13 @@ class Feps(EmissionsBase):
         super(Feps, self).__init__(fire_failure_handler, config_getter)
 
         # The same lookup object is used for both Rx and WF
-        self.calculator = EmissionsCalculator(FepsEFLookup(), species=species)
+        self.calculator = EmissionsCalculator(FepsEFLookup(),
+            species=self.species)
 
     def run(self, fires):
         logging.info("Running emissions module FEPS EFs")
 
-        for fire in fires.fires:
+        for fire in fires:
             with self.fire_failure_handler(fire):
                 self._run_on_fire(fire)
 
@@ -152,7 +153,7 @@ class Feps(EmissionsBase):
         if 'growth' not in fire:
             raise ValueError(
                 "Missing growth data required for computing emissions")
-        for g in fire.growth:
+        for g in fire['growth']:
             if 'fuelbeds' not in g:
                raise ValueError(
                     "Missing fuelbed data required for computing emissions")
@@ -192,7 +193,7 @@ class Urbanski(EmissionsBase):
             raise ValueError(
                 "Missing growth data required for computing emissions")
 
-        for g in fire.growth:
+        for g in fire['growth']:
             if 'fuelbeds' not in g:
                 raise ValueError(
                     "Missing fuelbed data required for computing emissions")
@@ -235,8 +236,8 @@ class Consume(EmissionsBase):
         # look for custom fuel loadings first in the emissions config and then
         # in the consumption config
 
-        for fire in fires_manager.fires:
-            with fires_manager.fire_failure_handler(fire):
+        for fire in fires:
+            with self.fire_failure_handler(fire):
                 self._run_on_fire(fire)
 
     def _run_on_fire(fire):
@@ -251,7 +252,7 @@ class Consume(EmissionsBase):
             raise ValueError("Consume can't be used for fuel type 'piles'")
         burn_type = fire.fuel_type
 
-        for g in fire.growth:
+        for g in fire['growth']:
             if 'fuelbeds' not in g:
                 raise ValueError(
                     "Missing fuelbed data required for computing emissions")
