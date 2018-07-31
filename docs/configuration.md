@@ -25,7 +25,8 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### ingestion
 
-(None)
+ - ***'config' > 'ingestion' > 'keep_emissions'*** -- *optional* keep any emissions, if specified, and record in growth object
+ - ***'config' > 'ingestion' > 'keep_heat'*** -- *optional* keep heat, if specified, and record in growth object
 
 ##### merge
 
