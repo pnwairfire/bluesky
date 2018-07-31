@@ -806,3 +806,203 @@ class TestIngestionValidInput(object):
         parsed_input = self.ingester.ingest(f)
         assert expected == f
         assert expected_parsed_input == parsed_input
+
+
+
+##
+## Keeping emissions and heat
+##
+
+class TestIngestionKeepEmissionsAndHeat(object):
+
+    def setup(self):
+        self.ingester = ingestion.FireIngester(
+            keep_emissions=True, keep_heat=True)
+
+    def test_fire_no_growth(self):
+        f = {
+            "location": {
+                "geojson": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                        [
+                            [
+                                [-121.4522115, 47.4316976],
+                                [-121.3990506, 47.4316976],
+                                [-121.3990506, 47.4099293],
+                                [-121.4522115, 47.4099293],
+                                [-121.4522115, 47.4316976]
+                            ]
+                        ]
+                    ]
+                }
+            },
+            "PM2.5": 123.0,
+            "co2": 434.3,
+            "heat": 123123123
+        }
+        expected = {
+            'growth': [
+                {
+                    'location': copy.deepcopy(f['location']),
+                    "emissions": {
+                        "summary": {
+                            "PM2.5": 123.0,
+                            "CO2": 434.3
+                        }
+                    },
+                    "heat": {
+                        "summary": {
+                            "total": 123123123
+                        }
+                    }
+                }
+            ]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+    def test_fire_with_growth(self):
+        f = {
+            "id": "SF11C14225236095807750",
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "location": {
+                "geojson": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                        [
+                            [
+                                [-121.4522115, 47.4316976],
+                                [-121.3990506, 47.4316976],
+                                [-121.3990506, 47.4099293],
+                                [-121.4522115, 47.4099293],
+                                [-121.4522115, 47.4316976]
+                            ]
+                        ]
+                    ]
+                },
+                "ecoregion": "southern"
+            },
+            "growth": [{
+                "start": "2015-01-20T17:00:00",
+                "end": "2015-01-21T17:00:00",
+                "pct": 100.0,
+                "PM2.5": 123.0,
+                "co2": 434.3,
+                "HEAT": 123123123
+            }],
+            "PM2.5": 321.0, # <-- ignored
+            "co2": 313.3, # <-- ignored
+            "heat": 349493.3 # <-- ignored
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "growth": [{
+                "start": "2015-01-20T17:00:00",
+                "end": "2015-01-21T17:00:00",
+                "location": copy.deepcopy(f['location']),
+                "emissions": {
+                    "summary": {
+                        "PM2.5": 123.0,
+                        "CO2": 434.3
+                    }
+                },
+                "heat": {
+                    "summary": {
+                        "total": 123123123
+                    }
+                }
+            }]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+    def test_fire_with_old_sf2_date_time(self):
+        f = {
+            "id": "SF11C14225236095807750",
+            "latitude": 47.0,
+            "longitude": -122.0,
+            "area": 100.0,
+            "date_time": '201405290000Z',
+            "PM2.5": 123.0,
+            "co2": 434.3,
+            "heat": 123123123
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "growth":[{
+                "start": "2014-05-29T00:00:00",
+                "end": "2014-05-30T00:00:00",
+                "location":{
+                    "latitude": 47.0,
+                    "longitude": -122.0,
+                    "area": 100.0
+                },
+                "emissions": {
+                    "summary": {
+                        "PM2.5": 123.0,
+                        "CO2": 434.3
+                    }
+                },
+                "heat": {
+                    "summary": {
+                        "total": 123123123
+                    }
+                }
+            }]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+    def test_fire_with_new_sf2_date_time(self):
+        f = {
+            "id": "SF11C14225236095807750",
+            "latitude": 47.0,
+            "longitude": -122.0,
+            "area": 100.0,
+            "date_time": '201508040000-04:00',
+            "PM2.5": 123.0,
+            "co2": 434.3,
+            "heat": 123123123
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "growth":[{
+                "start": "2015-08-04T00:00:00",
+                "end": "2015-08-05T00:00:00",
+                "location": {
+                    "latitude": 47.0,
+                    "longitude": -122.0,
+                    "area": 100.0,
+                    "utc_offset": "-04:00",
+                },
+                "emissions": {
+                    "summary": {
+                        "PM2.5": 123.0,
+                        "CO2": 434.3
+                    }
+                },
+                "heat": {
+                    "summary": {
+                        "total": 123123123
+                    }
+                }
+            }]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
