@@ -462,6 +462,8 @@ class FireIngester(object):
             for e in self.EMISSIONS_SPECIES:
                 keys = [e] if hasattr(e, "lower") else e
                 keys = [i for j in [(e, e.lower()) for e in keys] for i in j]
+                # TODO: look for value in src['emissions']['summary'][k],
+                #  for any k in keys, first
                 v = self._get_numeric_val(src, *keys)
                 if v is not None:
                     emissions["summary"][keys[0]] = v
@@ -473,6 +475,7 @@ class FireIngester(object):
     def _ingest_growth_heat(self, growth, src):
         if self._config.get('keep_heat'):
             logging.debug("Ingesting heat")
+            # TODO: look for value in src['heat|HEAT']['summary']['total'] first
             heat = self._get_numeric_val(src, "heat", "HEAT")
             if heat is not None:
                 logging.debug("Recording heat in growth object")
