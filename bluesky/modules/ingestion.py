@@ -124,6 +124,7 @@ import copy
 import datetime
 import logging
 import re
+import traceback
 
 from bluesky import consumeutils
 
@@ -150,7 +151,8 @@ def run(fires_manager):
     logging.info("Running ingestion module")
     try:
         parsed_input = []
-        fire_ingester = FireIngester()
+        config = fires_manager.get_config_value('ingestion', default={})
+        fire_ingester = FireIngester(**config)
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
                 parsed_input.append(fire_ingester.ingest(fire))
@@ -272,6 +274,10 @@ class FireIngester(object):
 
     NESTED_FIELD_METHOD_PREFIX = '_ingest_nested_field_'
     SPECIAL_FIELD_METHOD_PREFIX = '_ingest_special_field_'
+
+
+    def __init__(self, **config):
+        self._config = config
 
     ##
     ## Public Interface
@@ -419,11 +425,6 @@ class FireIngester(object):
 
     ## 'growth'
 
-    OPTIONAL_GROWTH_FIELDS = [
-        'start','end', 'pct', 'localmet',
-        'timeprofile', 'plumerise', 'frp'
-    ]
-
     def _ingest_growth_location(self, growth, src):
         # only look in growth object for location fields; don't look
         base_fields = []
@@ -442,11 +443,58 @@ class FireIngester(object):
                     location[f] = v
         growth[-1]['location'] = location
 
+    def _get_numeric_val(self, src, *keys):
+        for k in keys:
+            val = src.get(k)
+            if val not in (None, ""):
+                return val
+        # if we got here, method returns None
+
+    EMISSIONS_SPECIES = {
+        # if typle, both keys are recognized, but use first key in growth obj
+        ("PM2.5", "PM25"), "PM10", "CO", "CO2", "CH4",
+        "NOx", "NH3", "SO2", "VOC"
+    }
+    def _ingest_growth_emissions(self, growth, src):
+        if self._config.get('keep_emissions'):
+            logging.debug("Ingesting emissions")
+            emissions = {"summary": {}}
+            for e in self.EMISSIONS_SPECIES:
+                keys = [e] if hasattr(e, "lower") else e
+                keys = [i for j in [(e, e.lower()) for e in keys] for i in j]
+                v = self._get_numeric_val(src, *keys)
+                if v is not None:
+                    emissions["summary"][keys[0]] = v
+
+            if emissions["summary"]:
+                logging.debug("Recording emissions in growth object")
+                growth["emissions"] = emissions
+
+    def _ingest_growth_heat(self, growth, src):
+        if self._config.get('keep_heat'):
+            logging.debug("Ingesting heat")
+            heat = self._get_numeric_val(src, "heat", "HEAT")
+            if heat is not None:
+                logging.debug("Recording heat in growth object")
+                growth["heat"] = {
+                    "summary": {
+                        "total": heat
+                    }
+                }
+
+    OPTIONAL_GROWTH_FIELDS = [
+        'start','end', 'pct', 'localmet',
+        'timeprofile', 'plumerise', 'frp'
+    ]
+
     def _ingest_optional_growth_fields(self, growth, src):
         for f in self.OPTIONAL_GROWTH_FIELDS:
             v = src.get(f)
             if v:
                 growth[-1][f] = v
+
+        self._ingest_growth_emissions(growth[-1], src)
+        self._ingest_growth_heat(growth[-1], src)
 
     def _ingest_nested_field_growth(self, fire):
         # Note: can't use _get_field[s] as is because 'growth' is an array,
@@ -473,6 +521,7 @@ class FireIngester(object):
             if len(growth) == 1 and 'pct' not in growth[0]:
                 growth[0]['pct'] = 100.0
             # TODO: make sure percentages add up to 100.0, with allowable error
+            logging.debug("Setting growth array in fire object")
             fire['growth'] = growth
 
     ## 'fuelbeds'
@@ -563,11 +612,14 @@ class FireIngester(object):
                         # As assume 24-hour
                         end = start + datetime.timedelta(hours=24)
                         # Note: this assumes time is local
+                        logging.debug("Setting growth window from BSF data")
                         fire['growth'] =[{
                             'start': start.strftime(self.GROWTH_TIME_FORMAT),
                             'end': end.strftime(self.GROWTH_TIME_FORMAT),
                             'pct': 100.0
                         }]
+                        self._ingest_optional_growth_fields(fire['growth'],
+                            self._parsed_input)
 
                     if utc_offset is not None and not fire['location'].get(
                             'utc_offset'):
@@ -576,6 +628,7 @@ class FireIngester(object):
                 except Exception as e:
                     logging.warn("Failed to parse 'date_time' value %s",
                         date_time)
+                    logging.debug(traceback.format_exc())
 
 
 
