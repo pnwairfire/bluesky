@@ -63,8 +63,8 @@ class TestLatLng:
                 ]
             }
         })
-        assert latlng.latitude == 2.0
-        assert latlng.longitude == 100.0
+        assert latlng.latitude == 1.5
+        assert latlng.longitude == 100.5
 
     def test_geojson_polygon_no_holes(self):
         latlng = locationutils.LatLng({
@@ -81,8 +81,8 @@ class TestLatLng:
                 ]
             }
         })
-        assert latlng.latitude == 5.0
-        assert latlng.longitude == 100.0
+        assert latlng.latitude == 2.4
+        assert latlng.longitude == 100.4
 
     def test_geojson_polygon_holes(self):
         latlng = locationutils.LatLng({
@@ -106,8 +106,9 @@ class TestLatLng:
                 ]
             }
         })
-        assert latlng.latitude == 5.0
-        assert latlng.longitude == 100.0
+        # centroid computation only considers outer polygon boundary
+        assert latlng.latitude == 2.4
+        assert latlng.longitude == 100.4
 
     def test_geojson_multi_point(self):
         latlng = locationutils.LatLng({
@@ -119,8 +120,8 @@ class TestLatLng:
                 ]
             }
         })
-        assert latlng.latitude == 4.5
-        assert latlng.longitude == 100.0
+        assert latlng.latitude == 2.75
+        assert latlng.longitude == 100.5
 
     def test_geojson_multi_linestring(self):
         latlng = locationutils.LatLng({
@@ -138,8 +139,8 @@ class TestLatLng:
                 ]
             }
         })
-        assert latlng.latitude == -3.0
-        assert latlng.longitude == 100.0
+        assert latlng.latitude == 0.75
+        assert latlng.longitude == 101.5
 
     def test_geojson_multi_polygon_one(self):
         latlng = locationutils.LatLng({
@@ -208,5 +209,5 @@ class TestLatLng:
             "max_humid": 70.0,
             "utc_offset": "-07:00"
         })
-        assert latlng.latitude == 2.0
-        assert latlng.longitude == 102.0
+        assert latlng.latitude == 1.4
+        assert latlng.longitude == 101.4

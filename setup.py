@@ -53,6 +53,7 @@ setup(
         "https://pypi.airfire.org/simple/eflookup/",
         "https://pypi.airfire.org/simple/emitcalc/",
         "https://pypi.airfire.org/simple/fccsmap/",
+        "https://pypi.airfire.org/simple/geoutils/",
         "https://pypi.airfire.org/simple/timeprofile/",
         "https://pypi.airfire.org/simple/met/",
         "https://pypi.airfire.org/simple/plumerise/",
