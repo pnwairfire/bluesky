@@ -820,6 +820,8 @@ class TestIngestionKeepEmissionsAndHeat(object):
             keep_emissions=True, keep_heat=True)
 
     def test_fire_no_growth(self):
+        """Emissions and heat in this case aren't currently ingested
+        """
         f = {
             "location": {
                 "geojson": {
@@ -844,18 +846,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
         expected = {
             'growth': [
                 {
-                    'location': copy.deepcopy(f['location']),
-                    "emissions": {
-                        "summary": {
-                            "PM2.5": 123.0,
-                            "CO2": 434.3
-                        }
-                    },
-                    "heat": {
-                        "summary": {
-                            "total": 123123123
-                        }
-                    }
+                    'location': copy.deepcopy(f['location'])
                 }
             ]
         }
@@ -898,6 +889,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
             }],
             "PM2.5": 321.0, # <-- ignored
             "co2": 313.3, # <-- ignored
+            "PM10": 111, # <-- ignored
             "heat": 349493.3 # <-- ignored
         }
         expected = {
@@ -937,6 +929,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
             "date_time": '201405290000Z',
             "PM2.5": 123.0,
             "co2": 434.3,
+            "pm10": 111,
             "heat": 123123123
         }
         expected = {
@@ -952,7 +945,8 @@ class TestIngestionKeepEmissionsAndHeat(object):
                 "emissions": {
                     "summary": {
                         "PM2.5": 123.0,
-                        "CO2": 434.3
+                        "CO2": 434.3,
+                        "PM10": 111,
                     }
                 },
                 "heat": {
@@ -976,6 +970,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
             "date_time": '201508040000-04:00',
             "PM2.5": 123.0,
             "co2": 434.3,
+            "PM10": 111,
             "heat": 123123123
         }
         expected = {
@@ -992,7 +987,8 @@ class TestIngestionKeepEmissionsAndHeat(object):
                 "emissions": {
                     "summary": {
                         "PM2.5": 123.0,
-                        "CO2": 434.3
+                        "CO2": 434.3,
+                        "PM10": 111,
                     }
                 },
                 "heat": {

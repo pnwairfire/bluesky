@@ -116,6 +116,15 @@ following:
                 }
             ]
         }
+
+# TODO:
+ - for input fire array of growth objects, ingest emissions and heat
+   from top level fire object, if defined (and not defined in growth
+   objects); would need to distribute to growth objects based on
+   relative areas.
+ - ingest emissions for input with no growth window information
+   (i.e. start & end or date_time
+
 """
 
 __author__ = "Joel Dubowy"
