@@ -66,4 +66,5 @@ class StatusLogger(object):
             fields.update(extra_fields)
             self._log_async(**fields)
         else:
-            logging.debug('Status logging disabled.')
+            logging.debug("Status logging disabled - not submitting "
+                "'%s','%s', '%s', %s.", status, step, action, extra_fields)
