@@ -760,58 +760,8 @@ class HYSPLITDispersion(DispersionBase):
         return verticalMethod
 
     def _set_grid_params(self):
-
-        # If not specified, projection is assumed to be 'LatLon'
-        is_deg = (self.config('projection') or 'LatLon') == 'LatLon'
-
-        if self.config("USER_DEFINED_GRID"):
-            # This supports BSF config settings
-            # User settings that can override the default concentration grid info
-            logging.info("User-defined sampling/concentration grid invoked")
-            grid_params = {
-                "center_latitude": self.config("CENTER_LATITUDE"),
-                "center_longitude": self.config("CENTER_LONGITUDE"),
-                "height_latitude": self.config("HEIGHT_LATITUDE"),
-                "width_longitude": self.config("WIDTH_LONGITUDE"),
-                "spacing_longitude": self.config("SPACING_LONGITUDE"),
-                "spacing_latitude": self.config("SPACING_LATITUDE")
-            }
-            # BSF assumed lat/lng if USER_DEFINED_GRID; this support km spacing
-            if not is_deg:
-                grid_params["spacing_longitude"] /= hysplit_utils.km_per_deg_lng(
-                    grid_params["center_latitude"])
-                grid_params["spacing_latitude"] /= hysplit_utils.KM_PER_DEG_LAT
-
-        elif self.config('grid'):
-            grid_params = hysplit_utils.grid_params_from_grid(
-                self.config('grid'), self._met_info)
-
-        elif self.config('compute_grid'):
-            if len(self._fires) != 1:
-                # TODO: support multiple fires
-                raise ValueError("Option to compute grid only supported for "
-                    "runs with one fire")
-            if (not self.config('spacing_latitude')
-                    or not self.config('spacing_longitude')):
-                raise BlueSkyConfigurationError("Config settings "
-                    "'spacing_latitude' and 'spacing_longitude' required "
-                    "to compute hysplit grid")
-            grid_params = hysplit_utils.square_grid_from_lat_lng(
-                self._fires[0]['latitude'], self._fires[0]['longitude'],
-                self.config('spacing_latitude'), self.config('spacing_longitude'),
-                self.config('grid_length'), input_spacing_in_degrees=is_deg)
-
-        elif self._met_info.get('grid'):
-            grid_params = hysplit_utils.grid_params_from_grid(
-                self._met_info['grid'], self._met_info)
-
-        else:
-            raise BlueSkyConfigurationError("Specify hysplit dispersion grid")
-
-        logging.debug("grid_params: %s", grid_params)
-
-        self._grid_params = grid_params
-
+        self._grid_params = hysplit_utils.get_grid_params(
+            self.config, met_info=self._met_info, fires=self._fires)
 
     def _write_control_file(self, control_file, concFile):
         num_fires = len(self._fires)
