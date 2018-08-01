@@ -49,7 +49,7 @@ class EmissionsCsvWriter(object):
 
     def write(self, fires_manager):
         logging.info('Writing emissions csv to %s', self._filename)
-        with open(self._filename, 'w') as f:
+        with open(self._filename, 'w', encoding="utf-8") as f:
             self.emissions_writer = csv.writer(f)
             self.emissions_writer.writerow(self.HEADERS)
 

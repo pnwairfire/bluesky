@@ -251,13 +251,13 @@ class FiresCsvsWriter(object):
     def write(self, fires_manager):
         fires, events = self._collect_csv_fields(fires_manager)
 
-        with open(self._fire_locations_pathname, 'w') as _f:
+        with open(self._fire_locations_pathname, 'w', encoding="utf-8") as _f:
             f = csv.writer(_f)
             f.writerow([k for k, l in FIRE_LOCATIONS_CSV_FIELDS])
             for fire in fires:
                 f.writerow([str(fire[k] or '') for k, l in FIRE_LOCATIONS_CSV_FIELDS])
 
-        with open(self._fire_events_pathname, 'w') as _f:
+        with open(self._fire_events_pathname, 'w', encoding="utf-8") as _f:
             f = csv.writer(_f)
             f.writerow(['id'] + [k for k, l in FIRE_EVENTS_CSV_FIELDS])
             for e_id, event in list(events.items()):
