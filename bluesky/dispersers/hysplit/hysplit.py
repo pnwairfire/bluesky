@@ -156,6 +156,8 @@ class HYSPLITDispersion(DispersionBase):
 
     DEFAULTS = defaults
 
+    DEFAULT_OUTPUT_FILE_NAME = "hysplit_conc.nc"
+
     # Note: 'PHASES' and TIMEPROFILE_FIELDS defined in HYSPLITDispersion
 
     def __init__(self, met_info, **config):
@@ -166,6 +168,8 @@ class HYSPLITDispersion(DispersionBase):
         self.BINARIES = _get_binaries(self._config)
 
         self._set_met_info(copy.deepcopy(met_info))
+        self._output_file_name = (self.config('output_file_name')
+            or self.DEFAULT_OUTPUT_FILE_NAME)
 
     def _required_growth_fields(self):
         return ('timeprofile', 'plumerise')
@@ -200,7 +204,7 @@ class HYSPLITDispersion(DispersionBase):
         return {
             "output": {
                 "grid_filetype": "NETCDF",
-                "grid_filename": self.OUTPUT_FILE_NAME,
+                "grid_filename": self._output_file_name,
                 "parameters": {"pm25": "PM25"},
                 "grid_parameters": self._grid_params
             },
@@ -379,8 +383,6 @@ class HYSPLITDispersion(DispersionBase):
         ))
         return fire_sets, num_processes
 
-    OUTPUT_FILE_NAME = "hysplit_conc.nc"
-
     def _run_parallel(self, num_processes, fire_sets, working_dir):
         runner = self
         class T(threading.Thread):
@@ -426,16 +428,16 @@ class HYSPLITDispersion(DispersionBase):
         # prevents ncea from adding all the TFLAGs together and mucking up the
         # date
 
-        output_file = os.path.join(working_dir, self.OUTPUT_FILE_NAME)
+        output_file = os.path.join(working_dir, self._output_file_name)
 
         #ncea_args = ["-y", "ttl", "-O"]
         ncea_args = ["-O","-v","PM25","-y","ttl"]
-        ncea_args.extend(["%d/%s" % (i, self.OUTPUT_FILE_NAME) for i in  range(num_processes)])
+        ncea_args.extend(["%d/%s" % (i, self._output_file_name) for i in  range(num_processes)])
         ncea_args.append(output_file)
         self._execute(self.BINARIES['NCEA'], *ncea_args, working_dir=working_dir)
 
         ncks_args = ["-A","-v","TFLAG"]
-        ncks_args.append("0/%s" % (self.OUTPUT_FILE_NAME))
+        ncks_args.append("0/%s" % (self._output_file_name))
         ncks_args.append(output_file)
         self._execute(self.BINARIES['NCKS'], *ncks_args, working_dir=working_dir)
 
@@ -472,7 +474,7 @@ class HYSPLITDispersion(DispersionBase):
         setup_file = os.path.join(working_dir, "SETUP.CFG")
         message_files = [os.path.join(working_dir, "MESSAGE")]
         output_conc_file = os.path.join(working_dir, "hysplit.con")
-        output_file = os.path.join(working_dir, self.OUTPUT_FILE_NAME)
+        output_file = os.path.join(working_dir, self._output_file_name)
 
         # NINIT: sets how particle init file is to be used
         #  0 = no particle initialization file read (default)
