@@ -18,9 +18,9 @@ class MockFireLocationData(object):
         return "<%s %d, location_id: %d>" % (self.__class__.__name__, id(self), self.id)
     # __str__ = __repr__
 
-class TestHysplitUtils(object):
+class TestHysplitUtilsCreateFireSets(object):
 
-    def test_create_fire_sets(self):
+    def test(self):
         fires = [
             MockFireLocationData(1),
             MockFireLocationData(2),
@@ -43,7 +43,10 @@ class TestHysplitUtils(object):
         # order not preserved, so sort results
         assert expected_sets == sorted(fire_sets, key=lambda e: e[0].id)
 
-    def test_create_fire_tranches(self):
+
+class TestHysplitUtilsCreateFireTranches(object):
+
+    def test(self):
         fire_sets = [
             [MockFireLocationData(1), MockFireLocationData(1)],
             [MockFireLocationData(3), MockFireLocationData(3)],
@@ -95,7 +98,10 @@ class TestHysplitUtils(object):
         fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 1)
         assert expected_tranches == fire_tranches
 
-    def test_compute_num_processes(self):
+
+class TestHysplitUtilsComputeNumProcesses(object):
+
+    def test(self):
         n = hysplit_utils.compute_num_processes(4)
         assert isinstance(n, int) and n == 1
 
@@ -129,7 +135,7 @@ class TestHysplitUtils(object):
 
 class TestKmPerLng(object):
 
-    def test_basic(self):
+    def test(self):
         assert 111.32 == hysplit_utils.km_per_deg_lng(0)
         assert 78.71512688168647 == hysplit_utils.km_per_deg_lng(45)
         # Note: hysplit_utils.km_per_deg_lng(90) should equal 0
@@ -141,7 +147,7 @@ class TestKmPerLng(object):
 
 class TestSquareGridFromLatLng(object):
 
-    def test_basic(self):
+    def test(self):
         e = {
             "center_latitude": 45.0,
             "center_longitude": -118.0,
