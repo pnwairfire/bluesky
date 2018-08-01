@@ -26,6 +26,7 @@ from blueskykml import (
 
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.extrafilewriters.firescsvs import FiresCsvsWriter
+from bluesky.dispersers.hysplit import hysplit_utils
 
 ###
 ### HYSPLIT Dispersion Visualization
@@ -54,33 +55,49 @@ DEFAULT_FILENAMES = {
 
 class HysplitVisualizer(object):
     def __init__(self, fires_manager):
-        self._hysplit_output_info = fires_manager.dispersion['output']
+        self._fires_manager = fires_manager
         self._fires = fires_manager.fires
         self._run_id = fires_manager.run_id
+
         self._config = fires_manager.get_config_value(
             'visualization', 'hysplit', default={})
-        self._fires_manager = fires_manager
+        self._set_dispersion_output_info()
+
+    def _set_dispersion_output_info(self):
+        disp_output_info = fires_manager.get('dispersion', {}).get('output', {})
+        disp_conf = fires_manager.get_config_value('dispersion', default={})
+
+        self._hysplit_output_directory = (disp_output_info.get('directory')
+            or disp_conf.get('output_dir'))
+        if not self._hysplit_output_directory:
+            raise ValueError("hysplit output directory must be defined")
+        if not os.path.isdir(self._hysplit_output_directory):
+            raise RuntimeError("hysplit output directory {} is not valid".format(
+                self._hysplit_output_directory))
+
+        self._hysplit_output_file = (disp_output_info.get('grid_filename')
+            or )
+        if not self._hysplit_output_file:
+            raise ValueError("hysplit output file must be defined")
+        self._hysplit_output_file = os.path.join(self._hysplit_output_directory, self._hysplit_output_file)
+        if not os.path.isfile(self._hysplit_output_file):
+            raise RuntimeError("hysplit output file {} does not exist".format(
+                self._hysplit_output_file))
+
+        self._grid_params = (disp_output_info.get("grid_parameters")
+            or (hysplit_utils.get_grid_params(
+                    disp_conf.get('hysplit', {}), allow_undefined=True))
+            or {}) # allow them to be undefined
+
+        self._start_time = self._hysplit_output_info.get("start_time")
+        self._num_hours = self._hysplit_output_info.get("num_hours")
 
     def run(self):
-        hysplit_output_directory = self._hysplit_output_info.get('directory')
-        if not hysplit_output_directory:
-            raise ValueError("hysplit output directory must be defined")
-        if not os.path.isdir(hysplit_output_directory):
-            raise RuntimeError("hysplit output directory {} is not valid".format(
-                hysplit_output_directory))
-
-        hysplit_output_file = self._hysplit_output_info.get('grid_filename')
-        if not hysplit_output_file:
-            raise ValueError("hysplit output file must be defined")
-        hysplit_output_file = os.path.join(hysplit_output_directory, hysplit_output_file)
-        if not os.path.isfile(hysplit_output_file):
-            raise RuntimeError("hysplit output file {} does not exist".format(
-                hysplit_output_file))
 
         if self._config.get('output_dir'):
             output_directory = self._config['output_dir']
         else:
-            output_directory =  hysplit_output_directory
+            output_directory =  self._hysplit_output_directory
         data_dir = os.path.join(output_directory, self._config.get('data_dir') or '')
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
@@ -114,7 +131,7 @@ class HysplitVisualizer(object):
             # blueskykml inherit logging level
             verbose=False,
             config_options=config_options,
-            inputfile=str(hysplit_output_file),
+            inputfile=str(self._hysplit_output_file),
             fire_locations_csv=str(files['fire_locations_csv']['pathname']),
             fire_events_csv=str(files['fire_events_csv']['pathname']),
             smoke_dispersion_kmz_file=str(files['smoke_dispersion_kmz']['pathname']),
@@ -135,7 +152,7 @@ class HysplitVisualizer(object):
             'blueskykml_version': blueskykml_version,
             "output": {
                 "directory": output_directory,
-                "hysplit_output_file": hysplit_output_file,
+                "hysplit_output_file": self._hysplit_output_file,
                 "smoke_dispersion_kmz_filename": files['smoke_dispersion_kmz']['name'],
                 "fire_kmz_filename": files['fire_kmz']['name'],
                 "fire_locations_csv_filename": files['fire_locations_csv']['name'],
@@ -180,13 +197,10 @@ class HysplitVisualizer(object):
         """Creates summary.json (like BSF's) if configured to do so
         """
         if self._config.get('create_summary_json'):
-            grid_params = self._hysplit_output_info.get("grid_parameters", {})
             d_from = d_to = None
             try:
-                d_from = datetime_parsing.parse(
-                    self._hysplit_output_info.get("start_time"))
-                d_to = d_from + datetime.timedelta(
-                    hours=self._hysplit_output_info.get("num_hours"))
+                d_from = datetime_parsing.parse(self._start_time)
+                d_to = d_from + datetime.timedelta(hours=self._num_hours)
             except:
                 pass
 
@@ -197,10 +211,10 @@ class HysplitVisualizer(object):
                     "from": d_from and d_from.strftime("%Y%m%d %HZ"),
                     "to": d_to and d_to.strftime("%Y%m%d %HZ")
                 },
-                 "width_longitude": grid_params.get("width_longitude"),
-                 "height_latitude": grid_params.get("height_latitude"),
-                 "center_latitude": grid_params.get("center_latitude"),
-                 "center_longitude":  grid_params.get("center_longitude"),
+                 "width_longitude": self._grid_params.get("width_longitude"),
+                 "height_latitude": self._grid_params.get("height_latitude"),
+                 "center_latitude": self._grid_params.get("center_latitude"),
+                 "center_longitude":  self._grid_params.get("center_longitude"),
                  "model_configuration": "HYSPLIT"
             }
 

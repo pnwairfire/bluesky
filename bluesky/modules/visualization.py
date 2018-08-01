@@ -27,11 +27,7 @@ def run(fires_manager):
     try:
         # TODO: support VSMOKE as well
         if target == 'dispersion':
-            if not fires_manager.dispersion or not fires_manager.dispersion.get('model'):
-                raise ValueError("Dispersion model must be specified if visualizing dispersion")
-            if not fires_manager.dispersion or not fires_manager.dispersion.get('output'):
-                raise ValueError("Dispersion output information must be specified if visualizing dispersion")
-            dispersion_model = fires_manager.dispersion['model']
+            dispersion_model = get_dispersion_model(fires_manager)
             processed_kwargs.update(dispersion_model=dispersion_model)
             visualization_info.update(dispersion_model=dispersion_model)
             if dispersion_model == 'hysplit':
@@ -57,3 +53,12 @@ def run(fires_manager):
         fires_manager.processed(__name__, __version__, **processed_kwargs)
 
     # TODO: add information to fires_manager indicating where to find the hysplit output
+
+def get_dispersion_model(fires_manager):
+    if fires_manager.dispersion and fires_manager.dispersion.get('model'):
+        return fires_manager.dispersion['model']
+    model = fires_manager.get_config_value('dispersion', 'model')
+    if model:
+        return model.lower()
+
+    raise ValueError("Dispersion model must be specified if visualizing dispersion")
