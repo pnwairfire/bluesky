@@ -64,8 +64,9 @@ class HysplitVisualizer(object):
         self._set_dispersion_output_info()
 
     def _set_dispersion_output_info(self):
-        disp_output_info = fires_manager.get('dispersion', {}).get('output', {})
-        disp_conf = fires_manager.get_config_value('dispersion', default={})
+        disp_output_info = (self._fires_manager.dispersion
+            and self._fires_manager.dispersion.get('output')) or {}
+        disp_conf = self._fires_manager.get_config_value('dispersion', default={})
 
         self._hysplit_output_directory = (disp_output_info.get('directory')
             or disp_conf.get('output_dir'))
@@ -89,8 +90,10 @@ class HysplitVisualizer(object):
                     disp_conf.get('hysplit', {}), allow_undefined=True))
             or {}) # allow them to be undefined
 
-        self._start_time = self._hysplit_output_info.get("start_time")
-        self._num_hours = self._hysplit_output_info.get("num_hours")
+        self._start_time = (disp_output_info.get("start_time")
+            or disp_conf.get("start"))
+        self._num_hours = (disp_output_info.get("num_hours")
+            or disp_conf.get('num_hours'))
 
     def run(self):
 
