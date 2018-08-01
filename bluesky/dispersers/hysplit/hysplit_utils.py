@@ -11,6 +11,8 @@ import logging
 import math
 from functools import reduce
 
+from bluesky.exceptions import BlueSkyConfigurationError
+from . import defaults
 
 __all__ = [
     'create_fire_sets', 'create_fire_tranches'
@@ -184,47 +186,47 @@ def grid_params_from_grid(grid, met_info={}):
 
 def get_grid_params(config, met_info={}, fires=None, allow_undefined=False):
     # If not specified, projection is assumed to be 'LatLon'
-    is_deg = (config('projection') or 'LatLon') == 'LatLon'
+    is_deg = (config.get('projection') or 'LatLon') == 'LatLon'
 
-    if config("USER_DEFINED_GRID"):
+    if config.get("USER_DEFINED_GRID"):
         # This supports BSF config settings
         # User settings that can override the default concentration grid info
         logging.info("User-defined sampling/concentration grid invoked")
         grid_params = {
-            "center_latitude": config("CENTER_LATITUDE"),
-            "center_longitude": config("CENTER_LONGITUDE"),
-            "height_latitude": config("HEIGHT_LATITUDE"),
-            "width_longitude": config("WIDTH_LONGITUDE"),
-            "spacing_longitude": config("SPACING_LONGITUDE"),
-            "spacing_latitude": config("SPACING_LATITUDE")
+            "center_latitude": config.get("CENTER_LATITUDE"),
+            "center_longitude": config.get("CENTER_LONGITUDE"),
+            "height_latitude": config.get("HEIGHT_LATITUDE"),
+            "width_longitude": config.get("WIDTH_LONGITUDE"),
+            "spacing_longitude": config.get("SPACING_LONGITUDE"),
+            "spacing_latitude": config.get("SPACING_LATITUDE")
         }
         # BSF assumed lat/lng if USER_DEFINED_GRID; this support km spacing
         if not is_deg:
-            grid_params["spacing_longitude"] /= hysplit_utils.km_per_deg_lng(
+            grid_params["spacing_longitude"] /= km_per_deg_lng(
                 grid_params["center_latitude"])
-            grid_params["spacing_latitude"] /= hysplit_utils.KM_PER_DEG_LAT
+            grid_params["spacing_latitude"] /= KM_PER_DEG_LAT
 
-    elif config('grid'):
-        grid_params = hysplit_utils.grid_params_from_grid(
-            config('grid'), met_info)
+    elif config.get('grid'):
+        grid_params = grid_params_from_grid(
+            config['grid'], met_info)
 
-    elif config('compute_grid'):
+    elif config.get('compute_grid'):
         if not fires or len(fires) != 1:
             # TODO: support multiple fires
             raise ValueError("Option to compute grid only supported for "
                 "runs with one fire")
-        if (not config('spacing_latitude')
-                or not config('spacing_longitude')):
+        if (not config.get('spacing_latitude')
+                or not config.get('spacing_longitude')):
             raise BlueSkyConfigurationError("Config settings "
                 "'spacing_latitude' and 'spacing_longitude' required "
                 "to compute hysplit grid")
-        grid_params = hysplit_utils.square_grid_from_lat_lng(
+        grid_params = square_grid_from_lat_lng(
             fires[0]['latitude'], fires[0]['longitude'],
-            config('spacing_latitude'), config('spacing_longitude'),
-            config('grid_length'), input_spacing_in_degrees=is_deg)
+            config.get('spacing_latitude'), config.get('spacing_longitude'),
+            config.get('grid_length', defaults.GRID_LENGTH), input_spacing_in_degrees=is_deg)
 
     elif met_info and met_info.get('grid'):
-        grid_params = hysplit_utils.grid_params_from_grid(
+        grid_params = grid_params_from_grid(
             met_info['grid'], met_info)
 
     elif allow_undefined:

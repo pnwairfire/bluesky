@@ -56,7 +56,6 @@ import datetime
 
 from afdatetime.parsing import parse_datetime
 
-from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models.fires import Fire
 from .. import (
     DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE
