@@ -44,6 +44,10 @@ the fire data, each module has its own set of required and optional fields.
  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lat'*** -- *required* if 'location' section is defined --
  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lng'*** -- *required* if 'location' section is defined --
 
+##### splitgrowth
+
+ - ***'config' > 'splitgrowth' > 'record_original'*** -- *optional* --
+
 ##### fuelbeds
 
 - ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- default ['0', '900']
