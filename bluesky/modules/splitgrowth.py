@@ -31,13 +31,11 @@ def run(fires_manager):
 def _split(fire, record_original_growth):
     new_growth = []
     for g in fire.get('growth', []):
-        fire["growth"] = []
-        for g in growth:
-            fire['growth'].extend(_split_growth(g))
+        new_growth.extend(_split_growth(g))
 
-    if new_growth:
+    if new_growth and new_growth != fire['growth']:  #len(new_growth) != len(fire['growth']):
         if record_original_growth:
-            fire['original_growth'] = fire['growth'])
+            fire['original_growth'] = fire['growth']
         fire['growth'] = new_growth
 
 # TODO: Support splitting these fields. Only fuelbeds would
@@ -47,12 +45,13 @@ CANT_SPLIT_FIELDS = [
     'consumption', 'emissions', 'fuelbeds', 'heat'
 ]
 
-def _split_growh(g):
+def _split_growth(g):
     try:
         geojson = g.get('location', {}).get('geojson')
         if geojson:
             if not any([k in g for k in CANT_SPLIT_FIELDS]):
-                f = getattr('_split_{}'.format(geojson.get('type','').lower())
+                func_name = '_split_{}'.format(geojson.get('type','').lower())
+                f = locals().get(func_name)
                 if f:
                      return f(g)
                 else:
@@ -69,9 +68,23 @@ def _split_growh(g):
 
 def _split_multipoint(g):
     logging.debug('splitting multipoint growth object')
-    return
+    growth = []
+    for coord in g['location']['geojson']['coordinates']:
+        new_g = copy.deepcopy(g)
+        new_g['location']['geojson']['type'] == ['Point']
+        new_g['location']['geojson']['coordinates'] = coord
+        if new_g.get('area'):
+            new_g['area'] /= len(g['location']['geojson']['coordinates'])
+        growth.append(new_g)
+    return growth
 
 def _split_multipolygon(g):
-    ## How to divide area between polygon????
-    logging.debug('splitting multipolygon growth object')
-    return
+    if not g['location'].get('area'):
+        growth = []
+        for polgon in g['location']['geojson']['coordinates']:
+            new_g = copy.deepcopy(g)
+            new_g['location']['geojson']['type'] == ['Polygon']
+            new_g['location']['geojson']['coordinates'] = polygon
+            growth.append(new_g)
+        return growth
+    return [g]
