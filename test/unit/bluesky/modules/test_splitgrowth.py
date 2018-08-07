@@ -12,7 +12,6 @@ from bluesky.modules import splitgrowth
 ## No growth to split
 ##
 
-
 class TestNoGrowth(object):
 
     def test(self):
@@ -23,6 +22,7 @@ class TestNoGrowth(object):
         expected = copy.deepcopy(fire)
         splitgrowth._split(fire, False)
         assert fire == expected
+
 
 ##
 ## One growth object to split
@@ -50,11 +50,7 @@ BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH = {
     ]
 }
 
-class TestOneGrowthPreFuelbeds(object):
-
-    ##
-    ## Geometry types that are *not* split
-    ##
+class TestOneGrowthPreFuelbedsNothingSplit(object):
 
     def test_lat_lng(self):
         fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
@@ -183,9 +179,7 @@ class TestOneGrowthPreFuelbeds(object):
         splitgrowth._split(fire, False)
         assert fire == expected
 
-    ##
-    ## Geometry types that *are* split
-    ##
+class TestOneGrowthPreFuelbeds(object):
 
     def test_multi_point(self):
         fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
@@ -255,7 +249,7 @@ class TestOneGrowthPreFuelbeds(object):
                 ]
             ]
         }
-        expected = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        expected = copy.deepcopy(fire)
         expected['growth'].append(copy.deepcopy(expected['growth'][0]))
         expected['growth'][0]['location']['geojson'] = {
             "type": "Polygon",
@@ -441,9 +435,9 @@ class TestMultipleGrowthPreFuelbeds(object):
         splitgrowth._split(fire, False)
         assert fire == EXPECTED_PRE_FUELBEDS_TWO_GROWTH
 
-    def test_mixed_dont_record(self):
+    def test_mixed_record_orig(self):
         fire = copy.deepcopy(FIRE_PRE_FUELBEDS_TWO_GROWTH)
-        splitgrowth._split(fire, False)
+        splitgrowth._split(fire, True)
         expected = copy.deepcopy(EXPECTED_PRE_FUELBEDS_TWO_GROWTH)
         expected['original_growth'] = FIRE_PRE_FUELBEDS_TWO_GROWTH['growth']
         assert fire == expected

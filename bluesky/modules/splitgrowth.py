@@ -51,7 +51,7 @@ def _split_growth(g):
         if geojson:
             if not any([k in g for k in CANT_SPLIT_FIELDS]):
                 func_name = '_split_{}'.format(geojson.get('type','').lower())
-                f = locals().get(func_name)
+                f = globals().get(func_name)
                 if f:
                      return f(g)
                 else:
@@ -71,19 +71,19 @@ def _split_multipoint(g):
     growth = []
     for coord in g['location']['geojson']['coordinates']:
         new_g = copy.deepcopy(g)
-        new_g['location']['geojson']['type'] == ['Point']
+        new_g['location']['geojson']['type'] = 'Point'
         new_g['location']['geojson']['coordinates'] = coord
-        if new_g.get('area'):
-            new_g['area'] /= len(g['location']['geojson']['coordinates'])
+        if new_g['location'].get('area'):
+            new_g['location']['area'] /= len(g['location']['geojson']['coordinates'])
         growth.append(new_g)
     return growth
 
 def _split_multipolygon(g):
     if not g['location'].get('area'):
         growth = []
-        for polgon in g['location']['geojson']['coordinates']:
+        for polygon in g['location']['geojson']['coordinates']:
             new_g = copy.deepcopy(g)
-            new_g['location']['geojson']['type'] == ['Polygon']
+            new_g['location']['geojson']['type'] = 'Polygon'
             new_g['location']['geojson']['coordinates'] = polygon
             growth.append(new_g)
         return growth
