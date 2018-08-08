@@ -370,9 +370,7 @@ EXPECTED_PRE_FUELBEDS_TWO_GROWTH = {
                 "ecoregion": "western",
                 'geojson': {
                     "type": "Point",
-                    "coordinates": [
-                        [-100.0, 34.0]
-                    ]
+                    "coordinates": [-100.0, 34.0]
                 },
                 "max_humid": 80,
                 "moisture_duff": 75.0,
@@ -391,9 +389,7 @@ EXPECTED_PRE_FUELBEDS_TWO_GROWTH = {
                 "ecoregion": "western",
                 'geojson': {
                     "type": "Point",
-                    "coordinates": [
-                        [-101.0, 35.4]
-                    ]
+                    "coordinates": [-101.0, 35.4]
                 },
                 "max_humid": 80,
                 "moisture_duff": 75.0,
@@ -412,9 +408,7 @@ EXPECTED_PRE_FUELBEDS_TWO_GROWTH = {
                 "ecoregion": "western",
                 'geojson': {
                     "type": "Point",
-                    "coordinates": [
-                        [-102.0, 35.0]
-                    ]
+                    "coordinates": [-102.0, 35.0]
                 },
                 "max_humid": 80,
                 "moisture_duff": 75.0,

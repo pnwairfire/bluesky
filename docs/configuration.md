@@ -46,7 +46,7 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### splitgrowth
 
- - ***'config' > 'splitgrowth' > 'record_original'*** -- *optional* --
+ - ***'config' > 'splitgrowth' > 'record_original_growth'*** -- *optional* --
 
 ##### fuelbeds
 
