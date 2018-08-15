@@ -760,7 +760,7 @@ class HYSPLITDispersion(DispersionBase):
 
     def _set_grid_params(self):
         self._grid_params = hysplit_utils.get_grid_params(
-            self.config, met_info=self._met_info, fires=self._fires)
+            self._config, met_info=self._met_info, fires=self._fires)
 
     def _write_control_file(self, control_file, concFile):
         num_fires = len(self._fires)
