@@ -139,7 +139,7 @@
             "species": [
                 "PM2.5"
             ],
-            "efs": "feps"
+            "model": "feps"
         },
         "timeprofiling": {
             "hourly_fractions": {

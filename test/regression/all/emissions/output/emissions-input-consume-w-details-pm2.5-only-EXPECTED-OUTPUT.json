@@ -1040,7 +1040,7 @@
                 "pm2.5"
             ],
             "include_emissions_details": true,
-            "efs": "consume"
+            "model": "consume"
         },
         "skip_failed_fires": true
     }

@@ -688,7 +688,7 @@
     "config": {
         "skip_failed_fires": true,
         "emissions": {
-            "efs": "feps"
+            "model": "feps"
         }
     },
     "failed_fires": [
