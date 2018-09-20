@@ -59,7 +59,7 @@ the fire data, each module has its own set of required and optional fields.
 
 ##### emissions
 
- - ***'config' > 'emissions' > 'model'*** -- *optional* -- emissions model; 'urbanski', 'feps', or 'consume'; default 'feps'
+ - ***'config' > 'emissions' > 'model'*** -- *optional* -- emissions model; 'prichard-oneill' (which replaced 'urbanski'), 'feps', or 'consume'; default 'feps'
  - ***'config' > 'emissions' > 'efs'*** -- *optional* -- deprecated synonym for 'model'
  - ***'config' > 'emissions' > 'species'*** -- *optional* -- whitelist of species to compute emissions levels for
  - ***'config' > 'emissions' > 'include_emissions_details'*** -- *optional* -- whether or not to include emissions levels by fuel category; default: false

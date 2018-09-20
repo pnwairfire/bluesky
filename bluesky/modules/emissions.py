@@ -60,12 +60,15 @@ def run(fires_manager):
         emitcalc_version=emitcalc_version, eflookup_version=eflookup_version)
 
     try:
-        klass = getattr(sys.modules[__name__], model.capitalize())
+        klass_name = ''.join([e.capitalize() for e in model.split('-')])
+        klass = getattr(sys.modules[__name__], klass_name)
         e = klass(fires_manager.fire_failure_handler,
             fires_manager.get_config_value)
     except AttributeError:
-        raise BlueSkyConfigurationError(
-            "Invalid emissions model: '{}'".format(model))
+        msg = "Invalid emissions model: '{}'.".format(model)
+        if model == 'urbanski':
+            msg += " The urbanski model has be replaced by prichard-oneill"
+        raise BlueSkyConfigurationError(msg)
 
     e.run(fires_manager.fires)
 
@@ -173,16 +176,16 @@ class Feps(EmissionsBase):
                 #     datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
 
 ##
-## Urbanski
+## Prichard / O'Neill
 ##
 
-class Urbanski(EmissionsBase):
+class PrichardOneill(EmissionsBase):
 
     def __init__(self, fire_failure_handler, config_getter):
-        super(Urbanski, self).__init__(fire_failure_handler, config_getter)
+        super(PrichardOneill, self).__init__(fire_failure_handler, config_getter)
 
     def run(self, fires):
-        logging.info("Running emissions module with Urbanski EFs")
+        logging.info("Running emissions module with Prichard / O'Neill EFs")
 
         # Instantiate two lookup object, one Rx and one WF, to be reused
         for fire in fires:
@@ -301,7 +304,7 @@ class Consume(EmissionsBase):
                     fb['emissions'][p][upper_k] = r[k][p]
         if self.include_emissions_details:
             # Note: consume gives details per fuel category, not per
-            #  subcategory; to match what feps and urbanski calculators
+            #  subcategory; to match what FEPS and Prichard/O'Neill calculators
             #  produce, put all per-category details under'summary'
             # The details are under key 'stratum'. the key hierarchy is:
             #    'stratum' > species > fuel category > phase
@@ -323,7 +326,7 @@ class Consume(EmissionsBase):
         # have been multiplied by area.
 
         # TODO: act on 'self.include_emissions_details'?  consume emissions
-        #   doesn't provide as detailed emissions as FEPS and Urbanski;
+        #   doesn't provide as detailed emissions as FEPS and Prichard/O'Neill;
         #   it lists per-category emissions, not per-sub-category
 
 

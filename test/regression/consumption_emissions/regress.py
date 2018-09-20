@@ -48,7 +48,7 @@ OPTIONAL_ARGS = [
     {
         'short': '-e',
         'long': '--emissions-model',
-        'help': '"feps", "urbanski", or "consume"; default "consume"',
+        'help': '"feps", "prichard-oneill", or "consume"; default "consume"',
         'default': 'consume'
     },
     {

@@ -289,7 +289,7 @@ class TestFepsEmissions(BaseEmissionsTest):
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
-class TestUrbanskiEmissions(BaseEmissionsTest):
+class TestPrichardOneillEmissions(BaseEmissionsTest):
 
     EXPECTED_FIRE1_EMISSIONS = {
         'flaming': {
@@ -342,12 +342,12 @@ class TestUrbanskiEmissions(BaseEmissionsTest):
     def test_wo_details_PM_only(self):
         config_getter = create_config_getter({
             "emissions": {
-                "model": "Urbanski",
+                "model": "prichard-oneill",
                 "include_emissions_details": False,
                 'species': self.SPECIES
             }
         })
-        emissions.Urbanski(fire_failure_manager, config_getter).run(self.fires)
+        emissions.PrichardOneill(fire_failure_manager, config_getter).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -359,12 +359,12 @@ class TestUrbanskiEmissions(BaseEmissionsTest):
     def test_with_details_PM_only(self):
         config_getter = create_config_getter({
             "emissions": {
-                "model": "Urbanski",
+                "model": "prichard-oneill",
                 "include_emissions_details": True,
                 'species': self.SPECIES
             }
         })
-        emissions.Urbanski(fire_failure_manager, config_getter).run(self.fires)
+        emissions.PrichardOneill(fire_failure_manager, config_getter).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')

@@ -6,7 +6,7 @@
         },
         "emissions": {
             "species": ["PM2.5"],
-            "efs": "urbanski"
+            "model": "prichard-oneill"
         },
         "findmetdata": {
             "met_root_dir": "/NAM84/",
