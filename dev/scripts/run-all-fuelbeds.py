@@ -45,6 +45,9 @@ def parse_args():
     parser.add_argument('-l', '--local-code',
         default=False, action="store_true",
         help="Run with local code mounted in docker container")
+    parser.add_argument('--produce-emissions-csv', action="store_true",
+        help="Run with local code mounted in docker container")
+
 
     return parser.parse_args()
 
@@ -59,7 +62,8 @@ def main():
         "config": {
             "extrafiles":{
                 "dest_dir": "/data/",
-                "sets": ["firescsvs", "emissionscsv"],
+                "sets": (["firescsvs", "emissionscsv"]
+                    if args.produce_emissions_csv else ["firescsvs"]),
                 "firescsvs": {
                     "fire_locations_filename": "fire_locations.csv",
                     "fire_events_filename": "fire_events.csv"
@@ -113,7 +117,12 @@ def main():
     cmd += (" bluesky bsp --log-level=DEBUG"
         " -i /data/" + input_data['run_id'] + "-input.json"
         " -o /data/" + input_data['run_id'] + "-output.json"
-        " consumption emissions timeprofiling extrafiles")
+        " consumption emissions")
+
+    if args.produce_emissions_csv:
+        cmd += " timeprofiling"
+
+    cmd += " extrafiles"
 
     subprocess.run(cmd, shell=True, check=True)
 
