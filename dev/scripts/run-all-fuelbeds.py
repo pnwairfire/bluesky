@@ -61,6 +61,9 @@ def main():
         "run_id": ("one-fire-per-fccsid-" +
             datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')),
         "config": {
+            "emissions": {
+                "model": "prichard-oneill"
+            },
             "extrafiles":{
                 "dest_dir": "/data/",
                 "sets": (["firescsvs", "emissionscsv"]
