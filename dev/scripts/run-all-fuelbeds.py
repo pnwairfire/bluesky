@@ -59,14 +59,14 @@ def main():
         "config": {
             "extrafiles":{
                 "dest_dir": "/data/",
-                "sets": ["firescsvs"], #, "emissionscsv"],
+                "sets": ["firescsvs", "emissionscsv"],
                 "firescsvs": {
                     "fire_locations_filename": "fire_locations.csv",
                     "fire_events_filename": "fire_events.csv"
                 },
-                # "emissionscsv": {
-                #     "filename": "fire_emissions.csv"
-                # }
+                "emissionscsv": {
+                    "filename": "fire_emissions.csv"
+                }
             }
         },
         "fire_information": []
@@ -113,7 +113,7 @@ def main():
     cmd += (" bluesky bsp --log-level=DEBUG"
         " -i /data/" + input_data['run_id'] + "-input.json"
         " -o /data/" + input_data['run_id'] + "-output.json"
-        " consumption emissions extrafiles")
+        " consumption emissions timeprofiling extrafiles")
 
     subprocess.run(cmd, shell=True, check=True)
 
