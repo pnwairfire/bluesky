@@ -58,7 +58,7 @@ def main():
 
     input_data = {
         "run_id": ("one-fire-per-fccsid-" +
-            datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')),
+            datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')),
         "config": {
             "extrafiles":{
                 "dest_dir": "/data/",
