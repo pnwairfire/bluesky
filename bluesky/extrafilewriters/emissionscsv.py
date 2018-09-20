@@ -108,7 +108,7 @@ class EmissionsCsvWriter(object):
         # Note: plumerise might not be defined for the timestamp
         # (e.g. bluesky playground only defines plumerise for the
         #  hours in the dispersion time window)
-        if ts in g['plumerise']:
+        if 'plumerise' in g and ts in g['plumerise']:
             pr = g['plumerise'][ts]
             row['smoldering_fraction'] = pr['smolder_fraction']
             for i, h in enumerate(pr['heights']):
