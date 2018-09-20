@@ -47,6 +47,7 @@ def parse_args():
         help="Run with local code mounted in docker container")
     parser.add_argument('--produce-emissions-csv', action="store_true",
         help="Run with local code mounted in docker container")
+    parser.add_argument('--log-level', default="INFO", help="Log level")
 
 
     return parser.parse_args()
@@ -114,10 +115,10 @@ def main():
             " -e PYTHONPATH=/code/"
             " -e PATH=/code/bin/:$PATH")
 
-    cmd += (" bluesky bsp --log-level=DEBUG"
-        " -i /data/" + input_data['run_id'] + "-input.json"
-        " -o /data/" + input_data['run_id'] + "-output.json"
-        " consumption emissions")
+    cmd += (" bluesky bsp --log-level=" + args.log_level
+        + " -i /data/" + input_data['run_id'] + "-input.json"
+        + " -o /data/" + input_data['run_id'] + "-output.json"
+        + " consumption emissions")
 
     if args.produce_emissions_csv:
         cmd += " timeprofiling"
