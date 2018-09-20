@@ -102,14 +102,15 @@ def main():
     with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-input.json', 'w') as f:
         f.write(json.dumps(input_data))
 
-    if args.local_code:
-        sys.stderr.write("\n*** '--local-code' option not yet implemented.\n\n")
-        sys.exit(1)
 
-    cmd = ("docker run -ti --rm"
-        " -v $PWD/tmp/run-all-fuelbeds/:/data/"
-        " bluesky"
-        " bsp --log-level=DEBUG"
+    cmd = "docker run -ti --rm -v $PWD/tmp/run-all-fuelbeds/:/data/"
+
+    if args.local_code:
+        cmd += (" -v $PWD/:/code/"
+            " -e PYTHONPATH=/code/"
+            " -e PATH=/code/bin/:$PATH")
+
+    cmd += (" bluesky bsp --log-level=DEBUG"
         " -i /data/" + input_data['run_id'] + "-input.json"
         " -o /data/" + input_data['run_id'] + "-output.json"
         " consumption emissions extrafiles")
