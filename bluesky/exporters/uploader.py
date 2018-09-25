@@ -31,23 +31,33 @@ class UploadExporter(ExporterBase):
         self._upload_options = {}
         self._current_user = getpass.getuser()
 
-        # TODO: don't assume scp? maybe look for 'scp' > 'host' & 'user' & ...,
-        #  and/or 'ftp' > ..., etc., and upload to all specified
-        self._read_scp_config()
+        self._read_config()
+
         # TODO: other upload options
         if not self._upload_options:
             raise BlueSkyConfigurationError(
                 "Specify at least one mode of uploads")
 
-    def _read_scp_config(self):
-        c = self.config('scp')
+    def _read_config(self):
+        # TODO: don't assume scp? maybe look for 'scp' > 'host' & 'user' & ...,
+        #  and/or 'ftp' > ..., etc., and upload to all specified
+        if isinstance(self.config, list):
+            for c in self.config:
+                self._read_scp_config(c)
+        else:
+            self._read_scp_config(self.config)
+
+    def _read_scp_config(self, config):
+        c = config('scp')
         if c:
             if any([not c.get(k) for k in ['host', 'dest_dir']]):
                 raise BlueSkyConfigurationError(
                     "Specify host and dest_dir for scp'ing")
-            self._upload_options['scp'] = copy.deepcopy(c)
-            if not self._upload_options['scp'].get('user'):
-                self._upload_options['scp']['user'] = self._current_user
+            if 'scp' not in self._upload_options:
+                self._upload_options['scp'] = []
+            self._upload_options['scp'].append(copy.deepcopy(c))
+            if not self._upload_options['scp'][-1].get('user'):
+                self._upload_options['scp'][-1]['user'] = self._current_user
 
     LOCAL_HOSTS = set(['localhost', '127.0.0.1'])
     PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')
@@ -108,15 +118,12 @@ class UploadExporter(ExporterBase):
     ## SCP
     ##
 
-    def _scp_upload(self, tarball):
+    def _scp_upload(self, options, tarball):
         # TODO: check if host is in fact this server; if so,
         #   simply move tarball and unpack it rather than scp it;
-        port = str(self._upload_options['scp']['port'] or DEFAULT_SCP_PORT)
-        remote_server = "{}@{}".format(
-            self._upload_options['scp']['user'],
-            self._upload_options['scp']['host'])
-        destination = "{}:{}".format(remote_server,
-            self._upload_options['scp']['dest_dir'])
+        port = str(options['port'] or DEFAULT_SCP_PORT)
+        remote_server = "{}@{}".format(options['user'], options['host'])
+        destination = "{}:{}".format(remote_server, options['dest_dir'])
 
         # Note: there are various ways of doing this: a) call scp directly,
         #  b) use paramiko, c) use fabric, d) etc.....
@@ -126,10 +133,9 @@ class UploadExporter(ExporterBase):
         #    'ssh: connect to host 127.0.0.1 port 2222: Connection refused')
         #   is captured by piping stderr to stdout in each check_output call
         logging.info("Creating remote destination {}".format(
-            self._upload_options['scp']['dest_dir']))
+            options['dest_dir']))
         subprocess.check_output(['ssh', '-o', 'StrictHostKeyChecking=no',
-            remote_server, '-p', port,
-            'mkdir', '-p', self._upload_options['scp']['dest_dir']],
+            remote_server, '-p', port, 'mkdir', '-p', options['dest_dir']],
             stderr=subprocess.STDOUT)
         logging.info("Uploading {} via scp".format(tarball))
         subprocess.check_output(['scp', '-o', 'StrictHostKeyChecking=no',
@@ -140,32 +146,30 @@ class UploadExporter(ExporterBase):
             "tarball": os.path.basename(tarball)
         }
 
-    def _scp_unpack(self, tarball):
-        remote_server = "{}@{}".format(
-            self._upload_options['scp']['user'],
-            self._upload_options['scp']['host'])
-        port = str(self._upload_options['scp']['port'] or DEFAULT_SCP_PORT)
+    def _scp_unpack(self, options, tarball):
+        remote_server = "{}@{}".format(options['user'], options['host'])
+        port = str(options['port'] or DEFAULT_SCP_PORT)
         tarball_filename = os.path.basename(tarball)
         logging.info("Extracting {} on {} in {}".format(tarball,
-            remote_server, self._upload_options['scp']['dest_dir']))
+            remote_server, options['dest_dir']))
 
         # Note: due to need to quote remote command, I couldn't figure out
         #  away to avoid using shell=True in check_output call
         cmd = "ssh {} -p {} 'cd {} && tar xzf {}'".format(remote_server,
-            port, self._upload_options['scp']['dest_dir'], tarball_filename)
+            port, options['dest_dir'], tarball_filename)
         subprocess.check_output([cmd], shell=True, stderr=subprocess.STDOUT)
 
-    def _scp(self, tarball):
+    def _scp(self, options, tarball):
         # Note: don't catch and exceptions here. Let calling method, 'export',
         #  handle exceptions
-        r = self._scp_upload(tarball)
+        r = self._scp_upload(options, tarball)
 
         # Note: we do, however, want to catch exceptions here; failuer to
         #  extract shouldn't cause use to lose information about successful scp
         # TODO: move extraction code to separate method, to share with other
         #  future upload modes
         try:
-            self._scp_unpack(tarball)
+            self._scp_unpack(options, tarball)
             r["directory"] = self._output_dir_name
         except:
             r["error"] = "failed to extract {}".format(tarball)
@@ -193,26 +197,27 @@ class UploadExporter(ExporterBase):
             #   repetitive/redundant code)
             for u in ['scp']:
                 if self._upload_options.get(u):
-                    fires_manager.export['upload'][u] = {
-                        'options': self._upload_options[u]
-                    }
-                    is_local = self._is_same_host(
-                        self._upload_options[u]['user'],
-                        self._upload_options[u]['host'])
-                    try:
-                        if is_local:
-                            r = self._local_cp(tarball,
-                                self._upload_options[u]['dest_dir'])
-                        else:
-                            r = getattr(self,'_{}'.format(u))(tarball)
-                        if r:
-                            # Only include upload if it actually happened
-                            fires_manager.export['upload'][u].update(r)
-                    except Exception as e:
-                        msg = "Failed to {} tarball - {}".format(
-                            'cp' if is_local else u, str(e))
-                        fires_manager.export['upload'][u]["error"] = msg
-                        logging.error(msg)
+                    fires_manager.export['upload'][u] = []
+                    for options in self._upload_options[u]:
+                        fires_manager.export['upload'][u].append({
+                            'options': options
+                        })
+                        is_local = self._is_same_host(
+                            options['user'], options['host'])
+                        try:
+                            if is_local:
+                                r = self._local_cp(tarball,
+                                    options['dest_dir'])
+                            else:
+                                r = getattr(self,'_{}'.format(u))(options, tarball)
+                            if r:
+                                # Only include upload if it actually happened
+                                fires_manager.export['upload'][u][-1].update(r)
+                        except Exception as e:
+                            msg = "Failed to {} tarball - {}".format(
+                                'cp' if is_local else u, str(e))
+                            fires_manager.export['upload'][u][-1]["error"] = msg
+                            logging.error(msg)
                 else:
                     logging.warning("Missing configuration for %s export", u)
 
