@@ -26,8 +26,8 @@ class UploadExporter(ExporterBase):
 
     EXPORT_KEY = 'upload'
 
-    def __init__(self, extra_exports, **config):
-        super(UploadExporter, self).__init__(extra_exports, **config)
+    def __init__(self, extra_exports, config):
+        super(UploadExporter, self).__init__(extra_exports, config)
         self._upload_options = {}
         self._current_user = getpass.getuser()
 
@@ -41,14 +41,14 @@ class UploadExporter(ExporterBase):
     def _read_config(self):
         # TODO: don't assume scp? maybe look for 'scp' > 'host' & 'user' & ...,
         #  and/or 'ftp' > ..., etc., and upload to all specified
-        if isinstance(self.config, list):
-            for c in self.config:
+        if isinstance(self._config, list):
+            for c in self._config:
                 self._read_scp_config(c)
         else:
-            self._read_scp_config(self.config)
+            self._read_scp_config(self._config)
 
     def _read_scp_config(self, config):
-        c = config('scp')
+        c = config.get('scp')
         if c:
             if any([not c.get(k) for k in ['host', 'dest_dir']]):
                 raise BlueSkyConfigurationError(

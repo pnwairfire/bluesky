@@ -22,7 +22,7 @@ from bluesky.io import create_dir_or_handle_existing
 
 class ExporterBase(object):
 
-    def __init__(self, extra_exports, **config):
+    def __init__(self, extra_exports, config):
         self._config = config
         self._extra_exports = extra_exports
         self._handle_existing = self.config('handle_existing', default='fail')

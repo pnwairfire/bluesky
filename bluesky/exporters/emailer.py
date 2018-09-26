@@ -26,8 +26,8 @@ class EmailExporter(ExporterBase):
     DEFAULT_SMTP_SERVER = "localhost"
     DEFAULT_SMTP_PORT = 25
 
-    def __init__(self, extra_exports, **config):
-        super(EmailExporter, self).__init__(extra_exports, **config)
+    def __init__(self, extra_exports, config):
+        super(EmailExporter, self).__init__(extra_exports, config)
         self._recipients = self.config('recipients')
         if not self._recipients:
             raise BlueSkyConfigurationError("Specify email recipients.")

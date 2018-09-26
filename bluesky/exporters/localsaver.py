@@ -18,8 +18,8 @@ class LocalSaveExporter(ExporterBase):
 
     EXPORT_KEY = 'localsave'
 
-    def __init__(self, extra_exports, **config):
-        super(LocalSaveExporter, self).__init__(extra_exports, **config)
+    def __init__(self, extra_exports, config):
+        super(LocalSaveExporter, self).__init__(extra_exports, config)
         self._dest = self.config('dest_dir')
         if not self._dest:
             raise BlueSkyConfigurationError("Specify destination "
