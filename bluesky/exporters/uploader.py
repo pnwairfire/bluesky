@@ -31,33 +31,33 @@ class UploadExporter(ExporterBase):
         self._upload_options = {}
         self._current_user = getpass.getuser()
 
-        self._read_config()
+        # TODO: don't assume scp? maybe look for 'scp' > 'host' & 'user' & ...,
+        #  and/or 'ftp' > ..., etc., and upload to all specified
+        self._read_scp_config()
 
         # TODO: other upload options
         if not self._upload_options:
             raise BlueSkyConfigurationError(
                 "Specify at least one mode of uploads")
 
-    def _read_config(self):
-        # TODO: don't assume scp? maybe look for 'scp' > 'host' & 'user' & ...,
-        #  and/or 'ftp' > ..., etc., and upload to all specified
-        if isinstance(self._config, list):
-            for c in self._config:
-                self._read_scp_config(c)
-        else:
-            self._read_scp_config(self._config)
+    def _read_scp_config(self):
+        scp_config = self.config('scp')
+        if scp_config:
+            if isinstance(scp_config, list):
+                for c in scp_config:
+                    self._read_one_scp_dest_config(c)
+            else:
+                self._read_one_scp_dest_config(scp_config)
 
-    def _read_scp_config(self, config):
-        c = config.get('scp')
-        if c:
-            if any([not c.get(k) for k in ['host', 'dest_dir']]):
-                raise BlueSkyConfigurationError(
-                    "Specify host and dest_dir for scp'ing")
-            if 'scp' not in self._upload_options:
-                self._upload_options['scp'] = []
-            self._upload_options['scp'].append(copy.deepcopy(c))
-            if not self._upload_options['scp'][-1].get('user'):
-                self._upload_options['scp'][-1]['user'] = self._current_user
+    def _read_one_scp_dest_config(self, c):
+        if any([not c.get(k) for k in ['host', 'dest_dir']]):
+            raise BlueSkyConfigurationError(
+                "Specify host and dest_dir for scp'ing")
+        if 'scp' not in self._upload_options:
+            self._upload_options['scp'] = []
+        self._upload_options['scp'].append(copy.deepcopy(c))
+        if not self._upload_options['scp'][-1].get('user'):
+            self._upload_options['scp'][-1]['user'] = self._current_user
 
     LOCAL_HOSTS = set(['localhost', '127.0.0.1'])
     PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')

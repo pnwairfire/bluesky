@@ -3,24 +3,24 @@
         "export": {
             "modes": ["upload"],
             "extra_exports": ["dispersion", "visualization"],
-            "upload": [
-                {
-                    "scp": {
+            "upload": {
+                "scp": [
+                    {
                         "user": "vagrant",
                         "host": "127.0.0.1",
                         "port": "2222",
                         "dest_dir": "/home/vagrant/bsp-remote-exports/"
-                    }
-                },
-                {
-                    "scp": {
+                    },
+                    {
                         "user": "foo",
                         "host": "127.0.0.1",
                         "port": "2222",
                         "dest_dir": "/home/foo/bsp-remote-exports/"
                     }
-                }
-            ]
+                ],
+                "json_output_filename": "bsp-output.json",
+                "output_dir_name": "bsp-output"
+            }
         }
     }
 }
