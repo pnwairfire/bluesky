@@ -228,17 +228,24 @@ class TestEstimatorTruncation(object):
         self.estimator_w_options = fuelbeds.Estimator(lookup,
             truncation_percentage_threshold=75,
             truncation_count_threshold=2)
+        self.estimator_no_truncation = fuelbeds.Estimator(lookup,
+            truncation_percentage_threshold=None,
+            truncation_count_threshold=None)
 
 
     # TDOO: UPDATE ALL THESE TESTS TO USE NEW CLASS INTERFACE
 
 
     def test_truncate_empty_set(self):
-        actual = self.estimator._truncate([])
         expected = {
             "fuelbeds_total_accounted_for_pct": 0.0,
             "fuelbeds": []
         }
+        actual = self.estimator._truncate([])
+        assert expected == actual
+        actual = self.estimator_w_options._truncate([])
+        assert expected == actual
+        actual = self.estimator_no_truncation._truncate([])
         assert expected == actual
 
     def test_truncate_one_fuelbed(self):
@@ -259,6 +266,14 @@ class TestEstimatorTruncation(object):
             "fuelbeds": [{'fccs_id': 1, 'pct': 100}]
         }
         assert expected == actual
+
+        # with truncation turned off
+        actual = self.estimator_no_truncation._truncate(
+            [{'fccs_id': 1, 'pct': 100}])
+        expected = {
+            "fuelbeds_total_accounted_for_pct": 100,
+            "fuelbeds": [{'fccs_id': 1, 'pct': 100}]
+        }
 
         # a single fuelbed's percentage should never be below 100%,
         # let alone the truncation percemtage threshold, but code
@@ -283,6 +298,14 @@ class TestEstimatorTruncation(object):
         }
         assert expected == actual
 
+        # with truncation turned off
+        pct = self.estimator_no_truncation.percent_threshold - 1
+        actual = self.estimator_no_truncation._truncate(
+            [{'fccs_id': 1, 'pct': pct}])
+        expected = {
+            "fuelbeds_total_accounted_for_pct": pct,
+            "fuelbeds": [{'fccs_id': 1, 'pct': pct}]
+        }
 
     def test_truncate_multiple_fbs_no_truncation(self):
         # w/ truncation config defaults
@@ -317,6 +340,44 @@ class TestEstimatorTruncation(object):
         }
         assert expected == actual
 
+        # with truncation turned off
+        fuelbeds = [
+            {'fccs_id': 1, 'pct': 60},
+            {'fccs_id': 2, 'pct': 40}
+        ]
+        actual = self.estimator_no_truncation._truncate(fuelbeds)
+        expected =  {
+            "fuelbeds_total_accounted_for_pct": 100,
+            "fuelbeds": [
+                {'fccs_id': 1, 'pct': 60},
+                {'fccs_id': 3, 'pct': 40}
+            ]
+        }
+        assert expected == actual
+
+        fuelbeds = [
+            {'fccs_id': 5, 'pct': 13.2},
+            {'fccs_id': 323, 'pct': 35.223},
+            {'fccs_id': 3, 'pct': 4},
+            {'fccs_id': 1, 'pct': 17.6},
+            {'fccs_id': 223, 'pct': 13.2},
+            {'fccs_id': 98, 'pct': 8.8},
+            {'fccs_id': 145, 'pct': 8}
+        ]
+        actual = self.estimator._truncate(fuelbeds)
+        expected = {
+            "fuelbeds_total_accounted_for_pct": 100,
+            "fuelbeds": [
+                {'fccs_id': 323, 'pct': 35.223},
+                {'fccs_id': 1, 'pct': 17.6},
+                {'fccs_id': 5, 'pct': 13.2},
+                {'fccs_id': 223, 'pct': 13.2},
+                {'fccs_id': 98, 'pct': 8.8},
+                {'fccs_id': 145, 'pct': 8}
+                {'fccs_id': 3, 'pct': 4},
+            ]
+        }
+        assert expected == actual
 
     def test_truncate_multiple_fbs_truncated(self):
         # w/ truncation config defaults - percent threshold comes into play
@@ -407,6 +468,7 @@ class TestEstimatorTruncation(object):
         }
         assert expected == actual
 
+        # Note: estimator with truncation turned off not tested here
 
 # ##
 # ## Tests for Estimator._adjust_percentages
