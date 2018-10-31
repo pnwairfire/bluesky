@@ -51,6 +51,14 @@ the fire data, each module has its own set of required and optional fields.
 ##### fuelbeds
 
 - ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- default ['0', '900']
+- ***'config' > 'fuelbeds' > 'fccs_version'*** -- *optional* -- '1' or '2'
+- ***'config' > 'fuelbeds' > 'fccs_fuelload_file'*** -- *optional* -- NetCDF
+  file containing FCCS lookup map
+- ***'config' > 'fuelbeds' > 'fccs_fuelload_param'*** -- *optional* -- name of variable in NetCDF file
+- ***'config' > 'fuelbeds' > 'fccs_fuelload_grid_resolution'*** -- *optional* -- length of grid cells in km
+- ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- fuelbeds to ignore
+- ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
+- ***'config' > 'fuelbeds' > 'no_sampling'*** -- *optional* -- don't sample surrounding area for Point and MultiPoint geometries
 
 ##### consumption
 
