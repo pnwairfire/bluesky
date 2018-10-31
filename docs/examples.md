@@ -405,6 +405,7 @@ would give you:
                 "growth": [
                     {
                         "start": "2015-01-20T17:00:00",
+                        "fuelbeds_total_accounted_for_pct": 100.0,
                         "fuelbeds": [
                             {
                                 "pct": 100.0,
@@ -449,6 +450,7 @@ would give you:
                     },
                     {
                         "start": "20150121",
+                        "fuelbeds_total_accounted_for_pct": 100.0,
                         "fuelbeds": [
                             {
                                 "pct": 100.0,
@@ -1041,6 +1043,7 @@ would give you:
                                 "flaming": 344476309730.7089
                             }
                         },
+                        "fuelbeds_total_accounted_for_pct": 100.0,
                         "fuelbeds": [
                             {
                                 "fccs_id": "9",
@@ -1799,6 +1802,7 @@ would give you:
                                 "flaming": 344476309730.7089
                             }
                         },
+                        "fuelbeds_total_accounted_for_pct": 100.0,
                         "fuelbeds": [
                             {
                                 "fccs_id": "9",
@@ -3284,6 +3288,7 @@ would give you:
                             }
                         },
                         "start": "2015-01-20T17:00:00",
+                        "fuelbeds_total_accounted_for_pct": 100.0,
                         "fuelbeds": [
                             {
                                 "fccs_id": "9",
@@ -3963,6 +3968,7 @@ would give you:
                             }
                         },
                         "start": "20150121",
+                        "fuelbeds_total_accounted_for_pct": 100.0,
                         "fuelbeds": [
                             {
                                 "fccs_id": "9",

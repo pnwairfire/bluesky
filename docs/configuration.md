@@ -51,6 +51,8 @@ the fire data, each module has its own set of required and optional fields.
 ##### fuelbeds
 
 - ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- default ['0', '900']
+- ***'config' > 'fuelbeds' > 'truncation_percentage_threshold'*** -- *optional* -- use first N largest fuelbeds making up this percentage for a location; default 90.0
+- ***'config' > 'fuelbeds' > 'truncation_count_threshold'*** -- *optional* -- use only up to this many fuelbeds for a location; default 5
 - ***'config' > 'fuelbeds' > 'fccs_version'*** -- *optional* -- '1' or '2'
 - ***'config' > 'fuelbeds' > 'fccs_fuelload_file'*** -- *optional* -- NetCDF
   file containing FCCS lookup map

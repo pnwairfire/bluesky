@@ -189,10 +189,21 @@ class BaseTestEstimatorEstimate(object):
         # The value of GeoJSON is not actually used here
         self.estimator.estimate(self.growth_obj)
         assert expected_fuelbeds == self.growth_obj.get('fuelbeds')
+        assert 100.0 == self.growth_obj.get('fuelbeds_total_accounted_for_pct')
 
     def test_with_truncation(self):
-        # TODO: implement
-        pass
+        self.estimator.lookup.look_up = lambda p: FUELBED_INFO_40_30_26_6
+        expected_fuelbeds = [
+            {"fccs_id": "46", "percent": 40.0},
+            {"fccs_id": "47", "percent": 30.0},
+            {"fccs_id": "48", "percent": 26.0},
+            {"fccs_id": "49", "percent": 4.0}
+        ]
+        # Having 'geojson' key will trigger call to self.estimator.lookup.look_up;
+        # The value of GeoJSON is not actually used here
+        self.estimator.estimate(self.growth_obj)
+        assert expected_fuelbeds == self.growth_obj.get('fuelbeds')
+        assert 94.0 == self.growth_obj.get('fuelbeds_total_accounted_for_pct')
 
 class TestEstimatorGetFromGeoJSON(BaseTestEstimatorEstimate):
     def setup(self):
@@ -214,68 +225,188 @@ class TestEstimatorTruncation(object):
     def setup(self):
         lookup = mock.Mock()
         self.estimator = fuelbeds.Estimator(lookup)
+        self.estimator_w_options = fuelbeds.Estimator(lookup,
+            truncation_percentage_threshold=75,
+            truncation_count_threshold=2)
 
 
     # TDOO: UPDATE ALL THESE TESTS TO USE NEW CLASS INTERFACE
 
 
     def test_truncate_empty_set(self):
-        growth_obj = dict(fuelbeds=[])
-        self.estimator._truncate(growth_obj)
-        assert [] == growth_obj['fuelbeds']
+        actual = self.estimator._truncate([])
+        expected = {
+            "fuelbeds_total_accounted_for_pct": 0.0,
+            "fuelbeds": []
+        }
+        assert expected == actual
 
     def test_truncate_one_fuelbed(self):
-        growth_obj = dict(fuelbeds=[{'fccs_id': 1, 'pct': 100}])
-        self.estimator._truncate(growth_obj)
-        assert [{'fccs_id': 1, 'pct': 100}] == growth_obj['fuelbeds']
+        # w/ truncation config defaults
+        actual = self.estimator._truncate(
+            [{'fccs_id': 1, 'pct': 100}])
+        expected = {
+            "fuelbeds_total_accounted_for_pct": 100,
+            "fuelbeds": [{'fccs_id': 1, 'pct': 100}]
+        }
+        assert expected == actual
+
+        # with truncation options (which don't come into play here)
+        actual = self.estimator_w_options._truncate(
+            [{'fccs_id': 1, 'pct': 100}])
+        expected = {
+            "fuelbeds_total_accounted_for_pct": 100,
+            "fuelbeds": [{'fccs_id': 1, 'pct': 100}]
+        }
+        assert expected == actual
 
         # a single fuelbed's percentage should never be below 100%,
         # let alone the truncation percemtage threshold, but code
         # should handle it
-        pct = 99 - fuelbeds.Estimator.TRUNCATION_PERCENTAGE_THRESHOLD
-        growth_obj = dict(fuelbeds=[{'fccs_id': 1, 'pct': pct}])
-        self.estimator._truncate(growth_obj)
-        assert [{'fccs_id': 1, 'pct': pct}] == growth_obj['fuelbeds']
+        # w/ truncation config defaults
+        pct = self.estimator.percent_threshold - 1
+        actual = self.estimator._truncate(
+            [{'fccs_id': 1, 'pct': pct}])
+        expected = {
+            "fuelbeds_total_accounted_for_pct": pct,
+            "fuelbeds": [{'fccs_id': 1, 'pct': pct}]
+        }
+        assert expected == actual
+
+        # with truncation options (which don't come into play here)
+        pct = self.estimator_w_options.percent_threshold - 1
+        actual = self.estimator_w_options._truncate(
+            [{'fccs_id': 1, 'pct': pct}])
+        expected = {
+            "fuelbeds_total_accounted_for_pct": pct,
+            "fuelbeds": [{'fccs_id': 1, 'pct': pct}]
+        }
+        assert expected == actual
+
 
     def test_truncate_multiple_fbs_no_truncation(self):
-        growth_obj = dict(fuelbeds=[
+        # w/ truncation config defaults
+        fuelbeds = [
             {'fccs_id': 1, 'pct': 50},
             {'fccs_id': 2, 'pct': 20},
             {'fccs_id': 3, 'pct': 30}
-        ])
-        self.estimator._truncate(growth_obj)
-        expected = [
-            {'fccs_id': 1, 'pct': 50},
-            {'fccs_id': 3, 'pct': 30},
-            {'fccs_id': 2, 'pct': 20}
         ]
-        assert expected == growth_obj['fuelbeds']
+        actual = self.estimator._truncate(fuelbeds)
+        expected =  {
+            "fuelbeds_total_accounted_for_pct": 100,
+            "fuelbeds": [
+                {'fccs_id': 1, 'pct': 50},
+                {'fccs_id': 3, 'pct': 30},
+                {'fccs_id': 2, 'pct': 20}
+            ]
+        }
+        assert expected == actual
+
+        # with truncation options (which don't come into play here)
+        fuelbeds = [
+            {'fccs_id': 1, 'pct': 60},
+            {'fccs_id': 2, 'pct': 40}
+        ]
+        actual = self.estimator_w_options._truncate(fuelbeds)
+        expected =  {
+            "fuelbeds_total_accounted_for_pct": 100,
+            "fuelbeds": [
+                {'fccs_id': 1, 'pct': 60},
+                {'fccs_id': 3, 'pct': 40}
+            ]
+        }
+        assert expected == actual
+
 
     def test_truncate_multiple_fbs_truncated(self):
-        growth_obj = dict(fuelbeds=[
-            {'fccs_id': 3, 'pct': 20},
-            {'fccs_id': 1, 'pct': 75},
-            {'fccs_id': 2, 'pct': 5}
-        ])
-        self.estimator._truncate(growth_obj)
-        expected = [
-            {'fccs_id': 1, 'pct': 75},
-            {'fccs_id': 3, 'pct': 20}
+        # w/ truncation config defaults - percent threshold comes into play
+        fuelbeds = [
+            {'fccs_id': 3, 'pct': 23},
+            {'fccs_id': 1, 'pct': 69},
+            {'fccs_id': 2, 'pct': 8}
         ]
-        assert expected == growth_obj['fuelbeds']
-        growth_obj = dict(fuelbeds=[
-            {'fccs_id': 5, 'pct': 16},
-            {'fccs_id': 45, 'pct': 3},
-            {'fccs_id': 1, 'pct': 75},
-            {'fccs_id': 223, 'pct': 5},
-            {'fccs_id': 3, 'pct': 1}
-        ])
-        self.estimator._truncate(growth_obj)
-        expected = [
-            {'fccs_id': 1, 'pct': 75},
-            {'fccs_id': 5, 'pct': 16}
+        actual = self.estimator._truncate(fuelbeds)
+        expected = {
+            "fuelbeds_total_accounted_for_pct": 92.0,
+            "fuelbeds": [
+                {'fccs_id': 1, 'pct': 75},
+                {'fccs_id': 3, 'pct': 25}
+            ]
+        }
+        assert expected == actual
+
+        fuelbeds = [
+            {'fccs_id': 5, 'pct': 24},
+            {'fccs_id': 45, 'pct': 12},
+            {'fccs_id': 1, 'pct': 48},
+            {'fccs_id': 223, 'pct': 12},
+            {'fccs_id': 3, 'pct': 4}
         ]
-        assert expected == growth_obj['fuelbeds']
+        actual = self.estimator._truncate(fuelbeds)
+        expected = {
+            "fuelbeds_total_accounted_for_pct": 96,
+            "fuelbeds": [
+                {'fccs_id': 1, 'pct': 50.0},
+                {'fccs_id': 5, 'pct': 25.0},
+                {'fccs_id': 45, 'pct': 12.5},
+                {'fccs_id': 223, 'pct': 12.5}
+            ]
+        }
+        assert expected == actual
+
+        # w/ truncation config defaults - count threshold comes into play
+        fuelbeds = [
+            {'fccs_id': 5, 'pct': 13.2},
+            {'fccs_id': 323, 'pct': 35.223},
+            {'fccs_id': 3, 'pct': 4},
+            {'fccs_id': 1, 'pct': 17.6},
+            {'fccs_id': 223, 'pct': 13.2},
+            {'fccs_id': 98, 'pct': 8.8},
+            {'fccs_id': 145, 'pct': 8}
+        ]
+        actual = self.estimator._truncate(fuelbeds)
+        expected = {
+            "fuelbeds_total_accounted_for_pct": 88,
+            "fuelbeds": [
+                {'fccs_id': 5, 'pct': 15.0},
+                {'fccs_id': 323, 'pct': 40.0},
+                {'fccs_id': 1, 'pct': 20.0},
+                {'fccs_id': 223, 'pct': 15.0},
+                {'fccs_id': 98, 'pct': 10.0},
+            ]
+        }
+        assert expected == actual
+
+        # with truncation options - percent threshold comes into play
+        fuelbeds = [
+            {'fccs_id': 5, 'pct': 76},
+            {'fccs_id': 323, 'pct': 24.0}
+        ]
+        actual = self.estimator_w_options._truncate(fuelbeds)
+        expected = {
+            "fuelbeds_total_accounted_for_pct": 76,
+            "fuelbeds": [
+                {'fccs_id': 5, 'pct': 100.0}
+            ]
+        }
+        assert expected == actual
+        # with truncation options - count threshold comes into play
+        fuelbeds = [
+            {'fccs_id': 5, 'pct': 42.0},
+            {'fccs_id': 123, 'pct': 20.0},
+            {'fccs_id': 323, 'pct': 28.0},
+            {'fccs_id': 1, 'pct': 10.0}
+        ]
+        actual = self.estimator_w_options._truncate(fuelbeds)
+        expected = {
+            "fuelbeds_total_accounted_for_pct": 70,
+            "fuelbeds": [
+                {'fccs_id': 5, 'pct': 60.0},
+                {'fccs_id': 323, 'pct': 40.0}
+            ]
+        }
+        assert expected == actual
+
 
 # ##
 # ## Tests for Estimator._adjust_percentages
@@ -288,7 +419,25 @@ class TestEstimatorPercentageAdjustment(object):
         self.estimator = fuelbeds.Estimator(lookup)
 
     def test_no_adjustment(self):
-        pass
+        fuelbeds[
+            {'fccs_id': 1, 'pct': 60},
+            {'fccs_id': 3, 'pct': 40}
+        ]
+        actual = self.estimator._adjust_percentages(fuelbeds)
+        expected = [
+            {'fccs_id': 1, 'pct': 60},
+            {'fccs_id': 3, 'pct': 40}
+        ]
+        assert expected == actual
 
     def test_with_adjustment(self):
-        pass
+        fuelbeds = [
+            {'fccs_id': 5, 'pct': 42.0},
+            {'fccs_id': 323, 'pct': 28.0}
+        ]
+        actual = self.estimator._adjust_percentages(fuelbeds)
+        expected = [
+            {'fccs_id': 5, 'pct': 60.0},
+            {'fccs_id': 323, 'pct': 40.0}
+        ]
+        assert expected == actual

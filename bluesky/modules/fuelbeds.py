@@ -49,7 +49,7 @@ def run(fires_manager):
                 #   correct one here
                 lookup = FccsLookUp(is_alaska=g['location'].get('state')=='AK',
                     **fuelbeds_config)
-                Estimator(lookup).estimate(g)
+                Estimator(lookup, **fuelbeds_config).estimate(g)
 
     # TODO: Add fuel loadings data to each fuelbed object (????)
     #  If we do so here, use bluesky.modules.consumption.FuelLoadingsManager
@@ -90,8 +90,16 @@ TOTAL_PCT_THRESHOLD = 0.5
 
 class Estimator(object):
 
-    def __init__(self, lookup):
+    DEFAULT_TRUNCATION_PERCENTAGE_THRESHOLD = 90
+    DEFAULT_TRUNCATION_COUNT_THRESHOLD = 5
+
+    def __init__(self, lookup, **options):
         self.lookup = lookup
+        #
+        self.percent_threshold = 100 - (options.get('truncation_percentage_threshold')
+            or self.DEFAULT_TRUNCATION_PERCENTAGE_THRESHOLD)
+        self.count_threshold = (options.get('truncation_count_threshold')
+            or self.DEFAULT_TRUNCATION_COUNT_THRESHOLD)
 
     def estimate(self, growth_obj):
         """Estimates fuelbed composition based on lat/lng or GeoJSON data.
@@ -151,34 +159,37 @@ class Estimator(object):
             raise RuntimeError("Fuelbed percentages don't add up to 100% - {fuelbeds}".format(
                 fuelbeds=fuelbed_info['fuelbeds']))
 
-        growth_obj['fuelbeds'] = [{'fccs_id':f, 'pct':d['percent']}
+        fuelbeds = [{'fccs_id':f, 'pct':d['percent']}
             for f,d in fuelbed_info['fuelbeds'].items()]
 
-        self._truncate(growth_obj)
-        self._adjust_percentages(growth_obj)
+        growth_obj.update(**self._truncate(fuelbeds))
 
-    TRUNCATION_PERCENTAGE_THRESHOLD = 10
-    def _truncate(self, growth_obj):
+    def _truncate(self, fuelbeds):
         """Sorts fuelbeds by decreasing percentage, and
 
-        Sort fuelbeds by decreasing percentage, and then use all
-        fuelbeds up to 90% coverage (make that configurable, but default to
-        90%), and then adjust percentages of included growth_objs so that total is 100%.
-        ex. if 3 growth_objs, 85%, 8%, and 7%, use only the first and second, and then
+        Sort fuelbeds by decreasing percentage, use first N fuelbeds that
+        reach 90% coverage or 5 count (defaults, both configurable), and
+        then adjust percentages of included growth_objs so that total is 100%.
+        e.g. if 3 fuelbeds, 85%, 8%, and 7%, use only the first and second,
+        and then adjust percentages as follows:
           85% -> 85% * 100 / (100 - 7) = 91.4%
           8% -> 7% * 100 / (100 - 7) = 8.6%
         """
-        if not growth_obj['fuelbeds']:
-            return
+        truncated_fuelbeds = []
+        total_pct = 0.0
+        for i, f in enumerate(sorted(fuelbeds, key=lambda fb: -fb['pct'])):
+            truncated_fuelbeds.append(f)
+            total_pct += f['pct']
+            if (total_pct >= self.percent_threshold
+                    or i+1 >= self.count_threshold):
+                break
 
-        # TDOO: make sure percentages add up to 100%
-        growth_obj['fuelbeds'].sort(key=lambda fb: fb['pct'])
-        growth_obj['fuelbeds'].reverse()
-        total_popped_pct = 0
-        while total_popped_pct + growth_obj['fuelbeds'][-1]['pct'] < self.TRUNCATION_PERCENTAGE_THRESHOLD:
-            total_popped_pct += growth_obj['fuelbeds'].pop()['pct']
+        return {
+            "fuelbeds": self._adjust_percentages(truncated_fuelbeds),
+            "fuelbeds_total_accounted_for_pct": total_pct
+        }
 
-    def _adjust_percentages(self, growth_obj):
-        total_pct = sum([fb['pct'] for fb in growth_obj['fuelbeds']])
-        for fb in growth_obj['fuelbeds']:
+    def _adjust_percentages(self, fuelbeds):
+        total_pct = sum([fb['pct'] for fb in fuelbeds])
+        for fb in fuelbeds:
             fb['pct'] *= 100.0 / total_pct
