@@ -96,7 +96,7 @@ class Estimator(object):
     def __init__(self, lookup, **options):
         self.lookup = lookup
         #
-        self.percent_threshold = 100 - (options.get('truncation_percentage_threshold')
+        self.percent_threshold = (options.get('truncation_percentage_threshold')
             or self.DEFAULT_TRUNCATION_PERCENTAGE_THRESHOLD)
         self.count_threshold = (options.get('truncation_count_threshold')
             or self.DEFAULT_TRUNCATION_COUNT_THRESHOLD)
