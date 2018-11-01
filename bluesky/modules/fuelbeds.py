@@ -177,7 +177,9 @@ class Estimator(object):
         """
         truncated_fuelbeds = []
         total_pct = 0.0
-        for i, f in enumerate(sorted(fuelbeds, key=lambda fb: -fb['pct'])):
+        # iterate through fuelbeds sorted by pct (decreasing) and then by
+        # fccs_id (for deterministic results in the case of equal percentages)
+        for i, f in enumerate(sorted(fuelbeds, key=lambda fb: (-fb['pct'], fb['fccs_id']) )):
             truncated_fuelbeds.append(f)
             total_pct += f['pct']
             if (total_pct >= self.percent_threshold
