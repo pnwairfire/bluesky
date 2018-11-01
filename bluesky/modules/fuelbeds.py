@@ -90,16 +90,19 @@ TOTAL_PCT_THRESHOLD = 0.5
 
 class Estimator(object):
 
-    DEFAULT_TRUNCATION_PERCENTAGE_THRESHOLD = 90
-    DEFAULT_TRUNCATION_COUNT_THRESHOLD = 5
+    TRUNCATION_CONFIG_DEFAULTS = {
+        'percentage_threshold': 90.0,
+        'count_threshold': 5
+    }
 
     def __init__(self, lookup, **options):
         self.lookup = lookup
-        #
-        self.percent_threshold = (options.get('truncation_percentage_threshold')
-            or self.DEFAULT_TRUNCATION_PERCENTAGE_THRESHOLD)
-        self.count_threshold = (options.get('truncation_count_threshold')
-            or self.DEFAULT_TRUNCATION_COUNT_THRESHOLD)
+
+        for attr, default in self.TRUNCATION_CONFIG_DEFAULTS.items():
+            # if option is in the config but set to None or 0, then we
+            # won't truncate by that criterion
+            k = 'truncation_{}'.format(attr)
+            setattr(self, attr, options.get(k, default))
 
     def estimate(self, growth_obj):
         """Estimates fuelbed composition based on lat/lng or GeoJSON data.
@@ -182,9 +185,16 @@ class Estimator(object):
         for i, f in enumerate(sorted(fuelbeds, key=lambda fb: (-fb['pct'], fb['fccs_id']) )):
             truncated_fuelbeds.append(f)
             total_pct += f['pct']
-            if (total_pct >= self.percent_threshold
-                    or i+1 >= self.count_threshold):
+
+            # if either treshold is None or 0, then don't truncate
+            # by that that criterion
+            if ((self.percentage_threshold and total_pct >= self.percentage_threshold)
+                    or (self.count_threshold and i+1 >= self.count_threshold)):
                 break
+
+        # Note: we'll run adjust percentages even if nothing was truncated
+        # in case percentages of initial set of fuelbeds don't add up to 100
+        # (which should really never happen)
 
         return {
             "fuelbeds": self._adjust_percentages(truncated_fuelbeds),
