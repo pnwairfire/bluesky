@@ -21,6 +21,7 @@
             },
             "growth": [
                 {
+                    "fuelbeds_total_accounted_for_pct": 100.0,
                     "fuelbeds": [
                         {
                             "fccs_id": "52",
