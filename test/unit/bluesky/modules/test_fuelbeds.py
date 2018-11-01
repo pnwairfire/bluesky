@@ -251,12 +251,12 @@ class TestEstimatorDefaultTruncation(object):
         # let alone the truncation percemtage threshold, but code
         # should handle it
         # w/ truncation config defaults
-        pct = self.estimator.percent_threshold - 1
+        pct = self.estimator.percentage_threshold - 1
         actual = self.estimator._truncate(
             [{'fccs_id': 1, 'pct': pct}])
         expected = {
             "fuelbeds_total_accounted_for_pct": pct,
-            "fuelbeds": [{'fccs_id': 1, 'pct': pct}]
+            "fuelbeds": [{'fccs_id': 1, 'pct': 100.0}]
         }
         assert expected == actual
 
@@ -318,7 +318,7 @@ class TestEstimatorDefaultTruncation(object):
         # w/ truncation config defaults - count threshold comes into play
         input_fuelbeds = [
             {'fccs_id': 5, 'pct': 13.2},
-            {'fccs_id': 323, 'pct': 35.223},
+            {'fccs_id': 323, 'pct': 35.2},
             {'fccs_id': 3, 'pct': 4},
             {'fccs_id': 1, 'pct': 17.6},
             {'fccs_id': 223, 'pct': 13.2},
@@ -327,11 +327,11 @@ class TestEstimatorDefaultTruncation(object):
         ]
         actual = self.estimator._truncate(input_fuelbeds)
         expected = {
-            "fuelbeds_total_accounted_for_pct": 88,
+            "fuelbeds_total_accounted_for_pct": 88.0,
             "fuelbeds": [
-                {'fccs_id': 5, 'pct': 15.0},
                 {'fccs_id': 323, 'pct': 40.0},
                 {'fccs_id': 1, 'pct': 20.0},
+                {'fccs_id': 5, 'pct': 15.0},
                 {'fccs_id': 223, 'pct': 15.0},
                 {'fccs_id': 98, 'pct': 10.0},
             ]
@@ -344,7 +344,7 @@ class TestEstimatorCustomTruncation(object):
     def setup(self):
         lookup = mock.Mock()
         self.estimator_w_options = fuelbeds.Estimator(lookup,
-            truncation_percentage_threshold=75,
+            truncation_percentage_threshold=75.0,
             truncation_count_threshold=2)
 
     def test_truncate_empty_set(self):
@@ -358,10 +358,10 @@ class TestEstimatorCustomTruncation(object):
     def test_truncate_one_fuelbed(self):
         # with custom truncation options (which don't come into play here)
         actual = self.estimator_w_options._truncate(
-            [{'fccs_id': 1, 'pct': 100}])
+            [{'fccs_id': 1, 'pct': 100.0}])
         expected = {
-            "fuelbeds_total_accounted_for_pct": 100,
-            "fuelbeds": [{'fccs_id': 1, 'pct': 100}]
+            "fuelbeds_total_accounted_for_pct": 100.0,
+            "fuelbeds": [{'fccs_id': 1, 'pct': 100.0}]
         }
         assert expected == actual
 
@@ -369,12 +369,12 @@ class TestEstimatorCustomTruncation(object):
         # let alone the truncation percemtage threshold, but code
         # should handle it
         # with custom truncation options (which don't come into play here)
-        pct = self.estimator_w_options.percent_threshold - 1
+        pct = self.estimator_w_options.percentage_threshold - 1
         actual = self.estimator_w_options._truncate(
             [{'fccs_id': 1, 'pct': pct}])
         expected = {
             "fuelbeds_total_accounted_for_pct": pct,
-            "fuelbeds": [{'fccs_id': 1, 'pct': pct}]
+            "fuelbeds": [{'fccs_id': 1, 'pct': 100.0}]
         }
         assert expected == actual
 
@@ -382,15 +382,15 @@ class TestEstimatorCustomTruncation(object):
     def test_truncate_multiple_fbs_no_truncation(self):
         # with custom truncation options (which don't come into play here)
         input_fuelbeds = [
-            {'fccs_id': 1, 'pct': 60},
-            {'fccs_id': 2, 'pct': 40}
+            {'fccs_id': 1, 'pct': 60.0},
+            {'fccs_id': 2, 'pct': 40.0}
         ]
         actual = self.estimator_w_options._truncate(input_fuelbeds)
         expected =  {
-            "fuelbeds_total_accounted_for_pct": 100,
+            "fuelbeds_total_accounted_for_pct": 100.0,
             "fuelbeds": [
-                {'fccs_id': 1, 'pct': 60},
-                {'fccs_id': 3, 'pct': 40}
+                {'fccs_id': 1, 'pct': 60.0},
+                {'fccs_id': 2, 'pct': 40.0}
             ]
         }
         assert expected == actual
@@ -398,12 +398,12 @@ class TestEstimatorCustomTruncation(object):
     def test_truncate_multiple_fbs_truncated(self):
         # with custom truncation options - percent threshold comes into play
         input_fuelbeds = [
-            {'fccs_id': 5, 'pct': 76},
+            {'fccs_id': 5, 'pct': 76.0},
             {'fccs_id': 323, 'pct': 24.0}
         ]
         actual = self.estimator_w_options._truncate(input_fuelbeds)
         expected = {
-            "fuelbeds_total_accounted_for_pct": 76,
+            "fuelbeds_total_accounted_for_pct": 76.0,
             "fuelbeds": [
                 {'fccs_id': 5, 'pct': 100.0}
             ]
@@ -418,7 +418,7 @@ class TestEstimatorCustomTruncation(object):
         ]
         actual = self.estimator_w_options._truncate(input_fuelbeds)
         expected = {
-            "fuelbeds_total_accounted_for_pct": 70,
+            "fuelbeds_total_accounted_for_pct": 70.0,
             "fuelbeds": [
                 {'fccs_id': 5, 'pct': 60.0},
                 {'fccs_id': 323, 'pct': 40.0}
@@ -454,62 +454,58 @@ class TestEstimatorNoTruncation(object):
 
         # with truncation turned off
         actual = self.estimator_no_truncation._truncate(
-            [{'fccs_id': 1, 'pct': 100}])
+            [{'fccs_id': 1, 'pct': 100.0}])
         expected = {
-            "fuelbeds_total_accounted_for_pct": 100,
-            "fuelbeds": [{'fccs_id': 1, 'pct': 100}]
+            "fuelbeds_total_accounted_for_pct": 100.0,
+            "fuelbeds": [{'fccs_id': 1, 'pct': 100.0}]
         }
 
         # a single fuelbed's percentage should never be below 100%,
-        # let alone the truncation percemtage threshold, but code
-        # should handle it
-
-
+        # but code should handle it
         # with truncation turned off
-        pct = self.estimator_no_truncation.percent_threshold - 1
         actual = self.estimator_no_truncation._truncate(
-            [{'fccs_id': 1, 'pct': pct}])
+            [{'fccs_id': 1, 'pct': 76.0}])
         expected = {
-            "fuelbeds_total_accounted_for_pct": pct,
-            "fuelbeds": [{'fccs_id': 1, 'pct': pct}]
+            "fuelbeds_total_accounted_for_pct": 76.0,
+            "fuelbeds": [{'fccs_id': 1, 'pct': 100.0}]
         }
 
     def test_truncate_multiple_fbs_no_truncation(self):
         # with truncation turned off
         input_fuelbeds = [
-            {'fccs_id': 1, 'pct': 60},
-            {'fccs_id': 2, 'pct': 40}
+            {'fccs_id': 1, 'pct': 60.0},
+            {'fccs_id': 2, 'pct': 40.0}
         ]
         actual = self.estimator_no_truncation._truncate(input_fuelbeds)
         expected =  {
-            "fuelbeds_total_accounted_for_pct": 100,
+            "fuelbeds_total_accounted_for_pct": 100.0,
             "fuelbeds": [
-                {'fccs_id': 1, 'pct': 60},
-                {'fccs_id': 3, 'pct': 40}
+                {'fccs_id': 1, 'pct': 60.0},
+                {'fccs_id': 2, 'pct': 40.0}
             ]
         }
         assert expected == actual
 
         input_fuelbeds = [
             {'fccs_id': 5, 'pct': 13.2},
-            {'fccs_id': 323, 'pct': 35.223},
-            {'fccs_id': 3, 'pct': 4},
+            {'fccs_id': 323, 'pct': 35.2},
+            {'fccs_id': 3, 'pct': 4.0},
             {'fccs_id': 1, 'pct': 17.6},
             {'fccs_id': 223, 'pct': 13.2},
             {'fccs_id': 98, 'pct': 8.8},
-            {'fccs_id': 145, 'pct': 8}
+            {'fccs_id': 145, 'pct': 8.0}
         ]
-        actual = self.estimator._truncate(input_fuelbeds)
+        actual = self.estimator_no_truncation._truncate(input_fuelbeds)
         expected = {
-            "fuelbeds_total_accounted_for_pct": 100,
+            "fuelbeds_total_accounted_for_pct": 100.0,
             "fuelbeds": [
-                {'fccs_id': 323, 'pct': 35.223},
+                {'fccs_id': 323, 'pct': 35.2},
                 {'fccs_id': 1, 'pct': 17.6},
                 {'fccs_id': 5, 'pct': 13.2},
                 {'fccs_id': 223, 'pct': 13.2},
                 {'fccs_id': 98, 'pct': 8.8},
-                {'fccs_id': 145, 'pct': 8},
-                {'fccs_id': 3, 'pct': 4}
+                {'fccs_id': 145, 'pct': 8.0},
+                {'fccs_id': 3, 'pct': 4.0}
             ]
         }
         assert expected == actual
