@@ -203,5 +203,13 @@ class Estimator(object):
 
     def _adjust_percentages(self, fuelbeds):
         total_pct = sum([fb['pct'] for fb in fuelbeds])
-        for fb in fuelbeds:
-            fb['pct'] *= 100.0 / total_pct
+
+        if total_pct != 100.0:
+            for fb in fuelbeds:
+                # divide by total_pct before multiplying by 100 to avoid
+                # rounding errors
+                fb['pct'] = (fb['pct'] / total_pct) * 100.0
+        # else, no adjustment necessary
+
+        # return for convenience
+        return fuelbeds
