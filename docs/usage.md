@@ -580,7 +580,7 @@ To get indented and formated output like the above examples, try
 [json.tool](https://docs.python.org/3.5/library/json.html).  It will
 work only if you let the results go to STDOUT.  For example:
 
-    bsp -i fires.json fuelbeds | python -m json.tool
+    bsp -i fires.json --indent 4 fuelbeds
 
 #### Ingestion
 

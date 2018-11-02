@@ -64,8 +64,8 @@ use something like the following:
                 }
             }]
         }]
-    }' | docker run --rm -i bluesky bsp ingestion fuelbeds consumption emissions \
-    | python -m json.tool |less
+    }' | docker run --rm -i bluesky \
+        bsp ingestion fuelbeds consumption emissions --indent 4 | less
 
 To run bluesky with file input, you'll need to use the '-v' option to
 mount host machine directories in your container.  For example, suppose
@@ -150,11 +150,9 @@ Another example, running `bsp` through vsmoke dispersion:
                 ]
             }
         ]
-    }' | docker run --rm -i \
-    -v $HOME/docker-bsp-output:/bsp-output/ \
-    bluesky bsp \
-    ingestion fuelbeds consumption emissions timeprofiling dispersion \
-    | python -m json.tool > out.json
+    }' | docker run --rm -i -v $HOME/docker-bsp-output:/bsp-output/ \
+        bluesky bsp --indent 4 ingestion fuelbeds consumption \
+        emissions timeprofiling dispersion > out.json
 
 
 Another example, running `bsp` from the repo through HYSPLIT dispersion
@@ -245,7 +243,11 @@ Another example, running through hysplit dispersion:
                 ]
             }
         ]
-    }' | docker run --rm -i -v $HOME/docker-bsp-output/:/bsp-output/ -v $HOME/Met/CANSAC/6km/ARL/:/Met/CANSAC/6km/ARL/ bluesky bsp --log-level=DEBUG ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet plumerising dispersion visualization export | python -m json.tool > out.json
+    }' | docker run --rm -i -v $HOME/docker-bsp-output/:/bsp-output/ \
+        -v $HOME/Met/CANSAC/6km/ARL/:/Met/CANSAC/6km/ARL/ bluesky \
+        bsp --log-level=DEBUG ingestion fuelbeds consumption emissions \
+        timeprofiling findmetdata localmet plumerising dispersion \
+        visualization export --indent 4 > out.json
 
 Remember that, in the last three dispersion examples, the dispersion output
 will be under `$HOME/docker-bsp-output/bsp-dispersion-output/` on your host
@@ -288,7 +290,7 @@ the code as you normally would in development. E.g.:
         -i ./test/data/json/1-fire-24hr-post-ingestion.json \
         -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
          ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet \
-         plumerising dispersion visualization export | python -m json.tool > out.json
+         plumerising dispersion visualization export --indent 4 > out.json
 
 (The './bin/' is not actually necessary in this example, since we put the
 repo bin directory at the head of the PATH env var, but it doesn't hurt to
