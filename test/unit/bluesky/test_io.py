@@ -2,6 +2,8 @@
 
 __author__ = "Joel Dubowy"
 
+import time
+
 from py.test import raises
 
 from bluesky import io
@@ -13,11 +15,27 @@ from bluesky.exceptions import (
 ## io.wait_for_availability
 ##
 
-class TestWaitForAvailabilityBadConfig(object):
+class TestWaitForAvailabilityBase(object):
+
+    def setup(self):
+        self.counter = 0
+
+    def monkeypatch_sleep(self, monkeypatch):
+        self.sleepcount = 0
+        self.total_sleep = 0.0
+
+        def mock_sleep(seconds):
+            self.sleepcount += 1
+            self.total_sleep += seconds
+
+        monkeypatch.setattr(time, 'sleep', mock_sleep)
+
+
+class TestWaitForAvailabilityBadConfig(TestWaitForAvailabilityBase):
 
     def test_no_valid_config_options(self):
         with raises(BlueSkyConfigurationError) as e_info:
-            io.wait_for_availability({"foo": bar})
+            io.wait_for_availability({"foo": "bar"})
         assert e_info.value.args[0] == io.INVALID_WAIT_CONFIG_MSG
 
     def test_partial_config(self):
@@ -66,24 +84,20 @@ class TestWaitForAvailabilityBadConfig(object):
                 "time": 0.1, "max_attempts": 2.4})
         assert e_info.value.args[0] == io.INVALID_WAIT_MAX_ATTEMPTS_MSG
 
-class TestWaitForAvailabilityDisabled(object):
+class TestWaitForAvailabilityDisabled(TestWaitForAvailabilityBase):
 
-    def test_no_exception(self):
-        sleepcount = 0
-        total_sleep = 0.0
-        monkeypatch.setattr(time, 'sleep', lambda i: sleepcount+=1, total_sleep+=i)
+    def test_no_exception(self, monkeypatch):
+        self.monkeypatch_sleep(monkeypatch)
 
         io.wait_for_availability({})
         def no_exception():
             return 1
         assert no_exception() == 1
-        assert sleepcount == 0
-        assert total_sleep == 0.0
+        assert self.sleepcount == 0
+        assert self.total_sleep == 0.0
 
-    def test_bskur_error(self):
-        sleepcount = 0
-        total_sleep = 0.0
-        monkeypatch.setattr(time, 'sleep', lambda i: sleepcount+=1, total_sleep+=i)
+    def test_bskur_error(self, monkeypatch):
+        self.monkeypatch_sleep(monkeypatch)
 
         io.wait_for_availability({})
         def bskur_error():
@@ -91,13 +105,11 @@ class TestWaitForAvailabilityDisabled(object):
 
         with raises(BlueSkyUnavailableResourceError) as e_info:
             bskur_error()
-        assert sleepcount == 0
-        assert total_sleep == 0.0
+        assert self.sleepcount == 0
+        assert self.total_sleep == 0.0
 
-    def test_other_error(self):
-        sleepcount = 0
-        total_sleep = 0.0
-        monkeypatch.setattr(time, 'sleep', lambda i: sleepcount+=1, total_sleep+=i)
+    def test_other_error(self, monkeypatch):
+        self.monkeypatch_sleep(monkeypatch)
 
         io.wait_for_availability({})
         def other_error():
@@ -105,146 +117,136 @@ class TestWaitForAvailabilityDisabled(object):
 
         with raises(RuntimeError) as e_info:
             other_error()
-        assert sleepcount == 0
-        assert total_sleep == 0.0
 
-class TestWaitForAvailabilityFixed(object):
+        assert self.sleepcount == 0
+        assert self.total_sleep == 0.0
 
-    def setup(self):
-        self.wait_decorator = io.wait_for_availability({
-            "strategy": "fixed",
-            "time": 0.01,
-            "max_attempts": 5
-        })
+fixed_wait = io.wait_for_availability({
+    "strategy": "fixed",
+    "time": 2.0,
+    "max_attempts": 5
+})
 
-    def test_no_exception(self, monkeypatch):
-        sleepcount = 0
-        total_sleep = 0.0
-        monkeypatch.setattr(time, 'sleep', lambda i: sleepcount+=1, total_sleep+=i)
-
-        counter = 0
-        @self.wait_decorator
-        def successful():
-            counter += 1
-
-        successful()
-        assert counter == 1
-        assert sleepcount == 0
-        assert total_sleep == 0.0
-
-    def test_bskur_error_all(self):
-        sleepcount = 0
-        total_sleep = 0.0
-        monkeypatch.setattr(time, 'sleep', lambda i: sleepcount+=1, total_sleep+=i)
-
-        counter = 0
-        @self.wait_decorator
-        def bskur_error():
-            counter += 1
-            raise BlueSkyUnavailableResourceError()
-        bskur_error()
-        assert counter = 5
-        assert sleepcount == 4 # slept max_attempts - 1 times
-        assert total_sleep == 0.04 # slept (max_attempts - 1) * 0.01 seconds
-
-    def test_bskur_first_two_times(self):
-        sleepcount = 0
-        total_sleep = 0.0
-        monkeypatch.setattr(time, 'sleep', lambda i: sleepcount+=1, total_sleep+=i)
-
-        counter = 0
-        @self.wait_decorator
-        def bskur_error():
-            counter += 1
-            if counter <= 2:
-                raise BlueSkyUnavailableResourceError()
-        bskur_error()
-        assert counter = 2
-        assert sleepcount == 2
-        assert total_sleep == 0.02 # slept 2 * 0.01 seconds
-
-    def test_other_error(self):
-        sleepcount = 0
-        total_sleep = 0.0
-        monkeypatch.setattr(time, 'sleep', lambda i: sleepcount+=1, total_sleep+=i)
-
-        counter = 0
-        @self.wait_decorator
-        def other_error():
-            counter += 1
-            raise RuntimeError()
-        bskur_error()
-        assert counter = 1
-        assert sleepcount == 0
-        assert total_sleep == 0.0
-
-
-class TestWaitForAvailabilityBackoff(object):
-
-    def setup(self):
-        self.wait_decorator = io.wait_for_availability({
-            "strategy": "test_backoff_wait",
-            "time": 0.01,
-            "max_attempts": 5
-        })
+class TestWaitForAvailabilityFixed(TestWaitForAvailabilityBase):
 
     def test_no_exception(self, monkeypatch):
-        sleepcount = 0
-        total_sleep = 0.0
-        monkeypatch.setattr(time, 'sleep', lambda i: sleepcount+=1, total_sleep+=i)
+        self.monkeypatch_sleep(monkeypatch)
 
-        counter = 0
-        @self.wait_decorator
+        @fixed_wait
         def successful():
-            counter += 1
+            self.counter += 1
 
         successful()
-        assert counter == 1
-        assert sleepcount == 0
-        assert total_sleep == 0.0
+        assert self.counter == 1
+        assert self.sleepcount == 0
+        assert self.total_sleep == 0.0
 
-    def test_bskur_error_all(self):
-        sleepcount = 0
-        total_sleep = 0.0
-        monkeypatch.setattr(time, 'sleep', lambda i: sleepcount+=1, total_sleep+=i)
+    def test_bskur_error_all(self, monkeypatch):
+        self.monkeypatch_sleep(monkeypatch)
 
-        counter = 0
-        @self.wait_decorator
+        @fixed_wait
         def bskur_error():
-            counter += 1
+            self.counter += 1
             raise BlueSkyUnavailableResourceError()
-        bskur_error()
-        assert counter = 5
-        assert sleepcount == 4 # slept max_attempts - 1 times
-        assert total_sleep == 0.15 # slept 0.01+0.02+0.04+0.08
 
-    def test_bskur_first_two_times(self):
-        sleepcount = 0
-        total_sleep = 0.0
-        monkeypatch.setattr(time, 'sleep', lambda i: sleepcount+=1, total_sleep+=i)
+        with raises(BlueSkyUnavailableResourceError) as e:
+            bskur_error()
 
-        counter = 0
-        @self.wait_decorator
+        assert self.counter == 5
+        assert self.sleepcount == 4 # slept max_attempts - 1 times
+        assert self.total_sleep == 8.0 # slept (max_attempts - 1) * 2.0 seconds
+
+    def test_bskur_first_two_times(self, monkeypatch):
+        self.monkeypatch_sleep(monkeypatch)
+
+        @fixed_wait
         def bskur_error():
-            counter += 1
-            if counter <= 2:
+            self.counter += 1
+            if self.counter <= 2:
                 raise BlueSkyUnavailableResourceError()
+
         bskur_error()
-        assert counter = 2
-        assert sleepcount == 2
-        assert total_sleep == 0.03 # slept 0.01+0.02
 
-    def test_other_error(self):
-        sleepcount = 0
-        total_sleep = 0.0
-        monkeypatch.setattr(time, 'sleep', lambda i: sleepcount+=1, total_sleep+=i)
+        assert self.counter == 3
+        assert self.sleepcount == 2
+        assert self.total_sleep == 4.0 # slept 2 * 2.0 seconds
 
-        counter = 0
-        @self.wait_decorator
+    def test_other_error(self, monkeypatch):
+        self.monkeypatch_sleep(monkeypatch)
+
+        @fixed_wait
         def other_error():
-            counter += 1
+            self.counter += 1
             raise RuntimeError()
+
+        with raises(RuntimeError) as e:
+            other_error()
+
+        assert self.counter == 1
+        assert self.sleepcount == 0
+        assert self.total_sleep == 0.0
+
+backoff_wait = io.wait_for_availability({
+    "strategy": "backoff",
+    "time": 2.0,
+    "max_attempts": 5
+})
+
+class TestWaitForAvailabilityBackoff(TestWaitForAvailabilityBase):
+
+    def test_no_exception(self, monkeypatch):
+        self.monkeypatch_sleep(monkeypatch)
+
+        @backoff_wait
+        def successful():
+            self.counter += 1
+
+        successful()
+        assert self.counter == 1
+        assert self.sleepcount == 0
+        assert self.total_sleep == 0.0
+
+    def test_bskur_error_all(self, monkeypatch):
+        self.monkeypatch_sleep(monkeypatch)
+
+        @backoff_wait
+        def bskur_error():
+            self.counter += 1
+            raise BlueSkyUnavailableResourceError()
+
+        with raises(BlueSkyUnavailableResourceError) as e:
+            bskur_error()
+
+        assert self.counter == 5
+        assert self.sleepcount == 4 # slept max_attempts - 1 times
+        assert self.total_sleep == 30.0 # slept 2.0+4.0+8.0+16.0
+
+    def test_bskur_first_two_times(self, monkeypatch):
+        self.monkeypatch_sleep(monkeypatch)
+
+        @backoff_wait
+        def bskur_error():
+            self.counter += 1
+            if self.counter <= 2:
+                raise BlueSkyUnavailableResourceError()
+
         bskur_error()
-        assert counter = 1
-        assert sleepcount == 0
-        assert total_sleep == 0.0
+
+        assert self.counter == 3
+        assert self.sleepcount == 2
+        assert self.total_sleep == 6.0 # slept 2.0+4.0
+
+    def test_other_error(self, monkeypatch):
+        self.monkeypatch_sleep(monkeypatch)
+
+        @backoff_wait
+        def other_error():
+            self.counter += 1
+            raise RuntimeError()
+
+        with raises(RuntimeError) as e:
+            other_error()
+
+        assert self.counter == 1
+        assert self.sleepcount == 0
+        assert self.total_sleep == 0.0

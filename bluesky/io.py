@@ -5,6 +5,7 @@ __author__ = "Joel Dubowy"
 import logging
 import os
 import shutil
+import time
 
 from pyairfire.io import *
 
@@ -66,24 +67,27 @@ INVALID_WAIT_TIME_MSG = "Wait time must be positive number"
 INVALID_WAIT_MAX_ATTEMPTS_MSG = "Wait max_attempts must be positive integer"
 
 def wait_for_availability(config):
-    # wait_config can be undefined, but if it is defined, it must include
+    # config can be undefined, but if it is defined, it must include
     # strategy, time, and max_attempts.
-    if config and any([not config.get(k)
-            for k in ('strategy','time','max_attempts'))]):
-        raise BlueSkyConfigurationError(INVALID_WAIT_CONFIG_MSG)
-    if config['strategy'] not in ('fixed', 'backoff'):
-        raise BlueSkyConfigurationError(INVALID_WAIT_STRATEGY_MSG)
-    if not isinstance(config['time'], (int, float)) or config['time'] <= 0.0:
-        raise BlueSkyConfigurationError(INVALID_WAIT_TIME_MSG)
-    if (not isinstance(config['max_attempts'], int)
-            or config['max_attempts'] <= 0):
-        raise BlueSkyConfigurationError(INVALID_WAIT_MAX_ATTEMPTS_MSG)
+    if config:
+        if any([not config.get(k)
+                for k in ('strategy', 'time', 'max_attempts')]):
+            raise BlueSkyConfigurationError(INVALID_WAIT_CONFIG_MSG)
+
+        if config['strategy'] not in ('fixed', 'backoff'):
+            raise BlueSkyConfigurationError(INVALID_WAIT_STRATEGY_MSG)
+        if not isinstance(config['time'], (int, float)) or config['time'] <= 0.0:
+            raise BlueSkyConfigurationError(INVALID_WAIT_TIME_MSG)
+        if (not isinstance(config['max_attempts'], int)
+                or config['max_attempts'] <= 0):
+            raise BlueSkyConfigurationError(INVALID_WAIT_MAX_ATTEMPTS_MSG)
 
     def decorater(f):
         if config:
             def decorated(*args, **kwargs):
                 sleep_time = config['time']
                 attempts = 0
+
                 while True:
                     try:
                         f(*args, **kwargs)
@@ -103,3 +107,5 @@ def wait_for_availability(config):
             return decorated
         else:
             return f
+
+    return decorater
