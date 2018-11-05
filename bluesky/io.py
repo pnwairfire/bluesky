@@ -82,7 +82,7 @@ def wait_for_availability(config):
                 or config['max_attempts'] <= 0):
             raise BlueSkyConfigurationError(INVALID_WAIT_MAX_ATTEMPTS_MSG)
 
-    def decorater(f):
+    def decorator(f):
         if config:
             def decorated(*args, **kwargs):
                 sleep_time = config['time']
@@ -108,4 +108,4 @@ def wait_for_availability(config):
         else:
             return f
 
-    return decorater
+    return decorator
