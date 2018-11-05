@@ -31,3 +31,6 @@ class BlueSkyDatetimeValueError(ImportError):
 # TODO: rename this
 class BlueSkyGeographyValueError(ImportError):
     pass
+
+class BlueSkyUnavailableResourceError(ValueError):
+    pass
