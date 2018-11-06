@@ -7,7 +7,9 @@ import tempfile
 
 from py.test import raises
 
-from bluesky.exceptions import BlueSkyConfigurationError
+from bluesky.exceptions import (
+    BlueSkyConfigurationError, BlueSkyUnavailableResourceError
+)
 from bluesky.loaders import BaseJsonFileLoader, BaseCsvFileLoader
 
 class TestBaseFileLoader(object):
@@ -28,11 +30,11 @@ class TestBaseFileLoader(object):
 
     def test_file_doesnt_exist(self):
         filename = os.path.join(self._temp_dir, "fires.json")
-        with raises(BlueSkyConfigurationError) as e_info:
+        with raises(BlueSkyUnavailableResourceError) as e_info:
             l = BaseJsonFileLoader(file=filename)
         assert e_info.value.args[0] == 'Fires file to load {} does not exist'.format(filename)
 
-        with raises(BlueSkyConfigurationError) as e_info:
+        with raises(BlueSkyUnavailableResourceError) as e_info:
             l = BaseJsonFileLoader(file=filename)
         assert e_info.value.args[0] == 'Fires file to load {} does not exist'.format(filename)
 
