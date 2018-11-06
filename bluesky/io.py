@@ -95,8 +95,13 @@ def wait_for_availability(config):
                     except BlueSkyUnavailableResourceError as e:
                         attempts += 1
                         if attempts == config['max_attempts']:
+                            logging.info(
+                                "Resource doesn't exist. Reached max attempts."
+                                " (%s)", e)
                             raise
 
+                        logging.info("Resource doesn't exist. Will attempt "
+                            "again in %s seconds. (%s)", sleep_time, e)
                         time.sleep(sleep_time)
                         if config['strategy'] == 'backoff':
                             sleep_time *= 2
