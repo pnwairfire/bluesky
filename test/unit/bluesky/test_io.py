@@ -92,6 +92,7 @@ class TestWaitForAvailabilityDisabled(TestWaitForAvailabilityBase):
         io.wait_for_availability({})
         def no_exception():
             return 1
+
         assert no_exception() == 1
         assert self.sleepcount == 0
         assert self.total_sleep == 0.0
@@ -135,8 +136,9 @@ class TestWaitForAvailabilityFixed(TestWaitForAvailabilityBase):
         @fixed_wait
         def successful():
             self.counter += 1
+            return 2
 
-        successful()
+        assert successful() == 2
         assert self.counter == 1
         assert self.sleepcount == 0
         assert self.total_sleep == 0.0
@@ -200,8 +202,9 @@ class TestWaitForAvailabilityBackoff(TestWaitForAvailabilityBase):
         @backoff_wait
         def successful():
             self.counter += 1
+            return 2
 
-        successful()
+        assert successful() == 2
         assert self.counter == 1
         assert self.sleepcount == 0
         assert self.total_sleep == 0.0

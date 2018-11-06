@@ -90,7 +90,7 @@ def wait_for_availability(config):
 
                 while True:
                     try:
-                        f(*args, **kwargs)
+                        return f(*args, **kwargs)
 
                     except BlueSkyUnavailableResourceError as e:
                         attempts += 1
