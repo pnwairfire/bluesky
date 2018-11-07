@@ -11,10 +11,13 @@ import logging
 
 from met.arl import arlfinder
 
+from bluesky import io
 from bluesky.datetimeutils import (
     parse_datetimes, is_round_hour, parse_utc_offset
 )
-from bluesky.exceptions import BlueSkyConfigurationError
+from bluesky.exceptions import (
+    BlueSkyConfigurationError, BlueSkyUnavailableResourceError
+)
 
 __all__ = [
     'run'
@@ -37,15 +40,26 @@ def run(fires_manager):
     # arlfinder.ArlFinder (or put both code paths in ArlFinder?)
 
     met_finder = _get_met_finder(fires_manager)
-
     time_windows = _get_time_windows(fires_manager)
 
-    fires_manager.met = {"files": []}
-    for time_window in time_windows:
-        logging.debug("Findmetdata time window: %s to %s",
-            time_window['start'], time_window['end'])
-        fires_manager.met['files'].extend(met_finder.find(
-            time_window['start'], time_window['end']).get('files', []))
+    wait_config = fires_manager.get_config_value('findmetdata','wait')
+    @io.wait_for_availability(wait_config)
+    def _find():
+        files = []
+        for time_window in time_windows:
+            logging.debug("Findmetdata time window: %s to %s",
+                time_window['start'], time_window['end'])
+            files.extend(met_finder.find(
+                time_window['start'], time_window['end']).get('files', []))
+
+        if not files:
+            raise BlueSkyUnavailableResourceError("No met files found")
+
+        return files
+
+    fires_manager.met = {"files": _find()}
+
+
 
 def _get_met_root_dir(fires_manager):
     # Note: ArlFinder will raise an exception if met_root_dir is undefined
