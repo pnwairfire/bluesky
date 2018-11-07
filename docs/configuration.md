@@ -217,8 +217,8 @@ emissions config
 PARTICLE_DENSITY = 1.0
 PARTICLE_DIAMETER = 1.0
 PARTICLE_SHAPE = 1.0
- - ***'config' > 'dispersion' > 'hysplit' > 'PINPF'*** -- *optional* -- default: "./input/dispersion/PARINIT"
- - ***'config' > 'dispersion' > 'hysplit' > 'POUTF'*** -- *optional* -- default: "./input/dispersion/PARDUMP"
+ - ***'config' > 'dispersion' > 'hysplit' > 'PARINIT'*** -- *optional* -- default: "./input/dispersion/PARINIT"
+ - ***'config' > 'dispersion' > 'hysplit' > 'PARDUMP'*** -- *optional* -- default: "./input/dispersion/PARDUMP"
  - ***'config' > 'dispersion' > 'hysplit' > 'QCYCLE'*** -- *optional* -- default: 1.0
  - ***'config' > 'dispersion' > 'hysplit' > 'RADIOACTIVE_HALF_LIVE'*** -- *optional* -- default: 0.0
  - ***'config' > 'dispersion' > 'hysplit' > 'ROUGLEN_FILE'*** -- *optional* -- default: use default file in package

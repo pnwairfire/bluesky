@@ -76,7 +76,7 @@ NINIT = 0
 
 # name of the particle initialization input file
 # NOTE: must be limited to 80 chars max (i think, rcs)
-PINPF = "./input/dispersion/PARINIT"
+PARINIT = "./input/dispersion/PARINIT"
 
 # Stop processing if no particle initialization file is found and
 # NINIT != 0
@@ -93,7 +93,7 @@ MAKE_INIT_FILE = False
 #        created the dump files. code will warn if there
 #        are few files than CPUs but will ignore files
 #        for cases when more files than CPUs.
-POUTF = './input/dispersion/PARDUMP'
+PARDUMP = './input/dispersion/PARDUMP'
 
 # Number of hours from the start of the simulation to write the particle
 # initialization file (NOTE: unlike the comments in the v7 hysplit module,

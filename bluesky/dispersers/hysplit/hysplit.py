@@ -16,16 +16,16 @@ Heres are the notes coped from BSF:
             runs but not for TODO tranched runs
 
             READ_INIT_FILE is not longer supported, instead use NINIT
-                to control if and how to read in PINPF file
+                to control if and how to read in PARINIT file
 
             HYSPLIT_SETUP_CFG is no longer supported. instead include
                 the SETUP.CFG variable one wishes to set in the .ini
                 list of supported vars:
-                NCYCL, NDUMP, KHMAX, NINIT, INITD, PINPF, POUTF,
+                NCYCL, NDUMP, KHMAX, NINIT, INITD, PARINIT, PARDUMP,
                 QCYCLE, TRATIO, DELT, NUMPAR, MAXPAR, MGMIN and
                 ICHEM
 
-                PINPF & POUTF can both handle strftime strings in
+                PARINIT & PARDUMP can both handle strftime strings in
                       their names.
                       NOTE: full path name length must be <= 80 chars.
 
@@ -477,7 +477,7 @@ class HYSPLITDispersion(DispersionBase):
 
         # NINIT: sets how particle init file is to be used
         #  0 = no particle initialization file read (default)
-        #  1 = read pinpf file only once at initialization time
+        #  1 = read parinit file only once at initialization time
         #  2 = check each hour, if there is a match then read those values in
         #  3 = like '2' but replace emissions instead of adding to existing
         #      particles
@@ -488,17 +488,17 @@ class HYSPLITDispersion(DispersionBase):
 
         # need an input file if ninit_val > 0
         if ninit_val > 0:
-            # name of pardump input file, pinpf (check for strftime strings)
-            pinpf = self.config("PINPF")
-            if "%" in pinpf:
-                pinpf = self._model_start.strftime(pinpf)
-            parinitFiles = [ "%s" % pinpf ]
+            # name of pardump input file, parinit (check for strftime strings)
+            parinit = self.config("PARINIT")
+            if "%" in parinit:
+                parinit = self._model_start.strftime(parinit)
+            parinitFiles = [ "%s" % parinit ]
 
             # if an MPI run need to create the full list of expected files
             # based on the number of CPUs
             if self.config("MPI"):
                 NCPUS = self.config("NCPUS")
-                parinitFiles = ["%s.%3.3i" % ( pinpf, (i+1)) for i in range(NCPUS)]
+                parinitFiles = ["%s.%3.3i" % ( parinit, (i+1)) for i in range(NCPUS)]
 
             # loop over parinitFiles check if exists.
             # for MPI runs check that all files exist...if any in the list
@@ -518,10 +518,10 @@ class HYSPLITDispersion(DispersionBase):
                     self.log.info("Using particle initialization file %s" % f)
 
         # Prepare for run ... get pardump name just in case needed
-        poutf = self.config("POUTF")
-        if "%" in poutf:
-            poutf = self._model_start.strftime(poutf)
-        pardumpFiles = [ "%s" % poutf ]
+        pardump = self.config("PARDUMP")
+        if "%" in pardump:
+            pardump = self._model_start.strftime(pardump)
+        pardumpFiles = [ "%s" % pardump ]
 
         # If MPI run
         if self.config("MPI"):
@@ -535,7 +535,7 @@ class HYSPLITDispersion(DispersionBase):
 
             # name of the pardump files (one for each CPU)
             if self.config("MAKE_INIT_FILE"):
-                pardumpFiles = ["%s.%3.3i" % ( poutf, (i+1)) for i in range(NCPUS)]
+                pardumpFiles = ["%s.%3.3i" % ( pardump, (i+1)) for i in range(NCPUS)]
 
             # what command do we use to issue an mpi version of hysplit
 
@@ -1012,14 +1012,14 @@ class HYSPLITDispersion(DispersionBase):
             max_particles = (num_sources * 1000) / ncpus
 
         # name of the particle input file (check for strftime strings)
-        pinpf = self.config("PINPF")
-        if "%" in pinpf:
-            pinpf = self._model_start.strftime(pinpf)
+        parinit = self.config("PARINIT")
+        if "%" in parinit:
+            parinit = self._model_start.strftime(parinit)
 
         # name of the particle output file (check for strftime strings)
-        poutf = self.config("POUTF")
-        if "%" in poutf:
-            poutf = self._model_start.strftime(poutf)
+        pardump = self.config("PARDUMP")
+        if "%" in pardump:
+            pardump = self._model_start.strftime(pardump)
 
         # conversion module
         ichem_val = int(self.config("ICHEM"))
@@ -1066,23 +1066,23 @@ class HYSPLITDispersion(DispersionBase):
             # make the 'smoke initizilaztion' files?
             # pinfp: particle initialization file (see also ninit)
             if ninit_val > 0:
-                f.write("  PINPF = \"%s\",\n" % pinpf)
+                f.write("  PARINIT = \"%s\",\n" % parinit)
 
-            # ninit: (used along side pinpf) sets the type of initialization...
+            # ninit: (used along side parinit) sets the type of initialization...
             #        0 - no initialzation (even if files are present)
-            #        1 = read pinpf file only once at initialization time
+            #        1 = read parinit file only once at initialization time
             #        2 = check each hour, if there is a match then read those
             #            values in
             #        3 = like '2' but replace emissions instead of adding to
             #            existing particles
             f.write("  NINIT = %d,\n" % ninit_val)
 
-            # poutf: particle output/dump file
+            # pardump: particle output/dump file
             if self.config("MAKE_INIT_FILE"):
-                f.write("  POUTF = \"%s\",\n" % poutf)
-                self.log.info("Dumping particles to %s starting at %s every %s hours" % (poutf, dump_datetime, ncycl_val))
+                f.write("  PARDUMP = \"%s\",\n" % pardump)
+                self.log.info("Dumping particles to %s starting at %s every %s hours" % (pardump, dump_datetime, ncycl_val))
 
-            # ndump: when/how often to dump a poutf file negative values
+            # ndump: when/how often to dump a pardump file negative values
             #        indicate to just one create just one 'restart' file at
             #        abs(hours) after the model start
             # NOTE: negative hours do no actually appear to be supported, rcs)
