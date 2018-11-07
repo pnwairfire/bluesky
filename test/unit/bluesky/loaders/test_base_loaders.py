@@ -48,7 +48,7 @@ class TestBaseFileLoader(object):
         assert l._events_filename == None
 
         with open(filename, 'w') as f:
-            f.write('{}')
+            f.write('a,b,c')
         l = BaseCsvFileLoader(file=filename)
         assert l._filename == filename
         assert l._events_filename == None
