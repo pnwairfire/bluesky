@@ -65,13 +65,7 @@ def run(fires_manager):
             #   configured, don't have corresponding loader class, etc.) and source
             #   that fail to load
             try:
-                # File loaders raise BlueSkyUnavailableResourceError in the
-                # constructor, while API loaders raise it in 'load'.  So,
-                # we need to decorate both the construction and load with
-                # 'io.wait_for_availability'
-                wait_dec = io.wait_for_availability(source.get('wait'))
-                loader = wait_dec(_import_loader(source))(**source)
-                loaded_fires = wait_dec(loader.load)()
+                loaded_fires = _load_source(source)
                 fires_manager.add_fires(loaded_fires)
                 # TODO: add fires to fires_manager
                 successfully_loaded_sources.append(source)
@@ -81,6 +75,15 @@ def run(fires_manager):
     finally:
         fires_manager.processed(__name__, __version__,
             successfully_loaded_sources=successfully_loaded_sources)
+
+def _load_source(source):
+    # File loaders raise BlueSkyUnavailableResourceError in the
+    # constructor, while API loaders raise it in 'load'.  So,
+    # we need to decorate both the construction and load with
+    # 'io.wait_for_availability'
+    wait_dec = io.wait_for_availability(source.get('wait'))
+    loader = wait_dec(_import_loader(source))(**source)
+    return wait_dec(loader.load)()
 
 def _import_loader(source):
     if any([not source.get(k) for k in ['name', 'format', 'type']]):
