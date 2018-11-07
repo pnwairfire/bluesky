@@ -36,6 +36,7 @@ Currently supported formats: CSV
 import importlib
 import logging
 
+from bluesky import io
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __author__ = "Joel Dubowy"
@@ -64,8 +65,13 @@ def run(fires_manager):
             #   configured, don't have corresponding loader class, etc.) and source
             #   that fail to load
             try:
-                loader = _import_loader(source)
-                loaded_fires = loader(**source).load()
+                # File loaders raise BlueSkyUnavailableResourceError in the
+                # constructor, while API loaders raise it in 'load'.  So,
+                # we need to decorate both the construction and load with
+                # 'io.wait_for_availability'
+                wait_dec = io.wait_for_availability(source.get('wait'))
+                loader = wait_dec(_import_loader(source))(**source)
+                loaded_fires = wait_dec(loader.load)()
                 fires_manager.add_fires(loaded_fires)
                 # TODO: add fires to fires_manager
                 successfully_loaded_sources.append(source)

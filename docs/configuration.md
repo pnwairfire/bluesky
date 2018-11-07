@@ -17,6 +17,9 @@ the fire data, each module has its own set of required and optional fields.
  - ***'config' > 'load' > 'sources' > 'format'*** -- *required* for each source-- e.g. 'csv'
  - ***'config' > 'load' > 'sources' > 'type'*** -- *required* for each source-- e.g. 'file'
  - ***'config' > 'load' > 'sources' > 'date_time'*** -- *optional* for each source-- e.g. '20160412', '2016-04-12T12:00:00'; used to to replace any datetime formate codes in the file name; defaults to current date (local time)
+ - ***'config' > 'load' > 'sources' > 'wait' > 'strategy'*** -- *required* if 'wait' section is defined -- 'fixed' or 'backoff'
+ - ***'config' > 'load' > 'sources' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
+ - ***'config' > 'load' > 'sources' > 'wait' > 'max_attempts'*** -- *required* if 'wait' section is defined  -- max number of attempts
 
 ###### if type 'file':
 

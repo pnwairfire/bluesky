@@ -28,7 +28,9 @@ from pyairfire.io import CSV2JSON
 
 from bluesky import datetimeutils
 from bluesky.datetimeutils import parse_datetime
-from bluesky.exceptions import BlueSkyConfigurationError
+from bluesky.exceptions import (
+    BlueSkyConfigurationError, BlueSkyUnavailableResourceError
+)
 
 __author__ = "Joel Dubowy"
 
@@ -73,7 +75,7 @@ class BaseFileLoader(BaseLoader, metaclass=abc.ABCMeta):
             raise BlueSkyConfigurationError(
                 "Fires file to load not specified")
         if not os.path.isfile(self._filename):
-            raise BlueSkyConfigurationError("Fires file to "
+            raise BlueSkyUnavailableResourceError("Fires file to "
                 "load {} does not exist".format(self._filename))
         self._saved_copy_filename = config.get('saved_copy_file')
 
@@ -81,7 +83,7 @@ class BaseFileLoader(BaseLoader, metaclass=abc.ABCMeta):
         if config.get('events_file'):
             self._events_filename = config['events_file']
             if not os.path.isfile(self._events_filename):
-                raise BlueSkyConfigurationError("Fire events file to load {} "
+                raise BlueSkyUnavailableResourceError("Fire events file to load {} "
                     "does not exist".format(self._events_filename))
         self._saved_copy_events_filename = config.get('saved_copy_events_file')
 
@@ -200,7 +202,25 @@ class BaseApiLoader(BaseLoader):
             url = self._form_url(**query)
 
         req = urllib.request.Request(url)
-        resp = urllib.request.urlopen(req, None, self._request_timeout)
+
+        try:
+            resp = urllib.request.urlopen(req, None, self._request_timeout)
+
+        except urllib.request.HTTPError as e:
+            # TODO: should we do this check? any other codes to
+            # raise BlueSkyUnavailableResourceError for?
+            if e.getcode() == 404:
+                raise BlueSkyUnavailableResourceError(
+                    "Unavailable resource for loading: {}".format(url))
+            raise
+
+        # else if URLError (e.g. hostname doesn't exist -
+        #   'nodename nor servname provided, or not known'), then
+        #   there's no use in retrying
+        # TODO: handleany other errors?
+        #   - CertificateError (e.g. "hostname 'www.googlesds.com' doesn't match either of '*.dadapro.com', 'dadapro.com'"")
+        #   - other???
+
         body =  resp.read().decode('ascii')
 
         self._write_data(saved_data_filename, body)
