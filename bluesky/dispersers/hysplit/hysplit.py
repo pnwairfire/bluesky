@@ -226,7 +226,7 @@ class HYSPLITDispersion(DispersionBase):
         first_hour = parse_datetime(met_file_info['first_hour'], 'first_hour')
         last_hour = parse_datetime(met_file_info['last_hour'], 'last_hour')
         hours = [first_hour + datetime.timedelta(hours=n)
-            for n in range(int((last_hour-first_hour).seconds / 3600) + 1)]
+            for n in range(int((last_hour-first_hour).total_seconds() / 3600) + 1)]
         return hours
 
     def _set_met_info(self, met_info):
