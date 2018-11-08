@@ -385,17 +385,19 @@ class HYSPLITDispersion(DispersionBase):
     def _run_parallel(self, num_processes, fire_sets, working_dir):
         runner = self
         class T(threading.Thread):
-            def  __init__(self, fires, working_dir):
+            def  __init__(self, fires, working_dir, tranche_num):
                 super(T, self).__init__()
                 self.fires = fires
                 self.working_dir = working_dir
                 if not os.path.exists(working_dir):
                     os.makedirs(working_dir)
+                self.tranche_num = tranche_num
                 self.exc = None
 
             def run(self):
                 try:
-                    runner._run_process(self.fires, self.working_dir)
+                    runner._run_process(self.fires, self.working_dir,
+                        self.tranche_num)
                 except Exception as e:
                     self.exc = e
 
@@ -406,7 +408,7 @@ class HYSPLITDispersion(DispersionBase):
             fires = fire_tranches[nproc]
             # Note: no need to set _context.basedir; it will be set to workdir
             logging.info("Starting thread to run HYSPLIT on %d fires." % (len(fires)))
-            t = T(fires, os.path.join(working_dir, str(nproc)))
+            t = T(fires, os.path.join(working_dir, str(nproc)), nproc)
             t.start()
             threads.append(t)
 
@@ -447,11 +449,13 @@ class HYSPLITDispersion(DispersionBase):
             # ignore existing sym link error
             pass
 
-    def _run_process(self, fires, working_dir):
+    def _run_process(self, fires, working_dir, tranche_num=None):
         logging.info("Running one HYSPLIT49 Dispersion model process")
-        # TODO: set all but fires and working_dir as instance properties in self.run
-        # so that they don't have to be passed into each call to _run_process
-        # The only things that change from call to call are context and fires
+        # TODO: set all but fires, working_dir, and tranche_num as instance
+        # properties in self.run so that they don't have to be passed into
+        # each call to _run_process.
+        # The only things that change from call to call are working_dir,
+        # fires, and tranch_num
 
         for f in self._met_info['files']:
             # bluesky.modules.dispersion.run will have weeded out met
@@ -492,7 +496,9 @@ class HYSPLITDispersion(DispersionBase):
             parinit = self.config("PARINIT")
             if "%" in parinit:
                 parinit = self._model_start.strftime(parinit)
-            parinitFiles = [ "%s" % parinit ]
+            if tranche_num is not None:
+                parinit = parinit + "-" + str(tranche_num).zfill(2)
+            parinitFiles = [ parinit ]
 
             # if an MPI run need to create the full list of expected files
             # based on the number of CPUs
@@ -521,7 +527,9 @@ class HYSPLITDispersion(DispersionBase):
         pardump = self.config("PARDUMP")
         if "%" in pardump:
             pardump = self._model_start.strftime(pardump)
-        pardumpFiles = [ "%s" % pardump ]
+        if tranche_num is not None:
+            pardump = pardump + '-' + str(tranche_num).zfill(2)
+        pardumpFiles = [ pardump ]
 
         # If MPI run
         if self.config("MPI"):
@@ -555,7 +563,7 @@ class HYSPLITDispersion(DispersionBase):
 
         self._write_emissions(emissions_file)
         self._write_control_file(control_file, output_conc_file)
-        self._write_setup_file(emissions_file, setup_file, ninit_val, NCPUS)
+        self._write_setup_file(emissions_file, setup_file, ninit_val, NCPUS, tranche_num)
 
         try:
             # Run HYSPLIT
@@ -974,7 +982,7 @@ class HYSPLITDispersion(DispersionBase):
             # non-zero requires the definition of a deposition grid
             f.write("0.0\n")
 
-    def _write_setup_file(self, emissions_file, setup_file, ninit_val, ncpus):
+    def _write_setup_file(self, emissions_file, setup_file, ninit_val, ncpus, tranche_num):
         # Advanced setup options
         # adapted from Robert's HysplitGFS Perl script
 
@@ -1015,11 +1023,16 @@ class HYSPLITDispersion(DispersionBase):
         parinit = self.config("PARINIT")
         if "%" in parinit:
             parinit = self._model_start.strftime(parinit)
+        if tranche_num is not None:
+            parinit = parinit + '-' + str(tranche_num).zfill(2)
+
 
         # name of the particle output file (check for strftime strings)
         pardump = self.config("PARDUMP")
         if "%" in pardump:
             pardump = self._model_start.strftime(pardump)
+        if tranche_num is not None:
+            pardump = pardump + '-' + str(tranche_num).zfill(2)
 
         # conversion module
         ichem_val = int(self.config("ICHEM"))
