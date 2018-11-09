@@ -136,6 +136,47 @@ class TestComputeNumProcesses(object):
             num_fires_per_process=2, num_processes_max=1)
         assert isinstance(n, int) and n == 1
 
+    def test_with_parinit(self):
+        n = hysplit_utils.compute_num_processes(4,
+            parinit_or_pardump=True)
+        assert isinstance(n, int) and n == 1
+
+        n = hysplit_utils.compute_num_processes(4, num_processes=0,
+            num_fires_per_process=0, num_processes_max=0,
+            parinit_or_pardump=True)
+        assert isinstance(n, int) and n == 1
+
+        n = hysplit_utils.compute_num_processes(4, num_processes=1,
+            num_fires_per_process=0, num_processes_max=0,
+            parinit_or_pardump=True)
+        assert isinstance(n, int) and n == 1
+
+        n = hysplit_utils.compute_num_processes(4, num_processes=0,
+            num_fires_per_process=1, num_processes_max=3,
+            parinit_or_pardump=True)
+        assert isinstance(n, int) and n == 3
+
+        n = hysplit_utils.compute_num_processes(6, num_processes=0,
+            num_fires_per_process=2, num_processes_max=4,
+            parinit_or_pardump=True)
+        assert isinstance(n, int) and n == 4
+
+        n = hysplit_utils.compute_num_processes(4, num_processes=2,
+            num_fires_per_process=1, num_processes_max=3,
+            parinit_or_pardump=True)
+        assert isinstance(n, int) and n == 3
+
+        n = hysplit_utils.compute_num_processes(4, num_processes=0,
+            num_fires_per_process=2, num_processes_max=3,
+            parinit_or_pardump=True)
+        assert isinstance(n, int) and n == 3
+
+        n = hysplit_utils.compute_num_processes(4, num_processes=0,
+            num_fires_per_process=2, num_processes_max=1,
+            parinit_or_pardump=True)
+        assert isinstance(n, int) and n == 1
+
+
 class TestKmPerLng(object):
 
     def test(self):

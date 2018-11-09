@@ -86,19 +86,37 @@ def compute_num_processes(num_fire_sets, **config):
        num_processes isn't specified but num_fires_per_process is, and
        num_fires_per_process is greater than num_processes_max
     """
+    num_processes = config.get('num_processes', 0)
+    num_fires_per_process = config.get('num_fires_per_process', 0)
+    num_processes_max = config.get('num_processes_max', 0)
+    parinit_or_pardump = config.get('parinit_or_pardump', False)
+
     # in case num_fire_sets is zero, set to 1 so that we get at least
     # one process
     num_fire_sets = num_fire_sets or 1
-    if 1 <= config.get('num_processes', 0):
-        num_processes = min(num_fire_sets, config['num_processes'])
-    elif 1 <= config.get('num_fires_per_process', 0):
-        num_processes = math.ceil(float(num_fire_sets) / config['num_fires_per_process'])
-        if 1 <= config.get('num_processes_max', 0):
-            num_processes = min(num_processes, config['num_processes_max'])
+    if 1 <= num_processes:
+        computed_num_processes = min(num_fire_sets, num_processes)
+    elif 1 <= num_fires_per_process:
+        computed_num_processes = math.ceil(
+            float(num_fire_sets) / num_fires_per_process)
+        if 1 <= num_processes_max:
+            computed_num_processes = min(computed_num_processes,
+                num_processes_max)
     else:
-        num_processes = 1
+        computed_num_processes = 1
 
-    return int(num_processes)
+    # if reading or writing parainit file, max out num processes
+    if parinit_or_pardump:
+        computed_num_processes = max(computed_num_processes,
+            config.get('num_processes', 0),
+            config.get('num_processes_max', 0))
+
+    logging.debug('Parallel HYSPLIT? num_fire_sets=%s, %s -> num_processes=%s' %(
+        num_fire_sets, ', '.join(['%s=%s'%(k,v) for k,v in config.items()]),
+        computed_num_processes
+    ))
+
+    return int(computed_num_processes)
 
 
 KM_PER_DEG_LAT = 111

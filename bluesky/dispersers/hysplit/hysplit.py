@@ -366,7 +366,9 @@ class HYSPLITDispersion(DispersionBase):
         tranching_config = {
             'num_processes': self.config("NPROCESSES"),
             'num_fires_per_process': self.config("NFIRES_PER_PROCESS"),
-            'num_processes_max': self.config("NPROCESSES_MAX")
+            'num_processes_max': self.config("NPROCESSES_MAX"),
+            'parinit_or_pardump': int(self.config("NINIT")) > 0
+                or self.config("MAKE_INIT_FILE", bool)
         }
 
         # Note: organizing the fire sets is wasted computation if we end up
@@ -376,19 +378,8 @@ class HYSPLITDispersion(DispersionBase):
         # for greater testability.  (hysplit_utils.create_fire_sets could be
         # skipped if either NPROCESSES > 1 or NFIRES_PER_PROCESS > 1)
         self._fire_sets = hysplit_utils.create_fire_sets(self._fires)
-        num_fire_sets = len(self._fire_sets)
-        self._num_processes = hysplit_utils.compute_num_processes(num_fire_sets,
-            **tranching_config)
-        logging.debug('Parallel HYSPLIT? num_fire_sets=%s, %s -> num_processes=%s' %(
-            num_fire_sets, ', '.join(['%s=%s'%(k,v) for k,v in tranching_config.items()]),
-            self._num_processes
-        ))
-        # if reading or writing parainit file, max out num processes
-        if (int(self.config("NINIT")) > 0
-                or self.config("MAKE_INIT_FILE", bool)):
-            self._num_processes = max(self._num_processes,
-                tranching_config['num_processes'],
-                tranching_config['num_processes_max'])
+        self._num_processes = hysplit_utils.compute_num_processes(
+            len(self._fire_sets), **tranching_config)
 
     def _run_parallel(self, working_dir):
         runner = self
