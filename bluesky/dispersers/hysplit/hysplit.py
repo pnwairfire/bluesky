@@ -185,14 +185,14 @@ class HYSPLITDispersion(DispersionBase):
         self._adjust_dispersion_window_for_available_met()
 
         self._set_grid_params()
-        self._create_dummy_fire_if_necessary()
         self._set_reduction_factor()
-        fire_sets, num_processes  = self._compute_tranches()
+        self._compute_tranches()
+        self._create_dummy_fires_if_necessary()
 
-        if 1 < num_processes:
+        if 1 < self._num_processes:
                 # hysplit_utils.create_fire_tranches will log number of processes
                 # and number of fires each
-                self._run_parallel(num_processes, fire_sets, wdir)
+                self._run_parallel(wdir)
         else:
             self._run_process(self._fires, wdir)
 
@@ -265,12 +265,15 @@ class HYSPLITDispersion(DispersionBase):
                 " {} hours instead of {}".format(n, self._num_hours))
             self._num_hours = n
 
-    def _create_dummy_fire_if_necessary(self):
-        # TODO: create a dummy fire no matter what (in case whatever fires
-        #   are in the list are filtered by hysplit?)
-        # TODO: produce max(NPROCESSES, NPROCESSES_MAX) fires?
-        if not self._fires:
-            self._fires = [self._generate_dummy_fire()]
+    def _create_dummy_fires_if_necessary(self):
+        # TODO: create a dummy fire for each process no matter what
+        #   (in case whatever fires are assigned to a process are
+        #   filtered by hysplit?)
+        if len(self._fire_sets) < self._num_processes:
+            for i in range(self._num_processes - len(self._fire_sets)):
+                f = self._generate_dummy_fire()
+                self._fires.append(f)
+                self._fire_sets.append([f])
 
     DUMMY_EMISSIONS = (
         "pm2.5", "pm10", "co", "co2", "ch4", "nox",
@@ -372,17 +375,22 @@ class HYSPLITDispersion(DispersionBase):
         # for more code to be encapsulated in hysplit_utils, which then allows
         # for greater testability.  (hysplit_utils.create_fire_sets could be
         # skipped if either NPROCESSES > 1 or NFIRES_PER_PROCESS > 1)
-        fire_sets = hysplit_utils.create_fire_sets(self._fires)
-        num_fire_sets = len(fire_sets)
-        num_processes = hysplit_utils.compute_num_processes(num_fire_sets,
+        self._fire_sets = hysplit_utils.create_fire_sets(self._fires)
+        num_fire_sets = len(self._fire_sets)
+        self._num_processes = hysplit_utils.compute_num_processes(num_fire_sets,
             **tranching_config)
         logging.debug('Parallel HYSPLIT? num_fire_sets=%s, %s -> num_processes=%s' %(
             num_fire_sets, ', '.join(['%s=%s'%(k,v) for k,v in tranching_config.items()]),
-            num_processes
+            self._num_processes
         ))
-        return fire_sets, num_processes
+        # if reading or writing parainit file, max out num processes
+        if (int(self.config("NINIT")) > 0
+                or self.config("MAKE_INIT_FILE", bool)):
+            self._num_processes = max(self._num_processes,
+                tranching_config['num_processes'],
+                tranching_config['num_processes_max'])
 
-    def _run_parallel(self, num_processes, fire_sets, working_dir):
+    def _run_parallel(self, working_dir):
         runner = self
         class T(threading.Thread):
             def  __init__(self, fires, working_dir, tranche_num):
@@ -402,7 +410,7 @@ class HYSPLITDispersion(DispersionBase):
                     self.exc = e
 
         fire_tranches = hysplit_utils.create_fire_tranches(
-            fire_sets, num_processes)
+            self._fire_sets, self._num_processes)
         threads = []
         for nproc in range(len(fire_tranches)):
             fires = fire_tranches[nproc]
@@ -433,7 +441,7 @@ class HYSPLITDispersion(DispersionBase):
 
         #ncea_args = ["-y", "ttl", "-O"]
         ncea_args = ["-O","-v","PM25","-y","ttl"]
-        ncea_args.extend(["%d/%s" % (i, self._output_file_name) for i in  range(num_processes)])
+        ncea_args.extend(["%d/%s" % (i, self._output_file_name) for i in  range(self._num_processes)])
         ncea_args.append(output_file)
         self._execute(self.BINARIES['NCEA'], *ncea_args, working_dir=working_dir)
 

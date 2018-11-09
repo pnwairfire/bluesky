@@ -86,6 +86,9 @@ def compute_num_processes(num_fire_sets, **config):
        num_processes isn't specified but num_fires_per_process is, and
        num_fires_per_process is greater than num_processes_max
     """
+    # in case num_fire_sets is zero, set to 1 so that we get at least
+    # one process
+    num_fire_sets = num_fire_sets or 1
     if 1 <= config.get('num_processes', 0):
         num_processes = min(num_fire_sets, config['num_processes'])
     elif 1 <= config.get('num_fires_per_process', 0):
