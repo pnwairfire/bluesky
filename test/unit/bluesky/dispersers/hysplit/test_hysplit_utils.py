@@ -207,6 +207,23 @@ class TestDummyTimeprofileHour(object):
 
 class TestGenerateDummyFire(object):
 
+    EXPECTED_PLUMERISE_HOUR = {
+        'emission_fractions': [
+            0.5,0.5,0.5,0.5,0.5,
+            0.5,0.5,0.5,0.5,0.5,
+            0.5,0.5,0.5,0.5,0.5,
+            0.5,0.5,0.5,0.5,0.5
+        ],
+        'heights': [
+            1000,1100,1200,1300,1400,
+            1500,1600,1700,1800,1900,
+            2000,2100,2200,2300,2400,
+            2500,2600,2700,2800,2900,
+            3000
+        ],
+        'smolder_fraction': 0.0
+    }
+
     def test_one_hour(self):
         expected = {
             "area": 1,
@@ -216,22 +233,7 @@ class TestGenerateDummyFire(object):
             "longitude": -110,
             "utc_offset": 0,
             "plumerise": {
-                "2018-11-09T00:00:00": {
-                    'emission_fractions': [
-                        0.5,0.5,0.5,0.5,0.5,
-                        0.5,0.5,0.5,0.5,0.5,
-                        0.5,0.5,0.5,0.5,0.5,
-                        0.5,0.5,0.5,0.5,0.5
-                    ],
-                    'heights': [
-                        1000,1100,1200,1300,1400,
-                        1500,1600,1700,1800,1900,
-                        2000,2100,2200,2300,2400,
-                        2500,2600,2700,2800,2900,
-                        3000
-                    ],
-                    'smolder_fraction': 0.0
-                }
+                "2018-11-09T00:00:00": self.EXPECTED_PLUMERISE_HOUR
             },
             "timeprofile": {
                 "2018-11-09T00:00:00": {
@@ -269,8 +271,66 @@ class TestGenerateDummyFire(object):
         expected["id"] = f["id"] # id is randomly generated
         assert expected == f
 
-    def test_two_hours(self):
-        pass
+    def test_four_hours(self):
+        expected = {
+            "area": 1,
+            "type": "wildfire",
+            "fuel_type": "natural",
+            "latitude": 40,
+            "longitude": -110,
+            "utc_offset": 0,
+            "plumerise": {
+                "2018-11-09T00:00:00": self.EXPECTED_PLUMERISE_HOUR,
+                "2018-11-09T01:00:00": self.EXPECTED_PLUMERISE_HOUR,
+                "2018-11-09T02:00:00": self.EXPECTED_PLUMERISE_HOUR,
+                "2018-11-09T03:00:00": self.EXPECTED_PLUMERISE_HOUR
+
+            },
+            "timeprofile": {
+                "2018-11-09T00:00:00": {
+                    "area_fraction": 0.25, 'flaming': 0.25,
+                    'smoldering': 0.25, 'residual': 0.25
+                },
+                "2018-11-09T01:00:00": {
+                    "area_fraction": 0.25, 'flaming': 0.25,
+                    'smoldering': 0.25, 'residual': 0.25
+                },
+                "2018-11-09T02:00:00": {
+                    "area_fraction": 0.25, 'flaming': 0.25,
+                    'smoldering': 0.25, 'residual': 0.25
+                },
+                "2018-11-09T03:00:00": {
+                    "area_fraction": 0.25, 'flaming': 0.25,
+                    'smoldering': 0.25, 'residual': 0.25
+                }
+            },
+            "emissions": {
+                "flaming": {
+                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
+                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
+                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
+                    "pm": 0.00001, "nmhc": 0.00001
+                },
+                "smoldering": {
+                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
+                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
+                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
+                    "pm": 0.00001, "nmhc": 0.00001
+                },
+                "residual": {
+                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
+                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
+                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
+                    "pm": 0.00001, "nmhc": 0.00001
+                }
+            }
+        }
+        f = hysplit_utils.generate_dummy_fire(
+            datetime.datetime(2018,11,9), 4,
+            {"center_latitude": 40, "center_longitude": -110}
+        )
+        expected["id"] = f["id"] # id is randomly generated
+        assert expected == f
 
 
 class TestFillInDummyFires(object):
