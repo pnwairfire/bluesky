@@ -37,6 +37,8 @@ BTU_TO_MW = 3414425.94972     # Btu to MW
 
 # Conversion factor for fire size
 SQUARE_METERS_PER_ACRE = 4046.8726
+PHASES = ['flaming', 'smoldering', 'residual']
+TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
 class DispersionBase(object, metaclass=abc.ABCMeta):
 
@@ -48,8 +50,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
     # configuration settings (such as in a defaults module)
     DEFAULTS = None
 
-    PHASES = ['flaming', 'smoldering', 'residual']
-    TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
+
+
 
     def __init__(self, met_info, **config):
         # convert all keys to lower case
@@ -218,9 +220,9 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                         timeprofile[local_dt] = all_timeprofile.get(local_dt) or self.MISSING_TIMEPROFILE_HOUR
 
                     # sum the emissions across all fuelbeds, but keep them separate by phase
-                    emissions = {p: {} for p in self.PHASES}
+                    emissions = {p: {} for p in PHASES}
                     for fb in g['fuelbeds']:
-                        for p in self.PHASES:
+                        for p in PHASES:
                             for s in fb['emissions'][p]:
                                 emissions[p][s] = (emissions[p].get(s, 0.0)
                                     + sum(fb['emissions'][p][s]))
@@ -231,7 +233,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                         for e in self.SPECIES:
                             timeprofiled_emissions[dt][e] = sum([
                                 timeprofile[dt][p]*emissions[p].get('PM2.5', 0.0)
-                                    for p in self.PHASES
+                                    for p in PHASES
                             ])
 
                     # consumption = datautils.sum_nested_data(

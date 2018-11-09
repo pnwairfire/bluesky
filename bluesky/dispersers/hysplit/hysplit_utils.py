@@ -7,16 +7,23 @@ TODO: refactor this as a class
 
 __author__ = "Joel Dubowy and Sonoma Technology, Inc."
 
+import datetime
 import logging
 import math
 from functools import reduce
 
 from bluesky.exceptions import BlueSkyConfigurationError
+from bluesky.models.fires import Fire
+from .. import PHASES, TIMEPROFILE_FIELDS
 from . import defaults
 
 __all__ = [
     'create_fire_sets', 'create_fire_tranches'
     ]
+
+##
+## Tranching
+##
 
 def create_fire_sets(fires):
     """Creates sets of fires, grouping by location
@@ -118,6 +125,78 @@ def compute_num_processes(num_fire_sets, **config):
 
     return int(computed_num_processes)
 
+
+##
+## Dummy Fires
+##
+
+DUMMY_EMISSIONS = (
+    "pm2.5", "pm10", "co", "co2", "ch4", "nox",
+    "nh3", "so2", "voc", "pm", "nmhc"
+)
+DUMMY_EMISSIONS_VALUE = 0.00001
+DUMMY_HOURS = 24
+# Note: DUMMY_PLUMERISE_HOUR is slightly different than
+#    MISSING_PLUMERISE_HOUR
+# TODO: should they be the same and thus consolidated?
+# TODO: make sure these dummy plumerise values don't have unexpected consequences
+DUMMY_PLUMERISE_HOUR = dict(
+    heights=[1000 + 100*n for n in range(21)],
+    emission_fractions=[0.5] * 20,
+    smolder_fraction=0.0
+)
+
+# Note: dummy_timeprofile_hour is slightly different than
+#    MISSING_TIMEPROFILE_HOUR
+# TODO: should they be the same and thus consolidated?
+def dummy_timeprofile_hour(num_hours):
+    return {
+        d: 1.0 / float(num_hours) for d in TIMEPROFILE_FIELDS
+    }
+
+def generate_dummy_fire(model_start, num_hours, grid_params):
+    """Returns dummy fire formatted like
+    """
+    logging.info("Generating dummy fire for HYSPLIT")
+    f = Fire(
+        # let fire autogenerate id
+        area=1,
+        latitude=grid_params['center_latitude'],
+        longitude=grid_params['center_longitude'],
+        # TODO: look up offset from lat, lng, and model_start
+        utc_offset=0, # since plumerise and timeprofile will have utc keys
+        plumerise={},
+        timeprofile={},
+        emissions={
+            p: {
+                e: DUMMY_EMISSIONS_VALUE for e in DUMMY_EMISSIONS
+            } for p in PHASES
+        }
+    )
+    for hour in range(num_hours):
+        dt = model_start + datetime.timedelta(hours=hour)
+        dt = dt.strftime('%Y-%m-%dT%H:%M:%S')
+        f['plumerise'][dt] = DUMMY_PLUMERISE_HOUR
+        f['timeprofile'][dt] = dummy_timeprofile_hour(num_hours)
+
+    return f
+
+def fill_in_dummy_fires(fire_sets, fires, num_processes, model_start,
+        num_hours, grid_params):
+    # TODO: create a dummy fire for each process no matter what
+    #   (in case whatever fires are assigned to a process are
+    #   filtered by hysplit?)
+    if len(fire_sets) < num_processes:
+        for i in range(num_processes - len(fire_sets)):
+            f = hysplit_utils.generate_dummy_fire(
+                model_start, num_hours, grid_params)
+            fires.append(f)
+            fire_sets.append([f])
+
+
+##
+## Dispersion Grid
+##
 
 KM_PER_DEG_LAT = 111
 DEG_LAT_PER_KM = 1.0 / KM_PER_DEG_LAT

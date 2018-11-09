@@ -21,6 +21,11 @@ class MockFireLocationData(object):
         return "<%s %d, location_id: %d>" % (self.__class__.__name__, id(self), self.id)
     # __str__ = __repr__
 
+
+##
+## Tranching
+##
+
 class TestCreateFireSets(object):
 
     def test(self):
@@ -176,6 +181,104 @@ class TestComputeNumProcesses(object):
             parinit_or_pardump=True)
         assert isinstance(n, int) and n == 1
 
+##
+## Dummy Fires
+##
+
+class TestDummyTimeprofileHour(object):
+
+    def test_one_hour(self):
+        expected = {
+            "area_fraction": 1.0,
+            'flaming': 1.0,
+            'smoldering': 1.0,
+            'residual': 1.0
+        }
+        assert expected == hysplit_utils.dummy_timeprofile_hour(1)
+
+    def test_ten_hours(self):
+        expected = {
+            "area_fraction": 0.1,
+            'flaming': 0.1,
+            'smoldering': 0.1,
+            'residual': 0.1
+        }
+        assert expected == hysplit_utils.dummy_timeprofile_hour(10)
+
+class TestGenerateDummyFire(object):
+
+    def test_one_hour(self):
+        expected = {
+            "area": 1,
+            "type": "wildfire",
+            "fuel_type": "natural",
+            "latitude": 40,
+            "longitude": -110,
+            "utc_offset": 0,
+            "plumerise": {
+                "2018-11-09T00:00:00": {
+                    'emission_fractions': [
+                        0.5,0.5,0.5,0.5,0.5,
+                        0.5,0.5,0.5,0.5,0.5,
+                        0.5,0.5,0.5,0.5,0.5,
+                        0.5,0.5,0.5,0.5,0.5
+                    ],
+                    'heights': [
+                        1000,1100,1200,1300,1400,
+                        1500,1600,1700,1800,1900,
+                        2000,2100,2200,2300,2400,
+                        2500,2600,2700,2800,2900,
+                        3000
+                    ],
+                    'smolder_fraction': 0.0
+                }
+            },
+            "timeprofile": {
+                "2018-11-09T00:00:00": {
+                    "area_fraction": 1.0,
+                    'flaming': 1.0,
+                    'smoldering': 1.0,
+                    'residual': 1.0
+                }
+            },
+            "emissions": {
+                "flaming": {
+                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
+                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
+                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
+                    "pm": 0.00001, "nmhc": 0.00001
+                },
+                "smoldering": {
+                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
+                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
+                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
+                    "pm": 0.00001, "nmhc": 0.00001
+                },
+                "residual": {
+                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
+                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
+                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
+                    "pm": 0.00001, "nmhc": 0.00001
+                }
+            }
+        }
+        f = hysplit_utils.generate_dummy_fire(
+            datetime.datetime(2018,11,9), 1,
+            {"center_latitude": 40, "center_longitude": -110}
+        )
+        expected["id"] = f["id"] # id is randomly generated
+        assert expected == f
+
+    def test_two_hours(self):
+        pass
+
+
+class TestFillInDummyFires(object):
+    pass
+
+##
+## Dispersion Grid
+##
 
 class TestKmPerLng(object):
 

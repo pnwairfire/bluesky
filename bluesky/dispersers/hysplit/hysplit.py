@@ -58,7 +58,7 @@ from afdatetime.parsing import parse_datetime
 
 from bluesky.models.fires import Fire
 from .. import (
-    DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE
+    DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE, PHASES
 )
 
 from . import defaults, hysplit_utils
@@ -157,8 +157,6 @@ class HYSPLITDispersion(DispersionBase):
 
     DEFAULT_OUTPUT_FILE_NAME = "hysplit_conc.nc"
 
-    # Note: 'PHASES' and TIMEPROFILE_FIELDS defined in HYSPLITDispersion
-
     def __init__(self, met_info, **config):
         super(HYSPLITDispersion, self).__init__(met_info, **config)
 
@@ -187,7 +185,9 @@ class HYSPLITDispersion(DispersionBase):
         self._set_grid_params()
         self._set_reduction_factor()
         self._compute_tranches()
-        self._create_dummy_fires_if_necessary()
+        hysplit_utils.fill_in_dummy_fires(self._fire_sets, self._fires,
+            self._num_processes, self._model_start, self._num_hours,
+            self._grid_params)
 
         if 1 < self._num_processes:
                 # hysplit_utils.create_fire_tranches will log number of processes
@@ -266,66 +266,6 @@ class HYSPLITDispersion(DispersionBase):
                 " {} hours instead of {}".format(n, self._num_hours))
             self._num_hours = n
 
-    def _create_dummy_fires_if_necessary(self):
-        # TODO: create a dummy fire for each process no matter what
-        #   (in case whatever fires are assigned to a process are
-        #   filtered by hysplit?)
-        if len(self._fire_sets) < self._num_processes:
-            for i in range(self._num_processes - len(self._fire_sets)):
-                f = self._generate_dummy_fire()
-                self._fires.append(f)
-                self._fire_sets.append([f])
-
-    DUMMY_EMISSIONS = (
-        "pm2.5", "pm10", "co", "co2", "ch4", "nox",
-        "nh3", "so2", "voc", "pm", "nmhc"
-    )
-    DUMMY_EMISSIONS_VALUE = 0.00001
-    DUMMY_HOURS = 24
-    # Note: DUMMY_PLUMERISE_HOUR is slightly different than
-    #    MISSING_PLUMERISE_HOUR
-    # TODO: should they be the same and thus consolidated?
-    # TODO: make sure these dummy plumerise values don't have unexpected consequences
-    DUMMY_PLUMERISE_HOUR = dict(
-        heights=[1000 + 100*n for n in range(21)],
-        emission_fractions=[0.5] * 20,
-        smolder_fraction=0.0
-    )
-
-    # Note: DUMMY_TIMEPROFILE_HOUR is slightly different than
-    #    MISSING_TIMEPROFILE_HOUR
-    # TODO: should they be the same and thus consolidated?
-    @property
-    def DUMMY_TIMEPROFILE_HOUR(self):
-        return {
-            d: 1.0 / float(self._num_hours) for d in self.TIMEPROFILE_FIELDS
-        }
-
-    def _generate_dummy_fire(self):
-        """Returns dummy fire formatted like
-        """
-        logging.info("Generating dummy fire for HYSPLIT")
-        f = Fire(
-            # let fire autogenerate id
-            area=1,
-            latitude=self._grid_params['center_latitude'],
-            longitude=self._grid_params['center_longitude'],
-            utc_offset=0, # since plumerise and timeprofile will have utc keys
-            plumerise={},
-            timeprofile={},
-            emissions={
-                p: {
-                    e: self.DUMMY_EMISSIONS_VALUE for e in self.DUMMY_EMISSIONS
-                } for p in self.PHASES
-            }
-        )
-        for hour in range(self._num_hours):
-            dt = self._model_start + datetime.timedelta(hours=hour)
-            dt = dt.strftime('%Y-%m-%dT%H:%M:%S')
-            f['plumerise'][dt] = self.DUMMY_PLUMERISE_HOUR
-            f['timeprofile'][dt] = self.DUMMY_TIMEPROFILE_HOUR
-
-        return f
 
     # Number of quantiles in vertical emissions allocation scheme
     NQUANTILES = 20
@@ -625,7 +565,8 @@ class HYSPLITDispersion(DispersionBase):
             if plumerise_hour and timeprofile_hour:
                 return False, plumerise_hour, timeprofile_hour
 
-        return True, self.DUMMY_PLUMERISE_HOUR, self.DUMMY_TIMEPROFILE_HOUR
+        return (True, hysplit_utils.DUMMY_PLUMERISE_HOUR,
+            hysplit_utils.dummy_timeprofile_hour(self._num_hours))
 
 
     def _write_emissions(self, emissions_file):
@@ -690,7 +631,7 @@ class HYSPLITDispersion(DispersionBase):
                         # TODO: use fire.timeprofiled_emissions[local_dt]['PM2.5']
                         pm25_emitted = sum([
                             timeprofile_hour[p]*fire.emissions[p].get('PM2.5', 0.0)
-                                for p in self.PHASES
+                                for p in PHASES
                         ])
                         pm25_emitted *= GRAMS_PER_TON
                         # Total PM2.5 smoldering (not lofted in the plume)
