@@ -188,7 +188,7 @@ def fill_in_dummy_fires(fire_sets, fires, num_processes, model_start,
     #   filtered by hysplit?)
     if len(fire_sets) < num_processes:
         for i in range(num_processes - len(fire_sets)):
-            f = hysplit_utils.generate_dummy_fire(
+            f = generate_dummy_fire(
                 model_start, num_hours, grid_params)
             fires.append(f)
             fire_sets.append([f])
