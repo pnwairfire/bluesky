@@ -207,6 +207,7 @@ class HYSPLITDispersion(DispersionBase):
                 "parameters": {"pm25": "PM25"},
                 "grid_parameters": self._grid_params
             },
+            "num_processes": self._num_processes,
             "met_info": self._met_info
         }
 
