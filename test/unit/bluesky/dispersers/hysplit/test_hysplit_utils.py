@@ -5,6 +5,7 @@ Run with py.test:
     > py.test /path/to/hsyplit49/test/test_hysplit_utils.py
 """
 
+import copy
 import datetime
 import time
 
@@ -334,7 +335,74 @@ class TestGenerateDummyFire(object):
 
 
 class TestFillInDummyFires(object):
-    pass
+
+    def setup(self):
+        self.fires = [
+            {"id": 1},
+            {"id": 2},
+            {"id": 1}
+        ]
+        self.original_fires = copy.deepcopy(self.fires)
+
+        self.fire_sets = [
+            [self.fires[0], self.fires[2]],  # id 1
+            [self.fires[1]]  # id 2
+        ]
+        self.original_fire_sets = copy.deepcopy(self.fire_sets)
+
+    def test_one_proc_no_dummy_fires_needed(self):
+        hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 1,
+            datetime.datetime(2018,11,9), 4,
+            {"center_latitude": 40, "center_longitude": -110})
+        assert self.original_fires == self.fires
+        assert self.original_fire_sets == self.fire_sets
+        self.original_fires = copy.deepcopy(self.fires)
+        self.original_fire_sets = copy.deepcopy(self.fire_sets)
+
+        self.original_fires = copy.deepcopy(self.fires)
+        self.original_fire_sets = copy.deepcopy(self.fire_sets)
+
+        self.original_fires = copy.deepcopy(self.fires)
+        self.original_fire_sets = copy.deepcopy(self.fire_sets)
+
+    def test_two_procs_no_dummy_fires_needed(self):
+        hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 2,
+            datetime.datetime(2018,11,9), 4,
+            {"center_latitude": 40, "center_longitude": -110})
+        assert self.original_fires == self.fires
+        assert self.original_fire_sets == self.fire_sets
+        self.original_fires = copy.deepcopy(self.fires)
+        self.original_fire_sets = copy.deepcopy(self.fire_sets)
+
+        self.original_fires = copy.deepcopy(self.fires)
+        self.original_fire_sets = copy.deepcopy(self.fire_sets)
+
+        self.original_fires = copy.deepcopy(self.fires)
+        self.original_fire_sets = copy.deepcopy(self.fire_sets)
+
+    def test_three_procs_one_dummy_fire_needed(self):
+        hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 3,
+            datetime.datetime(2018,11,9), 4,
+            {"center_latitude": 40, "center_longitude": -110})
+        assert len(self.fires) == 4
+        assert self.fires[0:3] == self.original_fires
+        assert len(self.fire_sets) == 3
+        assert self.fire_sets[0:2] == self.original_fire_sets
+        assert len(self.fire_sets[2]) == 1
+        assert self.fire_sets[2][0] == self.fires[3]
+
+    def test_four_procs_two_dummy_fires_needed(self):
+        hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 4,
+            datetime.datetime(2018,11,9), 4,
+            {"center_latitude": 40, "center_longitude": -110})
+        assert len(self.fires) == 5
+        assert self.fires[0:3] == self.original_fires
+        assert len(self.fire_sets) == 4
+        assert self.fire_sets[0:2] == self.original_fire_sets
+        assert len(self.fire_sets[2]) == 1
+        assert self.fire_sets[2][0] == self.fires[3]
+        assert len(self.fire_sets[3]) == 1
+        assert self.fire_sets[3][0] == self.fires[4]
 
 ##
 ## Dispersion Grid
