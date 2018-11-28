@@ -458,10 +458,10 @@ class HYSPLITDispersion(DispersionBase):
                         raise Exception(msg)
                     else:
                         msg = "No matching particle initialization file, %s, found; Using no particle initialization" % f
-                        self.log.warn(msg)
-                        self.log.debug(msg)
+                        logging.warn(msg)
+                        logging.debug(msg)
                         ninit_val = 0
-                    self.log.info("Using particle initialization file %s" % f)
+                    logging.info("Using particle initialization file %s" % f)
 
         # Prepare for run ... get pardump name just in case needed
         pardump = self.config("PARDUMP")
@@ -1034,7 +1034,7 @@ class HYSPLITDispersion(DispersionBase):
             # pardump: particle output/dump file
             if self.config("MAKE_INIT_FILE"):
                 f.write("  PARDUMP = \"%s\",\n" % pardump)
-                self.log.info("Dumping particles to %s starting at %s every %s hours" % (pardump, dump_datetime, ncycl_val))
+                logging.info("Dumping particles to %s starting at %s every %s hours" % (pardump, dump_datetime, ncycl_val))
 
             # ndump: when/how often to dump a pardump file negative values
             #        indicate to just one create just one 'restart' file at
