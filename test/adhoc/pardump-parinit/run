@@ -8,12 +8,23 @@ REPO_DIR=`python -c "import os;print(os.path.abspath('$DIR/../../'))"`
 echo "Repo dir: $REPO_DIR"
 
 
+prompt_to_continue () {
+    read -p "Do you want to continue? [yN]: " -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "*** ABORTING."
+        exit 1
+    fi
+    echo "Continuing...."
+}
+
 check_return_code () {
     if [ $? -ne 0 ]; then
         echo "*** Bluesky $1 run FAILED."
         echo "*** ABORTING."
         exit 1
     fi
+    prompt_to_continue
 }
 
 echo "Running 2014-05-29"
