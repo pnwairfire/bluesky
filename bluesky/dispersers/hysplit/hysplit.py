@@ -1020,7 +1020,7 @@ class HYSPLITDispersion(DispersionBase):
             # make the 'smoke initizilaztion' files?
             # pinfp: particle initialization file (see also ninit)
             if ninit_val > 0:
-                f.write("  PARINIT = \"%s\",\n" % parinit)
+                f.write("  PINPF = \"%s\",\n" % parinit)
 
             # ninit: (used along side parinit) sets the type of initialization...
             #        0 - no initialzation (even if files are present)
@@ -1033,7 +1033,7 @@ class HYSPLITDispersion(DispersionBase):
 
             # pardump: particle output/dump file
             if self.config("MAKE_INIT_FILE"):
-                f.write("  PARDUMP = \"%s\",\n" % pardump)
+                f.write("  POUTF = \"%s\",\n" % pardump)
                 logging.info("Dumping particles to %s starting at %s every %s hours" % (pardump, dump_datetime, ncycl_val))
 
             # ndump: when/how often to dump a pardump file negative values
