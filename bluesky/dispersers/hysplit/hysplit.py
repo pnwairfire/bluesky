@@ -1033,7 +1033,7 @@ class HYSPLITDispersion(DispersionBase):
 
             # pardump: particle output/dump file
             if self.config("MAKE_INIT_FILE"):
-                pardump_dir = os.path.basename(pardump)
+                pardump_dir = os.path.dirname(pardump)
                 if not os.path.isdir(pardump_dir):
                     os.makedirs(pardump_dir)
 
