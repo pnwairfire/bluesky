@@ -1033,6 +1033,10 @@ class HYSPLITDispersion(DispersionBase):
 
             # pardump: particle output/dump file
             if self.config("MAKE_INIT_FILE"):
+                pardump_dir = os.path.basename(pardump)
+                if not os.path.isdir(pardump_dir):
+                    os.makedirs(pardump_dir)
+
                 f.write("  POUTF = \"%s\",\n" % pardump)
                 logging.info("Dumping particles to %s starting at %s every %s hours" % (pardump, dump_datetime, ncycl_val))
 
