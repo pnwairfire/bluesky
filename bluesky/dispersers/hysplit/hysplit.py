@@ -309,7 +309,7 @@ class HYSPLITDispersion(DispersionBase):
             'num_fires_per_process': self.config("NFIRES_PER_PROCESS"),
             'num_processes_max': self.config("NPROCESSES_MAX"),
             'parinit_or_pardump': int(self.config("NINIT")) > 0
-                or self.config("MAKE_INIT_FILE", bool)
+                or self.config("MAKE_INIT_FILE")
         }
 
         # Note: organizing the fire sets is wasted computation if we end up

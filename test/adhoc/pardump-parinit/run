@@ -4,7 +4,7 @@ DIR=`dirname $0`
 DIR=`python -c "import os;print(os.path.abspath('$DIR'))"`
 echo "Script dir: $DIR"
 
-REPO_DIR=`python -c "import os;print(os.path.abspath('$DIR/../../'))"`
+REPO_DIR=`python -c "import os;print(os.path.abspath('$DIR/../../../'))"`
 echo "Repo dir: $REPO_DIR"
 
 
