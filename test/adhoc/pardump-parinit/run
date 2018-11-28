@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+DIR=`dirname $0`
+DIR=`python -c "import os;print(os.path.abspath('$DIR'))"`
+echo "Script dir: $DIR"
+
+# REPO_DIR=`python -c "import os;print(os.path.abspath('$DIR/../../'))"`
+# echo "Repo dir: $REPO_DIR"
+
+
+check_return_code () {
+    if [ $? -ne 0 ]; then
+        echo "*** Bluesky $1 run FAILED."
+        echo "*** ABORTING."
+        exit 1
+    fi
+}
+
+echo "Running 2014-05-29"
+docker run -v $DIR/:/data/ -v $HOME/Met/:/Met/ bluesky \
+    bsp --log-level DEBUG --log-file /data/output-2014-05-29.log \
+    -i /data/input-2014-05-29.json -o /data/output-2014-05-29.json \
+    ingestion fuelbeds consumption emissions \
+    timeprofiling findmetdata localmet plumerising \
+    dispersion visualization
+check_return_code "2014-05-29"
+
+echo "Running 2014-05-30, Reading pardump file"
+docker run -v $DIR/:/data/ -v $HOME/Met/:/Met/ bluesky \
+    bsp --log-level DEBUG --log-file /data/output-2014-05-30.log \
+    -i /data/input-2014-05-30.json -o /data/output-2014-05-30.json \
+    ingestion fuelbeds consumption emissions \
+    timeprofiling findmetdata localmet plumerising \
+    dispersion visualization
+check_return_code "2014-05-30"
+
+echo "Running 2014-05-30 (no parinit)"
+docker run -v $DIR/:/data/ -v $HOME/Met/:/Met/ bluesky \
+    bsp --log-level DEBUG --log-file /data/output-2014-05-30-noparinit.log \
+    -i /data/input-2014-05-30.json -o /data/output-2014-05-30-noparinit.json \
+    -C plumerising.feps.working_dir=/data/working/plumerising/2014-05-30-noparinit/ \
+    -C dispersion.output_dir=/data/output/2014-05-30-noparinit/ \
+    -C dispersion.working_dir=/data/working/dispersion/2014-05-30-noparinit/ \
+    -C dispersion.hysplit.NINIT=0 \
+    ingestion fuelbeds consumption emissions \
+    timeprofiling findmetdata localmet plumerising \
+    dispersion visualization
+check_return_code "2014-05-30 (no parinit)"
+
+# TODO:
+#   - make sure num_processes was 2 each run
+#   - make sure dummy fire was filled in for first day
+#   - ...
