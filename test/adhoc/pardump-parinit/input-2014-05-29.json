@@ -23,7 +23,19 @@
             "output_dir": "/data/output/2014-05-29/",
             "working_dir": "/data/working/dispersion/2014-05-29/",
             "hysplit": {
-                "compute_grid": true,
+                "grid": {
+                    "spacing": 6.0,
+                    "boundary": {
+                        "ne": {
+                            "lat": 45.0,
+                            "lng": -115.0
+                        },
+                        "sw": {
+                            "lat": 35.0,
+                            "lng": -125.0
+                        }
+                    }
+                },
                 "spacing_longitude": 6.0,
                 "spacing_latitude": 6.0,
                 "NUMPAR": 2000,
