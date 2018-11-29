@@ -94,13 +94,14 @@ run_bsp () {
 }
 
 run_bsp 2014-05-29 1Fire na true 0
-run_bsp 2014-05-29 2Fire na true 0
 run_bsp 2014-05-30 1Fire 1piFire false 1
-run_bsp 2014-05-30 1Fire 2piFire false 1
 run_bsp 2014-05-30 1Fire na false 0
 run_bsp 2014-05-30 2Fire 1piFire false 1
-run_bsp 2014-05-30 2Fire 2piFire false 1
+
+run_bsp 2014-05-29 2Fire na true 0
+run_bsp 2014-05-30 1Fire 2piFire false 1
 run_bsp 2014-05-30 2Fire na false 0
+run_bsp 2014-05-30 2Fire 2piFire false 1
 
 # TODO:
 #   - make sure num_processes was 2 each run
