@@ -12,16 +12,19 @@ show_help_message () {
     echo ""
     echo "Usage:"
     echo
-    echo "   $0 2014-05-29,1Fire,pardump,true,0 \\"
-    echo "      2014-05-30,1Fire,parinit1Fire,false,1 2014-05-30,1Fire,na,false,0 \\"
-    echo "      2014-05-30,2Fire,parinit1Fire,false,1 2014-05-30,2Fire,na,false,0 \\"
+    echo "   %0 <date>,<fires>,<pardump-fires>,<MAKE_INIT_FILE>,<NINIT>"
+    echo
+    echo "   $0 2014-05-29,1Fire,na,true,0 \\"
+    echo "      2014-05-30,1Fire,1Fire,true,1 2014-05-30,1Fire,na,true,0 \\"
+    echo "      2014-05-30,2Fire,1Fire,true,1 2014-05-30,2Fire,na,true,0 \\"
     echo
     echo "   $0 2014-05-29,2Fire,pardump,true,0 \\"
-    echo "      2014-05-30,1Fire,parinit2Fire,false,1 2014-05-30,1Fire,na,false,0 \\"
-    echo "      2014-05-30,2Fire,parinit2Fire,false,1 2014-05-30,2Fire,na,false,0"
+    echo "      2014-05-30,1Fire,2Fire,true,1 2014-05-30,1Fire,na,true,0 \\"
+    echo "      2014-05-30,2Fire,2Fire,true,1 2014-05-30,2Fire,na,true,0"
     echo
-    echo "   $0 --no-prompts \\"
-    echo "      2014-05-29,1Fire,na,false,0 2014-05-30,1Fire,1piFire,false,1"
+    echo "  Try to load pardump file that doesn't exist"
+    echo
+    echo "   $0 --no-prompts 2014-05-29,1Fire,1Fire,false,1"
     echo
 
 # run_bsp 2014-05-29 2Fire na true 0
@@ -29,10 +32,6 @@ show_help_message () {
 # run_bsp 2014-05-30 2Fire na false 0
 # run_bsp 2014-05-30 2Fire 2piFire false 1
 
-# see what happens when run tries to load pardump file nad
-# it desn't exist
-# run_bsp 2014-05-29 1Fire na-nodump false 0
-# run_bsp 2014-05-30 1Fire 1piFire-nodump false 1
     echo ""
     if [ $# -ne 0 ]; then
         echo ""
@@ -52,33 +51,31 @@ while [ -n "$1" ]; do # while loop starts
     esac
 done
 
-run_arrays=()
+if [ "$show_help" = true ] ; then
+    show_help_message
+fi
+
 # if no runs were specified, show help
 if [ ${#run_strings[@]} -eq 0 ]; then
     show_help_message
 else
+    # if any runs were specified in an invalid way, show help
     for run_string in "${run_strings[@]}"; do
-        run_array=()
-        for e in `echo $run_string | tr "," "\n"`; do
-            run_array+=($e)
-        done
+        run_array=(${run_string//,/ })
         if [ ${#run_array[@]} -ne 5 ]; then
             show_help_message "Invalid run: $run_string"
         fi
-        run_arrays+=($run_array)
     done
-fi
-
-if [ "$show_help" = true ] ; then
-    show_help_message
 fi
 
 DIR=`dirname $0`
 DIR=`python -c "import os;print(os.path.abspath('$DIR'))"`
 echo "Script dir: $DIR"
-
 REPO_DIR=`python -c "import os;print(os.path.abspath('$DIR/../../../'))"`
 echo "Repo dir: $REPO_DIR"
+# RUN_DIR="$DIR$(date +"%Y%m%dT%H%M%S")"
+# echo "Run dir: $RUN_DIR"
+# mkdir $RUN_DIR
 
 
 prompt_to_continue () {
@@ -102,21 +99,27 @@ check_return_code () {
 }
 
 run_bsp () {
+    echo
+    echo ----------
+    echo
+
     TODAY=$1
     FIRES=$2
     PI_FIRES=$3
     MAKE_INIT_FILE=$4
     NINIT=$5
 
-    PARINIT_STR=""
+    PARINIT_STR="not writing parinit"
     if [ "$MAKE_INIT_FILE" = true ] ; then
         PARINIT_STR="writing parinit"
     fi
-    PARDUMP_STR=""
+    PARDUMP_STR="not loading pardump"
     if [ "$NINIT" = "1" ] ; then
-        PARDUMP_STR="reading pardump"
+        PARDUMP_STR="loading $PI_FIRES pardump"
     fi
+    echo
     echo "Running $TODAY, $FIRES, $PARINIT_STR, $PARDUMP_STR"
+    echo
 
     echo docker run --rm -ti -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
         -v $REPO_DIR/:/bluesky/ -e PYTHONPATH=/bluesky/ \
@@ -134,15 +137,16 @@ run_bsp () {
         -I dispersion.hysplit.NCYCL=0 \
         -C dispersion.hysplit.PARDUMP=/data/particlefiles/pardump-{today:%Y-%m-%d}-$FIRES \
         -I dispersion.hysplit.NINIT=$NINIT \
-        -C dispersion.hysplit.PARINIT=/data/particlefiles/pardump-{today-1:%Y-%m-%d}-$FIRES \
+        -C dispersion.hysplit.PARINIT=/data/particlefiles/pardump-{today-1:%Y-%m-%d}-$PI_FIRES \
         ingestion fuelbeds consumption emissions \
         timeprofiling findmetdata localmet plumerising \
         dispersion visualization
     check_return_code
 }
 
-for run_array in "${run_arrays[@]}"; do
-    run_bsp "${run_array[@]}"
+for run_string in "${run_strings[@]}"; do
+    run_array=(${run_string//,/ })
+    run_bsp ${run_array[@]}
 done
 
 
