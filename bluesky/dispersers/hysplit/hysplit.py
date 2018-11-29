@@ -308,7 +308,8 @@ class HYSPLITDispersion(DispersionBase):
             'num_processes': self.config("NPROCESSES"),
             'num_fires_per_process': self.config("NFIRES_PER_PROCESS"),
             'num_processes_max': self.config("NPROCESSES_MAX"),
-            'parinit_or_pardump': int(self.config("NINIT")) > 0
+            # The 'or 0' handles None value
+            'parinit_or_pardump': int(self.config("NINIT") or 0) > 0
                 or self.config("MAKE_INIT_FILE")
         }
 
@@ -425,10 +426,7 @@ class HYSPLITDispersion(DispersionBase):
         #  2 = check each hour, if there is a match then read those values in
         #  3 = like '2' but replace emissions instead of adding to existing
         #      particles
-        ninit = self.config("NINIT")
-        ninit_val = 0
-        if ninit != None:
-            ninit_val = int(ninit)
+        ninit_val = int(self.config("NINIT") or 0)
 
         # need an input file if ninit_val > 0
         if ninit_val > 0:
