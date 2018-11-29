@@ -53,163 +53,54 @@ check_return_code () {
     prompt_to_continue
 }
 
-echo "Running 2014-05-29, 1 Fire, writing pardump file"
-docker run --rm -ti -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
-    -v $REPO_DIR/:/bluesky/ -e PYTHONPATH=/bluesky/ \
-    -e PATH=/bluesky/bin/:$PATH bluesky bsp --log-level DEBUG \
-    --today=2014-05-29 \
-    --log-file /data/output-2014-05-29-pardump-1F.log \
-    -i /data/one-fire-2014-05-29.json \
-    -o /data/output-2014-05-29-pardump-1F.json \
-    -c /data/config.json \
-    -C plumerising.feps.working_dir=/data/working/plumerising/2014-05-29-pardump-1F/ \
-    -C dispersion.output_dir=/data/output/2014-05-29-pardump-1F/ \
-    -C dispersion.working_dir=/data/working/dispersion/2014-05-29-pardump-1F/ \
-    -B dispersion.hysplit.MAKE_INIT_FILE=true \
-    -I dispersion.hysplit.NDUMP=24 \
-    -I dispersion.hysplit.NCYCL=0 \
-    -C dispersion.hysplit.PARDUMP=/data/particlefiles/pardump-{today:%Y-%m-%d}-1F \
-    ingestion fuelbeds consumption emissions \
-    timeprofiling findmetdata localmet plumerising \
-    dispersion visualization
-check_return_code
+run_bsp () {
+    TODAY=$1
+    FIRES=$2
+    PI_FIRES=$3
+    MAKE_INIT_FILE=$4
+    NINIT=$5
 
-echo "Running 2014-05-29, 2 Fires, writing pardump file"
-docker run --rm -ti -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
-    -v $REPO_DIR/:/bluesky/ -e PYTHONPATH=/bluesky/ \
-    -e PATH=/bluesky/bin/:$PATH bluesky bsp --log-level DEBUG \
-    --today=2014-05-29 \
-    --log-file /data/output-2014-05-29-pardump-2F.log \
-    -i /data/one-fire-2014-05-29.json \
-    -o /data/output-2014-05-29-pardump-2F.json \
-    -c /data/config.json \
-    -C plumerising.feps.working_dir=/data/working/plumerising/2014-05-29-pardump-2F/ \
-    -C dispersion.output_dir=/data/output/2014-05-29-pardump-2F/ \
-    -C dispersion.working_dir=/data/working/dispersion/2014-05-29-pardump-2F/ \
-    -B dispersion.hysplit.MAKE_INIT_FILE=true \
-    -I dispersion.hysplit.NDUMP=24 \
-    -I dispersion.hysplit.NCYCL=0 \
-    -C dispersion.hysplit.PARDUMP=/data/particlefiles/pardump-{today:%Y-%m-%d}-2F \
-    ingestion fuelbeds consumption emissions \
-    timeprofiling findmetdata localmet plumerising \
-    dispersion visualization
-check_return_code
+    PARINIT_STR=""
+    if [ "$MAKE_INIT_FILE" = true ] ; then
+        PARINIT_STR="writing parinit"
+    fi
+    PARDUMP_STR=""
+    if [ "$NINIT" -eq 1 ] ; then
+        PARDUMP_STR="writing pardump"
+    fi
+    echo "Running $TODAY, $FIRES, $PARINIT_STR, $PARDUMP_STR"
 
-echo "Running 2014-05-30, 2 Fires, Reading pardump file from 1 fire run"
-docker run --rm -ti -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
-    -v $REPO_DIR/:/bluesky/ -e PYTHONPATH=/bluesky/ \
-    -e PATH=/bluesky/bin/:$PATH bluesky bsp --log-level DEBUG \
-    --today=2014-05-30 \
-    --log-file /data/output-2014-05-30-parinit-2F-from-1F.log \
-    -i /data/2-fires-2014-05-30.json \
-    -o /data/output-2014-05-30-parinit-2F-from-1F.json \
-    -c /data/config.json \
-    -C plumerising.feps.working_dir=/data/working/plumerising/2014-05-30-parinit-2F-from-1F/ \
-    -C dispersion.output_dir=/data/output/2014-05-30-parinit-2F-from-1F/ \
-    -C dispersion.working_dir=/data/working/dispersion/2014-05-30-parinit-2F-from-1F/ \
-    -I dispersion.hysplit.NINIT=1 \
-    -C dispersion.hysplit.PARINIT=/data/particlefiles/pardump-{today-1:%Y-%m-%d}-1F \
-    ingestion fuelbeds consumption emissions \
-    timeprofiling findmetdata localmet plumerising \
-    dispersion visualization
-check_return_code
+    echo docker run --rm -ti -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
+        -v $REPO_DIR/:/bluesky/ -e PYTHONPATH=/bluesky/ \
+        -e PATH=/bluesky/bin/:$PATH bluesky bsp --log-level DEBUG \
+        --today=$TODAY \
+        --log-file /data/output-$TODAY-$FIRES-$PI_FIRES.log \
+        -i /data/input-$TODAY-$FIRES.json \
+        -o /data/output-pardump-$TODAY-$FIRES.json \
+        -c /data/config.json \
+        -C plumerising.feps.working_dir=/data/working/plumerising/$TODAY-$FIRES-$PI_FIRES/ \
+        -C dispersion.output_dir=/data/output/$TODAY-$FIRES-$PI_FIRES/ \
+        -C dispersion.working_dir=/data/working/dispersion/$TODAY-$FIRES-$PI_FIRES/ \
+        -B dispersion.hysplit.MAKE_INIT_FILE=$MAKE_INIT_FILE \
+        -I dispersion.hysplit.NDUMP=24 \
+        -I dispersion.hysplit.NCYCL=0 \
+        -C dispersion.hysplit.PARDUMP=/data/particlefiles/pardump-{today:%Y-%m-%d}-$FIRES \
+        -I dispersion.hysplit.NINIT=$NINIT \
+        -C dispersion.hysplit.PARINIT=/data/particlefiles/pardump-{today-1:%Y-%m-%d}-$FIRES \
+        ingestion fuelbeds consumption emissions \
+        timeprofiling findmetdata localmet plumerising \
+        dispersion visualization
+    check_return_code
+}
 
-
-echo "Running 2014-05-30, 2 Fires, Reading pardump file from 2 fire run"
-docker run --rm -ti -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
-    -v $REPO_DIR/:/bluesky/ -e PYTHONPATH=/bluesky/ \
-    -e PATH=/bluesky/bin/:$PATH bluesky bsp --log-level DEBUG \
-    --today=2014-05-30 \
-    --log-file /data/output-2014-05-30-parinit-2F-from-2F.log \
-    -i /data/2-fires-2014-05-30.json \
-    -o /data/output-2014-05-30-parinit-2F-from-2F.json \
-    -c /data/config.json \
-    -C plumerising.feps.working_dir=/data/working/plumerising/2014-05-30-parinit-2F-from-2F/ \
-    -C dispersion.output_dir=/data/output/2014-05-30-parinit-2F-from-2F/ \
-    -C dispersion.working_dir=/data/working/dispersion/2014-05-30-parinit-2F-from-2F/ \
-    -I dispersion.hysplit.NINIT=1 \
-    -C dispersion.hysplit.PARINIT=/data/particlefiles/pardump-{today-1:%Y-%m-%d}-2F \
-    ingestion fuelbeds consumption emissions \
-    timeprofiling findmetdata localmet plumerising \
-    dispersion visualization
-check_return_code
-
-
-echo "Running 2014-05-30, 1 Fire, Reading pardump file from 1 fire run"
-docker run --rm -ti -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
-    -v $REPO_DIR/:/bluesky/ -e PYTHONPATH=/bluesky/ \
-    -e PATH=/bluesky/bin/:$PATH bluesky bsp --log-level DEBUG \
-    --today=2014-05-30 \
-    --log-file /data/output-2014-05-30-parinit-1F-from-1F.log \
-    -i /data/1-fire-2014-05-30.json \
-    -o /data/output-2014-05-30-parinit-1F-from-1F.json \
-    -c /data/config.json \
-    -C plumerising.feps.working_dir=/data/working/plumerising/2014-05-30-parinit-1F-from-1F/ \
-    -C dispersion.output_dir=/data/output/2014-05-30-parinit-1F-from-1F/ \
-    -C dispersion.working_dir=/data/working/dispersion/2014-05-30-parinit-1F-from-1F/ \
-    -I dispersion.hysplit.NINIT=1 \
-    -C dispersion.hysplit.PARINIT=/data/particlefiles/pardump-{today-1:%Y-%m-%d}-1F \
-    ingestion fuelbeds consumption emissions \
-    timeprofiling findmetdata localmet plumerising \
-    dispersion visualization
-check_return_code
-
-
-echo "Running 2014-05-30, 1 Fire, Reading pardump file from 2 fire run"
-docker run --rm -ti -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
-    -v $REPO_DIR/:/bluesky/ -e PYTHONPATH=/bluesky/ \
-    -e PATH=/bluesky/bin/:$PATH bluesky bsp --log-level DEBUG \
-    --today=2014-05-30 \
-    --log-file /data/output-2014-05-30-parinit-1F-from-2F.log \
-    -i /data/1-fire-2014-05-30.json \
-    -o /data/output-2014-05-30-parinit-1F-from-2F.json \
-    -c /data/config.json \
-    -C plumerising.feps.working_dir=/data/working/plumerising/2014-05-30-parinit-1F-from-2F/ \
-    -C dispersion.output_dir=/data/output/2014-05-30-parinit-1F-from-2F/ \
-    -C dispersion.working_dir=/data/working/dispersion/2014-05-30-parinit-1F-from-2F/ \
-    -I dispersion.hysplit.NINIT=1 \
-    -C dispersion.hysplit.PARINIT=/data/particlefiles/pardump-{today-1:%Y-%m-%d}-2F \
-    ingestion fuelbeds consumption emissions \
-    timeprofiling findmetdata localmet plumerising \
-    dispersion visualization
-check_return_code
-
-echo "Running 2014-05-30, 2 Fires, No parinit"
-docker run --rm -ti -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
-    -v $REPO_DIR/:/bluesky/ -e PYTHONPATH=/bluesky/ \
-    -e PATH=/bluesky/bin/:$PATH bluesky bsp --log-level DEBUG \
-    --today=2014-05-30 \
-    --log-file /data/output-2014-05-30-noparinit-1F.log \
-    -i /data/input-2014-05-30-noparinit-1F.json \
-    -o /data/output-2014-05-30-noparinit-1F.json \
-    -c /data/config.json \
-    -C plumerising.feps.working_dir=/data/working/plumerising/2014-05-30-noparinit-1F/ \
-    -C dispersion.output_dir=/data/output/2014-05-30-noparinit-1F/ \
-    -C dispersion.working_dir=/data/working/dispersion/2014-05-30-noparinit-1F/ \
-    -C dispersion.hysplit.NINIT=0 \
-    ingestion fuelbeds consumption emissions \
-    timeprofiling findmetdata localmet plumerising \
-    dispersion visualization
-check_return_code
-
-echo "Running 2014-05-30, 1 Fire, No parinit"
-docker run --rm -ti -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
-    -v $REPO_DIR/:/bluesky/ -e PYTHONPATH=/bluesky/ \
-    -e PATH=/bluesky/bin/:$PATH bluesky bsp --log-level DEBUG \
-    --today=2014-05-30 \
-    --log-file /data/output-2014-05-30-noparinit-2F.log \
-    -i /data/input-2014-05-30-noparinit-2F.json \
-    -o /data/output-2014-05-30-noparinit-2F.json \
-    -c /data/config.json \
-    -C plumerising.feps.working_dir=/data/working/plumerising/2014-05-30-noparinit-2F/ \
-    -C dispersion.output_dir=/data/output/2014-05-30-noparinit-2F/ \
-    -C dispersion.working_dir=/data/working/dispersion/2014-05-30-noparinit-2F/ \
-    -C dispersion.hysplit.NINIT=0 \
-    ingestion fuelbeds consumption emissions \
-    timeprofiling findmetdata localmet plumerising \
-    dispersion visualization
-check_return_code
-
+run_bsp 2018-05-29 1F na true 0
+run_bsp 2018-05-29 2F na true 0
+run_bsp 2018-05-30 1F 1F false 1
+run_bsp 2018-05-30 1F 2F false 1
+run_bsp 2018-05-30 1F na false 0
+run_bsp 2018-05-30 2F 1F false 1
+run_bsp 2018-05-30 2F 2F false 1
+run_bsp 2018-05-30 2F na false 0
 
 # TODO:
 #   - make sure num_processes was 2 each run
