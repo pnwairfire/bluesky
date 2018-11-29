@@ -7,7 +7,7 @@
             "species": ["PM2.5"]
         },
         "timeprofiling": {
-            "hourly_fractions": {
+            "__commented_out__hourly_fractions": {
                 "area_fraction": [
                     0.25,0.25,0.25,0.25,0.0,0.0,
                     0.0,0.0,0.0,0.0,0.0,0.0,
@@ -46,7 +46,7 @@
         "dispersion": {
             "handle_existing": "replace",
             "start": "{today:%Y-%m-%d}T00:00:00",
-            "num_hours": 4,
+            "num_hours": 24,
             "model": "hysplit",
             "output_dir": "/data/output/{today:%Y-%m-%d}/",
             "working_dir": "/data/working/dispersion/{today:%Y-%m-%d}/",
@@ -55,12 +55,12 @@
                     "spacing": 6.0,
                     "boundary": {
                         "ne": {
-                            "lat": 45.0,
-                            "lng": -115.0
+                            "lat": 40.0,
+                            "lng": -119.0
                         },
                         "sw": {
-                            "lat": 35.0,
-                            "lng": -125.0
+                            "lat": 39.0,
+                            "lng": -120.0
                         }
                     }
                 },
