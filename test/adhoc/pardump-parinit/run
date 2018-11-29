@@ -66,7 +66,7 @@ run_bsp () {
     fi
     PARDUMP_STR=""
     if [ "$NINIT" -eq 1 ] ; then
-        PARDUMP_STR="writing pardump"
+        PARDUMP_STR="reading pardump"
     fi
     echo "Running $TODAY, $FIRES, $PARINIT_STR, $PARDUMP_STR"
 
@@ -76,7 +76,7 @@ run_bsp () {
         bsp --log-level DEBUG --indent 4 --today=$TODAY \
         --log-file /data/output-$TODAY-$FIRES-$PI_FIRES.log \
         -i /data/input-$TODAY-$FIRES.json \
-        -o /data/output-$TODAY-$FIRES.json \
+        -o /data/output-$TODAY-$FIRES-$PI_FIRES.json \
         -c /data/config.json \
         -C plumerising.feps.working_dir=/data/working/plumerising/$TODAY-$FIRES-$PI_FIRES/ \
         -C dispersion.output_dir=/data/output/$TODAY-$FIRES-$PI_FIRES/ \
