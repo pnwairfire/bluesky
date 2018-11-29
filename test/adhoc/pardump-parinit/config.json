@@ -1,0 +1,63 @@
+{
+    "config": {
+        "consumption": {
+            "default_ecoregion": "western"
+        },
+        "emissions": {
+            "species": ["PM2.5"]
+        },
+        "timeprofiling": {
+            "hourly_fractions":[
+                0.025,0.025,0.025,0.025,0.0,0.0,0.0,0.0,
+                0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,
+                0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+            ]
+        },
+        "findmetdata": {
+            "met_root_dir": "/Met/CANSAC/6km/ARL/"
+        },
+        "plumerising": {
+            "model":"feps",
+            "feps": {
+                "working_dir": "/data/working/plumerising/{today:%Y-%m-%d}/"
+            }
+        },
+        "dispersion": {
+            "handle_existing": "replace",
+            "start": "{today:%Y-%m-%d}T00:00:00",
+            "num_hours": 4,
+            "model": "hysplit",
+            "output_dir": "/data/output/{today:%Y-%m-%d}/",
+            "working_dir": "/data/working/dispersion/{today:%Y-%m-%d}/",
+            "hysplit": {
+                "grid": {
+                    "spacing": 6.0,
+                    "boundary": {
+                        "ne": {
+                            "lat": 45.0,
+                            "lng": -115.0
+                        },
+                        "sw": {
+                            "lat": 35.0,
+                            "lng": -125.0
+                        }
+                    }
+                },
+                "spacing_longitude": 6.0,
+                "spacing_latitude": 6.0,
+                "NUMPAR": 1000,
+                "MAXPAR": 10000000,
+                "PARDUMP": "/data/particlefiles/pardump-{today:%Y-%m-%d}",
+                "NPROCESSES": 2,
+                "NFIRES_PER_PROCESS": 10
+            }
+        },
+        "visualization": {
+            "target": "dispersion",
+            "hysplit": {
+                "images_dir": "images/",
+                "data_dir": "data/"
+            }
+        }
+    }
+}

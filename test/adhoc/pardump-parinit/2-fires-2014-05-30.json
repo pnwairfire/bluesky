@@ -1,0 +1,46 @@
+{
+    "fire_information": [
+        {
+            "type": "rx",
+            "growth":  [
+                {
+                    "location": {
+                        "area": 6000.4,
+                        "geojson": {
+                            "type": "MultiPoint",
+                            "coordinates": [
+                                [-120.1822222, 39.3280556],
+                                [-120.19, 39.35]
+                            ]
+                        },
+                        "utc_offset": "-07:00",
+                        "ecoregion": "western"
+                    },
+                    "start": "2014-05-30T00:00:00",
+                    "end": "2014-05-31T00:00:00"
+                }
+            ]
+        },
+        {
+            "type": "rx",
+            "growth":  [
+                {
+                    "location": {
+                        "area": 1000.4,
+                        "geojson": {
+                            "type": "MultiPoint",
+                            "coordinates": [
+                                [-120.25, 40.1],
+                                [-120.2, 40.2]
+                            ]
+                        },
+                        "utc_offset": "-07:00",
+                        "ecoregion": "western"
+                    },
+                    "start": "2014-05-30T00:00:00",
+                    "end": "2014-05-31T00:00:00"
+                }
+            ]
+        }
+    ]
+}
