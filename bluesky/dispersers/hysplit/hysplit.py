@@ -1033,7 +1033,10 @@ class HYSPLITDispersion(DispersionBase):
             if self.config("MAKE_INIT_FILE"):
                 pardump_dir = os.path.dirname(pardump)
                 if not os.path.isdir(pardump_dir):
-                    os.makedirs(pardump_dir)
+                    # Even though we check if the dir exists before calling
+                    # os.makedirs, set exist_ok=True in case of race
+                    # condition in multi-process mode.  (It's happened)
+                    os.makedirs(pardump_dir, exist_ok=True)
 
                 f.write("  POUTF = \"%s\",\n" % pardump)
                 logging.info("Dumping particles to %s starting at %s every %s hours" % (pardump, dump_datetime, ncycl_val))
