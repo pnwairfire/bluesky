@@ -311,10 +311,6 @@ class FiresManager(object):
             self.config = self._raw_config
 
     @property
-    def modules(self):
-        return self._module_names
-
-    @property
     def run_id(self):
         if not self._meta.get('run_id'):
             self._meta['run_id'] = str(uuid.uuid1())
@@ -335,6 +331,10 @@ class FiresManager(object):
         # Note: the check for 'run_id' in self._meta prevents it from being
         #  generated unnecessarily
         self.run_id
+
+    @property
+    def modules(self):
+        return self._module_names
 
     @modules.setter
     def modules(self, module_names):
