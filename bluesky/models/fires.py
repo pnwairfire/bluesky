@@ -627,6 +627,8 @@ class FiresManager(object):
 
     ## Loading data
 
+    TODAY_IS_IMMUTABLE_MSG = "'today' is immutible"
+
     def load(self, input_dict):
         if not hasattr(input_dict, 'keys'):
             raise ValueError("Invalid fire data")
@@ -639,6 +641,18 @@ class FiresManager(object):
 
         # pop config, but don't set until after today has been set
         config = input_dict.pop('config', {})
+
+        # If today is defined in input_dict as well via --today arg,
+        # the two values must be the same
+        today = self._meta.get('today')
+        if today:
+            if input_dict.get('today'):
+                input_dict['today'] = datetimeutils.parse_datetime(
+                    input_dict['today'], 'today')
+                if input_dict['today'] != today:
+                    raise TypeError(self.TODAY_IS_IMMUTABLE_MSG)
+            else:
+                input_dict.update(today=today)
 
         self._meta = input_dict
 
