@@ -182,9 +182,7 @@ class FiresManager(object):
 
     def __init__(self, run_id=None):
         self._meta = {}
-        # self.today triggers setting of today to default and setting of
-        # self._processed_today to True
-        self.today
+        self._initialize_today()
         self.config = {} # self._raw_config will be set by config.setter
         self.modules = []
         self.fires = [] # this intitializes self._fires and self._num_fires
@@ -278,29 +276,37 @@ class FiresManager(object):
     ## Special Meta Attributes
     ##
 
+    def _initialize_today(self):
+        self._manually_set_today = False
+        self._processed_today = True
+        self._today = datetimeutils.today_utc()
+
     @property
     def today(self):
-        if not self._meta.get('today'):
-            self._meta['today'] = datetimeutils.today_utc()
-        elif not self._processed_today:
-            self._meta['today'] = datetimeutils.fill_in_datetime_strings(
-                self._meta['today'])
-            self._meta['today'] = datetimeutils.to_datetime(
-                self._meta['today'])
+        if not self._processed_today:
+            self._today = datetimeutils.fill_in_datetime_strings(self._today)
+            self._today = datetimeutils.to_datetime(self._today)
             self._processed_today = True
 
-        return self._meta['today']
+        return self._today
 
+    TODAY_IS_IMMUTABLE_MSG = "'today' is immutible"
     @today.setter
     def today(self, today):
         previous_today = self.today
         self._processed_today = False
-        self._meta['today'] = today
+        self._today = today
         # HACK (sort of): we need to call self.today to trigger replacement
         #   of wildcards and then converstion to datetime object (that's a
         #   hack), but we need to access it anyway to see if we need to
         #   reprocess the raw config
         new_today = self.today
+
+        # now that today is sure to be a datetime object, make sure that,
+        # if previously manually set, the two values are the same
+        if self._manually_set_today and previous_today != new_today:
+            raise TypeError(self.TODAY_IS_IMMUTABLE_MSG)
+
         if self._raw_config and previous_today != new_today:
             self.config = self._raw_config
 
@@ -627,8 +633,6 @@ class FiresManager(object):
 
     ## Loading data
 
-    TODAY_IS_IMMUTABLE_MSG = "'today' is immutible"
-
     def load(self, input_dict):
         if not hasattr(input_dict, 'keys'):
             raise ValueError("Invalid fire data")
@@ -642,17 +646,9 @@ class FiresManager(object):
         # pop config, but don't set until after today has been set
         config = input_dict.pop('config', {})
 
-        # If today is defined in input_dict as well via --today arg,
-        # the two values must be the same
-        today = self._meta.get('today')
+        today = input_dict.pop('today', None)
         if today:
-            if input_dict.get('today'):
-                input_dict['today'] = datetimeutils.parse_datetime(
-                    input_dict['today'], 'today')
-                if input_dict['today'] != today:
-                    raise TypeError(self.TODAY_IS_IMMUTABLE_MSG)
-            else:
-                input_dict.update(today=today)
+            self.today = today
 
         self._meta = input_dict
 
@@ -692,7 +688,7 @@ class FiresManager(object):
         # json or on the command line, and add them to the output if they
         # were in the input
 
-        return dict(self._meta, fire_information=self.fires,
+        return dict(self._meta, fire_information=self.fires, today=self.today,
             counts=self.counts, bluesky_version=__version__)
 
     def dumps(self, output_stream=None, output_file=None, indent=None):
