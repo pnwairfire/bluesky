@@ -21,7 +21,7 @@ from bluesky.models import fires
 ## Tests for Fire
 ##
 
-class TestFire:
+class TestFire(object):
 
     def test_fills_in_id(self, monkeypatch):
         monkeypatch.setattr(uuid, "uuid1", lambda: "abcd1234")
@@ -253,9 +253,9 @@ class TestFiresManager(object):
         assert fires_manager.num_fires == 2
         assert set(['1','2']) == set(list(fires_manager._fires.keys()))
         assert {'1': [fire_objects[0]],'2': [fire_objects[1]]} == fires_manager._fires
+        assert fires_manager.today == freezegun.api.FakeDate(2016, 4, 20)
         expected_meta = {
             'a':1, 'b':{'c':2}, 'd': 123,
-            'today': freezegun.api.FakeDate(2016, 4, 20),
             'config': {}
         }
         assert expected_meta == fires_manager._meta == fires_manager.meta
@@ -418,13 +418,13 @@ class TestFiresManager(object):
     def test_load_no_fires_no_meta(self, monkeypatch):
         fires_manager = fires.FiresManager()
         expected_meta = {
-            "today": datetime.date(2016,4,20),
             'config':{}
         }
 
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{}'))
         fires_manager.loads()
         assert fires_manager.num_fires == 0
+        assert fires_manager.today == datetime.date(2016,4,20)
         assert [] == fires_manager.fires
         assert expected_meta == fires_manager.meta
 
@@ -441,8 +441,9 @@ class TestFiresManager(object):
         fires_manager.loads()
         assert fires_manager.num_fires == 0
         assert [] == fires_manager.fires
+        assert fires_manager.today == datetime.date(2016,4,20)
         expected_meta = {
-            "today": datetime.date(2016,4,20),
+
             'config':{},
             "foo": {"bar": "baz"}
         }
@@ -460,8 +461,8 @@ class TestFiresManager(object):
         ]
         assert fires_manager.num_fires == 1
         assert expected_fires == fires_manager.fires
+        assert fires_manager.today == datetime.date(2016,4,20)
         expected_meta = {
-            "today": datetime.date(2016,4,20),
             'config':{},
             "foo": {"bar": "baz"}
         }
@@ -482,9 +483,9 @@ class TestFiresManager(object):
         ]
         assert fires_manager.num_fires == 2
         assert expected_fires == fires_manager.fires
+        assert fires_manager.today == datetime.date(2016,4,20)
         expected_meta = {
             #"run_id": 'abcd1234'
-            "today": datetime.date(2016,4,20),
             'config':{},
             "foo": {"bar": "baz"},
         }
@@ -524,7 +525,8 @@ class TestFiresManager(object):
             "bluesky_version": __version__
         }
 
-        assert expected == json.loads(self._output.getvalue())
+        actual = json.loads(self._output.getvalue())
+        assert expected == actual
 
     # TODO: test instantiating with fires, dump, adding more with loads, dump, etc.
 
@@ -582,6 +584,71 @@ class TestFiresManager(object):
         assert fires_manager.fires[1]['error']['message'] == 'oops'
         assert fires_manager.fires[1]['error']['traceback']
         assert fires_manager.failed_fires is None
+
+
+
+class TestFiresManagerSettingToday(object):
+
+    @freezegun.freeze_time("2016-04-20")
+    def not_explicitly_set(self):
+        fires_manager = fires.FiresManager()
+        assert fires_manager.today == datetime.datetime(2016,4,20)
+
+    @freezegun.freeze_time("2016-04-20")
+    def test_set_to_string_in_loaded_input_data(self):
+        fires_manager = fires.FiresManager()
+        fires_manager.load({"today": "2017-10-01"})
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+    @freezegun.freeze_time("2016-04-20")
+    def test_set_to_datetime_obj_in_loaded_input_data(self):
+        fires_manager = fires.FiresManager()
+        fires_manager.load({"today": datetime.datetime(2017,10,1)})
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+    @freezegun.freeze_time("2016-04-20")
+    def test_set_to_date_obj_in_loaded_input_data(self):
+        fires_manager = fires.FiresManager()
+        fires_manager.load({"today": datetime.date(2017,10,1)})
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+    @freezegun.freeze_time("2016-04-20")
+    def test_manually_set_to_string(self):
+        fires_manager = fires.FiresManager()
+        fires_manager.today = "2017-10-01"
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+    @freezegun.freeze_time("2016-04-20")
+    def test_manually_set_to_datetime_obj(self):
+        fires_manager = fires.FiresManager()
+        fires_manager.today = datetime.datetime(2017,10,1)
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+    @freezegun.freeze_time("2016-04-20")
+    def test_manually_set_to_date_obj(self):
+        fires_manager = fires.FiresManager()
+        fires_manager.today = datetime.date(2017,10,1)
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+    @freezegun.freeze_time("2016-04-20")
+    def test_is_immutable(self):
+        fires_manager = fires.FiresManager()
+        fires_manager.today = datetime.datetime(2017,10,1)
+        # ok to set to same val
+        fires_manager.today = datetime.datetime(2017,10,1)
+        fires_manager.today = datetime.date(2017,10,1)
+        fires_manager.today = "2017-10-01"
+        # not ok to change
+        with raises(TypeError) as e_info:
+            fires_manager.today = datetime.datetime(2017,10,2)
+        assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
+        with raises(TypeError) as e_info:
+            fires_manager.today = datetime.date(2017,10,2)
+        assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
+        with raises(TypeError) as e_info:
+            fires_manager.today = "2017-10-02"
+        assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
+
 
 
 ##
