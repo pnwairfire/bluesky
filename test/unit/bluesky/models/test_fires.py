@@ -269,15 +269,19 @@ class TestFiresManager(object):
 
         # test setting fm.today by load
 
+        fm = fires.FiresManager()
         fm.load({'today': datetime.datetime(2012, 4,3,22,11)})
         assert fm.today == datetime.datetime(2012, 4,3,22,11)
 
+        fm = fires.FiresManager()
         fm.load({'today': "2012-04-02T22:11:00Z"})
         assert fm.today == datetime.datetime(2012, 4,2,22,11)
 
+        fm = fires.FiresManager()
         fm.load({'today': "{today}"})
         assert fm.today == datetime.datetime(2016, 4,20)
 
+        fm = fires.FiresManager()
         fm.load({'today': "{yesterday}"})
         assert fm.today == datetime.datetime(2016, 4, 19)
 
@@ -285,15 +289,19 @@ class TestFiresManager(object):
 
         # test setting fm.today by assignmentd
 
+        fm = fires.FiresManager()
         fm.today = datetime.datetime(2016, 4, 1)
         assert fm.today == datetime.datetime(2016, 4, 1)
 
+        fm = fires.FiresManager()
         fm.today = "2012-04-04T22:13:00Z"
         assert fm.today == datetime.datetime(2012, 4, 4, 22, 13)
 
+        fm = fires.FiresManager()
         fm.today = "{today}"
         assert fm.today == datetime.datetime(2016, 4, 20)
 
+        fm = fires.FiresManager()
         fm.today = "{yesterday}"
         assert fm.today == datetime.datetime(2016, 4, 19)
 
@@ -424,7 +432,7 @@ class TestFiresManager(object):
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{}'))
         fires_manager.loads()
         assert fires_manager.num_fires == 0
-        assert fires_manager.today == datetime.date(2016,4,20)
+        assert fires_manager.today == datetime.datetime(2016,4,20)
         assert [] == fires_manager.fires
         assert expected_meta == fires_manager.meta
 
@@ -441,7 +449,7 @@ class TestFiresManager(object):
         fires_manager.loads()
         assert fires_manager.num_fires == 0
         assert [] == fires_manager.fires
-        assert fires_manager.today == datetime.date(2016,4,20)
+        assert fires_manager.today == datetime.datetime(2016,4,20)
         expected_meta = {
 
             'config':{},
@@ -461,7 +469,7 @@ class TestFiresManager(object):
         ]
         assert fires_manager.num_fires == 1
         assert expected_fires == fires_manager.fires
-        assert fires_manager.today == datetime.date(2016,4,20)
+        assert fires_manager.today == datetime.datetime(2016,4,20)
         expected_meta = {
             'config':{},
             "foo": {"bar": "baz"}
@@ -483,7 +491,7 @@ class TestFiresManager(object):
         ]
         assert fires_manager.num_fires == 2
         assert expected_fires == fires_manager.fires
-        assert fires_manager.today == datetime.date(2016,4,20)
+        assert fires_manager.today == datetime.datetime(2016,4,20)
         expected_meta = {
             #"run_id": 'abcd1234'
             'config':{},
@@ -630,23 +638,24 @@ class TestFiresManagerSettingToday(object):
         fires_manager.today = datetime.date(2017,10,1)
         assert fires_manager.today == datetime.datetime(2017,10,1)
 
-    @freezegun.freeze_time("2016-04-20")
     def test_is_immutable(self):
         fires_manager = fires.FiresManager()
         fires_manager.today = datetime.datetime(2017,10,1)
+
         # ok to set to same val
         fires_manager.today = datetime.datetime(2017,10,1)
         fires_manager.today = datetime.date(2017,10,1)
         fires_manager.today = "2017-10-01"
+
         # not ok to change
         with raises(TypeError) as e_info:
             fires_manager.today = datetime.datetime(2017,10,2)
         assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
         with raises(TypeError) as e_info:
-            fires_manager.today = datetime.date(2017,10,2)
+            fires_manager.today = datetime.date(2017,10,3)
         assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
         with raises(TypeError) as e_info:
-            fires_manager.today = "2017-10-02"
+            fires_manager.today = "2017-10-04"
         assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
 
 
@@ -693,6 +702,15 @@ class TestFiresManagerSetAndMergeConfig(object):
         fm.today = datetime.datetime(2016, 5, 4)
         fm.config = copy.deepcopy(self.RAW_CONFIG)
         assert fm.config == self.CONFIG_2016_05_04
+        # TODO: set fm.today = datetime.datetime(2016, 5, 4) again
+        #   and make sure (by capturing method calls) that config
+        #   doesn't get reprocessed
+
+    @freezegun.freeze_time("2016-05-04")
+    def test_setting_config_manually_and_change_date(self):
+        fm = fires.FiresManager()
+        fm.config = copy.deepcopy(self.RAW_CONFIG)
+        assert fm.config == self.CONFIG_2016_05_04
         fm.today = datetime.datetime(2016, 5, 5)
         assert fm.config == self.CONFIG_2016_05_05
         # TODO: set fm.today = datetime.datetime(2016, 5, 5) again
@@ -703,6 +721,17 @@ class TestFiresManagerSetAndMergeConfig(object):
         fm = fires.FiresManager()
         fm.load({
             'today': datetime.datetime(2016, 5, 4),
+            'config': copy.deepcopy(self.RAW_CONFIG)
+        })
+        assert fm.config == self.CONFIG_2016_05_04
+        # TODO: set fm.today = datetime.datetime(2016, 5, 4) again
+        #   and make sure (by capturing method calls) that config
+        #   doesn't get reprocessed
+
+    @freezegun.freeze_time("2016-05-04")
+    def test_loading_config_and_change_date(self):
+        fm = fires.FiresManager()
+        fm.load({
             'config': copy.deepcopy(self.RAW_CONFIG)
         })
         assert fm.config == self.CONFIG_2016_05_04
