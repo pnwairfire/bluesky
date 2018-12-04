@@ -310,6 +310,8 @@ class FiresManager(object):
         if self._raw_config and previous_today != new_today:
             self.config = self._raw_config
 
+        self._manually_set_today = True
+
     @property
     def run_id(self):
         if not self._meta.get('run_id'):
