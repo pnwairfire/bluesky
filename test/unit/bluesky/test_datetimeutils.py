@@ -364,7 +364,7 @@ class TestToDatetime(object):
     @freeze_time("2016-01-14")
     def test_date_defined_as_date_object(self):
         dt = datetimeutils.to_datetime(datetime.date(2015, 12, 14))
-        assert dt == datetime.date(2015, 12, 14)
+        assert dt == datetime.datetime(2015, 12, 14)
 
         dt = datetimeutils.to_datetime(datetime.datetime(2015, 12, 14, 2, 1, 23))
         assert dt == datetime.datetime(2015, 12, 14, 2, 1, 23)
