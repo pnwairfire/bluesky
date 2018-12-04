@@ -109,8 +109,12 @@ def to_datetime(val, limit_range=False):
             "Invalid datetime string value: {}".format(_val))
 
     if val is not None:
-        if isinstance(val, datetime.date):
+        # We need to check for datetime before date, since date
+        # includes datetime
+        if isinstance(val, datetime.datetime):
             return val
+        if isinstance(val, datetime.date):
+            return datetime.datetime(val.year, val.month, val.day)
         elif hasattr(val, 'lower'):
             try:
                 dt = parse_dt(val, extra_formats=_TO_DATETIME_EXTRA_FORMATS)
