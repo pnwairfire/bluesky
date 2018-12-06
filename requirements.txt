@@ -2,7 +2,7 @@
 -f https://pypi.airfire.org/simple/
 pyairfire>=3.0.4,<4.0.0
 afconfig==1.*
-afdatetime>=1.0.3,<2.0.0
+afdatetime>=1.1.1,<2.0.0
 afscripting>=1.1.2,<2.0.0
 afweb>=1.1.1,<2.0.0
 geoutils>=1.0.2,<2.0.0
@@ -12,7 +12,7 @@ fccsmap==2.1.0
 timeprofile==1.*
 met>=1.2.2,<2.0.0
 plumerise>=2.0.2,<3.0.0
-blueskykml>=2.4.0,<3.0.0
+blueskykml>=2.4.2,<3.0.0
 apps-consume4==4.1.*
 Fiona==1.7.2
 shapely==1.5.7
