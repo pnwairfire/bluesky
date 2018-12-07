@@ -77,7 +77,12 @@
             "target": "dispersion",
             "hysplit": {
                 "images_dir": "images/",
-                "data_dir": "data/"
+                "data_dir": "data/",
+                "blueskykml_config": {
+                    "DispersionImages": {
+                        "DAILY_IMAGES_UTC_OFFSETS": "auto"
+                    }
+                }
             }
         }
     }
