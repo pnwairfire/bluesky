@@ -14,18 +14,18 @@ import logging
 import os
 
 from afdatetime import parsing as datetime_parsing
-from blueskykml import smokedispersionkml
+from blueskykml import fires as blueskykml_fires
 
 from bluesky import locationutils
 from bluesky.exceptions import BlueSkyConfigurationError
 
 
-BLUESKYKML_DATE_FORMAT = smokedispersionkml.FireData.date_time_format
+BLUESKYKML_DATE_FORMAT = blueskykml_fires.FireData.date_time_format
 
 # as of blueskykml v0.2.5, this list is:
 #  'pm25', 'pm10', 'co', 'co2', 'ch4', 'nox', 'nh3', 'so2', 'voc'
 # Note that blueskykml expects 'pm25', not 'pm2.5'
-BLUESKYKML_SPECIES_LIST = [s.upper() for s in smokedispersionkml.FireData.emission_fields]
+BLUESKYKML_SPECIES_LIST = [s.upper() for s in blueskykml_fires.FireData.emission_fields]
 if 'NOX' in BLUESKYKML_SPECIES_LIST:
     BLUESKYKML_SPECIES_LIST.remove('NOX')
     BLUESKYKML_SPECIES_LIST.append('NOx')
