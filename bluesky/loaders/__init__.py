@@ -55,11 +55,11 @@ class BaseLoader(object):
     def _write_data(self, saved_data_filename, data):
         if saved_data_filename:
             try:
-                with open(saved_data_filename) as f:
+                with open(saved_data_filename, 'w') as f:
                     f.write(data)
             except Exception as e:
-                logging.warn(
-                    "Failed to write loaded data to %s - %s", filename, e)
+                logging.warn("Failed to write loaded data to %s - %s",
+                    saved_data_filename, e)
 
 
 ##
@@ -187,7 +187,10 @@ class BaseApiLoader(BaseLoader):
                 # TODO: if no timezone info, add 'Z' to end of string ?
 
 
-    def get(self, saved_data_filename=None, **query):
+    def get(self, **query):
+        saved_data_filename = (self._config.get('saved_data_file')
+            or self._config.get('saved_copy_file'))
+
         if self._secret:
             if self._auth_protocol == 'afweb':
                 url = self._form_url(**query)
