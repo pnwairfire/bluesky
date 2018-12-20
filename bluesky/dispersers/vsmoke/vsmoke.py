@@ -22,7 +22,7 @@ from afdatetime import parsing as datetime_parsing
 from bluesky.datetimeutils import parse_utc_offset
 
 from .. import (
-    DispersionBase, TONS_PER_HR_TO_GRAMS_PER_SEC, BTU_TO_MW
+    DispersionBase, TONS_PER_HR_TO_GRAMS_PER_SEC, BTU_TO_MW, PHASES
 )
 
 from . import defaults
@@ -190,7 +190,7 @@ class VSMOKEDispersion(DispersionBase):
         emtqr = self.config("EMTQR")
 
         #tons = npriod * (cons["flaming"] + cons["smoldering"] + cons["residual"] + cons["duff"])
-        tons = sum([fire.consumption[p] for p in self.PHASES])
+        tons = sum([fire.consumption[p] for p in PHASES])
 
         warn = []
         if in_var.temp_fire is None:
