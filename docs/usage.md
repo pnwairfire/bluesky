@@ -883,6 +883,38 @@ while the following is an example of the latter:
         ]
     }
 
+
+#### Log File
+
+`bsp` produces log output, either to file or to stdout.  The log level
+is set with the `--log-level` flag.  The log output looks like the following:
+
+```
+2019-02-22 06:24:48,191 INFO: BlueSky v4.0.6
+2019-02-22 06:24:48,191 INFO: output file: None
+2019-02-22 06:24:48,191 INFO: config options: None
+2019-02-22 06:24:48,191 INFO: module: []
+2019-02-22 06:24:48,191 INFO: log message format: None
+2019-02-22 06:24:48,191 INFO: run id: None
+2019-02-22 06:24:48,191 INFO: log level: 10
+2019-02-22 06:24:48,191 INFO: log file: None
+2019-02-22 06:24:48,192 INFO: today: None
+2019-02-22 06:24:48,192 INFO: config file options: None
+2019-02-22 06:24:48,192 INFO: version: False
+2019-02-22 06:24:48,192 INFO: no input: False
+2019-02-22 06:24:48,192 INFO: input file: /data/json/1-fire-24hr-20150121-Seattle-WA-post-ingestion.json
+2019-02-22 06:24:48,192 INFO: indent: None
+2019-02-22 06:24:48,192 DEBUG: Status logging disabled - not submitting 'Good','Main', 'Start', {}.
+2019-02-22 06:24:48,192 DEBUG: Status logging disabled - not submitting 'Good','Main', 'Finish', {}.
+2019-02-22 06:25:25,566 INFO: Running ingestion module
+2019-02-22 06:25:25,566 DEBUG: Setting growth array in fire object
+2019-02-22 06:25:25,566 DEBUG: Status logging disabled - not submitting 'Good','ingestion', 'Finish', {}.
+2019-02-22 06:25:25,566 DEBUG: Status logging disabled - not submitting 'Good','Main', 'Finish', {}.
+2019-02-22 06:24:48,193 INFO: Fire counts: {'fires': 1}
+```
+
+
+
 ### Other Executables
 
 the bluesky package includes three other executables:

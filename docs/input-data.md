@@ -5,11 +5,11 @@ The top level input data fields that bsp recognizes are: ```run_id```,
 
 ### 'run_id'
 
-...(fill in description)...
+Run identifier. If not defined, bluesky will generate a GUID.
 
 ### 'today'
 
-...(fill in description)...
+The day of the run.  Configuration settings are relative to this date.
 
 ### 'fire_information' Fields
 
