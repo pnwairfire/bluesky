@@ -2,28 +2,6 @@
 
 
 
-## Installing with pip
-
-First, install pip (with sudo if necessary):
-
-    apt-get install python-pip
-    pip install --upgrade pip
-
-Then, to install, for example, v4.0.6, use the following (with sudo if necessary):
-
-    pip install --no-binary gdal --extra-index https://pypi.airfire.org/simple bluesky==4.0.6
-
-Or, if using the bluesky package in another project, add it to your project's
-requirements.txt:
-
-    --extra-index https://pypi.airfire.org/simple/
-    bluesky==4.0.6
-
-See the Notes section, below, for information on resolving pip and
-gdal issues.
-
-
-
 
 ## Installing with Docker
 
@@ -50,6 +28,29 @@ complete image.
 
 See the [bluesky docker hub page](https://hub.docker.com/r/pnwairfire/bluesky/)
 for more information.
+
+
+
+
+## Installing with pip
+
+First, install pip (with sudo if necessary):
+
+    apt-get install python-pip
+    pip install --upgrade pip
+
+Then, to install, for example, v4.0.6, use the following (with sudo if necessary):
+
+    pip install --no-binary gdal --extra-index https://pypi.airfire.org/simple bluesky==4.0.6
+
+Or, if using the bluesky package in another project, add it to your project's
+requirements.txt:
+
+    --extra-index https://pypi.airfire.org/simple/
+    bluesky==4.0.6
+
+See the Notes section, below, for information on resolving pip and
+gdal issues.
 
 
 
@@ -116,12 +117,4 @@ If this doesn't work, uninstall gdal, and then install it manually:
     tar xzf GDAL-1.11.2.tar.gz
     cd GDAL-1.11.2
     python setup.py install
-
-### Setup Environment
-
-This project contains a single package, ```bluesky```. To import bluesky
-package in development, you'll have to add the repo root directory to the
-search path. The ```bsp``` script does this automatically, if
-necessary.
-
 

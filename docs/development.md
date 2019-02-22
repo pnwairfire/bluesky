@@ -1,6 +1,15 @@
 # Development
 
-Clone the repo, as described in the [installation doc](docs/installation.md)
+First, clone the repo and install depenencies, as described in the
+[installation](docs/installation.md) and
+[dependencies](docs/dependencies.md) docs.
+
+## PYTHONPATH
+
+This project contains a single package, ```bluesky```. To import bluesky
+in development, you'll have to add the repo root directory to the
+search path. The ```bsp``` script does this automatically, so it's only
+necessary for importing bluesky elsewhere.
 
 
 ## Running tests
