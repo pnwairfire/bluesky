@@ -1,29 +1,5 @@
 ## Using Docker to run BlueSky
 
-A Dockerfile is included in this repo. It can be used to run bluesky
-out of the box or as a base environment for development.
-
-### Install and Start Docker
-
-See https://www.docker.com/community-edition for platform specific
-installation instructions.
-
-
-### Build Bluesky Docker Image from Dockerfile
-
-    cd /path/to/bluesky/repo/
-    docker build -t bluesky .
-
-### Obtain pre-built docker image
-
-As an alternative to building the image yourself, you can use the pre-built
-complete image.
-
-    docker pull pnwairfire/bluesky
-
-See the [bluesky docker hub page](https://hub.docker.com/r/pnwairfire/bluesky/)
-for more information.
-
 
 ### Run Complete Container
 
