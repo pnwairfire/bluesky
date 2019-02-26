@@ -54,6 +54,11 @@ Example of redirecting input from file and outputing to stdout
 
 #### Data Format
 
+Note that this section covers the format of the input data
+(json vs csv), not the content.  For information about the
+expected input fields, see the [input data doc](input-data.md)
+
+
 ```bsp``` supports inputting and outputing only json formatted fire data.
 If you have csv formatted fire data, you can use ```bsp-csv2json``` to convert
 your data to json format.  For example, assume fires.csv contains the
