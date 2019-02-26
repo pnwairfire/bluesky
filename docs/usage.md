@@ -50,7 +50,7 @@ Example of redirecting input from and outputing to file:
 
 Example of redirecting input from file and outputing to stdout
 
-    $ bsp fuelbeds fuelloading < /path/to/input/fires/json/file.json
+    $ bsp fuelbeds < /path/to/input/fires/json/file.json
 
 #### Data Format
 
