@@ -924,7 +924,7 @@ is set with the `--log-level` flag.  The log output looks like the following:
 
 the bluesky package includes these other executables:
 
- - bsp-arlindexer - indexes available arl met data
+ - bsp-csv2json - converts csv formated fire data to json format, as expcted by ```bsp```
 
 For usage and examples, use the ```-h``` with each script.
 
