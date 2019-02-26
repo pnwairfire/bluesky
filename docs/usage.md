@@ -925,6 +925,16 @@ is set with the `--log-level` flag.  The log output looks like the following:
 the bluesky package includes these other executables:
 
  - bsp-csv2json - converts csv formated fire data to json format, as expcted by ```bsp```
+ - feps_plumerise - computes FEPS plumrise
+ - feps_weather -
+ - hycm_std - MPI hysplit
+ - hycs_std - hysplit
+ - hysplit2netcdf - converts hysplit concentration output to netcdf
+ - profile - extracts local met information
+ - vsmkgs -
+ - vsmoke -
 
-For usage and examples, use the ```-h``` with each script.
+
+`bsp-csv2json`, `feps_plumerise`, and `feps_weather` all
+support the  ```-h``` option to get usage information.
 
