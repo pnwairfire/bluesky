@@ -1,8 +1,8 @@
 # Development
 
 First, clone the repo and install depenencies, as described in the
-[installation](docs/installation.md) and
-[dependencies](docs/dependencies.md) docs.
+[installation](installation.md) and
+[dependencies](dependencies.md) docs.
 
 ## PYTHONPATH
 

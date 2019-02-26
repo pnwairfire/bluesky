@@ -1,6 +1,6 @@
 # External Dependencies
 
-As described in the [installation doc](docs/installation.md), there
+As described in the [installation doc](installation.md), there
 are three ways to install bluesky - cloning the repo, using pip, and
 using docker.  If you choose docker, you'll only need to install docker
 itself.  Otherwise, you'll need the various executables, packages,
