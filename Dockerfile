@@ -118,6 +118,7 @@ COPY bluesky/ /tmp/bluesky/bluesky/
 COPY bin/ /tmp/bluesky/bin/
 COPY setup.py /tmp/bluesky/setup.py
 RUN python3 setup.py install
+WORKDIR /bluesky/
 
 # default command is to display bsp help string
 CMD ["bsp", "-h"]
