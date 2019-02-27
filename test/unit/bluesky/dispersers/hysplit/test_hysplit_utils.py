@@ -1,8 +1,4 @@
-"""Unit tests for hysplit_utils.
-
-Run with py.test:
-    > pip install pytest
-    > py.test /path/to/hsyplit49/test/test_hysplit_utils.py
+"""Unit tests for bluesky.dispersers.hysplit.hysplit_utils
 """
 
 import copy

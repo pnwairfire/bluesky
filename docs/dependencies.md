@@ -15,9 +15,9 @@ been made but are not guaranteed.
 
 ### pip
 
-Install pip (with sudo if necessary):
+Install pip3 (with sudo if necessary):
 
-    apt-get install python-pip
+    apt-get install python3-pip
 
 
 ## Module specific dependencies

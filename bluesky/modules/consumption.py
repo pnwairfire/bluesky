@@ -28,9 +28,9 @@ def run(fires_manager):
     logging.info("Running consumption module")
     # TODO: don't hard code consume_version; either update consume to define
     # it's version in consume.__version__, or execute pip:
-    #   $ pip freeze |grep consume
+    #   $ pip3 freeze |grep consume
     #  or
-    #   $ pip show apps-consume4|grep "^Version:"
+    #   $ pip3 show apps-consume4|grep "^Version:"
     fires_manager.processed(__name__, __version__,
         consume_version="4.1.2")
 
