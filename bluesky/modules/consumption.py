@@ -171,7 +171,7 @@ def _validate_input(fires_manager):
                         g['location']['ecoregion'] = ecoregion_lookup.lookup(
                             latlng.latitude, latlng.longitude)
                         if not g['location']['ecoregion']:
-                            logging.warn("Failed to look up ecoregion for "
+                            logging.warning("Failed to look up ecoregion for "
                                 "{}, {}".format(latlng.latitude, latlng.longitude))
                             _use_default_ecoreion(fires_manager, g)
 

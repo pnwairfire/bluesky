@@ -58,11 +58,11 @@ def _split_growth(g):
                     logging.debug("splitgrowth doesn't support GeoJSON type %s",
                         geojson.get('type', '(not specified)'))
             else:
-                logging.warn("split growth ")
+                logging.warning("split growth ")
         else:
             logging.debug("splitgrowth only supports GeoJSON geometries")
     except:
-        logging.warn("Failed to split growth %s", g)
+        logging.warning("Failed to split growth %s", g)
 
     return [g]
 

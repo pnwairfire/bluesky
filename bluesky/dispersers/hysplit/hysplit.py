@@ -456,7 +456,7 @@ class HYSPLITDispersion(DispersionBase):
                         raise Exception(msg)
                     else:
                         msg = "No matching particle initialization file, %s, found; Using no particle initialization" % f
-                        logging.warn(msg)
+                        logging.warning(msg)
                         logging.debug(msg)
                         ninit_val = 0
                     logging.info("Using particle initialization file %s" % f)
@@ -474,7 +474,7 @@ class HYSPLITDispersion(DispersionBase):
             NCPUS = self.config("NCPUS")
             logging.info("Running MPI HYSPLIT with %s processors." % NCPUS)
             if NCPUS < 1:
-                logging.warn("Invalid NCPUS specified...resetting NCPUS to 1 for this run.")
+                logging.warning("Invalid NCPUS specified...resetting NCPUS to 1 for this run.")
                 NCPUS = 1
 
             message_files = ["MESSAGE.%3.3i" % (i+1) for i in range(NCPUS)]
@@ -733,7 +733,7 @@ class HYSPLITDispersion(DispersionBase):
 
         # Warn about multiple sampling grid levels and KML/PNG image generation
         if numLevels > 1:
-            logging.warn("KML and PNG images will be empty since more than 1 vertical level is selected")
+            logging.warning("KML and PNG images will be empty since more than 1 vertical level is selected")
 
         # To minimize change in the following code, set aliases
         centerLat =  self._grid_params["center_latitude"]

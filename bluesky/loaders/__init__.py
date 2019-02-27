@@ -58,7 +58,7 @@ class BaseLoader(object):
                 with open(saved_data_filename, 'w') as f:
                     f.write(data)
             except Exception as e:
-                logging.warn("Failed to write loaded data to %s - %s",
+                logging.warning("Failed to write loaded data to %s - %s",
                     saved_data_filename, e)
 
 
@@ -92,7 +92,7 @@ class BaseFileLoader(BaseLoader, metaclass=abc.ABCMeta):
             try:
                 shutil.copyfile(original, saved_copy_filename)
             except Exception as e:
-                logging.warn("Failed to copy %s to %s - %s",
+                logging.warning("Failed to copy %s to %s - %s",
                     original, saved_copy_filename, e)
 
     def load(self):

@@ -607,8 +607,8 @@ class FiresManager(object):
                             "traceback": str(traceback.format_tb(tb))
                         }
                         if fires_manager.skip_failed_fires:
-                            logging.warn(str(value))
-                            logging.warn(str(traceback.format_tb(tb)))
+                            logging.warning(str(value))
+                            logging.warning(str(traceback.format_tb(tb)))
                             # move fire to failed list, excluding it from
                             # future processing
                             if fires_manager.failed_fires is None:
@@ -754,7 +754,7 @@ class FiresActionBase(object, metaclass=abc.ABCMeta):
 
     def _fail_or_skip(self, msg):
         if self._skip_failures:
-            logging.warn(msg)
+            logging.warning(msg)
             return
         else:
             raise self._error_class(msg)
@@ -832,7 +832,7 @@ class FiresMerger(FiresActionBase):
                         self._fires_manager.add_fire(combined_fire)
                     raise ValueError(str(e))
                 # else, just log str(e) (which is detailed enough)
-                logging.warn(str(e))
+                logging.warning(str(e))
 
         if combined_fire:
             # add_fire will take care of creating new list
@@ -954,7 +954,7 @@ class FireGrowthFilter(FiresActionBase):
             if not self._skip_failures:
                 raise self.FilterError(self.NO_FILTERS_MSG)
             # else, just log and return
-            logging.warn(self.NO_FILTERS_MSG)
+            logging.warning(self.NO_FILTERS_MSG)
 
 
     ACTION = 'filter'
@@ -984,7 +984,7 @@ class FireGrowthFilter(FiresActionBase):
                 filter_func = self._get_filter_func(filter_field)
             except self.FilterError as e:
                 if self._skip_failures:
-                    logging.warn("Failed to initialize %s filter: %s",
+                    logging.warning("Failed to initialize %s filter: %s",
                         filter_field, e)
                     continue
                 else:
@@ -1043,7 +1043,7 @@ class FireGrowthFilter(FiresActionBase):
                         if self._skip_failures:
                             i += 1
                             # str(e) is already detailed
-                            logging.warn(str(e))
+                            logging.warning(str(e))
                             continue
                         else:
                             raise

@@ -34,7 +34,7 @@ class StatusLogger(object):
 
     def _log_async(self, status, **fields):
         def error_handler(e):
-            logging.warn('Failed to submit status log: %s', e)
+            logging.warning('Failed to submit status log: %s', e)
 
         def _log():
             # We don't need to catch exceptions here, but if we don't,
@@ -43,14 +43,14 @@ class StatusLogger(object):
                 self.sl.log(status, error_handler=error_handler, **fields)
                 logging.debug('Submitted status log: %s', fields)
             except Exception as e:
-                logging.warn('Failed to submit status log: %s', e)
+                logging.warning('Failed to submit status log: %s', e)
 
         try:
             loop = asyncio.get_event_loop()
             loop.run_in_executor(None, _log)
 
         except Exception as e:
-            logging.warn('Failed to asynchronously submit status log: %s', e)
+            logging.warning('Failed to asynchronously submit status log: %s', e)
 
     def log(self, status, step, action, **extra_fields):
         if self.enabled:

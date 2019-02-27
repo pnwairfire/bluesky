@@ -72,7 +72,7 @@ def _get_consumption_field(field):
                                 val += subcat_dict[field][0]
                 return val
             except Exception as e:
-                logging.warn("Failed to sum '{}' consumption "
+                logging.warning("Failed to sum '{}' consumption "
                     "for fire {}: {}".format(field, fire.id, e))
     return f
 
@@ -188,7 +188,7 @@ def _assign_event_name(event, fire, new_fire):
     name = fire.get('event_of', {}).get('name')
     if name:
         if event.get('name') and name != event['name']:
-            logging.warn("Fire {} event name conflict: '{}' != '{}'".format(
+            logging.warning("Fire {} event name conflict: '{}' != '{}'".format(
                 fire.id, name, event['name']))
         event['name'] = name
 

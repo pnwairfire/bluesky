@@ -224,7 +224,7 @@ class VSMOKEDispersion(DispersionBase):
             in_var.bkgcoa = self.config("BKGCOA")
             warn.append('background CO')
         if warn:
-            logging.warn("For fire " + in_var.fireID + ", used default values for the parameters: " + ', '.join(warn))
+            logging.warning("For fire " + in_var.fireID + ", used default values for the parameters: " + ', '.join(warn))
 
         with open(self._input_file, "w") as f:
             f.write("60\n")
@@ -304,7 +304,7 @@ class VSMOKEDispersion(DispersionBase):
             in_var.bkgpma = self.config("BKGPMA")
             warn.append('background PM2.5')
         if warn: # this should only happen the first time through this method
-            logging.warn("For fire " + in_var.fireID +
+            logging.warning("For fire " + in_var.fireID +
                 ", used default values for these parameters: " + ', '.join(warn))
 
         with open(self._iso_input_file, "w") as f:
