@@ -106,12 +106,12 @@ COPY bin/vsmoke /usr/local/bin/vsmoke
 # Install python dependencies
 RUN mkdir /tmp/bluesky/
 WORKDIR /tmp/bluesky/
-COPY requirements.txt /tmp/bluesky/requirements.txt
 COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
-COPY requirements-dev.txt /tmp/bluesky/requirements-dev.txt
-RUN pip3 install --no-binary gdal -r requirements.txt
 RUN pip3 install -r requirements-test.txt
+COPY requirements-dev.txt /tmp/bluesky/requirements-dev.txt
 RUN pip3 install -r requirements-dev.txt
+COPY requirements.txt /tmp/bluesky/requirements.txt
+RUN pip3 install --no-binary gdal -r requirements.txt
 
 # Install bluesky package
 COPY bluesky/ /tmp/bluesky/bluesky/
