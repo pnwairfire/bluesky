@@ -9,6 +9,7 @@ the fire data, each module has its own set of required and optional fields.
 ##### Top Level Fields
 
  - ***'config' > 'skip_failed_fires'*** -- *optional* -- exclude failed fire rather than abort entire run; default false; applies to various modules
+ - ***'config' > 'skip_failed_sources'*** -- *optional* -- exclude failed sources rather than abort entire run; default false
 
 ##### load
 

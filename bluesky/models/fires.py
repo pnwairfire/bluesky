@@ -18,6 +18,7 @@ import afconfig
 from pyairfire import process
 
 from bluesky import datautils, datetimeutils, __version__
+from bluesky.config import defaults as config_defaults
 from bluesky.exceptions import (
     BlueSkyImportError, BlueSkyModuleError, BlueSkyDatetimeValueError
 )
@@ -183,7 +184,9 @@ class FiresManager(object):
     def __init__(self, run_id=None):
         self._meta = {}
         self._initialize_today()
-        self.config = {} # self._raw_config will be set by config.setter
+        # self._raw_config will be set by config.setter; also,
+        # DEFAULTS will be deep-copied
+        self.config = config_defaults.DEFAULTS
         self.modules = []
         self.fires = [] # this intitializes self._fires and self._num_fires
         self._processed_run_id_wildcards = False
@@ -406,12 +409,13 @@ class FiresManager(object):
     @config.setter
     def config(self, config):
         self._raw_config = copy.deepcopy(config)
-        self._meta['config'] = self.replace_config_wildcards(config)
+        self._meta['config'] = self.replace_config_wildcards(
+            copy.deepcopy(config))
         self._im_config = afconfig.ImmutableConfigDict(self._meta['config'])
 
     def merge_config(self, config_dict):
         if config_dict:
-            # Use setter to take care of resetting self._im_config
+            # Uses setter to take care of resetting self._im_config
             self.config = afconfig.merge_configs(
                 self._meta.get('config') or dict(), config_dict)
 
