@@ -21,7 +21,7 @@ def run(fires_manager):
     """
     logging.info("Running merge module")
     fires_manager.processed(__name__, __version__)
-    skip_unsupported = fires_manager.get_config_value(
+    record_original_growth = fires_manager.get_config_value(
         'splitgrowth', 'record_original_growth')
 
     for fire in fires_manager.fires:
