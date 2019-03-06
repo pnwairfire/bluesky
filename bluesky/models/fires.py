@@ -398,8 +398,13 @@ class FiresManager(object):
         return val
 
     def get_config_value(self, *keys, **kwargs):
+        if 'default' in kwargs:
+            raise DeprecationWarning("config defaults are specified in "
+                "bluesky.config.defaults module")
+
+        # default is fail if key isn't in user's config or in default config
         return afconfig.get_config_value(self.config, *keys,
-            **kwargs)
+            fail_on_missing_key=not kwargs.get('allow_missing'))
 
     def set_config_value(self, value, *keys):
         self._meta['config'] = self._meta.get('config') or dict()
@@ -510,9 +515,10 @@ class FiresManager(object):
     def log_status(self, status, step, action, **extra_fields):
         if not getattr(self, '_status_logger'):
             # init_time will be converted to string if it's datetime.date[time]
-            init_time = (self.get_config_value('dispersion', 'start')
+            init_time = (
+                self.get_config_value('dispersion', 'start', allow_missing=True)
                 or self.today)
-            sl_config = self.get_config_value('statuslogging') or {}
+            sl_config = self.get_config_value('statuslogging')
             setattr(self, '_status_logger', StatusLogger(init_time, **sl_config))
         self._status_logger.log(status, step, action, **extra_fields)
 
@@ -957,7 +963,7 @@ class FireGrowthFilter(FiresActionBase):
          - fires_manager -- FiresManager object whose fires are to be merged
         """
         super(FireGrowthFilter, self).__init__(fires_manager)
-        self._filter_config = self._fires_manager.get_config_value('filter') or {}
+        self._filter_config = self._fires_manager.get_config_value('filter')
         self._filter_fields = set(self._filter_config.keys()) - set(['skip_failures'])
         if not self._filter_fields:
             if not self._skip_failures:

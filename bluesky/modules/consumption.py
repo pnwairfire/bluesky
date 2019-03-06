@@ -165,8 +165,7 @@ def _validate_input(fires_manager):
                         if not ecoregion_lookup:
                             from bluesky.ecoregion.lookup import EcoregionLookup
                             implemenation = fires_manager.get_config_value(
-                                'consumption', 'ecoregion_lookup_implemenation',
-                                default='ogr')
+                                'consumption', 'ecoregion_lookup_implemenation')
                             ecoregion_lookup = EcoregionLookup(implemenation)
                         g['location']['ecoregion'] = ecoregion_lookup.lookup(
                             latlng.latitude, latlng.longitude)

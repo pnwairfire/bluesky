@@ -55,7 +55,7 @@ def run(fires_manager):
     """
     logging.info("Running load module")
     successfully_loaded_sources = []
-    sources = fires_manager.get_config_value('load', 'sources', default=[])
+    sources = fires_manager.get_config_value('load', 'sources')
     if not sources:
         raise BlueSkyConfigurationError("No sources specified for load module")
     try:

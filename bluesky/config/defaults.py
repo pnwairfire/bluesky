@@ -1,57 +1,70 @@
 TOP_LEVEL = {
     "skip_failed_fires": False,
-    "skip_failed_sources": False
+    "skip_failed_sources": False,
+    "statuslogging": {}
 }
+
 
 MODULE_LEVEL = {
     "load": {
         "sources": []
-    }
 
+        #  - ***'config' > 'load' > 'sources'*** -- *optional* -- array of sources to load fire data from; if not defined or if empty array, nothing is loaded
+        #  - ***'config' > 'load' > 'sources' > 'name'*** -- *required* for each source-- e.g. 'smartfire2'
+        #  - ***'config' > 'load' > 'sources' > 'format'*** -- *required* for each source-- e.g. 'csv'
+        #  - ***'config' > 'load' > 'sources' > 'type'*** -- *required* for each source-- e.g. 'file'
+        #  - ***'config' > 'load' > 'sources' > 'date_time'*** -- *optional* for each source-- e.g. '20160412', '2016-04-12T12:00:00'; used to to replace any datetime formate codes in the file name; defaults to current date (local time)
+        #  - ***'config' > 'load' > 'sources' > 'wait' > 'strategy'*** -- *required* if 'wait' section is defined -- 'fixed' or 'backoff'
+        #  - ***'config' > 'load' > 'sources' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
+        #  - ***'config' > 'load' > 'sources' > 'wait' > 'max_attempts'*** -- *required* if 'wait' section is defined  -- max number of attempts
 
-#  - ***'config' > 'load' > 'sources'*** -- *optional* -- array of sources to load fire data from; if not defined or if empty array, nothing is loaded
-#  - ***'config' > 'load' > 'sources' > 'name'*** -- *required* for each source-- e.g. 'smartfire2'
-#  - ***'config' > 'load' > 'sources' > 'format'*** -- *required* for each source-- e.g. 'csv'
-#  - ***'config' > 'load' > 'sources' > 'type'*** -- *required* for each source-- e.g. 'file'
-#  - ***'config' > 'load' > 'sources' > 'date_time'*** -- *optional* for each source-- e.g. '20160412', '2016-04-12T12:00:00'; used to to replace any datetime formate codes in the file name; defaults to current date (local time)
-#  - ***'config' > 'load' > 'sources' > 'wait' > 'strategy'*** -- *required* if 'wait' section is defined -- 'fixed' or 'backoff'
-#  - ***'config' > 'load' > 'sources' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
-#  - ***'config' > 'load' > 'sources' > 'wait' > 'max_attempts'*** -- *required* if 'wait' section is defined  -- max number of attempts
+        #  - ***'config' > 'load' > 'sources' > 'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
+        #  - ***'config' > 'load' > 'sources' > 'events_file'*** -- *optional* for each file type source-- file containing fire events data; e.g. '/path/to/fire_events.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
+    },
+    "ingestion": {
 
-#  - ***'config' > 'load' > 'sources' > 'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
-#  - ***'config' > 'load' > 'sources' > 'events_file'*** -- *optional* for each file type source-- file containing fire events data; e.g. '/path/to/fire_events.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
+        #  - ***'config' > 'ingestion' > 'keep_emissions'*** -- *optional* keep any emissions, if specified, and record in growth object
+        #  - ***'config' > 'ingestion' > 'keep_heat'*** -- *optional* keep heat, if specified, and record in growth object
+    },
+    "merge": {
+        "skip_failures": False
+    },
+    "filter": {
+        "skip_failures": False
 
-#  - ***'config' > 'ingestion' > 'keep_emissions'*** -- *optional* keep any emissions, if specified, and record in growth object
-#  - ***'config' > 'ingestion' > 'keep_heat'*** -- *optional* keep heat, if specified, and record in growth object
+        #  - ***'config' > 'filter' > 'skip_failures'*** -- *optional* -- if fires filter fails, move on; default: false
+        #  - ***'config' > 'filter' > 'country' > 'whitelist'*** -- *required* if 'country' section is defined and 'blacklist' array isn't -- whitelist of countries to include
+        #  - ***'config' > 'filter' > 'country' > 'blacklist'*** -- *required* if 'country' section is defined and 'whiteilst' array isn't -- blacklist of countries to exclude
+        #  - ***'config' > 'filter' > 'area' > 'min'*** -- *required* if 'area' section is defined and 'max' subfield isn't -- min area threshold
+        #  - ***'config' > 'filter' > 'area' > 'max'*** -- *required* if 'area' section is defined and 'min' subfield isn't -- max area threshold
+        #  - ***'config' > 'filter' > 'location' > 'boundary' > 'sw' > 'lat'*** -- *required* if 'location' section is defined --
+        #  - ***'config' > 'filter' > 'location' > 'boundary' > 'sw' > 'lng'*** -- *required* if 'location' section is defined --
+        #  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lat'*** -- *required* if 'location' section is defined --
+        #  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lng'*** -- *required* if 'location' section is defined --
+    },
+    "splitgrowth": {
 
-#  - ***'config' > 'merge' > 'skip_failures'*** -- *optional* -- if fires fail to merge, keep separate and move on; default: false
+        #  - ***'config' > 'splitgrowth' > 'record_original_growth'*** -- *optional* --
+    },
+    "fuelbeds": {
 
-#  - ***'config' > 'filter' > 'skip_failures'*** -- *optional* -- if fires filter fails, move on; default: false
-#  - ***'config' > 'filter' > 'country' > 'whitelist'*** -- *required* if 'country' section is defined and 'blacklist' array isn't -- whitelist of countries to include
-#  - ***'config' > 'filter' > 'country' > 'blacklist'*** -- *required* if 'country' section is defined and 'whiteilst' array isn't -- blacklist of countries to exclude
-#  - ***'config' > 'filter' > 'area' > 'min'*** -- *required* if 'area' section is defined and 'max' subfield isn't -- min area threshold
-#  - ***'config' > 'filter' > 'area' > 'max'*** -- *required* if 'area' section is defined and 'min' subfield isn't -- max area threshold
-#  - ***'config' > 'filter' > 'location' > 'boundary' > 'sw' > 'lat'*** -- *required* if 'location' section is defined --
-#  - ***'config' > 'filter' > 'location' > 'boundary' > 'sw' > 'lng'*** -- *required* if 'location' section is defined --
-#  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lat'*** -- *required* if 'location' section is defined --
-#  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lng'*** -- *required* if 'location' section is defined --
-
-#  - ***'config' > 'splitgrowth' > 'record_original_growth'*** -- *optional* --
-
-#  - ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- default ['0', '900']
-#  - ***'config' > 'fuelbeds' > 'truncation_percentage_threshold'*** -- *optional* -- use first N largest fuelbeds making up this percentage for a location; default 90.0
-#  - ***'config' > 'fuelbeds' > 'truncation_count_threshold'*** -- *optional* -- use only up to this many fuelbeds for a location; default 5
-#  - ***'config' > 'fuelbeds' > 'fccs_version'*** -- *optional* -- '1' or '2'
-#  - ***'config' > 'fuelbeds' > 'fccs_fuelload_file'*** -- *optional* -- NetCDF
-#    file containing FCCS lookup map
-#  - ***'config' > 'fuelbeds' > 'fccs_fuelload_param'*** -- *optional* -- name of variable in NetCDF file
-#  - ***'config' > 'fuelbeds' > 'fccs_fuelload_grid_resolution'*** -- *optional* -- length of grid cells in km
-#  - ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- fuelbeds to ignore
-#  - ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
-#  - ***'config' > 'fuelbeds' > 'no_sampling'*** -- *optional* -- don't sample surrounding area for Point and MultiPoint geometries
-
-#  - ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
-#  - ***'config' > 'consumption' > 'default_ecoregion'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
+        #  - ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- default ['0', '900']
+        #  - ***'config' > 'fuelbeds' > 'truncation_percentage_threshold'*** -- *optional* -- use first N largest fuelbeds making up this percentage for a location; default 90.0
+        #  - ***'config' > 'fuelbeds' > 'truncation_count_threshold'*** -- *optional* -- use only up to this many fuelbeds for a location; default 5
+        #  - ***'config' > 'fuelbeds' > 'fccs_version'*** -- *optional* -- '1' or '2'
+        #  - ***'config' > 'fuelbeds' > 'fccs_fuelload_file'*** -- *optional* -- NetCDF
+        #    file containing FCCS lookup map
+        #  - ***'config' > 'fuelbeds' > 'fccs_fuelload_param'*** -- *optional* -- name of variable in NetCDF file
+        #  - ***'config' > 'fuelbeds' > 'fccs_fuelload_grid_resolution'*** -- *optional* -- length of grid cells in km
+        #  - ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- fuelbeds to ignore
+        #  - ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
+        #  - ***'config' > 'fuelbeds' > 'no_sampling'*** -- *optional* -- don't sample surrounding area for Point and MultiPoint geometries
+    },
+    "consumption": {
+        "fuel_loadings": None,
+        "default_ecoregion": None,
+        "ecoregion_lookup_implemenation": "ogr"
+    },
 
 #  - ***'config' > 'emissions' > 'model'*** -- *optional* -- emissions model; 'prichard-oneill' (which replaced 'urbanski'), 'feps', or 'consume'; default 'feps'
 #  - ***'config' > 'emissions' > 'efs'*** -- *optional* -- deprecated synonym for 'model'

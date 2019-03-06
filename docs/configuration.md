@@ -70,6 +70,7 @@ the fire data, each module has its own set of required and optional fields.
 
  - ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
   - ***'config' > 'consumption' > 'default_ecoregion'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
+  - ***'config' > 'consumption' > 'ecoregion_lookup_implemenation'*** -- *optional* -- default 'ogr'
 
 ##### emissions
 
