@@ -1,38 +1,33 @@
 TOP_LEVEL = {
     "skip_failed_fires": False,
     "skip_failed_sources": False,
-    "statuslogging": {}
-
+    "statuslogging": {
         #  - ***'config' > 'statuslogging' > 'enabled'*** - on/off switch
         #  - ***'config' > 'statuslogging' > 'api_endpoint'*** - i.e. http://HOSTNAME/status-logs/",
         #  - ***'config' > 'statuslogging' > 'api_key'*** - api key
         #  - ***'config' > 'statuslogging' > 'api_secret'*** - api secret
         #  - ***'config' > 'statuslogging' > 'process'*** - how you want to identify the process to the status logger
         #  - ***'config' > 'statuslogging' > 'domain'*** - how you want to identify the met domain to the status logger
-
+    }
 }
 
 
 MODULE_LEVEL = {
     "load": {
         "sources": []
-
-        #  - ***'config' > 'load' > 'sources'*** -- *optional* -- array of sources to load fire data from; if not defined or if empty array, nothing is loaded
-        #  - ***'config' > 'load' > 'sources' > 'name'*** -- *required* for each source-- e.g. 'smartfire2'
-        #  - ***'config' > 'load' > 'sources' > 'format'*** -- *required* for each source-- e.g. 'csv'
-        #  - ***'config' > 'load' > 'sources' > 'type'*** -- *required* for each source-- e.g. 'file'
-        #  - ***'config' > 'load' > 'sources' > 'date_time'*** -- *optional* for each source-- e.g. '20160412', '2016-04-12T12:00:00'; used to to replace any datetime formate codes in the file name; defaults to current date (local time)
-        #  - ***'config' > 'load' > 'sources' > 'wait' > 'strategy'*** -- *required* if 'wait' section is defined -- 'fixed' or 'backoff'
-        #  - ***'config' > 'load' > 'sources' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
-        #  - ***'config' > 'load' > 'sources' > 'wait' > 'max_attempts'*** -- *required* if 'wait' section is defined  -- max number of attempts
-
-        #  - ***'config' > 'load' > 'sources' > 'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
-        #  - ***'config' > 'load' > 'sources' > 'events_file'*** -- *optional* for each file type source-- file containing fire events data; e.g. '/path/to/fire_events.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
+        # Each source has some subset of the following defined, but
+        # there are no defaults to be defined here
+        #  'name'
+        #  'format'
+        #  'type'
+        #  'date_time'
+        #  'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
+        #  'events_file'*** -- *optional* for each file type source-- file containing fire events data; e.g. '/path/to/fire_events.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
+        #  "wait": None, #{"strategy": None,"time": None,"max_attempts": None}
     },
     "ingestion": {
-
-        #  - ***'config' > 'ingestion' > 'keep_emissions'*** -- *optional* keep any emissions, if specified, and record in growth object
-        #  - ***'config' > 'ingestion' > 'keep_heat'*** -- *optional* keep heat, if specified, and record in growth object
+        "keep_emissions": False,
+        "keep_heat": False
     },
     "merge": {
         "skip_failures": False
@@ -51,22 +46,27 @@ MODULE_LEVEL = {
         #  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lng'*** -- *required* if 'location' section is defined --
     },
     "splitgrowth": {
-
-        #  - ***'config' > 'splitgrowth' > 'record_original_growth'*** -- *optional* --
+        "record_original_growth": False
     },
     "fuelbeds": {
+        # The following defaults are defined in the fccsmap package,
+        # so they could be removed from here
+        "fccs_version": "2",
+        "is_alaska": False,
+        "ignored_percent_resampling_threshold": 99.9,
+        "ignored_fuelbeds": ['0', '900'],
+        "no_sampling": False,
 
-        #  - ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- default ['0', '900']
-        #  - ***'config' > 'fuelbeds' > 'truncation_percentage_threshold'*** -- *optional* -- use first N largest fuelbeds making up this percentage for a location; default 90.0
-        #  - ***'config' > 'fuelbeds' > 'truncation_count_threshold'*** -- *optional* -- use only up to this many fuelbeds for a location; default 5
-        #  - ***'config' > 'fuelbeds' > 'fccs_version'*** -- *optional* -- '1' or '2'
-        #  - ***'config' > 'fuelbeds' > 'fccs_fuelload_file'*** -- *optional* -- NetCDF
-        #    file containing FCCS lookup map
-        #  - ***'config' > 'fuelbeds' > 'fccs_fuelload_param'*** -- *optional* -- name of variable in NetCDF file
-        #  - ***'config' > 'fuelbeds' > 'fccs_fuelload_grid_resolution'*** -- *optional* -- length of grid cells in km
-        #  - ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- fuelbeds to ignore
-        #  - ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
-        #  - ***'config' > 'fuelbeds' > 'no_sampling'*** -- *optional* -- don't sample surrounding area for Point and MultiPoint geometries
+        # The following defaults are defined in the fccsmap package
+        # and are based on the location of the pacakge in the file
+        # system. So, let fccsmap set defaults
+        # "fccs_fuelload_file": None,
+        # "fccs_fuelload_param": None,
+        # "fccs_fuelload_grid_resolution": None,
+
+        # the following defaults are *not* defined in fccsmap package
+        "truncation_percentage_threshold": 90.0,
+        "truncation_count_threshold": ; 5
     },
     "consumption": {
         "fuel_loadings": None,
@@ -81,54 +81,68 @@ MODULE_LEVEL = {
         "fuel_loadings": None
     },
     "findmetdata": {
+        "met_root_dir": None,
+        # We need to default time_window as None, since it will be used
+        # if it is defined, even if the first and last hours are None
+        "time_window": None, # {"first_hour": None,"last_hour": None}
 
-        #  - ***'config' > 'findmetdata' > 'met_root_dir'*** -- *required* --
-        #  - ***'config' > 'findmetdata' > 'time_window' > 'first_hour'*** -- *required* if fire growth data isn't defined --
-        #  - ***'config' > 'findmetdata' > 'time_window' > 'last_hour'*** -- *required* if fire growth data isn't defined --
-        #  - ***'config' > 'findmetdata' > 'met_format'*** -- *optional* -- defaults to 'arl'
-        #  - ***'config' > 'findmetdata' > 'wait' > 'strategy'*** -- *required* if 'wait' section is defined -- 'fixed' or 'backoff'
-        #  - ***'config' > 'findmetdata' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
-        #  - ***'config' > 'findmetdata' > 'wait' > 'max_attempts'*** -- *required* if 'wait' section is defined  -- max number of attempts
-        #  - ***'config' > 'findmetdata' > 'arl' > 'index_filename_pattern'*** -- *optional* -- defaults to 'arl12hrindex.csv'
-        #  - ***'config' > 'findmetdata' > 'arl' > 'max_days_out'*** -- *optional* -- defaults to 4
+        # We need to default wait to None, since being set to None
+        # or empty dict in the config indicates that we don't want
+        # to wait (which is the default behavior)
+        "wait": None, # {"strategy": None,"time": None,"max_attempts": None},
+
+        "met_format": "arl",
+        "arl": {
+            # The following two defaults are dfined in the met package
+            # TODO: should we comment them out here and leave "arl"
+            #    sub-config as an empty dict
+            "index_filename_pattern": "arl12hrindex.csv",
+            "max_days_out": 4
+        }
     },
     "localmet": {
-
-        # - ***'config' > 'localmet' > 'time_step'*** -- *optional* -- hour per arl file time step; defaults to 1
+        # The following default is defined in the met package,
+        # so we won't define it here
+        # "time_step": 1
     },
     "timeprofiling": {
-
-        #  - ***'config' > 'timeprofiling' > 'hourly_fractions'*** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the growth window)
+        "hourly_fractions": None
     },
 
     "plumerising": {
-        #  - ***'config' > 'plumerising' > 'model'*** -- *optional* -- plumerise model; defaults to "feps"
-
-    },
-    "plumerising": {
-        #  - ***'config' > 'plumerising' > 'feps' > 'feps_weather_binary'*** -- *optional* -- defaults to "feps_weather"
-        #  - ***'config' > 'plumerising' > 'feps' > 'feps_plumerise_binary'*** -- *optional* -- defaults to "feps_plumerise"
-        #  - ***'config' > 'plumerising' > 'feps' > 'plume_top_behavior'*** -- *optional* -- how to model plume top; options: 'Briggs', 'FEPS', 'auto'; defaults to 'auto'
-        #  - ***'config' > 'plumerising' > 'feps' > 'working_dir'*** -- *optional* -- where to write intermediate files; defaults to writing to tmp dir
-    },
-    "plumerising": {
-        #  - ***'config' > 'plumerising' > 'sev' > 'alpha'*** -- *optional* -- default: 0.24
-        #  - ***'config' > 'plumerising' > 'sev' > 'beta'*** -- *optional* -- default: 170
-        #  - ***'config' > 'plumerising' > 'sev' > 'ref_power'*** -- *optional* -- default: 1e6
-        #  - ***'config' > 'plumerising' > 'sev' > 'gamma'*** -- *optional* -- default: 0.35
-        #  - ***'config' > 'plumerising' > 'sev' > 'delta'*** -- *optional* -- default: 0.6
-        #  - ***'config' > 'plumerising' > 'sev' > 'ref_n'*** -- *optional* -- default: 2.5e-4
-        #  - ***'config' > 'plumerising' > 'sev' > 'gravity'*** -- *optional* -- default: 9.8
-        #  - ***'config' > 'plumerising' > 'sev' > 'plume_bottom_over_top'*** -- *optional* -- default: 0.5
+        "model": "feps",
+        "feps": {
+            "working_dir": None
+            # The following defaults are defined in the plumerise
+            # package, so we won't set them here
+            # "feps_weather_binary": "feps_weather",
+            # "feps_plumerise_binary": "feps_plumerise",
+            # "plume_top_behavior": "auto",
+        },
+        "sev": {
+            # The following defaults are defined in the plumerise
+            # package, so we won't set them here
+            # "alpha": 0.24
+            # "beta": 170
+            # "ref_power": 1e6
+            # "gamma": 0.35
+            # "delta": 0.6
+            # "ref_n": 2.5e-4
+            # "gravity": 9.8
+            # "plume_bottom_over_top": 0.5
+        }
     },
     "extrafiles": {
-        # - ***'config' > 'extrafiles' > 'dest_dir' -- *required* -- where to write extra files
-        # - ***'config' > 'extrafiles' > 'sets' -- *optional* (though nothing happens if not defined) -- array of file sets to write
+        "sets": [],
+        "dest_dir": None,
+        "emissionscsv": {
+            "filename": None
+        }
+        "firescsvs": {
+            "fire_locations_filename": "fire_locations.csv",
+            "fire_events_filename": "fire_events.csv"
 
-        # - ***'config' > 'extrafiles' > 'emissionscsv' > 'filename'*** -- *required* --
-
-        # - ***'config' > 'extrafiles' > 'firescsvs' > 'fire_locations_filename'*** -- *optional* -- default: 'fire_locations.csv'
-        # - ***'config' > 'extrafiles' > 'firescsvs' > 'fire_events_filename'*** -- *optiona* -- default: 'fire_events.csv'
+        }
     },
     "dispersion": {
         "model": "hysplit",

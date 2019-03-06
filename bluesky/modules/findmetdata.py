@@ -77,11 +77,10 @@ def _get_met_root_dir(fires_manager):
 
 def _get_met_finder(fires_manager):
     met_root_dir = _get_met_root_dir(fires_manager)
-    met_format = fires_manager.get_config_value('findmetdata', 'met_format',
-        default="arl").lower()
+    met_format = fires_manager.get_config_value(
+        'findmetdata', 'met_format').lower()
     if met_format == "arl":
-        arl_config = fires_manager.get_config_value('findmetdata', 'arl',
-            default={})
+        arl_config = fires_manager.get_config_value('findmetdata', 'arl')
         logging.debug("ARL config: %s", arl_config)
         return arlfinder.ArlFinder(met_root_dir, **arl_config)
     else:

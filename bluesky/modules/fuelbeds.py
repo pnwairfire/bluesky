@@ -16,8 +16,6 @@ __all__ = [
 
 __version__ = "0.1.0"
 
-FCCS_VERSION = '2' # TODO: make this configurable
-
 def run(fires_manager):
     """Runs emissions module
 
@@ -28,10 +26,8 @@ def run(fires_manager):
     fires_manager.processed(__name__, __version__,
         fccsmap_version=fccsmap.__version__)
 
-    fuelbeds_config = dict(fires_manager.get_config_value('fuelbeds') or {})
-    if 'fccs_version' not in fuelbeds_config:
-        fuelbeds_config['fccs_version'] = FCCS_VERSION
-    logging.debug('Using FCCS version %s', FCCS_VERSION)
+    fuelbeds_config = fires_manager.get_config_value('fuelbeds')
+    logging.debug('Using FCCS version %s', fuelbeds_config['fccs_version'])
 
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
@@ -90,19 +86,14 @@ TOTAL_PCT_THRESHOLD = 0.5
 
 class Estimator(object):
 
-    TRUNCATION_CONFIG_DEFAULTS = {
-        'percentage_threshold': 90.0,
-        'count_threshold': 5
-    }
-
     def __init__(self, lookup, **options):
         self.lookup = lookup
 
-        for attr, default in self.TRUNCATION_CONFIG_DEFAULTS.items():
-            # if option is in the config but set to None or 0, then we
-            # won't truncate by that criterion
-            k = 'truncation_{}'.format(attr)
-            setattr(self, attr, options.get(k, default))
+        for attr, default in options.items():
+            if attr.startswith('truncation_'):
+                # if user override defaults by setting to None or 0, we
+                # won't truncate by that criterion
+                setattr(self, attr, options[k])
 
     def estimate(self, growth_obj):
         """Estimates fuelbed composition based on lat/lng or GeoJSON data.

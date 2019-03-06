@@ -43,8 +43,7 @@ def run(fires_manager):
 
 class ComputeFunction(object):
     def __init__(self, fires_manager):
-        model = fires_manager.get_config_value('plumerising', 'model',
-            default='feps').lower()
+        model = fires_manager.get_config_value('plumerising', 'model').lower()
         fires_manager.processed(__name__, __version__,
             plumerise_version=plumerise_version, model=model)
 
@@ -54,10 +53,10 @@ class ComputeFunction(object):
             raise BlueSkyConfigurationError(
                 "Invalid plumerise model: '{}'".format(model))
 
-        config = fires_manager.get_config_value('plumerising', model, default={})
+        config = fires_manager.get_config_value('plumerising', model)
         self._compute_func = generator(config)
 
-        if 'working_dir' in config:
+        if config.get('working_dir'):
             fires_manager.plumerising = {
                 'output': {
                     'directory': config['working_dir']
@@ -77,7 +76,7 @@ class ComputeFunction(object):
         pr = feps.FEPSPlumeRise(**config)
 
         def _get_working_dir(fire):
-            if 'working_dir' in config:
+            if config.get('working_dir'):
                 working_dir = os.path.join(config['working_dir'],
                     "feps-plumerise-{}".format(fire.id))
                 if not os.path.exists(working_dir):

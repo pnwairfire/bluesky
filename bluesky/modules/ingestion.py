@@ -160,7 +160,7 @@ def run(fires_manager):
     logging.info("Running ingestion module")
     try:
         parsed_input = []
-        config = fires_manager.get_config_value('ingestion', default={})
+        config = fires_manager.get_config_value('ingestion')
         fire_ingester = FireIngester(**config)
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
