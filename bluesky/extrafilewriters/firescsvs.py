@@ -17,8 +17,6 @@ from afdatetime import parsing as datetime_parsing
 from blueskykml import fires as blueskykml_fires
 
 from bluesky import locationutils
-from bluesky.exceptions import BlueSkyConfigurationError
-
 
 BLUESKYKML_DATE_FORMAT = blueskykml_fires.FireData.date_time_format
 
