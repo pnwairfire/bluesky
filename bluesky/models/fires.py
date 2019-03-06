@@ -186,7 +186,7 @@ class FiresManager(object):
         self._initialize_today()
         # self._raw_config will be set by config.setter; also,
         # DEFAULTS will be deep-copied
-        self.config = config_defaults.DEFAULTS
+        self.config = config_defaults.TOP_LEVEL
         self.modules = []
         self.fires = [] # this intitializes self._fires and self._num_fires
         self._processed_run_id_wildcards = False
@@ -348,6 +348,11 @@ class FiresManager(object):
         for m in module_names:
             try:
                 self._modules.append(importlib.import_module('bluesky.modules.%s' % (m)))
+                # fill in defaults, but let what's in self.config['m'] take
+                # precedence
+                self.config[m] = afconfig.merge_configs(
+                    config_defaults.MODULE_LEVEL, self.config.get(m, {}))
+
             except ImportError as e:
                 if str(e) == 'No module named {}'.format(m):
                     raise BlueSkyImportError("Invalid module '{}'".format(m))

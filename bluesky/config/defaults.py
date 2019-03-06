@@ -1,6 +1,9 @@
-DEFAULTS = {
+TOP_LEVEL = {
     "skip_failed_fires": False,
-    "skip_failed_sources": False,
+    "skip_failed_sources": False
+}
+
+MODULE_LEVEL = {
     "load": {
         "sources": []
     }
