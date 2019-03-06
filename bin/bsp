@@ -106,7 +106,12 @@ OPTIONAL_ARGS = [
         'long': '--config-file',
         'dest': 'config_file_options',
         'help': 'config file containing JSON formatted overrides for default config values',
-        'action': scripting_args.ConfigFileAction
+        'action': scripting_args.create_config_file_action(
+            ['raw_config', 'config'])
+    },
+    {
+        'long': '--dump-config',
+        'action': 'store_true'
     },
     {
         #'short': "-v",
@@ -203,6 +208,10 @@ def is_piped_input():
     """
     return False
 
+##
+## Args Parsing and Validation
+##
+
 def parse_args():
     """Parses args - required, optional, and positional
 
@@ -244,22 +253,16 @@ def validate_args(args):
 
     # TODO: validate other args values as necessary
 
-def exit_with_traceback(e):
-    logging.error(e)
-    logging.debug(traceback.format_exc())
-    exit_with_msg(e)
-
 def output_version(parser, args):
     if args.version:
         sys.stdout.write("bsp (bluesky) version {}\n".format(__version__))
         sys.exit(0)
 
-def setup(args):
-    fires_manager = models.fires.FiresManager()
-    if args.today:
-        fires_manager.today = args.today
+##
+## Setting up FiresManager
+##
 
-    # configure logging as soon as possible, before any log messages
+def configure_logging(args, fires_manager):
     # are written
     if args.log_file:
         args.log_file = datetimeutils.fill_in_datetime_strings(
@@ -268,9 +271,39 @@ def setup(args):
     #  is not used. It must be left over from a previous version
     #  of the function. So just pass in None.
     scripting_args.configure_logging_from_args(args, None)
+
+def set_config(args, fires_manager):
+    # TODO: uncomment/enable '-D'/'--contig-option' and merge the config
+    #  values specified in args.config_options into config. First refactor
+    #  that option to produce nested dict rather than a ConfigParser object
+    #  object.  Make sure output json contains merged config (with tests)
+    # TODO: uncomment/enable '-c'/'--config-file' option, load into
+    #  ConfigParser object, convert that object into a dict, and merge that
+    #  dict into config.  Make sure output json contains merged config
+    #  (with tests)
+
+    # merge loaded file options
+    fires_manager.merge_config(args.config_file_options)
+    fires_manager.merge_config(args.config_options)
+
+    if args.dump_config:
+        logging.info("Configuration:")
+        sys.stdout.write(json.dumps(fires_manager.config))
+        sys.exit(0)
+
+def setup(args):
+    fires_manager = models.fires.FiresManager()
+    if args.today:
+        fires_manager.today = args.today
+
+    # configure logging as soon as possible, before any log messages
+    configure_logging(args, fires_manager)
+
     logging.info("BlueSky v%s", __version__)
     scripting_args.output_args(args)
     #afscripting.utils.log_config(args.config_options)
+
+    set_config(args, fires_manager)
 
     # Note: Calling code handles exception
     if not args.no_input:
@@ -286,6 +319,15 @@ def setup(args):
         fires_manager.run_id = args.run_id
     return fires_manager
 
+##
+## Main
+##
+
+def exit_with_traceback(e):
+    logging.error(e)
+    logging.debug(traceback.format_exc())
+    exit_with_msg(e)
+
 def main():
     args = parse_args()
 
@@ -300,20 +342,9 @@ def main():
                 " on the command line and in the input json")
             fires_manager.modules = args.module
 
-        # TODO: uncomment/enable '-D'/'--contig-option' and merge the config
-        #  values specified in args.config_options into config. First refactor
-        #  that option to produce nested dict rather than a ConfigParser object
-        #  object.  Make sure output json contains merged config (with tests)
-        # TODO: uncomment/enable '-c'/'--config-file' option, load into
-        #  ConfigParser object, convert that object into a dict, and merge that
-        #  dict into config.  Make sure output json contains merged config
-        #  (with tests)
-
-        # merge loaded file options
-        fires_manager.merge_config(args.config_file_options)
-        fires_manager.merge_config(args.config_options)
 
         fires_manager.run()
+
     except exceptions.BlueSkyModuleError as e:
         # The error was added to fires_manager's meta data, and will be
         # included in the output data
