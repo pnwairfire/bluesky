@@ -272,6 +272,16 @@ def configure_logging(args, fires_manager):
     #  of the function. So just pass in None.
     scripting_args.configure_logging_from_args(args, None)
 
+def set_modules(args, fires_manager):
+    # modules may be specified either in the input json or as command line
+    # args, but not in both places
+    if args.module:
+        if fires_manager.modules:
+            raise RuntimeError("Modules to be run can't be specified both"
+            " on the command line and in the input json")
+        fires_manager.modules = args.module
+
+
 def set_config(args, fires_manager):
     # TODO: uncomment/enable '-D'/'--contig-option' and merge the config
     #  values specified in args.config_options into config. First refactor
@@ -288,6 +298,7 @@ def set_config(args, fires_manager):
 
     if args.dump_config:
         logging.info("Configuration:")
+        # TODO: prune any config not relevant to modules specified
         sys.stdout.write(json.dumps(fires_manager.config,
             indent=args.indent, cls=models.fires.FireEncoder))
         sys.exit(0)
@@ -299,12 +310,12 @@ def setup(args):
 
     # configure logging as soon as possible, before any log messages
     configure_logging(args, fires_manager)
+    set_modules(args, fires_manager)
+    set_config(args, fires_manager)
 
     logging.info("BlueSky v%s", __version__)
     scripting_args.output_args(args)
     #afscripting.utils.log_config(args.config_options)
-
-    set_config(args, fires_manager)
 
     # Note: Calling code handles exception
     if not args.no_input:
@@ -334,15 +345,6 @@ def main():
 
     try:
         fires_manager = setup(args)
-
-        # modules may be specified either in the input json or as command line
-        # args, but not in both places
-        if args.module:
-            if fires_manager.modules:
-                raise RuntimeError("Modules to be run can't be specified both"
-                " on the command line and in the input json")
-            fires_manager.modules = args.module
-
 
         fires_manager.run()
 
