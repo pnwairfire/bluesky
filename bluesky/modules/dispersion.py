@@ -30,13 +30,11 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    model = fires_manager.get_config_value('dispersion', 'model',
-        default='hysplit').lower()
+    model = fires_manager.get_config_value('dispersion', 'model').lower()
     processed_kwargs = {}
     try:
         module, klass = _get_module_and_class(model)
-        model_config = fires_manager.get_config_value(
-            'dispersion', model, default={})
+        model_config = fires_manager.get_config_value('dispersion', model)
 
         start, num_hours = _get_time(fires_manager)
         met = _filter_met(fires_manager.met, start, num_hours)

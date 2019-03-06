@@ -30,8 +30,6 @@ __version__ = "0.1.0"
 
 TONS_PER_POUND = 0.0005 # 1.0 / 2000.0
 
-INCLUDE_EMISSIONS_DETAILS_DEFAULT = False
-
 def run(fires_manager):
     """Runs emissions module
 
@@ -54,8 +52,8 @@ def run(fires_manager):
         or fires_manager.get_config_value('emissions', 'efs')
         or 'feps').lower()
 
-    include_emissions_details = fires_manager.get_config_value('emissions',
-        'include_emissions_details', default=INCLUDE_EMISSIONS_DETAILS_DEFAULT)
+    include_emissions_details = fires_manager.get_config_value(
+        'emissions', 'include_emissions_details')
     fires_manager.processed(__name__, __version__, model=model,
         emitcalc_version=emitcalc_version, eflookup_version=eflookup_version)
 
@@ -123,10 +121,9 @@ class EmissionsBase(object, metaclass=abc.ABCMeta):
     def __init__(self, fire_failure_handler, config_getter):
         self.fire_failure_handler = fire_failure_handler
         self.include_emissions_details = config_getter(
-            'emissions', 'include_emissions_details',
-            default=INCLUDE_EMISSIONS_DETAILS_DEFAULT)
+            'emissions', 'include_emissions_details')
         self.config_getter = config_getter
-        self.species = config_getter('emissions', 'species', default=[])
+        self.species = config_getter('emissions', 'species')
 
     @abc.abstractmethod
     def run(self, fires):
