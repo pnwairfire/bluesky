@@ -288,7 +288,7 @@ def set_config(args, fires_manager):
 
     if args.dump_config:
         logging.info("Configuration:")
-        sys.stdout.write(json.dumps(fires_manager.config))
+        sys.stdout.write(json.dumps(fires_manager.config, indent=args.indent))
         sys.exit(0)
 
 def setup(args):
