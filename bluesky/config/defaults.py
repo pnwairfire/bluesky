@@ -1,6 +1,6 @@
 DEFAULTS = {
     "skip_failed_fires": False,
-    "skip_failed_sources"
+    "skip_failed_sources": False,
     "load": {
         "sources": []
     }
