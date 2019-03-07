@@ -661,7 +661,12 @@ class FiresManager(object):
         self.fires = input_dict.pop('fire_information', [])
 
         # pop config, but don't set until after today has been set
-        config = input_dict.pop('config', {})
+        if 'config' in input_dict:
+            raise DeprecationWarning("Don't specify 'config' in input data")
+
+        if 'run_config' in input_dict:
+            logging.info("Ignoring previous output config in the input data")
+            input_dict.pop('run_config')
 
         today = input_dict.pop('today', None)
         if today:
@@ -677,8 +682,6 @@ class FiresManager(object):
         if 'run_id' in self._meta:
             self._processed_run_id_wildcards = False
             self.run_id
-
-        self.config = config
 
     def loads(self, input_stream=None, input_file=None):
         """Loads json-formatted fire data, creating list of Fire objects and
@@ -706,7 +709,8 @@ class FiresManager(object):
         # were in the input
 
         return dict(self._meta, fire_information=self.fires, today=self.today,
-            counts=self.counts, bluesky_version=__version__)
+            counts=self.counts, bluesky_version=__version__,
+            run_config=self.config)
 
     def dumps(self, output_stream=None, output_file=None, indent=None):
         if output_stream and output_file:
