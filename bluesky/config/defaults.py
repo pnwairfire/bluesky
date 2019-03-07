@@ -374,39 +374,113 @@ MODULE_LEVEL = {
             "DISPERSION_OFFSET": 0
         },
         "vsmoke": {
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'TEMP_FIRE' -- temperature of fire (F), default: 59.0
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'PRES'*** -- *optional* -- Atmospheric pressure at surface (mb); default: 1013.25
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'IRHA'*** -- *optional* -- Period relative humidity; default: 25
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'LTOFDY'*** -- *optional* -- Is fire before sunset?; default: True
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'STABILITY'*** -- *optional* -- Period instability class - 1 -> extremely unstable; 2 -> moderately unstable; 3 -> slightly unstable; 4 -> near neutral; 5 -> slightly stable; 6 -> moderately stable; 7 -> extremely stable; default: 4
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'MIX_HT'*** -- *optional* -- Period mixing height (m); default: 1500.0
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'OYINTA'*** -- *optional* -- Period's initial horizontal crosswind dispersion at the source (m); default: 0.0
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'OZINTA'*** -- *optional* -- Period's initial vertical dispersion at the surface (m); default: 0.0
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'BKGPMA'*** -- *optional* -- Period's background PM (ug/m3); default: 0.0
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'BKGCOA'*** -- *optional* -- Period's background CO (ppm); default: 0.0
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'THOT'*** -- *optional* -- Duration of convective period of fire (decimal hours); default: 4
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'TCONST'*** -- *optional* -- Duration of constant emissions period (decimal hours); default: 4
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'TDECAY'*** -- *optional* -- Exponential decay constant for smoke emissions (decimal hours); default: 2
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'EFPM'*** -- *optional* -- Emission factor for PM2.5 (lbs/ton); default: 30
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'EFCO'*** -- *optional* -- Emission factor for CO (lbs/ton); default: 250
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'ICOVER'*** -- *optional* -- Period's cloud cover (tenths); default: 0
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'CEIL'*** -- *optional* -- Period's cloud ceiling height (feet); default: 99999
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'CC0CRT'*** -- *optional* -- Critical contrast ratio for crossplume visibility estimates; default: 0.02
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'VISCRT'*** -- *optional* -- Visibility criterion for roadway safety; default: 0.125
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'GRAD_RISE'*** -- *optional* -- Plume rise: TRUE -> gradual to final ht; FALSE ->mediately attain final ht; default: True
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'RFRC'*** -- *optional* -- Proportion of emissions subject to plume rise; default: -0.75
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'EMTQR'*** -- *optional* -- Proportion of emissions subject to plume rise for each period; default: -0.75
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'KMZ_FILE'*** -- *optional* -- default: "smoke_dispersion.kmz"
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'OVERLAY_TITLE'*** -- *optional* -- default: "Peak Hourly PM2.5"
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'LEGEND_IMAGE'*** -- *optional* -- absolute path nem to legend; default: "aqi_legend.png" included in bluesky package
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'JSON_FILE'*** -- *optional* -- name of file to write GeoJSON dispersion data; default: "smoke_dispersion.json"
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'CREATE_JSON'*** -- *optional* -- whether or not to create the GeoJSON file; default: True
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'DUTMFE'*** -- *optional* -- UTM displacement of fire east of reference point; default: 0
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'DUTMFN'*** -- *optional* -- UTM displacement of fire north of reference point; default: 100
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'XBGN'*** -- *optional* -- What downward distance to start calculations (km); default: 150
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'XEND'*** -- *optional* -- What downward distance to end calculation (km) - 200km max; default: 200
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'XNTVL'*** -- *optional* -- Downward distance interval (km) - 0 results in default 31 distances; default: 0.05
-            #  - ***'config' > 'dispersion' > 'vsmoke' > 'TOL'*** -- *optional* -- Tolerance for isopleths; detault: 0.1
+            # Temperature of fire (F)
+            "TEMP_FIRE": 59.0,
+
+            # Atmospheric pressure at surface (mb)
+            "PRES": 1013.25,
+
+            # Period relative humidity
+            "IRHA": 25,
+
+            # Is fire before sunset?
+            "LTOFDY": True,
+
+            # Period instability class
+            # 1 = extremely unstable
+            # 2 = moderately unstable
+            # 3 = slightly unstable
+            # 4 = near neutral
+            # 5 = slightly stable
+            # 6 = moderately stable
+            # 7 = extremely stable
+            "STABILITY": 4,
+
+            # Period mixing height (m)
+            "MIX_HT": 1500.0,
+
+            # Period's initial horizontal crosswind dispersion at the source (m)
+            "OYINTA": 0.0,
+
+            # Period's initial vertical dispersion at the surface (m)
+            "OZINTA": 0.0,
+
+            # Period's background PM (ug/m3)
+            "BKGPMA": 0.0,
+
+            # Period's background CO (ppm)
+            "BKGCOA": 0.0,
+
+            # Duration of convective period of fire (decimal hours)
+            "THOT": 4,
+
+            # Duration of constant emissions period (decimal hours)
+            "TCONST": 4,
+
+            # Exponential decay constant for smoke emissions (decimal hours)
+            "TDECAY": 2,
+
+            # Emission factor for PM2.5 (lbs/ton)
+            "EFPM": 30,
+
+            # Emission factor for CO (lbs/ton)
+            "EFCO": 250,
+
+            # Period's cloud cover (tenths)
+            "ICOVER": 0,
+
+            # Period's cloud ceiling height (feet)
+            "CEIL": 99999,
+
+            # Critical contrast ratio for crossplume visibility estimates
+            "CC0CRT": 0.02,
+
+            # Visibility criterion for roadway safety
+            "VISCRT": 0.125,
+
+            #
+            # RUN SETTINGS
+            #
+
+            "# Plume rise: TRUE": gradual to final ht, FALSE": immediately attain final ht,
+            "GRAD_RISE": True,
+
+            # Proportion of emissions subject to plume rise
+            "RFRC": -0.75,
+
+            # Proportion of emissions subject to plume rise for each period
+            "EMTQR": -0.75,
+
+            #
+            # OUTPUT SETTINGS
+            #
+
+            # KMZ Output settings
+            "KMZ_FILE": "smoke_dispersion.kmz",
+            "OVERLAY_TITLE": "Peak Hourly PM2.5",
+            "LEGEND_IMAGE": os.path.join(os.path.dirname(__file__), 'images', "aqi_legend.png"),
+
+            # GeoJSON Output settings
+            "JSON_FILE": "smoke_dispersion.json",
+            "CREATE_JSON": True,
+
+            # UTM displacement of fire east of reference point
+            "DUTMFE": 0,
+
+            # UTM displacement of fire north of reference point
+            "DUTMFN": 100,
+
+            # What downward distance to start calculations (km)
+            "XBGN": 150,
+
+            # What downward distance to end calculation (km) - 200km max
+            "XEND": 200,
+
+            # Downward distance interval (km) - 0 results in default 31 distances
+            "XNTVL": 0.05,
+
+            # Tolerance for isopleths
+            "TOL": 0.1
         }
     },
     "visualization": {
