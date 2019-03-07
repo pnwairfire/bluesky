@@ -178,9 +178,11 @@ MODULE_LEVEL = {
             "CENTER_LONGITUDE": None,
             "WIDTH_LONGITUDE": None,
             "HEIGHT_LATITUDE": None,
+
             # *required* if either COMPUTE_GRID or USER_DEFINED_GRID is true
             "SPACING_LONGITUDE": None,
             "SPACING_LATITUDE": None,
+            "projection": "LatLon",
 
             # There are no default 'grid' parameter, and the presence/absence
             # of a grid definition is used in the logic in the code.  So,

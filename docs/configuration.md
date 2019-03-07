@@ -210,8 +210,8 @@ emissions config
  - ***'config' > 'dispersion' > 'hysplit' > 'MGMIN'*** -- *optional* -- default: 10
  - ***'config' > 'dispersion' > 'hysplit' > 'MPI'*** -- *optional* -- default: false
  - ***'config' > 'dispersion' > 'hysplit' > 'NCPUS'*** -- *optional* -- default: 1
- - ***'config' > 'dispersion' > 'hysplit' > 'NCYCL'*** -- *optional* -- default: 24
- - ***'config' > 'dispersion' > 'hysplit' > 'NDUMP'*** -- *optional* -- default: 24
+ - ***'config' > 'dispersion' > 'hysplit' > 'NCYCL'*** -- *optional* -- default: 0
+ - ***'config' > 'dispersion' > 'hysplit' > 'NDUMP'*** -- *optional* -- default: 0
  - ***'config' > 'dispersion' > 'hysplit' > 'NFIRES_PER_PROCESS'*** -- *optional* -- default: -1 (i.e. no tranching)
  - ***'config' > 'dispersion' > 'hysplit' > 'NINIT'*** -- *optional* -- default: 0
  - ***'config' > 'dispersion' > 'hysplit' > 'NPROCESSES'*** -- *optional* -- default: 1 (i.e. no tranching)

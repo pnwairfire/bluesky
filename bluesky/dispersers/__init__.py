@@ -67,8 +67,10 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                 self._config[c])
 
     def config(self, key):
-        # check if key is defined, in the config as lower case or as lower case
-        return self._config.get(key.lower(), self._config.get(key.upper()))
+        # Config keys were all converted to lowercase, so no need to
+        # check uppercase version of 'key'
+        # TODO: handle missing key?
+        return self._config.get(key.lower())
 
     def run(self, fires, start, num_hours, output_dir, working_dir=None):
         """Runs hysplit

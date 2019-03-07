@@ -286,7 +286,7 @@ def grid_params_from_grid(grid, met_info={}):
 
 def get_grid_params(config, met_info={}, fires=None, allow_undefined=False):
     # If not specified, projection is assumed to be 'LatLon'
-    is_deg = (config.get('projection') or 'LatLon') == 'LatLon'
+    is_deg = config.get('projection') == 'LatLon'
 
     if config.get("USER_DEFINED_GRID"):
         # This supports BSF config settings
@@ -323,7 +323,7 @@ def get_grid_params(config, met_info={}, fires=None, allow_undefined=False):
         grid_params = square_grid_from_lat_lng(
             fires[0]['latitude'], fires[0]['longitude'],
             config.get('spacing_latitude'), config.get('spacing_longitude'),
-            config.get('grid_length', defaults.GRID_LENGTH), input_spacing_in_degrees=is_deg)
+            config.get('grid_length'), input_spacing_in_degrees=is_deg)
 
     elif met_info and met_info.get('grid'):
         grid_params = grid_params_from_grid(
