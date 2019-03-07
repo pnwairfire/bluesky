@@ -41,13 +41,6 @@ ARGS = [
 ]
 BlueskyKmlArgs = namedtuple('BlueskyKmlArgs', ARGS)
 
-DEFAULT_FILENAMES = {
-    "fire_locations_csv": 'fire_locations.csv',
-    "fire_events_csv": 'fire_events.csv',
-    "smoke_dispersion_kmz": 'smoke_dispersion.kmz',
-    "fire_kmz": 'fire_locations.kmz'
-}
-
 
 ##
 ## Visualizer class
@@ -60,7 +53,7 @@ class HysplitVisualizer(object):
         self._run_id = fires_manager.run_id
 
         self._config = fires_manager.get_config_value(
-            'visualization', 'hysplit', default={})
+            'visualization', 'hysplit')
         self._set_dispersion_output_info()
 
     def _set_dispersion_output_info(self):
@@ -101,7 +94,7 @@ class HysplitVisualizer(object):
             output_directory = self._config['output_dir']
         else:
             output_directory =  self._hysplit_output_directory
-        data_dir = os.path.join(output_directory, self._config.get('data_dir') or '')
+        data_dir = os.path.join(output_directory, self._config['data_dir'])
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
 
@@ -127,7 +120,7 @@ class HysplitVisualizer(object):
         args = BlueskyKmlArgs(
             output_directory=str(output_directory),
             configfile=None, # TODO: allow this to be configurable?
-            prettykml=self._config.get('prettykml'),
+            prettykml=self._config['prettykml'],
             # in blueskykml, if verbose is True, then logging level will be set
             # DEBUG; otherwise, logging level is left as is.  bsp already takes
             # care of setting log level, so setting verbose to False will let
@@ -165,7 +158,7 @@ class HysplitVisualizer(object):
         }
 
     def _get_file_name(self, directory, f):
-        name = self._config.get('{}_filename'.format(f), DEFAULT_FILENAMES[f])
+        name = self._config['{}_filename'.format(f)]
         return {
             "name": name,
             "pathname": os.path.join(directory, name)
@@ -226,7 +219,6 @@ class HysplitVisualizer(object):
             with open(os.path.join(output_directory, 'summary.json'), 'w') as f:
                 f.write(contents_json)
 
-    DEFAULT_FIRE_EVENT_ICON = "http://maps.google.com/mapfiles/ms/micons/firedept.png"
     def _get_config_options(self, output_directory):
         """Creates config options dict to be pass into BlueSkyKml
 
@@ -257,16 +249,7 @@ class HysplitVisualizer(object):
             "http://maps.google.com/mapfiles/ms/micons/firedept.png"
           - 'DispersionGridOutput' > 'OUTPUT_DIR'
         """
-        config_options = copy.deepcopy(self._config.get('blueskykml_config') or {})
-
-        # TODO: should we be using google's icon as the default?
-        # Use google's fire icon instead of BlueSkyKml's built-in icon
-        # (if an alternative isn't already specified)
-        if afconfig.get_config_value(config_options,
-                'SmokeDispersionKMLInput', 'FIRE_EVENT_ICON') is None:
-            afconfig.set_config_value(config_options,
-                self.DEFAULT_FIRE_EVENT_ICON,
-                'SmokeDispersionKMLInput', 'FIRE_EVENT_ICON')
+        config_options = copy.deepcopy(self._config['blueskykml_config'])
 
         # set output directory if not already specified
         if afconfig.get_config_value(config_options,

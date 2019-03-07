@@ -284,18 +284,34 @@ MODULE_LEVEL = {
         }
     },
     "visualization": {
-        #  - ***'config' > 'visualization' > 'target'*** -- *optional* -- defaults to dispersion
+        "target": "'dispersion'"
+        "hysplit": {
+            "fire_locations_csv_filename": 'fire_locations.csv',
+            "fire_events_csv_filename": 'fire_events.csv',
+            "smoke_dispersion_kmz_filename": 'smoke_dispersion.kmz',
+            "fire_kmz_filename": 'fire_locations.kmz',
+            "prettykml": False,
+            "output_dir": None,
+            "images_dir": None,
+            "data_dir": "",
+            "blueskykml_config": {
+                'SmokeDispersionKMLInput': {
+                    # Use google's fire icon instead of BlueSkyKml's built-in icon
+                    # (if an alternative isn't already specified)
+                    # TODO: should we be using google's icon as the default?
+                    'FIRE_EVENT_ICON': "http://maps.google.com/mapfiles/ms/micons/firedept.png"
+                },
+                'DispersionGridOutput': {
+                    # If not set by user, it will be set to
+                    # output_dir/images_dir
+                    'OUTPUT_DIR': None
+                }
+            }
 
-        #  - ***'config' > 'visualization' > 'hysplit' > 'smoke_dispersion_kmz_filename'*** -- *optional* -- defaults to 'smoke_dispersion.kmz'
-        #  - ***'config' > 'visualization' > 'hysplit' > 'fire_kmz_filename'*** -- *optional* -- defaults to 'smoke_dispersion.kmz'
-        #  - ***'config' > 'visualization' > 'hysplit' > 'fire_locations_csv_filename'*** -- *optional* -- defaults to 'fire_locations.csv'
-        #  - ***'config' > 'visualization' > 'hysplit' > 'fire_events_csv_filename'*** -- *optional* -- defaults to 'fire_events.csv'
-        #  - ***'config' > 'visualization' > 'hysplit' > 'layers'*** -- *optional* -- defaults to [0]
-        #  - ***'config' > 'visualization' >  'hysplit' > 'prettykml'*** -- *optional* -- whether or not to make the kml human readable; defaults to false
-        #  - ***'config' > 'visualization' >  'hysplit' > 'output_dir' -- *optional* -- where to create visualization output; if not specified, visualization output will go in hysplit output directory
-        #  - ***'config' > 'visualization' >  'hysplit' > 'images_dir' -- *optional* -- sub-directory to contain images (relative to output direcotry); default is 'graphics/''
-        #  - ***'config' > 'visualization' >  'hysplit' > 'data_dir' -- *optional* -- sub-directory to contain data files (relative to output direcotry); default is output directory root
-        #  - ***'config' > 'visualization' >  'hysplit' > 'blueskykml_config' -- *optional* -- contains configuration to pass directly into blueskykml; expected to be nested with top level section keys and second level option keys; see https://github.com/pnwairfire/blueskykml/ for configuration options
+            # The following defaults are defined in the blueskykml package,
+            # so they don't need to be defined here
+            #"layers": [0],
+        }
     },
     "export": {
         "modes": [],

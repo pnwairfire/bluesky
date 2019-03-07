@@ -20,8 +20,7 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    target = fires_manager.get_config_value('visualization', 'target',
-        default='dispersion').lower()
+    target = fires_manager.get_config_value('visualization', 'target').lower()
     processed_kwargs = {"target": target}
     visualization_info = {"target": target}
     try:
