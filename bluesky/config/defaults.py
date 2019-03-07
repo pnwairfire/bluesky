@@ -13,9 +13,12 @@ TOP_LEVEL = {
     }
 }
 
-_HYSPLIT_BDYFILES_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)),
+_REPO_ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+_HYSPLIT_BDYFILES_PATH = os.path.join(_REPO_ROOT_DIR,
     'dispersers/hysplit/bdyfiles')
+_VSMOKE_IMAGES_PATH = os.path.join(_REPO_ROOT_DIR,
+    'dispersers/vsmoke/images'
+
 MODULE_LEVEL = {
     "load": {
         "sources": []
@@ -460,7 +463,7 @@ MODULE_LEVEL = {
             # KMZ Output settings
             "KMZ_FILE": "smoke_dispersion.kmz",
             "OVERLAY_TITLE": "Peak Hourly PM2.5",
-            "LEGEND_IMAGE": os.path.join(os.path.dirname(__file__), 'images', "aqi_legend.png"),
+            "LEGEND_IMAGE": os.path.join(_VSMOKE_IMAGES_PATH, "aqi_legend.png"),
 
             # GeoJSON Output settings
             "JSON_FILE": "smoke_dispersion.json",
