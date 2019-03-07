@@ -519,33 +519,36 @@ MODULE_LEVEL = {
         "modes": [],
         "extra_exports": [],
         "email": {
-            # - ***'config' > 'export' > 'email' > 'recipients'*** -- *required* --
-            # - ***'config' > 'export' > 'email' > 'sender'*** -- *optional* -- defaults to 'bsp@airfire.org'
-            # - ***'config' > 'export' > 'email' > 'subject'*** -- *optional* -- defaults to 'bluesky run output'
-            # - ***'config' > 'export' > 'email' > 'smtp_server'*** -- *optional* -- defaults to 'localhost'
-            # - ***'config' > 'export' > 'email' > 'smtp_port'*** -- *optional* -- defaults to 1025
-            # - ***'config' > 'export' > 'email' > 'smtp_starttls'*** -- *optional* -- defaults to False
-            # - ***'config' > 'export' > 'email' > 'username'*** -- *optional* --
-            # - ***'config' > 'export' > 'email' > 'password'*** -- *optional* --
+            "recipients": None,
+            # TODO: should there indeed be a default sender?
+            "sender": "bsp@airfire.org",
+            "subject": "bluesky run output",
+            "smtp_server": "localhost",
+            "smtp_port": 25,
+            "smtp_starttls": False,
+            "username": None,
+            "password": None
         },
         "localsave": {
-
-            #  - ***'config' > 'export' > 'localsave' > 'output_dir_name'*** -- *optional* -- defaults to run_id, which is generated if not defined
-            #  - ***'config' > 'export' > 'localsave' > 'extra_exports_dir_name'*** -- *optional* -- generated from extra_exports mode name(s) if not defined
-            #  - ***'config' > 'export' > 'localsave' > 'json_output_filename'*** -- *optional* -- defaults to 'output.json'
-            #  - ***'config' > 'export' > 'localsave' > 'dest_dir'*** - *required* -- destination directory to contain output directory
-            #  - ***'config' > 'export' > 'localsave' > 'handle_existing'*** - *optional* -- how to handle case where output dir already exists; options: 'replace', 'write_in_place', 'fail'; defaults to 'fail'
+            "handle_existing": "fail",
+            "output_dir_name": None,
+            "extra_exports_dir_name": None,
+            "json_output_filename": "output.json",
+            "dest_dir": None
         },
         "upload": {
-            #  - ***'config' > 'export' > 'upload' > 'output_dir_name'*** -- *optional* -- defaults to run_id, which is generated if not defined
-            #  - ***'config' > 'export' > 'upload' > 'extra_exports_dir_name'*** -- *optional* -- generated from extra_exports mode name(s) if not defined
-            #  - ***'config' > 'export' > 'upload' > 'json_output_filename'*** -- *optional* -- defaults to 'output.json'
+            "handle_existing": "fail",
+            "output_dir_name": None,
+            "extra_exports_dir_name": None,
+            "json_output_filename": "output.json",
 
-            #  - ***'config' > 'export' > 'upload' > 'tarball_name'*** - *optional* -- defaults to '<output_dir>.tar.gz'
-            #  - ***'config' > 'export' > 'upload' > 'scp' > 'host'*** - *required* if uploading via scp (which is currently the only supported upload mode) -- hostname of server to scp to
-            #  - ***'config' > 'export' > 'upload' > 'scp' > 'user'*** - *optional* if uploading via scp (which is currently the only supported upload mode) -- username to use in scp; defaults to 'bluesky'
-            #  - ***'config' > 'export' > 'upload' > 'scp' > 'port'*** - *optional* if uploading via scp (which is currently the only supported upload mode) -- port to use in scp; defaults to 22
-            #  - ***'config' > 'export' > 'upload' > 'scp' > 'dest_dir'*** - *required* if uploading via scp (which is currently the only supported upload mode) -- destination directory on remote host to contain output directory
+            "tarball_name": None,
+            "scp": {
+                "host": None,
+                "user": None, # TODO: did this default to 'bluesky' before?
+                "port": 22,
+                "dest_dir": None
+            }
         }
     }
 

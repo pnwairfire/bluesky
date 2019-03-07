@@ -25,10 +25,11 @@ class ExporterBase(object):
     def __init__(self, extra_exports, config):
         self._config = config
         self._extra_exports = extra_exports
-        self._handle_existing = self.config('handle_existing', default='fail')
+        self._handle_existing = self.config('handle_existing')
 
-    def config(self, *keys, **kwargs):
-        return afconfig.get_config_value(self._config, *keys, **kwargs)
+    def config(self, *keys):
+        return afconfig.get_config_value(self._config, *keys,
+            fail_on_missing=True)
 
     def export(self, fires_manager):
         raise NotImplementedError("Bluesky's {} exporter needs to "
@@ -48,7 +49,7 @@ class ExporterBase(object):
         if not create_tarball:
             r['directory'] = output_dir
 
-        json_output_filename = self.config('json_output_filename') or 'output.json'
+        json_output_filename = self.config('json_output_filename')
         r['output_json'] = json_output_filename
 
         fires_manager.export = fires_manager.export or {}

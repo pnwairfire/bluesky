@@ -20,7 +20,6 @@ __all__ = [
 
 __version__ = "0.1.0"
 
-DEFAULT_SCP_PORT = 22
 
 class UploadExporter(ExporterBase):
 
@@ -121,7 +120,7 @@ class UploadExporter(ExporterBase):
     def _scp_upload(self, options, tarball):
         # TODO: check if host is in fact this server; if so,
         #   simply move tarball and unpack it rather than scp it;
-        port = str(options['port'] or DEFAULT_SCP_PORT)
+        port = str(options['port'])
         remote_server = "{}@{}".format(options['user'], options['host'])
         destination = "{}:{}".format(remote_server, options['dest_dir'])
 
@@ -148,7 +147,7 @@ class UploadExporter(ExporterBase):
 
     def _scp_unpack(self, options, tarball):
         remote_server = "{}@{}".format(options['user'], options['host'])
-        port = str(options['port'] or DEFAULT_SCP_PORT)
+        port = str(options['port'])
         tarball_filename = os.path.basename(tarball)
         logging.info("Extracting {} on {} in {}".format(tarball,
             remote_server, options['dest_dir']))
