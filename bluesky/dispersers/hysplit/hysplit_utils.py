@@ -15,7 +15,7 @@ from functools import reduce
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models.fires import Fire
 from .. import PHASES, TIMEPROFILE_FIELDS
-from . import defaults
+from bluesky.config import defaults
 
 __all__ = [
     'create_fire_sets', 'create_fire_tranches'
