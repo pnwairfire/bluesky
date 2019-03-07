@@ -2,11 +2,8 @@
 """
 
 from bluesky.dispersers import DispersionBase
-from bluesky.dispersers.hysplit import defaults
 
 class FakeDisperser(DispersionBase):
-    # Use hysplits defaults
-    DEFAULTS = defaults
 
     def _required_growth_fields(self):
         pass
