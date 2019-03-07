@@ -61,7 +61,7 @@ from .. import (
     DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE, PHASES
 )
 
-from . import defaults, hysplit_utils
+from . import hysplit_utils
 
 __all__ = [
     'HYSPLITDispersion'
@@ -153,10 +153,6 @@ class HYSPLITDispersion(DispersionBase):
     TODO: determine which config options we'll support
     """
 
-    DEFAULTS = defaults
-
-    DEFAULT_OUTPUT_FILE_NAME = "hysplit_conc.nc"
-
     def __init__(self, met_info, **config):
         super(HYSPLITDispersion, self).__init__(met_info, **config)
 
@@ -165,8 +161,7 @@ class HYSPLITDispersion(DispersionBase):
         self.BINARIES = _get_binaries(self._config)
 
         self._set_met_info(copy.deepcopy(met_info))
-        self._output_file_name = (self.config('output_file_name')
-            or self.DEFAULT_OUTPUT_FILE_NAME)
+        self._output_file_name = self.config('output_file_name')
 
     def _required_growth_fields(self):
         return ('timeprofile', 'plumerise')

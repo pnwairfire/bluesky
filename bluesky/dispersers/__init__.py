@@ -46,12 +46,6 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
     # external binaries
     BINARIES = {}
 
-    # 'DEFAULTS' object should be defined by each subclass that has default
-    # configuration settings (such as in a defaults module)
-    DEFAULTS = None
-
-
-
 
     def __init__(self, met_info, **config):
         # convert all keys to lower case
@@ -68,27 +62,13 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
     def _log_config(self):
         # TODO: bail if logging level is less than DEBUG (to avoid list and
         #   set operations)
-        defaults = sorted([c for c in dir(self.DEFAULTS) if not c.startswith('_')])
-        with_no_defaults = [c for c in sorted(self._config.keys())
-            if c.upper() not in defaults]
-        not_overridden = [c for c in defaults if c.lower() not in self._config]
-        overridden = set(defaults).difference(not_overridden)
-        for c in with_no_defaults:
-            logging.debug('User defined dispersion config setting - %s = %s', c,
-                self.config(c))
-        for c in overridden:
-            logging.debug('User overridden dispersion config setting - %s = %s (default: %s)',
-                c, self.config(c), getattr(self.DEFAULTS, c))
-        for c in not_overridden:
-            logging.debug('Default dispersion config setting - %s = %s',
-                c, self.config(c))
+        for c in sorted(self._config.keys()):
+            logging.debug('Dispersion config setting - %s = %s', c,
+                self._config[c])
 
     def config(self, key):
-        # check if key is defined, in order, a) in the config as upper case,
-        # b) in the config as lower case, c) in the hardcoded defaults as
-        # upper case
-        return self._config.get(key.lower(),
-            getattr(self.DEFAULTS, key.upper(), None))
+        # check if key is defined, in the config as lower case or as lower case
+        return self._config.get(key.lower(), self._config.get(key.upper()))
 
     def run(self, fires, start, num_hours, output_dir, working_dir=None):
         """Runs hysplit

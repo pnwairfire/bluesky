@@ -1,17 +1,21 @@
+import os
+
 TOP_LEVEL = {
     "skip_failed_fires": False,
     "skip_failed_sources": False,
     "statuslogging": {
-        #  - ***'config' > 'statuslogging' > 'enabled'*** - on/off switch
-        #  - ***'config' > 'statuslogging' > 'api_endpoint'*** - i.e. http://HOSTNAME/status-logs/",
-        #  - ***'config' > 'statuslogging' > 'api_key'*** - api key
-        #  - ***'config' > 'statuslogging' > 'api_secret'*** - api secret
-        #  - ***'config' > 'statuslogging' > 'process'*** - how you want to identify the process to the status logger
-        #  - ***'config' > 'statuslogging' > 'domain'*** - how you want to identify the met domain to the status logger
+        "enabled": False,
+        "api_endpoint": None,
+        "api_key": None,
+        "api_secret": None,
+        "process": None,
+        "domain": None
     }
 }
 
-
+_HYSPLIT_BDYFILES_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)),
+    'dispersers/hysplit/bdyfiles')
 MODULE_LEVEL = {
     "load": {
         "sources": []
@@ -34,16 +38,15 @@ MODULE_LEVEL = {
     },
     "filter": {
         "skip_failures": False
-
-        #  - ***'config' > 'filter' > 'skip_failures'*** -- *optional* -- if fires filter fails, move on; default: false
-        #  - ***'config' > 'filter' > 'country' > 'whitelist'*** -- *required* if 'country' section is defined and 'blacklist' array isn't -- whitelist of countries to include
-        #  - ***'config' > 'filter' > 'country' > 'blacklist'*** -- *required* if 'country' section is defined and 'whiteilst' array isn't -- blacklist of countries to exclude
-        #  - ***'config' > 'filter' > 'area' > 'min'*** -- *required* if 'area' section is defined and 'max' subfield isn't -- min area threshold
-        #  - ***'config' > 'filter' > 'area' > 'max'*** -- *required* if 'area' section is defined and 'min' subfield isn't -- max area threshold
-        #  - ***'config' > 'filter' > 'location' > 'boundary' > 'sw' > 'lat'*** -- *required* if 'location' section is defined --
-        #  - ***'config' > 'filter' > 'location' > 'boundary' > 'sw' > 'lng'*** -- *required* if 'location' section is defined --
-        #  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lat'*** -- *required* if 'location' section is defined --
-        #  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lng'*** -- *required* if 'location' section is defined --
+        # The following filter-specific sub-dicts have to be commented out
+        # in the defaults, since each one's presence/absence determines whether
+        # or not the filter is run.  There are no default values anywa
+        # for the filter-specific options
+        #   "country": {"whitelist": None, "blacklist": None},
+        #   "area": {"min": None, "max": None}
+        #   "location": {"boundary": {
+        #     "sw": { "lat":None, "lng": None},
+        #     "ne": { "lat":None, "lng": None}}}
     },
     "splitgrowth": {
         "record_original_growth": False
@@ -152,91 +155,13 @@ MODULE_LEVEL = {
         "working_dir": None,
         "handle_existing": "fail",
         "hsyplit": {
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'spacing'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed --
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'domain'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed -- default: 'LatLng' (which means the spacing is in degrees)
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed --
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed --
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed --
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed --
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'COMPUTE_GRID'*** -- *required* to be set to true if grid is not defined in met data, in 'grid' setting, or by USER_DEFINED_GRID settings -- whether or not to compute grid
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'GRID_LENGTH'***
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'CONVERT_HYSPLIT2NETCDF'*** -- *optional* -- default: true
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'output_file_name'*** -- *optional* -- default: 'hysplit_conc.nc'
+            "skip_invalid_fires": False,
 
+            # NOTE: executables are no longer configurable.  It is assumed that any
+            # executable upon which hysplit depends is in a directory in the search path.
+            # This is a security measure for when hysplit is executed via web requests.
 
-            #  ####### Config settings adopted from BlueSky Framework
-
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'DISPERSION_OFFSET'*** -- *optional* -- number of hours to offset start of dispersion
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'ASCDATA_FILE'*** -- *optional* -- default: use default file in package
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'CENTER_LATITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'CENTER_LONGITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'DELT'*** -- *optional* -- default: 0.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'DISPERSION_FOLDER'*** -- *optional* -- default: "./input/dispersion"
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'DRY_DEP_DIFFUSIVITY'*** -- *optional* -- default: 0.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'DRY_DEP_EFF_HENRY'*** -- *optional* -- default: 0.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'DRY_DEP_MOL_WEIGHT'*** -- *optional* -- default: 0.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'DRY_DEP_REACTIVITY'*** -- *optional* -- default: 0.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'DRY_DEP_VELOCITY'*** -- *optional* -- default: 0.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'FIRE_INTERVALS'*** -- *optional* -- default: [0, 100, 200, 500, 1000]
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'HEIGHT_LATITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'ICHEM'*** -- *optional* -- default: 0; options:
-            #    - 0 -> none
-            #    - 1 -> matrix
-            #    - 2 -> 10% / hour
-            #    - 3 -> PM10 dust storm simulation
-            #    - 4 -> Set concentration grid identical to the meteorology grid (not in GUI)
-            #    - 5 -> Deposition Probability method
-            #    - 6 -> Puff to Particle conversion (not in GUI)
-            #    - 7 -> Surface water pollutant transport
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'INITD'*** -- *optional* -- default: 0
-            #    - 0 -> horizontal & vertical particle
-            #    - 1 -> horizontal gaussian puff, vertical top hat puff
-            #    - 2 -> horizontal & vertical top hat puff
-            #    - 3 -> horizontal gaussian puff, verticle particle
-            #    - 4 -> horizontal top hat puff, verticle particle
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'KHMAX'*** -- *optional* -- default: 72
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'LANDUSE_FILE'*** -- *optional* -- default: use default file in package
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'MAKE_INIT_FILE'*** -- *optional* -- default: false
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'MAXPAR'*** -- *optional* -- default: 10000
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'MAX_SPACING_LONGITUDE'*** -- *optional* -- default: 0.5
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'MAX_SPACING_LATITUDE'*** -- *optional* -- default: 0.5
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'MGMIN'*** -- *optional* -- default: 10
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'MPI'*** -- *optional* -- default: false
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'NCPUS'*** -- *optional* -- default: 1
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'NCYCL'*** -- *optional* -- default: 24
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'NDUMP'*** -- *optional* -- default: 24
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'NFIRES_PER_PROCESS'*** -- *optional* -- default: -1 (i.e. no tranching)
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'NINIT'*** -- *optional* -- default: 0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'NPROCESSES'*** -- *optional* -- default: 1 (i.e. no tranching)
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'NPROCESSES_MAX'*** -- *optional* -- default: -1  (i.e. no tranching)
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'NUMPAR'*** -- *optional* -- default: 500
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'OPTIMIZE_GRID_RESOLUTION'*** -- *optional* -- default: false
-            # PARTICLE_DENSITY = 1.0
-            # PARTICLE_DIAMETER = 1.0
-            # PARTICLE_SHAPE = 1.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'PARINIT'*** -- *optional* -- default: "./input/dispersion/PARINIT"
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'PARDUMP'*** -- *optional* -- default: "./input/dispersion/PARDUMP"
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'QCYCLE'*** -- *optional* -- default: 1.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'RADIOACTIVE_HALF_LIVE'*** -- *optional* -- default: 0.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'ROUGLEN_FILE'*** -- *optional* -- default: use default file in package
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'SAMPLING_INTERVAL_HOUR'*** -- *optional* -- default: 1
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'SAMPLING_INTERVAL_MIN '*** -- *optional* -- default: 0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'SAMPLING_INTERVAL_TYPE'*** -- *optional* -- default: 0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'SMOLDER_HEIGHT'*** -- *optional* -- default: 10.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'SPACING_LATITUDE'*** -- *required* if either COMPUTE_GRID or USER_DEFINED_GRID is true
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'SPACING_LONGITUDE'*** -- *required* if either COMPUTE_GRID or USER_DEFINED_GRID is true
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'STOP_IF_NO_PARINIT'*** -- *optional* -- default: True
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'TOP_OF_MODEL_DOMAIN'*** -- *optional* -- default: 30000.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'TRATIO'*** -- *optional* -- default: 0.75
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'USER_DEFINED_GRID'*** -- *required* to be set to true if grid is not defined in met data or in 'grid' settings, and it's not being computed -- default: False
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_EMISLEVELS_REDUCTION_FACTOR'*** -- *optional* -- default: 1
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_LEVELS'*** -- *optional* -- default: [100]
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_METHOD'*** -- *optional* -- default: "DATA"
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'WET_DEP_ACTUAL_HENRY'*** -- *optional* -- default: 0.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'WET_DEP_BELOW_CLOUD_SCAV'*** -- *optional* -- default: 0.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'WET_DEP_IN_CLOUD_SCAV'*** -- *optional* -- default: 0.0
-            #  - ***'config' > 'dispersion' > 'hysplit' > 'WIDTH_LONGITUDE'*** -- *required if USER_DEFINED_GRID==true* -- default: none
+            ## Grid
 
             # Note about the grid:  There are three ways to specify the dispersion grid.
             # If USER_DEFINED_GRID is set to true, hysplit will expect BlueSky framework's
@@ -246,6 +171,207 @@ MODULE_LEVEL = {
             # 'hysplit' > 'grid' for 'boundary', 'spacing', and 'domain' fields.  If not
             # defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
             # 'met' object.
+
+            # User defined concentration grid option
+            "USER_DEFINED_GRID": False,
+            "CENTER_LATITUDE": None,
+            "CENTER_LONGITUDE": None,
+            "WIDTH_LONGITUDE": None,
+            "HEIGHT_LATITUDE": None,
+            # *required* if either COMPUTE_GRID or USER_DEFINED_GRID is true
+            "SPACING_LONGITUDE": None,
+            "SPACING_LATITUDE": None,
+
+            # There are no default 'grid' parameter, and the presence/absence
+            # of a grid definition is used in the logic in the code.  So,
+            # leave it commented out
+            #"grid": {
+            #    "spacing": None,
+            #    "domain": None,
+            #    "boundary": {
+            #     "sw": { "lat":None, "lng": None},
+            #     "ne": { "lat":None, "lng": None}}
+            #}
+
+            # computing grid around fire
+            "COMPUTE_GRID": False, # Program to convert raw HYSPLIT output to netCDF
+            "GRID_LENGTH": 2000, # km
+
+            # Optimize (i.e. decrease) concentration grid resolution based on number of fires
+            "OPTIMIZE_GRID_RESOLUTION": = False,
+            "MAX_SPACING_LONGITUDE": = 0.50,
+            "MAX_SPACING_LATITUDE": = 0.50,
+
+            ## Resource Files
+
+            # Ancillary data files (note: HYSPLIT4.9 balks if it can't find ASCDATA.CFG)
+            #  The code will default to using
+            "ASCDATA_FILE": os.path.join(_HYSPLIT_BDYFILES_PATH, 'ASCDATA.CFG'),
+            "LANDUSE_FILE": os.path.join(_HYSPLIT_BDYFILES_PATH, 'LANDUSE.ASC'),
+            "ROUGLEN_FILE": os.path.join(_HYSPLIT_BDYFILES_PATH, 'ROUGLEN.ASC'),
+
+
+            ## Other
+
+            "CONVERT_HYSPLIT2NETCDF": True,
+            "output_file_name": "hysplit_conc.nc",
+
+            "SMOLDER_HEIGHT": 10.0,
+
+            # Height in meters of the top of the model domain
+            "TOP_OF_MODEL_DOMAIN": 30000.0,
+
+            # List of vertical levels for output sampling grid
+            "VERTICAL_LEVELS": [100],
+
+            # Factor for reducing the number of vertical emission levels
+            "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 1,
+
+            # Method of vertical motion calculation in HYSPLIT
+            # Choices: DATA, ISOB, ISEN, DENS, SIGMA, DIVERG, ETA
+            "VERTICAL_METHOD": "DATA",
+
+            ## HYSPLIT Setup variables
+
+            # Location of particle initialization input files
+            "DISPERSION_FOLDER": "./input/dispersion",
+
+            # conversion modules
+            #    0 - none
+            #    1 - matrix
+            #    2 - 10% / hour
+            #    3 - PM10 dust storm simulation
+            #    4 - Set concentration grid identical to the meteorology grid (not in GUI)
+            #    5 - Deposition Probability method
+            #    6 - Puff to Particle conversion (not in GUI)
+            #    7 - Surface water pollutant transport
+            "ICHEM": 0,
+
+            "FIRE_INTERVALS": [0, 100, 200, 500, 1000],
+
+            # name of the particle initialization input file
+            # NOTE: must be limited to 80 chars max (i think, rcs)
+            "PARINIT": "./input/dispersion/PARINIT",
+
+            "NINIT": 0
+            # Stop processing if no particle initialization file is found and NINIT != 0
+            "STOP_IF_NO_PARINIT": True,
+
+            # Create a particle initialization input file
+            "MAKE_INIT_FILE": False,
+
+            # name of the particle initialization output file
+            # NOTES: must be limited to 80 chars max (i think, rcs)
+            #        also, MPI runs will append a .NNN at the end
+            #        based on the CPU number. subsequent restarts must
+            #        use the same number of CPUs as the original that
+            #        created the dump files. code will warn if there
+            #        are few files than CPUs but will ignore files
+            #        for cases when more files than CPUs.
+            "PARDUMP": './input/dispersion/PARDUMP',
+
+            # Number of hours from the start of the simulation to write the particle
+            # initialization file (NOTE: unlike the comments in the v7 hysplit module,
+            # negative values do not actually appear to be supported as NDUMP must be
+            # greater than 0 for this to occur)
+            "NDUMP": 0, # TODO: should this be 24 ?
+
+            # The repeat interval at which the particle initialization file will be
+            # written after NDUMP
+            "NCYCL": 0, # TODO: should this be 24 ?
+
+            ## ADVANCED Setup variable options
+
+            # Minimum size in grid units of the meteorological sub-grid
+            #         default is 10 (from the hysplit user manual). however,
+            #         once hysplit complained and said i need to raise this
+            #         variable to some value around 750...leaving w/default
+            #         but change if required.
+            "MGMIN": 10,
+
+            # Maximum length of a trajectory in hours
+            "KHMAX": 72,
+
+            # Number of hours between emission start cycles
+            "QCYCLE": 1.0,
+
+            # NINIT: Read a particle initialization input file?
+            # 0 - horizontal & vertical particle
+            # 1 - horizontal gaussian puff, vertical top hat puff
+            # 2 - horizontal & vertical top hat puff
+            # 3 - horizontal gaussian puff, verticle particle
+            # 4 - horizontal top hat puff, verticle particle
+            "INITD": 0,
+
+            # used to calculate the time step integration interval
+            "TRATIO": 0.750,
+            "DELT": 0.0,
+
+            # particle release limits. if 0 is provided then the values are calculated
+            # based on the number of sources: numpar" = num_sources" = num_fires*num_heights)
+            # and maxpar" = numpar*1000/ncpus
+            "NUMPAR": 1000,
+            "MAXPAR": 10000000,
+
+            #
+            # MPI options
+            #
+            # This flag triggers MPI with multpile cores/processors on a single (local) node via MPICH2
+            "MPI": False,
+
+            # Number of processors/cores per HYSPLIT Process
+            "NCPUS": 1,
+
+            # Optional tranching of dispersion calculation using multiple HYSPLIT processes
+            # There are two options:
+            #  - Specify the number of processes (NPROCESSES) and let BlueSky determine
+            #    how many fires are input into each process
+            #  - Specify the number of fires per process (NFIRES_PER_PROCESS) and
+            #    let BlueSky determine how many processes need to be run, up to an
+            #    optional max (NPROCESSES_MAX).  The NFIRES_PER_PROCESS/NPROCESSES_MAX
+            #    option is ignored if NPROCESSES is set to 1 or greater
+            "NPROCESSES": 1,
+            "NFIRES_PER_PROCESS": -1,
+            "NPROCESSES_MAX": -1,
+
+            # Machines file (TODO: functionality for multiple nodes)
+            #MACHINEFILE": machines,
+
+            #
+            # CONTROL vars:
+            #
+
+            # sampling interval type, hour & min (default 0 1 0)
+            # type of 0 gives the average over the interval
+            "SAMPLING_INTERVAL_TYPE": 0,
+            "SAMPLING_INTERVAL_HOUR": 1,
+            "SAMPLING_INTERVAL_MIN": 0,
+
+            # particle stuff (1.0 use default hysplit values)
+            # diamater in micrometer, density in g/cc.
+            "PARTICLE_DIAMETER": 1.0,
+            "PARTICLE_DENSITY": 1.0,
+            "PARTICLE_SHAPE": 1.0,
+
+            # dry deposition vars (0.0 use default hysplit values)
+            # velocity is m/s and weight is g/mol.
+            "DRY_DEP_VELOCITY": 0.0,
+            "DRY_DEP_MOL_WEIGHT": 0.0,
+            "DRY_DEP_REACTIVITY": 0.0,
+            "DRY_DEP_DIFFUSIVITY": 0.0,
+            "DRY_DEP_EFF_HENRY": 0.0,
+
+            # wet deposition vars (0.0 use default hysplit values)
+            # in-cloud scav is L/L, below cloud is 1/s.
+            "WET_DEP_ACTUAL_HENRY": 0.0,
+            "WET_DEP_IN_CLOUD_SCAV": 0.0,
+            "WET_DEP_BELOW_CLOUD_SCAV": 0.0,
+
+            # radioactive decay half live in days (0.0 is default, ie: no decay)
+            "RADIOACTIVE_HALF_LIVE": 0.0,
+
+            # number of hours to offset start of dispersion
+            "DISPERSION_OFFSET": 0
         },
         "vsmoke": {
             #  - ***'config' > 'dispersion' > 'vsmoke' > 'TEMP_FIRE' -- temperature of fire (F), default: 59.0
