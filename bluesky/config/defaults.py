@@ -69,7 +69,7 @@ MODULE_LEVEL = {
 
         # the following defaults are *not* defined in fccsmap package
         "truncation_percentage_threshold": 90.0,
-        "truncation_count_threshold": ; 5
+        "truncation_count_threshold": 5
     },
     "consumption": {
         "fuel_loadings": None,
@@ -140,7 +140,7 @@ MODULE_LEVEL = {
         "dest_dir": None,
         "emissionscsv": {
             "filename": None
-        }
+        },
         "firescsvs": {
             "fire_locations_filename": "fire_locations.csv",
             "fire_events_filename": "fire_events.csv"
@@ -200,9 +200,9 @@ MODULE_LEVEL = {
             "GRID_LENGTH": 2000, # km
 
             # Optimize (i.e. decrease) concentration grid resolution based on number of fires
-            "OPTIMIZE_GRID_RESOLUTION": = False,
-            "MAX_SPACING_LONGITUDE": = 0.50,
-            "MAX_SPACING_LATITUDE": = 0.50,
+            "OPTIMIZE_GRID_RESOLUTION": False,
+            "MAX_SPACING_LONGITUDE": 0.50,
+            "MAX_SPACING_LATITUDE": 0.50,
 
             ## Resource Files
 
@@ -255,7 +255,7 @@ MODULE_LEVEL = {
             # NOTE: must be limited to 80 chars max (i think, rcs)
             "PARINIT": "./input/dispersion/PARINIT",
 
-            "NINIT": 0
+            "NINIT": 0,
             # Stop processing if no particle initialization file is found and NINIT != 0
             "STOP_IF_NO_PARINIT": True,
 
@@ -444,7 +444,7 @@ MODULE_LEVEL = {
             # RUN SETTINGS
             #
 
-            "# Plume rise: TRUE": gradual to final ht, FALSE": immediately attain final ht,
+            # Plume rise: TRUE = gradual to final ht, FALSE = immediately attain final ht,
             "GRAD_RISE": True,
 
             # Proportion of emissions subject to plume rise
@@ -486,7 +486,7 @@ MODULE_LEVEL = {
         }
     },
     "visualization": {
-        "target": "'dispersion'"
+        "target": "dispersion",
         "hysplit": {
             "fire_locations_csv_filename": 'fire_locations.csv',
             "fire_events_csv_filename": 'fire_events.csv',
