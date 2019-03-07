@@ -37,7 +37,7 @@ to the beggining of PATH and PYTHONPATH env vars.
     docker run --rm -ti \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ -e PATH=/bluesky/bin/:$PATH \
-        bluesky py.test
+        bluesky py.test --disable-pytest-warnings
 
 You can also use the ```--collect-only``` option to see a list of all tests.
 
