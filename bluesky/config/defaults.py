@@ -17,7 +17,7 @@ _REPO_ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 _HYSPLIT_BDYFILES_PATH = os.path.join(_REPO_ROOT_DIR,
     'dispersers/hysplit/bdyfiles')
 _VSMOKE_IMAGES_PATH = os.path.join(_REPO_ROOT_DIR,
-    'dispersers/vsmoke/images'
+    'dispersers/vsmoke/images')
 
 MODULE_LEVEL = {
     "load": {
@@ -554,5 +554,4 @@ MODULE_LEVEL = {
             }
         }
     }
-
 }
