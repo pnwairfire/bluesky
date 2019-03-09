@@ -1,3 +1,5 @@
+import copy
+
 import afconfig
 
 # make sure importing AVAILABLE_MODULES doesn't result in
