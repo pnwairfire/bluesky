@@ -13,7 +13,7 @@ class Config:
     _TODAY = None
     _RAW_CONFIG = copy.deepcopy(defaults.DEFAULTS)
     _CONFIG = copy.deepcopy(defaults.DEFAULTS)
-    _IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
+    _IM_CONFIG = afconfig.ImmutableConfigDict(_CONFIG)
 
     def __new__(cls):
         # Never instantiate. Always return class object
