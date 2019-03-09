@@ -6,7 +6,7 @@ _HYSPLIT_BDYFILES_PATH = os.path.join(_REPO_ROOT_DIR,
 _VSMOKE_IMAGES_PATH = os.path.join(_REPO_ROOT_DIR,
     'dispersers/vsmoke/images')
 
-DEFAULTS_LEVEL = {
+DEFAULTS = {
     "skip_failed_fires": False,
     "skip_failed_sources": False,
     "statuslogging": {
