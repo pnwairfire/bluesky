@@ -299,7 +299,7 @@ def set_config(args, fires_manager):
     if args.dump_config:
         logging.info("Configuration:")
         # TODO: prune any config not relevant to modules specified
-        sys.stdout.write(json.dumps(fires_manager.config,
+        sys.stdout.write(json.dumps(fires_manager.dump_config(),
             indent=args.indent, cls=models.fires.FireEncoder))
         sys.exit(0)
 

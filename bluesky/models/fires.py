@@ -14,11 +14,10 @@ import traceback
 import uuid
 from collections import OrderedDict
 
-import afconfig
 from pyairfire import process
 
 from bluesky import datautils, datetimeutils, __version__
-from bluesky.config import defaults as config_defaults
+from bluesky.config import Config
 from bluesky.exceptions import (
     BlueSkyImportError, BlueSkyModuleError, BlueSkyDatetimeValueError
 )
@@ -184,15 +183,14 @@ class FiresManager(object):
     def __init__(self, run_id=None):
         self._meta = {}
         self._initialize_today()
-        # self._raw_config will be set by config.setter; also,
-        # DEFAULTS will be deep-copied
-        self.config = config_defaults.TOP_LEVEL
+        # configuration no longer initialized here
         self.modules = []
         self.fires = [] # this intitializes self._fires and self._num_fires
         self._processed_run_id_wildcards = False
         self._num_fires = 0
         if run_id:
             self._meta['run_id'] = run_id
+            Config.set_run_id(run_id)
 
     ##
     ## Importing
@@ -283,6 +281,7 @@ class FiresManager(object):
         self._manually_set_today = False
         self._processed_today = True
         self._today = datetimeutils.today_utc()
+        Config.set_today(self._today)
 
     @property
     def today(self):
@@ -310,8 +309,7 @@ class FiresManager(object):
         if self._manually_set_today and previous_today != new_today:
             raise TypeError(self.TODAY_IS_IMMUTABLE_MSG)
 
-        if self._raw_config and previous_today != new_today:
-            self.config = self._raw_config
+        Config.set_today(today)
 
         self._manually_set_today = True
 
@@ -332,6 +330,7 @@ class FiresManager(object):
         if self._meta.get('run_id'):
             raise TypeError(self.RUN_ID_IS_IMMUTABLE_MSG)
         self._meta['run_id'] = run_id
+        Config.set_run_id(run_id)
         # HACK: access run id simply to trigger replacement of wildcards
         # Note: the check for 'run_id' in self._meta prevents it from being
         #  generated unnecessarily
@@ -348,10 +347,6 @@ class FiresManager(object):
         for m in module_names:
             try:
                 self._modules.append(importlib.import_module('bluesky.modules.%s' % (m)))
-                # fill in defaults, but let what's in self.config['m'] take
-                # precedence
-                self.config[m] = afconfig.merge_configs(
-                    config_defaults.MODULE_LEVEL, self.config.get(m, {}))
 
             except ImportError as e:
                 if str(e) == 'No module named {}'.format(m):
@@ -368,66 +363,25 @@ class FiresManager(object):
     ## Configuration
     ##
 
-    def replace_config_wildcards(self, val):
-        if isinstance(val, dict):
-            for k in val:
-                val[k] = self.replace_config_wildcards(val[k])
-        elif isinstance(val, list):
-            val = [self.replace_config_wildcards(v) for v in val]
-        elif hasattr(val, 'lower'):  # i.e. it's a string
-            if val:
-                # first, fill in any datetime control codes or wildcards
-                val = datetimeutils.fill_in_datetime_strings(val,
-                    today=self.today)
-
-                # then, see if the resulting string purely represents a datetime
-                try:
-                    val = datetimeutils.to_datetime(val, limit_range=True)
-                except BlueSkyDatetimeValueError:
-                    pass
-
-                if hasattr(val, 'capitalize'):
-                    # This gets rid of datetime parsing busters embedded
-                    # in strings to prevent conversion to datetime object
-                    val = val.replace('{datetime-parse-buster}', '')
-
-                    val = val.replace('{run_id}', self.run_id)
-
-                # TODO: any other replacements?
-
-        return val
-
-    def get_config_value(self, *keys, **kwargs):
-        if 'default' in kwargs:
-            raise DeprecationWarning("config defaults are specified in "
-                "bluesky.config.defaults module")
-
-        # default is fail if key isn't in user's config or in default config
-        return afconfig.get_config_value(self.config, *keys,
-            fail_on_missing_key=not kwargs.get('allow_missing'))
-
-    def set_config_value(self, value, *keys):
-        self._meta['config'] = self._meta.get('config') or dict()
-        value = self.replace_config_wildcards(value)
-        afconfig.set_config_value(self._meta['config'], value, *keys)
-        self._im_config = afconfig.ImmutableConfigDict(self._meta['config'])
+    # All these methods delegate to config.Config
 
     @property
     def config(self):
-        return self._im_config
+        return Config.get()
 
     @config.setter
     def config(self, config):
-        self._raw_config = copy.deepcopy(config)
-        self._meta['config'] = self.replace_config_wildcards(
-            copy.deepcopy(config))
-        self._im_config = afconfig.ImmutableConfigDict(self._meta['config'])
+        Config.set(config)
 
     def merge_config(self, config_dict):
-        if config_dict:
-            # Uses setter to take care of resetting self._im_config
-            self.config = afconfig.merge_configs(
-                self._meta.get('config') or dict(), config_dict)
+        Config.merge(config_dict)
+
+    def get_config_value(cls, *keys, **kwargs):
+        # Deprecate this method in favor of calling Contig directly?
+        return Config.get(*keys, **kwargs)
+
+    def dump_config(self):
+        return Config.dump(self.modules)
 
     ##
     ## Helper properties
@@ -516,9 +470,9 @@ class FiresManager(object):
         if not getattr(self, '_status_logger'):
             # init_time will be converted to string if it's datetime.date[time]
             init_time = (
-                self.get_config_value('dispersion', 'start', allow_missing=True)
+                Config.get('dispersion', 'start', allow_missing=True)
                 or self.today)
-            sl_config = self.get_config_value('statuslogging')
+            sl_config = Config.get('statuslogging')
             setattr(self, '_status_logger', StatusLogger(init_time, **sl_config))
         self._status_logger.log(status, step, action, **extra_fields)
 
@@ -646,7 +600,7 @@ class FiresManager(object):
 
     @property
     def skip_failed_fires(self):
-        return not not self.get_config_value('skip_failed_fires')
+        return not not Config.get('skip_failed_fires')
 
     ## Loading data
 
@@ -710,7 +664,7 @@ class FiresManager(object):
 
         return dict(self._meta, fire_information=self.fires, today=self.today,
             counts=self.counts, bluesky_version=__version__,
-            run_config=self.config)
+            run_config=Config.dump(self.modules))
 
     def dumps(self, output_stream=None, output_file=None, indent=None):
         if output_stream and output_file:
@@ -737,8 +691,7 @@ class FiresActionBase(object, metaclass=abc.ABCMeta):
          - fires_manager -- FiresManager object whose fires are to be merged
         """
         self._fires_manager = fires_manager
-        self._skip_failures = not not self._fires_manager.get_config_value(
-            self.ACTION, 'skip_failures')
+        self._skip_failures = not not Config.get(self.ACTION, 'skip_failures')
 
     def __enter__(self):
         logging.info("Number of fires before running %s: %s", self.ACTION,
@@ -967,7 +920,7 @@ class FireGrowthFilter(FiresActionBase):
          - fires_manager -- FiresManager object whose fires are to be merged
         """
         super(FireGrowthFilter, self).__init__(fires_manager)
-        self._filter_config = self._fires_manager.get_config_value('filter')
+        self._filter_config = Config.get('filter')
         self._filter_fields = set(self._filter_config.keys()) - set(['skip_failures'])
         if not self._filter_fields:
             if not self._skip_failures:

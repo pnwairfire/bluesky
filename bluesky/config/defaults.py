@@ -1,6 +1,12 @@
 import os
 
-TOP_LEVEL = {
+_REPO_ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+_HYSPLIT_BDYFILES_PATH = os.path.join(_REPO_ROOT_DIR,
+    'dispersers/hysplit/bdyfiles')
+_VSMOKE_IMAGES_PATH = os.path.join(_REPO_ROOT_DIR,
+    'dispersers/vsmoke/images')
+
+DEFAULTS_LEVEL = {
     "skip_failed_fires": False,
     "skip_failed_sources": False,
     "statuslogging": {
@@ -10,16 +16,7 @@ TOP_LEVEL = {
         "api_secret": None,
         "process": None,
         "domain": None
-    }
-}
-
-_REPO_ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
-_HYSPLIT_BDYFILES_PATH = os.path.join(_REPO_ROOT_DIR,
-    'dispersers/hysplit/bdyfiles')
-_VSMOKE_IMAGES_PATH = os.path.join(_REPO_ROOT_DIR,
-    'dispersers/vsmoke/images')
-
-MODULE_LEVEL = {
+    },
     "load": {
         "sources": []
         # Each source has some subset of the following defined, but
