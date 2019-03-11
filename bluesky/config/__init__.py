@@ -32,8 +32,8 @@ class Config:
     def merge(cls, config_dict):
         if config_dict:
             # Uses setter to take care of resetting cls._im_config
-            cls.set(afconfig.merge_configs(
-                cls._CONFIG, config_dict))
+            _c =cls.replace_config_wildcards(copy.deepcopy(config_dict))
+            cls.set(afconfig.merge_configs(cls._CONFIG, _c))
 
     @classmethod
     def set(cls, config_dict, **keys):
