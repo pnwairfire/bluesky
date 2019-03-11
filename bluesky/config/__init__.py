@@ -72,7 +72,7 @@ class Config:
         if keys:
             # default behavior is to fail if key isn't in user's config
             # or in default config
-            return afconfig.get_config_value(cls.config, *keys,
+            return afconfig.get_config_value(cls._IM_CONFIG, *keys,
                 fail_on_missing_key=not kwargs.get('allow_missing'))
         else:
             return cls._IM_CONFIG
@@ -99,7 +99,7 @@ class Config:
             if val:
                 # first, fill in any datetime control codes or wildcards
                 val = datetimeutils.fill_in_datetime_strings(val,
-                    today=cls.TODAY)
+                    today=cls._TODAY)
 
                 # then, see if the resulting string purely represents a datetime
                 try:
