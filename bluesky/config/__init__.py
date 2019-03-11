@@ -4,15 +4,24 @@ import afconfig
 
 # make sure importing AVAILABLE_MODULES doesn't result in
 # circular importsx
+from bluesky import datetimeutils
+from bluesky.exceptions import (
+    BlueSkyDatetimeValueError
+)
 from bluesky.modules import AVAILABLE_MODULES
-from . import defaults
+from .defaults import DEFAULTS
+
+__all__ = [
+    "Config",
+    "DEFAULTS"
+]
 
 class Config:
 
     _RUN_ID = None
     _TODAY = None
-    _RAW_CONFIG = copy.deepcopy(defaults.DEFAULTS)
-    _CONFIG = copy.deepcopy(defaults.DEFAULTS)
+    _RAW_CONFIG = copy.deepcopy(DEFAULTS)
+    _CONFIG = copy.deepcopy(DEFAULTS)
     _IM_CONFIG = afconfig.ImmutableConfigDict(_CONFIG)
 
     def __new__(cls):
