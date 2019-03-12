@@ -36,6 +36,7 @@ class Config:
         cls._CONFIG = copy.deepcopy(DEFAULTS)
         cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
 
+        return cls
 
     @classmethod
     def merge(cls, config_dict):
@@ -45,6 +46,8 @@ class Config:
             cls._CONFIG = afconfig.merge_configs(cls._CONFIG,
                 cls.replace_config_wildcards(copy.deepcopy(config_dict)))
             cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
+
+        return cls
 
     @classmethod
     def set(cls, config_dict, *keys):
@@ -60,6 +63,8 @@ class Config:
             cls._RAW_CONFIG = copy.deepcopy(DEFAULTS)
             cls._CONFIG = copy.deepcopy(DEFAULTS)
             cls.merge(config_dict)
+
+        return cls
 
     @classmethod
     def set_today(cls, today):
