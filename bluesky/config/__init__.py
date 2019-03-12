@@ -30,11 +30,11 @@ class Config:
 
     @classmethod
     def reset(cls):
-        _RUN_ID = None
-        _TODAY = None
-        _RAW_CONFIG = copy.deepcopy(DEFAULTS)
-        _CONFIG = copy.deepcopy(DEFAULTS)
-        _IM_CONFIG = afconfig.ImmutableConfigDict(_CONFIG)
+        cls._RUN_ID = None
+        cls._TODAY = None
+        cls._RAW_CONFIG = copy.deepcopy(DEFAULTS)
+        cls._CONFIG = copy.deepcopy(DEFAULTS)
+        cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
 
 
     @classmethod
