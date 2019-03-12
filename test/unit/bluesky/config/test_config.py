@@ -26,7 +26,7 @@ class TestGetAndSet(object):
         assert None == Config.get('fuelbeds', 'sdf', allow_missing=True)
         assert None == Config.get('sdf', 'keep_heat', allow_missing=True)
 
-    def test_setting_config_run_id_today():
+    def test_setting_config_run_id_today(self):
         # setting
         Config.set({"foo": "{run_id}_{today-2:%Y%m%d}_bar", "bar": "baz"})
         assert Config._RUN_ID == None
