@@ -71,7 +71,7 @@ class HysplitVisualizer(object):
                 self._hysplit_output_directory))
 
         self._hysplit_output_file = (disp_output_info.get('grid_filename')
-            or disp_conf.get('output_file_name'))
+            or Config.get('dispersion','hysplit','output_file_name'))
         if not self._hysplit_output_file:
             raise ValueError("hysplit output file must be defined")
         self._hysplit_output_file = os.path.join(self._hysplit_output_directory, self._hysplit_output_file)
