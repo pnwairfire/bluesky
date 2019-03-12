@@ -23,6 +23,7 @@ import afscripting
 # We're running bluesky via the package rather than by running the bsp script
 # to allow breaking into the code (with pdb)
 from bluesky import models
+from bluesky.config import Config
 
 # TODO: rename this script
 
@@ -423,9 +424,9 @@ def run(args):
     success = True
     for input_filename in input_filenames:
         fires_manager = load_scenario(input_filename)
-        fires_manager.set_config_value(args.emissions_model, 'emissions',
+        Config.set(args.emissions_model, 'emissions',
             'efs')
-        fires_manager.set_config_value(args.include_emissions_details,
+        Config.set(args.include_emissions_details,
             'emissions','include_emissions_details')
         fires_manager.modules = ['consumption', 'emissions']
         fires_manager.run()
