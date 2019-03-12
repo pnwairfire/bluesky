@@ -60,7 +60,7 @@ class HysplitVisualizer(object):
     def _set_dispersion_output_info(self):
         disp_output_info = (self._fires_manager.dispersion
             and self._fires_manager.dispersion.get('output')) or {}
-        disp_conf = Config.get('dispersion', default={})
+        disp_conf = Config.get('dispersion')
 
         self._hysplit_output_directory = (disp_output_info.get('directory')
             or disp_conf.get('output_dir'))
