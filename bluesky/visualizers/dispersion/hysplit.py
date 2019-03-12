@@ -80,8 +80,7 @@ class HysplitVisualizer(object):
                 self._hysplit_output_file))
 
         self._grid_params = (disp_output_info.get("grid_parameters")
-            or (hysplit_utils.get_grid_params(
-                    disp_conf.get('hysplit', {}), allow_undefined=True))
+            or (hysplit_utils.get_grid_params(allow_undefined=True))
             or {}) # allow them to be undefined
 
         self._start_time = (disp_output_info.get("start_time")
