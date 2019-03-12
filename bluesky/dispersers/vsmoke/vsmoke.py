@@ -25,8 +25,6 @@ from .. import (
     DispersionBase, TONS_PER_HR_TO_GRAMS_PER_SEC, BTU_TO_MW, PHASES
 )
 
-from . import defaults
-
 __all__ = [
     'VSMOKEDispersion'
 ]
@@ -42,7 +40,6 @@ class VSMOKEDispersion(DispersionBase):
         'VSMOKE': 'vsmoke',
         'VSMOKEGIS': 'vsmkgs'
     }
-    DEFAULTS = defaults
 
     def __init__(self, met_info, **config):
         super(VSMOKEDispersion, self).__init__(met_info, **config)

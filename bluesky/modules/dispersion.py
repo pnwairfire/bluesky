@@ -35,12 +35,11 @@ def run(fires_manager):
     processed_kwargs = {}
     try:
         module, klass = _get_module_and_class(model)
-        model_config = Config.get('dispersion', model)
 
         start, num_hours = _get_time(fires_manager)
         met = _filter_met(fires_manager.met, start, num_hours)
 
-        disperser = klass(met, **model_config)
+        disperser = klass(met)
         processed_kwargs.update({
             "{}_version".format(model): module.__version__
         })

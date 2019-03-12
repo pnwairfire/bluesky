@@ -15,7 +15,7 @@ from functools import reduce
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models.fires import Fire
 from .. import PHASES, TIMEPROFILE_FIELDS
-from bluesky.config import defaults
+from bluesky.config import Config
 
 __all__ = [
     'create_fire_sets', 'create_fire_tranches'
@@ -284,9 +284,11 @@ def grid_params_from_grid(grid, met_info={}):
         "width_longitude": width_lng
     }
 
-def get_grid_params(config, met_info={}, fires=None, allow_undefined=False):
-    # If not specified, projection is assumed to be 'LatLon'
-    is_deg = config.get('projection') == 'LatLon'
+def get_grid_params(met_info={}, fires=None, allow_undefined=False):
+    config = Config.get('dispersion', 'hysplit')
+
+    # defaults to 'LatLon' in config defaults
+    is_deg = config.get('projection')
 
     if config.get("USER_DEFINED_GRID"):
         # This supports BSF config settings

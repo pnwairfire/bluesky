@@ -94,7 +94,7 @@ DEFAULT_BINARIES = {
     }
 }
 
-def _get_binaries(config):
+def _get_binaries(config_getter):
     """The various executables can be specified either
     using the old BSF config keys or the new keys nested
     under 'binaries'. e.g.
@@ -135,13 +135,13 @@ def _get_binaries(config):
 
     The new way takes precedence over the old.
     """
-    binaries_config = {
-        k.lower(): v for k, v in config.get('binaries', {}).items()
-    }
+
     binaries = {}
     for k, d in DEFAULT_BINARIES.items():
-        binaries[k] = (binaries_config.get(k.lower())
-            or config.get(d['old_config_key'].lower())
+        # config_getter will try upper and lower case
+        # versions of k and d['old_config_key']
+        binaries[k] = (config_getter('binaries', k, allow_missing=True)
+            or config_getter(d['old_config_key'], allow_missing=True)
             or d['default'])
     return binaries
 
@@ -156,9 +156,7 @@ class HYSPLITDispersion(DispersionBase):
     def __init__(self, met_info, **config):
         super(HYSPLITDispersion, self).__init__(met_info, **config)
 
-        # pass in self._config, since it's keys were already
-        # converted to lowercase
-        self.BINARIES = _get_binaries(self._config)
+        self.BINARIES = _get_binaries(self.config)
 
         self._set_met_info(copy.deepcopy(met_info))
         self._output_file_name = self.config('output_file_name')
@@ -702,7 +700,7 @@ class HYSPLITDispersion(DispersionBase):
 
     def _set_grid_params(self):
         self._grid_params = hysplit_utils.get_grid_params(
-            self._config, met_info=self._met_info, fires=self._fires)
+            met_info=self._met_info, fires=self._fires)
 
     def _write_control_file(self, control_file, concFile):
         num_fires = len(self._fires)

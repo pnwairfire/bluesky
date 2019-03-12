@@ -47,9 +47,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
     BINARIES = {}
 
 
-    def __init__(self, met_info, **config):
-        # convert all keys to lower case
-        self._config = {k.lower(): v for k, v in config.items()}
+    def __init__(self, met_info):
+        self._model = self.__class__.__module__.split('.')[-2]
         self._log_config()
 
         # TODO: iterate through self.BINARIES.values() making sure each
@@ -62,15 +61,22 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
     def _log_config(self):
         # TODO: bail if logging level is less than DEBUG (to avoid list and
         #   set operations)
-        for c in sorted(self._config.keys()):
-            logging.debug('Dispersion config setting - %s = %s', c,
-                self._config[c])
+        _c = Config.get('dispersion', self._model)
+        for c in sorted(_c.keys()):
+            logging.debug('Dispersion config setting - %s = %s', c, _c[c])
 
-    def config(self, key):
-        # Config keys were all converted to lowercase, so no need to
-        # check uppercase version of 'key'
-        # TODO: handle missing key?
-        return self._config.get(key.lower())
+    def config(self, *keys, allow_missing=False):
+        for f in ('lower', 'upper'):
+            keys[-1] = getattr(keys[-1], f)()
+            try:
+                return Config.get('dispersion', self._model, *keys)
+            except KeyError():
+                pass
+
+        if not allow_missing:
+            raise KeyError("Config setting not defined: 'dispersion' > "
+                "'{}' > '{}'".format(self._model, key))
+        # else returns None
 
     def run(self, fires, start, num_hours, output_dir, working_dir=None):
         """Runs hysplit

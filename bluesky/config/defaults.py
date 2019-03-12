@@ -155,6 +155,7 @@ DEFAULTS = {
         "working_dir": None,
         "handle_existing": "fail",
         "hsyplit": {
+            "binaries": {},
             "skip_invalid_fires": False,
 
             # NOTE: executables are no longer configurable.  It is assumed that any
