@@ -154,7 +154,7 @@ DEFAULTS = {
         "output_dir": None,
         "working_dir": None,
         "handle_existing": "fail",
-        "hsyplit": {
+        "hysplit": {
             "binaries": {},
             "skip_invalid_fires": False,
 
