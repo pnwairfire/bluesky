@@ -37,6 +37,7 @@ import importlib
 import logging
 
 from bluesky import io
+from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 
 __author__ = "Joel Dubowy"
@@ -55,7 +56,7 @@ def run(fires_manager):
     """
     logging.info("Running load module")
     successfully_loaded_sources = []
-    sources = fires_manager.get_config_value('load', 'sources')
+    sources = Config.get('load', 'sources')
     if not sources:
         raise BlueSkyConfigurationError("No sources specified for load module")
     try:
@@ -70,7 +71,7 @@ def run(fires_manager):
                 # TODO: add fires to fires_manager
                 successfully_loaded_sources.append(source)
             except:
-                if not fires_manager.get_config_value('skip_failed_sources'):
+                if not Config.get('skip_failed_sources'):
                     raise
     finally:
         fires_manager.processed(__name__, __version__,

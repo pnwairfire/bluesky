@@ -10,6 +10,8 @@ import fccsmap
 from fccsmap.lookup import FccsLookUp
 from functools import reduce
 
+from bluesky.config import Config
+
 __all__ = [
     'run'
 ]
@@ -26,7 +28,7 @@ def run(fires_manager):
     fires_manager.processed(__name__, __version__,
         fccsmap_version=fccsmap.__version__)
 
-    fuelbeds_config = fires_manager.get_config_value('fuelbeds')
+    fuelbeds_config = Config.get('fuelbeds')
     logging.debug('Using FCCS version %s', fuelbeds_config['fccs_version'])
 
     for fire in fires_manager.fires:

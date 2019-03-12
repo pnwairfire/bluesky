@@ -13,6 +13,7 @@ import importlib
 import logging
 
 from bluesky import datetimeutils
+from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.dispersers.hysplit import hysplit
 from bluesky.datetimeutils import parse_datetime
@@ -30,11 +31,11 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    model = fires_manager.get_config_value('dispersion', 'model').lower()
+    model = Config.get('dispersion', 'model').lower()
     processed_kwargs = {}
     try:
         module, klass = _get_module_and_class(model)
-        model_config = fires_manager.get_config_value('dispersion', model)
+        model_config = Config.get('dispersion', model)
 
         start, num_hours = _get_time(fires_manager)
         met = _filter_met(fires_manager.met, start, num_hours)
@@ -111,8 +112,8 @@ def _get_module_and_class(model):
 SECONDS_PER_HOUR = 3600
 
 def _get_time(fires_manager):
-    start = fires_manager.get_config_value('dispersion', 'start')
-    num_hours = fires_manager.get_config_value('dispersion', 'num_hours')
+    start = Config.get('dispersion', 'start')
+    num_hours = Config.get('dispersion', 'num_hours')
 
     if not start or num_hours is None:
         s = fires_manager.earliest_start # needed for 'start' and 'num_hours'
@@ -133,15 +134,15 @@ def _get_time(fires_manager):
 
 
 def _get_dirs(fires_manager):
-    handle_existing = fires_manager.get_config_value(
+    handle_existing = Config.get(
         'dispersion', 'handle_existing')
 
-    output_dir = fires_manager.get_config_value('dispersion', 'output_dir')
+    output_dir = Config.get('dispersion', 'output_dir')
     if not output_dir:
         raise ValueError("Specify dispersion output directory")
     create_dir_or_handle_existing(output_dir, handle_existing)
 
-    working_dir = fires_manager.get_config_value('dispersion', 'working_dir')
+    working_dir = Config.get('dispersion', 'working_dir')
     if working_dir:
         create_dir_or_handle_existing(working_dir, handle_existing)
 

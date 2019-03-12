@@ -11,6 +11,7 @@ from timeprofile.static import (
     InvalidEmissionsDataError
 )
 
+from bluesky.config import Config
 from bluesky.datetimeutils import parse_datetimes
 from bluesky.exceptions import BlueSkyConfigurationError
 from functools import reduce
@@ -26,7 +27,7 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    hourly_fractions = fires_manager.get_config_value('timeprofiling', 'hourly_fractions')
+    hourly_fractions = Config.get('timeprofiling', 'hourly_fractions')
 
     fires_manager.processed(__name__, __version__,
         timeprofile_version=timeprofile.__version__)

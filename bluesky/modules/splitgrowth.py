@@ -5,6 +5,8 @@ __author__ = "Joel Dubowy"
 import copy
 import logging
 
+from bluesky.config import Config
+
 __all__ = [
     'run'
 ]
@@ -21,7 +23,7 @@ def run(fires_manager):
     """
     logging.info("Running merge module")
     fires_manager.processed(__name__, __version__)
-    record_original_growth = fires_manager.get_config_value(
+    record_original_growth = Config.get(
         'splitgrowth', 'record_original_growth')
 
     for fire in fires_manager.fires:

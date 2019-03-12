@@ -14,6 +14,7 @@ from plumerise import sev, feps, __version__ as plumerise_version
 from pyairfire import sun
 
 from bluesky import datautils, datetimeutils, locationutils
+from bluesky.config import Config
 
 __all__ = [
     'run'
@@ -43,7 +44,7 @@ def run(fires_manager):
 
 class ComputeFunction(object):
     def __init__(self, fires_manager):
-        model = fires_manager.get_config_value('plumerising', 'model').lower()
+        model = Config.get('plumerising', 'model').lower()
         fires_manager.processed(__name__, __version__,
             plumerise_version=plumerise_version, model=model)
 
@@ -53,7 +54,7 @@ class ComputeFunction(object):
             raise BlueSkyConfigurationError(
                 "Invalid plumerise model: '{}'".format(model))
 
-        config = fires_manager.get_config_value('plumerising', model)
+        config = Config.get('plumerising', model)
         self._compute_func = generator(config)
 
         if config.get('working_dir'):

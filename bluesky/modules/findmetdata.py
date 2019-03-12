@@ -12,6 +12,7 @@ import logging
 from met.arl import arlfinder
 
 from bluesky import io
+from bluesky.config import Config
 from bluesky.datetimeutils import (
     parse_datetimes, is_round_hour, parse_utc_offset
 )
@@ -42,7 +43,7 @@ def run(fires_manager):
     met_finder = _get_met_finder(fires_manager)
     time_windows = _get_time_windows(fires_manager)
 
-    wait_config = fires_manager.get_config_value('findmetdata','wait')
+    wait_config = Config.get('findmetdata','wait')
     @io.wait_for_availability(wait_config)
     def _find():
         files = []
@@ -67,7 +68,7 @@ def _get_met_root_dir(fires_manager):
     # TODO: specify domain instead of met_root_dir, and somehow configure (not
     # in the code, since this is open source), per domain, the root dir, arl file
     # name pattern, etc.
-    met_root_dir = fires_manager.get_config_value('findmetdata',
+    met_root_dir = Config.get('findmetdata',
         'met_root_dir')
     if not met_root_dir:
         raise BlueSkyConfigurationError("Config setting 'met_root_dir' "
@@ -77,10 +78,10 @@ def _get_met_root_dir(fires_manager):
 
 def _get_met_finder(fires_manager):
     met_root_dir = _get_met_root_dir(fires_manager)
-    met_format = fires_manager.get_config_value(
+    met_format = Config.get(
         'findmetdata', 'met_format').lower()
     if met_format == "arl":
-        arl_config = fires_manager.get_config_value('findmetdata', 'arl')
+        arl_config = Config.get('findmetdata', 'arl')
         logging.debug("ARL config: %s", arl_config)
         return arlfinder.ArlFinder(met_root_dir, **arl_config)
     else:
@@ -111,7 +112,7 @@ def _get_time_windows(fires_manager):
     return merged_time_windows
 
 def _get_configured_time_windows(fires_manager):
-    time_window = fires_manager.get_config_value('findmetdata', 'time_window')
+    time_window = Config.get('findmetdata', 'time_window')
     if time_window:
         logging.debug("Met time window specified in the config")
         time_window = parse_datetimes(time_window, 'first_hour', 'last_hour')
@@ -153,8 +154,8 @@ def _infer_time_windows_from_fires(fires_manager):
 
 
 def _get_dispersion_time_window(fires_manager):
-    start = fires_manager.get_config_value('dispersion', 'start')
-    num_hours = fires_manager.get_config_value('dispersion', 'num_hours')
+    start = Config.get('dispersion', 'start')
+    num_hours = Config.get('dispersion', 'num_hours')
     if start and num_hours:
         return {
             'start': start,

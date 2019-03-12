@@ -13,6 +13,7 @@ import os
 
 from met.arl.arlprofiler import ArlProfiler
 
+from bluesky.config import Config
 from bluesky.datetimeutils import parse_datetimes, parse_utc_offset
 from bluesky.locationutils import LatLng
 
@@ -34,7 +35,7 @@ def run(fires_manager):
         raise ValueError("Specify met files to use in localmet")
 
     arl_profiler = ArlProfiler(fires_manager.met.get('files'),
-        time_step=fires_manager.get_config_value('localmet', 'time_step'))
+        time_step=Config.get('localmet', 'time_step'))
     logging.debug("Extracting localmet data for %d fires",
         len(fires_manager.fires))
     for fire in fires_manager.fires:

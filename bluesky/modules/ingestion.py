@@ -136,6 +136,7 @@ import re
 import traceback
 
 from bluesky import consumeutils
+from bluesky.config import Config
 
 __all__ = [
     'run'
@@ -160,7 +161,7 @@ def run(fires_manager):
     logging.info("Running ingestion module")
     try:
         parsed_input = []
-        config = fires_manager.get_config_value('ingestion')
+        config = Config.get('ingestion')
         fire_ingester = FireIngester(**config)
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):

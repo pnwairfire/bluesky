@@ -377,8 +377,8 @@ class FiresManager(object):
         Config.merge(config_dict)
 
     def get_config_value(cls, *keys, **kwargs):
-        # Deprecate this method in favor of calling Contig directly?
-        return Config.get(*keys, **kwargs)
+        raise DeprecationWarning(
+            "Get config values with bluesky.config.Config.get")
 
     def dump_config(self):
         return Config.dump(self.modules)

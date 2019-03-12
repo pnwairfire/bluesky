@@ -17,6 +17,7 @@ from eflookup.fepsef import FepsEFLookup
 import consume
 
 from bluesky import datautils
+from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 
 from bluesky.consumeutils import (
@@ -48,11 +49,11 @@ def run(fires_manager):
     """
     # Supporting 'efs' for backwards compatibility
     # TODO: deprecate and remove support for 'efs'
-    model = (fires_manager.get_config_value('emissions', 'model')
-        or fires_manager.get_config_value('emissions', 'efs')
+    model = (Config.get('emissions', 'model')
+        or Config.get('emissions', 'efs')
         or 'feps').lower()
 
-    include_emissions_details = fires_manager.get_config_value(
+    include_emissions_details = Config.get(
         'emissions', 'include_emissions_details')
     fires_manager.processed(__name__, __version__, model=model,
         emitcalc_version=emitcalc_version, eflookup_version=eflookup_version)
@@ -61,7 +62,7 @@ def run(fires_manager):
         klass_name = ''.join([e.capitalize() for e in model.split('-')])
         klass = getattr(sys.modules[__name__], klass_name)
         e = klass(fires_manager.fire_failure_handler,
-            fires_manager.get_config_value)
+            Config.get)
     except AttributeError:
         msg = "Invalid emissions model: '{}'.".format(model)
         if model == 'urbanski':

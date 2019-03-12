@@ -24,6 +24,7 @@ from blueskykml import (
     smokedispersionkml, __version__ as blueskykml_version
 )
 
+from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.extrafilewriters.firescsvs import FiresCsvsWriter
 from bluesky.dispersers.hysplit import hysplit_utils
@@ -52,14 +53,14 @@ class HysplitVisualizer(object):
         self._fires = fires_manager.fires
         self._run_id = fires_manager.run_id
 
-        self._config = fires_manager.get_config_value(
+        self._config = Config.get(
             'visualization', 'hysplit')
         self._set_dispersion_output_info()
 
     def _set_dispersion_output_info(self):
         disp_output_info = (self._fires_manager.dispersion
             and self._fires_manager.dispersion.get('output')) or {}
-        disp_conf = self._fires_manager.get_config_value('dispersion', default={})
+        disp_conf = Config.get('dispersion', default={})
 
         self._hysplit_output_directory = (disp_output_info.get('directory')
             or disp_conf.get('output_dir'))
