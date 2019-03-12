@@ -65,18 +65,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         for c in sorted(_c.keys()):
             logging.debug('Dispersion config setting - %s = %s', c, _c[c])
 
-    def config(self, *keys, allow_missing=False):
-        for f in ('lower', 'upper'):
-            keys[-1] = getattr(keys[-1], f)()
-            try:
-                return Config.get('dispersion', self._model, *keys)
-            except KeyError():
-                pass
-
-        if not allow_missing:
-            raise KeyError("Config setting not defined: 'dispersion' > "
-                "'{}' > '{}'".format(self._model, key))
-        # else returns None
+    def config(self, *keys, **kwargs):
+        return Config.get('dispersion', self._model, *keys, **kwargs)
 
     def run(self, fires, start, num_hours, output_dir, working_dir=None):
         """Runs hysplit
