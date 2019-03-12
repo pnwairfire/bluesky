@@ -75,7 +75,7 @@ def create_fire_tranches(fire_sets, num_processes):
         fire_tranches.append(fires)
     return fire_tranches
 
-def compute_num_processes(num_fire_sets, **config):
+def compute_num_processes(num_fire_sets, **tranching_config):
     """Determines number of HYSPLIT tranches given the number of fires sets
     and various tranching related config variables.
 
@@ -83,7 +83,7 @@ def compute_num_processes(num_fire_sets, **config):
      - num_fire_sets -- number of sets of fires, each set represeting a fire over
        possibly multiple days
 
-    Config options:
+    Tranching config options:
      - num_processes -- if specified and greater than 0, this value is returned
      - num_fires_per_process -- if num_processes isn't specified and this value
        is (and is greater than 0), then the num_processes is set to the min value
@@ -93,10 +93,10 @@ def compute_num_processes(num_fire_sets, **config):
        num_processes isn't specified but num_fires_per_process is, and
        num_fires_per_process is greater than num_processes_max
     """
-    num_processes = config.get('num_processes', 0)
-    num_fires_per_process = config.get('num_fires_per_process', 0)
-    num_processes_max = config.get('num_processes_max', 0)
-    parinit_or_pardump = config.get('parinit_or_pardump', False)
+    num_processes = tranching_config.get('num_processes', 0)
+    num_fires_per_process = tranching_config.get('num_fires_per_process', 0)
+    num_processes_max = tranching_config.get('num_processes_max', 0)
+    parinit_or_pardump = tranching_config.get('parinit_or_pardump', False)
 
     # in case num_fire_sets is zero, set to 1 so that we get at least
     # one process
@@ -115,11 +115,11 @@ def compute_num_processes(num_fire_sets, **config):
     # if reading or writing parainit file, max out num processes
     if parinit_or_pardump:
         computed_num_processes = max(computed_num_processes,
-            config.get('num_processes', 0),
-            config.get('num_processes_max', 0))
+            tranching_config.get('num_processes', 0),
+            tranching_config.get('num_processes_max', 0))
 
     logging.debug('Parallel HYSPLIT? num_fire_sets=%s, %s -> num_processes=%s' %(
-        num_fire_sets, ', '.join(['%s=%s'%(k,v) for k,v in config.items()]),
+        num_fire_sets, ', '.join(['%s=%s'%(k,v) for k,v in tranching_config.items()]),
         computed_num_processes
     ))
 
