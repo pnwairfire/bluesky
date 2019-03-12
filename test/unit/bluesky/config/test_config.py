@@ -5,6 +5,7 @@ __author__ = "Joel Dubowy"
 import copy
 import datetime
 
+from freezegun import freeze_time
 from py.test import raises
 
 from bluesky.config import Config, DEFAULTS
@@ -26,6 +27,7 @@ class TestGetAndSet(object):
         assert None == Config.get('fuelbeds', 'sdf', allow_missing=True)
         assert None == Config.get('sdf', 'keep_heat', allow_missing=True)
 
+    @freeze_time("2016-04-20 12:00:00", tz_offset=0)
     def test_setting_config_run_id_today(self):
         # setting
         Config.set({"foo": "{run_id}_{today-2:%Y%m%d}_bar", "bar": "baz"})
@@ -34,7 +36,7 @@ class TestGetAndSet(object):
         EXPECTED_RAW =  dict(DEFAULTS,
             foo="{run_id}_{today-2:%Y%m%d}_bar", bar="baz")
         EXPECTED = dict(DEFAULTS,
-            foo="{run_id}_{today-2:%Y%m%d}_bar", bar="baz")
+            foo="{run_id}_20160418_bar", bar="baz")
         assert Config._RAW_CONFIG == EXPECTED_RAW
         assert Config._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
@@ -58,7 +60,7 @@ class TestGetAndSet(object):
         EXPECTED_RAW =  dict(DEFAULTS,
             foo="{run_id}_{today:%Y%m%d%H}_bar", bar="sdfsdf")
         EXPECTED = dict(DEFAULTS,
-            foo="{run_id}_2019010510_bar", bar="dsfsdf")
+            foo="{run_id}_2019010510_bar", bar="sdfsdf")
         assert Config._RAW_CONFIG == EXPECTED_RAW
         assert Config._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
@@ -70,7 +72,7 @@ class TestGetAndSet(object):
         EXPECTED_RAW =  dict(DEFAULTS,
             foo="{run_id}_{today:%Y%m%d%H}_bar", bar="sdfsdf")
         EXPECTED = dict(DEFAULTS,
-            foo="abc123_2019010510_bar", bar="dsfsdf")
+            foo="abc123_2019010510_bar", bar="sdfsdf")
         assert Config._RAW_CONFIG == EXPECTED_RAW
         assert Config._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
@@ -110,6 +112,7 @@ class TestGetAndSet(object):
 
 class TestMerge(object):
 
+    @freeze_time("2016-04-20 12:00:00", tz_offset=0)
     def test_merge_configs(self):
         Config.merge({
             "foo": {"a": "{run_id}-{today}","b": 222,"c": 333,"d": 444}
@@ -117,18 +120,21 @@ class TestMerge(object):
         EXPECTED_RAW = dict(DEFAULTS, **{
             "foo": {"a": "{run_id}-{today}","b": 222,"c": 333,"d": 444}
         })
+        EXPECTED = dict(DEFAULTS, **{
+            "foo": {"a": "{run_id}-20160420","b": 222,"c": 333,"d": 444}
+        })
         assert Config._RUN_ID == None
         assert Config._TODAY == None
         assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED_RAW # since today and now not set
-        assert Config.get() == EXPECTED_RAW # since today and now not set
+        assert Config._CONFIG == EXPECTED
+        assert Config.get() == EXPECTED
 
         Config.set_today(datetime.datetime(2019, 2, 4))
         EXPECTED_RAW = dict(DEFAULTS, **{
             "foo": {"a": "{run_id}-{today}","b": 222,"c": 333,"d": 444}
         })
         EXPECTED = dict(DEFAULTS, **{
-            "foo": {"a": "{run_id}-2019-02-04","b": 222,"c": 333,"d": 444}
+            "foo": {"a": "{run_id}-20190204","b": 222,"c": 333,"d": 444}
         })
         assert Config._RUN_ID == None
         assert Config._TODAY == datetime.datetime(2019, 2, 4)
@@ -148,7 +154,7 @@ class TestMerge(object):
             "b": "b"
         })
         EXPECTED = dict(DEFAULTS, **{
-            "foo": {"a": "{run_id}-2019-02-04","b": "2019-02-03-{run_id}",
+            "foo": {"a": "{run_id}-20190204","b": "20190203-{run_id}",
                 "c": 3333,"d": 4444,"bb": "bb"},
             "bar": {"b": "b"},
             "b": "b"
@@ -173,7 +179,7 @@ class TestMerge(object):
             "c": "c"
         })
         EXPECTED = dict(DEFAULTS, **{
-            "foo": {"a": "{run_id}-2019-02-04","b": "2019-02-03-{run_id}",
+            "foo": {"a": "{run_id}-20190204","b": "20190203-{run_id}",
                 "c": 33333,"d": 44444,"bb": "bb","cc": "cc"},
             "bar": {"b": "b"},
             "baz": {"c": "c"},
@@ -186,16 +192,16 @@ class TestMerge(object):
         assert Config._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
-        Config.set_config_value("444444", 'foo', 'd')
-        Config.set_config_value("dd", 'foo', 'dd')
-        Config.set_config_value("d", 'boo', 'd')
-        Config.set_config_value("d", 'd')
-        Config.set_config_value(True, 'dbt')
-        Config.set_config_value(False, 'dbf')
-        Config.set_config_value(23, 'di')
-        Config.set_config_value(123.23, 'df')
-        Config.set_config_value('23', 'dci')
-        Config.set_config_value('123.23', 'dcf')
+        Config.set("444444", 'foo', 'd')
+        Config.set("dd", 'foo', 'dd')
+        Config.set("d", 'boo', 'd')
+        Config.set("d", 'd')
+        Config.set(True, 'dbt')
+        Config.set(False, 'dbf')
+        Config.set(23, 'di')
+        Config.set(123.23, 'df')
+        Config.set('23', 'dci')
+        Config.set('123.23', 'dcf')
         EXPECTED_RAW = dict(DEFAULTS, **{
             "foo": {
                 "a": "{run_id}-{today}","b": "{today-1}-{run_id}",
@@ -218,7 +224,7 @@ class TestMerge(object):
         })
         EXPECTED = dict(DEFAULTS, **{
             "foo": {
-                "a": "{run_id}-2019-02-04","b": "2019-02-03-{run_id}",
+                "a": "{run_id}-20190204","b": "20190203-{run_id}",
                 "c": 33333,"bb": "bb","cc": "cc","dd": "dd",
                 "d": "444444" # because it was set on command line
 

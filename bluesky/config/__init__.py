@@ -31,25 +31,26 @@ class Config:
     @classmethod
     def merge(cls, config_dict):
         if config_dict:
-            # Uses setter to take care of resetting cls._im_config
-            _c =cls.replace_config_wildcards(copy.deepcopy(config_dict))
-            cls.set(afconfig.merge_configs(cls._CONFIG, _c))
+            cls._RAW_CONFIG = afconfig.merge_configs(
+                cls._RAW_CONFIG, copy.deepcopy(config_dict))
+            cls._CONFIG = afconfig.merge_configs(cls._CONFIG,
+                cls.replace_config_wildcards(copy.deepcopy(config_dict)))
+            cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
 
     @classmethod
-    def set(cls, config_dict, **keys):
-        raw = copy.deepcopy(config_dict)
-        with_replacements = cls.replace_config_wildcards(
-            copy.deepcopy(config_dict))
-
+    def set(cls, config_dict, *keys):
         if keys:
-            afconfig.set_config_value(self._RAW_CONFIG, raw, *keys)
-            afconfig.set_config_value(self._CONFIG, with_replacements, *keys)
+            afconfig.set_config_value(cls._RAW_CONFIG,
+                copy.deepcopy(config_dict), *keys)
+            afconfig.set_config_value(cls._CONFIG,
+                cls.replace_config_wildcards(copy.deepcopy(config_dict)),
+                *keys)
+            cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
 
         else:
-            cls._RAW_CONFIG = raw
-            cls._CONFIG = with_replacements
-
-        cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
+            cls._RAW_CONFIG = copy.deepcopy(DEFAULTS)
+            cls._CONFIG = copy.deepcopy(DEFAULTS)
+            cls.merge(config_dict)
 
     @classmethod
     def set_today(cls, today):
@@ -86,7 +87,7 @@ class Config:
             return {k: cls._IM_CONFIG[k] for k in cls._IM_CONFIG
                 if k not in AVAILABLE_MODULES or k in modules}
         else:
-            return self._IM_CONFIG
+            return cls._IM_CONFIG
 
     @classmethod
     def replace_config_wildcards(cls, val):
