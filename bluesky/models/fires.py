@@ -300,8 +300,7 @@ class FiresManager(object):
         self._today = today
         # HACK (sort of): we need to call self.today to trigger replacement
         #   of wildcards and then converstion to datetime object (that's a
-        #   hack), but we need to access it anyway to see if we need to
-        #   reprocess the raw config
+        #   hack), but we need to access it anyway to set in Config
         new_today = self.today
 
         # now that today is sure to be a datetime object, make sure that,
@@ -329,6 +328,7 @@ class FiresManager(object):
     def run_id(self, run_id):
         if self._meta.get('run_id'):
             raise TypeError(self.RUN_ID_IS_IMMUTABLE_MSG)
+        self._processed_run_id_wildcards = False
         self._meta['run_id'] = run_id
         Config.set_run_id(run_id)
         # HACK: access run id simply to trigger replacement of wildcards
@@ -626,16 +626,21 @@ class FiresManager(object):
         if today:
             self.today = today
 
+        # Even though run_id is ultimately set in self._meta, we'll
+        # pop and use the setter to trigger wildcard replacements, etc.
+        # The setter is used after assigning input_dict to self._meta
+        # so that we don't overwrite self._meta['run_id']
+        run_id = input_dict.pop('run_id', None)
+
         self._meta = input_dict
 
-        # HACK: access 'today' and 'run_id' to trigger replacement
-        #  of wildcards or setting of defaults, but only do so for
-        #  run_id if it's defined
-        self._processed_today = False
-        self.today
-        if 'run_id' in self._meta:
-            self._processed_run_id_wildcards = False
-            self.run_id
+        if run_id:
+            self.run_id = run_id
+
+        # HACK: access 'today' to trigger replacement of wildcards or
+        # setting of defaults
+        # self._processed_today = False
+        # self.today
 
     def loads(self, input_stream=None, input_file=None):
         """Loads json-formatted fire data, creating list of Fire objects and
