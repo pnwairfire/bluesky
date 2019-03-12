@@ -29,6 +29,15 @@ class Config:
         return cls
 
     @classmethod
+    def reset(cls):
+        _RUN_ID = None
+        _TODAY = None
+        _RAW_CONFIG = copy.deepcopy(DEFAULTS)
+        _CONFIG = copy.deepcopy(DEFAULTS)
+        _IM_CONFIG = afconfig.ImmutableConfigDict(_CONFIG)
+
+
+    @classmethod
     def merge(cls, config_dict):
         if config_dict:
             cls._RAW_CONFIG = afconfig.merge_configs(

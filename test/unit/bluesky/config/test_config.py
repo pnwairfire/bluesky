@@ -10,7 +10,11 @@ from py.test import raises
 
 from bluesky.config import Config, DEFAULTS
 
-class TestGetAndSet(object):
+class ConfigTestBase(object):
+    def setup(self):
+        Config.reset()
+
+class TestGetAndSet(ConfigTestBase):
 
     def test_getting_defaults(self):
         # getting defaults
@@ -110,7 +114,7 @@ class TestGetAndSet(object):
 ## filled in, etc.) and merging
 ##
 
-class TestMerge(object):
+class TestMerge(ConfigTestBase):
 
     @freeze_time("2016-04-20 12:00:00", tz_offset=0)
     def test_merge_configs(self):
