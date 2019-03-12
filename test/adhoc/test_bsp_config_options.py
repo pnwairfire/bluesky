@@ -12,14 +12,22 @@ import json
 import logging
 import os
 import subprocess
+import sys
 import tempfile
 
-BSP = os.path.abspath(
-    os.path.join(
-        os.path.dirname(__file__), '../../bin/bsp'))
+from bluesky.config import DEFAULTS
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+sys.path.insert(0, ROOT_DIR) # in case this script is run outside of py.test
+BSP = os.path.join(ROOT_DIR, 'bin/bsp')
+
 
 INPUT = {
     "run_id": 'abcdefg123',
+    "fire_information": []
+}
+
+CONFIG_0 = {
     "config": {
         "foo": {
             "a": 111,
@@ -28,8 +36,7 @@ INPUT = {
             "d": 444
         },
         'echo_run_id': '{run_id}'
-    },
-    "fire_information": []
+    }
 }
 
 CONFIG_1 = {
@@ -68,7 +75,7 @@ CONFIG_2 = {
 #  will be specified on the command line
 
 EXPECTED = {
-    "config": {
+    "run_config": dict(DEFAULTS, **{
         "foo": {
             "a": 111,
             "b": 2222,
@@ -99,13 +106,17 @@ EXPECTED = {
         "dcf": "123.23",
         "e": 'abcdefg123__{_run_id}',
         #"f": 'sdfdsf__abcdefg123'
-    },
+    }),
     "fire_information": []
 }
 
 input_file = tempfile.NamedTemporaryFile(mode='w+t')
 input_file.write(json.dumps(INPUT))
 input_file.flush()
+
+config_0_file = tempfile.NamedTemporaryFile(mode='w+t')
+config_0_file.write(json.dumps(CONFIG_0))
+config_0_file.flush()
 
 config_1_file = tempfile.NamedTemporaryFile(mode='w+t')
 config_1_file.write(json.dumps(CONFIG_1))
@@ -118,6 +129,7 @@ config_2_file.flush()
 cmd_args = [
     BSP, '-i', input_file.name,
     '--log-level', 'DEBUG',
+    '-c', config_0_file.name,
     '-c', config_1_file.name,
     '-c', config_2_file.name,
     '-C', 'foo.d=444444',
@@ -140,10 +152,13 @@ logging.basicConfig(level=logging.INFO)
 logging.info("actual:   {}".format(actual))
 logging.info("expected: {}".format(EXPECTED))
 today = actual.pop('today')
-assert today == datetime.datetime.utcnow().strftime('%Y-%m-%dT00:00:00')
+assert today == datetime.datetime.utcnow().strftime('%Y-%m-%d') #T00:00:00')
 #assert actual == EXPECTED
-assert set(actual.keys()) == set(['config', 'fire_information', 'run_id', 'counts', 'bluesky_version'])
+assert set(actual.keys()) == set(['run_config', 'fire_information', 'run_id', 'counts', 'bluesky_version'])
 assert actual['fire_information'] == EXPECTED['fire_information']
-assert actual['config'] == EXPECTED['config']
+assert set(actual['run_config'].keys()) == set(EXPECTED['run_config'].keys())
+for k in actual['run_config'].keys():
+    logging.info('Checking output config key %s', k)
+    assert actual['run_config'][k] == EXPECTED['run_config'][k]
 
 print("\n*** PASSED ***\n")
