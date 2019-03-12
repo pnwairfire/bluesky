@@ -8,15 +8,89 @@ import datetime
 from freezegun import freeze_time
 from py.test import raises
 
-from bluesky.config import Config, DEFAULTS
+from bluesky.config import Config, DEFAULTS, to_lowercase_keys
+
+class TestToLowercaseKeys(object):
+
+    def test(self):
+        before = {
+            "foo": "ERW",
+            "BAR": 123,
+            "BaZ": {
+                'a': [
+                    "SDF",
+                    {
+                        "C": 123,
+                        "d": [
+                            {
+                                "asd": True,
+                                "SDFSDF": 1
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+        before_copy = copy.deepcopy(before) # to make sure not done in place
+        expected_after = {
+            "foo": "ERW",
+            "bar": 123,
+            "baz": {
+                'a': [
+                    "SDF", # not a key, so should remain uppercase
+                    {
+                        "c": 123,
+                        "d": [
+                            {
+                                "asd": True,
+                                "sdfsdf": 1
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+        assert expected_after == to_lowercase_keys(before_copy)
+        assert before == before_copy
+
+    def test_conflicting_keys(self):
+        # top level
+        before = {
+            "foo": "ERW",
+            "BAR": 123,
+            "Bar": {
+                'a': 1
+            }
+        }
+        with raises(ValueError) as e:
+            to_lowercase_keys(before)
+
+        # nested
+        before = {
+            "foo": "ERW",
+            "BAR": 123,
+            "Bdfd": {
+                'a': 1,
+                'A': 23
+            }
+        }
+        with raises(ValueError) as e:
+            to_lowercase_keys(before)
+
 
 class TestGetAndSet(object):
 
+    def setup(self):
+        self._ORIGINAL_DEFAULTS = copy.deepcopy(DEFAULTS)
+        self._DEFAULTS_LOWERCASE = to_lowercase_keys(DEFAULTS)
+
     def test_getting_defaults(self, reset_config):
         # getting defaults
-        assert Config.get() == DEFAULTS
+        assert Config.get() == self._DEFAULTS_LOWERCASE
         assert Config.get('skip_failed_fires') == False
         assert Config.get('fuelbeds', 'fccs_version') == '2'
+        # last key can be upper or lower
+        assert Config.get('fuelbeds', 'FCCS_VERSION') == '2'
         with raises(KeyError) as e:
             Config.get('sdfsd')
         with raises(KeyError) as e:
@@ -30,12 +104,12 @@ class TestGetAndSet(object):
     @freeze_time("2016-04-20 12:00:00", tz_offset=0)
     def test_setting_config_run_id_today(self, reset_config):
         # setting
-        Config.set({"foo": "{run_id}_{today-2:%Y%m%d}_bar", "bar": "baz"})
+        Config.set({"FOO": "{run_id}_{today-2:%Y%m%d}_bar", "bar": "baz"})
         assert Config._RUN_ID == None
         assert Config._TODAY == None
-        EXPECTED_RAW =  dict(DEFAULTS,
+        EXPECTED_RAW =  dict(self._DEFAULTS_LOWERCASE,
             foo="{run_id}_{today-2:%Y%m%d}_bar", bar="baz")
-        EXPECTED = dict(DEFAULTS,
+        EXPECTED = dict(self._DEFAULTS_LOWERCASE,
             foo="{run_id}_20160418_bar", bar="baz")
         assert Config._RAW_CONFIG == EXPECTED_RAW
         assert Config._CONFIG == EXPECTED
@@ -45,21 +119,21 @@ class TestGetAndSet(object):
         Config.set_today(datetime.datetime(2019, 1, 5, 10, 12, 1))
         assert Config._RUN_ID == None
         assert Config._TODAY == datetime.datetime(2019,1,5,10,12,1)
-        EXPECTED_RAW =  dict(DEFAULTS,
+        EXPECTED_RAW =  dict(self._DEFAULTS_LOWERCASE,
             foo="{run_id}_{today-2:%Y%m%d}_bar", bar="baz")
-        EXPECTED = dict(DEFAULTS,
+        EXPECTED = dict(self._DEFAULTS_LOWERCASE,
             foo="{run_id}_20190103_bar", bar="baz")
         assert Config._RAW_CONFIG == EXPECTED_RAW
         assert Config._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         # set again; datetime wildcard should be filled in
-        Config.set({"foo": "{run_id}_{today:%Y%m%d%H}_bar", "bar": "sdfsdf"})
+        Config.set({"fOO": "{run_id}_{today:%Y%m%d%H}_bar", "bar": "sdfsdf"})
         assert Config._RUN_ID == None
         assert Config._TODAY == datetime.datetime(2019,1,5,10,12,1)
-        EXPECTED_RAW =  dict(DEFAULTS,
+        EXPECTED_RAW =  dict(self._DEFAULTS_LOWERCASE,
             foo="{run_id}_{today:%Y%m%d%H}_bar", bar="sdfsdf")
-        EXPECTED = dict(DEFAULTS,
+        EXPECTED = dict(self._DEFAULTS_LOWERCASE,
             foo="{run_id}_2019010510_bar", bar="sdfsdf")
         assert Config._RAW_CONFIG == EXPECTED_RAW
         assert Config._CONFIG == EXPECTED
@@ -69,9 +143,9 @@ class TestGetAndSet(object):
         Config.set_run_id("abc123")
         assert Config._RUN_ID == "abc123"
         assert Config._TODAY == datetime.datetime(2019,1,5,10,12,1)
-        EXPECTED_RAW =  dict(DEFAULTS,
+        EXPECTED_RAW =  dict(self._DEFAULTS_LOWERCASE,
             foo="{run_id}_{today:%Y%m%d%H}_bar", bar="sdfsdf")
-        EXPECTED = dict(DEFAULTS,
+        EXPECTED = dict(self._DEFAULTS_LOWERCASE,
             foo="abc123_2019010510_bar", bar="sdfsdf")
         assert Config._RAW_CONFIG == EXPECTED_RAW
         assert Config._CONFIG == EXPECTED
@@ -81,9 +155,9 @@ class TestGetAndSet(object):
         Config.set({"foo": "FOO_{run_id}_{today:%Y%m%d%H}_bar", "bar": "zz"})
         assert Config._RUN_ID == "abc123"
         assert Config._TODAY == datetime.datetime(2019,1,5,10,12,1)
-        EXPECTED_RAW =  dict(DEFAULTS,
+        EXPECTED_RAW =  dict(self._DEFAULTS_LOWERCASE,
             foo="FOO_{run_id}_{today:%Y%m%d%H}_bar", bar="zz")
-        EXPECTED = dict(DEFAULTS,
+        EXPECTED = dict(self._DEFAULTS_LOWERCASE,
             foo="FOO_abc123_2019010510_bar", bar="zz")
         assert Config._RAW_CONFIG == EXPECTED_RAW
         assert Config._CONFIG == EXPECTED
@@ -91,19 +165,22 @@ class TestGetAndSet(object):
 
         # set in individual values
         Config.set(100, "bar")
+        Config.set(200, "BAAAR")
         Config.set("sdfsdf{run_id}", "baz", "a")
+        Config.set("{run_id}", "BAZ", "b")
         assert Config._RUN_ID == "abc123"
         assert Config._TODAY == datetime.datetime(2019,1,5,10,12,1)
-        EXPECTED_RAW =  dict(DEFAULTS,
-            foo="FOO_{run_id}_{today:%Y%m%d%H}_bar", bar=100,
-            baz={"a": "sdfsdf{run_id}"})
-        EXPECTED = dict(DEFAULTS,
-            foo="FOO_abc123_2019010510_bar", bar=100,
-            baz={"a": "sdfsdfabc123"})
+        EXPECTED_RAW =  dict(self._DEFAULTS_LOWERCASE,
+            foo="FOO_{run_id}_{today:%Y%m%d%H}_bar", bar=100, baaar=200,
+            baz={"a": "sdfsdf{run_id}", "b": "{run_id}"})
+        EXPECTED = dict(self._DEFAULTS_LOWERCASE,
+            foo="FOO_abc123_2019010510_bar", bar=100, baaar=200,
+            baz={"a": "sdfsdfabc123", "b": "abc123"})
         assert Config._RAW_CONFIG == EXPECTED_RAW
         assert Config._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
+        assert self._ORIGINAL_DEFAULTS == DEFAULTS
 
 ##
 ## Tests for setting aconfiguration (to make sure filecards get
@@ -112,15 +189,19 @@ class TestGetAndSet(object):
 
 class TestMerge(object):
 
+    def setup(self):
+        self._ORIGINAL_DEFAULTS = copy.deepcopy(DEFAULTS)
+        self._DEFAULTS_LOWERCASE = to_lowercase_keys(DEFAULTS)
+
     @freeze_time("2016-04-20 12:00:00", tz_offset=0)
     def test_merge_configs(self, reset_config):
         Config.merge({
+            "foo": {"A": "{run_id}-{today}","b": 222,"c": 333,"d": 444}
+        })
+        EXPECTED_RAW = dict(self._DEFAULTS_LOWERCASE, **{
             "foo": {"a": "{run_id}-{today}","b": 222,"c": 333,"d": 444}
         })
-        EXPECTED_RAW = dict(DEFAULTS, **{
-            "foo": {"a": "{run_id}-{today}","b": 222,"c": 333,"d": 444}
-        })
-        EXPECTED = dict(DEFAULTS, **{
+        EXPECTED = dict(self._DEFAULTS_LOWERCASE, **{
             "foo": {"a": "{run_id}-20160420","b": 222,"c": 333,"d": 444}
         })
         assert Config._RUN_ID == None
@@ -130,10 +211,10 @@ class TestMerge(object):
         assert Config.get() == EXPECTED
 
         Config.set_today(datetime.datetime(2019, 2, 4))
-        EXPECTED_RAW = dict(DEFAULTS, **{
+        EXPECTED_RAW = dict(self._DEFAULTS_LOWERCASE, **{
             "foo": {"a": "{run_id}-{today}","b": 222,"c": 333,"d": 444}
         })
-        EXPECTED = dict(DEFAULTS, **{
+        EXPECTED = dict(self._DEFAULTS_LOWERCASE, **{
             "foo": {"a": "{run_id}-20190204","b": 222,"c": 333,"d": 444}
         })
         assert Config._RUN_ID == None
@@ -143,17 +224,17 @@ class TestMerge(object):
         assert Config.get() == EXPECTED
 
         Config.merge({
-            "foo": {"b": "{today-1}-{run_id}","c": 3333,"d": 4444,"bb": "bb"},
-            "bar": {"b": "b"},
+            "foo": {"B": "{today-1}-{run_id}","c": 3333,"d": 4444,"bb": "bb"},
+            "BAR": {"b": "b"},
             "b": "b"
         })
-        EXPECTED_RAW = dict(DEFAULTS, **{
+        EXPECTED_RAW = dict(self._DEFAULTS_LOWERCASE, **{
             "foo": {"a": "{run_id}-{today}","b": "{today-1}-{run_id}",
                 "c": 3333,"d": 4444,"bb": "bb"},
             "bar": {"b": "b"},
             "b": "b"
         })
-        EXPECTED = dict(DEFAULTS, **{
+        EXPECTED = dict(self._DEFAULTS_LOWERCASE, **{
             "foo": {"a": "{run_id}-20190204","b": "20190203-{run_id}",
                 "c": 3333,"d": 4444,"bb": "bb"},
             "bar": {"b": "b"},
@@ -170,7 +251,7 @@ class TestMerge(object):
             "baz": {"c": "c"},
             "c": "c"
         })
-        EXPECTED_RAW = dict(DEFAULTS, **{
+        EXPECTED_RAW = dict(self._DEFAULTS_LOWERCASE, **{
             "foo": {"a": "{run_id}-{today}","b": "{today-1}-{run_id}",
                 "c": 33333,"d": 44444,"bb": "bb","cc": "cc"},
             "bar": {"b": "b"},
@@ -178,7 +259,7 @@ class TestMerge(object):
             "b": "b",
             "c": "c"
         })
-        EXPECTED = dict(DEFAULTS, **{
+        EXPECTED = dict(self._DEFAULTS_LOWERCASE, **{
             "foo": {"a": "{run_id}-20190204","b": "20190203-{run_id}",
                 "c": 33333,"d": 44444,"bb": "bb","cc": "cc"},
             "bar": {"b": "b"},
@@ -202,7 +283,7 @@ class TestMerge(object):
         Config.set(123.23, 'df')
         Config.set('23', 'dci')
         Config.set('123.23', 'dcf')
-        EXPECTED_RAW = dict(DEFAULTS, **{
+        EXPECTED_RAW = dict(self._DEFAULTS_LOWERCASE, **{
             "foo": {
                 "a": "{run_id}-{today}","b": "{today-1}-{run_id}",
                 "c": 33333,"bb": "bb","cc": "cc","dd": "dd",
@@ -222,7 +303,7 @@ class TestMerge(object):
             "dci": "23",
             "dcf": "123.23"
         })
-        EXPECTED = dict(DEFAULTS, **{
+        EXPECTED = dict(self._DEFAULTS_LOWERCASE, **{
             "foo": {
                 "a": "{run_id}-20190204","b": "20190203-{run_id}",
                 "c": 33333,"bb": "bb","cc": "cc","dd": "dd",
@@ -247,3 +328,5 @@ class TestMerge(object):
         assert Config._RAW_CONFIG == EXPECTED_RAW
         assert Config._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
+
+        assert self._ORIGINAL_DEFAULTS == DEFAULTS

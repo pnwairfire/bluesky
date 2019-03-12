@@ -16,12 +16,25 @@ __all__ = [
     "DEFAULTS"
 ]
 
+def to_lowercase_keys(val):
+    if isinstance(val, dict):
+        if len(set(val.keys())) != len(set([k.lower() for k in val])):
+            raise ValueError("Conflicting keys in config dict: %s",
+                list(val.keys()))
+
+        return {k.lower(): to_lowercase_keys(v) for k, v in val.items()}
+
+    elif isinstance(val, list):
+        return [to_lowercase_keys(v) for v in val]
+
+    return copy.deepcopy(val)
+
 class Config:
 
     _RUN_ID = None
     _TODAY = None
-    _RAW_CONFIG = copy.deepcopy(DEFAULTS)
-    _CONFIG = copy.deepcopy(DEFAULTS)
+    _RAW_CONFIG = to_lowercase_keys(DEFAULTS)
+    _CONFIG = copy.deepcopy(_RAW_CONFIG)
     _IM_CONFIG = afconfig.ImmutableConfigDict(_CONFIG)
 
     def __new__(cls):
@@ -32,8 +45,8 @@ class Config:
     def reset(cls):
         cls._RUN_ID = None
         cls._TODAY = None
-        cls._RAW_CONFIG = copy.deepcopy(DEFAULTS)
-        cls._CONFIG = copy.deepcopy(DEFAULTS)
+        cls._RAW_CONFIG = to_lowercase_keys(DEFAULTS)
+        cls._CONFIG = copy.deepcopy(cls._RAW_CONFIG)
         cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
 
         return cls
@@ -41,8 +54,9 @@ class Config:
     @classmethod
     def merge(cls, config_dict):
         if config_dict:
+            config_dict = to_lowercase_keys(config_dict)
             cls._RAW_CONFIG = afconfig.merge_configs(
-                cls._RAW_CONFIG, copy.deepcopy(config_dict))
+                cls._RAW_CONFIG, config_dict)
             cls._CONFIG = afconfig.merge_configs(cls._CONFIG,
                 cls.replace_config_wildcards(copy.deepcopy(config_dict)))
             cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
@@ -51,7 +65,9 @@ class Config:
 
     @classmethod
     def set(cls, config_dict, *keys):
+        config_dict = to_lowercase_keys(config_dict)
         if keys:
+            keys = [k.lower() for k in keys]
             afconfig.set_config_value(cls._RAW_CONFIG,
                 copy.deepcopy(config_dict), *keys)
             afconfig.set_config_value(cls._CONFIG,
@@ -60,8 +76,8 @@ class Config:
             cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
 
         else:
-            cls._RAW_CONFIG = copy.deepcopy(DEFAULTS)
-            cls._CONFIG = copy.deepcopy(DEFAULTS)
+            cls._RAW_CONFIG = to_lowercase_keys(DEFAULTS)
+            cls._CONFIG = copy.deepcopy(cls._RAW_CONFIG)
             cls.merge(config_dict)
 
         return cls
@@ -85,10 +101,12 @@ class Config:
                 "bluesky.config.defaults module")
 
         if keys:
+            keys = [k.lower() for k in keys]
             # default behavior is to fail if key isn't in user's config
             # or in default config
             return afconfig.get_config_value(cls._IM_CONFIG, *keys,
                 fail_on_missing_key=not kwargs.get('allow_missing'))
+
         else:
             return cls._IM_CONFIG
 
