@@ -112,7 +112,8 @@ class Config:
                     # in strings to prevent conversion to datetime object
                     val = val.replace('{datetime-parse-buster}', '')
 
-                    val = val.replace('{run_id}', cls.run_id)
+                    if cls._RUN_ID:
+                        val = val.replace('{run_id}', cls._RUN_ID)
 
                 # TODO: any other replacements?
 
