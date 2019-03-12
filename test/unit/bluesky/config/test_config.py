@@ -10,13 +10,9 @@ from py.test import raises
 
 from bluesky.config import Config, DEFAULTS
 
-class ConfigTestBase(object):
-    def setup(self):
-        Config.reset()
+class TestGetAndSet(object):
 
-class TestGetAndSet(ConfigTestBase):
-
-    def test_getting_defaults(self):
+    def test_getting_defaults(self, reset_config):
         # getting defaults
         assert Config.get() == DEFAULTS
         assert Config.get('skip_failed_fires') == False
@@ -32,7 +28,7 @@ class TestGetAndSet(ConfigTestBase):
         assert None == Config.get('sdf', 'keep_heat', allow_missing=True)
 
     @freeze_time("2016-04-20 12:00:00", tz_offset=0)
-    def test_setting_config_run_id_today(self):
+    def test_setting_config_run_id_today(self, reset_config):
         # setting
         Config.set({"foo": "{run_id}_{today-2:%Y%m%d}_bar", "bar": "baz"})
         assert Config._RUN_ID == None
@@ -114,10 +110,10 @@ class TestGetAndSet(ConfigTestBase):
 ## filled in, etc.) and merging
 ##
 
-class TestMerge(ConfigTestBase):
+class TestMerge(object):
 
     @freeze_time("2016-04-20 12:00:00", tz_offset=0)
-    def test_merge_configs(self):
+    def test_merge_configs(self, reset_config):
         Config.merge({
             "foo": {"a": "{run_id}-{today}","b": 222,"c": 333,"d": 444}
         })
