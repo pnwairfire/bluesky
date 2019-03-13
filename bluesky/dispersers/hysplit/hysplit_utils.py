@@ -313,7 +313,7 @@ def get_grid_params(met_info={}, fires=None, allow_undefined=False):
 
     elif config('grid'):
         grid_params = grid_params_from_grid(
-            config['grid'], met_info)
+            config('grid'), met_info)
 
     elif config('compute_grid'):
         if not fires or len(fires) != 1:
