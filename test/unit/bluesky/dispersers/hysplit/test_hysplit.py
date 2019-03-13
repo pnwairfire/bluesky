@@ -4,8 +4,10 @@
 import datetime
 import os
 
+import afconfig
 from py.test import raises
 
+from bluesky.config import to_lowercase_keys
 from bluesky.dispersers.hysplit import hysplit
 
 class TestGetBinaries(object):
@@ -13,8 +15,16 @@ class TestGetBinaries(object):
     #    - hysplit._get_binaries will always be passed a dict;
     #    - the dict will have all lowercase top level keys
 
+    def _config_getter(self, config):
+        config = to_lowercase_keys(config)
+        def getter(*keys, **kwargs):
+            keys = [k.lower() for k in keys]
+            return afconfig.get_config_value(config, *keys,
+                fail_on_missing_key=not kwargs.get('allow_missing'))
+        return getter
+
     def test_empty_config(self):
-        config = {}
+        config_getter = self._config_getter({})
         expected = {
             'HYSPLIT': "hycs_std",
             'HYSPLIT_MPI': "hycm_std",
@@ -23,12 +33,12 @@ class TestGetBinaries(object):
             'MPI': "mpiexec",
             'HYSPLIT2NETCDF': "hysplit2netcdf"
         }
-        assert hysplit._get_binaries(config) == expected
+        assert hysplit._get_binaries(config_getter) == expected
 
     def test_old(self):
-        config = {
+        config_getter = self._config_getter({
             'hysplit_binary': 'zzz'
-        }
+        })
         expected = {
             'HYSPLIT': "zzz",
             'HYSPLIT_MPI': "hycm_std",
@@ -37,10 +47,10 @@ class TestGetBinaries(object):
             'MPI': "mpiexec",
             'HYSPLIT2NETCDF': "hysplit2netcdf"
         }
-        assert hysplit._get_binaries(config) == expected
+        assert hysplit._get_binaries(config_getter) == expected
 
     def test_old_and_new(self):
-        config = {
+        config_getter = self._config_getter({
             'mpiexec': 'foo',
             'binaries': {
                 'MPI': 'bar', # takes precedence over 'MPIEXEC'
@@ -49,7 +59,7 @@ class TestGetBinaries(object):
             },
             'hysplit_binary': 'zzz',
             'hysplit_mpi_binary': 'ttt'
-        }
+        })
         expected = {
             'HYSPLIT': "zzz",
             'HYSPLIT_MPI': "ttt",
@@ -58,7 +68,7 @@ class TestGetBinaries(object):
             'MPI': "bar",
             'HYSPLIT2NETCDF': "hysplit2netcdf"
         }
-        assert hysplit._get_binaries(config) == expected
+        assert hysplit._get_binaries(config_getter) == expected
 
 class TestSetMetInfo(object):
 
