@@ -22,6 +22,7 @@ from pyairfire import osutils
 from afdatetime import parsing as datetime_parsing
 
 from bluesky import datautils, locationutils
+from bluesky.config import Config
 from bluesky.datetimeutils import parse_utc_offset
 from bluesky.models.fires import Fire
 from functools import reduce
