@@ -7,6 +7,7 @@ import time
 
 from py.test import raises
 
+from bluesky.config import Config
 from bluesky.dispersers.hysplit import hysplit_utils
 from bluesky.exceptions import BlueSkyConfigurationError
 
@@ -25,7 +26,7 @@ class MockFireLocationData(object):
 
 class TestCreateFireSets(object):
 
-    def test(self):
+    def test(self, reset_config):
         fires = [
             MockFireLocationData(1),
             MockFireLocationData(2),
@@ -51,7 +52,7 @@ class TestCreateFireSets(object):
 
 class TestCreateFireTranches(object):
 
-    def test(self):
+    def test(self, reset_config):
         fire_sets = [
             [MockFireLocationData(1), MockFireLocationData(1)],
             [MockFireLocationData(3), MockFireLocationData(3)],
@@ -106,7 +107,7 @@ class TestCreateFireTranches(object):
 
 class TestComputeNumProcesses(object):
 
-    def test(self):
+    def test(self, reset_config):
         n = hysplit_utils.compute_num_processes(4)
         assert isinstance(n, int) and n == 1
 
@@ -138,7 +139,7 @@ class TestComputeNumProcesses(object):
             num_fires_per_process=2, num_processes_max=1)
         assert isinstance(n, int) and n == 1
 
-    def test_with_parinit(self):
+    def test_with_parinit(self, reset_config):
         n = hysplit_utils.compute_num_processes(4,
             parinit_or_pardump=True)
         assert isinstance(n, int) and n == 1
@@ -184,7 +185,7 @@ class TestComputeNumProcesses(object):
 
 class TestDummyTimeprofileHour(object):
 
-    def test_one_hour(self):
+    def test_one_hour(self, reset_config):
         expected = {
             "area_fraction": 1.0,
             'flaming': 1.0,
@@ -193,7 +194,7 @@ class TestDummyTimeprofileHour(object):
         }
         assert expected == hysplit_utils.dummy_timeprofile_hour(1)
 
-    def test_ten_hours(self):
+    def test_ten_hours(self, reset_config):
         expected = {
             "area_fraction": 0.1,
             'flaming': 0.1,
@@ -221,7 +222,7 @@ class TestGenerateDummyFire(object):
         'smolder_fraction': 0.0
     }
 
-    def test_one_hour(self):
+    def test_one_hour(self, reset_config):
         expected = {
             "area": 1,
             "type": "wildfire",
@@ -268,7 +269,7 @@ class TestGenerateDummyFire(object):
         expected["id"] = f["id"] # id is randomly generated
         assert expected == f
 
-    def test_four_hours(self):
+    def test_four_hours(self, reset_config):
         expected = {
             "area": 1,
             "type": "wildfire",
@@ -346,7 +347,7 @@ class TestFillInDummyFires(object):
         ]
         self.original_fire_sets = copy.deepcopy(self.fire_sets)
 
-    def test_one_proc_no_dummy_fires_needed(self):
+    def test_one_proc_no_dummy_fires_needed(self, reset_config):
         hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 1,
             datetime.datetime(2018,11,9), 4,
             {"center_latitude": 40, "center_longitude": -110})
@@ -361,7 +362,7 @@ class TestFillInDummyFires(object):
         self.original_fires = copy.deepcopy(self.fires)
         self.original_fire_sets = copy.deepcopy(self.fire_sets)
 
-    def test_two_procs_no_dummy_fires_needed(self):
+    def test_two_procs_no_dummy_fires_needed(self, reset_config):
         hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 2,
             datetime.datetime(2018,11,9), 4,
             {"center_latitude": 40, "center_longitude": -110})
@@ -376,7 +377,7 @@ class TestFillInDummyFires(object):
         self.original_fires = copy.deepcopy(self.fires)
         self.original_fire_sets = copy.deepcopy(self.fire_sets)
 
-    def test_three_procs_one_dummy_fire_needed(self):
+    def test_three_procs_one_dummy_fire_needed(self, reset_config):
         hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 3,
             datetime.datetime(2018,11,9), 4,
             {"center_latitude": 40, "center_longitude": -110})
@@ -387,7 +388,7 @@ class TestFillInDummyFires(object):
         assert len(self.fire_sets[2]) == 1
         assert self.fire_sets[2][0] == self.fires[3]
 
-    def test_four_procs_two_dummy_fires_needed(self):
+    def test_four_procs_two_dummy_fires_needed(self, reset_config):
         hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 4,
             datetime.datetime(2018,11,9), 4,
             {"center_latitude": 40, "center_longitude": -110})
@@ -406,7 +407,7 @@ class TestFillInDummyFires(object):
 
 class TestKmPerLng(object):
 
-    def test(self):
+    def test(self, reset_config):
         assert 111.32 == hysplit_utils.km_per_deg_lng(0)
         assert 78.71512688168647 == hysplit_utils.km_per_deg_lng(45)
         # Note: hysplit_utils.km_per_deg_lng(90) should equal 0
@@ -418,7 +419,7 @@ class TestKmPerLng(object):
 
 class TestSquareGridFromLatLng(object):
 
-    def test(self):
+    def test(self, reset_config):
         e = {
             "center_latitude": 45.0,
             "center_longitude": -118.0,
@@ -448,7 +449,7 @@ class TestSquareGridFromLatLng(object):
 
 class TestGridParamsFromGrid(object):
 
-    def test_llc_projection(self):
+    def test_llc_projection(self, reset_config):
         grid = {
             "spacing": 6.0,
             #"projection": 'LLC',
@@ -465,7 +466,7 @@ class TestGridParamsFromGrid(object):
         }
 
         # 0.06705008458604998 == 6.0 / (111.32 * math.cos(math.pi / 180.0 * 36.5))
-        spacing = 0.06705008458604998
+        spacing = 0.06705008458605
         expected = {
             "spacing_latitude": spacing,
             "spacing_longitude": spacing,
@@ -476,7 +477,7 @@ class TestGridParamsFromGrid(object):
         }
         assert expected == hysplit_utils.grid_params_from_grid(grid)
 
-    def test_latlong_projection(self):
+    def test_latlong_projection(self, reset_config):
         grid = {
             "spacing": 0.06,
             "projection": "LatLon",
@@ -503,16 +504,14 @@ class TestGridParamsFromGrid(object):
 
 class TestGetGridParams(object):
 
-    def test_user_defined_grid(self):
-        config = {
-            "USER_DEFINED_GRID": True,
-            "CENTER_LATITUDE": 36.5,
-            "CENTER_LONGITUDE": -119.0,
-            "WIDTH_LONGITUDE": 25.0,
-            "HEIGHT_LATITUDE": 17.5,
-            "SPACING_LONGITUDE": 0.05,
-            "SPACING_LATITUDE": 0.05
-        }
+    def test_user_defined_grid(self, reset_config):
+        Config.set(True, "dispersion", "hysplit" , "USER_DEFINED_GRID")
+        Config.set(36.5, "dispersion", "hysplit" , "CENTER_LATITUDE")
+        Config.set(-119.0, "dispersion", "hysplit", "CENTER_LONGITUDE")
+        Config.set(25.0, "dispersion", "hysplit" , "WIDTH_LONGITUDE")
+        Config.set(17.5, "dispersion", "hysplit" , "HEIGHT_LATITUDE")
+        Config.set(0.05, "dispersion", "hysplit" , "SPACING_LONGITUDE")
+        Config.set(0.05, "dispersion", "hysplit" , "SPACING_LATITUDE")
         expected = {
             'center_latitude': 36.5,
             'center_longitude': -119.0,
@@ -521,75 +520,78 @@ class TestGetGridParams(object):
             'spacing_longitude': 0.05,
             'width_longitude': 25.0
         }
-        assert expected == hysplit_utils.get_grid_params(config)
+        assert expected == hysplit_utils.get_grid_params()
 
-    def test_grid(self):
-        config = {
-            "grid": {
-                "spacing": 6.0,
-                "boundary": {
-                    "ne": {
-                        "lat": 45.25,
-                        "lng": -106.5
-                    },
-                    "sw": {
-                        "lat": 27.75,
-                        "lng": -131.5
-                    }
+    def test_grid(self, reset_config):
+        Config.set( {
+            "spacing": 6.0,
+            "boundary": {
+                "ne": {
+                    "lat": 45.25,
+                    "lng": -106.5
+                },
+                "sw": {
+                    "lat": 27.75,
+                    "lng": -131.5
                 }
             }
-        }
+        }, "dispersion", "hysplit" , "grid")
         expected = {
             'center_latitude': 36.5,
             'center_longitude': -119.0,
             'height_latitude': 17.5,
-            'spacing_latitude': 0.06705008458604998,
-            'spacing_longitude': 0.06705008458604998,
+            'spacing_latitude': 0.06705008458605,
+            'spacing_longitude': 0.06705008458605,
             'width_longitude': 25.0
         }
-        assert expected == hysplit_utils.get_grid_params(config)
+        assert expected == hysplit_utils.get_grid_params()
 
-    def test_compute_grid(self):
+    def test_compute_grid(self, reset_config):
         fires_one = [{'latitude': 40.0, 'longitude': -118.5}]
         fires_two = [
             {'latitude': 40.0, 'longitude': -118.5},
             {'latitude': 45.0, 'longitude': -117.5}
         ]
-        config = {
-            "compute_grid": True,
-        }
 
         ## Missing spacing
 
+        Config.set(True, "dispersion", "hysplit" , "compute_grid")
         with raises(BlueSkyConfigurationError) as e_info:
-            hysplit_utils.get_grid_params(config, fires=fires_one)
+            hysplit_utils.get_grid_params(fires=fires_one)
         assert e_info.value.args[0] == ("Config settings 'spacing_latitude' "
                 "and 'spacing_longitude' required to compute hysplit grid")
+
+        Config.reset()
+        Config.set(True, "dispersion", "hysplit" , "compute_grid")
+        Config.set(0.05, 'dispersion', 'hysplit', 'spacing_longitude')
         with raises(BlueSkyConfigurationError) as e_info:
-            hysplit_utils.get_grid_params(
-                dict(config, spacing_longitude=0.05), fires=fires_one)
+            hysplit_utils.get_grid_params(fires=fires_one)
         assert e_info.value.args[0] == ("Config settings 'spacing_latitude' "
                 "and 'spacing_longitude' required to compute hysplit grid")
+
+        Config.reset()
+        Config.set(True, "dispersion", "hysplit" , "compute_grid")
+        Config.set(0.05, 'dispersion', 'hysplit', 'spacing_latitude')
         with raises(BlueSkyConfigurationError) as e_info:
-            hysplit_utils.get_grid_params(
-                dict(config, spacing_latitude=0.05), fires=fires_one)
+            hysplit_utils.get_grid_params(fires=fires_one)
         assert e_info.value.args[0] == ("Config settings 'spacing_latitude' "
                 "and 'spacing_longitude' required to compute hysplit grid")
 
 
         ## no fires or two many fires
 
-        config.update(spacing_longitude=0.05, spacing_latitude=0.05)
+        Config.reset()
+        Config.set(True, "dispersion", "hysplit" , "compute_grid")
+        Config.set(0.05, 'dispersion', 'hysplit', 'spacing_latitude')
+        Config.set(0.05, 'dispersion', 'hysplit', 'spacing_longitude')
 
         with raises(ValueError) as e_info:
-            hysplit_utils.get_grid_params(config)
+            hysplit_utils.get_grid_params()
         assert e_info.value.args[0] == 'Option to compute grid only supported for runs with one fire'
 
         with raises(ValueError) as e_info:
-            hysplit_utils.get_grid_params(config, fires=fires_two)
+            hysplit_utils.get_grid_params(fires=fires_two)
         assert e_info.value.args[0] == 'Option to compute grid only supported for runs with one fire'
-
-        ## successful cases
 
         expected = {
             'center_latitude': 40.0,
@@ -597,24 +599,23 @@ class TestGetGridParams(object):
             'height_latitude': 18.01801801801802,
             'spacing_latitude': 0.05,
             'spacing_longitude': 0.05,
-            'width_longitude': 23.45323911843835
+            'width_longitude': 23.453239118438354
         }
-        assert expected == hysplit_utils.get_grid_params(config, fires=fires_one)
+        assert expected == hysplit_utils.get_grid_params(fires=fires_one)
 
         # custom grid length (default is 2000)
-        config['grid_length'] = 1000
+        Config.set(1000, 'dispersion', 'hysplit', 'grid_length')
         expected = {
             'center_latitude': 40.0,
             'center_longitude': -118.5,
             'height_latitude': 9.00900900900901,
             'spacing_latitude': 0.05,
             'spacing_longitude': 0.05,
-            'width_longitude': 11.726619559219175
+            'width_longitude': 11.726619559219177
         }
-        assert expected == hysplit_utils.get_grid_params(config, fires=fires_one)
+        assert expected == hysplit_utils.get_grid_params(fires=fires_one)
 
-    def test_met_info(self):
-        config = {}
+    def test_met_info(self, reset_config):
         met_info = {
             "grid": {
                 "spacing": 6.0,
@@ -634,21 +635,17 @@ class TestGetGridParams(object):
             'center_latitude': 36.5,
             'center_longitude': -119.0,
             'height_latitude': 17.5,
-            'spacing_latitude': 0.06705008458604998,
-            'spacing_longitude': 0.06705008458604998,
+            'spacing_latitude': 0.06705008458605,
+            'spacing_longitude': 0.06705008458605,
             'width_longitude': 25.0
         }
-        assert expected == hysplit_utils.get_grid_params(
-            config, met_info=met_info)
+        assert expected == hysplit_utils.get_grid_params(met_info=met_info)
 
-    def test_allow_undefined(self):
-        config = {}
+    def test_allow_undefined(self, reset_config):
         expected = {}
-        assert expected == hysplit_utils.get_grid_params(
-            config, allow_undefined=True)
+        assert expected == hysplit_utils.get_grid_params(allow_undefined=True)
 
-    def test_fail(self):
-        config = {}
+    def test_fail(self, reset_config):
         with raises(BlueSkyConfigurationError) as e_info:
-            hysplit_utils.get_grid_params(config)
+            hysplit_utils.get_grid_params()
         assert e_info.value.args[0] == 'Specify hysplit dispersion grid'
