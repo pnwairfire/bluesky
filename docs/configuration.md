@@ -17,15 +17,29 @@ the fire data, each module has its own set of required and optional fields.
  - ***'config' > 'load' > 'sources' > 'name'*** -- *required* for each source-- e.g. 'smartfire2'
  - ***'config' > 'load' > 'sources' > 'format'*** -- *required* for each source-- e.g. 'csv'
  - ***'config' > 'load' > 'sources' > 'type'*** -- *required* for each source-- e.g. 'file'
- - ***'config' > 'load' > 'sources' > 'date_time'*** -- *optional* for each source-- e.g. '20160412', '2016-04-12T12:00:00'; used to to replace any datetime formate codes in the file name; defaults to current date (local time)
  - ***'config' > 'load' > 'sources' > 'wait' > 'strategy'*** -- *required* if 'wait' section is defined -- 'fixed' or 'backoff'
  - ***'config' > 'load' > 'sources' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
  - ***'config' > 'load' > 'sources' > 'wait' > 'max_attempts'*** -- *required* if 'wait' section is defined  -- max number of attempts
+ - ***'config' > 'load' > 'sources' > 'saved_copy_file'*** -- *optional* - save copy of loaded fire data to file
+ - ***'config' > 'load' > 'sources' > 'saved_copy_events_file'*** -- *optional* - save copy of loaded fire events data to file
+ - ***'config' > 'load' > 'sources' > 'start'*** -- used to filter fires based on time
+ - ***'config' > 'load' > 'sources' > 'end'*** -- used to filter fires based on time
 
 ###### if type 'file':
 
  - ***'config' > 'load' > 'sources' > 'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
  - ***'config' > 'load' > 'sources' > 'events_file'*** -- *optional* for each file type source-- file containing fire events data; e.g. '/path/to/fire_events.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
+
+###### if type 'API':
+
+ - ***'config' > 'load' > 'sources' > 'endpoint'*** --
+ - ***'config' > 'load' > 'sources' > 'key'*** --
+ - ***'config' > 'load' > 'sources' > 'secret'*** --
+ - ***'config' > 'load' > 'sources' > 'key_param'*** --
+ - ***'config' > 'load' > 'sources' > 'auth_protocol'*** --
+ - ***'config' > 'load' > 'sources' > 'request_timeout'*** --
+ - ***'config' > 'load' > 'sources' > 'query'*** --
+
 
 ##### ingestion
 

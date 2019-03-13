@@ -161,8 +161,7 @@ def run(fires_manager):
     logging.info("Running ingestion module")
     try:
         parsed_input = []
-        config = Config.get('ingestion')
-        fire_ingester = FireIngester(**config)
+        fire_ingester = FireIngester()
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
                 parsed_input.append(fire_ingester.ingest(fire))
@@ -284,10 +283,6 @@ class FireIngester(object):
 
     NESTED_FIELD_METHOD_PREFIX = '_ingest_nested_field_'
     SPECIAL_FIELD_METHOD_PREFIX = '_ingest_special_field_'
-
-
-    def __init__(self, **config):
-        self._config = config
 
     ##
     ## Public Interface
@@ -466,7 +461,7 @@ class FireIngester(object):
         "NOx", "NH3", "SO2", "VOC"
     }
     def _ingest_growth_emissions(self, growth, src):
-        if self._config.get('keep_emissions'):
+        if Config.get('ingestion', 'keep_emissions'):
             logging.debug("Ingesting emissions")
             emissions = {"summary": {}}
             for e in self.EMISSIONS_SPECIES:
@@ -483,7 +478,7 @@ class FireIngester(object):
                 growth["emissions"] = emissions
 
     def _ingest_growth_heat(self, growth, src):
-        if self._config.get('keep_heat'):
+        if Config.get('ingestion', 'keep_heat'):
             logging.debug("Ingesting heat")
             # TODO: look for value in src['heat|HEAT']['summary']['total'] first
             heat = self._get_numeric_val(src, "heat", "HEAT")
