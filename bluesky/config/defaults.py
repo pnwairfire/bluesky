@@ -86,7 +86,7 @@ DEFAULTS = {
         "truncation_percentage_threshold": 90.0,
         "truncation_count_threshold": 5,
         # Allow summed fuel percentages to be between 99.5% and 100.5%
-        "total_pct_threshold" = 0.5
+        "total_pct_threshold": 0.5
 
     },
     "consumption": {
