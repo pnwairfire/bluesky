@@ -205,15 +205,16 @@ DEFAULTS = {
             "projection": "LatLon",
 
             # There are no default 'grid' parameter, and the presence/absence
-            # of a grid definition is used in the logic in the code.  So,
-            # leave it commented out
-            #"grid": {
-            #    "spacing": None,
-            #    "domain": None,
-            #    "boundary": {
-            #     "sw": { "lat":None, "lng": None},
-            #     "ne": { "lat":None, "lng": None}}
-            #}
+            # of a grid definition (nonempty vs. empty grid dict) is used in
+            # the logic in the code. So, leave grid fields commented out
+            "grid": {
+                # "spacing": None,
+                # "domain": None,
+                # "boundary": {
+                #   "sw": { "lat":None, "lng": None},
+                #   "ne": { "lat":None, "lng": None}
+                # }
+            },
 
             # computing grid around fire
             "COMPUTE_GRID": False, # Program to convert raw HYSPLIT output to netCDF
