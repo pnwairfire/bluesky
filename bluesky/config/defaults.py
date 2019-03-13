@@ -141,6 +141,7 @@ DEFAULTS = {
             # "plume_top_behavior": "auto",
         },
         "sev": {
+            "working_dir": None
             # The following defaults are defined in the plumerise
             # package, so we won't set them here
             # "alpha": 0.24
@@ -515,6 +516,7 @@ DEFAULTS = {
             "output_dir": None,
             "images_dir": None,
             "data_dir": "",
+            "create_summary_json": False,
             "blueskykml_config": {
                 'SmokeDispersionKMLInput': {
                     # Use google's fire icon instead of BlueSkyKml's built-in icon

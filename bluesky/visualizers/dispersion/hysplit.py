@@ -53,8 +53,7 @@ class HysplitVisualizer(object):
         self._fires = fires_manager.fires
         self._run_id = fires_manager.run_id
 
-        self._config = Config.get(
-            'visualization', 'hysplit')
+        self._config = Config.get('visualization', 'hysplit')
         self._set_dispersion_output_info()
 
     def _set_dispersion_output_info(self):
