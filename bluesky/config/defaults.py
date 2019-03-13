@@ -103,9 +103,9 @@ DEFAULTS = {
     },
     "findmetdata": {
         "met_root_dir": None,
-        # We need to default time_window as None, since it will be used
-        # if it is defined, even if the first and last hours are None
-        "time_window": None, # {"first_hour": None,"last_hour": None}
+        # We need to default time_window empty, since it will be used
+        # if it has keys, even if the first and last hours are None
+        "time_window": {}, # {"first_hour": None,"last_hour": None}
 
         # We need to default wait to None, since being set to None
         # or empty dict in the config indicates that we don't want
