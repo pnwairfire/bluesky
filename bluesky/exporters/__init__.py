@@ -12,8 +12,7 @@ import shutil
 import tarfile
 import tempfile
 
-import afconfig
-
+from bluesky.config import Config
 from bluesky.io import create_dir_or_handle_existing
 
 # TODO: Support exporting VSMOKE dispersion, which would include KMLs
@@ -22,14 +21,14 @@ from bluesky.io import create_dir_or_handle_existing
 
 class ExporterBase(object):
 
-    def __init__(self, extra_exports, config):
-        self._config = config
+    def __init__(self, extra_exports):
+        self._export_mode = self.__class__.__module__.split('.')[-1]
+
         self._extra_exports = extra_exports
         self._handle_existing = self.config('handle_existing')
 
     def config(self, *keys):
-        return afconfig.get_config_value(self._config, *keys,
-            fail_on_missing=True)
+        Config.get('export', self._export_mode, *keys)
 
     def export(self, fires_manager):
         raise NotImplementedError("Bluesky's {} exporter needs to "

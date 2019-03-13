@@ -39,7 +39,6 @@ def run(fires_manager):
 
     Config options:
      - emissions > model -- emissions model to use
-     - emissions > efs -- deprecated synonym for 'model'
      - emissions > species -- whitelist of species to compute emissions for
      - emissions > include_emissions_details -- whether or not to include
         emissions per fuel category per phase, as opposed to just per phase
@@ -47,11 +46,7 @@ def run(fires_manager):
      - consumption > fuel_loadings -- considered if fuel loadings aren't
         specified in the emissions config
     """
-    # Supporting 'efs' for backwards compatibility
-    # TODO: deprecate and remove support for 'efs'
-    model = (Config.get('emissions', 'model')
-        or Config.get('emissions', 'efs')
-        or 'feps').lower()
+    model = Config.get('emissions', 'model')
 
     include_emissions_details = Config.get(
         'emissions', 'include_emissions_details')

@@ -28,8 +28,7 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    file_sets = [m.lower() for m in
-        Config.get('extrafiles', 'sets')]
+    file_sets = [m.lower() for m in Config.get('extrafiles', 'sets')]
     fires_manager.processed(__name__, __version__, sets=file_sets)
 
     dest_dir = _get_dest_dir(fires_manager)
@@ -52,9 +51,8 @@ def get_extra_file_writers(fires_manager, file_sets, dest_dir):
             raise BlueSkyConfigurationError("Invalid writer - {}".format(
                 writer_klass))
 
-        writer_config = Config.get('extrafiles', file_set)
         writers.append(
-            (file_set, writer_klass(dest_dir, **writer_config))
+            (file_set, writer_klass(dest_dir))
         )
     return writers
 

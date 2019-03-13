@@ -68,8 +68,7 @@ def _get_met_root_dir(fires_manager):
     # TODO: specify domain instead of met_root_dir, and somehow configure (not
     # in the code, since this is open source), per domain, the root dir, arl file
     # name pattern, etc.
-    met_root_dir = Config.get('findmetdata',
-        'met_root_dir')
+    met_root_dir = Config.get('findmetdata', 'met_root_dir')
     if not met_root_dir:
         raise BlueSkyConfigurationError("Config setting 'met_root_dir' "
             "required by findmetdata module")
@@ -78,8 +77,7 @@ def _get_met_root_dir(fires_manager):
 
 def _get_met_finder(fires_manager):
     met_root_dir = _get_met_root_dir(fires_manager)
-    met_format = Config.get(
-        'findmetdata', 'met_format').lower()
+    met_format = Config.get('findmetdata', 'met_format').lower()
     if met_format == "arl":
         arl_config = Config.get('findmetdata', 'arl')
         logging.debug("ARL config: %s", arl_config)

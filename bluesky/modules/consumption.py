@@ -38,8 +38,7 @@ def run(fires_manager):
     # TODO: get msg_level and burn_type from fires_manager's config
     msg_level = 2  # 1 => fewest messages; 3 => most messages
 
-    all_fuel_loadings = Config.get('consumption',
-        'fuel_loadings')
+    all_fuel_loadings = Config.get('consumption', 'fuel_loadings')
     fuel_loadings_manager = FuelLoadingsManager(all_fuel_loadings=all_fuel_loadings)
 
     _validate_input(fires_manager)
@@ -165,8 +164,8 @@ def _validate_input(fires_manager):
                         latlng = LatLng(g['location'])
                         if not ecoregion_lookup:
                             from bluesky.ecoregion.lookup import EcoregionLookup
-                            implemenation = Config.get(
-                                'consumption', 'ecoregion_lookup_implemenation')
+                            implemenation = Config.get('consumption',
+                                'ecoregion_lookup_implemenation')
                             ecoregion_lookup = EcoregionLookup(implemenation)
                         g['location']['ecoregion'] = ecoregion_lookup.lookup(
                             latlng.latitude, latlng.longitude)
@@ -183,8 +182,7 @@ def _validate_input(fires_manager):
                         raise ValueError("Each fuelbed must define 'fccs_id' and 'pct'")
 
 def _use_default_ecoreion(fires_manager, g, exc=None):
-    default_ecoregion = Config.get(
-        'consumption', 'default_ecoregion')
+    default_ecoregion = Config.get('consumption', 'default_ecoregion')
     if default_ecoregion:
         logging.debug('Using default ecoregion %s', default_ecoregion)
         g['location']['ecoregion'] = default_ecoregion

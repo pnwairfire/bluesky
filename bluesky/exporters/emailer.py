@@ -20,8 +20,8 @@ __version__ = "0.1.0"
 
 class EmailExporter(ExporterBase):
 
-    def __init__(self, extra_exports, config):
-        super(EmailExporter, self).__init__(extra_exports, config)
+    def __init__(self, extra_exports):
+        super(EmailExporter, self).__init__(extra_exports)
         self._recipients = self.config('recipients')
         if not self._recipients:
             raise BlueSkyConfigurationError("Specify email recipients.")

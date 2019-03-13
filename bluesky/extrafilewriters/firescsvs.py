@@ -17,6 +17,7 @@ from afdatetime import parsing as datetime_parsing
 from blueskykml import fires as blueskykml_fires
 
 from bluesky import locationutils
+from bluesky.config import Config
 
 BLUESKYKML_DATE_FORMAT = blueskykml_fires.FireData.date_time_format
 
@@ -240,11 +241,11 @@ and aggregate.  Note that this list lacks 'id', which is the first column.
 
 class FiresCsvsWriter(object):
 
-    def __init__(self, dest_dir, **config):
-        fl = config.get('fire_locations_filename') or 'fire_locations.csv'
+    def __init__(self, dest_dir):
+        fl = Config.get('extrafiles', 'firescsvs', 'fire_locations_filename')
         self._fire_locations_pathname = os.path.join(dest_dir, fl)
 
-        fe = config.get('fire_events_filename') or 'fire_events.csv'
+        fe = Config.get('extrafiles', 'firescsvs', 'fire_events_filename')
         self._fire_events_pathname = os.path.join(dest_dir, fe)
 
     def write(self, fires_manager):

@@ -25,8 +25,8 @@ class UploadExporter(ExporterBase):
 
     EXPORT_KEY = 'upload'
 
-    def __init__(self, extra_exports, config):
-        super(UploadExporter, self).__init__(extra_exports, config)
+    def __init__(self, extra_exports):
+        super(UploadExporter, self).__init__(extra_exports)
         self._upload_options = {}
         self._current_user = getpass.getuser()
 

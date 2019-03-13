@@ -133,8 +133,7 @@ def _get_time(fires_manager):
 
 
 def _get_dirs(fires_manager):
-    handle_existing = Config.get(
-        'dispersion', 'handle_existing')
+    handle_existing = Config.get('dispersion', 'handle_existing')
 
     output_dir = Config.get('dispersion', 'output_dir')
     if not output_dir:

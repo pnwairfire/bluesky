@@ -13,12 +13,13 @@ import csv
 import logging
 import os
 
+from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 
 class EmissionsCsvWriter(object):
 
-    def __init__(self, dest_dir, **config):
-        self._filename = config.get('filename')
+    def __init__(self, dest_dir):
+        self._filename = Config.get('extrafiles', 'emissionscsv', 'filename')
         if not self._filename:
             raise BlueSkyConfigurationError("Specify destination "
                 "('config' > 'extrafiles' > 'emissionscsv' > 'filename')")
