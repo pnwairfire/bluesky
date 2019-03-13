@@ -90,7 +90,7 @@ DEFAULTS = {
 
     },
     "consumption": {
-        "fuel_loadings": None,
+        "fuel_loadings": {},
         "default_ecoregion": None,
         "ecoregion_lookup_implemenation": "ogr"
     },
@@ -99,7 +99,7 @@ DEFAULTS = {
         "model": "feps",
         "include_emissions_details": False,
         "species": [],
-        "fuel_loadings": None
+        "fuel_loadings": {}
     },
     "findmetdata": {
         "met_root_dir": None,
@@ -107,10 +107,10 @@ DEFAULTS = {
         # if it has keys, even if the first and last hours are None
         "time_window": {}, # {"first_hour": None,"last_hour": None}
 
-        # We need to default wait to None, since being set to None
-        # or empty dict in the config indicates that we don't want
+        # We need to default wait to empty dict, since being set
+        # empty dict in the config indicates that we don't want
         # to wait (which is the default behavior)
-        "wait": None, # {"strategy": None,"time": None,"max_attempts": None},
+        "wait": {}, # {"strategy": None,"time": None,"max_attempts": None},
 
         "met_format": "arl",
         "arl": {
