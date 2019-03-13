@@ -29,6 +29,20 @@ from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.extrafilewriters.firescsvs import FiresCsvsWriter
 from bluesky.dispersers.hysplit import hysplit_utils
 
+##
+## Config getter helpers
+##
+
+def disp_config(*keys):
+    return Config.get('dispersion', *keys)
+
+def hysplit_vis_config(*keys):
+    return Config.get('visualization', 'hysplit', *keys)
+
+def hysplit_disp_config(*keys):
+    return Config.get('dispersion', 'hysplit', *keys)
+
+
 ###
 ### HYSPLIT Dispersion Visualization
 ###
@@ -42,7 +56,6 @@ ARGS = [
 ]
 BlueskyKmlArgs = namedtuple('BlueskyKmlArgs', ARGS)
 
-
 ##
 ## Visualizer class
 ##
@@ -53,16 +66,14 @@ class HysplitVisualizer(object):
         self._fires = fires_manager.fires
         self._run_id = fires_manager.run_id
 
-        self._config = Config.get('visualization', 'hysplit')
         self._set_dispersion_output_info()
 
     def _set_dispersion_output_info(self):
         disp_output_info = (self._fires_manager.dispersion
             and self._fires_manager.dispersion.get('output')) or {}
-        disp_conf = Config.get('dispersion')
 
         self._hysplit_output_directory = (disp_output_info.get('directory')
-            or disp_conf.get('output_dir'))
+            or disp_config('output_dir'))
         if not self._hysplit_output_directory:
             raise ValueError("hysplit output directory must be defined")
         if not os.path.isdir(self._hysplit_output_directory):
@@ -70,7 +81,7 @@ class HysplitVisualizer(object):
                 self._hysplit_output_directory))
 
         self._hysplit_output_file = (disp_output_info.get('grid_filename')
-            or Config.get('dispersion','hysplit','output_file_name'))
+            or hysplit_disp_config('output_file_name'))
         if not self._hysplit_output_file:
             raise ValueError("hysplit output file must be defined")
         self._hysplit_output_file = os.path.join(self._hysplit_output_directory, self._hysplit_output_file)
@@ -83,17 +94,17 @@ class HysplitVisualizer(object):
             or {}) # allow them to be undefined
 
         self._start_time = (disp_output_info.get("start_time")
-            or disp_conf.get("start"))
+            or disp_config("start"))
         self._num_hours = (disp_output_info.get("num_hours")
-            or disp_conf.get('num_hours'))
+            or disp_config('num_hours'))
 
     def run(self):
 
-        if self._config.get('output_dir'):
-            output_directory = self._config['output_dir']
+        if hysplit_vis_config('output_dir'):
+            output_directory = hysplit_vis_config('output_dir')
         else:
             output_directory =  self._hysplit_output_directory
-        data_dir = os.path.join(output_directory, self._config['data_dir'])
+        data_dir = os.path.join(output_directory, hysplit_vis_config('data_dir'))
         if not os.path.exists(data_dir):
             os.makedirs(data_dir)
 
@@ -115,11 +126,11 @@ class HysplitVisualizer(object):
 
         config_options = self._get_config_options(output_directory)
 
-        layers = self._config.get('layers')
+        layers = hysplit_vis_config('layers')
         args = BlueskyKmlArgs(
             output_directory=str(output_directory),
             configfile=None, # TODO: allow this to be configurable?
-            prettykml=self._config['prettykml'],
+            prettykml=hysplit_vis_config('prettykml'),
             # in blueskykml, if verbose is True, then logging level will be set
             # DEBUG; otherwise, logging level is left as is.  bsp already takes
             # care of setting log level, so setting verbose to False will let
@@ -157,7 +168,7 @@ class HysplitVisualizer(object):
         }
 
     def _get_file_name(self, directory, f):
-        name = self._config['{}_filename'.format(f)]
+        name = hysplit_vis_config('{}_filename'.format(f))
         return {
             "name": name,
             "pathname": os.path.join(directory, name)
@@ -191,7 +202,7 @@ class HysplitVisualizer(object):
     def _generate_summary_json(self, output_directory):
         """Creates summary.json (like BSF's) if configured to do so
         """
-        if self._config.get('create_summary_json'):
+        if hysplit_vis_config('create_summary_json'):
             d_from = d_to = None
             try:
                 d_from = datetime_parsing.parse(self._start_time)
@@ -248,13 +259,16 @@ class HysplitVisualizer(object):
             "http://maps.google.com/mapfiles/ms/micons/firedept.png"
           - 'DispersionGridOutput' > 'OUTPUT_DIR'
         """
-        config_options = copy.deepcopy(self._config['blueskykml_config'])
+        # we don't want to modify the central Config, so we use
+        # afconfig on deep-copied blueskykml config
+        # TODO: is there a valid reason for not modifying the central Config ?
+        config_options = copy.deepcopy(hysplit_vis_config('blueskykml_config'))
 
         # set output directory if not already specified
         if afconfig.get_config_value(config_options,
                 'DispersionGridOutput', 'OUTPUT_DIR') is None:
             images_dir = str(os.path.join(output_directory,
-                self._config.get('images_dir') or ''))
+                hysplit_vis_config('images_dir') or ''))
             afconfig.set_config_value(config_options, images_dir,
                 'DispersionGridOutput', 'OUTPUT_DIR')
 
