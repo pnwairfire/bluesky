@@ -71,7 +71,10 @@ def run(fires_manager):
                 # TODO: add fires to fires_manager
                 successfully_loaded_sources.append(source)
             except:
-                if not Config.get('skip_failed_sources'):
+                # Let skip_failed_sources be defined at top level
+                # or under 'load' in the config
+                if not (Config.get('skip_failed_sources')
+                        or Config.get('load', 'skip_failed_sources')):
                     raise
     finally:
         fires_manager.processed(__name__, __version__,
