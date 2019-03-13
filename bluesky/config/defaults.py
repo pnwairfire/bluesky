@@ -61,15 +61,20 @@ DEFAULTS = {
         "no_sampling": False,
 
         # The following defaults are defined in the fccsmap package
-        # and are based on the location of the pacakge in the file
+        # and are based on the location of the package in the file
         # system. So, let fccsmap set defaults
         # "fccs_fuelload_file": None,
         # "fccs_fuelload_param": None,
         # "fccs_fuelload_grid_resolution": None,
 
-        # the following defaults are *not* defined in fccsmap package
+        # The following defaults are *not* defined in fccsmap package
+        # If user override truncation threshold defaults by setting to
+        # None or 0, we won't truncate by that criterion
         "truncation_percentage_threshold": 90.0,
-        "truncation_count_threshold": 5
+        "truncation_count_threshold": 5,
+        # Allow summed fuel percentages to be between 99.5% and 100.5%
+        "total_pct_threshold" = 0.5
+
     },
     "consumption": {
         "fuel_loadings": None,

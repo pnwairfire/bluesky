@@ -28,8 +28,8 @@ def run(fires_manager):
     fires_manager.processed(__name__, __version__,
         fccsmap_version=fccsmap.__version__)
 
-    fuelbeds_config = Config.get('fuelbeds')
-    logging.debug('Using FCCS version %s', fuelbeds_config['fccs_version'])
+    logging.debug('Using FCCS version %s',
+        Config.get('fuelbeds', 'fccs_version'))
 
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
@@ -46,8 +46,8 @@ def run(fires_manager):
                 #   estimator objects that are reused, and set reference to
                 #   correct one here
                 lookup = FccsLookUp(is_alaska=g['location'].get('state')=='AK',
-                    **fuelbeds_config)
-                Estimator(lookup, **fuelbeds_config).estimate(g)
+                    **Config.get('fuelbeds'))
+                Estimator(lookup).estimate(g)
 
     # TODO: Add fuel loadings data to each fuelbed object (????)
     #  If we do so here, use bluesky.modules.consumption.FuelLoadingsManager
@@ -81,21 +81,16 @@ def summarize(fires):
 
 # According to https://en.wikipedia.org/wiki/Acre, an acre is 4046.8564224 m^2
 ACRES_PER_SQUARE_METER = 1 / 4046.8564224  # == 0.0002471053814671653
-# Allow summed fuel percentages to be between 99.5% and 100.5%
-# TODO: Move to common constants module? (timeprofiling defines similar
-# constant for total growth percentage)
-TOTAL_PCT_THRESHOLD = 0.5
 
 class Estimator(object):
 
-    def __init__(self, lookup, **options):
+    def __init__(self, lookup):
         self.lookup = lookup
 
-        for attr, default in options.items():
+        # Is this necessary?
+        for attr, val in Config.get('fuelbeds').items():
             if attr.startswith('truncation_'):
-                # if user override defaults by setting to None or 0, we
-                # won't truncate by that criterion
-                setattr(self, attr, options[k])
+                setattr(self, attr, cal)
 
     def estimate(self, growth_obj):
         """Estimates fuelbed composition based on lat/lng or GeoJSON data.
@@ -150,7 +145,7 @@ class Estimator(object):
         if not fuelbed_info or not fuelbed_info.get('fuelbeds'):
             # TODO: option to ignore failures ?
             raise RuntimeError("Failed to lookup fuelbed information")
-        elif TOTAL_PCT_THRESHOLD < abs(100.0 - sum(
+        elif Config.get('fuelbeds', 'total_pct_threshold') < abs(100.0 - sum(
                 [d['percent'] for d in fuelbed_info['fuelbeds'].values()])):
             raise RuntimeError("Fuelbed percentages don't add up to 100% - {fuelbeds}".format(
                 fuelbeds=fuelbed_info['fuelbeds']))
