@@ -1,5 +1,37 @@
 ## Configuring BlueSky Runs
 
+Config settings can be specified in separate config file(s) as well
+as via command line options.  Config files are loaded in the
+order they appear on the command line, with each subsequent files
+overriding any config parameters already set. Next, the comand line
+settings are applied in the order they are specified, overriding
+any config paramters already set.
+
+For example if config1.json specifies foo=bar and bar=1, and
+config2.json specifies foo=baz and baz=3, and if bsp is invoked like:
+
+    $ bsp -i input.json -c config1.json -c config2.json
+
+then the net result is foo=baz, bar=1, baz=3.  If you add
+'-C foo=bsdf' to the command
+
+    $ bsp -i input.json -c config1.json -c config2.json -C foo=bsdf
+
+then regardless of where it is specified in the command, foo
+will be 'bsdf', bar will remain 1, and baz will remain 3.
+
+The command line options are specifying configuration are:
+
+  - `-C`, `--config-option`
+  - `-B`, `--boolean-config-option`
+  - `-I`, `--integer-config-option`
+  - `-F`, `--float-config-option`
+  - `-J`, `--json-config-option`
+  - `-c`, `--config-file`
+
+Use `bsp`'s `-h` option to get more more information about each
+config related option.
+
 ### 'config' Fields
 
 The 'config' object has sub-objects specific to the modules to be run, as
