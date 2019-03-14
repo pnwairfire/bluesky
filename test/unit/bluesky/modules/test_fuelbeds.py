@@ -7,6 +7,7 @@ from unittest import mock
 
 from py.test import raises
 
+from bluesky.config import Config
 from bluesky.models.fires import Fire
 from bluesky.modules import fuelbeds
 
@@ -343,9 +344,9 @@ class TestEstimatorCustomTruncation(object):
 
     def setup(self):
         lookup = mock.Mock()
-        self.estimator_w_options = fuelbeds.Estimator(lookup,
-            truncation_percentage_threshold=75.0,
-            truncation_count_threshold=2)
+        Config.set(75.0, "fuelbeds", "truncation_percentage_threshold")
+        Config.set(2, "fuelbeds", "truncation_count_threshold")
+        self.estimator_w_options = fuelbeds.Estimator(lookup)
 
     def test_truncate_empty_set(self):
         expected = {
@@ -433,9 +434,9 @@ class TestEstimatorNoTruncation(object):
 
     def setup(self):
         lookup = mock.Mock()
-        self.estimator_no_truncation = fuelbeds.Estimator(lookup,
-            truncation_percentage_threshold=None,
-            truncation_count_threshold=None)
+        Config.set(None, "fuelbeds", "truncation_percentage_threshold")
+        Config.set(None, "fuelbeds", "truncation_count_threshold")
+        self.estimator_no_truncation = fuelbeds.Estimator(lookup)
 
 
     # TDOO: UPDATE ALL THESE TESTS TO USE NEW CLASS INTERFACE
