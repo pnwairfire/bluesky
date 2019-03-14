@@ -220,7 +220,9 @@ fields):
             "total": "0.0h 0.0m 0s"
         },
         "today": "2016-09-15",
-        "config": {},
+        "run_config": {
+            ...
+        },
         "processing": [
             {
                 "version": "0.1.0",
@@ -337,7 +339,9 @@ yielding the following augmented output:
                 }
             }
         ],
-        "config": {},
+        "run_config": {
+            ...
+        },
         "today": "2016-09-15",
         "summary": {
             "consumption": {
@@ -444,7 +448,9 @@ would contain this output, agumented with emissions data:
                 }
             ]
         },
-        "config": {},
+        "run_config": {
+            ...
+        },
         "fire_information": [
             {
                 "fuel_type": "natural",
@@ -626,7 +632,9 @@ Assume you start with the following data:
 It would become:
 
     {
-        "config": {},
+        "run_config": {
+            ...
+        },
         "runtime": {
             "start": "2016-09-15T18:55:48Z",
             "end": "2016-09-15T18:55:48Z",
@@ -731,7 +739,9 @@ if you pass this data through ingestion:
 you'll end up with this:
 
     {
-        "config": {},
+        "run_config": {
+            ...
+        },
         "today": "2016-09-15",
         "processing": [
             {

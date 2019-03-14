@@ -271,7 +271,9 @@ would give you:
             "start": "2016-09-15T18:27:22Z",
             "total": "0.0h 0.0m 0s"
         },
-        "config": {}
+        "run_config": {
+            ...
+        }
     }
 
 
@@ -516,7 +518,9 @@ would give you:
             "end": "2016-09-15T18:28:07Z",
             "start": "2016-09-15T18:28:07Z"
         },
-        "config": {}
+        "run_config": {
+            ...
+        }
     }
 
 Piping that through consumption
@@ -2635,7 +2639,9 @@ would give you:
                 "version": "0.1.0"
             }
         ],
-        "config": {},
+        "run_config": {
+            ...
+        },
         "runtime": {
             "modules": [
                 {
@@ -4776,5 +4782,7 @@ would give you:
                 "ef_set": "feps"
             }
         ],
-        "config": {}
+        "run_config": {
+            ...
+        }
     }
