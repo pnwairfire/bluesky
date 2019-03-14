@@ -59,7 +59,7 @@ could run something like the following:
 To use the docker image to run bluesky from your local repo, you need to
 set PYTHONPATH and PATH variables in your docker run command.
 
-For example
+For example, to just print the helpstring:
 
     docker run --rm \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
@@ -67,9 +67,7 @@ For example
         -e PATH=/bluesky/bin/:$PATH \
         bluesky bsp -h
 
-
-
-Another example:
+Another example, running through emissions:
 
     docker run --rm -ti \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
@@ -77,58 +75,25 @@ Another example:
         -e PATH=/bluesky/bin/:$PATH \
         -w /bluesky/ \
         bluesky \
-        bsp --log-level=DEBUG \
+        bsp --log-level=DEBUG --indent 4 \
         -i ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json \
-        -o ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion-output.json \
+        -o ./output/json/1-fire-24hr-20140530-CA-post-ingestion-output.json \
         ingestion fuelbeds consumption emissions
 
 
-Another example, running `bsp` through vsmoke dispersion:
+Another example, running through vsmoke dispersion:
 
-    echo '{
-        "config": {
-            "emissions": {
-                "species": ["PM2.5"]
-            },
-            "dispersion": {
-                "start": "2014-05-30T00:00:00",
-                "num_hours": 24,
-                "model": "vsmoke",
-                "output_dir": "/bsp-output/bsp-dispersion-output/{run_id}"
-            }
-        },
-        "fire_information": [
-            {
-                "meta":{
-                    "vsmoke": {
-                        "wd": 30,
-                        "ws": 10
-                    }
-                },
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Fire Near Wolf Creek, Winthrop, WA"
-                },
-                "id": "SF11C14225236095807750",
-                "type": "wildfire",
-                "growth": [
-                    {
-                        "start": "2014-05-29T17:00:00",
-                        "end": "2014-05-30T17:00:00",
-                        "location": {
-                            "area": 10000,
-                            "ecoregion": "western",
-                            "latitude": 48.4956218,
-                            "longitude": -120.2663579,
-                            "utc_offset": "-07:00"
-                        }
-                    }
-                ]
-            }
-        ]
-    }' | docker run --rm -i -v $HOME/docker-bsp-output:/bsp-output/ \
-        bluesky bsp --indent 4 ingestion fuelbeds consumption \
-        emissions timeprofiling dispersion > out.json
+    docker run --rm -ti \
+        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
+        -e PYTHONPATH=/bluesky/ \
+        -e PATH=/bluesky/bin/:$PATH \
+        -w /bluesky/ \
+        bluesky \
+        bsp --log-level=DEBUG --indent 4 \
+        -i ./test/data/json/1-fire-24hr-20140530-WA-pre-ingestion.json \
+        -o ./output/1-fire-24hr-20140530-WA-pre-ingestion-output.json \
+        -c ./test/config/dispersion/dispersion-vsmoke-24hr.json \
+        ingestion fuelbeds consumption emissions timeprofiling dispersion
 
 
 Another example, running `bsp` from the repo through HYSPLIT dispersion
@@ -138,98 +103,23 @@ and KML visualization:
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:$PATH \
-        -v $HOME/docker-bsp-output/:/bsp-output/ \
-        -v $HOME/Met/CANSAC/6km/ARL/:/Met/CANSAC/6km/ARL/ \
+        -v $HOME/Met/CANSAC/6km/ARL/:/data/Met/CANSAC/6km/ARL/ \
         -w /bluesky/ \
         bluesky \
-        bsp --log-level=DEBUG \
+        bsp --log-level=DEBUG --indent 4 \
         -i ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json \
-        -o ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion-output.json \
+        -o ./output/json/1-fire-24hr-20140530-CA-post-ingestion-output.json \
         -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
         ingestion fuelbeds consumption emissions \
         timeprofiling findmetdata localmet plumerising \
         dispersion visualization export
 
-Another example, running through hysplit dispersion:
 
-    echo '{
-        "config": {
-            "emissions": {
-                "species": ["PM2.5"]
-            },
-            "findmetdata": {
-                "met_root_dir": "/Met/CANSAC/6km/ARL/"
-            },
-            "dispersion": {
-                "start": "2014-05-30T00:00:00",
-                "num_hours": 24,
-                "model": "hysplit",
-                "output_dir": "/bsp-output/bsp-dispersion-output/{run_id}",
-                "hysplit": {
-                    "grid": {
-                        "spacing": 6.0,
-                        "boundary": {
-                            "ne": {
-                                "lat": 45.25,
-                                "lng": -106.5
-                            },
-                            "sw": {
-                                "lat": 27.75,
-                                "lng": -131.5
-                            }
-                        }
-                    }
-                }
-            },
-            "visualization": {
-                "target": "dispersion",
-                "hysplit": {
-                    "images_dir": "images/",
-                    "data_dir": "data/"
-                }
-            },
-            "export": {
-                "modes": ["localsave"],
-                "extra_exports": ["dispersion", "visualization"],
-                "localsave": {
-                    "dest_dir": "/bsp-output/bsp-local-exports/"
-                }
-            }
-        },
-        "fire_information": [
-            {
-                "event_of": {
-                    "id": "SF11E826544",
-                    "name": "Natural Fire near Yosemite, CA"
-                },
-                "id": "SF11C14225236095807750",
-                "type": "wildfire",
-                "growth": [
-                    {
-                        "start": "2014-05-29T17:00:00",
-                        "end": "2014-05-30T17:00:00",
-                        "location": {
-                            "area": 10000,
-                            "ecoregion": "western",
-                            "latitude": 37.909644,
-                            "longitude": -119.7615805,
-                            "utc_offset": "-07:00"
-                        }
-                    }
-                ]
-            }
-        ]
-    }' | docker run --rm -i -v $HOME/docker-bsp-output/:/bsp-output/ \
-        -v $HOME/Met/CANSAC/6km/ARL/:/Met/CANSAC/6km/ARL/ bluesky \
-        bsp --log-level=DEBUG ingestion fuelbeds consumption emissions \
-        timeprofiling findmetdata localmet plumerising dispersion \
-        visualization export --indent 4 > out.json
-
-Remember that, in the last three dispersion examples, the dispersion output
-will be under `$HOME/docker-bsp-output/bsp-dispersion-output/` on your host
-machine, not under `/bsp-output/bsp-dispersion-output/`. The export
-directory (for the last two examples), will be under
-`$HOME/bsp-local-exports`.
+Remember that, in the last dispersion example, the dispersion output
+will be under `$HOME/code/pnwairfire-bluesky/output/bsp-dispersion-output/`
+on your host machine, not under `/bluesky/output/bsp-dispersion-output/`.
+The export directory will be under
+`$HOME/code/pnwairfire-bluesky/output/bsp-local-exports`.
 
 #### Docker wrapper script
 
