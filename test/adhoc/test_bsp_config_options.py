@@ -15,6 +15,8 @@ import subprocess
 import sys
 import tempfile
 
+from py.test import raises
+
 from bluesky.config import DEFAULTS
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -24,7 +26,10 @@ BSP = os.path.join(ROOT_DIR, 'bin/bsp')
 
 INPUT = {
     "run_id": 'abcdefg123',
-    "fire_information": []
+    "fire_information": [],
+    "run_config": {  # 'run_config' is ignored in input data
+        "foobar": 12312
+    }
 }
 
 CONFIG_0 = {
@@ -56,7 +61,7 @@ CONFIG_1 = {
 }
 
 CONFIG_2 = {
-    "config": {
+    "run_config": { # either 'config' or 'run_config' is allowed
         "foo": {
             "c": 33333,
             "d": 44444,
@@ -160,5 +165,16 @@ assert set(actual['run_config'].keys()) == set(EXPECTED['run_config'].keys())
 for k in actual['run_config'].keys():
     logging.info('Checking output config key %s', k)
     assert actual['run_config'][k] == EXPECTED['run_config'][k]
+
+
+# Now check that specifying 'config' in input data causes failure
+INPUT['config'] = INPUT.pop('run_config')
+invalid_input_file = tempfile.NamedTemporaryFile(mode='w+t')
+invalid_input_file.write(json.dumps(INPUT))
+invalid_input_file.flush()
+cmd_args[2] = invalid_input_file.name
+with raises(subprocess.CalledProcessError) as e:
+    output = subprocess.check_output(cmd_args)
+print("\n*** Correctly failed due to 'config' in input data ***\n")
 
 print("\n*** PASSED ***\n")
