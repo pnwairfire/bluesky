@@ -98,17 +98,6 @@ class Config:
         else:
             return cls._IM_CONFIG
 
-
-    @classmethod
-    def dump(cls, modules=None):
-        if modules:
-            # return all top level keys that are either
-            #  not module-specific or which are in 'modules'
-            return {k: cls._IM_CONFIG[k] for k in cls._IM_CONFIG
-                if k not in AVAILABLE_MODULES or k in modules}
-        else:
-            return cls._IM_CONFIG
-
     @classmethod
     def replace_config_wildcards(cls, val):
         if isinstance(val, dict):

@@ -380,9 +380,6 @@ class FiresManager(object):
         raise DeprecationWarning(
             "Get config values with bluesky.config.Config.get")
 
-    def dump_config(self):
-        return Config.dump(self.modules)
-
     ##
     ## Helper properties
     ##
@@ -669,7 +666,7 @@ class FiresManager(object):
 
         return dict(self._meta, fire_information=self.fires, today=self.today,
             counts=self.counts, bluesky_version=__version__,
-            run_config=Config.dump(self.modules))
+            run_config=self.config)
 
     def dumps(self, output_stream=None, output_file=None, indent=None):
         if output_stream and output_file:
