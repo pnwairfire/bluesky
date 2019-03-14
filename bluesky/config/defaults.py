@@ -74,7 +74,6 @@ _DEFAULTS = {
         # The following defaults are defined in the fccsmap package,
         # so they could be removed from here
         "fccs_version": "2",
-        "is_alaska": False,
         "ignored_percent_resampling_threshold": 99.9,
         "ignored_fuelbeds": ['0', '900'],
         "no_sampling": False,

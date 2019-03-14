@@ -1381,7 +1381,6 @@
                 "0",
                 "900"
             ],
-            "is_alaska": false,
             "fccs_version": "2",
             "ignored_percent_resampling_threshold": 99.9,
             "no_sampling": false,
