@@ -123,7 +123,7 @@ def run_input(module, input_file):
         '.json', '-CONFIG.json')
 
     with open(config_file) as f:
-        config = json.loads(f.read())
+        config = json.loads(f.read()).get('config')
 
     logging.debug('Running bsp on %s', input_file)
     try:
