@@ -109,7 +109,7 @@ OPTIONAL_ARGS = [
         'dest': 'config_file_options',
         'help': 'config file containing JSON formatted overrides for default config values',
         'action': scripting_args.create_config_file_action(
-            ['raw_config', 'config'])
+            ['run_config', 'config'])
     },
     {
         'long': '--dump-config',
