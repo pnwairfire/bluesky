@@ -90,7 +90,7 @@ class Estimator(object):
         # Is this necessary?
         for attr, val in Config.get('fuelbeds').items():
             if attr.startswith('truncation_'):
-                setattr(self, attr, cal)
+                setattr(self, attr.replace('truncation_', ''), val)
 
     def estimate(self, growth_obj):
         """Estimates fuelbed composition based on lat/lng or GeoJSON data.
