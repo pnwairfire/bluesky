@@ -665,7 +665,7 @@ class FiresManager(object):
 
         return dict(self._meta, fire_information=self.fires, today=self.today,
             counts=self.counts, bluesky_version=__version__,
-            run_config=self.config)
+            run_config=Config.get())
 
     def dumps(self, output_stream=None, output_file=None, indent=None):
         if output_stream and output_file:
