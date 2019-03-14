@@ -6,6 +6,7 @@ import copy
 
 from py.test import raises
 
+from bluesky.config import Config
 from bluesky.modules import ingestion
 
 class TestIngestionErrorScenarios(object):
@@ -17,7 +18,7 @@ class TestIngestionErrorScenarios(object):
     ## Tests For ingest
     ##
 
-    def test_fire_missing_required_fields(self):
+    def test_fire_missing_required_fields(self, reset_config):
         with raises(ValueError) as e_info:
             self.ingester.ingest({})
         assert e_info.value.args[0] ==  ingestion.IngestionErrMsgs.NO_DATA
@@ -27,7 +28,7 @@ class TestIngestionErrorScenarios(object):
             self.ingester.ingest({"location": {}})
         assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION
 
-    def test_multiple_growth_fields_missing_pct(self):
+    def test_multiple_growth_fields_missing_pct(self, reset_config):
         # If growth is specified, each object in the array must have
         # 'start', 'end', and 'pct' defined
         with raises(ValueError) as e_info:
@@ -44,7 +45,7 @@ class TestIngestionErrorScenarios(object):
             )
         assert e_info.value.args[0] == ingestion.IngestionErrMsgs.MULTIPLE_GROWTH_NO_PCT
 
-    def test_multiple_growth_one_geojson(self):
+    def test_multiple_growth_one_geojson(self, reset_config):
         with raises(ValueError) as e_info:
             self.ingester.ingest(
                 {
@@ -68,7 +69,7 @@ class TestIngestionErrorScenarios(object):
             )
         assert e_info.value.args[0] == ingestion.IngestionErrMsgs.ONE_GEOJSON_MULTIPLE_GROWTH
 
-    def test_invalid_top_level_location(self):
+    def test_invalid_top_level_location(self, reset_config):
         # missing area
         with raises(ValueError) as e_info:
             self.ingester.ingest(
@@ -96,7 +97,7 @@ class TestIngestionErrorScenarios(object):
             )
         assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION
 
-    def test_invalid_growth_level_location(self):
+    def test_invalid_growth_level_location(self, reset_config):
         # missing area
         with raises(ValueError) as e_info:
             self.ingester.ingest(
@@ -144,7 +145,7 @@ class TestIngestionValidInput(object):
     def setup(self):
         self.ingester = ingestion.FireIngester()
 
-    def test_fire_with_minimum_fields(self):
+    def test_fire_with_minimum_fields(self, reset_config):
         f = {
             "location": {
                 "geojson": {
@@ -175,7 +176,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_fire_with_maximum_optional_fields(self):
+    def test_fire_with_maximum_optional_fields(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "event_of": {
@@ -222,7 +223,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_flat_fire(self):
+    def test_flat_fire(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "event_of":{
@@ -284,7 +285,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_flat_and_nested_fire(self):
+    def test_flat_and_nested_fire(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "event_of":{
@@ -359,7 +360,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_fire_with_ignored_fields(self):
+    def test_fire_with_ignored_fields(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "event_of":{
@@ -408,7 +409,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_fire_with_geojson_and_lat_lng(self):
+    def test_fire_with_geojson_and_lat_lng(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "event_of":{
@@ -455,7 +456,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_fire_with_old_sf2_date_time(self):
+    def test_fire_with_old_sf2_date_time(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "latitude": 47.0,
@@ -480,7 +481,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_fire_with_new_sf2_date_time(self):
+    def test_fire_with_new_sf2_date_time(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "latitude": 47.0,
@@ -506,7 +507,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_old_sf2_fire(self):
+    def test_old_sf2_fire(self, reset_config):
         f = {
             "area": 199.999999503,
             "canopy": "",
@@ -623,7 +624,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_new_sf2_fire(self):
+    def test_new_sf2_fire(self, reset_config):
         f = {
             "area": 99.9999997516,
             "canopy": 1.99,
@@ -742,7 +743,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_fire_with_consume_synonyms(self):
+    def test_fire_with_consume_synonyms(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "latitude": 47.0,
@@ -770,7 +771,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_no_change(self):
+    def test_no_change(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "event_of":{
@@ -816,10 +817,11 @@ class TestIngestionValidInput(object):
 class TestIngestionKeepEmissionsAndHeat(object):
 
     def setup(self):
-        self.ingester = ingestion.FireIngester(
-            keep_emissions=True, keep_heat=True)
+        Config.set(True, "ingestion", "keep_emissions")
+        Config.set(True, "ingestion", "keep_heat")
+        self.ingester = ingestion.FireIngester()
 
-    def test_fire_no_growth(self):
+    def test_fire_no_growth(self, reset_config):
         """Emissions and heat in this case aren't currently ingested
         """
         f = {
@@ -855,7 +857,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_fire_with_growth(self):
+    def test_fire_with_growth(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "event_of": {
@@ -920,7 +922,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_fire_with_old_sf2_date_time(self):
+    def test_fire_with_old_sf2_date_time(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "latitude": 47.0,
@@ -961,7 +963,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_fire_with_new_sf2_date_time(self):
+    def test_fire_with_new_sf2_date_time(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "latitude": 47.0,
