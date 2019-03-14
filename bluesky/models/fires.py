@@ -375,9 +375,6 @@ class FiresManager(object):
         raise DeprecationWarning(
             "Set config with bluesky.config.Config.set")
 
-    def merge_config(self, config_dict):
-        Config.merge(config_dict)
-
     def get_config_value(cls, *keys, **kwargs):
         raise DeprecationWarning(
             "Get config values with bluesky.config.Config.get")

@@ -24,6 +24,7 @@ try:
         datetimeutils, exceptions,
         modules, models, __version__
     )
+    from bluesky.config import Config
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
@@ -32,6 +33,7 @@ except:
         datetimeutils, exceptions,
         modules, models, __version__
     )
+    from bluesky.config import Config
 
 __author__ = "Joel Dubowy"
 
@@ -293,8 +295,8 @@ def set_config(args, fires_manager):
     #  (with tests)
 
     # merge loaded file options
-    fires_manager.merge_config(args.config_file_options)
-    fires_manager.merge_config(args.config_options)
+    Confug.merge(args.config_file_options)
+    Confug.merge(args.config_options)
 
     if args.dump_config:
         logging.info("Configuration:")
