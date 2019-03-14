@@ -56,8 +56,7 @@ def run(fires_manager):
     try:
         klass_name = ''.join([e.capitalize() for e in model.split('-')])
         klass = getattr(sys.modules[__name__], klass_name)
-        e = klass(fires_manager.fire_failure_handler,
-            Config.get)
+        e = klass(fires_manager.fire_failure_handler)
     except AttributeError:
         msg = "Invalid emissions model: '{}'.".format(model)
         if model == 'urbanski':
@@ -114,12 +113,11 @@ def _fix_keys(emissions):
 
 class EmissionsBase(object, metaclass=abc.ABCMeta):
 
-    def __init__(self, fire_failure_handler, config_getter):
+    def __init__(self, fire_failure_handler):
         self.fire_failure_handler = fire_failure_handler
-        self.include_emissions_details = config_getter(
+        self.include_emissions_details = Config.get(
             'emissions', 'include_emissions_details')
-        self.config_getter = config_getter
-        self.species = config_getter('emissions', 'species')
+        self.species = Config.get('emissions', 'species')
 
     @abc.abstractmethod
     def run(self, fires):
@@ -132,8 +130,8 @@ class EmissionsBase(object, metaclass=abc.ABCMeta):
 
 class Feps(EmissionsBase):
 
-    def __init__(self, fire_failure_handler, config_getter):
-        super(Feps, self).__init__(fire_failure_handler, config_getter)
+    def __init__(self, fire_failure_handler):
+        super(Feps, self).__init__(fire_failure_handler)
 
         # The same lookup object is used for both Rx and WF
         self.calculator = EmissionsCalculator(FepsEFLookup(),
@@ -174,8 +172,8 @@ class Feps(EmissionsBase):
 
 class PrichardOneill(EmissionsBase):
 
-    def __init__(self, fire_failure_handler, config_getter):
-        super(PrichardOneill, self).__init__(fire_failure_handler, config_getter)
+    def __init__(self, fire_failure_handler):
+        super(PrichardOneill, self).__init__(fire_failure_handler)
 
     def run(self, fires):
         logging.info("Running emissions module with Prichard / O'Neill EFs")
@@ -219,13 +217,13 @@ class PrichardOneill(EmissionsBase):
 
 class Consume(EmissionsBase):
 
-    def __init__(self, fire_failure_handler, config_getter):
-        super(Consume, self).__init__(fire_failure_handler, config_getter)
+    def __init__(self, fire_failure_handler):
+        super(Consume, self).__init__(fire_failure_handler)
 
         self.species = self.species and [e.upper() for e in self.species]
 
-        all_fuel_loadings = (config_getter('emissions','fuel_loadings')
-            or config_getter('consumption','fuel_loadings'))
+        all_fuel_loadings = (Config.get('emissions','fuel_loadings')
+            or Config.get('consumption','fuel_loadings'))
         self.fuel_loadings_manager = FuelLoadingsManager(
             all_fuel_loadings=all_fuel_loadings)
 
