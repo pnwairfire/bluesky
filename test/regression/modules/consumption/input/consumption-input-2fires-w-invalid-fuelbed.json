@@ -1,17 +1,17 @@
 {
-    "config": {
-        "skip_failed_fires": true
-    },
     "fire_information": [
         {
-            "event_of": {
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
             "growth": [
                 {
-                    "start": "2015-01-20T15:00:00",
                     "end": "2015-01-21T15:00:00",
+                    "location": {
+                        "area": 200,
+                        "latitude": 47.4316976,
+                        "longitude": -121.3990506,
+                        "utc_offset": "-09:00",
+                        "ecoregion": "southern"
+                    },
+                    "start": "2015-01-20T15:00:00",
                     "fuelbeds": [
                         {
                             "fccs_id": "46",
@@ -25,34 +25,27 @@
                             "fccs_id": "900",
                             "pct": 25.0
                         }
-                    ],
-                    "location": {
-                        "area": 200,
-                        "ecoregion": "southern",
-                        "latitude": 47.4316976,
-                        "longitude": -121.3990506,
-                        "utc_offset": "-09:00"
-                    }
+                    ]
                 }
             ],
+            "event_of": {
+                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "id": "SF11E826544"
+            },
             "id": "SF11C14225236095807750"
         },
         {
-            "event_of": {
-                "id": "ssdlfjsldfj",
-                "name": "Activity Fire near Snoqualmie Pass, WA"
-            },
             "growth": [
                 {
-                    "start": "2015-01-20T15:00:00",
                     "end": "2015-01-21T15:00:00",
                     "location": {
                         "area": 200,
-                        "ecoregion": "southern",
                         "latitude": 47.5316976,
                         "longitude": -121.3990506,
-                        "utc_offset": "-09:00"
+                        "utc_offset": "-09:00",
+                        "ecoregion": "southern"
                     },
+                    "start": "2015-01-20T15:00:00",
                     "fuelbeds": [
                         {
                             "fccs_id": "41",
@@ -65,6 +58,10 @@
                     ]
                 }
             ],
+            "event_of": {
+                "name": "Activity Fire near Snoqualmie Pass, WA",
+                "id": "ssdlfjsldfj"
+            },
             "id": "lkjrisdfo"
         }
     ]

@@ -1,0 +1,8 @@
+{
+    "config": {
+        "plumerising": {
+            "model": "feps"
+        },
+        "skip_failed_fires": true
+    }
+}

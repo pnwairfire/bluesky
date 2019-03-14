@@ -1,0 +1,34 @@
+{
+    "config": {
+        "timeprofiling": {
+            "hourly_fractions": {
+                "flaming": [
+                    0.8,
+                    0.1,
+                    0.1
+                ],
+                "smoldering": [
+                    0.8,
+                    0.1,
+                    0.1
+                ],
+                "area_fraction": [
+                    0.8,
+                    0.1,
+                    0.1
+                ],
+                "residual": [
+                    0.8,
+                    0.1,
+                    0.1
+                ]
+            }
+        },
+        "emissions": {
+            "model": "feps",
+            "species": [
+                "PM2.5"
+            ]
+        }
+    }
+}

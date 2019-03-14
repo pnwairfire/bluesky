@@ -1,0 +1,12 @@
+{
+    "config": {
+        "emissions": {
+            "include_emissions_details": true,
+            "model": "consume",
+            "species": [
+                "PM2.5"
+            ]
+        },
+        "skip_failed_fires": true
+    }
+}

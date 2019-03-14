@@ -1,0 +1,8 @@
+{
+    "config": {
+        "plumerising": {
+            "model": "sev"
+        },
+        "skip_failed_fires": true
+    }
+}

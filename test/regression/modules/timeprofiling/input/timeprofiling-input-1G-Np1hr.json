@@ -5,20 +5,72 @@
                 {
                     "fuelbeds": [
                         {
+                            "fuel_loadings": {
+                                "duff_upper_loading": 0.96,
+                                "pile_clean_loading": 0.0,
+                                "snags_c3_loading": 0.0,
+                                "w_stump_lightered_loading": 0.0,
+                                "w_rotten_3_9_loading": 0.0,
+                                "lichen_loading": 0.0,
+                                "nw_primary_perc_live": 0.0,
+                                "nw_secondary_perc_live": 0.0,
+                                "litter_loading": 0.3,
+                                "w_stump_rotten_loading": 0.0,
+                                "litter_depth": 1.0,
+                                "duff_lower_loading": 2.16,
+                                "w_sound_0_quarter_loading": 0.5,
+                                "duff_lower_depth": 0.2,
+                                "pile_vdirty_loading": 0.0,
+                                "snags_c1_wood_loading": 0.0,
+                                "w_sound_quarter_1_loading": 1.0,
+                                "shrubs_primary_loading": 12.061473,
+                                "nw_secondary_loading": 0.0,
+                                "lichen_depth": 0.0,
+                                "overstory_loading": 0.0,
+                                "w_sound_3_9_loading": 0.0,
+                                "duff_upper_depth": 0.2,
+                                "basal_accum_loading": 0.0,
+                                "w_sound_gt20_loading": 0.0,
+                                "cover_type": 161,
+                                "efg_activity": 7,
+                                "filename": "FB_0046_FCCS.xml",
+                                "pile_dirty_loading": 0.0,
+                                "w_sound_1_3_loading": 1.0,
+                                "squirrel_midden_loading": 0.0,
+                                "total_available_fuel_loading": 18.153765,
+                                "ladderfuels_loading": 0.0,
+                                "shrubs_secondary_perc_live": 0.85,
+                                "understory_loading": 0.0,
+                                "nw_primary_loading": 0.0,
+                                "moss_depth": 0.0,
+                                "snags_c2_loading": 0.0,
+                                "midstory_loading": 0.0,
+                                "shrubs_secondary_loading": 0.172292,
+                                "moss_loading": 0.0,
+                                "w_sound_9_20_loading": 0.0,
+                                "w_rotten_gt20_loading": 0.0,
+                                "snags_c1wo_foliage_loading": 0.0,
+                                "shrubs_primary_perc_live": 0.85,
+                                "w_rotten_9_20_loading": 0.0,
+                                "snags_c1_foliage_loading": 0.0,
+                                "ecoregion": 260.0,
+                                "efg_natural": 7,
+                                "w_stump_sound_loading": 0.0
+                            },
                             "emissions": {
                                 "flaming": {
                                     "PM2.5": [
                                         0.07199844026240416
                                     ]
                                 },
-                                "smoldering": {
-                                    "PM2.5": [
-                                        0.011065743225101874
-                                    ]
-                                },
                                 "total": {
                                     "PM2.5": [
                                         0.08339865300750604
+                                    ]
+                                },
+                                "smoldering": {
+                                    "PM2.5": [
+                                        0.011065743225101874
                                     ]
                                 },
                                 "residual": {
@@ -28,109 +80,25 @@
                                 }
                             },
                             "fccs_id": "46",
-                            "pct": 100.0,
-                            "fuel_loadings": {
-                                "w_stump_sound_loading": 0.0,
-                                "snags_c1_wood_loading": 0.0,
-                                "nw_primary_loading": 0.0,
-                                "overstory_loading": 0.0,
-                                "total_available_fuel_loading": 18.153765,
-                                "duff_lower_loading": 2.16,
-                                "filename": "FB_0046_FCCS.xml",
-                                "ecoregion": 260.0,
-                                "w_sound_9_20_loading": 0.0,
-                                "shrubs_secondary_perc_live": 0.85,
-                                "snags_c3_loading": 0.0,
-                                "nw_secondary_perc_live": 0.0,
-                                "efg_activity": 7,
-                                "basal_accum_loading": 0.0,
-                                "duff_lower_depth": 0.2,
-                                "shrubs_primary_perc_live": 0.85,
-                                "w_rotten_3_9_loading": 0.0,
-                                "lichen_loading": 0.0,
-                                "duff_upper_depth": 0.2,
-                                "duff_upper_loading": 0.96,
-                                "lichen_depth": 0.0,
-                                "shrubs_primary_loading": 12.061473,
-                                "pile_clean_loading": 0.0,
-                                "nw_secondary_loading": 0.0,
-                                "nw_primary_perc_live": 0.0,
-                                "w_stump_rotten_loading": 0.0,
-                                "shrubs_secondary_loading": 0.172292,
-                                "w_sound_3_9_loading": 0.0,
-                                "w_rotten_9_20_loading": 0.0,
-                                "efg_natural": 7,
-                                "snags_c1wo_foliage_loading": 0.0,
-                                "w_sound_1_3_loading": 1.0,
-                                "pile_dirty_loading": 0.0,
-                                "snags_c2_loading": 0.0,
-                                "understory_loading": 0.0,
-                                "squirrel_midden_loading": 0.0,
-                                "litter_depth": 1.0,
-                                "ladderfuels_loading": 0.0,
-                                "moss_depth": 0.0,
-                                "midstory_loading": 0.0,
-                                "cover_type": 161,
-                                "w_stump_lightered_loading": 0.0,
-                                "pile_vdirty_loading": 0.0,
-                                "snags_c1_foliage_loading": 0.0,
-                                "w_sound_0_quarter_loading": 0.5,
-                                "w_sound_quarter_1_loading": 1.0,
-                                "w_sound_gt20_loading": 0.0,
-                                "litter_loading": 0.3,
-                                "moss_loading": 0.0,
-                                "w_rotten_gt20_loading": 0.0
-                            }
+                            "pct": 100.0
                         }
                     ],
-                    "end": "2015-01-20T02:00:00",
                     "location": {
-                        "longitude": -121.3990506,
                         "area": 20000.0,
                         "latitude": 47.4316976,
-                        "ecoregion": "southern",
-                        "utc_offset": "-09:00"
+                        "longitude": -121.3990506,
+                        "utc_offset": "-09:00",
+                        "ecoregion": "southern"
                     },
-                    "start": "2015-01-20T00:00:00"
+                    "start": "2015-01-20T00:00:00",
+                    "end": "2015-01-20T02:00:00"
                 }
             ],
-            "id": "SF11C14225236095807750",
             "event_of": {
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            }
+                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "id": "SF11E826544"
+            },
+            "id": "SF11C14225236095807750"
         }
-    ],
-    "config": {
-        "timeprofiling": {
-            "hourly_fractions": {
-                "area_fraction": [
-                    0.8,
-                    0.1,
-                    0.1
-                ],
-                "flaming": [
-                    0.8,
-                    0.1,
-                    0.1
-                ],
-                "smoldering": [
-                    0.8,
-                    0.1,
-                    0.1
-                ],
-                "residual": [
-                    0.8,
-                    0.1,
-                    0.1
-                ]
-            }
-        },
-        "emissions": {
-            "species": [
-                "PM2.5"
-            ],
-            "model": "feps"
-        }
-    }
+    ]
 }

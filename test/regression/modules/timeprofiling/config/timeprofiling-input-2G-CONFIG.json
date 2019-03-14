@@ -1,0 +1,10 @@
+{
+    "config": {
+        "emissions": {
+            "model": "feps",
+            "species": [
+                "PM2.5"
+            ]
+        }
+    }
+}

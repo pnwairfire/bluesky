@@ -1,0 +1,22 @@
+{
+    "config": {
+        "emissions": {
+            "species": [
+                "PM2.5"
+            ]
+        },
+        "consumption": {
+            "fuel_loadings": {
+                "10046": {
+                    "w_sound_quarter_1_loading": 0.44,
+                    "based_on_fccs_id": "46",
+                    "w_stump_lightered_loading": 0.45,
+                    "w_sound_9_20_loading": 0.42,
+                    "w_stump_rotten_loading": 0.46,
+                    "w_sound_gt20_loading": 0.43,
+                    "w_stump_sound_loading": 0.47
+                }
+            }
+        }
+    }
+}

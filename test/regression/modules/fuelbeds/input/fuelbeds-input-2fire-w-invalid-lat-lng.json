@@ -1,45 +1,42 @@
 {
-    "config": {
-        "skip_failed_fires": true
-    },
     "fire_information": [
         {
-            "event_of": {
-                "id": "SF11E826544",
-                "name": "Natural Fire in arctic"
-            },
-            "id": "SF11C14225236095807750",
             "type": "wildfire",
             "growth": [
                 {
                     "location": {
                         "area": 500,
-                        "ecoregion": "western",
                         "latitude": 89.0,
                         "longitude": 115.0,
-                        "utc_offset": "07:00"
+                        "utc_offset": "07:00",
+                        "ecoregion": "western"
                     }
                 }
-            ]
+            ],
+            "event_of": {
+                "name": "Natural Fire in arctic",
+                "id": "SF11E826544"
+            },
+            "id": "SF11C14225236095807750"
         },
         {
-            "event_of": {
-                "id": "sdfsdf",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            "id": "kjldsfjsdfj",
             "type": "wildfire",
             "growth": [
                 {
                     "location": {
                         "area": 500,
-                        "ecoregion": "western",
                         "latitude": 45.0,
                         "longitude": -115.0,
-                        "utc_offset": "-07:00"
+                        "utc_offset": "-07:00",
+                        "ecoregion": "western"
                     }
                 }
-            ]
+            ],
+            "event_of": {
+                "name": "Natural Fire near Snoqualmie Pass, WA",
+                "id": "sdfsdf"
+            },
+            "id": "kjldsfjsdfj"
         }
     ]
 }

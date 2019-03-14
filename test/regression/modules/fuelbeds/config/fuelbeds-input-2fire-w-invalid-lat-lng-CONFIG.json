@@ -1,0 +1,5 @@
+{
+    "config": {
+        "skip_failed_fires": true
+    }
+}

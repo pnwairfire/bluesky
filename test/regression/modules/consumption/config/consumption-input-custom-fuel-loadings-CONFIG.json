@@ -1,0 +1,61 @@
+{
+    "config": {
+        "consumption": {
+            "fuel_loadings": {
+                "10046": {
+                    "pile_clean_loading": 0.21,
+                    "snags_c3_loading": 0.32,
+                    "w_stump_lightered_loading": 0.45,
+                    "w_rotten_3_9_loading": 0.36,
+                    "total_available_fuel_loading": 0.34,
+                    "nw_primary_perc_live": 0.18,
+                    "moss_loading": 0.17,
+                    "w_stump_rotten_loading": 0.46,
+                    "litter_loading": 0.14,
+                    "litter_depth": 0.13,
+                    "midstory_loading": 0.15,
+                    "w_sound_0_quarter_loading": 0.39,
+                    "duff_lower_depth": 0.2,
+                    "shrubs_primary_loading": 0.24,
+                    "pile_vdirty_loading": 0.23,
+                    "snags_c1_wood_loading": 0.29,
+                    "w_sound_quarter_1_loading": 0.44,
+                    "shrubs_secondary_loading": 0.26,
+                    "nw_secondary_loading": 0.185,
+                    "based_on_fccs_id": "46",
+                    "lichen_depth": 0.11,
+                    "overstory_loading": 0.2,
+                    "w_sound_3_9_loading": 0.41,
+                    "duff_upper_depth": 0.4,
+                    "basal_accum_loading": 0.1,
+                    "w_sound_gt20_loading": 0.43,
+                    "cover_type": "",
+                    "ecoregion": "6",
+                    "filename": "9",
+                    "pile_dirty_loading": 0.22,
+                    "w_sound_1_3_loading": 0.4,
+                    "squirrel_midden_loading": 0.33,
+                    "lichen_loading": 0.12,
+                    "ladderfuels_loading": 0.1,
+                    "shrubs_secondary_perc_live": 0.27,
+                    "understory_loading": 0.35,
+                    "nw_primary_loading": 0.175,
+                    "moss_depth": 0.16,
+                    "snags_c2_loading": 0.31,
+                    "duff_lower_loading": 0.3,
+                    "duff_upper_loading": 0.5,
+                    "snags_c1_foliage_loading": 0.28,
+                    "shrubs_primary_perc_live": 0.25,
+                    "w_rotten_gt20_loading": 0.38,
+                    "snags_c1wo_foliage_loading": 0.3,
+                    "w_sound_9_20_loading": 0.42,
+                    "w_rotten_9_20_loading": 0.37,
+                    "nw_secondary_perc_live": 0.19,
+                    "efg_activity": "7",
+                    "efg_natural": "8",
+                    "w_stump_sound_loading": 0.47
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "config": {
+        "emissions": {
+            "model": "feps",
+            "species": [
+                "PM2.5"
+            ]
+        },
+        "skip_failed_fires": true
+    }
+}

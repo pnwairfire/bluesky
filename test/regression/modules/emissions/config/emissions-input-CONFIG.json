@@ -1,0 +1,8 @@
+{
+    "config": {
+        "emissions": {
+            "model": "feps"
+        },
+        "skip_failed_fires": true
+    }
+}
