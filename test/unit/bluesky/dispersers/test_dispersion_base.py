@@ -1,9 +1,13 @@
 """Unit tests for bluesky.dispersers.DispersionBase
 """
 
+from bluesky.config import Config
 from bluesky.dispersers import DispersionBase
 
 class FakeDisperser(DispersionBase):
+
+    def __init__(self, met_info):
+        self._model = 'hysplit'
 
     def _required_growth_fields(self):
         pass
@@ -14,14 +18,12 @@ class FakeDisperser(DispersionBase):
 class TestDispersionBase(object):
 
     def test_config(self):
-        config = {
-            "QCYCLE": 2.2,
-            "numpar": 333,
-            "FOO": 34,
-            "bar": 100
+        Config.set(2.2, "dispersion", "hysplit", "QCYCLE")
+        Config.set(333, "dispersion", "hysplit", "numpar")
+        Config.set(34, "dispersion", "hysplit", "FOO")
+        Config.set(100, "dispersion", "hysplit", "bar")
 
-        }
-        d = FakeDisperser({}, **config)
+        d = FakeDisperser({})
         # non-overridden default
         assert d.config('MGMIN') == 10
         assert d.config('mgmin') == 10
