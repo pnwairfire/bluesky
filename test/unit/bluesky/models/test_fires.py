@@ -24,7 +24,7 @@ from bluesky.models import fires
 
 class TestFire(object):
 
-    def test_fills_in_id(self, monkeypatch):
+    def test_fills_in_id(self, monkeypatch, reset_config):
         monkeypatch.setattr(uuid, "uuid1", lambda: "abcd1234")
         # if id is missing, the id is set to generated guid.
         # Note: id used to integrate start and/or end, if specified;
@@ -46,7 +46,7 @@ class TestFire(object):
             "id": "sdkjfh2rkjhsdf"})
         assert "sdkjfh2rkjhsdf" == f["id"]
 
-    def test_fills_in_or_validates_type_and_fuel_type(self):
+    def test_fills_in_or_validates_type_and_fuel_type(self, reset_config):
         # defaults 'type' and 'fuel_type
         f = fires.Fire({"a": 123, "b": "sdf"})
         assert f['type'] == fires.Fire.DEFAULT_TYPE
@@ -99,7 +99,7 @@ class TestFire(object):
             f['fuel_type'] = 'bar'
         assert e_info.value.args[0] == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
 
-    def test_accessing_attributes(self):
+    def test_accessing_attributes(self, reset_config):
         f = fires.Fire({'a': 123, 'b': 'sdf'})
         assert 123 == f['a']
         assert 123 == f.a
@@ -110,7 +110,7 @@ class TestFire(object):
         with raises(AttributeError) as e:
             f.rifsijsflj
 
-    def test_start_and_end(self):
+    def test_start_and_end(self, reset_config):
         # no growth windows
         f = fires.Fire({})
         assert None == f.start
@@ -223,7 +223,7 @@ class TestFiresManager(object):
 
     ## Get/Set Fires and Meta
 
-    def test_getting_fires_and_meta(self):
+    def test_getting_fires_and_meta(self, reset_config):
         fires_manager = fires.FiresManager()
         fire_objects = [
             fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
@@ -239,7 +239,7 @@ class TestFiresManager(object):
         assert None == fires_manager.d
 
     @freezegun.freeze_time("2016-04-20")
-    def test_setting_fires_and_meta(self):
+    def test_setting_fires_and_meta(self, reset_config):
         fires_manager = fires.FiresManager()
         fire_objects = [
             fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
@@ -264,7 +264,7 @@ class TestFiresManager(object):
     ## Properties
 
     @freezegun.freeze_time("2016-04-20")
-    def test_today_is_processed_for_wildcards(self, monkeypatch):
+    def test_today_is_processed_for_wildcards(self, monkeypatch, reset_config):
         fm = fires.FiresManager()
         assert fm.today == datetime.date(2016,4,20)
 
@@ -308,7 +308,7 @@ class TestFiresManager(object):
 
         # TODO: any other possibilities ??
 
-    def test_run_id_is_immutable(self, monkeypatch):
+    def test_run_id_is_immutable(self, monkeypatch, reset_config):
         monkeypatch.setattr(uuid, 'uuid1', lambda: "sdf123")
 
         fm = fires.FiresManager()
@@ -352,7 +352,7 @@ class TestFiresManager(object):
         fm.load({'run_id': "ggbgbg"})
         assert fm.run_id == "ggbgbg"
 
-    def test_earliest_and_latest_times(self):
+    def test_earliest_and_latest_times(self, reset_config):
         fm = fires.FiresManager()
         f1 = fires.Fire({
             'id': '1',
@@ -404,7 +404,7 @@ class TestFiresManager(object):
                 return test_self._output
         return _stream
 
-    def test_load_invalid_data(self, monkeypatch):
+    def test_load_invalid_data(self, monkeypatch, reset_config):
         fires_manager = fires.FiresManager()
 
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(''))
@@ -424,7 +424,7 @@ class TestFiresManager(object):
             fires_manager.loads()
 
     @freezegun.freeze_time("2016-04-20")
-    def test_load_no_fires_no_meta(self, monkeypatch):
+    def test_load_no_fires_no_meta(self, monkeypatch, reset_config):
         fires_manager = fires.FiresManager()
         expected_meta = {
             'config':{}
@@ -443,7 +443,7 @@ class TestFiresManager(object):
         assert expected_meta == fires_manager.meta
 
     @freezegun.freeze_time("2016-04-20")
-    def test_load_no_fires_with_meta(self, monkeypatch):
+    def test_load_no_fires_with_meta(self, monkeypatch, reset_config):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
             '{"fire_information":[], "foo": {"bar": "baz"}}'))
@@ -459,7 +459,7 @@ class TestFiresManager(object):
         assert expected_meta == fires_manager.meta
 
     @freezegun.freeze_time("2016-04-20")
-    def test_load_one_fire_with_meta(self, monkeypatch):
+    def test_load_one_fire_with_meta(self, monkeypatch, reset_config):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
             '{"fire_information":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"}],'
@@ -478,7 +478,7 @@ class TestFiresManager(object):
         assert expected_meta == fires_manager.meta
 
     @freezegun.freeze_time("2016-04-20")
-    def test_load_multiple_fires_with_meta(self, monkeypatch):
+    def test_load_multiple_fires_with_meta(self, monkeypatch, reset_config):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
             '{"fire_information":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
@@ -502,17 +502,17 @@ class TestFiresManager(object):
 
     ## Dumping
 
-    def test_dump_no_fire_no_meta(self, monkeypatch):
+    def test_dump_no_fire_no_meta(self, monkeypatch, reset_config):
         pass
 
-    def test_dump_no_fires_with_meta(self, monkeypatch):
+    def test_dump_no_fires_with_meta(self, monkeypatch, reset_config):
         pass
 
-    def test_dump_one_fire_with_meta(self, monkeypatch):
+    def test_dump_one_fire_with_meta(self, monkeypatch, reset_config):
         pass
 
     @freezegun.freeze_time("2016-04-20")
-    def test_dump_multiple_fires_with_meta(self, monkeypatch):
+    def test_dump_multiple_fires_with_meta(self, monkeypatch, reset_config):
         fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream())
         fire_objects = [
@@ -541,7 +541,7 @@ class TestFiresManager(object):
 
     ## Failures
 
-    def test_fire_failure_handler(self):
+    def test_fire_failure_handler(self, reset_config):
         def go(fire):
             if fire.id == '2':
                 raise RuntimeError("oops")
@@ -604,42 +604,42 @@ class TestFiresManagerSettingToday(object):
         assert fires_manager.today == datetime.datetime(2016,4,20)
 
     @freezegun.freeze_time("2016-04-20")
-    def test_set_to_string_in_loaded_input_data(self):
+    def test_set_to_string_in_loaded_input_data(self, reset_config):
         fires_manager = fires.FiresManager()
         fires_manager.load({"today": "2017-10-01"})
         assert fires_manager.today == datetime.datetime(2017,10,1)
 
     @freezegun.freeze_time("2016-04-20")
-    def test_set_to_datetime_obj_in_loaded_input_data(self):
+    def test_set_to_datetime_obj_in_loaded_input_data(self, reset_config):
         fires_manager = fires.FiresManager()
         fires_manager.load({"today": datetime.datetime(2017,10,1)})
         assert fires_manager.today == datetime.datetime(2017,10,1)
 
     @freezegun.freeze_time("2016-04-20")
-    def test_set_to_date_obj_in_loaded_input_data(self):
+    def test_set_to_date_obj_in_loaded_input_data(self, reset_config):
         fires_manager = fires.FiresManager()
         fires_manager.load({"today": datetime.date(2017,10,1)})
         assert fires_manager.today == datetime.datetime(2017,10,1)
 
     @freezegun.freeze_time("2016-04-20")
-    def test_manually_set_to_string(self):
+    def test_manually_set_to_string(self, reset_config):
         fires_manager = fires.FiresManager()
         fires_manager.today = "2017-10-01"
         assert fires_manager.today == datetime.datetime(2017,10,1)
 
     @freezegun.freeze_time("2016-04-20")
-    def test_manually_set_to_datetime_obj(self):
+    def test_manually_set_to_datetime_obj(self, reset_config):
         fires_manager = fires.FiresManager()
         fires_manager.today = datetime.datetime(2017,10,1)
         assert fires_manager.today == datetime.datetime(2017,10,1)
 
     @freezegun.freeze_time("2016-04-20")
-    def test_manually_set_to_date_obj(self):
+    def test_manually_set_to_date_obj(self, reset_config):
         fires_manager = fires.FiresManager()
         fires_manager.today = datetime.date(2017,10,1)
         assert fires_manager.today == datetime.datetime(2017,10,1)
 
-    def test_is_immutable(self):
+    def test_is_immutable(self, reset_config):
         fires_manager = fires.FiresManager()
         fires_manager.today = datetime.datetime(2017,10,1)
 
@@ -669,7 +669,7 @@ class TestFiresManagerSettingToday(object):
 
 class TestFiresManagerMergeFires(object):
 
-    def test_no_fires(self):
+    def test_no_fires(self, reset_config):
         fm = fires.FiresManager()
         assert fm.num_fires == 0
         assert fm.fires == []
@@ -677,7 +677,7 @@ class TestFiresManagerMergeFires(object):
         assert fm.num_fires == 0
         assert fm.fires == []
 
-    def test_one_fire(self):
+    def test_one_fire(self, reset_config):
         fm = fires.FiresManager()
         f = fires.Fire({'id': '1'})
         fm.fires = [f]
@@ -687,7 +687,7 @@ class TestFiresManagerMergeFires(object):
         assert fm.num_fires == 1
         assert fm.fires == [f]
 
-    def test_none_to_merge(self):
+    def test_none_to_merge(self, reset_config):
         fm = fires.FiresManager()
         f = fires.Fire({'id': '1'})
         f2 = fires.Fire({'id': '2'})
@@ -698,7 +698,7 @@ class TestFiresManagerMergeFires(object):
         assert fm.num_fires == 2
         assert fm.fires == [f, f2]
 
-    def test_simple(self):
+    def test_simple(self, reset_config):
         fm = fires.FiresManager()
         f = fires.Fire({'id': '1'})
         f2 = fires.Fire({'id': '1'})
@@ -710,7 +710,7 @@ class TestFiresManagerMergeFires(object):
             'type': fires.Fire.DEFAULT_TYPE
         }
 
-    def test_invalid_keys(self):
+    def test_invalid_keys(self, reset_config):
         # test in both skip and no-skip modes
         for s in (True, False):
             # i.e. top-level location is old structure
@@ -729,7 +729,7 @@ class TestFiresManagerMergeFires(object):
                 assert fm.num_fires == 2
                 assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.id))
 
-    def test_growth_for_only_one_fire(self):
+    def test_growth_for_only_one_fire(self, reset_config):
         # test in both skip and no-skip modes
         for s in (True, False):
             fm = fires.FiresManager()
@@ -764,11 +764,11 @@ class TestFiresManagerMergeFires(object):
                 assert fm.num_fires == 2
                 assert [f, f2] == sorted(fm.fires, key=lambda e: int('growth' in e))
 
-    def test_overlapping_growth(self):
+    def test_overlapping_growth(self, reset_config):
         # TODO: implemented once check is in place
         pass
 
-    def test_different_event_ids(self):
+    def test_different_event_ids(self, reset_config):
         # test in both skip and no-skip modes
         for s in (True, False):
             fm = fires.FiresManager()
@@ -800,7 +800,7 @@ class TestFiresManagerMergeFires(object):
                 assert fm.num_fires == 2
                 assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.growth[0]['location']['area']))
 
-    def test_different_fire_and_fuel_type(self):
+    def test_different_fire_and_fuel_type(self, reset_config):
         # test in both skip and no-skip modes
         for s in (True, False):
             fm = fires.FiresManager()
@@ -846,7 +846,7 @@ class TestFiresManagerMergeFires(object):
                 assert fm.num_fires == 2
                 assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.growth[0]['location']['area']))
 
-    def test_merge_mixed_success_no_growth(self):
+    def test_merge_mixed_success_no_growth(self, reset_config):
         fm = fires.FiresManager()
         #Config.set(True, 'merge', 'skip_failures')
         f = fires.Fire({
@@ -882,7 +882,7 @@ class TestFiresManagerMergeFires(object):
         assert fm.num_fires == 2
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
-    def test_merge_mixed_success(self):
+    def test_merge_mixed_success(self, reset_config):
         fm = fires.FiresManager()
         #Config.set(True, 'merge', 'skip_failures')
         f = fires.Fire({
@@ -1013,7 +1013,7 @@ class TestFiresManagerFilterFires(object):
 
     ## Filtering
 
-    def test_no_filters_specified(self):
+    def test_no_filters_specified(self, reset_config):
         fm = fires.FiresManager()
         init_fires = [
             fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
@@ -1032,7 +1032,7 @@ class TestFiresManagerFilterFires(object):
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
 
-    def test_filter_by_country(self):
+    def test_filter_by_country(self, reset_config):
         fm = fires.FiresManager()
         init_fires = [
             fires.Fire({'id': '01', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
@@ -1207,7 +1207,7 @@ class TestFiresManagerFilterFires(object):
         assert fm.num_fires == 0
         assert [] == fm.fires
 
-    def test_filter_by_location(self):
+    def test_filter_by_location(self, reset_config):
 
         fm = fires.FiresManager()
         init_fires = [
@@ -1421,7 +1421,7 @@ class TestFiresManagerFilterFires(object):
             assert [f] == fm.fires
 
 
-    def test_filter_by_area(self):
+    def test_filter_by_area(self, reset_config):
 
         fm = fires.FiresManager()
         init_fires = [
