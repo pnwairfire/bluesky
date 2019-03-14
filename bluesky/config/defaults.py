@@ -1,4 +1,10 @@
+import copy
 import os
+
+__all__ = [
+    "DEFAULTS",
+    "to_lowercase_keys"
+]
 
 _REPO_ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 _HYSPLIT_BDYFILES_PATH = os.path.join(_REPO_ROOT_DIR,
@@ -6,7 +12,7 @@ _HYSPLIT_BDYFILES_PATH = os.path.join(_REPO_ROOT_DIR,
 _VSMOKE_IMAGES_PATH = os.path.join(_REPO_ROOT_DIR,
     'dispersers/vsmoke/images')
 
-DEFAULTS = {
+_DEFAULTS = {
     "skip_failed_fires": False,
     "skip_failed_sources": False,
     "statuslogging": {
@@ -574,3 +580,18 @@ DEFAULTS = {
         }
     }
 }
+
+def to_lowercase_keys(val):
+    if isinstance(val, dict):
+        if len(set(val.keys())) != len(set([k.lower() for k in val])):
+            raise ValueError("Conflicting keys in config dict: %s",
+                list(val.keys()))
+
+        return {k.lower(): to_lowercase_keys(v) for k, v in val.items()}
+
+    elif isinstance(val, list):
+        return [to_lowercase_keys(v) for v in val]
+
+    return copy.deepcopy(val)
+
+DEFAULTS = to_lowercase_keys(_DEFAULTS)

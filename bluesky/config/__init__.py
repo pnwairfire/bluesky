@@ -9,31 +9,19 @@ from bluesky.exceptions import (
     BlueSkyDatetimeValueError
 )
 from bluesky.modules import AVAILABLE_MODULES
-from .defaults import DEFAULTS
+from .defaults import DEFAULTS, to_lowercase_keys
 
 __all__ = [
     "Config",
     "DEFAULTS"
 ]
 
-def to_lowercase_keys(val):
-    if isinstance(val, dict):
-        if len(set(val.keys())) != len(set([k.lower() for k in val])):
-            raise ValueError("Conflicting keys in config dict: %s",
-                list(val.keys()))
-
-        return {k.lower(): to_lowercase_keys(v) for k, v in val.items()}
-
-    elif isinstance(val, list):
-        return [to_lowercase_keys(v) for v in val]
-
-    return copy.deepcopy(val)
 
 class Config:
 
     _RUN_ID = None
     _TODAY = None
-    _RAW_CONFIG = to_lowercase_keys(DEFAULTS)
+    _RAW_CONFIG = copy.deepcopy(DEFAULTS)
     _CONFIG = copy.deepcopy(_RAW_CONFIG)
     _IM_CONFIG = afconfig.ImmutableConfigDict(_CONFIG)
 
@@ -45,7 +33,7 @@ class Config:
     def reset(cls):
         cls._RUN_ID = None
         cls._TODAY = None
-        cls._RAW_CONFIG = to_lowercase_keys(DEFAULTS)
+        cls._RAW_CONFIG = copy.deepcopy(DEFAULTS)
         cls._CONFIG = copy.deepcopy(cls._RAW_CONFIG)
         cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
 
@@ -76,7 +64,7 @@ class Config:
             cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
 
         else:
-            cls._RAW_CONFIG = to_lowercase_keys(DEFAULTS)
+            cls._RAW_CONFIG = copy.deepcopy(DEFAULTS)
             cls._CONFIG = copy.deepcopy(cls._RAW_CONFIG)
             cls.merge(config_dict)
 
