@@ -45,6 +45,7 @@ def run(fires_manager):
                 #   for each growth object, create AK and non-AK lookup and
                 #   estimator objects that are reused, and set reference to
                 #   correct one here
+                # TODO: is_alaska from lat,lng, not from 'state'
                 lookup = FccsLookUp(is_alaska=g['location'].get('state')=='AK',
                     **Config.get('fuelbeds'))
                 Estimator(lookup).estimate(g)
