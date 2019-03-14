@@ -11,6 +11,7 @@ from py.test import raises
 
 import afconfig
 
+from bluesky.config import Config
 from bluesky.models.fires import Fire
 from bluesky.modules import emissions
 
@@ -138,11 +139,6 @@ class fire_failure_manager(object):
             self._fire['error'] = str(value)
         return True # return true even if there's an error
 
-def create_config_getter(config):
-    def _get(*keys, **kwargs):
-        return afconfig.get_config_value(config, *keys, **kwargs)
-    return _get
-
 class BaseEmissionsTest(object):
 
     def setup(self):
@@ -224,13 +220,10 @@ class TestFepsEmissions(BaseEmissionsTest):
     }
 
     def test_wo_details(self):
-        config_getter = create_config_getter({
-            "emissions": {
-                "model": "feps",
-                "include_emissions_details": False
-            }
-        })
-        emissions.Feps(fire_failure_manager, config_getter).run(self.fires)
+        Config.set("feps", 'emissions', "model")
+        Config.set(False, 'emissions', "include_emissions_details")
+
+        emissions.Feps(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -240,13 +233,9 @@ class TestFepsEmissions(BaseEmissionsTest):
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details(self):
-        config_getter = create_config_getter({
-            "emissions": {
-                "model": "feps",
-                "include_emissions_details": True
-            }
-        })
-        emissions.Feps(fire_failure_manager, config_getter).run(self.fires)
+        Config.set("feps", 'emissions', "model")
+        Config.set(True, 'emissions', "include_emissions_details")
+        emissions.Feps(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -256,14 +245,10 @@ class TestFepsEmissions(BaseEmissionsTest):
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
     def test_wo_details_PM_only(self):
-        config_getter = create_config_getter({
-            "emissions": {
-                "model": "feps",
-                "include_emissions_details": False,
-                'species': ['PM2.5', 'PM10']
-            }
-        })
-        emissions.Feps(fire_failure_manager, config_getter).run(self.fires)
+        Config.set("feps", 'emissions', "model")
+        Config.set(False, 'emissions', "include_emissions_details")
+        Config.set(['PM2.5', 'PM10'], 'emissions', "species")
+        emissions.Feps(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -273,14 +258,10 @@ class TestFepsEmissions(BaseEmissionsTest):
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self):
-        config_getter = create_config_getter({
-            "emissions": {
-                "model": "feps",
-                "include_emissions_details": True,
-                'species': ['PM2.5', 'PM10']
-            }
-        })
-        emissions.Feps(fire_failure_manager, config_getter).run(self.fires)
+        Config.set("feps", 'emissions', "model")
+        Config.set(True, 'emissions', "include_emissions_details")
+        Config.set(['PM2.5', 'PM10'], 'emissions', "species")
+        emissions.Feps(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -340,14 +321,10 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
     # a huge set
 
     def test_wo_details_PM_only(self):
-        config_getter = create_config_getter({
-            "emissions": {
-                "model": "prichard-oneill",
-                "include_emissions_details": False,
-                'species': self.SPECIES
-            }
-        })
-        emissions.PrichardOneill(fire_failure_manager, config_getter).run(self.fires)
+        Config.set("prichard-oneill", 'emissions', "model")
+        Config.set(False, 'emissions', "include_emissions_details")
+        Config.set(self.SPECIES, 'emissions', "species")
+        emissions.PrichardOneill(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -357,14 +334,10 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self):
-        config_getter = create_config_getter({
-            "emissions": {
-                "model": "prichard-oneill",
-                "include_emissions_details": True,
-                'species': self.SPECIES
-            }
-        })
-        emissions.PrichardOneill(fire_failure_manager, config_getter).run(self.fires)
+        Config.set("prichard-oneill", 'emissions', "model")
+        Config.set(True, 'emissions', "include_emissions_details")
+        Config.set(self.SPECIES, 'emissions', "species")
+        emissions.PrichardOneill(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -434,13 +407,9 @@ class TestConsumeEmissions(BaseEmissionsTest):
     }
 
     def test_wo_details(self):
-        config_getter = create_config_getter({
-            "emissions": {
-                "model": "consume",
-                "include_emissions_details": False
-            }
-        })
-        emissions.Consume(fire_failure_manager, config_getter).run(self.fires)
+        Config.set("consume", 'emissions', "model")
+        Config.set(False, 'emissions', "include_emissions_details")
+        emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -450,13 +419,9 @@ class TestConsumeEmissions(BaseEmissionsTest):
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details(self):
-        config_getter = create_config_getter({
-            "emissions": {
-                "model": "consume",
-                "include_emissions_details": True
-            }
-        })
-        emissions.Consume(fire_failure_manager, config_getter).run(self.fires)
+        Config.set("consume", 'emissions', "model")
+        Config.set(True, 'emissions', "include_emissions_details")
+        emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -466,14 +431,10 @@ class TestConsumeEmissions(BaseEmissionsTest):
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
     def test_wo_details_PM_only(self):
-        config_getter = create_config_getter({
-            "emissions": {
-                "model": "consume",
-                "include_emissions_details": False,
-                'species': ['PM2.5', 'PM10']
-            }
-        })
-        emissions.Consume(fire_failure_manager, config_getter).run(self.fires)
+        Config.set("consume", 'emissions', "model")
+        Config.set(False, 'emissions', "include_emissions_details")
+        Config.set(['PM2.5', 'PM10'], 'emissions', "species")
+        emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -483,14 +444,10 @@ class TestConsumeEmissions(BaseEmissionsTest):
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self):
-        config_getter = create_config_getter({
-            "emissions": {
-                "model": "consume",
-                "include_emissions_details": True,
-                'species': ['PM2.5', 'PM10']
-            }
-        })
-        emissions.Consume(fire_failure_manager, config_getter).run(self.fires)
+        Config.set("consume", 'emissions', "model")
+        Config.set(True, 'emissions', "include_emissions_details")
+        Config.set(['PM2.5', 'PM10'], 'emissions', "species")
+        emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
