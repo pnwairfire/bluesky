@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """test_regression.py - regression test for a subset of the bsp modules
 
@@ -30,6 +30,7 @@ sys.path.insert(0, app_root)
 # We're running bluesky via the package rather than by running the bsp script
 # to allow breaking into the code (with pdb)
 from bluesky import models, exceptions
+from bluesky.config import Config
 
 MODULES = [ os.path.basename(m.rstrip('/'))
     for m in glob.glob(os.path.join(os.path.dirname(__file__), '*'))
@@ -118,9 +119,15 @@ def check(expected, actual):
 def run_input(module, input_file):
     output_file = input_file.replace('input/', 'output/').replace(
         '.json', '-EXPECTED-OUTPUT.json')
+    config_file = input_file.replace('input/', 'config/').replace(
+        '.json', '-CONFIG.json')
+
+    with open(config_file) as f:
+        config = json.loads(f.read())
 
     logging.debug('Running bsp on %s', input_file)
     try:
+        Config.set(config)
         fires_manager = models.fires.FiresManager()
         fires_manager.loads(input_file=input_file)
         fires_manager.modules = [module]
