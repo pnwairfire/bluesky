@@ -367,11 +367,13 @@ class FiresManager(object):
 
     @property
     def config(self):
-        return Config.get()
+        raise DeprecationWarning(
+            "Get config with bluesky.config.Config.get")
 
     @config.setter
     def config(self, config):
-        Config.set(config)
+        raise DeprecationWarning(
+            "Set config with bluesky.config.Config.set")
 
     def merge_config(self, config_dict):
         Config.merge(config_dict)

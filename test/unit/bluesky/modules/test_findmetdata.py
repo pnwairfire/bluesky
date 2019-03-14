@@ -134,12 +134,12 @@ class TestGetTimeWindows(object):
 
     def test_with_dispersion_window_no_fires(self, reset_config):
         fm = FiresManager()
-        fm.config = {
+        Config.set({
             "dispersion": {
                 "start": "2014-05-29T19:00:00Z",
                 "num_hours": 12
             }
-        }
+        })
         expected = [
             {
                 'start': datetime.datetime(2014,5,29,19,0,0),
@@ -150,14 +150,14 @@ class TestGetTimeWindows(object):
 
     def test_with_configured_time_window_no_fires(self, reset_config):
         fm = FiresManager()
-        fm.config = {
+        Config.set({
             "findmetdata": {
                 "time_window": {
                     "first_hour": "2016-01-04T04:00:00Z",
                     "last_hour": "2016-01-05T13:00:00Z"
                 }
             }
-        }
+        })
         expected = [
             {
                 'start': datetime.datetime(2016,1,4,4,0,0),
@@ -168,7 +168,7 @@ class TestGetTimeWindows(object):
 
     def test_with_dispersion_and_configured_time_window_no_fires(self, reset_config):
         fm = FiresManager()
-        fm.config = {
+        Config.set({
             "dispersion": {
                 "start": "2014-05-29T19:00:00Z",
                 "num_hours": 12
@@ -179,7 +179,7 @@ class TestGetTimeWindows(object):
                     "last_hour": "2016-01-05T13:00:00Z"
                 }
             }
-        }
+        })
 
         expected = [
             {
@@ -198,7 +198,7 @@ class TestGetTimeWindows(object):
         fm.load({
                 "fire_information": [FIRE_1, FIRE_2, FIRE_3],
         })
-        fm.config =  {
+        Config.set( {
             "dispersion": {
                 "start": "2014-05-29T19:00:00Z",
                 "num_hours": 12
@@ -209,7 +209,7 @@ class TestGetTimeWindows(object):
                     "last_hour": "2016-01-05T13:00:00Z"
                 }
             }
-        }
+        })
         expected = [
             {
                 'start': datetime.datetime(2014,5,29,19,0,0),
