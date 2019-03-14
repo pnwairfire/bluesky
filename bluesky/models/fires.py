@@ -308,7 +308,7 @@ class FiresManager(object):
         if self._manually_set_today and previous_today != new_today:
             raise TypeError(self.TODAY_IS_IMMUTABLE_MSG)
 
-        Config.set_today(today)
+        Config.set_today(new_today)
 
         self._manually_set_today = True
 
