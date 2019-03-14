@@ -318,7 +318,6 @@ def setup(args):
 
     # configure logging as soon as possible, before any log messages
     configure_logging(args, fires_manager)
-    set_modules(args, fires_manager)
     set_config(args, fires_manager)
 
     logging.info("BlueSky v%s", __version__)
@@ -328,6 +327,8 @@ def setup(args):
     # Note: Calling code handles exception
     if not args.no_input:
         fires_manager.loads(input_file=args.input_file)
+
+    set_modules(args, fires_manager)
 
     # run_id must be specified after the call to loads (as opposed to when
     # instantiatiing fires_manager) - otherwise, loads will delete it
