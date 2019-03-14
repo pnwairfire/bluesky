@@ -15,7 +15,7 @@ from py.test import raises
 from numpy.testing import assert_approx_equal
 
 from bluesky import __version__
-from bluesky.config import Config
+from bluesky.config import Config, DEFAULTS
 from bluesky.models import fires
 
 ##
@@ -256,8 +256,7 @@ class TestFiresManager(object):
         assert {'1': [fire_objects[0]],'2': [fire_objects[1]]} == fires_manager._fires
         assert fires_manager.today == freezegun.api.FakeDate(2016, 4, 20)
         expected_meta = {
-            'a':1, 'b':{'c':2}, 'd': 123,
-            'config': {}
+            'a':1, 'b':{'c':2}, 'd': 123
         }
         assert expected_meta == fires_manager._meta == fires_manager.meta
 
@@ -427,13 +426,12 @@ class TestFiresManager(object):
     def test_load_no_fires_no_meta(self, monkeypatch, reset_config):
         fires_manager = fires.FiresManager()
         expected_meta = {
-            'config':{}
         }
 
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{}'))
         fires_manager.loads()
         assert fires_manager.num_fires == 0
-        assert fires_manager.today == datetime.datetime(2016,4,20)
+        assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
         assert [] == fires_manager.fires
         assert expected_meta == fires_manager.meta
 
@@ -450,10 +448,8 @@ class TestFiresManager(object):
         fires_manager.loads()
         assert fires_manager.num_fires == 0
         assert [] == fires_manager.fires
-        assert fires_manager.today == datetime.datetime(2016,4,20)
+        assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
         expected_meta = {
-
-            'config':{},
             "foo": {"bar": "baz"}
         }
         assert expected_meta == fires_manager.meta
@@ -470,9 +466,8 @@ class TestFiresManager(object):
         ]
         assert fires_manager.num_fires == 1
         assert expected_fires == fires_manager.fires
-        assert fires_manager.today == datetime.datetime(2016,4,20)
+        assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
         expected_meta = {
-            'config':{},
             "foo": {"bar": "baz"}
         }
         assert expected_meta == fires_manager.meta
@@ -492,10 +487,9 @@ class TestFiresManager(object):
         ]
         assert fires_manager.num_fires == 2
         assert expected_fires == fires_manager.fires
-        assert fires_manager.today == datetime.datetime(2016,4,20)
+        assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
         expected_meta = {
             #"run_id": 'abcd1234'
-            'config':{},
             "foo": {"bar": "baz"},
         }
         assert expected_meta == fires_manager.meta
@@ -525,7 +519,7 @@ class TestFiresManager(object):
         fires_manager.dumps()
         expected = {
             "today": "2016-04-20",
-            "config": {},
+            "run_config": DEFAULTS,
             "fire_information": fire_objects,
             "foo": {"bar": "baz"},
             "counts": {
