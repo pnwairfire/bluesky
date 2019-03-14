@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+
+import glob
+import json
+import logging
+import os
+import sys
+
+# Hack to put the repo root dir at the front of sys.path so that
+# the local bluesky package is found
+app_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
+   os.path.abspath(__file__)))))
+sys.path.insert(0, app_root)
+sys.path.insert(0, os.path.abspath(
+    os.path.join(app_root, '..', 'pnwairfire-afconfig')))
+
+from bluesky.config import Config
+
+MODULES = [ os.path.basename(m.rstrip('/'))
+    for m in glob.glob(os.path.join(os.path.dirname(__file__), '*'))
+    if os.path.isdir(m) and not os.path.basename(m).startswith('__')]  # catches '__pycache__' dir
+
+def process_input(module, input_file):
+    config_file = input_file.replace('input/', 'config/').replace(
+        '.json', '-CONFIG.json')
+    output_file = input_file.replace('input/', 'output/').replace(
+        '.json', '-EXPECTED-OUTPUT.json')
+
+    logging.debug('Processing %s, %s, %s',
+        input_file, config_file, output_file)
+
+    with open(input_file) as f:
+        input_data = json.loads(f.read())
+
+    config = input_data.pop('config', {})
+
+    with open(input_file, "w") as f:
+        f.write(json.dumps(input_data, indent=4))
+    with open(config_file, "w") as f:
+        f.write(json.dumps({"config": config}, indent=4))
+
+    with open(output_file) as f:
+        output_data = json.loads(f.read())
+
+    output_data.pop('config') # throw away what's there
+    Config.reset()
+    Config.set(config)
+    output_data['run_config'] = Config.get()
+    with open(output_file, "w") as f:
+        f.write(json.dumps(output_data, indent=4))
+
+def process_module(module):
+    module_root_dir = os.path.join(os.path.dirname(__file__), module)
+    files = [os.path.abspath(f) for f in glob.glob(os.path.join(
+        module_root_dir, 'input', '*')) ]
+    config_dir = os.makedirs(os.path.join(module_root_dir, 'config'),
+        exist_ok=True)
+    logging.info("Creating config dir %s", config_dir)
+    return all([process_input(module, f) for f in files])
+
+
+def main():
+    logging.getLogger().setLevel(logging.DEBUG)
+    logging.debug(MODULES)
+    for m in MODULES:
+        process_module(m)
+
+if __name__ == "__main__":
+    main()
