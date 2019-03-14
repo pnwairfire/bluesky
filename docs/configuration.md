@@ -38,6 +38,8 @@ The 'config' object has sub-objects specific to the modules to be run, as
 well as top level fields that apply to multiple modules. As with
 the fire data, each module has its own set of required and optional fields.
 
+***All keys in the configuration json data are case-insensitive.***
+
 ##### Top Level Fields
 
  - ***'config' > 'skip_failed_fires'*** -- *optional* -- exclude failed fire rather than abort entire run; default false; applies to various modules
