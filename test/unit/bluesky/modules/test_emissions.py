@@ -219,7 +219,7 @@ class TestFepsEmissions(BaseEmissionsTest):
         }
     }
 
-    def test_wo_details(self):
+    def test_wo_details(self, reset_config):
         Config.set("feps", 'emissions', "model")
         Config.set(False, 'emissions', "include_emissions_details")
 
@@ -232,7 +232,7 @@ class TestFepsEmissions(BaseEmissionsTest):
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
-    def test_with_details(self):
+    def test_with_details(self, reset_config):
         Config.set("feps", 'emissions', "model")
         Config.set(True, 'emissions', "include_emissions_details")
         emissions.Feps(fire_failure_manager).run(self.fires)
@@ -244,7 +244,7 @@ class TestFepsEmissions(BaseEmissionsTest):
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
-    def test_wo_details_PM_only(self):
+    def test_wo_details_PM_only(self, reset_config):
         Config.set("feps", 'emissions', "model")
         Config.set(False, 'emissions', "include_emissions_details")
         Config.set(['PM2.5', 'PM10'], 'emissions', "species")
@@ -257,7 +257,7 @@ class TestFepsEmissions(BaseEmissionsTest):
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
-    def test_with_details_PM_only(self):
+    def test_with_details_PM_only(self, reset_config):
         Config.set("feps", 'emissions', "model")
         Config.set(True, 'emissions', "include_emissions_details")
         Config.set(['PM2.5', 'PM10'], 'emissions', "species")
@@ -320,7 +320,7 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
     # Note: no tests with all emissions species, since that would be
     # a huge set
 
-    def test_wo_details_PM_only(self):
+    def test_wo_details_PM_only(self, reset_config):
         Config.set("prichard-oneill", 'emissions', "model")
         Config.set(False, 'emissions', "include_emissions_details")
         Config.set(self.SPECIES, 'emissions', "species")
@@ -333,7 +333,7 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
-    def test_with_details_PM_only(self):
+    def test_with_details_PM_only(self, reset_config):
         Config.set("prichard-oneill", 'emissions', "model")
         Config.set(True, 'emissions', "include_emissions_details")
         Config.set(self.SPECIES, 'emissions', "species")
@@ -406,7 +406,7 @@ class TestConsumeEmissions(BaseEmissionsTest):
         }
     }
 
-    def test_wo_details(self):
+    def test_wo_details(self, reset_config):
         Config.set("consume", 'emissions', "model")
         Config.set(False, 'emissions', "include_emissions_details")
         emissions.Consume(fire_failure_manager).run(self.fires)
@@ -418,7 +418,7 @@ class TestConsumeEmissions(BaseEmissionsTest):
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
-    def test_with_details(self):
+    def test_with_details(self, reset_config):
         Config.set("consume", 'emissions', "model")
         Config.set(True, 'emissions', "include_emissions_details")
         emissions.Consume(fire_failure_manager).run(self.fires)
@@ -430,7 +430,7 @@ class TestConsumeEmissions(BaseEmissionsTest):
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
-    def test_wo_details_PM_only(self):
+    def test_wo_details_PM_only(self, reset_config):
         Config.set("consume", 'emissions', "model")
         Config.set(False, 'emissions', "include_emissions_details")
         Config.set(['PM2.5', 'PM10'], 'emissions', "species")
@@ -443,7 +443,7 @@ class TestConsumeEmissions(BaseEmissionsTest):
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
             self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
 
-    def test_with_details_PM_only(self):
+    def test_with_details_PM_only(self, reset_config):
         Config.set("consume", 'emissions', "model")
         Config.set(True, 'emissions', "include_emissions_details")
         Config.set(['PM2.5', 'PM10'], 'emissions', "species")
