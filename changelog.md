@@ -11,3 +11,4 @@
   - added --dump-config to show the config settings (defaults + user overrides) of a potential run
   - deprecated FiresManager.get_config_value
   - deprecated FiresManager.set_config_value
+  - deprecated FiresManager.config (getter and setter)
