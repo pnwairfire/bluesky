@@ -295,8 +295,8 @@ def set_config(args, fires_manager):
     #  (with tests)
 
     # merge loaded file options
-    Confug.merge(args.config_file_options)
-    Confug.merge(args.config_options)
+    Config.merge(args.config_file_options)
+    Config.merge(args.config_options)
 
     if args.dump_config:
         logging.info("Configuration:")
