@@ -44,11 +44,11 @@ class Fire(dict):
 
         # private id used to identify fire from possibly multiple fires with
         # the same public 'id' (e.g. in FiresManager's failure handler)
-        self._private_id = str(uuid.uuid1())
+        self._private_id = str(uuid.uuid4())
 
         # if id isn't specified, set to new guid
         if not self.get('id'):
-            self['id'] = str(uuid.uuid1())[:8]
+            self['id'] = str(uuid.uuid4())[:8]
 
         if not self.get('type'):
             self['type'] = self.DEFAULT_TYPE
@@ -180,17 +180,14 @@ class FireEncoder(json.JSONEncoder):
 
 class FiresManager(object):
 
-    def __init__(self, run_id=None):
+    def __init__(self):
         self._meta = {}
         self._initialize_today()
         # configuration no longer initialized here
         self.modules = []
         self.fires = [] # this intitializes self._fires and self._num_fires
-        self._processed_run_id_wildcards = False
         self._num_fires = 0
-        if run_id:
-            self._meta['run_id'] = run_id
-            Config.set_run_id(run_id)
+        self._initialize_run_id()
 
     ##
     ## Importing
@@ -277,6 +274,8 @@ class FiresManager(object):
     ## Special Meta Attributes
     ##
 
+    ## today
+
     def _initialize_today(self):
         self._manually_set_today = False
         self._processed_today = True
@@ -310,31 +309,37 @@ class FiresManager(object):
 
         Config.set_today(new_today)
 
+        # TODO: keep track of raw run_id and redo filling in of wild cards
+        #   in case '{today}' is embedded in it (or )
+
         self._manually_set_today = True
+
+    ## run_id
+
+    def _initialize_run_id(self):
+        self._maually_set_run_id = False
+        # default to guid, but manual set will still be allowed
+        self._meta['run_id'] = str(uuid.uuid4())
+        Config.set_run_id(self._meta['run_id'])
 
     @property
     def run_id(self):
-        if not self._meta.get('run_id'):
-            self._meta['run_id'] = str(uuid.uuid1())
-        elif not self._processed_run_id_wildcards:
-            logging.debug('filling in run_id wildcards')
-            self._meta['run_id'] = datetimeutils.fill_in_datetime_strings(
-                self._meta['run_id'], today=self.today)
-            self._processed_run_id_wildcards = True
         return self._meta['run_id']
 
     RUN_ID_IS_IMMUTABLE_MSG = "Run id is immutible"
     @run_id.setter
     def run_id(self, run_id):
-        if self._meta.get('run_id'):
+        if self._maually_set_run_id:
             raise TypeError(self.RUN_ID_IS_IMMUTABLE_MSG)
-        self._processed_run_id_wildcards = False
-        self._meta['run_id'] = run_id
-        Config.set_run_id(run_id)
-        # HACK: access run id simply to trigger replacement of wildcards
-        # Note: the check for 'run_id' in self._meta prevents it from being
-        #  generated unnecessarily
-        self.run_id
+
+        self._maually_set_run_id = True
+        logging.debug('filling in run_id wildcards')
+        self._meta['run_id'] = datetimeutils.fill_in_datetime_strings(
+            run_id, today=self.today)
+
+        Config.set_run_id(self._meta['run_id'])
+
+    ## modules
 
     @property
     def modules(self):
@@ -624,14 +629,16 @@ class FiresManager(object):
 
         # Even though run_id is ultimately set in self._meta, we'll
         # pop and use the setter to trigger wildcard replacements, etc.
-        # The setter is used after assigning input_dict to self._meta
-        # so that we don't overwrite self._meta['run_id']
         run_id = input_dict.pop('run_id', None)
+        if run_id:
+            self.run_id = run_id
+        # put run_id back in input_dict so that run_id isn't
+        # wiped out from self._meta when it's assigned to input_dict
+        # run_id either was just set or still has it's initial value
+        input_dict['run_id'] = self._meta['run_id']
 
         self._meta = input_dict
 
-        if run_id:
-            self.run_id = run_id
 
         # HACK: access 'today' to trigger replacement of wildcards or
         # setting of defaults

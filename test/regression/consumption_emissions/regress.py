@@ -112,7 +112,7 @@ def load_scenario(input_filename):
     #total_area = sum([int(r['area']) for r in rows])
     for row_dict in rows:
         fire = models.fires.Fire(copy.deepcopy(BASE_FIRE))
-        fire.event_of["id"] = str(uuid.uuid1())
+        fire.event_of["id"] = str(uuid.uuid4())
         area = int(row_dict['area'])
         fire.growth[0]['location']['area'] = area
         fire.growth[0]['location']['ecoregion'] = row_dict['ecoregion']

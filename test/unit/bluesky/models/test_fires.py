@@ -25,7 +25,7 @@ from bluesky.models import fires
 class TestFire(object):
 
     def test_fills_in_id(self, monkeypatch, reset_config):
-        monkeypatch.setattr(uuid, "uuid1", lambda: "abcd1234")
+        monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
         # if id is missing, the id is set to generated guid.
         # Note: id used to integrate start and/or end, if specified;
         #   this is no longer the case
@@ -308,7 +308,7 @@ class TestFiresManager(object):
         # TODO: any other possibilities ??
 
     def test_run_id_is_immutable(self, monkeypatch, reset_config):
-        monkeypatch.setattr(uuid, 'uuid1', lambda: "sdf123")
+        monkeypatch.setattr(uuid, 'uuid4', lambda: "sdf123")
 
         fm = fires.FiresManager()
         # if not already set, run_id is set when accessed
@@ -328,12 +328,6 @@ class TestFiresManager(object):
         fm = fires.FiresManager()
         fm.load({'run_id': "ggbgbg"})
         assert fm.run_id == "ggbgbg"
-        with raises(TypeError) as e_info:
-            fm.run_id = "sdfsdfsdf"
-        assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
-
-        fm = fires.FiresManager(run_id="ggg")
-        assert fm.run_id == "ggg"
         with raises(TypeError) as e_info:
             fm.run_id = "sdfsdfsdf"
         assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
@@ -424,8 +418,11 @@ class TestFiresManager(object):
 
     @freezegun.freeze_time("2016-04-20")
     def test_load_no_fires_no_meta(self, monkeypatch, reset_config):
+        monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
+
         fires_manager = fires.FiresManager()
         expected_meta = {
+            "run_id": "abcd1234"
         }
 
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{}'))
@@ -442,24 +439,29 @@ class TestFiresManager(object):
 
     @freezegun.freeze_time("2016-04-20")
     def test_load_no_fires_with_meta(self, monkeypatch, reset_config):
-        fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
             '{"fire_information":[], "foo": {"bar": "baz"}}'))
+        monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
+
+        fires_manager = fires.FiresManager()
         fires_manager.loads()
         assert fires_manager.num_fires == 0
         assert [] == fires_manager.fires
         assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
         expected_meta = {
+            "run_id": "abcd1234",
             "foo": {"bar": "baz"}
         }
         assert expected_meta == fires_manager.meta
 
     @freezegun.freeze_time("2016-04-20")
     def test_load_one_fire_with_meta(self, monkeypatch, reset_config):
-        fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
             '{"fire_information":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"}],'
             '"foo": {"bar": "baz"}}'))
+        monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
+
+        fires_manager = fires.FiresManager()
         fires_manager.loads()
         expected_fires = [
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"})
@@ -468,18 +470,20 @@ class TestFiresManager(object):
         assert expected_fires == fires_manager.fires
         assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
         expected_meta = {
+            "run_id": "abcd1234",
             "foo": {"bar": "baz"}
         }
         assert expected_meta == fires_manager.meta
 
     @freezegun.freeze_time("2016-04-20")
     def test_load_multiple_fires_with_meta(self, monkeypatch, reset_config):
-        fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
             '{"fire_information":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
             '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}],'
             '"foo": {"bar": "baz"}}'))
-        #monkeypatch.setattr(uuid, "uuid1", lambda: "abcd1234")
+        monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
+
+        fires_manager = fires.FiresManager()
         fires_manager.loads()
         expected_fires = [
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
@@ -489,7 +493,7 @@ class TestFiresManager(object):
         assert expected_fires == fires_manager.fires
         assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
         expected_meta = {
-            #"run_id": 'abcd1234'
+            "run_id": "abcd1234",
             "foo": {"bar": "baz"},
         }
         assert expected_meta == fires_manager.meta
@@ -507,8 +511,10 @@ class TestFiresManager(object):
 
     @freezegun.freeze_time("2016-04-20")
     def test_dump_multiple_fires_with_meta(self, monkeypatch, reset_config):
-        fires_manager = fires.FiresManager()
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream())
+        monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
+
+        fires_manager = fires.FiresManager()
         fire_objects = [
             fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
             fires.Fire({'id':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'})
@@ -518,6 +524,7 @@ class TestFiresManager(object):
 
         fires_manager.dumps()
         expected = {
+            "run_id": "abcd1234",
             "today": "2016-04-20",
             "run_config": DEFAULTS,
             "fire_information": fire_objects,
