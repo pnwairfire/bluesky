@@ -108,7 +108,7 @@ and KML visualization:
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
         -i ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json \
-        -o ./output/json/1-fire-24hr-20140530-CA-post-ingestion-output.json \
+        -o ./output/1-fire-24hr-20140530-CA-post-ingestion-output.json \
         -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
         ingestion fuelbeds consumption emissions \
         timeprofiling findmetdata localmet plumerising \
