@@ -309,9 +309,6 @@ class FiresManager(object):
 
         Config.set_today(new_today)
 
-        # TODO: keep track of raw run_id and redo filling in of wild cards
-        #   in case '{today}' is embedded in it (or )
-
         self._manually_set_today = True
 
     ## run_id
@@ -319,12 +316,12 @@ class FiresManager(object):
     def _initialize_run_id(self):
         self._maually_set_run_id = False
         # default to guid, but manual set will still be allowed
-        self._meta['run_id'] = str(uuid.uuid4())
-        Config.set_run_id(self._meta['run_id'])
+        self._run_id = str(uuid.uuid4())
+        Config.set_run_id(self._run_id)
 
     @property
     def run_id(self):
-        return self._meta['run_id']
+        return self._run_id
 
     RUN_ID_IS_IMMUTABLE_MSG = "Run id is immutible"
     @run_id.setter
@@ -334,10 +331,10 @@ class FiresManager(object):
 
         self._maually_set_run_id = True
         logging.debug('filling in run_id wildcards')
-        self._meta['run_id'] = datetimeutils.fill_in_datetime_strings(
+        self._run_id = datetimeutils.fill_in_datetime_strings(
             run_id, today=self.today)
 
-        Config.set_run_id(self._meta['run_id'])
+        Config.set_run_id(self._run_id)
 
     ## modules
 
@@ -627,15 +624,9 @@ class FiresManager(object):
         if today:
             self.today = today
 
-        # Even though run_id is ultimately set in self._meta, we'll
-        # pop and use the setter to trigger wildcard replacements, etc.
         run_id = input_dict.pop('run_id', None)
         if run_id:
             self.run_id = run_id
-        # put run_id back in input_dict so that run_id isn't
-        # wiped out from self._meta when it's assigned to input_dict
-        # run_id either was just set or still has it's initial value
-        input_dict['run_id'] = self._meta['run_id']
 
         self._meta = input_dict
 
@@ -671,7 +662,7 @@ class FiresManager(object):
         # were in the input
 
         return dict(self._meta, fire_information=self.fires, today=self.today,
-            counts=self.counts, bluesky_version=__version__,
+            run_id=self.run_id, counts=self.counts, bluesky_version=__version__,
             run_config=Config.get())
 
     def dumps(self, output_stream=None, output_file=None, indent=None):
