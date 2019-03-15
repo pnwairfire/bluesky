@@ -10,7 +10,7 @@
             "start": "2014-05-30T00:00:00",
             "num_hours": 3,
             "model": "hysplit",
-            "output_dir": "/bsp-output/bsp-dispersion-output/DRI6km-2014-05-30-comptuted-grid-km-{run_id}",
+            "output_dir": "/bluesky/output/hysplit/DRI6km-2014-05-30-comptuted-grid-km-{run_id}",
             "hysplit": {
                 "compute_grid": true,
                 "spacing_longitude": 6.0,
@@ -39,7 +39,7 @@
             "modes": ["localsave"],
             "extra_exports": ["dispersion", "visualization"],
             "localsave": {
-                "dest_dir": "/bsp-output/bsp-local-exports/",
+                "dest_dir": "/bluesky/output/exports/hysplit/",
                 "output_dir_name": "exported-{dispersion_output_dir_name}"
             }
         }

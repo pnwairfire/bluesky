@@ -1,7 +1,7 @@
 {
     "config": {
         "extrafiles":{
-            "dest_dir": "tmp/{run_id}/extrafiles/",
+            "dest_dir": "/bluesky/output/extrafiles/{run_id}/",
             "sets": ["emissionscsv"],
             "emissionscsv": {
                 "filename": "emissions.csv"

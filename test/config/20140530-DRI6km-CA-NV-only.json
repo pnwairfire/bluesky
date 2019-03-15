@@ -29,7 +29,7 @@
             "start": "2014-05-30T00:00:00",
             "num_hours": 48,
             "model": "hysplit",
-            "output_dir": "/bsp-output/bsp-dispersion-output/{run_id}/",
+            "output_dir": "/bluesky/output/hysplit/{run_id}/",
             "hysplit": {
                 "grid": {
                     "spacing": 0.15,
@@ -59,7 +59,7 @@
             "modes": ["localsave"],
             "extra_exports": ["dispersion", "visualization"],
             "localsave": {
-                "dest_dir": "/bsp-output/bsp-local-exports/"
+                "dest_dir": "/bluesky/output/exports/hysplit/"
             }
         }
    }
