@@ -128,8 +128,7 @@ _DEFAULTS = {
     },
     "localmet": {
         # The following default is defined in the met package,
-        # byt we need to define it here so that code doesn't fail
-        # so we won't define it here
+        # but we need to define it here so that the code doesn't fail
         "time_step": 1
     },
     "timeprofiling": {
@@ -536,11 +535,11 @@ _DEFAULTS = {
                     # output_dir/images_dir
                     'OUTPUT_DIR': None
                 }
-            }
+            },
 
-            # The following defaults are defined in the blueskykml package,
-            # so they don't need to be defined here
-            #"layers": [0],
+            # The following default is defined in the blueskykml package,
+            # but we need to define it here so that the code doesn't fail
+            "layers": [0]
         }
     },
     "export": {
