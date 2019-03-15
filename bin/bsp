@@ -174,7 +174,9 @@ Configuration:
     then regardless of where it is specified in the command, foo
     will be 'bsdf', bar will remain 1, and baz will remain 3.
 
-    Note that all keys in the configuration json data are case-insensitive.
+    Note that, with the exception of keys under
+    visualization > hysplit > blueskykml, all keys in the
+    configuration json data are case-insensitive.
  """.format('\n    '.join(modules.AVAILABLE_MODULES))
 
 def is_piped_input():
