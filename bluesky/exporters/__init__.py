@@ -28,7 +28,7 @@ class ExporterBase(object):
         self._handle_existing = self.config('handle_existing')
 
     def config(self, *keys):
-        Config.get('export', self._export_mode, *keys)
+        return Config.get('export', self._export_mode, *keys)
 
     def export(self, fires_manager):
         raise NotImplementedError("Bluesky's {} exporter needs to "
