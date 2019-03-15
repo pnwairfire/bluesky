@@ -128,8 +128,9 @@ _DEFAULTS = {
     },
     "localmet": {
         # The following default is defined in the met package,
+        # byt we need to define it here so that code doesn't fail
         # so we won't define it here
-        # "time_step": 1
+        "time_step": 1
     },
     "timeprofiling": {
         "hourly_fractions": None
@@ -546,6 +547,9 @@ _DEFAULTS = {
         "modes": [],
         "extra_exports": [],
         "email": {
+            # handle_existing needs to be defined here for exporter
+            # code not to fail, even though it's not relevant to email
+            "handle_existing": "fail",
             "recipients": None,
             # TODO: should there indeed be a default sender?
             "sender": "bsp@airfire.org",
