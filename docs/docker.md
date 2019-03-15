@@ -77,7 +77,7 @@ Another example, running through emissions:
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
         -i ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json \
-        -o ./output/json/1-fire-24hr-20140530-CA-post-ingestion-output.json \
+        -o ./output/1-fire-24hr-20140530-CA-post-ingestion-output.json \
         ingestion fuelbeds consumption emissions
 
 
@@ -144,7 +144,6 @@ $HOME/docker-bsp-output/
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:$PATH \
         -v $HOME/Met/NAM/12km/ARL/:/data/Met/NAM/12km/ARL/ \
-        -v $HOME/docker-bsp-output/:/bsp-output/ \
         -w /bluesky/ \
         bluesky bash
 
@@ -175,8 +174,9 @@ you have to cp or mv directories under your home dir in order to mount them.
 
 #### Cleanup
 
-Docker leaves behind partial images during the build process, and it leaves behind
-containers after they've been used.  To clean up, you can use the following:
+Docker leaves behind partial images during the build process, and it
+leaves behind containers after they've been used (if you don't use the
+`--rm` option, see below).  To clean up, you can use the following:
 
     # remove all stopped containers
     docker ps -a | awk 'NR > 1 {print $1}' | xargs docker rm
@@ -195,13 +195,13 @@ Since BlueSkyKml is installed as a dependency of bluesky, you can run
 ```makedispersionkml``` just as you'd run ```bsp```. As with ```bsp```,
 you'll need to use the '-v' option to mount host machine
 directories in your container.  For example, suppose you've got bluesky
-output data in /bluesky-output/20151212f/data/ and you want to create
-the dispersion kml in /docker-output/, you could run something like the
-following:
+output data in $HOME/bluesky-output/20151212f/data/ and you want to create
+the dispersion kml in $HOME/bluesky-kml-output/, you could run something
+like the following:
 
     docker run --rm \
         -v $HOME/bluesky-output/2015121200/data/:/input/ \
-        -v $HOME/docker-output/:/output/ bluesky \
+        -v $HOME/bluesky-kml-output/:/output/ bluesky \
         makedispersionkml \
         -i /input/smoke_dispersion.nc \
         -l /input/fire_locations.csv \
