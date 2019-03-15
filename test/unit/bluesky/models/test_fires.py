@@ -311,21 +311,22 @@ class TestFiresManager(object):
         monkeypatch.setattr(uuid, 'uuid4', lambda: "sdf123")
 
         fm = fires.FiresManager()
-        # if not already set, run_id is set when accessed
+        # if not already set, run_id is set when accessed.
+        # This initial guid can be overwritten
         assert fm.run_id == "sdf123"
-        with raises(TypeError) as e_info:
-            fm.run_id = "sdfsdfsdf"
-        assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+        fm.run_id = "sdfsdfsdf"
+        assert fm.run_id == "sdfsdfsdf"
 
-        # FiresManager.load sets run_id
+        # if FiresManager.load doesn't set run_id, then it can still be set after
         fm = fires.FiresManager()
+        assert fm.run_id == "sdf123"
         fm.load({})
         assert fm.run_id == "sdf123"
-        with raises(TypeError) as e_info:
-            fm.run_id = "sdfsdfsdf"
-        assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+        fm.run_id = "sdfsdfsdf"
+        assert fm.run_id == "sdfsdfsdf"
 
         fm = fires.FiresManager()
+        assert fm.run_id == "sdf123"
         fm.load({'run_id': "ggbgbg"})
         assert fm.run_id == "ggbgbg"
         with raises(TypeError) as e_info:
@@ -333,6 +334,7 @@ class TestFiresManager(object):
         assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
         fm = fires.FiresManager()
+        assert fm.run_id == "sdf123"
         fm.run_id = "eee"
         assert fm.run_id == "eee"
         with raises(TypeError) as e_info:
@@ -340,8 +342,8 @@ class TestFiresManager(object):
         assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
 
         # when you load, fm starts from scratch
-        assert fm.run_id == "eee"
         fm = fires.FiresManager()
+        assert fm.run_id == "sdf123"
         fm.load({'run_id': "ggbgbg"})
         assert fm.run_id == "ggbgbg"
 
@@ -422,7 +424,6 @@ class TestFiresManager(object):
 
         fires_manager = fires.FiresManager()
         expected_meta = {
-            "run_id": "abcd1234"
         }
 
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{}'))
@@ -449,7 +450,6 @@ class TestFiresManager(object):
         assert [] == fires_manager.fires
         assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
         expected_meta = {
-            "run_id": "abcd1234",
             "foo": {"bar": "baz"}
         }
         assert expected_meta == fires_manager.meta
@@ -470,7 +470,6 @@ class TestFiresManager(object):
         assert expected_fires == fires_manager.fires
         assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
         expected_meta = {
-            "run_id": "abcd1234",
             "foo": {"bar": "baz"}
         }
         assert expected_meta == fires_manager.meta
@@ -493,7 +492,6 @@ class TestFiresManager(object):
         assert expected_fires == fires_manager.fires
         assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
         expected_meta = {
-            "run_id": "abcd1234",
             "foo": {"bar": "baz"},
         }
         assert expected_meta == fires_manager.meta
