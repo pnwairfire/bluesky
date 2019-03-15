@@ -241,11 +241,13 @@ and aggregate.  Note that this list lacks 'id', which is the first column.
 
 class FiresCsvsWriter(object):
 
-    def __init__(self, dest_dir):
-        fl = Config.get('extrafiles', 'firescsvs', 'fire_locations_filename')
+    def __init__(self, dest_dir, **kwargs):
+        fl = (kwargs.get('fire_locations_filename') or
+            Config.get('extrafiles', 'firescsvs', 'fire_locations_filename'))
         self._fire_locations_pathname = os.path.join(dest_dir, fl)
 
-        fe = Config.get('extrafiles', 'firescsvs', 'fire_events_filename')
+        fe = (kwargs.get('fire_events_filename') or
+            Config.get('extrafiles', 'firescsvs', 'fire_events_filename'))
         self._fire_events_pathname = os.path.join(dest_dir, fe)
 
     def write(self, fires_manager):
