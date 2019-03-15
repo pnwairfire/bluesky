@@ -26,7 +26,12 @@ class TestToLowercaseKeys(object):
                                 "asd": True,
                                 "SDFSDF": 1
                             }
-                        ]
+                        ],
+                        "blueskykml_config": {
+                            "CaseShouldBePreserved": {
+                                "FooBar": 234
+                            }
+                        }
                     }
                 ]
             }
@@ -45,7 +50,12 @@ class TestToLowercaseKeys(object):
                                 "asd": True,
                                 "sdfsdf": 1
                             }
-                        ]
+                        ],
+                        "blueskykml_config": {
+                            "CaseShouldBePreserved": {
+                                "FooBar": 234
+                            }
+                        }
                     }
                 ]
             }

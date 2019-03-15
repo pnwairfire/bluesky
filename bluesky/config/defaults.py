@@ -583,13 +583,20 @@ _DEFAULTS = {
     }
 }
 
+PRESERVE_CASE_IN_VALUE = ['blueskykml_config']
+
 def to_lowercase_keys(val):
     if isinstance(val, dict):
         if len(set(val.keys())) != len(set([k.lower() for k in val])):
             raise ValueError("Conflicting keys in config dict: %s",
                 list(val.keys()))
 
-        return {k.lower(): to_lowercase_keys(v) for k, v in val.items()}
+        return {
+            k.lower(): (to_lowercase_keys(v)
+                if k.lower() not in PRESERVE_CASE_IN_VALUE
+                else v)
+                for k, v in val.items()
+        }
 
     elif isinstance(val, list):
         return [to_lowercase_keys(v) for v in val]
