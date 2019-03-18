@@ -109,7 +109,7 @@ and KML visualization:
         bsp --log-level=DEBUG --indent 4 \
         -i ./test/data/json/4-fires-24hr-20140530-CA-post-ingestion.json \
         -o ./output/{run_id}.json \
-        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
+        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM2.5-user-defined-grid-km.json \
         ingestion fuelbeds consumption emissions \
         timeprofiling findmetdata localmet plumerising \
         dispersion visualization export
