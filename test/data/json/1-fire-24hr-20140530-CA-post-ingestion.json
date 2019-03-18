@@ -1,5 +1,5 @@
 {
-    "run_id": "vsmoke-1-fire-24hr-{today}-CA",
+    "run_id": "1-fire-24hr-20140530-CA-{today}",
     "fire_information": [
         {
             "type": "wildfire",

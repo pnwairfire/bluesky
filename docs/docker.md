@@ -77,7 +77,7 @@ Another example, running through emissions:
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
         -i ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json \
-        -o ./output/1-fire-24hr-20140530-CA-post-ingestion-output.json \
+        -o ./output/{run_id}.json \
         ingestion fuelbeds consumption emissions
 
 
@@ -91,7 +91,7 @@ Another example, running through vsmoke dispersion:
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
         -i ./test/data/json/1-fire-24hr-20140530-WA-pre-ingestion.json \
-        -o ./output/1-fire-24hr-20140530-WA-pre-ingestion-output.json \
+        -o ./output/{run_id}.json \
         -c ./test/config/dispersion/dispersion-vsmoke-24hr.json \
         ingestion fuelbeds consumption emissions timeprofiling dispersion
 
@@ -107,8 +107,8 @@ and KML visualization:
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
-        -i ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json \
-        -o ./output/1-fire-24hr-20140530-CA-post-ingestion-output.json \
+        -i ./test/data/json/4-fires-24hr-20140530-CA-post-ingestion.json \
+        -o ./output/{run_id}.json \
         -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
         ingestion fuelbeds consumption emissions \
         timeprofiling findmetdata localmet plumerising \
