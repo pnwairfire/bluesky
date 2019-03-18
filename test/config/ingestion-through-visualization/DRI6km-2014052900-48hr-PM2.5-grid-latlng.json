@@ -10,7 +10,7 @@
             "start": "2014-05-29T00:00:00",
             "num_hours": 48,
             "model": "hysplit",
-            "output_dir": "/bluesky/output/bsp-dispersion-output/{run_id}/",
+            "output_dir": "/bluesky/output/{run_id}/",
             "hysplit": {
                 "grid": {
                     "spacing": 0.06,
@@ -48,7 +48,7 @@
                 "smtp_port": 1025
             },
             "localsave": {
-                "dest_dir": "/bluesky/output/bsp-local-exports/"
+                "dest_dir": "/bluesky/exports/"
             }
         }
     }

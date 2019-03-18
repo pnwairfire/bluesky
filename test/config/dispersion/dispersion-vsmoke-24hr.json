@@ -4,7 +4,7 @@
             "start": "2014-05-30T00:00:00Z",
             "num_hours": 24,
             "model": "vsmoke",
-            "output_dir": "/bluesky/output/vsmoke/{run_id}"
+            "output_dir": "/bluesky/output/{run_id}"
         }
     }
 }

@@ -19,7 +19,7 @@
                     }
                 ],
                 "json_output_filename": "bsp-output.json",
-                "output_dir_name": "bsp-output"
+                "output_dir_name": "{run_id}"
             }
         }
     }

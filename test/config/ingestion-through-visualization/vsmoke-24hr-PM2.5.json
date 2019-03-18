@@ -7,7 +7,7 @@
             "start": "2014-05-30T00:00:00",
             "num_hours": 24,
             "model": "vsmoke",
-            "output_dir": "/bluesky/output/vsmoke/{run_id}/"
+            "output_dir": "/bluesky/output/{run_id}/"
         },
         "export": {
             "modes": ["email", "localsave"],
@@ -20,7 +20,7 @@
                 "smtp_port": 1025
             },
             "localsave": {
-                "dest_dir": "/bluesky/output/exports/vsmoke/"
+                "dest_dir": "/bluesky/exports/"
             }
         }
     }
