@@ -12,3 +12,4 @@
   - deprecated FiresManager.get_config_value
   - deprecated FiresManager.set_config_value
   - deprecated FiresManager.config (getter and setter)
+  - refactored run_id logic and store as FiresManager attr rather than in _meta dict
