@@ -234,6 +234,9 @@ class FiresManager(object):
     # (would have a fair amoubnt of unit test updates)
     def _stream(self, file_name, flag): #, do_strip_newlines):
         if file_name:
+            file_name = datetimeutils.fill_in_datetime_strings(
+                file_name, today=self.today)
+            file_name = file_name.replace('{run_id}', self.run_id)
             return open(file_name, flag)
         else:
             if flag == 'r':

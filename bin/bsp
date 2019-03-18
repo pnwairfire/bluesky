@@ -366,9 +366,6 @@ def main():
     except Exception as e:
         exit_with_traceback(e)
 
-    if args.output_file:
-        args.output_file = datetimeutils.fill_in_datetime_strings(
-            args.output_file, today=fires_manager.today)
     fires_manager.dumps(output_file=args.output_file, indent=args.indent)
 
 if __name__ == "__main__":
