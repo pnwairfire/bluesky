@@ -10,7 +10,9 @@
             "start": "2014-05-30T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
+            "handle_existing": "replace",
             "output_dir": "/bluesky/output/hysplit/{run_id}/",
+            "working_dir": "/bluesky/working/hysplit/{run_id}/",
             "hysplit": {
                 "grid": {
                     "spacing": 6.0,

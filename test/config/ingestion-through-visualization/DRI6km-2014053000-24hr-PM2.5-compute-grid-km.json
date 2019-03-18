@@ -18,24 +18,14 @@
                 "spacing_longitude": 6.0,
                 "spacing_latitude": 6.0,
                 "NUMPAR": 500,
-                "MAXPAR": 12000,
-                "VERTICAL_LEVELS": [100, 500, 1000]
+                "MAXPAR": 12000
             }
         },
         "visualization": {
             "target": "dispersion",
             "hysplit": {
                 "images_dir": "images/",
-                "data_dir": "data/",
-                "blueskykml_config": {
-                    "DispersionGridInput": {
-                        "LAYERS": [0,2]
-                    },
-                    "DispersionImages": {
-                        "DAILY_IMAGES_UTC_OFFSETS": [-7, 0],
-                        "REPROJECT_IMAGES": "True"
-                    }
-                }
+                "data_dir": "data/"
             }
         },
         "export": {
