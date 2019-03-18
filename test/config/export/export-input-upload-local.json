@@ -6,7 +6,7 @@
             "upload": {
                 "scp": {
                     "host": "127.0.0.1",
-                    "dest_dir": "/bluesky/export/"
+                    "dest_dir": "/bluesky/output/exports/"
                 }
             }
         }

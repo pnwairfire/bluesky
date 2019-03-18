@@ -10,7 +10,8 @@
             "start": "2015-08-15T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
-            "output_dir": "/bluesky/output/{run_id}/",
+            "output_dir": "/bluesky/output/dispersion-output/{run_id}/",
+            "working_dir": "/bluesky/output/dispersion-working/{run_id}/",
             "hysplit": {
                 "grid": {
                     "spacing": 1.33,
@@ -47,7 +48,7 @@
                 "smtp_port": 1025
             },
             "localsave": {
-                "dest_dir": "/bluesky/exports/"
+                "dest_dir": "/bluesky/output/exports/"
             }
         }
     }

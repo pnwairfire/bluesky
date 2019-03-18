@@ -20,8 +20,8 @@
             "start": "{today}",
             "num_hours": 24,
             "model": "hysplit",
-            "output_dir": "/bluesky/output/{run_id}/",
-            "working_dir": "/bluesky/working/{run_id}/",
+            "output_dir": "/bluesky/output/dispersion-output/{run_id}/",
+            "working_dir": "/bluesky/output/dispersion-working/{run_id}/",
             "hysplit": {
                 "grid": {
                     "spacing": 0.15,
@@ -59,7 +59,7 @@
                 "smtp_port": 1025
             },
             "localsave": {
-                "dest_dir": "/bluesky/exports/"
+                "dest_dir": "/bluesky/output/exports/"
             }
         }
     }

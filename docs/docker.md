@@ -116,10 +116,10 @@ and KML visualization:
 
 
 Remember that, in the last dispersion example, the dispersion output
-will be under `$HOME/code/pnwairfire-bluesky/output/bsp-dispersion-output/`
-on your host machine, not under `/bluesky/output/bsp-dispersion-output/`.
+will be under `$HOME/code/pnwairfire-bluesky/output/dispersion-output/bsp-dispersion-output/`
+on your host machine, not under `/bluesky/output/dispersion-output/`.
 The export directory will be under
-`$HOME/code/pnwairfire-bluesky/output/bsp-local-exports`.
+`$HOME/code/pnwairfire-bluesky/output/exports/`.
 
 #### Docker wrapper script
 

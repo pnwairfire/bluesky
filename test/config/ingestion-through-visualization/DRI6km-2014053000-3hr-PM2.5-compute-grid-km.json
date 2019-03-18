@@ -10,7 +10,8 @@
             "start": "2014-05-30T00:00:00",
             "num_hours": 3,
             "model": "hysplit",
-            "output_dir": "/bluesky/output/{run_id}",
+            "output_dir": "/bluesky/output/dispersion-output/{run_id}/",
+            "working_dir": "/bluesky/output/dispersion-working/{run_id}/",
             "hysplit": {
                 "compute_grid": true,
                 "spacing_longitude": 6.0,
@@ -39,7 +40,7 @@
             "modes": ["localsave"],
             "extra_exports": ["dispersion", "visualization"],
             "localsave": {
-                "dest_dir": "/bluesky/exports/",
+                "dest_dir": "/bluesky/output/exports/",
                 "output_dir_name": "exported-{dispersion_output_dir_name}"
             }
         }

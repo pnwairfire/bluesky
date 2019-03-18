@@ -1,7 +1,7 @@
 {
     "config": {
         "extrafiles":{
-            "dest_dir": "/bluesky/extrafiles/{run_id}/",
+            "dest_dir": "/bluesky/output/extrafiles/{run_id}/",
             "sets": ["firescsvs"],
             "firescsvs": {
                 "fire_locations_filename": "fire_locations.csv",
