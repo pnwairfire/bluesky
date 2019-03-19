@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+default_image_name=bluesky
+default_uid=$(id -u)
+default_gid=$(id -g)
+default_user_name=bluesky-alternate
+
+show_help=false
+image_name=$default_image_name
+uid=$default_uid
+gid=$default_gid
+user_name=$default_user_name
+
+while [ -n "$1" ]; do # while loop starts
+    case "$1" in
+    -h) show_help=true && shift ;;
+    --help) show_help=true && shift ;;
+    -i) image_name="$2" && shift && shift ;;
+    --image-name) image_name="$2" && shift && shift ;;
+    -u) uid="$2" && shift && shift ;;
+    --uid) uid="$2" && shift && shift ;;
+    -g) gid="$2" && shift && shift ;;
+    --gid) gid="$2" && shift && shift ;;
+    -n) user_name="$2" && shift && shift ;;
+    --user-name) user_name="$2" && shift && shift ;;
+    *) echo "Option $1 not recognized" && exit 1 ;;
+    esac
+done
+
+if [ "$show_help" = true ] ; then
+    echo ""
+    echo "Options:"
+    echo "   -h/--help       - show this help message"
+    echo "   -i/--image-name - e.g. 'pnwairfire/bluesky:v4.0.6'; default: '$default_image_name'"
+    echo "   -u/--uid        - user id; default $default_uid"
+    echo "   -g/--gid        - group id; default $default_gid"
+    echo "   -n/--user-name  - default '$default_user_name'"
+    echo ""
+    echo "Usage:"
+    echo "   $0"
+    echo "   $0 -i pnwairfire/bluesky:v4.0.6 -u 2000 -g 2000 -n bluesky2"
+    echo ""
+    exit 0
+fi
+
+echo "Options"
+echo " Image Name: $image_name"
+echo " UID: $uid"
+echo " Group Id: $gid"
+echo " User Name: $user_name"
+
+function update_image {
+    echo "About to run $1"
+    docker rm temp-bluesky-container
+    docker run --name temp-bluesky-container $image_name $1
+    docker commit temp-bluesky-container $image_name
+    docker rm temp-bluesky-container
+}
+
+update_image "groupadd -g $gid -o $user_name"
+update_image "useradd -m -u $uid -g $gid -o -s /bin/bash $user_name"
