@@ -33,7 +33,7 @@ def run(fires_manager):
     #  or
     #   $ pip3 show apps-consume4|grep "^Version:"
     fires_manager.processed(__name__, __version__,
-        consume_version="4.1.2")
+        consume_version="5.0.1")
 
     # TODO: get msg_level and burn_type from fires_manager's config
     msg_level = 2  # 1 => fewest messages; 3 => most messages
