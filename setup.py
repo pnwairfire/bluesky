@@ -58,7 +58,7 @@ setup(
         "https://pypi.airfire.org/simple/met/",
         "https://pypi.airfire.org/simple/plumerise/",
         "https://pypi.airfire.org/simple/blueskykml/",
-        "https://pypi.airfire.org/simple/apps-consume4/"
+        "https://pypi.airfire.org/simple/apps-consume/"
     ],
     tests_require=test_requirements
 )
