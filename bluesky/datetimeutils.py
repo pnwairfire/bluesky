@@ -6,6 +6,7 @@ TODO: Remove this module and update all imports of this module to import
 
 __author__ = "Joel Dubowy"
 
+import calendar
 import datetime
 import re
 
@@ -129,3 +130,19 @@ def to_datetime(val, limit_range=False):
             _invalid(val)
 
     # else, it just returns None, val's value
+
+# Leap yeaer is account for in season_from_date
+SEASON_END_DATES = [
+    ('winter', 79), # 1/1 - 3/20
+    ('spring', 171), # 3/21 - 6/20
+    ('summer', 265), # 6/21 - 9/22
+    ('fall', 354), # 9/23 - 12/20
+    ('winter', 365) # 12/21 - 12/31
+]
+def season_from_date(date_obj):
+    # TODO: should we have more sophisticated logic, or
+    #    location-specific season date ranges
+    if date_obj:
+        l = int(calendar.isleap(date_obj.year))
+        doy = int(date_obj.strftime('%j'))
+        return next(season for season, e in SEASON_END_DATES if doy <= e + l)

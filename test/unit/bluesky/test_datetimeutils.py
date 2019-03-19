@@ -368,3 +368,37 @@ class TestToDatetime(object):
 
         dt = datetimeutils.to_datetime(datetime.datetime(2015, 12, 14, 2, 1, 23))
         assert dt == datetime.datetime(2015, 12, 14, 2, 1, 23)
+
+
+
+class TestSeasonFromDate(object):
+
+    def test(self):
+        sfd = datetimeutils.season_from_date
+
+        # date Not defined
+        assert None == sfd(None)
+
+        # leap year
+        assert 'winter' == sfd(datetime.date(2016, 1, 1))
+        assert 'winter' == sfd(datetime.date(2016, 3, 20))
+        assert 'spring' == sfd(datetime.date(2016, 3, 21))
+        assert 'spring' == sfd(datetime.date(2016, 6, 20))
+        assert 'summer' == sfd(datetime.date(2016, 6, 21))
+        assert 'summer' == sfd(datetime.date(2016, 9, 22))
+        assert 'fall' == sfd(datetime.date(2016, 9, 23))
+        assert 'fall' == sfd(datetime.date(2016, 12, 20))
+        assert 'winter' == sfd(datetime.date(2016, 12, 21))
+        assert 'winter' == sfd(datetime.date(2016, 12, 31))
+
+        # not leap year
+        assert 'winter' == sfd(datetime.date(2019, 1, 1))
+        assert 'winter' == sfd(datetime.date(2019, 3, 20))
+        assert 'spring' == sfd(datetime.date(2019, 3, 21))
+        assert 'spring' == sfd(datetime.date(2019, 6, 20))
+        assert 'summer' == sfd(datetime.date(2019, 6, 21))
+        assert 'summer' == sfd(datetime.date(2019, 9, 22))
+        assert 'fall' == sfd(datetime.date(2019, 9, 23))
+        assert 'fall' == sfd(datetime.date(2019, 12, 20))
+        assert 'winter' == sfd(datetime.date(2019, 12, 21))
+        assert 'winter' == sfd(datetime.date(2019, 12, 31))
