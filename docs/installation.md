@@ -17,7 +17,12 @@ installation instructions.
 ### Build Bluesky Docker Image from Dockerfile
 
     cd /path/to/bluesky/repo/
-    docker build -t bluesky .
+    docker build  -t bluesky . \
+        --build-arg UID=$(id -u) \
+        --build-arg GID=$(id -g)
+
+Note that the build args are so that files saved in mounted host volumes
+are saved as your user.
 
 ### Obtain pre-built docker image
 

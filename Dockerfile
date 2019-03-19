@@ -120,5 +120,12 @@ COPY setup.py /tmp/bluesky/setup.py
 RUN python3 setup.py install
 WORKDIR /bluesky/
 
+ARG UNAME=bluesky
+ARG UID=0
+ARG GID=0
+RUN groupadd -g $GID -o $UNAME
+RUN useradd -m -u $UID -g $GID -o -s /bin/bash $UNAME
+USER $UNAME
+
 # default command is to display bsp help string
 CMD ["bsp", "-h"]
