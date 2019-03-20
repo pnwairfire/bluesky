@@ -330,11 +330,11 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
 
         # self._set_consumption_data(consumption_data)
         # self._set_heat_data(heat_data)
-        self.season = season
         self.burn_type = burn_type
         self.fuelbed_fccs_ids = [fccs_id]
         self.fuelbed_area_acres = [area]
         self.fuelbed_ecoregion = [location['ecoregion']]
+        self.season = [season]
 
         _apply_settings(self, location, burn_type)
 

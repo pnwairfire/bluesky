@@ -97,9 +97,9 @@ def _run_fuelbed(fb, fuel_loadings_manager, season, location, burn_type, msg_lev
 
     fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
 
-    fc.season = season
     fc.burn_type = burn_type
     fc.fuelbed_fccs_ids = [fb['fccs_id']]
+    fc.season = [season]
 
     # Note: if we end up running fc on all fuelbeds at once, use lists
     # for the rest
