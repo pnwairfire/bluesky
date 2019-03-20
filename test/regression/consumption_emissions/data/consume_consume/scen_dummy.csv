@@ -1,5 +1,5 @@
-area,fm_duff,fm_1000hr,can_con_pct,shrub_black_pct,pile_black_pct,fuelbeds,units,ecoregion
-1,30,20,20,20,20,0,tons,western
-1,30,20,20,20,20,1,tons,western
-1,30,20,20,20,20,2,tons,western
-1,30,20,20,20,20,3,tons,western
+area,fm_duff,fm_1000hr,can_con_pct,shrub_black_pct,pile_black_pct,fuelbeds,units,ecoregion,fm_litter,season
+1,30,20,20,20,20,0,tons,western,30,fall
+1,30,20,20,20,20,1,tons,western,30,fall
+1,30,20,20,20,20,2,tons,western,30,fall
+1,30,20,20,20,20,3,tons,western,30,fall

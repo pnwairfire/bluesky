@@ -116,7 +116,18 @@ def load_scenario(input_filename):
         area = int(row_dict['area'])
         fire.growth[0]['location']['area'] = area
         fire.growth[0]['location']['ecoregion'] = row_dict['ecoregion']
+        # season is deterimined in pipeline consume code by growth start date,
+        # so, reverse engineer start date based on season in input file
+        if row_dict['season'] == 'spring':
+            fire.growth[0]['start'] = '2019-04-01'
+        elif row_dict['season'] == 'summer':
+            fire.growth[0]['start'] = '2019-07-01'
+        elif row_dict['season'] == 'fall':
+            fire.growth[0]['start'] = '2019-10-01'
+        else:
+            fire.growth[0]['start'] = '2019-01-01'
         fire.growth[0]['location']['fuel_moisture_duff_pct'] = int(row_dict['fm_duff'])
+        fire.growth[0]['location']['fuel_moisture_litter_pct'] = int(row_dict['fm_litter'])
         fire.growth[0]['location']['fuel_moisture_1000hr_pct'] = int(row_dict['fm_1000hr'])
         fire.growth[0]['location']['canopy_consumption_pct'] = int(row_dict['can_con_pct'])
         fire.growth[0]['location']['shrub_blackened_pct'] = int(row_dict['shrub_black_pct'])
