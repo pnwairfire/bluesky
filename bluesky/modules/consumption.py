@@ -8,7 +8,7 @@ import logging
 import consume
 
 from bluesky.config import Config
-from bluesky import datautils
+from bluesky import datautils, datetimeutils
 from bluesky.consumeutils import _apply_settings, FuelLoadingsManager
 from bluesky import exceptions
 from bluesky.locationutils import LatLng
@@ -72,8 +72,9 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
     # the results, make sure that running all at once produces any performance
     # gain; if it doesn't,then it might not be worth the trouble
     for g in fire.growth:
+        season = datetimeutils.season_from_date(g.get('start'))
         for fb in g['fuelbeds']:
-            _run_fuelbed(fb, fuel_loadings_manager, g['location'], burn_type, msg_level)
+            _run_fuelbed(fb, fuel_loadings_manager, season, g['location'], burn_type, msg_level)
         # Aggregate consumption and heat over all fuelbeds in the growth window
         # include only per-phase totals, not per category > sub-category > phase
         g['consumption'] = datautils.summarize([g], 'consumption',
@@ -87,7 +88,7 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
     fire.heat = datautils.summarize(fire.growth, 'heat',
         include_details=False)
 
-def _run_fuelbed(fb, fuel_loadings_manager, location, burn_type, msg_level):
+def _run_fuelbed(fb, fuel_loadings_manager, season, location, burn_type, msg_level):
     fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
         fb['fccs_id'])
 
@@ -96,6 +97,7 @@ def _run_fuelbed(fb, fuel_loadings_manager, location, burn_type, msg_level):
 
     fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
 
+    fc.season = season
     fc.burn_type = burn_type
     fc.fuelbed_fccs_ids = [fb['fccs_id']]
 

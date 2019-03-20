@@ -66,6 +66,11 @@ SETTINGS = {
             'synonyms': ['moisture_duff'] # TODO: confirm
         },
         {
+            'field': 'fuel_moisture_litter_pct',
+            'default': 50, # TODO: confirm
+            'synonyms': ['moisture_litter'] # TODO: confirm
+        },
+        {
             'field': 'canopy_consumption_pct',
             'default': 0,
             # TDOO: is 'canopy' a valid synonym
