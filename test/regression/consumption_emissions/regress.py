@@ -13,6 +13,7 @@ import traceback
 import uuid
 
 import afscripting
+import numpy
 
 # Hack to put the repo root dir at the front of sys.path so that
 # the local bluesky package is found
@@ -348,8 +349,12 @@ def check_value(counts, counts_key, actual, expected, *keys):
         actual = actual.get(k, {})
         expected = expected.get(k, {})
     valid_comparison = keys[-1] in actual and keys[-1] in expected
-    actual = actual.get(keys[-1], '???')
-    expected = expected.get(keys[-1], '???')
+
+    actual = actual.get(keys[-1])
+    if actual:
+        # consume rounds to 2 decimal points before writing csv
+        actual = numpy.round(actual, 2)
+    expected = expected.get(keys[-1])
     # TODO: check equality with allowable difference instead of just '=='
     log_args = ("%s - %s: actual vs. expected (%s): %s vs %s", counts_key.upper(),
         keys[0].upper(), ', '.join(keys[1:]), actual, expected)
