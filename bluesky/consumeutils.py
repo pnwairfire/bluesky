@@ -67,7 +67,7 @@ SETTINGS = {
         },
         {
             'field': 'fuel_moisture_litter_pct',
-            'default': 50, # TODO: confirm
+            'default': 30,
             'synonyms': ['moisture_litter'] # TODO: confirm
         },
         {
