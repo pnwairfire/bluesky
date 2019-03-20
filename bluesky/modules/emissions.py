@@ -16,7 +16,7 @@ from eflookup.fepsef import FepsEFLookup
 
 import consume
 
-from bluesky import datautils
+from bluesky import datautils, datetimeutils
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 
@@ -256,10 +256,11 @@ class Consume(EmissionsBase):
                     "Missing fuelbed data required for computing emissions")
 
 
+            season = datetimeutils.season_from_date(g.get('start'))
             for fb in g['fuelbeds']:
-                self._run_on_fuelbed(fb, g['location'], burn_type)
+                self._run_on_fuelbed(fb, season, g['location'], burn_type)
 
-    def _run_on_fuelbed(self, fb, location, burn_type):
+    def _run_on_fuelbed(self, fb, season, location, burn_type):
         if 'consumption' not in fb:
             raise ValueError(
                 "Missing consumption data required for computing emissions")
@@ -277,7 +278,7 @@ class Consume(EmissionsBase):
              fb['fccs_id'])
         area = (fb['pct'] / 100.0) * location['area']
         fc = FuelConsumptionForEmissions(fb["consumption"], fb['heat'],
-            area, burn_type, fb['fccs_id'], location,
+            area, burn_type, fb['fccs_id'], season, location,
             fccs_file=fuel_loadings_csv_filename)
 
         e_fuel_loadings = self.fuel_loadings_manager.get_fuel_loadings(

@@ -318,7 +318,7 @@ CONSUME_FIELDS = ["flaming", "smoldering", "residual", "total"]
 
 class FuelConsumptionForEmissions(consume.FuelConsumption):
     def __init__(self, consumption_data, heat_data, area, burn_type, fccs_id,
-            location, fccs_file=None):
+            season, location, fccs_file=None):
         fccs_file = fccs_file or ""
         super(FuelConsumptionForEmissions, self).__init__(fccs_file=fccs_file)
 
@@ -330,6 +330,7 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
 
         # self._set_consumption_data(consumption_data)
         # self._set_heat_data(heat_data)
+        self.season = season
         self.burn_type = burn_type
         self.fuelbed_fccs_ids = [fccs_id]
         self.fuelbed_area_acres = [area]
