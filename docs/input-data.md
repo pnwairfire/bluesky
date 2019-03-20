@@ -145,6 +145,7 @@ TODO: fill in this section...
  - ***'fire_information' > 'growth' > 'location' > 'ecoregion'*** -- *required*
  - ***'fire_information' > 'growth' > 'location' > 'fuel_moisture_1000hr_pct'*** -- *optional* -- default: 50
  - ***'fire_information' > 'growth' > 'location' > 'fuel_moisture_duff_pct'*** -- *optional* -- default: 50
+ - ***'fire_information' > 'growth' > 'location' > 'fuel_moisture_litter_pct'*** -- *optional* -- default: 50
  - ***'fire_information' > 'growth' > 'location' > 'canopy_consumption_pct'*** -- *optional* -- default: 0
  - ***'fire_information' > 'growth' > 'location' > 'shrub_blackened_pct'*** -- *optional* -- default: 50
  - ***'fire_information' > 'growth' > 'location' > 'output_units'*** -- *optional* -- default: "tons_ac"
