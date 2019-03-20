@@ -213,34 +213,34 @@ CONSUMPTION_OUTPUT_HEADER_TRANSLATIONS = {
     "c_squirrel": ["ground fuels", "squirrel middens", "total"]
 }
 EMISSIONS_OUTPUT_HEADER_TRANSLATIONS = {
-    "e_ch4": ["total", "CH4"],
-    "e_co": ["total", "CO"],
-    "e_co2": ["total", "CO2"],
-    "e_nmhc": ["total", "NMHC"],
-    "e_pm": ["total", "PM"],
-    "e_pm10": ["total", "PM10"],
-    "e_pm25": ["total", "PM2.5"],
-    "e_ch4_F": ["flaming", "CH4"],
-    "e_co_F": ["flaming", "CO"],
-    "e_co2_F": ["flaming", "CO2"],
-    "e_nmhc_F": ["flaming", "NMHC"],
-    "e_pm_F": ["flaming", "PM"],
-    "e_pm10_F": ["flaming", "PM10"],
-    "e_pm25_F": ["flaming", "PM2.5"],
-    "e_ch4_S": ["smoldering", "CH4"],
-    "e_co_S": ["smoldering", "CO"],
-    "e_co2_S": ["smoldering", "CO2"],
-    "e_nmhc_S": ["smoldering", "NMHC"],
-    "e_pm_S": ["smoldering", "PM"],
-    "e_pm10_S": ["smoldering", "PM10"],
-    "e_pm25_S": ["smoldering", "PM2.5"],
-    "e_ch4_R": ["residual", "CH4"],
-    "e_co_R": ["residual", "CO"],
-    "e_co2_R": ["residual", "CO2"],
-    "e_nmhc_R": ["residual", "NMHC"],
-    "e_pm_R": ["residual", "PM"],
-    "e_pm10_R": ["residual", "PM10"],
-    "e_pm25_R": ["residual", "PM2.5"]
+    "ch4": ["total", "CH4"],
+    "co": ["total", "CO"],
+    "co2": ["total", "CO2"],
+    "nmhc": ["total", "NMHC"],
+    "pm": ["total", "PM"],
+    "pm10": ["total", "PM10"],
+    "pm25": ["total", "PM2.5"],
+    "ch4_F": ["flaming", "CH4"],
+    "co_F": ["flaming", "CO"],
+    "co2_F": ["flaming", "CO2"],
+    "nmhc_F": ["flaming", "NMHC"],
+    "pm_F": ["flaming", "PM"],
+    "pm10_F": ["flaming", "PM10"],
+    "pm25_F": ["flaming", "PM2.5"],
+    "ch4_S": ["smoldering", "CH4"],
+    "co_S": ["smoldering", "CO"],
+    "co2_S": ["smoldering", "CO2"],
+    "nmhc_S": ["smoldering", "NMHC"],
+    "pm_S": ["smoldering", "PM"],
+    "pm10_S": ["smoldering", "PM10"],
+    "pm25_S": ["smoldering", "PM2.5"],
+    "ch4_R": ["residual", "CH4"],
+    "co_R": ["residual", "CO"],
+    "co2_R": ["residual", "CO2"],
+    "nmhc_R": ["residual", "NMHC"],
+    "pm_R": ["residual", "PM"],
+    "pm10_R": ["residual", "PM10"],
+    "pm25_R": ["residual", "PM2.5"]
 }
 EMISSIONS_DETAILS_OUTPUT_HEADER_TRANSLATIONS = {
     "ch4_canopy": ["summary", "canopy", "total", "CH4"],
@@ -287,10 +287,10 @@ EMISSIONS_DETAILS_OUTPUT_HEADER_TRANSLATIONS = {
     "pm25_ground": ["summary", "ground fuels", "total", "PM2.5"]
 }
 HEAT_OUTPUT_HEADER_TRANSLATIONS = {
-    "head_total": "total",
-    "head_flaming": "flaming",
-    "head_smoldering": "smoldering",
-    "head_residual": "residual"
+    "heat_total": "total",
+    "heat_flaming": "flaming",
+    "heat_smoldering": "smoldering",
+    "heat_residual": "residual"
 }
 def load_output(input_filename):
     # Consumption + emissions by fuelbed and fuel category
