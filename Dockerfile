@@ -84,7 +84,7 @@ RUN apt-get install -y \
 #   likelyhood of upgrade
 RUN pip3 install Fiona==1.7.2
 RUN pip3 install \
-    --extra-index https://pypi.airfire.org/simple apps-consume==5.0.1
+    --extra-index https://pypi.airfire.org/simple apps-consume==5.0.2
 RUN pip3 install \
     --extra-index https://pypi.airfire.org/simple blueskykml==2.4.2
 
