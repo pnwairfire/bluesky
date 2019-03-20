@@ -143,6 +143,7 @@ def season_from_date(date_obj):
     # TODO: should we have more sophisticated logic, or
     #    location-specific season date ranges
     if date_obj:
+        date_obj = parse_datetime(date_obj)
         l = int(calendar.isleap(date_obj.year))
         doy = int(date_obj.strftime('%j'))
         return next(season for season, e in SEASON_END_DATES if doy <= e + l)
