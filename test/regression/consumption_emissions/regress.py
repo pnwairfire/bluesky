@@ -351,11 +351,12 @@ def load_output(input_filename, args):
         p = PHASE_TRANSLATIONS[r.pop('Phase')]
         expected_totals['emissions'][p] = {
             k.upper(): [float(v)] for k, v in r.items()
+
         }
 
     return expected_partials, expected_totals
 
-def check_value(counts, counts_key, actual, expected, *keys):
+def check_value(counts, counts_key, actual, expected, *keys, precision=2):
     for k in keys[:-1]:
         actual = actual.get(k, {})
         expected = expected.get(k, {})
@@ -364,7 +365,7 @@ def check_value(counts, counts_key, actual, expected, *keys):
     actual = actual.get(keys[-1])
     if actual:
         # consume rounds to 2 decimal points before writing csv
-        actual = numpy.round(actual, 2)
+        actual = numpy.round(actual, precision)
     expected = expected.get(keys[-1])
     # TODO: check equality with allowable difference instead of just '=='
     log_args = ("%s - %s: actual vs. expected (%s): %s vs %s", counts_key.upper(),
@@ -424,7 +425,7 @@ def check(actual, expected_partials, expected_totals):
     for phase in expected_totals['emissions']:
         for species in expected_totals['emissions'][phase]:
             check_value(counts, 'totals', actual['summary'], expected_totals,
-                'emissions', phase, species)
+                'emissions', phase, species, precision=3)
 
     success = True
     logging.info('Final counts')
