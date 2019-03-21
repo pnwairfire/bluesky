@@ -107,9 +107,10 @@ def _run_fuelbed(fb, fuel_loadings_manager, season, location, burn_type, msg_lev
     # for the rest
     # Note: consume expects area, but disregards it when computing
     #  consumption values - it produces tons per unit area (acre?), not
-    #  total tons; the consumption values will be multiplied by area, below
+    #  total tons; so, to avoid confution, just set it to 1 and
+    #  then correct the consumption values by multiplying by area, below
     area = (fb['pct'] / 100.0) * location['area']
-    fc.fuelbed_area_acres = [area]
+    fc.fuelbed_area_acres = [1] # see see note,above
     fc.fuelbed_ecoregion = [location['ecoregion']]
 
     _apply_settings(fc, location, burn_type)

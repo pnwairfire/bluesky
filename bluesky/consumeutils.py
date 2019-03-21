@@ -92,7 +92,16 @@ SETTINGS = {
         },
         {
             'field': 'output_units',
-            'default': "tons_ac"  # default in consume package is 'tons_ac'
+            # The default in the consume package is 'tons_ac'. When we tried
+            # setting it to 'tons' here, it still ended up being 'tons_ac' in
+            # the consumption results.  So, just set it to 'tons_ac' to avoid
+            # confusion.
+            # (We ultimately want tons, and so we end up multiplying by
+            # acreage to get it.  It would be nice if setting output_units to
+            # tons worked.)
+            # Note that setting output_units='tons' does behave as expected
+            # when computing emissions.
+            'default': "tons_ac"
         },
         {
             'field': 'pile_blackened_pct',
