@@ -62,7 +62,10 @@ OPTIONAL_ARGS = [
 ]
 
 EXAMPLES_STR = """
-"""
+Example:
+
+{script} --data-dir consume_consume --log-level=DEBUG --include-emissions-details
+ """.format(script=sys.argv[0])
 
 BASE_FIRE = {
     "event_of": {
