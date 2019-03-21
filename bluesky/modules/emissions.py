@@ -294,11 +294,6 @@ class Consume(EmissionsBase):
         e.output_units = 'tons'
 
         r = e.results()['emissions']
-        #correction_factor = 1
-        # if e.output_units in ('lbs_ac', 'tons_ac'):
-        #     correction_factor = area
-        #     if e.output_units == 'lbs_ac':
-        #         correction_factor *= TONS_PER_POUND
 
         fb['emissions'] = {f: {} for f in CONSUME_FIELDS}
         # r's key hierarchy is species > phase; we want phase > species
@@ -307,7 +302,6 @@ class Consume(EmissionsBase):
             if k != 'stratum' and (not self.species or upper_k in self.species):
                 for p in r[k]:
                     fb['emissions'][p][upper_k] = r[k][p]
-        #datautils.multiply_nested_data(fb['emissions'], correction_factor)
 
         if self.include_emissions_details:
             # Note: consume gives details per fuel category, not per
@@ -326,7 +320,6 @@ class Consume(EmissionsBase):
                         for p in r['stratum'][k][c]:
                             fb['emissions_details']['summary'][c][p] = fb['emissions_details']['summary'][c].get(p, {})
                             fb['emissions_details']['summary'][c][p][upper_k] = r['stratum'][k][c][p]
-            #datautils.multiply_nested_data(fb['emissions_details'], correction_factor)
 
         # Note: We don't need to call
         #   datautils.multiply_nested_data(fb["emissions"], area)
