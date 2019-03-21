@@ -463,6 +463,33 @@ def run(args):
         success = success and check(actual, expected_partials, expected_totals)
     return success
 
+def add_coloring_to_emit_ansi(fn):
+    # add methods we need to the class
+    def new(*args):
+        levelno = args[1].levelno
+        if(levelno>=50): # FATAL
+            color = '\x1b[31m' # red
+        elif(levelno>=40): # ERROR
+            color = '\x1b[31m' # red
+        elif(levelno>=30): # WARNING
+            color = '\x1b[33m' # yellow
+        # elif(levelno>=20): # INFO
+        #     color = '\x1b[32m' # green
+        # elif(levelno>=10): # DEBUG
+        #     color = '\x1b[35m' # pink
+        else:
+            color = '\x1b[0m' # normal
+        args[1].msg = color + args[1].msg +  '\x1b[0m'  # normal
+        #print "after"
+        return fn(*args)
+    return new
+
+def set_logging_color(args):
+    if not args.log_file:
+        logging.StreamHandler.emit = add_coloring_to_emit_ansi(
+            logging.StreamHandler.emit)
+
+
 if __name__ == "__main__":
     parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
         epilog=EXAMPLES_STR)
@@ -470,6 +497,7 @@ if __name__ == "__main__":
         logging.error("Invalid data directory: %s", args.data_dir)
         sys.exit(1)
 
+    set_logging_color(args)
     try:
         success = run(args)
 
