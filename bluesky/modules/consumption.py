@@ -9,7 +9,9 @@ import consume
 
 from bluesky.config import Config
 from bluesky import datautils, datetimeutils
-from bluesky.consumeutils import _apply_settings, FuelLoadingsManager
+from bluesky.consumeutils import (
+    _apply_settings, FuelLoadingsManager, CONSUME_VERSION_STR
+)
 from bluesky import exceptions
 from bluesky.locationutils import LatLng
 
@@ -33,7 +35,7 @@ def run(fires_manager):
     #  or
     #   $ pip3 show apps-consume4|grep "^Version:"
     fires_manager.processed(__name__, __version__,
-        consume_version="5.0.1")
+        consume_version=CONSUME_VERSION_STR)
 
     # TODO: get msg_level and burn_type from fires_manager's config
     msg_level = 2  # 1 => fewest messages; 3 => most messages

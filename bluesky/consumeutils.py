@@ -16,8 +16,18 @@ from bluesky.exceptions import BlueSkyConfigurationError
 __all__ = [
     "_apply_settings",
     "FuelLoadingsManager",
-    "FuelConsumptionForEmissions"
+    "FuelConsumptionForEmissions",
+    "CONSUME_FIELDS",
+    "CONSUME_VERSION_STR"
 ]
+
+CONSUME_VERSION_STR = '.'.join([
+    str(v) for v in [
+        consume.version.MAJOR_VERSION,
+        consume.version.MINOR_VERSION,
+        consume.version.PYPI_BUILD_REVISION
+    ]
+])
 
 # TODO: These burn-type pecific settings sets might not be correct
 # TODO: Check with Susan P, Susan O, Kjell, etc. to make sure defaults are correct
