@@ -288,9 +288,6 @@ class Consume(EmissionsBase):
             fb['fccs_id'], fc.FCCS)
         fb['emissions_fuel_loadings'] = e_fuel_loadings
         e = consume.Emissions(fuel_consumption_object=fc)
-        # consume returns the same emissions results whether the output units
-        # is set to 'tons_ac' or 'tons'.  So, to avoid confusion, set to
-        # tons_ac and correct area below
         e.output_units = 'tons'
 
         r = e.results()['emissions']
