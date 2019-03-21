@@ -21,7 +21,8 @@ from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 
 from bluesky.consumeutils import (
-    _apply_settings, FuelLoadingsManager, FuelConsumptionForEmissions, CONSUME_FIELDS
+    _apply_settings, FuelLoadingsManager, FuelConsumptionForEmissions,
+    CONSUME_FIELDS, CONSUME_VERSION_STR
 )
 
 __all__ = [
@@ -51,7 +52,8 @@ def run(fires_manager):
     include_emissions_details = Config.get(
         'emissions', 'include_emissions_details')
     fires_manager.processed(__name__, __version__, model=model,
-        emitcalc_version=emitcalc_version, eflookup_version=eflookup_version)
+        emitcalc_version=emitcalc_version, eflookup_version=eflookup_version,
+        consume_version=CONSUME_VERSION_STR)
 
     try:
         klass_name = ''.join([e.capitalize() for e in model.split('-')])
