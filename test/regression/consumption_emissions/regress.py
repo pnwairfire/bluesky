@@ -459,7 +459,7 @@ def run(args):
         fires_manager.run()
         actual = fires_manager.dump()
         expected_partials, expected_totals = load_output(
-            input_filename)
+            input_filename, args)
         success = success and check(actual, expected_partials, expected_totals)
     return success
 
