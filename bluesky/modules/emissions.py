@@ -216,8 +216,6 @@ class PrichardOneill(EmissionsBase):
 ## CONSUME
 ##
 
-LBS_PER_TON = 2000
-
 class Consume(EmissionsBase):
 
     def __init__(self, fire_failure_handler):
@@ -279,6 +277,8 @@ class Consume(EmissionsBase):
 
         fuel_loadings_csv_filename = self.fuel_loadings_manager.generate_custom_csv(
              fb['fccs_id'])
+        # unlike with consume consumption results, emissions results reflect
+        # how you set area and output_units
         area = (fb['pct'] / 100.0) * location['area']
         fc = FuelConsumptionForEmissions(fb["consumption"], fb['heat'],
             area, burn_type, fb['fccs_id'], season, location,
@@ -288,15 +288,27 @@ class Consume(EmissionsBase):
             fb['fccs_id'], fc.FCCS)
         fb['emissions_fuel_loadings'] = e_fuel_loadings
         e = consume.Emissions(fuel_consumption_object=fc)
+        # consume returns the same emissions results whether the output units
+        # is set to 'tons_ac' or 'tons'.  So, to avoid confusion, set to
+        # tons_ac and correct area below
+        e.output_units = 'tons'
 
         r = e.results()['emissions']
+        #correction_factor = 1
+        # if e.output_units in ('lbs_ac', 'tons_ac'):
+        #     correction_factor = area
+        #     if e.output_units == 'lbs_ac':
+        #         correction_factor *= TONS_PER_POUND
+
         fb['emissions'] = {f: {} for f in CONSUME_FIELDS}
         # r's key hierarchy is species > phase; we want phase > species
         for k in r:
             upper_k = 'PM2.5' if k == 'pm25' else k.upper()
             if k != 'stratum' and (not self.species or upper_k in self.species):
                 for p in r[k]:
-                    fb['emissions'][p][upper_k] = r[k][p] / LBS_PER_TON
+                    fb['emissions'][p][upper_k] = r[k][p]
+        #datautils.multiply_nested_data(fb['emissions'], correction_factor)
+
         if self.include_emissions_details:
             # Note: consume gives details per fuel category, not per
             #  subcategory; to match what FEPS and Prichard/O'Neill calculators
@@ -313,7 +325,8 @@ class Consume(EmissionsBase):
                         fb['emissions_details']['summary'][c] = fb['emissions_details']['summary'].get(c, {})
                         for p in r['stratum'][k][c]:
                             fb['emissions_details']['summary'][c][p] = fb['emissions_details']['summary'][c].get(p, {})
-                            fb['emissions_details']['summary'][c][p][upper_k] = r['stratum'][k][c][p] / LBS_PER_TON
+                            fb['emissions_details']['summary'][c][p][upper_k] = r['stratum'][k][c][p]
+            #datautils.multiply_nested_data(fb['emissions_details'], correction_factor)
 
         # Note: We don't need to call
         #   datautils.multiply_nested_data(fb["emissions"], area)

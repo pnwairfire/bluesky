@@ -25,7 +25,7 @@ import numpy
 # to allow breaking into the code (with pdb)
 from bluesky import models
 from bluesky.config import Config
-from bluesky.modules.emissions import LBS_PER_TON
+from bluesky.modules.emissions import TONS_PER_POUND
 
 # TODO: rename this script
 
@@ -320,7 +320,7 @@ def load_output(input_filename, args):
                 fb_e[p][s] = [float(r[k])]
                 if args.emissions_model == "consume":
                     # emissions in consume output file are in lbs instead of tons
-                    fb_e[p][s][0] = numpy.round(fb_e[p][s][0] / LBS_PER_TON, 2)
+                    fb_e[p][s][0] = numpy.round(fb_e[p][s][0] * TONS_PER_POUND, 2)
             elif k in EMISSIONS_DETAILS_OUTPUT_HEADER_TRANSLATIONS:
                 a, b, c, d = EMISSIONS_DETAILS_OUTPUT_HEADER_TRANSLATIONS[k]
                 fb_ed[a] = fb_ed.get(a, {})
@@ -330,7 +330,7 @@ def load_output(input_filename, args):
                 if args.emissions_model == "consume":
                     # emissions in consume output file are in lbs instead of tons
                     fb_ed[a][b][c][d][0] = numpy.round(
-                        fb_ed[a][b][c][d][0] / LBS_PER_TON, 2)
+                        fb_ed[a][b][c][d][0] * TONS_PER_POUND, 2)
 
         fccs_id = r['fuelbeds']
         expected_partials[fccs_id] = {
