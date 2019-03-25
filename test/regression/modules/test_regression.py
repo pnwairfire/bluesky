@@ -41,7 +41,7 @@ REQUIRED_ARGS = [
 
 OPTIONAL_ARGS = [
     {
-        'short': '-module',
+        'short': '-m',
         'long': '--module',
         'help': 'options "{}"'.format(" or ".join(MODULES))
     }
