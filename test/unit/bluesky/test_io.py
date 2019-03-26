@@ -260,6 +260,7 @@ class TestCaptureStdout(object):
 
     def test(self):
         with io.capture_stdout() as stdout_buffer:
+            assert sys.stdout == stdout_buffer
             assert "" == stdout_buffer.read()
             print("sdf")
             stdout_buffer.seek(0)
@@ -267,3 +268,6 @@ class TestCaptureStdout(object):
             sys.stdout.write("322342")
             stdout_buffer.seek(0)
             assert "sdf\n322342" == stdout_buffer.read()
+            assert sys.stdout == stdout_buffer
+        assert sys.stdout != stdout_buffer
+        assert sys.stdout == sys.__stdout__
