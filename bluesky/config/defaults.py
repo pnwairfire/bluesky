@@ -99,6 +99,9 @@ _DEFAULTS = {
         "default_ecoregion": None,
         "ecoregion_lookup_implemenation": "ogr",
         "consume_settings": {
+            # TODO: Confirm with Susan P, Susan O. to confirm that these
+            #    burn-type specific settings (defaults and synonyms) are
+            #    correct, and that none are missing
             'natural': {},
             'activity': {
                 'slope': {

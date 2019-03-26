@@ -119,8 +119,27 @@ configuration json data are case-insensitive.***
 ##### consumption
 
  - ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
-  - ***'config' > 'consumption' > 'default_ecoregion'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
-  - ***'config' > 'consumption' > 'ecoregion_lookup_implemenation'*** -- *optional* -- default 'ogr'
+ - ***'config' > 'consumption' > 'default_ecoregion'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
+ - ***'config' > 'consumption' > 'ecoregion_lookup_implemenation'*** -- *optional* -- default 'ogr'
+
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'slope' > 'default'*** -- *optional* -- percent, from 1 to 100; default 5
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'windspeed' > 'default'*** -- *optional* -- default 5G
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'days_since_rain' > 'default'*** -- *optional* -- 10,   # our defaultG
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'days_since_rain' > 'synonyms'*** -- *optional* -- default ['rain_days']G
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fuel_moisture_10hr_pct' > 'default'*** -- *optional* -- default 50G
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fuel_moisture_10hr_pct' > 'synonyms'*** -- *optional* -- default ['moisture_10hr']G
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'length_of_ignition' > 'default'*** -- *optional* -- in minutes; default 120G
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fm_type' > 'default'*** -- *optional* -- defailt "MEAS-Th"G
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_1000hr_pct' > 'default'*** -- *optional* -- default 50G
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_1000hr_pct' > 'synonyms'*** -- *optional* -- default ['moisture_1khr']G
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_duff_pct' > 'default'*** -- *optional* -- default 50G
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_duff_pct' > 'synonyms'*** -- *optional* -- default ['moisture_duff']G
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_litter_pct' > 'default'*** -- *optional* -- default 30G
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_litter_pct' > 'synonyms'*** -- *optional* -- default ['moisture_litter']G
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'canopy_consumption_pct' > 'default'*** -- *optional* -- default 0G
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'shrub_blackened_pct' > 'default'*** -- *optional* -- default 50G
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'output_units' > 'default'*** -- *optional* -- default "tons_ac"G
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'pile_blackened_pct' > 'default'*** -- *optional* -- default 0
 
 ##### emissions
 
