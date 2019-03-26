@@ -99,64 +99,52 @@ _DEFAULTS = {
         "default_ecoregion": None,
         "ecoregion_lookup_implemenation": "ogr",
         "consume_settings": {
-            'natural': [],
-            'activity': [
-                {
-                    'field': 'slope',
+            'natural': {},
+            'activity': {
+                'slope': {
                     'default': 5 # percent, from 1 to 100; default from consume package
                 },
-                {
-                    'field': 'windspeed',
+                'windspeed': {
                     'default': 5,  # default from consume package
                     # TODO: is 'max_wind' a valid synonym? or 'min_wind_aloft'?
                 },
-                {
-                    'field': 'days_since_rain',
+                'days_since_rain': {
                     'default': 10,   # our default
                     'synonyms': ['rain_days'] # TODO: confirm
                 },
-                {
-                    'field': 'fuel_moisture_10hr_pct',
+                'fuel_moisture_10hr_pct': {
                     'default': 50, # default from consume package
                     'synonyms': ['moisture_10hr'] # TODO: confirm
                 },
-                {
-                    'field': 'length_of_ignition',
+                'length_of_ignition': {
                     'default': 120 # in minutes; our default
                 },
-                {
-                    'field': 'fm_type',
+                'fm_type': {
                     'default': "MEAS-Th" # default from consume package
                 }
-            ],
-            'all': [
-                {
-                    'field': 'fuel_moisture_1000hr_pct',
+            },
+            'all': {
+                'fuel_moisture_1000hr_pct': {
                     'default': 50, # default from consume package
                     'synonyms': ['moisture_1khr'] # TODO: confirm
                 },
-                {
-                    'field': 'fuel_moisture_duff_pct',
+                'fuel_moisture_duff_pct': {
                     'default': 50, # default from consume package
                     'synonyms': ['moisture_duff'] # TODO: confirm
                 },
-                {
-                    'field': 'fuel_moisture_litter_pct',
+                'fuel_moisture_litter_pct': {
                     'default': 30,
                     'synonyms': ['moisture_litter'] # TODO: confirm
                 },
-                {
-                    'field': 'canopy_consumption_pct',
+                'canopy_consumption_pct': {
                     'default': 0,
                     # TDOO: is 'canopy' a valid synonym
                 },
-                {
-                    'field': 'shrub_blackened_pct',
+                'shrub_blackened_pct': {
                     'default': 50,
                     # TODO: is 'shrub' a valid synonym
                 },
-                {
-                    'field': 'output_units',
+                'output_units': {
                     # The default in the consume package is 'tons_ac'. When we tried
                     # setting it to 'tons' here, it still ended up being 'tons_ac' in
                     # the consumption results.  So, just set it to 'tons_ac' to avoid
@@ -168,11 +156,10 @@ _DEFAULTS = {
                     # when computing emissions.
                     'default': "tons_ac"
                 },
-                {
-                    'field': 'pile_blackened_pct',
+                'pile_blackened_pct': {
                     'default': 0
                 },
-            ]
+            }
         }
     },
     "emissions": {

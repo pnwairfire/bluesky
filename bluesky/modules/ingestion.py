@@ -231,8 +231,8 @@ OPTIONAL_LOCATION_FIELDS = [
     # Other SF2 fields are mentioned in a TODO, below
 ]
 for a in list(consumeutils.SETTINGS.values()):
-    for b in a:
-        OPTIONAL_LOCATION_FIELDS.append(b['field'])
+    for field, b in a.items():
+        OPTIONAL_LOCATION_FIELDS.append(field)
         if 'synonyms' in b:
             OPTIONAL_LOCATION_FIELDS.extend(b['synonyms'])
 # remove dupes

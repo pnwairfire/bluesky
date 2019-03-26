@@ -38,19 +38,19 @@ CONSUME_VERSION_STR = '.'.join([
 SETTINGS = Config.get('consumption', 'consume_settings')
 
 def _apply_settings(fc, location, burn_type):
-    valid_settings = SETTINGS[burn_type] + SETTINGS['all']
-    for d in valid_settings:
-        possible_name = [d['field']] + d.get('synonyms', [])
+    valid_settings = dict(SETTINGS[burn_type], **SETTINGS['all'])
+    for field, d in valid_settings.items():
+        possible_name = [field] + d.get('synonyms', [])
         defined_fields = [f for f in possible_name if f in location]
         if defined_fields:
             # use first of defined fields - it's not likely that
             # len(defined_fields) > 1
-            setattr(fc, d['field'], location[defined_fields[0]])
+            setattr(fc, field, location[defined_fields[0]])
         elif 'default' in d:
-            setattr(fc, d['field'], d['default'])
+            setattr(fc, field, d['default'])
         else:
             raise BlueSkyConfigurationError("Specify {} for {} burns".format(
-                d['field'], burn_type))
+                field, burn_type))
 
 class FuelLoadingsManager(object):
 
