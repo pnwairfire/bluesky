@@ -3,8 +3,10 @@
 __author__ = "Joel Dubowy"
 
 import logging
+import io
 import os
 import shutil
+import sys
 import time
 
 from pyairfire.io import *
@@ -15,7 +17,8 @@ from bluesky.exceptions import (
 
 __all__ = [
     "create_dir_or_handle_existing",
-    "wait_for_availability"
+    "wait_for_availability",
+    "capture_stdout"
 ]
 
 def create_dir_or_handle_existing(dir_to_create, handle_existing):
@@ -114,3 +117,34 @@ def wait_for_availability(config):
             return f
 
     return decorator
+
+
+class capture_stdout(object):
+    """Context manager that redirects stdout to a stringIO buffer
+
+    Note: could also write to dev null like:
+
+        with open(os.devnull,"w") as devnull:
+            sys.stdout = devnull
+            ...
+
+    but then we'd lose the output.
+
+    TODO: make wirting to devnull an option, for situations
+    where there is a large amount of output.
+
+    TODO: move this to pyairfire.io
+    """
+
+    def __init__(self):
+        self._buffer = io.StringIO()
+
+    def __enter__(self):
+        logging.debug("Capturing stdout")
+        sys.stdout = self._buffer
+
+    def __exit__(self, e_type, value, tb):
+        sys.stdout = sys.__stdout__
+        if e_type:
+            self._fire['error'] = str(value)
+        return True # return true even if there's an error

@@ -4,7 +4,6 @@ __author__ = "Joel Dubowy"
 
 import abc
 import copy
-import io
 import itertools
 import logging
 import sys
@@ -20,6 +19,7 @@ import consume
 from bluesky import datautils, datetimeutils
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
+from bluesky.io import capture_stdout
 
 from bluesky.consumeutils import (
     _apply_settings, FuelLoadingsManager, FuelConsumptionForEmissions,
@@ -293,16 +293,9 @@ class Consume(EmissionsBase):
 
         # Consume emissions prints out lines like
         #    Converting units: tons_ac -> tons
-        # We'll redirect stdout to a stringIO buffer while
-        # consume runs, and ignore the output
-        # Note: could also write to dev null like:
-        #   with open(os.devnull,"w") as devnull:
-        #       sys.stdout = devnull
-        #       ...
-        logging.debug("Capturing consume emissions stdout")
-        sys.stdout = io.StringIO()
-        r = e.results()['emissions']
-        sys.stdout = sys.__stdout__
+        # which we want to capture and ifnore
+        with capture_stdout() as std_buffer:
+            r = e.results()['emissions']
 
         fb['emissions'] = {f: {} for f in CONSUME_FIELDS}
         # r's key hierarchy is species > phase; we want phase > species
