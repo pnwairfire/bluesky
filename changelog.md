@@ -14,4 +14,6 @@
   - deprecated FiresManager.config (getter and setter)
   - refactored run_id logic and store as FiresManager attr rather than in _meta dict
 - support building docker image with default user matching host user's UID and group id & added script to add user post-build
+
+## 4.1.1
 - upgrade consume package to v5
