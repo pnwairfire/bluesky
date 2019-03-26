@@ -137,14 +137,14 @@ class capture_stdout(object):
     """
 
     def __init__(self):
-        self._buffer = io.StringIO()
+        pass
 
     def __enter__(self):
+        self._buffer = io.StringIO()
         sys.stdout = self._buffer
         return self._buffer
 
     def __exit__(self, e_type, value, tb):
+        self._buffer.flush()
         sys.stdout = sys.__stdout__
-        if e_type:
-            self._fire['error'] = str(value)
-        return True # return true even if there's an error
+
