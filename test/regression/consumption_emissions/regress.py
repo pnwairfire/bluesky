@@ -371,10 +371,16 @@ def check_value(counts, counts_key, actual, expected, *keys, precision=2):
     log_args = ("%s - %s: actual vs. expected (%s): %s vs %s", counts_key.upper(),
         keys[0].upper(), ', '.join(keys[1:]), actual, expected)
     if valid_comparison:
+        logging_func = logging.debug
         match = actual == expected
+        if not match:
+            logging_func = logging.error
+            if numpy.round(actual, 1) == numpy.round(expected, 1):
+                logging_func = logging.warning
+                match = True
         counts[counts_key][keys[0]]['total'] += 1
         counts[counts_key][keys[0]]['matches'] += int(match)
-        (logging.debug if match else logging.error)(*log_args)
+        logging_func(*log_args)
     else:
         logging.debug(*log_args)
 
