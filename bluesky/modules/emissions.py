@@ -4,6 +4,7 @@ __author__ = "Joel Dubowy"
 
 import abc
 import copy
+import io
 import itertools
 import logging
 import sys
@@ -290,7 +291,14 @@ class Consume(EmissionsBase):
         e = consume.Emissions(fuel_consumption_object=fc)
         e.output_units = 'tons'
 
+        # Consume emissions prints out lines like
+        #    Converting units: tons_ac -> tons
+        # We'll redirect stdout to a stringIO buffer while
+        # consume runs, and ignore the output
+        logging.debug("Capturing consume emissions stdout")
+        sys.stdout = io.StringIO()
         r = e.results()['emissions']
+        sys.stdout = sys.__stdout__
 
         fb['emissions'] = {f: {} for f in CONSUME_FIELDS}
         # r's key hierarchy is species > phase; we want phase > species
