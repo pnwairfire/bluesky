@@ -30,12 +30,20 @@ CONSUME_VERSION_STR = '.'.join([
     ]
 ])
 
-# TODO: These burn-type pecific settings sets might not be correct
-# TODO: Check with Susan P, Susan O, Kjell, etc. to make sure defaults are correct
-# TODO: Check with Susan P, Susan O, Kjell, etc. to make sure sysnonyms are
-#  valid and to see if any are missing
-
 SETTINGS = Config.get('consumption', 'consume_settings')
+# User can configure output_units
+SETTINGS['all']['output_units'] = {
+    # The default in the consume package is 'tons_ac'. When we tried
+    # setting it to 'tons' here, it still ended up being 'tons_ac' in
+    # the consumption results.  So, just set it to 'tons_ac' to avoid
+    # confusion.
+    # (We ultimately want tons, and so we end up multiplying by
+    # acreage to get it.  It would be nice if setting output_units to
+    # tons worked.)
+    # Note that setting output_units='tons' does behave as expected
+    # when computing emissions.
+    'default': "tons_ac"
+}
 
 def _apply_settings(fc, location, burn_type):
     valid_settings = dict(SETTINGS[burn_type], **SETTINGS['all'])
