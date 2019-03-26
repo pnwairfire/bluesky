@@ -17,5 +17,5 @@ for i in `find /data/ -maxdepth 1 -path "*scen_*" ! -path "*out.csv" ! -path "*f
     python3 consume_batch.py -l 3 -o ${i}_out.csv natural $i.csv ;
     mv feps_emissions_input.csv /data/feps_input_em_`echo $i|sed -e 's/\/data\///g'`.csv;
 done
-exit
+exit # exit docker container
 ```
