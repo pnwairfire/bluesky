@@ -140,7 +140,6 @@ class capture_stdout(object):
         self._buffer = io.StringIO()
 
     def __enter__(self):
-        logging.debug("Capturing stdout")
         sys.stdout = self._buffer
 
     def __exit__(self, e_type, value, tb):
