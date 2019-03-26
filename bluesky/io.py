@@ -136,15 +136,13 @@ class capture_stdout(object):
     TODO: move this to pyairfire.io
     """
 
-    def __init__(self):
-        pass
-
     def __enter__(self):
-        self._buffer = io.StringIO()
-        sys.stdout = self._buffer
-        return self._buffer
+        sys.stdout = io.StringIO()
+        # returning sys.stdout isn't necessary, since user could
+        # just use a reference to sys.stdout directly, but it's for
+        # convenience and hopefully more intuitive usage
+        return sys.stdout
 
     def __exit__(self, e_type, value, tb):
-        self._buffer.flush()
         sys.stdout = sys.__stdout__
 
