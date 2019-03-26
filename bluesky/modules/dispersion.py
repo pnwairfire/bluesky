@@ -6,7 +6,6 @@ Executables. See the repo README.md for more information.
 
 __author__ = "Joel Dubowy"
 
-import consume
 import copy
 import datetime
 import importlib

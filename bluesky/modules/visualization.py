@@ -2,7 +2,6 @@
 
 __author__ = "Joel Dubowy"
 
-import consume
 import logging
 
 from bluesky.config import Config
