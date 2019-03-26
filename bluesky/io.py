@@ -141,6 +141,7 @@ class capture_stdout(object):
 
     def __enter__(self):
         sys.stdout = self._buffer
+        return self._buffer
 
     def __exit__(self, e_type, value, tb):
         sys.stdout = sys.__stdout__
