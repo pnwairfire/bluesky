@@ -295,6 +295,10 @@ class Consume(EmissionsBase):
         #    Converting units: tons_ac -> tons
         # We'll redirect stdout to a stringIO buffer while
         # consume runs, and ignore the output
+        # Note: could also write to dev null like:
+        #   with open(os.devnull,"w") as devnull:
+        #       sys.stdout = devnull
+        #       ...
         logging.debug("Capturing consume emissions stdout")
         sys.stdout = io.StringIO()
         r = e.results()['emissions']
