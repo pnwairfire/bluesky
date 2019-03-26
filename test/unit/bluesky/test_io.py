@@ -2,6 +2,7 @@
 
 __author__ = "Joel Dubowy"
 
+import sys
 import time
 
 from py.test import raises
@@ -253,3 +254,16 @@ class TestWaitForAvailabilityBackoff(TestWaitForAvailabilityBase):
         assert self.counter == 1
         assert self.sleepcount == 0
         assert self.total_sleep == 0.0
+
+
+class TestCaptureStdout(object):
+
+    def test(self):
+        with io.capture_stdout() as stdout_buffer:
+            assert "" == stdout_buffer.read()
+            print("sdf")
+            stdout_buffer.seek(0)
+            assert "sdf\n" == stdout_buffer.read()
+            sys.stdout.write("322342")
+            stdout_buffer.seek(0)
+            assert "sdf\n322342" == stdout_buffer.read()
