@@ -3,6 +3,7 @@
 import argparse
 import datetime
 import json
+import logging
 import os
 import subprocess
 import sys
@@ -32,12 +33,21 @@ FCCS_IDS = [
     1280, 1281, 1290, 1291, 1292, 1293, 1294, 1295, 1296, 1297, 1298, 1299,
 ]
 
+# TODO: Get default coordinates from Susan
+DEFAULT_COORDINATES = [
+    (45.0,-119.0),(44.0,-118.0),
+]
+
 DEFAULT_AREA = 1000
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-m', '--mode', required=True,
+        help="'coordinates' or 'fccs-ids'")
     parser.add_argument('-i', '--fccs-ids',
         help="comma-dilimited list of fccs ids to run")
+    parser.add_argument('--coordinates',
+        help="semi-colon-dilimited list of coordinages; e.g. '45,-123;33,-119'")
     parser.add_argument('-t', '--fire-type', default="wf",
         help="'wf' or 'rx'; default 'wf'")
     parser.add_argument('-a', '--area', default=DEFAULT_AREA,
@@ -54,21 +64,103 @@ def parse_args():
     parser.add_argument('--run-through-plumerise', action="store_true")
     parser.add_argument('--log-level', default="INFO", help="Log level")
 
+    args = parser.parse_args()
 
-    return parser.parse_args()
+    logging.basicConfig(level=getattr(logging, args.log_level),
+        format='%(asctime)s %(levelname)s: %(message)s')
+
+    logging.info(" Args:")
+    for k,v in args.__dict__.items():
+        if k in ('fccs_ids', 'coordinates'):
+            logging.info("   %s: %s", k, v and v[:50])
+        else:
+            logging.info("   %s: %s", k, v)
+
+    return args
+
+def get_fccs_ids_fire_information(args, times):
+    fccs_ids = ([i.strip() for i in args.fccs_ids.split(',')]
+        if args.fccs_ids else FCCS_IDS)
+    fires = []
+    for fccs_id in fccs_ids:
+        fires.append({
+            "type": args.fire_type,
+            "growth": [
+                {
+                    "location": {
+                        "longitude": -120.5906549, #-119.7615805,
+                        "ecoregion": args.ecoregion,
+                        "utc_offset": "-07:00",
+                        "latitude": 39.0704668, #37.909644,
+                        "area": args.area
+                    },
+                    "fuelbeds":[
+                        {
+                            "pct": 100.0,
+                            "fccs_id": str(fccs_id)
+                        }
+                    ],
+                    "start": times['start'],
+                    "end": times['end']
+                }
+            ]
+        })
+    return fires
+
+def get_coordinates_fire_information(args):
+    coordinates = ([[float(y.strip()) for y in x.split(',')] for x in args.coordinates.split(';')]
+        if args.coordinates else DEFAULT_COORDINATES)
+    fires = []
+    for lat, lng in coordinates:
+        fires.append({
+            "type": args.fire_type,
+            "growth": [
+                {
+                    "location": {
+                        "latitude": lat,
+                        "longitude": lng,
+                        "ecoregion": args.ecoregion,
+                        "utc_offset": "-07:00",
+                        "area": args.area
+                    },
+                    "start": times['start'],
+                    "end": times['end']
+                }
+            ]
+        })
+    return fires
+
+MODES = {
+    'fccs-ids': get_fccs_ids_fire_information,
+    'coordinates': get_coordinates_fire_information
+}
+
+def get_times():
+    today = datetime.date.today()
+    return {
+        "start": today.strftime('%Y-%m-%dT%H:%M:%SZ'),
+        "end": (today + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
+    }
 
 def main():
     args = parse_args()
-    fccs_ids = ([i.strip() for i in args.fccs_ids.split(',')]
-        if args.fccs_ids else FCCS_IDS)
+    if args.mode not in MODES:
+        print("\n*** ERROR: -m/--mode must be one of '{}'\n".format(
+            "', '".join(MODES.keys())))
+        sys.exit(1)
+
+    times = get_times()
 
     input_data = {
         "run_id": ("one-fire-per-fccsid-" +
             datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')),
-        "fire_information": []
+        "fire_information": MODES[args.mode](args, times)
     }
     config = {
         "config": {
+            "fuelbeds": {
+                "no_sampling": True
+            },
             "emissions": {
                 "model": "prichard-oneill"
             },
@@ -92,32 +184,7 @@ def main():
             }
         }
     }
-    today = datetime.date.today()
-    start = today.strftime('%Y-%m-%dT%H:%M:%SZ')
-    end = (today + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
-    for fccs_id in fccs_ids:
-        input_data['fire_information'].append({
-            "type": args.fire_type,
-            "growth": [
-                {
-                    "location": {
-                        "longitude": -120.5906549, #-119.7615805,
-                        "ecoregion": args.ecoregion,
-                        "utc_offset": "-07:00",
-                        "latitude": 39.0704668, #37.909644,
-                        "area": args.area
-                    },
-                    "fuelbeds":[
-                        {
-                            "pct": 100.0,
-                            "fccs_id": str(fccs_id)
-                        }
-                    ],
-                    "start": start,
-                    "end": end
-                }
-            ]
-        })
+
     if not os.path.exists('tmp/run-all-fuelbeds/' + input_data['run_id']):
         os.makedirs('tmp/run-all-fuelbeds/' + input_data['run_id'])
     with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '/input.json', 'w') as f:
@@ -133,10 +200,15 @@ def main():
             " -e PATH=/code/bin/:$PATH")
 
     cmd += (" bluesky bsp --log-level=" + args.log_level
+        + " --log-file " + '/data/' + input_data['run_id'] + "/output.log"
         + " -c /data/" + input_data['run_id'] + "/config.json"
         + " -i /data/" + input_data['run_id'] + "/input.json"
-        + " -o /data/" + input_data['run_id'] + "/output.json"
-        + " consumption emissions")
+        + " -o /data/" + input_data['run_id'] + "/output.json")
+
+    if args.mode == 'coordinates':
+        cmd += fuelbeds
+
+    cmd += " consumption emissions"
 
     if args.produce_emissions_csv or args.run_through_plumerise:
         cmd += " timeprofiling"
@@ -144,6 +216,10 @@ def main():
         cmd += " plumerising"
 
     cmd += " extrafiles"
+
+    logging.info("Running command: " + cmd)
+    logging.info("Log file: %s", 'tmp/run-all-fuelbeds/'
+        + input_data['run_id'] + "/output.log")
 
     subprocess.run(cmd, shell=True, check=True)
 
