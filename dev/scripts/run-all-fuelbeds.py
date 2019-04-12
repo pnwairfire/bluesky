@@ -32,12 +32,16 @@ FCCS_IDS = [
     1280, 1281, 1290, 1291, 1292, 1293, 1294, 1295, 1296, 1297, 1298, 1299,
 ]
 
+DEFAULT_AREA = 1000
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--fccs-ids',
         help="comma-dilimited list of fccs ids to run")
     parser.add_argument('-t', '--fire-type', default="wf",
         help="'wf' or 'rx'; default 'wf'")
+    parser.add_argument('-a', '--area', default=DEFAULT_AREA,
+        help="Are per fire; default {}".format(DEFAULT_AREA))
     parser.add_argument('-e', '--ecoregion', default="western",
         help="ecoregion; default 'western'")
     parser.add_argument('--indented-output', default=False,
@@ -92,7 +96,7 @@ def main():
                         "ecoregion": args.ecoregion,
                         "utc_offset": "-07:00",
                         "latitude": 39.0704668, #37.909644,
-                        "area": 1
+                        "area": args.area
                     },
                     "fuelbeds":[
                         {
