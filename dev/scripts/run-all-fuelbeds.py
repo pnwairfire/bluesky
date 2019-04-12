@@ -61,13 +61,18 @@ def main():
     fccs_ids = ([i.strip() for i in args.fccs_ids.split(',')]
         if args.fccs_ids else FCCS_IDS)
 
+    input_data = {
+        "run_id": ("one-fire-per-fccsid-" +
+            datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')),
+        "fire_information": []
+    }
     config = {
         "config": {
             "emissions": {
                 "model": "prichard-oneill"
             },
             "extrafiles":{
-                "dest_dir": "/data/",
+                "dest_dir": "/data/" + input_data["run_id"],
                 "sets": (["firescsvs", "emissionscsv"]
                     if args.produce_emissions_csv else ["firescsvs"]),
                 "firescsvs": {
@@ -79,12 +84,6 @@ def main():
                 }
             }
         }
-    }
-
-    input_data = {
-        "run_id": ("one-fire-per-fccsid-" +
-            datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')),
-        "fire_information": []
     }
     today = datetime.date.today()
     start = today.strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -112,11 +111,11 @@ def main():
                 }
             ]
         })
-    if not os.path.exists('tmp/run-all-fuelbeds/'):
-        os.makedirs('tmp/run-all-fuelbeds/')
-    with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-input.json', 'w') as f:
+    if not os.path.exists('tmp/run-all-fuelbeds/' + input_data['run_id']):
+        os.makedirs('tmp/run-all-fuelbeds/' + input_data['run_id'])
+    with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '/input.json', 'w') as f:
         f.write(json.dumps(input_data))
-    with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-config.json', 'w') as f:
+    with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '/config.json', 'w') as f:
         f.write(json.dumps(config))
 
     cmd = "docker run -ti --rm -v $PWD/tmp/run-all-fuelbeds/:/data/"
@@ -127,9 +126,9 @@ def main():
             " -e PATH=/code/bin/:$PATH")
 
     cmd += (" bluesky bsp --log-level=" + args.log_level
-        + " -c /data/" + input_data['run_id'] + "-config.json"
-        + " -i /data/" + input_data['run_id'] + "-input.json"
-        + " -o /data/" + input_data['run_id'] + "-output.json"
+        + " -c /data/" + input_data['run_id'] + "/config.json"
+        + " -i /data/" + input_data['run_id'] + "/input.json"
+        + " -o /data/" + input_data['run_id'] + "/output.json"
         + " consumption emissions")
 
     if args.produce_emissions_csv:
