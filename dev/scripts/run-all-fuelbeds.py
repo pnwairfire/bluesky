@@ -107,7 +107,7 @@ def get_fccs_ids_fire_information(args, times):
         })
     return fires
 
-def get_coordinates_fire_information(args):
+def get_coordinates_fire_information(args, times):
     coordinates = ([[float(y.strip()) for y in x.split(',')] for x in args.coordinates.split(';')]
         if args.coordinates else DEFAULT_COORDINATES)
     fires = []
@@ -152,7 +152,9 @@ def main():
     times = get_times()
 
     run_id = (("by-fccsids" if args.mode == 'fccs-ids' else 'by-coordinates')
-        + '/' + datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ'))
+        + '_' + datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ'))
+    host_output_dir = './tmp/run-all-fuelbeds/' + run_id.replace('_','/')
+    docker_output_dir = '/data/' + run_id.replace('_','/')
 
     input_data = {
         "run_id": run_id,
@@ -167,7 +169,7 @@ def main():
                 "model": "prichard-oneill"
             },
             "extrafiles":{
-                "dest_dir": "/data/" + run_id,
+                "dest_dir": docker_output_dir,
                 "sets": (["firescsvs", "emissionscsv"]
                     if args.produce_emissions_csv else ["firescsvs"]),
                 "firescsvs": {
@@ -181,13 +183,12 @@ def main():
             "plumerising": {
                 "model":"feps",
                 "feps": {
-                    "working_dir": "/data/" + run_id
+                    "working_dir": docker_output_dir
                 }
             }
         }
     }
 
-    host_output_dir = './tmp/run-all-fuelbeds/' + run_id
     if not os.path.exists(host_output_dir):
         os.makedirs(host_output_dir)
     with open(host_output_dir + '/input.json', 'w') as f:
@@ -203,13 +204,13 @@ def main():
             " -e PATH=/code/bin/:$PATH")
 
     cmd += (" bluesky bsp --log-level=" + args.log_level
-        + " --log-file " + '/data/' + run_id + "/output.log"
-        + " -c /data/" + run_id + "/config.json"
-        + " -i /data/" + run_id + "/input.json"
-        + " -o /data/" + run_id + "/output.json")
+        + " --log-file " + docker_output_dir + "/output.log"
+        + " -c " + docker_output_dir + "/config.json"
+        + " -i " + docker_output_dir + "/input.json"
+        + " -o " + docker_output_dir + "/output.json")
 
     if args.mode == 'coordinates':
-        cmd += fuelbeds
+        cmd += ' fuelbeds'
 
     cmd += " consumption emissions"
 
