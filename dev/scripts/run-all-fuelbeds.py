@@ -61,9 +61,7 @@ def main():
     fccs_ids = ([i.strip() for i in args.fccs_ids.split(',')]
         if args.fccs_ids else FCCS_IDS)
 
-    input_data = {
-        "run_id": ("one-fire-per-fccsid-" +
-            datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')),
+    config = {
         "config": {
             "emissions": {
                 "model": "prichard-oneill"
@@ -80,7 +78,12 @@ def main():
                     "filename": "fire_emissions.csv"
                 }
             }
-        },
+        }
+    }
+
+    input_data = {
+        "run_id": ("one-fire-per-fccsid-" +
+            datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')),
         "fire_information": []
     }
     today = datetime.date.today()
@@ -113,7 +116,8 @@ def main():
         os.makedirs('tmp/run-all-fuelbeds/')
     with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-input.json', 'w') as f:
         f.write(json.dumps(input_data))
-
+    with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-config.json', 'w') as f:
+        f.write(json.dumps(config))
 
     cmd = "docker run -ti --rm -v $PWD/tmp/run-all-fuelbeds/:/data/"
 
@@ -123,6 +127,7 @@ def main():
             " -e PATH=/code/bin/:$PATH")
 
     cmd += (" bluesky bsp --log-level=" + args.log_level
+        + " -c /data/" + input_data['run_id'] + "-config.json"
         + " -i /data/" + input_data['run_id'] + "-input.json"
         + " -o /data/" + input_data['run_id'] + "-output.json"
         + " consumption emissions")
