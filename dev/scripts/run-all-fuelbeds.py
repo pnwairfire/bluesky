@@ -151,9 +151,11 @@ def main():
 
     times = get_times()
 
+    run_id = (("by-fccsids" if args.mode == 'fccs-ids' else 'by-coordinates')
+        + '/' + datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ'))
+
     input_data = {
-        "run_id": ("one-fire-per-fccsid-" +
-            datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')),
+        "run_id": run_id,
         "fire_information": MODES[args.mode](args, times)
     }
     config = {
@@ -165,7 +167,7 @@ def main():
                 "model": "prichard-oneill"
             },
             "extrafiles":{
-                "dest_dir": "/data/" + input_data["run_id"],
+                "dest_dir": "/data/" + run_id,
                 "sets": (["firescsvs", "emissionscsv"]
                     if args.produce_emissions_csv else ["firescsvs"]),
                 "firescsvs": {
@@ -179,17 +181,18 @@ def main():
             "plumerising": {
                 "model":"feps",
                 "feps": {
-                    "working_dir": "/data/" + input_data["run_id"]
+                    "working_dir": "/data/" + run_id
                 }
             }
         }
     }
 
-    if not os.path.exists('tmp/run-all-fuelbeds/' + input_data['run_id']):
-        os.makedirs('tmp/run-all-fuelbeds/' + input_data['run_id'])
-    with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '/input.json', 'w') as f:
+    host_output_dir = './tmp/run-all-fuelbeds/' + run_id
+    if not os.path.exists(host_output_dir):
+        os.makedirs(host_output_dir)
+    with open(host_output_dir + '/input.json', 'w') as f:
         f.write(json.dumps(input_data))
-    with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '/config.json', 'w') as f:
+    with open(host_output_dir + '/config.json', 'w') as f:
         f.write(json.dumps(config))
 
     cmd = "docker run -ti --rm -v $PWD/tmp/run-all-fuelbeds/:/data/"
@@ -200,10 +203,10 @@ def main():
             " -e PATH=/code/bin/:$PATH")
 
     cmd += (" bluesky bsp --log-level=" + args.log_level
-        + " --log-file " + '/data/' + input_data['run_id'] + "/output.log"
-        + " -c /data/" + input_data['run_id'] + "/config.json"
-        + " -i /data/" + input_data['run_id'] + "/input.json"
-        + " -o /data/" + input_data['run_id'] + "/output.json")
+        + " --log-file " + '/data/' + run_id + "/output.log"
+        + " -c /data/" + run_id + "/config.json"
+        + " -i /data/" + run_id + "/input.json"
+        + " -o /data/" + run_id + "/output.json")
 
     if args.mode == 'coordinates':
         cmd += fuelbeds
@@ -218,17 +221,21 @@ def main():
     cmd += " extrafiles"
 
     logging.info("Running command: " + cmd)
-    logging.info("Log file: %s", 'tmp/run-all-fuelbeds/'
-        + input_data['run_id'] + "/output.log")
+    logging.info("Output files:")
+    logging.info("   Log: %s", host_output_dir + "/output.log")
+    logging.info("   config: %s", host_output_dir + "/config.json")
+    logging.info("   input: %s", host_output_dir + "/input.json")
+    logging.info("   output: %s", host_output_dir + "/output.json")
+
 
     subprocess.run(cmd, shell=True, check=True)
 
     if args.indented_output:
-        with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-output.json', 'r') as f_in:
+        with open(host_output_dir + '-output.json', 'r') as f_in:
             data = json.loads(f_in.read())
-            with open('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-output-indented.json', 'w') as f_out:
+            with open(host_output_dir + '-output-indented.json', 'w') as f_out:
                 f_out.write(json.dumps(data, indent=4))
-        os.remove('./tmp/run-all-fuelbeds/' + input_data['run_id'] + '-output.json')
+        os.remove(host_output_dir + '-output.json')
 
 
 if __name__ == "__main__":
