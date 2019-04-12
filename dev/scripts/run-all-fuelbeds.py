@@ -50,7 +50,8 @@ def parse_args():
         default=False, action="store_true",
         help="Run with local code mounted in docker container")
     parser.add_argument('--produce-emissions-csv', action="store_true",
-        help="Run with local code mounted in docker container")
+        help="run extrafiles to produce the emisisons csv")
+    parser.add_argument('--run-through-plumerise', action="store_true")
     parser.add_argument('--log-level', default="INFO", help="Log level")
 
 
@@ -81,6 +82,12 @@ def main():
                 },
                 "emissionscsv": {
                     "filename": "fire_emissions.csv"
+                }
+            },
+            "plumerising": {
+                "model":"feps",
+                "feps": {
+                    "working_dir": "/data/" + input_data["run_id"]
                 }
             }
         }
@@ -131,8 +138,10 @@ def main():
         + " -o /data/" + input_data['run_id'] + "/output.json"
         + " consumption emissions")
 
-    if args.produce_emissions_csv:
+    if args.produce_emissions_csv or args.run_through_plumerise:
         cmd += " timeprofiling"
+    if args.run_through_plumerise:
+        cmd += " plumerising"
 
     cmd += " extrafiles"
 
