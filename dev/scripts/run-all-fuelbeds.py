@@ -230,6 +230,17 @@ DEFAULT_COORDINATES = [
 
 DEFAULT_AREA = 1000
 
+EXAMPLES_STRING = """
+Examples:
+
+    {script} -m fccs-ids
+    {script} -m fccs-ids -i 1,2,3
+    {script} -m coordinates -c 45.1,-120;34,-114.2
+    {script} -m coordinates -t wf -a 1000 --indented-output \\
+        --produce-emissions-csv --run-through-plumerise
+
+ """.format(script=sys.argv[0])
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', '--mode', required=True,
@@ -253,6 +264,9 @@ def parse_args():
         help="run extrafiles to produce the emisisons csv")
     parser.add_argument('--run-through-plumerise', action="store_true")
     parser.add_argument('--log-level', default="INFO", help="Log level")
+
+    parser.epilog = EXAMPLES_STRING
+    parser.formatter_class = argparse.RawTextHelpFormatter
 
     args = parser.parse_args()
 
