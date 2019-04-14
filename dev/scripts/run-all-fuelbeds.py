@@ -413,6 +413,9 @@ def main():
         + " -i " + docker_output_dir + "/input.json"
         + " -o " + docker_output_dir + "/output.json")
 
+    if args.indented_output:
+        cmd += ' --indent 4'
+
     if args.mode == 'coordinates':
         cmd += ' fuelbeds'
 
@@ -432,15 +435,7 @@ def main():
     logging.info("   input: %s", host_output_dir + "/input.json")
     logging.info("   output: %s", host_output_dir + "/output.json")
 
-
     subprocess.run(cmd, shell=True, check=True)
-
-    if args.indented_output:
-        with open(host_output_dir + '/output.json', 'r') as f_in:
-            data = json.loads(f_in.read())
-            with open(host_output_dir + '/output-indented.json', 'w') as f_out:
-                f_out.write(json.dumps(data, indent=4))
-        os.remove(host_output_dir + '/output.json')
 
 
 if __name__ == "__main__":
