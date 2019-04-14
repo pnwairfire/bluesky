@@ -247,7 +247,7 @@ def parse_args():
         help="'coordinates' or 'fccs-ids'")
     parser.add_argument('-i', '--fccs-ids',
         help="comma-dilimited list of fccs ids to run")
-    parser.add_argument('--coordinates',
+    parser.add_argument('-c','--coordinates',
         help="semi-colon-dilimited list of coordinages; e.g. '45,-123;33,-119'")
     parser.add_argument('-t', '--fire-type', default="wf",
         help="'wf' or 'rx'; default 'wf'")
