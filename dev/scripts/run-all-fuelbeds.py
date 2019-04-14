@@ -436,11 +436,11 @@ def main():
     subprocess.run(cmd, shell=True, check=True)
 
     if args.indented_output:
-        with open(host_output_dir + '-output.json', 'r') as f_in:
+        with open(host_output_dir + '/output.json', 'r') as f_in:
             data = json.loads(f_in.read())
-            with open(host_output_dir + '-output-indented.json', 'w') as f_out:
+            with open(host_output_dir + '/output-indented.json', 'w') as f_out:
                 f_out.write(json.dumps(data, indent=4))
-        os.remove(host_output_dir + '-output.json')
+        os.remove(host_output_dir + '/output.json')
 
 
 if __name__ == "__main__":
