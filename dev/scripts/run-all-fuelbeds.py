@@ -373,6 +373,7 @@ def write_input(args, run_id, host_output_dir):
 def write_config(args, host_output_dir, docker_output_dir):
     config = {
         "config": {
+            "skip_failed_fires": True,
             "fuelbeds": {
                 "no_sampling": True
             },
