@@ -230,6 +230,11 @@ DEFAULT_COORDINATES = [
 
 DEFAULT_AREA = 1000
 
+
+##
+## Args
+##
+
 EXAMPLES_STRING = """
 Examples:
 
@@ -281,6 +286,11 @@ def parse_args():
             logging.info("   %s: %s", k, v)
 
     return args
+
+
+##
+## Input File
+##
 
 def get_fccs_ids_fire_information(args, times):
     fccs_ids = ([i.strip() for i in args.fccs_ids.split(',')]
@@ -346,24 +356,21 @@ def get_times():
         "end": (today + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%H:%M:%SZ')
     }
 
-def main():
-    args = parse_args()
-    if args.mode not in MODES:
-        print("\n*** ERROR: -m/--mode must be one of '{}'\n".format(
-            "', '".join(MODES.keys())))
-        sys.exit(1)
-
+def write_input(args, run_id, host_output_dir):
     times = get_times()
-
-    run_id = (("by-fccsids" if args.mode == 'fccs-ids' else 'by-coordinates')
-        + '_' + datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ'))
-    host_output_dir = './tmp/run-all-fuelbeds/' + run_id.replace('_','/')
-    docker_output_dir = '/data/' + run_id.replace('_','/')
-
     input_data = {
         "run_id": run_id,
         "fire_information": MODES[args.mode](args, times)
     }
+    with open(host_output_dir + '/input.json', 'w') as f:
+        f.write(json.dumps(input_data))
+
+
+##
+## Config File
+##
+
+def write_config(args, host_output_dir, docker_output_dir):
     config = {
         "config": {
             "fuelbeds": {
@@ -392,14 +399,15 @@ def main():
             }
         }
     }
-
-    if not os.path.exists(host_output_dir):
-        os.makedirs(host_output_dir)
-    with open(host_output_dir + '/input.json', 'w') as f:
-        f.write(json.dumps(input_data))
     with open(host_output_dir + '/config.json', 'w') as f:
         f.write(json.dumps(config))
 
+
+##
+## BSP Command
+##
+
+def get_command(args, docker_output_dir):
     cmd = "docker run -ti --rm -v $PWD/tmp/run-all-fuelbeds/:/data/"
 
     if args.local_code:
@@ -428,6 +436,32 @@ def main():
 
     cmd += " extrafiles"
 
+    return cmd
+
+
+##
+## Main
+##
+
+def main():
+    args = parse_args()
+    if args.mode not in MODES:
+        print("\n*** ERROR: -m/--mode must be one of '{}'\n".format(
+            "', '".join(MODES.keys())))
+        sys.exit(1)
+
+    run_id = (("by-fccsids" if args.mode == 'fccs-ids' else 'by-coordinates')
+        + '_' + datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ'))
+    host_output_dir = './tmp/run-all-fuelbeds/' + run_id.replace('_','/')
+    if not os.path.exists(host_output_dir):
+        os.makedirs(host_output_dir)
+    docker_output_dir = '/data/' + run_id.replace('_','/')
+
+    write_config(args, host_output_dir, docker_output_dir)
+    write_input(args, run_id, host_output_dir)
+
+    cmd = get_command(args, docker_output_dir)
+
     logging.info("Running command: " + cmd)
     logging.info("Output files:")
     logging.info("   Log: %s", host_output_dir + "/output.log")
@@ -436,7 +470,6 @@ def main():
     logging.info("   output: %s", host_output_dir + "/output.json")
 
     subprocess.run(cmd, shell=True, check=True)
-
 
 if __name__ == "__main__":
     main()
