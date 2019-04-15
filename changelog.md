@@ -17,3 +17,8 @@
 
 ## 4.1.1
 - upgrade consume package to v5
+
+## 4.1.2
+- capture and ignore consume stdout
+- various changes to run-all-fuelbeds.py dev script
+- Fix conversion factor for Prichard/Oneill emissions output (valyes wer half of what they should have been)
