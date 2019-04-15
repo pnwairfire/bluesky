@@ -28,7 +28,6 @@ __all__ = [
 ]
 __version__ = "0.1.0"
 
-TONS_PER_POUND = 0.0005 # 1.0 / 2000.0
 
 INCLUDE_EMISSIONS_DETAILS_DEFAULT = False
 
@@ -153,6 +152,8 @@ class Feps(EmissionsBase):
             with self.fire_failure_handler(fire):
                 self._run_on_fire(fire)
 
+    CONVERSION_FACTOR = 0.0005 # 1.0 ton / 2000.0 lbs
+
     def _run_on_fire(self, fire):
         if 'growth' not in fire:
             raise ValueError(
@@ -171,13 +172,14 @@ class Feps(EmissionsBase):
                 # Note: According to BSF, FEPS emissions are in lbs/ton consumed.  Since
                 # consumption is in tons, and since we want emissions in tons, we need
                 # to divide each value by 2000.0
-                # datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
+                # datautils.multiply_nested_data(fb['emissions'], self.CONVERSION_FACTOR)
                 # if self.include_emissions_details:
-                #     datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
+                #     datautils.multiply_nested_data(fb['emissions_details'], self.CONVERSION_FACTOR)
 
 ##
 ## Prichard / O'Neill
 ##
+
 
 class PrichardOneill(EmissionsBase):
 
@@ -191,6 +193,12 @@ class PrichardOneill(EmissionsBase):
         for fire in fires:
             with self.fire_failure_handler(fire):
                 self._run_on_fire(fire)
+
+    # Consumption values are in tons, Prichard/ONeill EFS are in g/kg, and
+    # we want emissions values in tons.  Since 1 g/kg == 2 lbs/ton, we need
+    # to multiple the emissions output by:
+    #   (2 lbs/ton) * (1 ton / 2000lbs) = 1/1000 = 0.001
+    CONVERSION_FACTOR = 0.001
 
     def _run_on_fire(self, fire):
         if 'growth' not in fire:
@@ -215,9 +223,9 @@ class PrichardOneill(EmissionsBase):
                 # TODO: Update EFs to be tons/ton in a) eflookup package,
                 #   b) just after instantiating look-up objects, above,
                 #   or c) just before calling EmissionsCalculator, above
-                datautils.multiply_nested_data(fb['emissions'], TONS_PER_POUND)
+                datautils.multiply_nested_data(fb['emissions'], self.CONVERSION_FACTOR)
                 if self.include_emissions_details:
-                    datautils.multiply_nested_data(fb['emissions_details'], TONS_PER_POUND)
+                    datautils.multiply_nested_data(fb['emissions_details'], self.CONVERSION_FACTOR)
 
 ##
 ## CONSUME
