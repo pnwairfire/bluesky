@@ -128,15 +128,15 @@ _DEFAULTS = {
             },
             'all': {
                 'fuel_moisture_1000hr_pct': {
-                    'default': 50, # default from consume package
+                    'default': 30,
                     'synonyms': ['moisture_1khr'] # TODO: confirm
                 },
                 'fuel_moisture_duff_pct': {
-                    'default': 50, # default from consume package
+                    'default': 75,
                     'synonyms': ['moisture_duff'] # TODO: confirm
                 },
                 'fuel_moisture_litter_pct': {
-                    'default': 30,
+                    'default': 16,
                     'synonyms': ['moisture_litter'] # TODO: confirm
                 },
                 'canopy_consumption_pct': {
