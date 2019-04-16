@@ -240,7 +240,7 @@ Examples:
 
     {script} -m fccs-ids
     {script} -m fccs-ids -i 1,2,3
-    {script} -m coordinates -c 45.1,-120;34,-114.2
+    {script} -m coordinates -c "45.1,-120;34,-114.2"
     {script} -m coordinates -t wf -a 1000 --indented-output \\
         --produce-emissions-csv --run-through-plumerise
 
