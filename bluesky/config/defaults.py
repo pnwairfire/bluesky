@@ -108,7 +108,7 @@ _DEFAULTS = {
                     'default': 5 # percent, from 1 to 100; default from consume package
                 },
                 'windspeed': {
-                    'default': 5,  # default from consume package
+                    'default': 6,  # default from consume package
                     # TODO: is 'max_wind' a valid synonym? or 'min_wind_aloft'?
                 },
                 'days_since_rain': {
