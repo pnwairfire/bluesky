@@ -208,6 +208,7 @@ OPTIONAL_LOCATION_FIELDS = [
     'moisture_1hr','moisture_10hr',
     'moisture_100hr','moisture_1khr',
     'moisture_live','moisture_duff',
+    'moisture_litter',
     # consumption / blackened fields used by consume
     'canopy_consumption_pct',
     'shrub_blackened_pct',
