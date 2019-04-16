@@ -335,7 +335,13 @@ def get_coordinates_fire_information(args, times):
                         "longitude": lng,
                         "ecoregion": args.ecoregion,
                         "utc_offset": "-07:00",
-                        "area": args.area
+                        "area": args.area,
+                        "fuel_moisture_1hr_pct": 7,
+                        "fuel_moisture_10hr_pct": 8,
+                        "fuel_moisture_100hr_pct": 9,
+                        "fuel_moisture_1000hr_pct": 12,
+                        "fuel_moisture_duff_pct": 40,
+                        "canopy_consumption_pct": 60
                     },
                     "start": times['start'],
                     "end": times['end']
