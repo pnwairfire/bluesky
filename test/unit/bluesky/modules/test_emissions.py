@@ -55,7 +55,19 @@ FIRES = [
                         "type": "Point",
                         "coordinates": [-71.362, 50.632],
                     },
-                    "utc_offset": "-04:00"
+                    "utc_offset": "-04:00",
+                    'slope': 5,
+                    'windspeed': 5,
+                    'rain_days': 10,
+                    'moisture_10hr': 50,
+                    'length_of_ignition': 120,
+                    'fm_type':  "MEAS-Th",
+                    'moisture_1khr': 50,
+                    'moisture_duff': 50,
+                    'moisture_litter': 30,
+                    'canopy_consumption_pct':  0,
+                    'shrub_blackened_pct':  50,
+                    'pile_blackened_pct':  0
                 },
                 "start": "2018-06-27T00:00:00",
                 "end": "2018-06-28T00:00:00"
@@ -76,7 +88,19 @@ FIRES = [
                         ]
                     },
                     "utc_offset": "-07:00",
-                    "ecoregion": "western" # needed by CONSUME
+                    "ecoregion": "western",
+                    'slope': 5,
+                    'windspeed': 5,
+                    'rain_days': 10,
+                    'moisture_10hr': 50,
+                    'length_of_ignition': 120,
+                    'fm_type':  "MEAS-Th",
+                    'moisture_1khr': 50,
+                    'moisture_duff': 50,
+                    'moisture_litter': 30,
+                    'canopy_consumption_pct':  0,
+                    'shrub_blackened_pct':  50,
+                    'pile_blackened_pct':  0
                 },
                 "start": "2018-06-27T00:00:00",
                 "end": "2018-06-28T00:00:00",
