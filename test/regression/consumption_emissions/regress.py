@@ -25,7 +25,8 @@ import numpy
 # to allow breaking into the code (with pdb)
 from bluesky import models
 from bluesky.config import Config
-from bluesky.modules.emissions import TONS_PER_POUND
+
+TONS_PER_POUND = 0.0005
 
 # TODO: rename this script
 
