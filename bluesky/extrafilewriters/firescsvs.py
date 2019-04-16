@@ -153,6 +153,7 @@ FIRE_LOCATIONS_CSV_FIELDS = (
             'moisture_1hr','moisture_10hr',
             'moisture_100hr','moisture_1khr',
             'moisture_live','moisture_duff',
+            'canopy_consumption_pct',
             'min_wind','max_wind',
             'min_wind_aloft', 'max_wind_aloft',
             'min_humid','max_humid',
