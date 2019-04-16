@@ -257,7 +257,7 @@ def parse_args():
     parser.add_argument('-t', '--fire-type', default="wf",
         help="'wf' or 'rx'; default 'wf'")
     parser.add_argument('-a', '--area', default=DEFAULT_AREA,
-        help="Are per fire; default {}".format(DEFAULT_AREA))
+        type=float, help="Are per fire; default {}".format(DEFAULT_AREA))
     parser.add_argument('-e', '--ecoregion', default="western",
         help="ecoregion; default 'western'")
     parser.add_argument('--indented-output', default=False,
