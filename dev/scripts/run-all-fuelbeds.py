@@ -292,6 +292,15 @@ def parse_args():
 ## Input File
 ##
 
+CONSUME_LOCATION_FIELDS = {
+    "moisture_1hr": 7,
+    "moisture_10hr": 8,
+    "moisture_100hr": 9,
+    "moisture_1khr": 12,
+    "moisture_duff": 40,
+    "canopy_consumption_pct": 60
+}
+
 def get_fccs_ids_fire_information(args, times):
     fccs_ids = ([i.strip() for i in args.fccs_ids.split(',')]
         if args.fccs_ids else FCCS_IDS)
@@ -319,6 +328,7 @@ def get_fccs_ids_fire_information(args, times):
                 }
             ]
         })
+        fires[-1]['growth'][0]['location'].update(**CONSUME_LOCATION_FIELDS)
     return fires
 
 def get_coordinates_fire_information(args, times):
@@ -335,19 +345,14 @@ def get_coordinates_fire_information(args, times):
                         "longitude": lng,
                         "ecoregion": args.ecoregion,
                         "utc_offset": "-07:00",
-                        "area": args.area,
-                        "moisture_1hr": 7,
-                        "moisture_10hr": 8,
-                        "moisture_100hr": 9,
-                        "moisture_1khr": 12,
-                        "moisture_duff": 40,
-                        "canopy_consumption_pct": 60
+                        "area": args.area
                     },
                     "start": times['start'],
                     "end": times['end']
                 }
             ]
         })
+        fires[-1]['growth'][0]['location'].update()
     return fires
 
 MODES = {
