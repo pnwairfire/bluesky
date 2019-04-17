@@ -1,0 +1,8 @@
+{
+    "config": {
+        "emissions": {
+            "model": "prichard-oneill"
+        },
+        "skip_failed_fires": true
+    }
+}
