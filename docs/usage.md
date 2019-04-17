@@ -103,7 +103,7 @@ example, assume that you start with the following fire data:
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "growth": [
+                "activity": [
                     {
                         "location": {
                             "geojson": {
@@ -158,7 +158,7 @@ fields):
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
                 "fuel_type": "natural",
-                "growth": [
+                "activity": [
                     {
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00",
@@ -258,7 +258,7 @@ yielding the following augmented output:
         ],
         "fires": [
             {
-                "growth": [
+                "activity": [
                     {
                         "fuelbeds": [
                             {
@@ -477,7 +477,7 @@ would contain this output, agumented with emissions data:
                     }
                 },
                 "type": "wildfire",
-                "growth": [
+                "activity": [
                     {
                         "fuelbeds": [
                             {
@@ -658,7 +658,7 @@ It would become:
                     "id": "jfkhfdskj",
                     "name": "event name"
                 },
-                "growth": [
+                "activity": [
                     {
                         "location": {
                             "area": 200,
@@ -721,7 +721,7 @@ assume is in fires.json):
                     "foo": "bar"
                 },
                 "ecoregion": "southern",
-                "growth": [
+                "activity": [
                     {
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00"
@@ -748,7 +748,7 @@ you'll end up with this:
                 "parsed_input": [
                     {
                         "bar": 123,
-                        "growth": [
+                        "activity": [
                             {
                                 "end": "2015-01-21T17:00:00",
                                 "start": "2015-01-20T17:00:00"
@@ -778,7 +778,7 @@ you'll end up with this:
         ],
         "fires": [
             {
-                "growth": [
+                "activity": [
                     {
                         "end": "2015-01-21T17:00:00",
                         "location": {
@@ -845,7 +845,7 @@ The following is an example of the former:
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "growth": [
+                "activity": [
                     {
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00",
@@ -871,7 +871,7 @@ while the following is an example of the latter:
                     "id": "SF11E826544",
                     "name": "Natural Fire near Snoqualmie Pass, WA"
                 },
-                "growth": [
+                "activity": [
                     {
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00",

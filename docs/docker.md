@@ -17,7 +17,7 @@ use something like the following:
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            "growth": [{
+            "activity": [{
                 "start": "2015-01-20T17:00:00",
                 "end": "2015-01-21T17:00:00",
                 "location": {

@@ -15,7 +15,7 @@ Assume you have the following input data:
                     "name": "Natural Fire near Snoqualmie Pass, WA",
                     "id": "SF11E826544"
                 },
-                "growth": [
+                "activity": [
                     {
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00",
@@ -78,7 +78,7 @@ would give you:
         "today": "2016-09-15",
         "fires": [
             {
-                "growth": [
+                "activity": [
                     {
                         "location": {
                             "ecoregion": "southern",
@@ -169,7 +169,7 @@ would give you:
                 "version": "0.1.0",
                 "parsed_input": [
                     {
-                        "growth": [
+                        "activity": [
                             {
                                 "location": {
                                     "ecoregion": "southern",
@@ -305,7 +305,7 @@ would give you:
                             "name": "Natural Fire near Snoqualmie Pass, WA",
                             "id": "SF11E826544"
                         },
-                        "growth": [
+                        "activity": [
                             {
                                 "start": "2015-01-20T17:00:00",
                                 "location": {
@@ -404,7 +404,7 @@ would give you:
                     "id": "SF11E826544"
                 },
                 "fuel_type": "natural",
-                "growth": [
+                "activity": [
                     {
                         "start": "2015-01-20T17:00:00",
                         "fuelbeds_total_accounted_for_pct": 100.0,
@@ -994,7 +994,7 @@ would give you:
                         "flaming": 43059.538716338604
                     }
                 },
-                "growth": [
+                "activity": [
                     {
                         "end": "2015-01-21T17:00:00",
                         "consumption": {
@@ -2542,7 +2542,7 @@ would give you:
                             "name": "Natural Fire near Snoqualmie Pass, WA"
                         },
                         "fuel_type": "natural",
-                        "growth": [
+                        "activity": [
                             {
                                 "end": "2015-01-21T17:00:00",
                                 "start": "2015-01-20T17:00:00",
@@ -3234,7 +3234,7 @@ would give you:
         },
         "fires": [
             {
-                "growth": [
+                "activity": [
                     {
                         "location": {
                             "ecoregion": "southern",
@@ -4674,7 +4674,7 @@ would give you:
                 "parsed_input": [
                     {
                         "type": "wildfire",
-                        "growth": [
+                        "activity": [
                             {
                                 "location": {
                                     "ecoregion": "southern",
