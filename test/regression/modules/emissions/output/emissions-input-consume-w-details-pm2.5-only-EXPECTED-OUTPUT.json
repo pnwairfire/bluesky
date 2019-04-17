@@ -19,7 +19,7 @@
                 "message": "Missing consumption data required for computing emissions",
                 "type": "ValueError"
             },
-            "growth": [
+            "activity": [
                 {
                     "fuelbeds": [
                         {
@@ -108,7 +108,7 @@
             },
             "fuel_type": "natural",
             "id": "SF11C14225236095807750",
-            "growth": [
+            "activity": [
                 {
                     "emissions": {
                         "summary": {

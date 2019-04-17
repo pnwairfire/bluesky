@@ -2,7 +2,7 @@
     "fires": [
         {
             "fuel_type": "natural",
-            "growth": [
+            "activity": [
                 {
                     "localmet": {
                         "2014-05-29T23:00:00": {
@@ -1663,7 +1663,7 @@
         {
             "type": "wildfire",
             "id": "slijlfdsljfsdkljf",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "area": 200.0,

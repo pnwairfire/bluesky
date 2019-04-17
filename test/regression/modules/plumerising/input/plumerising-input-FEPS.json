@@ -1,7 +1,7 @@
 {
     "fires": [
         {
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "area": 200.0,
@@ -19,7 +19,7 @@
             "id": "slijlfdsljfsdkljf"
         },
         {
-            "growth": [
+            "activity": [
                 {
                     "end": "2014-05-30T01:00:00",
                     "location": {

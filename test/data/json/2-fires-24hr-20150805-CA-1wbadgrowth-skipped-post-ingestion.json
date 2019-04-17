@@ -5,7 +5,7 @@
             "type": "wildfire",
             "fuel_type": "natural",
             "id": "SF11C14225236095807750",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "longitude": -119.7615805,
@@ -27,7 +27,7 @@
             "type": "rx",
             "fuel_type": "activity",
             "id": "sdk2risodijfdsf",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "longitude": -120.0,

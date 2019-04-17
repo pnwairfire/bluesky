@@ -2,7 +2,7 @@
     "fires": [
         {
             "type": "wildfire",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "area": 500,
@@ -21,7 +21,7 @@
         },
         {
             "type": "wildfire",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "area": 500,

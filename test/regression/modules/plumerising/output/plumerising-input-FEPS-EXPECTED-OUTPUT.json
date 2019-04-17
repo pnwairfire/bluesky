@@ -4,7 +4,7 @@
         {
             "type": "wildfire",
             "id": "slijlfdsljfsdkljf",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "area": 200.0,
@@ -29,7 +29,7 @@
         {
             "type": "wildfire",
             "id": "SF11C14225236095807750",
-            "growth": [
+            "activity": [
                 {
                     "fuelbeds": [
                         {

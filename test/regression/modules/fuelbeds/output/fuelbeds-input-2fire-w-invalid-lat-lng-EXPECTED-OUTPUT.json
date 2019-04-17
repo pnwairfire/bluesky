@@ -1,7 +1,7 @@
 {
     "fires": [
         {
-            "growth": [
+            "activity": [
                 {
                     "fuelbeds": [
                         {
@@ -32,7 +32,7 @@
         {
             "type": "wildfire",
             "id": "SF11C14225236095807750",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "area": 500,

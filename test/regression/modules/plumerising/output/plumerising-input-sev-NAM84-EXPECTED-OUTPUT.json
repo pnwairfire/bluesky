@@ -2,7 +2,7 @@
     "fires": [
         {
             "fuel_type": "natural",
-            "growth": [
+            "activity": [
                 {
                     "localmet": {
                         "2015-08-05T07:00:00": {

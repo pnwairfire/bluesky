@@ -4,7 +4,7 @@
         {
             "type": "wildfire",
             "id": "SF11C14225236095807750",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "longitude": -119.0,
@@ -36,7 +36,7 @@
         {
             "type": "wildfire",
             "id": "sdk2risodijfdsf",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "longitude": -120.0,
@@ -68,7 +68,7 @@
         {
             "type": "wildfire",
             "id": "sdf342klsfjfsdf",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "longitude": -120.7576061,
@@ -89,7 +89,7 @@
         {
             "type": "wildfire",
             "id": "weru24oir",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "longitude": -122.0,

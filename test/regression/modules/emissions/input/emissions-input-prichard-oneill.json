@@ -1,7 +1,7 @@
 {
     "fires": [
         {
-            "growth": [
+            "activity": [
                 {
                     "fuelbeds": [
                         {
@@ -37,7 +37,7 @@
             "id": "slijlfdsljfsdkljf"
         },
         {
-            "growth": [
+            "activity": [
                 {
                     "fuelbeds": [
                         {

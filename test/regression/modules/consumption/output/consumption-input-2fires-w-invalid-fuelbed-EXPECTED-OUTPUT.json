@@ -3,7 +3,7 @@
     "failed_fires": [
         {
             "id": "SF11C14225236095807750",
-            "growth": [
+            "activity": [
                 {
                     "end": "2015-01-21T15:00:00",
                     "location": {
@@ -1343,7 +1343,7 @@
     "fires": [
         {
             "id": "lkjrisdfo",
-            "growth": [
+            "activity": [
                 {
                     "start": "2015-01-20T15:00:00",
                     "fuelbeds": [

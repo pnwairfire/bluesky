@@ -1,7 +1,7 @@
 {
     "fires": [
         {
-            "growth": [
+            "activity": [
                 {
                     "end": "2015-01-21T15:00:00",
                     "location": {
@@ -33,7 +33,7 @@
             "id": "SF11C14225236095807750"
         },
         {
-            "growth": [
+            "activity": [
                 {
                     "end": "2015-01-21T15:00:00",
                     "location": {

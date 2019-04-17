@@ -4,7 +4,7 @@
         {
             "event_id": "SF11E826544",
             "name": "Some Rx Fire in the Bahamas with consumption inputs provided",
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "slope": 10.0,

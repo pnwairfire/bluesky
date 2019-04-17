@@ -2,7 +2,7 @@
     "fires": [
         {
             "type": "wildfire",
-            "growth": [
+            "activity": [
                 {
                     "localmet": {
                         "2014-05-29T23:00:00": {
