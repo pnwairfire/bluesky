@@ -8,7 +8,7 @@ do not represent the current behavior.
 Assume you have the following input data:
 
     {
-        "fire_information": [
+        "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of" :{
@@ -76,7 +76,7 @@ would give you:
 
     {
         "today": "2016-09-15",
-        "fire_information": [
+        "fires": [
             {
                 "growth": [
                     {
@@ -396,7 +396,7 @@ would give you:
                 "fccsmap_version": "1.0.1"
             }
         ],
-        "fire_information": [
+        "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of": {
@@ -984,7 +984,7 @@ would give you:
                 }
             }
         },
-        "fire_information": [
+        "fires": [
             {
                 "consumption": {
                     "summary": {
@@ -3232,7 +3232,7 @@ would give you:
                 }
             }
         },
-        "fire_information": [
+        "fires": [
             {
                 "growth": [
                     {
