@@ -11,7 +11,19 @@
                         "longitude": -121.3990506,
                         "utc_offset": "-09:00",
                         "area": 200,
-                        "ecoregion": "southern"
+                        "ecoregion": "southern",
+                        "slope": 5,
+                        "windspeed": 5,
+                        "rain_days": 10,
+                        "moisture_10hr": 50,
+                        "length_of_ignition": 120,
+                        "fm_type":  "MEAS-Th",
+                        "moisture_1khr": 50,
+                        "moisture_duff": 50,
+                        "moisture_litter": 30,
+                        "canopy_consumption_pct":  0,
+                        "shrub_blackened_pct":  50,
+                        "pile_blackened_pct":  0
                     },
                     "fuelbeds": [
                         {
@@ -2642,7 +2654,19 @@
                         "longitude": -121.3990506,
                         "utc_offset": "-09:00",
                         "area": 200,
-                        "ecoregion": "southern"
+                        "ecoregion": "southern",
+                        "slope": 5,
+                        "windspeed": 5,
+                        "rain_days": 10,
+                        "moisture_10hr": 50,
+                        "length_of_ignition": 120,
+                        "fm_type":  "MEAS-Th",
+                        "moisture_1khr": 50,
+                        "moisture_duff": 50,
+                        "moisture_litter": 30,
+                        "canopy_consumption_pct":  0,
+                        "shrub_blackened_pct":  50,
+                        "pile_blackened_pct":  0
                     },
                     "heat": {
                         "summary": {
