@@ -105,13 +105,13 @@ def check(expected, actual):
     expected.pop('runtime')
     actual.pop('runtime')
     # TODO: cherry pick other fields to check
-    if len(expected['fire_information']) != len(actual['fire_information']):
+    if len(expected['fires']) != len(actual['fires']):
         return False
 
-    for i in range(len(expected['fire_information'])):
-        expected['fire_information'][i].pop('error', None)
-        actual['fire_information'][i].pop('error', None)
-        if not check_value(expected['fire_information'][i], actual['fire_information'][i]):
+    for i in range(len(expected['fires'])):
+        expected['fires'][i].pop('error', None)
+        actual['fires'][i].pop('error', None)
+        if not check_value(expected['fires'][i], actual['fires'][i]):
             return False
 
     return True
