@@ -26,7 +26,7 @@ BSP = os.path.join(ROOT_DIR, 'bin/bsp')
 
 INPUT = {
     "run_id": 'abcdefg123',
-    "fire_information": [],
+    "fires": [],
     "run_config": {  # 'run_config' is ignored in input data
         "foobar": 12312
     }
@@ -112,7 +112,7 @@ EXPECTED = {
         "e": 'abcdefg123__{_run_id}',
         #"f": 'sdfdsf__abcdefg123'
     }),
-    "fire_information": []
+    "fires": []
 }
 
 input_file = tempfile.NamedTemporaryFile(mode='w+t')
