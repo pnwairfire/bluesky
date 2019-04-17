@@ -18,3 +18,5 @@
 - capture and ignore consume stdout
 - various changes to run-all-fuelbeds.py dev script
 - Fix conversion factor for Prichard/Oneill emissions output (valyes wer half of what they should have been)
+- modify consume input defaults
+- update ingestion to pass through more consume input fields
