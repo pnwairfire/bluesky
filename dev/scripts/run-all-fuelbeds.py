@@ -308,7 +308,7 @@ def get_fccs_ids_fires(args, times):
     for fccs_id in fccs_ids:
         fires.append({
             "type": args.fire_type,
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "longitude": -120.5906549, #-119.7615805,
@@ -338,7 +338,7 @@ def get_coordinates_fires(args, times):
     for lat, lng in coordinates:
         fires.append({
             "type": args.fire_type,
-            "growth": [
+            "activity": [
                 {
                     "location": {
                         "latitude": lat,
