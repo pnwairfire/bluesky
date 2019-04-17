@@ -1,6 +1,6 @@
 {
     "run_id": "1-fire-24hr-20140530-WA-{today}",
-    "fire_information": [
+    "fires": [
         {
             "meta":{
                 "vsmoke": {

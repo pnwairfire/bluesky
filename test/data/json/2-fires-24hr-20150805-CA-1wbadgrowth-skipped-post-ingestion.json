@@ -1,6 +1,6 @@
 {
     "run_id": "2-fire-24hr-20150805-CA-{today}",
-    "fire_information": [
+    "fires": [
         {
             "type": "wildfire",
             "fuel_type": "natural",
