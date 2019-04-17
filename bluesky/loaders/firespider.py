@@ -77,38 +77,43 @@ class BaseFireSpiderLoader(object):
                 "source": "goes16"
             }
 
-        The only thing that needs to be done is to filter out growth
+        The only thing that needs to be done is to filter out activity
         windows that are outside of time range. Nothing else needs to
-        be done since all times in the growth objects (growth 'start'
+        be done since all times in the activity objects (activity 'start'
         and 'end' times, as well as timeprofile and hourly_frp keys)
         are already in local time.
+
+        Note that FireSpider strill (as of 4/17/2019) uses the term 'growth',
+        but this code supports parsing both 'growth' and 'activity', in
+        anticipation of the spider switching to 'activity'
         """
         for f in fires:
-            f['growth'] = [g for g in f.pop('growth', [])
-                if self._within_time_range(g)]
+            # accept either 'activity' or 'growth'
+            activity = f.pop('activity', []) or f.pop('growth', [])
+            f['activity'] = [a for a in activity if self._within_time_range(a)]
 
-        fires = [f for f in fires if f['growth']]
+        fires = [f for f in fires if f['activity']]
 
         return fires
 
-    def _within_time_range(self, g):
-        utc_offset = self._get_utc_offset(g)
-        if g.get('start') and g.get('end'):
+    def _within_time_range(self, a):
+        utc_offset = self._get_utc_offset(a)
+        if a.get('start') and a.get('end'):
             # convert to datetime objects in place
-            g['start'] = parse_datetime(g.get('start'), 'start')
-            g['end'] = parse_datetime(g.get('end'), 'end')
-            # the growth object's 'start' and 'end' will be in local time;
+            a['start'] = parse_datetime(a.get('start'), 'start')
+            a['end'] = parse_datetime(a.get('end'), 'end')
+            # the activity object's 'start' and 'end' will be in local time;
             # convert them to UTC to compare with start/end query parameters
-            utc_start = g['start'] - utc_offset
-            utc_end = g['end'] - utc_offset
+            utc_start = a['start'] - utc_offset
+            utc_end = a['end'] - utc_offset
 
             return ((not self._start or utc_end >= self._start) and
                 (not self._end or utc_start <= self._end ))
 
         return False # not necessary, but makes code more readable
 
-    def _get_utc_offset(self, g):
-        utc_offset = g.get('location', {}).get('utc_offset')
+    def _get_utc_offset(self, a):
+        utc_offset = a.get('location', {}).get('utc_offset')
         if utc_offset:
             return datetime.timedelta(hours=parse_utc_offset(utc_offset))
         else:
