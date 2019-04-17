@@ -118,56 +118,56 @@ class TestFire(object):
         assert None == f.end
         assert None == f.end_utc
         # empty growth list
-        f = fires.Fire({"growth": []})
+        f = fires.Fire({"activity": []})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
         # one growth window with no 'start'
-        f = fires.Fire({"growth": [{}]})
+        f = fires.Fire({"activity": [{}]})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
         # one growth window with None 'start'
-        f = fires.Fire({"growth": [{'start': None}]})
+        f = fires.Fire({"activity": [{'start': None}]})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
         # multiple growth windows with no 'start'
-        f = fires.Fire({"growth": [{}, {}]})
+        f = fires.Fire({"activity": [{}, {}]})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
         # multiple growth windows with None 'start'
-        f = fires.Fire({"growth": [{'start': None}, {'start': None}]})
+        f = fires.Fire({"activity": [{'start': None}, {'start': None}]})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
         # multiple growth windows with None 'end'
-        f = fires.Fire({"growth": [{'end': None}, {'end': None}]})
+        f = fires.Fire({"activity": [{'end': None}, {'end': None}]})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
         # one growth window with start defined
-        f = fires.Fire({"growth": [{'start': "2014-05-27T17:00:00"}]})
+        f = fires.Fire({"activity": [{'start': "2014-05-27T17:00:00"}]})
         assert datetime.datetime(2014,5,27,17,0,0) == f.start
         assert datetime.datetime(2014,5,27,17,0,0) == f.start_utc
         assert None == f.end
         assert None == f.end_utc
         # one growth window with end defined
-        f = fires.Fire({"growth": [{'end': "2014-05-27T17:00:00"}]})
+        f = fires.Fire({"activity": [{'end': "2014-05-27T17:00:00"}]})
         assert None == f.start
         assert None == f.start_utc
         assert datetime.datetime(2014,5,27,17,0,0) == f.end
         assert datetime.datetime(2014,5,27,17,0,0) == f.end_utc
         # multiple growth windows, some with 'start' defined, some with end
         # defined, out of order
-        f = fires.Fire({"growth": [
+        f = fires.Fire({"activity": [
             {'start': None, 'end': '2014-05-30T17:00:00'},
             {'start': "2014-05-29T17:00:00", 'end': None},
             {'start': "2014-05-27T17:00:00", 'end': '2014-05-27T17:00:00'},
@@ -179,7 +179,7 @@ class TestFire(object):
         assert datetime.datetime(2014,5,30,17,0,0) == f.end_utc
 
         # multiple growth windows, all with 'start' & 'end' defined, out of order
-        f = fires.Fire({"growth": [
+        f = fires.Fire({"activity": [
             {'start': "2014-05-29T17:00:00", 'end': "2014-05-30T17:00:00"},
             {'start': "2014-05-27T17:00:00", 'end': "2014-05-28T17:00:00"},
             {'start': "2014-05-28T17:00:00", 'end': "2014-05-29T17:00:00"}
@@ -191,7 +191,7 @@ class TestFire(object):
         # multiple growth windows, all with 'start' & 'end' defined, out of
         # order, with utc_offset defined
         f = fires.Fire({
-            "growth": [
+            "activity": [
                 {
                     "location": {"utc_offset": '-07:00'},
                     'start': "2014-05-29T17:00:00",
@@ -778,7 +778,7 @@ class TestFiresManagerMergeFires(object):
                     "id": "ABC"
                 },
                 # growth just used for assertion, below
-                "growth": [{"location":{'area': 123}}]
+                "activity": [{"location":{'area': 123}}]
             })
             f2 = fires.Fire({
                 'id': '1',
@@ -786,7 +786,7 @@ class TestFiresManagerMergeFires(object):
                     "id": "SDF"
                 },
                 # growth just used for assertion, below
-                "growth": [{"location":{'area': 456}}]
+                "activity": [{"location":{'area': 456}}]
             })
             fm.fires = [f, f2]
             if not s:
@@ -809,14 +809,14 @@ class TestFiresManagerMergeFires(object):
                 "type": "rx",
                 "fuel_type": "natural",
                 # growth just used for assertion, below
-                "growth": [{"location":{'area': 123}}]
+                "activity": [{"location":{'area': 123}}]
             })
             f2 = fires.Fire({
                 'id': '1',
                 "type": "wf",
                 "fuel_type": "natural",
                 # growth just used for assertion, below
-                "growth": [{"location":{'area': 456}}]
+                "activity": [{"location":{'area': 456}}]
             })
             fm.fires = [f, f2]
             assert fm.num_fires == 2
@@ -888,7 +888,7 @@ class TestFiresManagerMergeFires(object):
             'id': '1',
             "type": "rx",
             "fuel_type": "natural",
-            "growth": [
+            "activity": [
                 {
                     "start": "2014-05-28T17:00:00",
                     "end": "2014-05-29T17:00:00",
@@ -913,7 +913,7 @@ class TestFiresManagerMergeFires(object):
             'id': '1',
             "type": "rx",
             "fuel_type": "natural",
-            "growth": [
+            "activity": [
                 {
                     "start": "2014-05-27T17:00:00",
                     "end": "2014-05-28T17:00:00",
@@ -929,7 +929,7 @@ class TestFiresManagerMergeFires(object):
             'id': '2',
             "type": "rx",
             "fuel_type": "natural",
-            "growth": [
+            "activity": [
                 {
                     "start": "2014-05-27T17:00:00",
                     "end": "2014-05-30T17:00:00",
@@ -950,7 +950,7 @@ class TestFiresManagerMergeFires(object):
                 'id': '1',
                 "type": "rx",
                 "fuel_type": "natural",
-                "growth": [
+                "activity": [
                     {
                         "start": "2014-05-27T17:00:00",
                         "end": "2014-05-28T17:00:00",
@@ -984,7 +984,7 @@ class TestFiresManagerMergeFires(object):
                 'id': '2',
                 "type": "rx",
                 "fuel_type": "natural",
-                "growth": [
+                "activity": [
                     {
                         "start": "2014-05-27T17:00:00",
                         "end": "2014-05-30T17:00:00",
@@ -1037,27 +1037,27 @@ class TestFiresManagerFilterFires(object):
             fires.Fire({'id': '01', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '02', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '03', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "ZZ"}}, {"location": {'country': "ZZ"}}]}),
+                "activity": [{"location": {'country': "ZZ"}}, {"location": {'country': "ZZ"}}]}),
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "UK"}}]}),
+                "activity": [{"location": {'country': "UK"}}]}),
             fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "USA"}}]}),
+                "activity": [{"location": {'country': "USA"}}]}),
             fires.Fire({'id': '06', 'name': 'n6', 'bar1': 1 , 'baz':'baz1',
-                "growth": [{"location": {'country': ''}}]}),
+                "activity": [{"location": {'country': ''}}]}),
             fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
-                "growth": [{"location": {'country': "CA"}}]}),
+                "activity": [{"location": {'country': "CA"}}]}),
             fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
-                "growth": [{"location": {'country': "CA"}}]}),
+                "activity": [{"location": {'country': "CA"}}]}),
             fires.Fire({'id': '09', 'name': 'n9', 'bar2': 2 , 'baz':'baz2',
-                "growth": [{"location": {'country': 'Unknown'}}]}),
+                "activity": [{"location": {'country': 'Unknown'}}]}),
             fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
-                "growth": [{"location": {"country": "USA"}}]}),
+                "activity": [{"location": {"country": "USA"}}]}),
             fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
-                "growth": [{"location": {"country": "BZ"}}]}),
+                "activity": [{"location": {"country": "BZ"}}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "ZZ"}}, {"location": {'country': "UK"}}]}),
+                "activity": [{"location": {'country': "ZZ"}}, {"location": {'country': "UK"}}]}),
             fires.Fire({'id': '13', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "ZZ"}}, {"location": {'country': "ZZ"}}]}),
+                "activity": [{"location": {'country': "ZZ"}}, {"location": {'country': "ZZ"}}]}),
         ]
         fm.fires = init_fires
         assert fm.num_fires == 13
@@ -1105,23 +1105,23 @@ class TestFiresManagerFilterFires(object):
         fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "UK"}}]}),
+                "activity": [{"location": {'country': "UK"}}]}),
             fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "USA"}}]}),
+                "activity": [{"location": {'country': "USA"}}]}),
             fires.Fire({'id': '06', 'name': 'n6', 'bar1': 1 , 'baz':'baz1',
-                "growth": [{"location": {'country': ''}}]}),
+                "activity": [{"location": {'country': ''}}]}),
             fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
-                "growth": [{"location": {'country': "CA"}}]}),
+                "activity": [{"location": {'country': "CA"}}]}),
             fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
-                "growth": [{"location": {'country': "CA"}}]}),
+                "activity": [{"location": {'country': "CA"}}]}),
             fires.Fire({'id': '09', 'name': 'n9', 'bar2': 2 , 'baz':'baz2',
-                "growth": [{"location": {'country': 'Unknown'}}]}),
+                "activity": [{"location": {'country': 'Unknown'}}]}),
             fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
-                "growth": [{"location": {"country": "USA"}}]}),
+                "activity": [{"location": {"country": "USA"}}]}),
             fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
-                "growth": [{"location": {"country": "BZ"}}]}),
+                "activity": [{"location": {"country": "BZ"}}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "UK"}}]}),
+                "activity": [{"location": {'country': "UK"}}]}),
         ]
         assert fm.num_fires == 9
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
@@ -1132,19 +1132,19 @@ class TestFiresManagerFilterFires(object):
         fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "UK"}}]}),
+                "activity": [{"location": {'country': "UK"}}]}),
             fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "USA"}}]}),
+                "activity": [{"location": {'country': "USA"}}]}),
             fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
-                "growth": [{"location": {'country': "CA"}}]}),
+                "activity": [{"location": {'country': "CA"}}]}),
             fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
-                "growth": [{"location": {'country': "CA"}}]}),
+                "activity": [{"location": {'country': "CA"}}]}),
             fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
-                "growth": [{"location": {"country": "USA"}}]}),
+                "activity": [{"location": {"country": "USA"}}]}),
             fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
-                "growth": [{"location": {"country": "BZ"}}]}),
+                "activity": [{"location": {"country": "BZ"}}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "UK"}}]})
+                "activity": [{"location": {'country': "UK"}}]})
         ]
         assert fm.num_fires == 7
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
@@ -1154,15 +1154,15 @@ class TestFiresManagerFilterFires(object):
         fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "UK"}}]}),
+                "activity": [{"location": {'country': "UK"}}]}),
             fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
-                "growth": [{"location": {'country': "CA"}}]}),
+                "activity": [{"location": {'country': "CA"}}]}),
             fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
-                "growth": [{"location": {'country': "CA"}}]}),
+                "activity": [{"location": {'country': "CA"}}]}),
             fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
-                "growth": [{"location": {"country": "BZ"}}]}),
+                "activity": [{"location": {"country": "BZ"}}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "UK"}}]})
+                "activity": [{"location": {'country': "UK"}}]})
         ]
         assert fm.num_fires == 5
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
@@ -1172,13 +1172,13 @@ class TestFiresManagerFilterFires(object):
         fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "UK"}}]}),
+                "activity": [{"location": {'country': "UK"}}]}),
             fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
-                "growth": [{"location": {'country': "CA"}}]}),
+                "activity": [{"location": {'country': "CA"}}]}),
             fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
-                "growth": [{"location": {'country': "CA"}}]}),
+                "activity": [{"location": {'country': "CA"}}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "UK"}}]})
+                "activity": [{"location": {'country': "UK"}}]})
         ]
         assert fm.num_fires == 4
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
@@ -1188,9 +1188,9 @@ class TestFiresManagerFilterFires(object):
         fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "UK"}}]}),
+                "activity": [{"location": {'country': "UK"}}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "growth": [{"location": {'country': "UK"}}]})
+                "activity": [{"location": {'country': "UK"}}]})
         ]
         assert fm.num_fires == 2
         assert expected == fm.fires

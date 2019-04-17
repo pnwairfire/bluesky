@@ -37,7 +37,7 @@ class TestFiresCsvsPickRepresentativeFuelbed(object):
         g = {}
         assert None == firescsvs._pick_representative_fuelbed({}, g)
         g = {
-            "growth": []
+            "activity": []
         }
         assert None == firescsvs._pick_representative_fuelbed({}, g)
 

@@ -30,7 +30,7 @@ class TestNoGrowth(object):
 
 BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH = {
     "name": "North fire",
-    "growth": [
+    "activity": [
         {
             "start": "2018-06-18T17:00:00",
             "end": "2018-06-18T19:00:00",
@@ -281,7 +281,7 @@ class TestOneGrowthPreFuelbeds(object):
 
 FIRE_PRE_FUELBEDS_TWO_GROWTH = {
     "name": "North fire",
-    "growth": [
+    "activity": [
         {
             "start": "2018-06-18T17:00:00",
             "end": "2018-06-18T19:00:00",
@@ -335,7 +335,7 @@ FIRE_PRE_FUELBEDS_TWO_GROWTH = {
 }
 EXPECTED_PRE_FUELBEDS_TWO_GROWTH = {
     "name": "North fire",
-    "growth": [
+    "activity": [
         {
             "start": "2018-06-18T17:00:00",
             "end": "2018-06-18T19:00:00",
@@ -443,7 +443,7 @@ class TestMultipleGrowthPreFuelbeds(object):
 
 FIRE_POST_EMISSIONS = {
     "name": "North fire",
-    "growth": [
+    "activity": [
         {
             "start": "2018-06-18T17:00:00",
             "end": "2018-06-18T19:00:00",

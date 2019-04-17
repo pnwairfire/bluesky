@@ -40,7 +40,7 @@ class TestIngestionErrorScenarios(object):
                         "area": 100.0,
                         "ecoregion": "southern"
                     },
-                    "growth": [{},{}]
+                    "activity": [{},{}]
                 }
             )
         assert e_info.value.args[0] == ingestion.IngestionErrMsgs.MULTIPLE_GROWTH_NO_PCT
@@ -56,7 +56,7 @@ class TestIngestionErrorScenarios(object):
                         },
                         "area": 100.0,
                     },
-                    "growth": [{
+                    "activity": [{
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00",
                         "pct": 20.0
@@ -102,7 +102,7 @@ class TestIngestionErrorScenarios(object):
         with raises(ValueError) as e_info:
             self.ingester.ingest(
                 {
-                    "growth": [{
+                    "activity": [{
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00",
                         "location": {
@@ -119,7 +119,7 @@ class TestIngestionErrorScenarios(object):
         with raises(ValueError) as e_info:
             self.ingester.ingest(
                 {
-                    "growth": [{
+                    "activity": [{
                         "start": "2015-01-20T17:00:00",
                         "end": "2015-01-21T17:00:00",
                         "location": {
@@ -200,7 +200,7 @@ class TestIngestionValidInput(object):
                 },
                 "ecoregion": "southern"
             },
-            "growth": [{
+            "activity": [{
                 "start": "2015-01-20T17:00:00",
                 "end": "2015-01-21T17:00:00",
                 "pct": 100.0
@@ -212,7 +212,7 @@ class TestIngestionValidInput(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            "growth": [{
+            "activity": [{
                 "start": "2015-01-20T17:00:00",
                 "end": "2015-01-21T17:00:00",
                 "location": copy.deepcopy(f['location'])
@@ -309,7 +309,7 @@ class TestIngestionValidInput(object):
                 }
             },
             "ecoregion": "southern",
-            "growth": [
+            "activity": [
                 {
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
@@ -327,7 +327,7 @@ class TestIngestionValidInput(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            "growth": [
+            "activity": [
                 {
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
@@ -367,7 +367,7 @@ class TestIngestionValidInput(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            "growth": [
+            "activity": [
                 {
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
@@ -778,7 +778,7 @@ class TestIngestionValidInput(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            "growth": [
+            "activity": [
                 {
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
@@ -881,7 +881,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
                 },
                 "ecoregion": "southern"
             },
-            "growth": [{
+            "activity": [{
                 "start": "2015-01-20T17:00:00",
                 "end": "2015-01-21T17:00:00",
                 "pct": 100.0,
@@ -900,7 +900,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            "growth": [{
+            "activity": [{
                 "start": "2015-01-20T17:00:00",
                 "end": "2015-01-21T17:00:00",
                 "location": copy.deepcopy(f['location']),

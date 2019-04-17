@@ -16,7 +16,7 @@ FS_FIRES = [
         "name": "HMS_sdfsdfsdf",
         "fuel_type": "natural",
         "type": "wildfire",
-        "growth": [
+        "activity": [
             {
                 "start": "2015-08-09T00:00:00",
                 "end": "2015-08-10T00:00:00",
@@ -80,7 +80,7 @@ MARSHALED = [
         "name": "HMS_sdfsdfsdf",
         "fuel_type": "natural",
         "type": "wildfire",
-        "growth": [
+        "activity": [
             {
                 "start": datetime.datetime(2015,8,9,0,0,0),
                 "end": datetime.datetime(2015,8,10,0,0,0),
