@@ -404,7 +404,7 @@ def check(actual, expected_partials, expected_totals):
         "totals": {k: {'matches': 0, 'total': 0} for k in ['emissions']}
     }
 
-    for fire in actual['fire_information']:
+    for fire in actual['fires']:
         fb = fire['growth'][0]['fuelbeds'][0]
         fccs_id = fb['fccs_id']
         fb_e = expected_partials[fccs_id]

@@ -4,7 +4,7 @@ Inputs data in a variety of formats, and produces data structured like the
 following:
 
 {
-    "fire_information": [
+    "fires": [
         {
             "event_of": {
                 "id": "SF11E826544",

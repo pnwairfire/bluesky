@@ -11,7 +11,7 @@ it will output the bluesky help image.  To run bluesky with piped input,
 use something like the following:
 
     echo '{
-        "fire_information": [{
+        "fires": [{
             "id": "SF11C14225236095807750",
             "event_of": {
                 "id": "SF11E826544",

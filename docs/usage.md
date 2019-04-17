@@ -73,7 +73,7 @@ running ```bsp-csv2json``` like so:
 
 would produce the following (written to stdout):
 
-    {"fire_information": [{"date_time": "201501200000Z", "litter": "", "county": "", "timezone": -5.0, "co": "", "elevation": 0.0, "pm10": "", "slope": 10.0, "state": "Unknown", "nh3": "", "moisture_duff": 150.0, "fuel_10khr": "", "fuel_gt10khr": "", "veg": "", "snow_month": 5, "min_temp_hour": 4, "min_wind": 6.0, "ch4": "", "moisture_1hr": 10.0, "id": "SF11C14225236095807750", "grass": "", "fuel_1hr": "", "duff": "", "max_humid": 80.0, "latitude": 25.041, "fuel_1khr": "", "heat": "", "area": 99.9999997516, "consumption_smoldering": "", "owner": "", "longitude": -77.379, "fuel_10hr": "", "rain_days": 8, "sf_server": "playground.dri.edu", "canopy": "", "min_humid": 40.0, "min_wind_aloft": 6.0, "rot": "", "fuel_100hr": "", "moisture_live": 130.0, "min_temp": 13.1, "pm2.5": "", "consumption_residual": "", "moisture_10hr": 12.0, "sunrise_hour": 7, "voc": "", "event_id": "SF11E826544", "moisture_1khr": 22.0, "so2": "", "max_wind": 6.0, "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "moisture_100hr": 12.0, "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "shrub": "", "country": "Unknown", "max_temp": 30.0, "sunset_hour": 18, "co2": "", "scc": 2810015000, "consumption_duff": "", "fccs_number": "", "nox": "", "max_temp_hour": 14, "consumption_flaming": "", "fips": -9999, "max_wind_aloft": 6.0, "type": "RX", "sf_stream_name": "realtime"}]}
+    {"fires": [{"date_time": "201501200000Z", "litter": "", "county": "", "timezone": -5.0, "co": "", "elevation": 0.0, "pm10": "", "slope": 10.0, "state": "Unknown", "nh3": "", "moisture_duff": 150.0, "fuel_10khr": "", "fuel_gt10khr": "", "veg": "", "snow_month": 5, "min_temp_hour": 4, "min_wind": 6.0, "ch4": "", "moisture_1hr": 10.0, "id": "SF11C14225236095807750", "grass": "", "fuel_1hr": "", "duff": "", "max_humid": 80.0, "latitude": 25.041, "fuel_1khr": "", "heat": "", "area": 99.9999997516, "consumption_smoldering": "", "owner": "", "longitude": -77.379, "fuel_10hr": "", "rain_days": 8, "sf_server": "playground.dri.edu", "canopy": "", "min_humid": 40.0, "min_wind_aloft": 6.0, "rot": "", "fuel_100hr": "", "moisture_live": 130.0, "min_temp": 13.1, "pm2.5": "", "consumption_residual": "", "moisture_10hr": 12.0, "sunrise_hour": 7, "voc": "", "event_id": "SF11E826544", "moisture_1khr": 22.0, "so2": "", "max_wind": 6.0, "sf_event_guid": "17cde405-cc3a-4555-97d2-77004435a020", "moisture_100hr": 12.0, "event_url": "http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020", "shrub": "", "country": "Unknown", "max_temp": 30.0, "sunset_hour": 18, "co2": "", "scc": 2810015000, "consumption_duff": "", "fccs_number": "", "nox": "", "max_temp_hour": 14, "consumption_flaming": "", "fips": -9999, "max_wind_aloft": 6.0, "type": "RX", "sf_stream_name": "realtime"}]}
 
 You can pipe the output of ```bsp-csv2json``` directly into ```bsp```, as long
 as you use the ingestions module, described below:
@@ -96,7 +96,7 @@ that doesn't depend on data updates made by any module not yet run.  For
 example, assume that you start with the following fire data:
 
     {
-        "fire_information": [
+        "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of": {
@@ -149,7 +149,7 @@ fields):
                 }
             ]
         },
-        "fire_information": [
+        "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "type": "wildfire",
@@ -256,7 +256,7 @@ yielding the following augmented output:
                 "version": "0.1.0"
             }
         ],
-        "fire_information": [
+        "fires": [
             {
                 "growth": [
                     {
@@ -451,7 +451,7 @@ would contain this output, agumented with emissions data:
         "run_config": {
             ...
         },
-        "fire_information": [
+        "fires": [
             {
                 "fuel_type": "natural",
                 "emissions": {
@@ -598,7 +598,7 @@ work only if you let the results go to STDOUT.  For example:
 For each fire, the ingestion module does the following:
 
  1. Moves the raw fire object to the 'parsed_input' array under the ingestion module's processing record -- In so doing, it keeps a record of the initial data, which will remain untouched.
- 2. Copies recognized fields back into a fire object under the 'fire_information' array -- In this step, it looks for nested fields both in the correctly nested
+ 2. Copies recognized fields back into a fire object under the 'fires' array -- In this step, it looks for nested fields both in the correctly nested
 locations as well as in the root fire object.
  3. Validates the fire data -- For example, if there is no location information, or if the nested location is insufficient, a ```ValueError``` is raised.
 
@@ -615,7 +615,7 @@ Some proposed but not yet implemented tasks:
 Assume you start with the following data:
 
     {
-        "fire_information": [
+        "fires": [
             {
                 "location": {
                     "latitude": 47.4316976,
@@ -649,7 +649,7 @@ It would become:
             ]
         },
         "today": "2016-09-15",
-        "fire_information": [
+        "fires": [
             {
                 "type": "wildfire",
                 "fuel_type": "natural",
@@ -706,7 +706,7 @@ As a fuller example, starting with the following input data (which we'll
 assume is in fires.json):
 
     {
-        "fire_information": [
+        "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of": {
@@ -776,7 +776,7 @@ you'll end up with this:
                 "module_name": "ingestion"
             }
         ],
-        "fire_information": [
+        "fires": [
             {
                 "growth": [
                     {
@@ -838,7 +838,7 @@ data, such as a polygon or multi-polygon representing the perimeter.
 The following is an example of the former:
 
     {
-        "fire_information": [
+        "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of": {
@@ -864,7 +864,7 @@ The following is an example of the former:
 while the following is an example of the latter:
 
     {
-        "fire_information": [
+        "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of": {

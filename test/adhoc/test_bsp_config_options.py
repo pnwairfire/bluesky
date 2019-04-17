@@ -26,7 +26,7 @@ BSP = os.path.join(ROOT_DIR, 'bin/bsp')
 
 INPUT = {
     "run_id": 'abcdefg123',
-    "fire_information": [],
+    "fires": [],
     "run_config": {  # 'run_config' is ignored in input data
         "foobar": 12312
     }
@@ -112,7 +112,7 @@ EXPECTED = {
         "e": 'abcdefg123__{_run_id}',
         #"f": 'sdfdsf__abcdefg123'
     }),
-    "fire_information": []
+    "fires": []
 }
 
 input_file = tempfile.NamedTemporaryFile(mode='w+t')
@@ -159,8 +159,8 @@ logging.info("expected: {}".format(EXPECTED))
 today = actual.pop('today')
 assert today == datetime.datetime.utcnow().strftime('%Y-%m-%d') #T00:00:00')
 #assert actual == EXPECTED
-assert set(actual.keys()) == set(['run_config', 'fire_information', 'run_id', 'counts', 'bluesky_version'])
-assert actual['fire_information'] == EXPECTED['fire_information']
+assert set(actual.keys()) == set(['run_config', 'fires', 'run_id', 'counts', 'bluesky_version'])
+assert actual['fires'] == EXPECTED['fires']
 assert set(actual['run_config'].keys()) == set(EXPECTED['run_config'].keys())
 for k in actual['run_config'].keys():
     logging.info('Checking output config key %s', k)

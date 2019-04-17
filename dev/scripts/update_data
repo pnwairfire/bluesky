@@ -33,7 +33,7 @@ def go(directory):
             with open(filename, 'r') as _f:
                  data = _f.read()
             data = json.loads(data)
-            for fire in data.get('fire_information', []):
+            for fire in data.get('fires', []):
                 process_fire(fire)
             for fire in data.get('failed_fires', []):
                 process_fire(fire)

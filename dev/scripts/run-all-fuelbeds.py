@@ -301,7 +301,7 @@ CONSUME_LOCATION_FIELDS = {
     "canopy_consumption_pct": 60
 }
 
-def get_fccs_ids_fire_information(args, times):
+def get_fccs_ids_fires(args, times):
     fccs_ids = ([i.strip() for i in args.fccs_ids.split(',')]
         if args.fccs_ids else FCCS_IDS)
     fires = []
@@ -331,7 +331,7 @@ def get_fccs_ids_fire_information(args, times):
         fires[-1]['growth'][0]['location'].update(**CONSUME_LOCATION_FIELDS)
     return fires
 
-def get_coordinates_fire_information(args, times):
+def get_coordinates_fires(args, times):
     coordinates = ([[float(y.strip()) for y in x.split(',')] for x in args.coordinates.split(';')]
         if args.coordinates else DEFAULT_COORDINATES)
     fires = []
@@ -356,8 +356,8 @@ def get_coordinates_fire_information(args, times):
     return fires
 
 MODES = {
-    'fccs-ids': get_fccs_ids_fire_information,
-    'coordinates': get_coordinates_fire_information
+    'fccs-ids': get_fccs_ids_fires,
+    'coordinates': get_coordinates_fires
 }
 
 def get_times():
@@ -371,7 +371,7 @@ def write_input(args, run_id, host_output_dir):
     times = get_times()
     input_data = {
         "run_id": run_id,
-        "fire_information": MODES[args.mode](args, times)
+        "fires": MODES[args.mode](args, times)
     }
     with open(host_output_dir + '/input.json', 'w') as f:
         f.write(json.dumps(input_data))

@@ -613,7 +613,8 @@ class FiresManager(object):
         self.modules = input_dict.pop('modules', [])
 
         # wipe out existing fires, if any
-        self.fires = input_dict.pop('fire_information', [])
+        self.fires = (input_dict.pop('fires', [])
+            or input_dict.pop('fire_information', []))
 
         # pop config, but don't set until after today has been set
         if 'config' in input_dict:
@@ -664,7 +665,7 @@ class FiresManager(object):
         # json or on the command line, and add them to the output if they
         # were in the input
 
-        return dict(self._meta, fire_information=self.fires, today=self.today,
+        return dict(self._meta, fires=self.fires, today=self.today,
             run_id=self.run_id, counts=self.counts, bluesky_version=__version__,
             run_config=Config.get())
 
@@ -1023,7 +1024,7 @@ class FireGrowthFilter(FiresActionBase):
                             raise
 
     def _remove_fire(self, fire):
-        """Removes fire from fires manager's `fire_information` list, and adds it
+        """Removes fire from fires manager's `fires` list, and adds it
         to `filtered_fires`
 
         args

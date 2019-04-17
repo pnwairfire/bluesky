@@ -1,6 +1,6 @@
 {
     "run_id": "1-fire-24hr-20150121-WA-latlng-{today}",
-    "fire_information": [
+    "fires": [
         {
             "event_id": "SF11E826544",
             "name": "Natural Fire near Snoqualmie Pass, WA",
