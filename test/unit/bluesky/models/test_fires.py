@@ -433,7 +433,7 @@ class TestFiresManager(object):
         assert [] == fires_manager.fires
         assert expected_meta == fires_manager.meta
 
-        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{"fire_information":[]}'))
+        monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{"fires":[]}'))
         fires_manager.loads()
         assert [] == fires_manager.fires
         assert expected_meta == fires_manager.meta
@@ -441,7 +441,7 @@ class TestFiresManager(object):
     @freezegun.freeze_time("2016-04-20")
     def test_load_no_fires_with_meta(self, monkeypatch, reset_config):
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
-            '{"fire_information":[], "foo": {"bar": "baz"}}'))
+            '{"fires":[], "foo": {"bar": "baz"}}'))
         monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
 
         fires_manager = fires.FiresManager()
@@ -457,7 +457,7 @@ class TestFiresManager(object):
     @freezegun.freeze_time("2016-04-20")
     def test_load_one_fire_with_meta(self, monkeypatch, reset_config):
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
-            '{"fire_information":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"}],'
+            '{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"}],'
             '"foo": {"bar": "baz"}}'))
         monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
 
@@ -477,7 +477,7 @@ class TestFiresManager(object):
     @freezegun.freeze_time("2016-04-20")
     def test_load_multiple_fires_with_meta(self, monkeypatch, reset_config):
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream(
-            '{"fire_information":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
+            '{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
             '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}],'
             '"foo": {"bar": "baz"}}'))
         monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
@@ -525,7 +525,7 @@ class TestFiresManager(object):
             "run_id": "abcd1234",
             "today": "2016-04-20",
             "run_config": DEFAULTS,
-            "fire_information": fire_objects,
+            "fires": fire_objects,
             "foo": {"bar": "baz"},
             "counts": {
                 "fires": 2

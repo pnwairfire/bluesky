@@ -75,7 +75,7 @@ class TestGetTimeWindows(object):
     def test_no_fires(self, reset_config):
         fm = FiresManager()
         fm.load({
-            "fire_information": []
+            "fires": []
         })
         with raises(BlueSkyConfigurationError) as e_info:
             findmetdata._get_time_windows(fm)
@@ -83,7 +83,7 @@ class TestGetTimeWindows(object):
     def test_fire_no_growth(self, reset_config):
         fm = FiresManager()
         fm.load({
-            "fire_information": [FIRE_NO_GROWTH]
+            "fires": [FIRE_NO_GROWTH]
         })
         with raises(BlueSkyConfigurationError) as e_info:
             findmetdata._get_time_windows(fm)
@@ -91,7 +91,7 @@ class TestGetTimeWindows(object):
     def test_one_fire(self, reset_config):
         fm = FiresManager()
         fm.load({
-            "fire_information": [FIRE_1]
+            "fires": [FIRE_1]
         })
         expected = [
             {
@@ -104,7 +104,7 @@ class TestGetTimeWindows(object):
     def test_two_fires(self, reset_config):
         fm = FiresManager()
         fm.load({
-            "fire_information": [FIRE_1, FIRE_2]
+            "fires": [FIRE_1, FIRE_2]
         })
         expected = [
             {
@@ -117,7 +117,7 @@ class TestGetTimeWindows(object):
     def test_three_fires(self, reset_config):
         fm = FiresManager()
         fm.load({
-            "fire_information": [FIRE_1, FIRE_2, FIRE_3]
+            "fires": [FIRE_1, FIRE_2, FIRE_3]
         })
         expected = [
             {
@@ -196,7 +196,7 @@ class TestGetTimeWindows(object):
     def test_with_dispersion_and_configured_time_window_and_three_fires(self, reset_config):
         fm = FiresManager()
         fm.load({
-                "fire_information": [FIRE_1, FIRE_2, FIRE_3],
+                "fires": [FIRE_1, FIRE_2, FIRE_3],
         })
         Config.set( {
             "dispersion": {
