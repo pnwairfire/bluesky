@@ -14,9 +14,14 @@
   - deprecated FiresManager.config (getter and setter)
   - refactored run_id logic and store as FiresManager attr rather than in _meta dict
 - support building docker image with default user matching host user's UID and group id & added script to add user post-build
-- upgrade consume package to v5
-- capture and ignore consume stdout
+- CONSUME
+  - upgrade consume package to v5
+  - capture and ignore consume stdout
+  - modify consume input defaults
+  - update ingestion to pass through more consume input fields
+- emissions
+  - Fix conversion factor for Prichard/Oneill emissions output (values wer half of what they should have been)
+  - added regression test case for Prichard/Oneill emissions
 - various changes to run-all-fuelbeds.py dev script
-- Fix conversion factor for Prichard/Oneill emissions output (valyes wer half of what they should have been)
-- modify consume input defaults
-- update ingestion to pass through more consume input fields
+- renamed input data fields
+  - 'fire_information' -> 'fires'
