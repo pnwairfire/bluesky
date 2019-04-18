@@ -128,7 +128,7 @@ class TestSummarize(object):
         summary = fuelbeds.summarize(fires)
         assert summary == expected_summary
 
-    # TODO: def test_two_fires_two_growth_each(self):
+    # TODO: def test_two_fires_two_activity_each(self):
 ##
 ## Tests for Estimator.estimate
 ##

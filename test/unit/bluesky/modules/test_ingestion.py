@@ -26,9 +26,9 @@ class TestIngestionErrorScenarios(object):
         # location must have geojson or lat+lng+area
         with raises(ValueError) as e_info:
             self.ingester.ingest({"location": {}})
-        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_ACTIVITY_OR_BASE_LOCATION
 
-    def test_multiple_growth_fields_missing_pct(self, reset_config):
+    def test_multiple_activity_fields_missing_pct(self, reset_config):
         # If growth is specified, each object in the array must have
         # 'start', 'end', and 'pct' defined
         with raises(ValueError) as e_info:
@@ -43,9 +43,9 @@ class TestIngestionErrorScenarios(object):
                     "activity": [{},{}]
                 }
             )
-        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.MULTIPLE_GROWTH_NO_PCT
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.MULTIPLE_ACTIVITY_NO_PCT
 
-    def test_multiple_growth_one_geojson(self, reset_config):
+    def test_multiple_activity_one_geojson(self, reset_config):
         with raises(ValueError) as e_info:
             self.ingester.ingest(
                 {
@@ -81,7 +81,7 @@ class TestIngestionErrorScenarios(object):
                     }
                 }
             )
-        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_ACTIVITY_OR_BASE_LOCATION
 
         # GeoJOSN types other than Polygon and MultiPolygon require area
         with raises(ValueError) as e_info:
@@ -95,9 +95,9 @@ class TestIngestionErrorScenarios(object):
                     }
                 }
             )
-        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_ACTIVITY_OR_BASE_LOCATION
 
-    def test_invalid_growth_level_location(self, reset_config):
+    def test_invalid_activity_level_location(self, reset_config):
         # missing area
         with raises(ValueError) as e_info:
             self.ingester.ingest(

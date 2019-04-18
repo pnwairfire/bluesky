@@ -9,7 +9,7 @@ class FakeDisperser(DispersionBase):
     def __init__(self, met_info):
         self._model = 'hysplit'
 
-    def _required_growth_fields(self):
+    def _required_activity_fields(self):
         pass
 
     def _run(wdir):

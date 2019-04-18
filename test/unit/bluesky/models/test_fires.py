@@ -728,7 +728,7 @@ class TestFiresManagerMergeFires(object):
                 assert fm.num_fires == 2
                 assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.id))
 
-    def test_growth_for_only_one_fire(self, reset_config):
+    def test_activity_for_only_one_fire(self, reset_config):
         # test in both skip and no-skip modes
         for s in (True, False):
             fm = fires.FiresManager()
@@ -1559,13 +1559,13 @@ class TestFiresManagerFilterFires(object):
         scenarios = (
             # missing area
             (fires.Fire({'id': '1', 'activity':[{'location':{}}]}),
-             fires.FireGrowthFilter.MISSING_GROWTH_AREA_MSG),
+             fires.FireGrowthFilter.MISSING_ACTIVITY_AREA_MSG),
             # missing location
             (fires.Fire({'id': '1', 'activity':[{}]}),
-             fires.FireGrowthFilter.MISSING_GROWTH_AREA_MSG),
+             fires.FireGrowthFilter.MISSING_ACTIVITY_AREA_MSG),
             # negative area
             (fires.Fire({'id': '1', 'activity':[{'location':{'area': -123}}]}),
-             fires.FireGrowthFilter.NEGATIVE_GROWTH_AREA_MSG),
+             fires.FireGrowthFilter.NEGATIVE_ACTIVITY_AREA_MSG),
         )
         for f, err_msg in scenarios:
             fm.fires = [f]

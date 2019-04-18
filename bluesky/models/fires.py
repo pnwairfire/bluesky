@@ -793,7 +793,7 @@ class FiresMerger(FiresActionBase):
                 #   with '_check_'; would need to change _check_keys'
                 #   signature to match the others
                 self._check_keys(fire)
-                self._check_growth_windows(fire, combined_fire)
+                self._check_activity_windows(fire, combined_fire)
                 self._check_event_of(fire, combined_fire)
                 self._check_fire_and_fuel_types(fire, combined_fire)
 
@@ -866,8 +866,8 @@ class FiresMerger(FiresActionBase):
 
     GROWTH_FOR_BOTH_OR_NONE_MSG = ("growth windows must be defined for both "
         "fires or neither in order to merge")
-    OVERLAPPING_GROWTH_WINDOWS = "growth windows overlap"
-    def _check_growth_windows(self, fire, combined_fire):
+    OVERLAPPING_ACTIVITY_WINDOWS = "growth windows overlap"
+    def _check_activity_windows(self, fire, combined_fire):
         """Makes sure growth windows are defined for all or none,
         and if defined, make sure they don't overlap
 
@@ -1118,8 +1118,8 @@ class FireGrowthFilter(FiresActionBase):
     SPECIFY_MIN_OR_MAX_MSG = "Specify min and/or max area for filtering"
     INVALID_MIN_MAX_MUST_BE_POS_MSG = "Min and max areas must be positive for filtering"
     INVALID_MIN_MUST_BE_LTE_MAX_MSG = "Min area must be LTE max if both are specified"
-    MISSING_GROWTH_AREA_MSG = "Fire growth window must have area defined to be filtered by area"
-    NEGATIVE_GROWTH_AREA_MSG = "Fire growth area can't be negative"
+    MISSING_ACTIVITY_AREA_MSG = "Fire growth window must have area defined to be filtered by area"
+    NEGATIVE_ACTIVITY_AREA_MSG = "Fire growth area can't be negative"
     def _get_area_filter(self, **kwargs):
         """Returns funciton that checks if a fire is smaller than some
         max threshold and/or larger than some min threshold.
@@ -1138,9 +1138,9 @@ class FireGrowthFilter(FiresActionBase):
         def _filter(fire, g):
             if (not isinstance(g.get('location'), dict) or
                     not g['location'].get('area')):
-                self._fail_fire(fire, self.MISSING_GROWTH_AREA_MSG)
+                self._fail_fire(fire, self.MISSING_ACTIVITY_AREA_MSG)
             elif g['location']['area'] < 0.0:
-                self._fail_fire(fire, self.NEGATIVE_GROWTH_AREA_MSG)
+                self._fail_fire(fire, self.NEGATIVE_ACTIVITY_AREA_MSG)
 
             return ((min_area is not None and g['location']['area'] < min_area) or
                 (max_area is not None and g['location']['area'] > max_area))

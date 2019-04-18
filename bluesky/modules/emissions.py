@@ -70,8 +70,8 @@ def run(fires_manager):
     # fix keys
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            for g in fire.activity:
-                for fb in g['fuelbeds']:
+            for a in fire.activity:
+                for fb in a['fuelbeds']:
                     _fix_keys(fb['emissions'])
                     if include_emissions_details:
                         _fix_keys(fb['emissions_details'])
@@ -82,8 +82,8 @@ def run(fires_manager):
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             # TODO: validate that each fuelbed has emissions data (here, or below) ?
-            for g in fire.activity:
-                g['emissions'] = datautils.summarize([g], 'emissions',
+            for a in fire.activity:
+                a['emissions'] = datautils.summarize([a], 'emissions',
                     include_details=False)
             fire.emissions = datautils.summarize(fire.activity, 'emissions',
                 include_details=False)
@@ -152,11 +152,11 @@ class Feps(EmissionsBase):
         if 'activity' not in fire:
             raise ValueError(
                 "Missing growth data required for computing emissions")
-        for g in fire['activity']:
-            if 'fuelbeds' not in g:
+        for a in fire['activity']:
+            if 'fuelbeds' not in a:
                raise ValueError(
                     "Missing fuelbed data required for computing emissions")
-            for fb in g['fuelbeds']:
+            for fb in a['fuelbeds']:
                 if 'consumption' not in fb:
                     raise ValueError(
                         "Missing consumption data required for computing emissions")
@@ -199,11 +199,11 @@ class PrichardOneill(EmissionsBase):
             raise ValueError(
                 "Missing growth data required for computing emissions")
 
-        for g in fire['activity']:
-            if 'fuelbeds' not in g:
+        for a in fire['activity']:
+            if 'fuelbeds' not in a:
                 raise ValueError(
                     "Missing fuelbed data required for computing emissions")
-            for fb in g['fuelbeds']:
+            for fb in a['fuelbeds']:
                 if 'consumption' not in fb:
                     raise ValueError(
                         "Missing consumption data required for computing emissions")
@@ -260,15 +260,15 @@ class Consume(EmissionsBase):
         if burn_type == 'piles':
             raise ValueError("Consume can't be used for fuel type 'piles'")
 
-        for g in fire['activity']:
-            if 'fuelbeds' not in g:
+        for a in fire['activity']:
+            if 'fuelbeds' not in a:
                 raise ValueError(
                     "Missing fuelbed data required for computing emissions")
 
 
-            season = datetimeutils.season_from_date(g.get('start'))
-            for fb in g['fuelbeds']:
-                self._run_on_fuelbed(fb, season, g['location'], burn_type)
+            season = datetimeutils.season_from_date(a.get('start'))
+            for fb in a['fuelbeds']:
+                self._run_on_fuelbed(fb, season, a['location'], burn_type)
 
     def _run_on_fuelbed(self, fb, season, location, burn_type):
         if 'consumption' not in fb:

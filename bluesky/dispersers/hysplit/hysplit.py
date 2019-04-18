@@ -161,7 +161,7 @@ class HYSPLITDispersion(DispersionBase):
         self._set_met_info(copy.deepcopy(met_info))
         self._output_file_name = self.config('output_file_name')
 
-    def _required_growth_fields(self):
+    def _required_activity_fields(self):
         return ('timeprofile', 'plumerise')
 
     def _run(self, wdir):

@@ -48,7 +48,7 @@ class VSMOKEDispersion(DispersionBase):
         logging.debug("PM Isopleths Names =%s" % self.ISONAMES)
         logging.debug("PM Isopleths Colors =%s" % self.ISOCOLORS)
 
-    def _required_growth_fields(self):
+    def _required_activity_fields(self):
         return ('timeprofile', ) # this is supposed to return a tuple
 
     def _set_input_file_vars(self, wdir):

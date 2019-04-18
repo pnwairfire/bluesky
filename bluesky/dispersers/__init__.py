@@ -117,7 +117,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         return r
 
     @abc.abstractmethod
-    def _required_growth_fields(self):
+    def _required_activity_fields(self):
         pass
 
     @abc.abstractmethod
@@ -157,13 +157,13 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                 if 'activity' not in fire:
                     raise ValueError(
                         "Missing fire growth data required for computing dispersion")
-                growth_fields = self._required_growth_fields() + ('fuelbeds', 'location')
-                for g in fire.activity:
-                    if any([not g.get(f) for f in growth_fields]):
+                growth_fields = self._required_activity_fields() + ('fuelbeds', 'location')
+                for a in fire.activity:
+                    if any([not a.get(f) for f in growth_fields]):
                         raise ValueError("Each growth window must have {} in "
                             "order to compute {} dispersion".format(
                             ','.join(growth_fields), self.__class__.__name__))
-                    if any([not fb.get('emissions') for fb in g['fuelbeds']]):
+                    if any([not fb.get('emissions') for fb in a['fuelbeds']]):
                         raise ValueError(
                             "Missing emissions data required for computing dispersion")
 
@@ -171,23 +171,23 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                     #   (just make sure each phase is defined, and set total to sum)
                     heat = None
                     heat_values = list(itertools.chain.from_iterable(
-                        [fb.get('heat', {}).get('total', [None]) for fb in g['fuelbeds']]))
+                        [fb.get('heat', {}).get('total', [None]) for fb in a['fuelbeds']]))
                     if not any([v is None for v in heat_values]):
                         heat = sum(heat_values)
                         if heat < 1.0e-6:
                             logging.debug("Fire %s growth window %s - %s has "
                                 "less than 1.0e-6 total heat; skip...",
-                                fire.id, g['start'], g['end'])
+                                fire.id, a['start'], a['end'])
                             continue
                     # else, just forget about heat
 
-                    utc_offset = g.get('location', {}).get('utc_offset')
+                    utc_offset = a.get('location', {}).get('utc_offset')
                     utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
 
                     # TODO: only include plumerise and timeprofile keys within model run
                     # time window; and somehow fill in gaps (is this possible?)
-                    all_plumerise = g.get('plumerise', {})
-                    all_timeprofile = g.get('timeprofile', {})
+                    all_plumerise = a.get('plumerise', {})
+                    all_timeprofile = a.get('timeprofile', {})
                     plumerise = {}
                     timeprofile = {}
                     for i in range(self._num_hours):
@@ -200,7 +200,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
                     # sum the emissions across all fuelbeds, but keep them separate by phase
                     emissions = {p: {} for p in PHASES}
-                    for fb in g['fuelbeds']:
+                    for fb in a['fuelbeds']:
                         for p in PHASES:
                             for s in fb['emissions'][p]:
                                 emissions[p][s] = (emissions[p].get(s, 0.0)
@@ -216,16 +216,16 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                             ])
 
                     # consumption = datautils.sum_nested_data(
-                    #     [fb.get("consumption", {}) for fb in g['fuelbeds']], 'summary', 'total')
-                    consumption = g['consumption']['summary']
+                    #     [fb.get("consumption", {}) for fb in a['fuelbeds']], 'summary', 'total')
+                    consumption = a['consumption']['summary']
 
-                    latlng = locationutils.LatLng(g['location'])
+                    latlng = locationutils.LatLng(a['location'])
 
                     f = Fire(
                         id=fire.id,
                         meta=fire.get('meta', {}),
-                        start=g['start'],
-                        area=g['location']['area'],
+                        start=a['start'],
+                        area=a['location']['area'],
                         latitude=latlng.latitude,
                         longitude=latlng.longitude,
                         utc_offset=utc_offset,
