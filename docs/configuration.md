@@ -98,9 +98,9 @@ configuration json data are case-insensitive.***
  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lat'*** -- *required* if 'location' section is defined --
  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lng'*** -- *required* if 'location' section is defined --
 
-##### splitgrowth
+##### splitactivity
 
- - ***'config' > 'splitgrowth' > 'record_original_growth'*** -- *optional* --
+ - ***'config' > 'splitactivity' > 'record_original_growth'*** -- *optional* --
 
 ##### fuelbeds
 

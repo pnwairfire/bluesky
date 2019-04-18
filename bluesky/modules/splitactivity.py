@@ -1,4 +1,4 @@
-"""bluesky.modules.splitgrowth"""
+"""bluesky.modules.splitactivity"""
 
 __author__ = "Joel Dubowy"
 
@@ -24,7 +24,7 @@ def run(fires_manager):
     logging.info("Running merge module")
     fires_manager.processed(__name__, __version__)
     record_original_growth = Config.get(
-        'splitgrowth', 'record_original_growth')
+        'splitactivity', 'record_original_growth')
 
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
@@ -57,12 +57,12 @@ def _split_growth(g):
                 if f:
                      return f(g)
                 else:
-                    logging.debug("splitgrowth doesn't support GeoJSON type %s",
+                    logging.debug("splitactivity doesn't support GeoJSON type %s",
                         geojson.get('type', '(not specified)'))
             else:
                 logging.warning("split growth ")
         else:
-            logging.debug("splitgrowth only supports GeoJSON geometries")
+            logging.debug("splitactivity only supports GeoJSON geometries")
     except:
         logging.warning("Failed to split growth %s", g)
 

@@ -1,4 +1,4 @@
-"""Unit tests for bluesky.modules.splitgrowth"""
+"""Unit tests for bluesky.modules.splitactivity"""
 
 __author__ = "Joel Dubowy"
 
@@ -6,7 +6,7 @@ import copy
 
 from py.test import raises
 
-from bluesky.modules import splitgrowth
+from bluesky.modules import splitactivity
 
 ##
 ## No growth to split
@@ -20,7 +20,7 @@ class TestNoGrowth(object):
         }
         # Expect no change
         expected = copy.deepcopy(fire)
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
 
@@ -58,7 +58,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         fire['growth'][0]['location']['longitude'] = 108.2
         # Expect no change
         expected = copy.deepcopy(fire)
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
     def test_invalid_geojson(self):
@@ -72,7 +72,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         }
         # Expect no change
         expected = copy.deepcopy(fire)
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
 
@@ -84,7 +84,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         }
         # Expect no change
         expected = copy.deepcopy(fire)
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
     def test_line_string(self):
@@ -98,7 +98,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         }
         # Expect no change
         expected = copy.deepcopy(fire)
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
     def test_polygon(self):
@@ -113,7 +113,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         }
         # Expect no change
         expected = copy.deepcopy(fire)
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
     def test_polygon_with_hole(self):
@@ -132,7 +132,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         }
         # Expect no change
         expected = copy.deepcopy(fire)
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
     def test_multi_line_string(self):
@@ -150,7 +150,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         }
         # Expect no change
         expected = copy.deepcopy(fire)
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
     def test_multi_polygon_with_area(self):
@@ -176,7 +176,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         }
         # Expect no change, due to not knowing how to divide area
         expected = copy.deepcopy(fire)
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
 class TestOneGrowthPreFuelbeds(object):
@@ -201,7 +201,7 @@ class TestOneGrowthPreFuelbeds(object):
             "type": "Point",
             "coordinates": [-101.0, 35.4]
         }
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
     def test_multi_point_no_area(self):
@@ -224,7 +224,7 @@ class TestOneGrowthPreFuelbeds(object):
             "type": "Point",
             "coordinates": [-101.0, 35.4]
         }
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
     def test_multi_polygon_no_area(self):
@@ -271,7 +271,7 @@ class TestOneGrowthPreFuelbeds(object):
                 ]
             ]
         }
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
 
 
@@ -426,12 +426,12 @@ class TestMultipleGrowthPreFuelbeds(object):
 
     def test_mixed_dont_record_orig(self):
         fire = copy.deepcopy(FIRE_PRE_FUELBEDS_TWO_GROWTH)
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == EXPECTED_PRE_FUELBEDS_TWO_GROWTH
 
     def test_mixed_record_orig(self):
         fire = copy.deepcopy(FIRE_PRE_FUELBEDS_TWO_GROWTH)
-        splitgrowth._split(fire, True)
+        splitactivity._split(fire, True)
         expected = copy.deepcopy(EXPECTED_PRE_FUELBEDS_TWO_GROWTH)
         expected['original_growth'] = FIRE_PRE_FUELBEDS_TWO_GROWTH['growth']
         assert fire == expected
@@ -541,7 +541,7 @@ FIRE_POST_EMISSIONS = {
     ]
 }
 
-class TestSplitGrowthPostFuelbeds(object):
+class TestSplitActivityPostFuelbeds(object):
 
     def test_basic(self):
         fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
@@ -555,5 +555,5 @@ class TestSplitGrowthPostFuelbeds(object):
         }
         # Expect no change
         expected = copy.deepcopy(fire)
-        splitgrowth._split(fire, False)
+        splitactivity._split(fire, False)
         assert fire == expected
