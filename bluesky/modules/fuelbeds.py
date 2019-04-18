@@ -37,8 +37,8 @@ def run(fires_manager):
                 raise ValueError(
                     "Activity information required to look up fuelbeds")
 
-            for g in fire['activity']:
-                if not g.get('location'):
+            for a in fire['activity']:
+                if not a.get('location'):
                     raise ValueError(
                         "activity location information required to look up fuelbeds")
                 # TODO: instead of instantiating a new FccsLookUp and Estimator
@@ -46,9 +46,9 @@ def run(fires_manager):
                 #   estimator objects that are reused, and set reference to
                 #   correct one here
                 # TODO: is_alaska from lat,lng, not from 'state'
-                lookup = FccsLookUp(is_alaska=g['location'].get('state')=='AK',
+                lookup = FccsLookUp(is_alaska=a['location'].get('state')=='AK',
                     **Config.get('fuelbeds'))
-                Estimator(lookup).estimate(g)
+                Estimator(lookup).estimate(a)
 
     # TODO: Add fuel loadings data to each fuelbed object (????)
     #  If we do so here, use bluesky.modules.consumption.FuelLoadingsManager
@@ -69,10 +69,10 @@ def summarize(fires):
     area_by_fccs_id = defaultdict(lambda: 0)
     total_area = 0
     for fire in fires:
-        for g in fire['activity']:
-            total_area += g['location']['area']
-            for fb in g['fuelbeds']:
-                area_by_fccs_id[fb['fccs_id']] += (fb['pct'] / 100.0) * g['location']['area']
+        for a in fire['activity']:
+            total_area += a['location']['area']
+            for fb in a['fuelbeds']:
+                area_by_fccs_id[fb['fccs_id']] += (fb['pct'] / 100.0) * a['location']['area']
     summary = [{"fccs_id": fccs_id, "pct": (area / total_area) * 100.0}
         for fccs_id, area in area_by_fccs_id.items()]
     return sorted(summary, key=lambda a: a["fccs_id"])

@@ -738,13 +738,13 @@ class FirePostProcessor(object):
             if fire['location'].get('geojson') and num_activity_objects > 1:
                 raise ValueError(IngestionErrMsgs.ONE_GEOJSON_MULTIPLE_ACTIVITY)
 
-            for g in fire['activity']:
-                g_pct = g.pop('pct', None)
-                g_base_location = self._get_base_location(g)
+            for a in fire['activity']:
+                a_pct = a.pop('pct', None)
+                a_base_location = self._get_base_location(a)
 
-                if (not not top_level_base_location) == (not not g_base_location):
+                if (not not top_level_base_location) == (not not a_base_location):
                     raise ValueError(IngestionErrMsgs.BASE_LOCATION_AT_TOP_OR_PER_ACTIVITY)
-                if not not fire.get('fuelbeds') and not not g.get('fuelbeds'):
+                if not not fire.get('fuelbeds') and not not a.get('fuelbeds'):
                     raise ValueError(IngestionErrMsgs.FUELBEDS_AT_TOP_OR_PER_ACTIVITY)
 
                 if top_level_base_location:
@@ -757,28 +757,28 @@ class FirePostProcessor(object):
                         # This must be the old, deprecated activity and location
                         # structure, so the activity object should either have
                         # 'pct' defined or be th eonly activity object
-                        if not g_pct:
+                        if not a_pct:
                             if num_activity_objects == 1:
-                                g_pct = 100
+                                a_pct = 100
                             else:
                                 raise ValueError(
                                     IngestionErrMsgs.MULTIPLE_ACTIVITY_NO_PCT)
-                        g['location']['area'] *= g_pct / 100.0
+                        a['location']['area'] *= a_pct / 100.0
 
-                    self._copy_optional_location_fields(fire['location'], g['location'])
+                    self._copy_optional_location_fields(fire['location'], a['location'])
                 else:
                     # prune activity object's location so that it has the base
                     # location info plus optional fields
-                    old_g_location = g.pop('location')
-                    g['location'] = g_base_location
-                    self._copy_optional_location_fields(old_g_location, g['location'])
+                    old_a_location = a.pop('location')
+                    a['location'] = a_base_location
+                    self._copy_optional_location_fields(old_a_location, a['location'])
 
                 if fire.get('fuelbeds'):
                     # just copy over fuelbeds; there's no need to adjust
                     # percentages, since they apply to the activity's area (not
                     # the fire's total area), and we'll assume the same
                     # percentages for each activity object
-                    g['fuelbeds'] = fire['fuelbeds']
+                    a['fuelbeds'] = fire['fuelbeds']
                 # else, whether or not fuelbeds are defined in the activity
                 # object, do nothing (leave it as is if defined)
         else:

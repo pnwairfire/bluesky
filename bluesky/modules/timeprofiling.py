@@ -57,22 +57,22 @@ def _run_fire(hourly_fractions, fire):
             "profiles supported for fires with multiple activity windows")
 
     _validate_fire(fire)
-    for g in fire.activity:
-        tw = parse_datetimes(g, 'start', 'end')
+    for a in fire.activity:
+        tw = parse_datetimes(a, 'start', 'end')
         profiler = StaticTimeProfiler(tw['start'], tw['end'],
             hourly_fractions=hourly_fractions)
         # convert timeprofile to dict with dt keys
-        g['timeprofile'] = {}
+        a['timeprofile'] = {}
         fields = list(profiler.hourly_fractions.keys())
         for i in range(len(list(profiler.hourly_fractions.values())[0])): # each phase should have same len
             hr = profiler.start_hour + (i * profiler.ONE_HOUR)
-            g['timeprofile'][hr.isoformat()] = {
+            a['timeprofile'][hr.isoformat()] = {
                 p: profiler.hourly_fractions[p][i] for p in fields }
 
 def _validate_fire(fire):
     if 'activity' not in fire:
         raise ValueError("Missing activity data required for time profiling")
-    for g in fire.activity:
-        if 'start' not in g or 'end' not in g:
+    for a in fire.activity:
+        if 'start' not in a or 'end' not in a:
             raise ValueError(
                 "Insufficient activity data required for time profiling")

@@ -10,13 +10,13 @@ import afscripting
 def process_fire(fire):
     if 'activity' not in fire:
         fire['activity'] = [{'pct': 100.0}]
-    for g in fire['activity']:
+    for a in fire['activity']:
         if 'location' in fire:
-            g['location'] = copy.deepcopy(fire['location'])
-            if g['location'].get('area') and g.get('pct'):
-                g['location']['area'] = g['location']['area'] * (g['pct'] / 100.0)
+            a['location'] = copy.deepcopy(fire['location'])
+            if a['location'].get('area') and a.get('pct'):
+                a['location']['area'] = a['location']['area'] * (a['pct'] / 100.0)
         if 'fuelbeds' in fire:
-            g['fuelbeds'] = copy.deepcopy(fire['fuelbeds'])
+            a['fuelbeds'] = copy.deepcopy(fire['fuelbeds'])
         g.pop('pct', None)
     fire.pop('location', None)
     fire.pop('fuelbeds', None)

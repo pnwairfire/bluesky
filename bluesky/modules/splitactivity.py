@@ -32,8 +32,8 @@ def run(fires_manager):
 
 def _split(fire, record_original_activity):
     new_activity = []
-    for g in fire.get('activity', []):
-        new_activity.extend(_split_activity(g))
+    for a in fire.get('activity', []):
+        new_activity.extend(_split_activity(a))
 
     if new_activity and new_activity != fire['activity']:  #len(new_activity) != len(fire['activity']):
         if record_original_activity:

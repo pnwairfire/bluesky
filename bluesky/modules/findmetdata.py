@@ -137,10 +137,10 @@ def _infer_time_windows_from_fires(fires_manager):
             with fires_manager.fire_failure_handler(fire):
                 if 'activity' in fire:
                     # parse_utc_offset makes sure utc offset is defined and valid
-                    for g in fire.activity:
-                        utc_offset = parse_utc_offset(g.get('location', {}).get('utc_offset'))
+                    for a in fire.activity:
+                        utc_offset = parse_utc_offset(a.get('location', {}).get('utc_offset'))
                         offset = datetime.timedelta(hours=utc_offset)
-                        tw = parse_datetimes(g, 'start', 'end')
+                        tw = parse_datetimes(a, 'start', 'end')
                         if tw['start'] > tw['end']:
                             raise ValueError("Invalid activity time window - start: {}, end: {}".format(
                                 tw['start'], tw['end']))

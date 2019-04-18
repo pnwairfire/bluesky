@@ -42,12 +42,12 @@ def run(fires_manager):
         with fires_manager.fire_failure_handler(fire):
             if not fire.get('activity'):
                 raise ValueError("Missing activity data required for localmet")
-            for g in fire['activity']:
-                latlng = LatLng(g.get('location'))
+            for a in fire['activity']:
+                latlng = LatLng(a.get('location'))
                 # parse_utc_offset makes sure utc offset is defined and valid
-                utc_offset = parse_utc_offset(g.get('location', {}).get('utc_offset'))
-                tw = parse_datetimes(g, 'start', 'end')
-                g['localmet'] = arl_profiler.profile(latlng.latitude,
+                utc_offset = parse_utc_offset(a.get('location', {}).get('utc_offset'))
+                tw = parse_datetimes(a, 'start', 'end')
+                a['localmet'] = arl_profiler.profile(latlng.latitude,
                     latlng.longitude, tw['start'],
                     tw['end'], utc_offset)
 
