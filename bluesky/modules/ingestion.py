@@ -12,7 +12,7 @@ following:
             },
             "id": "SF11C14225236095807750",
             "type": "wildfire",
-            "growth": [
+            "activity": [
                 {
                     "start": "2014-05-29T17:00:00",
                     "end": "2014-05-30T17:00:00",
@@ -33,7 +33,7 @@ following:
             },
             "id": "sdk2risodijfdsf",
             "type": "wildfire",
-            "growth": [
+            "activity": [
                 {
                     "start": "2014-05-29T17:00:00",
                     "end": "2014-05-30T17:00:00",
@@ -116,13 +116,36 @@ following:
                 }
             ]
         }
+    {
+  5) More recently deprecated fire structure
+        {
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Yosemite, CA"
+            },
+            "id": "SF11C14225236095807750",
+            "type": "wildfire",
+            "growth": [
+                {
+                    "start": "2014-05-29T17:00:00",
+                    "end": "2014-05-30T17:00:00",
+                    "location": {
+                        "area": 10000,
+                        "ecoregion": "western",
+                        "latitude": 37.909644,
+                        "longitude": -119.7615805,
+                        "utc_offset": "-07:00"
+                    }
+                }
+            ]
+        },
 
 # TODO:
- - for input fire array of growth objects, ingest emissions and heat
-   from top level fire object, if defined (and not defined in growth
-   objects); would need to distribute to growth objects based on
+ - for input fire array of activity objects, ingest emissions and heat
+   from top level fire object, if defined (and not defined in activity
+   objects); would need to distribute to activity objects based on
    relative areas.
- - ingest emissions for input with no growth window information
+ - ingest emissions for input with no activity window information
    (i.e. start & end or date_time
 
 """
@@ -175,25 +198,25 @@ def run(fires_manager):
 
 
 class IngestionErrMsgs(object):
-    MULTIPLE_GROWTH_NO_PCT = ("Growth percentage, 'pct', must be"
-        " defined if there are more than one growth objects"
+    MULTIPLE_ACTIVITY_NO_PCT = ("Activity percentage, 'pct', must be"
+        " defined if there are more than one activity objects"
         " and location is defined at the fire's top level.")
 
     NO_DATA = "Fire contains no data"
 
-    ONE_GEOJSON_MULTIPLE_GROWTH = ("Can't assign fire GeoJSON to mutiple "
-        "growth windows")
+    ONE_GEOJSON_MULTIPLE_ACTIVITY = ("Can't assign fire GeoJSON to mutiple "
+        "activity windows")
 
-    BASE_LOCATION_AT_TOP_OR_PER_GROWTH = ("GeoJSON or lat+lng+area must be "
-        "defined for the entire fire or for each growth object, not both")
+    BASE_LOCATION_AT_TOP_OR_PER_ACTIVITY = ("GeoJSON or lat+lng+area must be "
+        "defined for the entire fire or for each activity object, not both")
 
-    FUELBEDS_AT_TOP_OR_PER_GROWTH = ("Fuelbeds may be defined for the entire "
-        "fire or for each growth object, or for neither, not both")
+    FUELBEDS_AT_TOP_OR_PER_ACTIVITY = ("Fuelbeds may be defined for the entire "
+        "fire or for each activity object, or for neither, not both")
 
-    NO_GROWTH_OR_BASE_LOCATION = ("GeoJSON or lat+lng+area must be defined"
-        " for the entire fire if no growth windows are defined")
+    NO_ACTIVITY_OR_BASE_LOCATION = ("GeoJSON or lat+lng+area must be defined"
+        " for the entire fire if no activity windows are defined")
 
-    MISSING_GROWH_FIELD = "Missing growth field: '{}'"
+    MISSING_GROWH_FIELD = "Missing activity field: '{}'"
 
 
 OPTIONAL_LOCATION_FIELDS = [
@@ -399,7 +422,7 @@ class FireIngester(object):
             }
         else:
             # We'll check later to ensure that lat/lng + area or GeoJSON is
-            # specified either in top level or per growth object (but not both)
+            # specified either in top level or per activity object (but not both)
             return {}
 
 
@@ -437,10 +460,10 @@ class FireIngester(object):
         if event_of_dict:
             fire['event_of'] = event_of_dict
 
-    ## 'growth'
+    ## 'activity'
 
-    def _ingest_growth_location(self, growth, src):
-        # only look in growth object for location fields; don't look
+    def _ingest_activity_location(self, activity, src):
+        # only look in activity object for location fields; don't look
         base_fields = []
         for f in ['geojson', 'latitude', 'longitude', 'area']:
             v = src.get(f)
@@ -455,7 +478,7 @@ class FireIngester(object):
                 v = src['location'].get(f)
                 if v is not None:
                     location[f] = v
-        growth[-1]['location'] = location
+        activity[-1]['location'] = location
 
     def _get_numeric_val(self, src, *keys):
         for k in keys:
@@ -465,11 +488,11 @@ class FireIngester(object):
         # if we got here, method returns None
 
     EMISSIONS_SPECIES = {
-        # if typle, both keys are recognized, but use first key in growth obj
+        # if typle, both keys are recognized, but use first key in activity obj
         ("PM2.5", "PM25"), "PM10", "CO", "CO2", "CH4",
         "NOx", "NH3", "SO2", "VOC"
     }
-    def _ingest_growth_emissions(self, growth, src):
+    def _ingest_activity_emissions(self, activity, src):
         if Config.get('ingestion', 'keep_emissions'):
             logging.debug("Ingesting emissions")
             emissions = {"summary": {}}
@@ -483,63 +506,66 @@ class FireIngester(object):
                     emissions["summary"][keys[0]] = v
 
             if emissions["summary"]:
-                logging.debug("Recording emissions in growth object")
-                growth["emissions"] = emissions
+                logging.debug("Recording emissions in activity object")
+                activity["emissions"] = emissions
 
-    def _ingest_growth_heat(self, growth, src):
+    def _ingest_activity_heat(self, activity, src):
         if Config.get('ingestion', 'keep_heat'):
             logging.debug("Ingesting heat")
             # TODO: look for value in src['heat|HEAT']['summary']['total'] first
             heat = self._get_numeric_val(src, "heat", "HEAT")
             if heat is not None:
-                logging.debug("Recording heat in growth object")
-                growth["heat"] = {
+                logging.debug("Recording heat in activity object")
+                activity["heat"] = {
                     "summary": {
                         "total": heat
                     }
                 }
 
-    OPTIONAL_GROWTH_FIELDS = [
+    OPTIONAL_ACTIVITY_FIELDS = [
         'start','end', 'pct', 'localmet',
         'timeprofile', 'plumerise', 'frp'
     ]
 
-    def _ingest_optional_growth_fields(self, growth, src):
-        for f in self.OPTIONAL_GROWTH_FIELDS:
+    def _ingest_optional_activity_fields(self, activity, src):
+        for f in self.OPTIONAL_ACTIVITY_FIELDS:
             v = src.get(f)
             if v:
-                growth[-1][f] = v
+                activity[-1][f] = v
 
-        self._ingest_growth_emissions(growth[-1], src)
-        self._ingest_growth_heat(growth[-1], src)
+        self._ingest_activity_emissions(activity[-1], src)
+        self._ingest_activity_heat(activity[-1], src)
 
-    def _ingest_nested_field_growth(self, fire):
-        # Note: can't use _get_field[s] as is because 'growth' is an array,
+    def _ingest_nested_field_activity(self, fire):
+        # Note: can't use _get_field[s] as is because 'activity' is an array,
         # not a nested object
-        growth = []
-        if not self._parsed_input.get('growth'):
-            # no growth array - look for 'start'/'end' in top level
+        # Recognze 'growth' as synonym for 'activity'
+        input_activity = (self._parsed_input.get('activity') or
+            self._parsed_input.get('growth'))
+        activity = []
+        if not input_activity:
+            # no activity array - look for 'start'/'end' in top level
             start = self._parsed_input.get('start')
             end = self._parsed_input.get('end')
             if start and end:
-                growth.append({'start': start, 'end': end, 'pct': 100.0})
-                self._ingest_optional_growth_fields(growth, self._parsed_input)
+                activity.append({'start': start, 'end': end, 'pct': 100.0})
+                self._ingest_optional_activity_fields(activity, self._parsed_input)
 
         else:
-            for g in self._parsed_input['growth']:
-                growth.append({})
-                self._ingest_optional_growth_fields(growth, g)
-                self._ingest_growth_location(growth, g)
-                # TODO: make sure calling _ingest_nested_field_fuelbeds on g
+            for a in input_activity:
+                activity.append({})
+                self._ingest_optional_activity_fields(activity, a)
+                self._ingest_activity_location(activity, a)
+                # TODO: make sure calling _ingest_nested_field_fuelbeds on a
                 #   has the desired effect
-                self._ingest_nested_field_fuelbeds(g)
+                self._ingest_nested_field_fuelbeds(a)
 
-        if growth:
-            if len(growth) == 1 and 'pct' not in growth[0]:
-                growth[0]['pct'] = 100.0
+        if activity:
+            if len(activity) == 1 and 'pct' not in activity[0]:
+                activity[0]['pct'] = 100.0
             # TODO: make sure percentages add up to 100.0, with allowable error
-            logging.debug("Setting growth array in fire object")
-            fire['growth'] = growth
+            logging.debug("Setting activity array in fire object")
+            fire['activity'] = activity
 
     ## 'fuelbeds'
 
@@ -589,7 +615,7 @@ class FireIngester(object):
     OLD_DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?Z$')
     DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?([+-]\d{2}\:\d{2})$')
     DATE_TIME_FMT = "%Y%m%d%H%M"
-    GROWTH_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
+    ACTIVITY_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
     def _ingest_special_field_date_time(self, fire):
         """Ingests/parses 'date_time' field, found in sf2 fire data
 
@@ -605,7 +631,7 @@ class FireIngester(object):
 
         With true utc offset embedded in the string.
         """
-        if not fire['location'].get('utc_offset') or not fire.get('growth'):
+        if not fire['location'].get('utc_offset') or not fire.get('activity'):
             date_time = self._parsed_input.get('date_time')
             if date_time:
                 # this supports fires from bluesky daily runs;
@@ -625,17 +651,17 @@ class FireIngester(object):
                                 m.group(1), self.DATE_TIME_FMT)
                             # Note: we don't know utc offset; don't set
 
-                    if start is not None and not fire.get('growth'):
+                    if start is not None and not fire.get('activity'):
                         # As assume 24-hour
                         end = start + datetime.timedelta(hours=24)
                         # Note: this assumes time is local
-                        logging.debug("Setting growth window from BSF data")
-                        fire['growth'] =[{
-                            'start': start.strftime(self.GROWTH_TIME_FORMAT),
-                            'end': end.strftime(self.GROWTH_TIME_FORMAT),
+                        logging.debug("Setting activity window from BSF data")
+                        fire['activity'] =[{
+                            'start': start.strftime(self.ACTIVITY_TIME_FORMAT),
+                            'end': end.strftime(self.ACTIVITY_TIME_FORMAT),
                             'pct': 100.0
                         }]
-                        self._ingest_optional_growth_fields(fire['growth'],
+                        self._ingest_optional_activity_fields(fire['activity'],
                             self._parsed_input)
 
                     if utc_offset is not None and not fire['location'].get(
@@ -659,7 +685,7 @@ class FirePostProcessor(object):
     ##
 
     def process(self):
-        self._process_growth_locations_and_fuelbeds()
+        self._process_activity_locations_and_fuelbeds()
         self._validate()
 
     ##
@@ -683,21 +709,21 @@ class FirePostProcessor(object):
                 return {f: obj['location'][f] for f in ('latitude', 'longitude', 'area')}
         # else returns None
 
-    def _copy_optional_location_fields(self, fire_location, growth_location):
+    def _copy_optional_location_fields(self, fire_location, activity_location):
         # This is different than the copying of the optional fields in
         # FireIngester in that, here, each field is copied over only if
-        # it's not alredy defined in the growth's location
+        # it's not alredy defined in the activity's location
         if fire_location:
             for f in OPTIONAL_LOCATION_FIELDS:
-                if f in fire_location and f not in growth_location:
-                    growth_location[f] = fire_location[f]
+                if f in fire_location and f not in activity_location:
+                    activity_location[f] = fire_location[f]
 
     ##
     ## Processing
     ##
 
-    def _process_growth_locations_and_fuelbeds(self):
-        """Move location information from top level into growth objects.
+    def _process_activity_locations_and_fuelbeds(self):
+        """Move location information from top level into activity objects.
 
         Makes sure either lat+lng+area or GeoJSON is defined either at the
         top level location or in each of the growh objects.
@@ -707,41 +733,41 @@ class FirePostProcessor(object):
         """
         fire = self._fire
         top_level_base_location = self._get_base_location(fire)
-        if fire.get('growth'):
-            num_growth_objects = len(fire['growth'])
-            if fire['location'].get('geojson') and num_growth_objects > 1:
-                raise ValueError(IngestionErrMsgs.ONE_GEOJSON_MULTIPLE_GROWTH)
+        if fire.get('activity'):
+            num_activity_objects = len(fire['activity'])
+            if fire['location'].get('geojson') and num_activity_objects > 1:
+                raise ValueError(IngestionErrMsgs.ONE_GEOJSON_MULTIPLE_ACTIVITY)
 
-            for g in fire['growth']:
+            for g in fire['activity']:
                 g_pct = g.pop('pct', None)
                 g_base_location = self._get_base_location(g)
 
                 if (not not top_level_base_location) == (not not g_base_location):
-                    raise ValueError(IngestionErrMsgs.BASE_LOCATION_AT_TOP_OR_PER_GROWTH)
+                    raise ValueError(IngestionErrMsgs.BASE_LOCATION_AT_TOP_OR_PER_ACTIVITY)
                 if not not fire.get('fuelbeds') and not not g.get('fuelbeds'):
-                    raise ValueError(IngestionErrMsgs.FUELBEDS_AT_TOP_OR_PER_GROWTH)
+                    raise ValueError(IngestionErrMsgs.FUELBEDS_AT_TOP_OR_PER_ACTIVITY)
 
                 if top_level_base_location:
                     # initialize with base location; if it's a GeoJSON, then
-                    # we know this is the only growth object given the check
-                    # above; if it's lat+lng+area, we'll adjust the growth
+                    # we know this is the only activity object given the check
+                    # above; if it's lat+lng+area, we'll adjust the activity
                     # objets portion of the area
                     g['location'] = copy.deepcopy(top_level_base_location)
                     if fire['location'].get('area'):
-                        # This must be the old, deprecated growth and location
-                        # structure, so the growth object should either have
-                        # 'pct' defined or be th eonly growth object
+                        # This must be the old, deprecated activity and location
+                        # structure, so the activity object should either have
+                        # 'pct' defined or be th eonly activity object
                         if not g_pct:
-                            if num_growth_objects == 1:
+                            if num_activity_objects == 1:
                                 g_pct = 100
                             else:
                                 raise ValueError(
-                                    IngestionErrMsgs.MULTIPLE_GROWTH_NO_PCT)
+                                    IngestionErrMsgs.MULTIPLE_ACTIVITY_NO_PCT)
                         g['location']['area'] *= g_pct / 100.0
 
                     self._copy_optional_location_fields(fire['location'], g['location'])
                 else:
-                    # prune growth object's location so that it has the base
+                    # prune activity object's location so that it has the base
                     # location info plus optional fields
                     old_g_location = g.pop('location')
                     g['location'] = g_base_location
@@ -749,24 +775,24 @@ class FirePostProcessor(object):
 
                 if fire.get('fuelbeds'):
                     # just copy over fuelbeds; there's no need to adjust
-                    # percentages, since they apply to the growth's area (not
+                    # percentages, since they apply to the activity's area (not
                     # the fire's total area), and we'll assume the same
-                    # percentages for each growth object
+                    # percentages for each activity object
                     g['fuelbeds'] = fire['fuelbeds']
-                # else, whether or not fuelbeds are defined in the growth
+                # else, whether or not fuelbeds are defined in the activity
                 # object, do nothing (leave it as is if defined)
         else:
             if not top_level_base_location:
-                raise ValueError(IngestionErrMsgs.NO_GROWTH_OR_BASE_LOCATION)
-            fire['growth'] = [{
+                raise ValueError(IngestionErrMsgs.NO_ACTIVITY_OR_BASE_LOCATION)
+            fire['activity'] = [{
                 'location': top_level_base_location
             }]
             self._copy_optional_location_fields(fire['location'],
-                fire['growth'][0]['location'])
+                fire['activity'][0]['location'])
             if fire.get('fuelbeds'):
-                fire['growth'][0]['fuelbeds'] = fire['fuelbeds']
+                fire['activity'][0]['fuelbeds'] = fire['fuelbeds']
 
-        # delete top level location and fuelbeds, since each growth obejct
+        # delete top level location and fuelbeds, since each activity obejct
         # should have them now
         fire.pop('location', None)
         fire.pop('fuelbeds', None)
@@ -778,10 +804,10 @@ class FirePostProcessor(object):
     def _validate(self):
         # TODO: make sure required fields are all defined, and validate
         # values not validated by nested field specific _ingest_* methods
-        self._validate_growth()
+        self._validate_activity()
 
-    def _validate_growth(self):
-        """Provides extravalidation of growthinformation
+    def _validate_activity(self):
+        """Provides extravalidation of activityinformation
 
         The ingest_ and process_ methods, above, already provide some
         validation
