@@ -25,3 +25,4 @@
 - various changes to run-all-fuelbeds.py dev script
 - renamed input data fields
   - 'fire_information' -> 'fires'
+  - 'growth' -> 'activity'
