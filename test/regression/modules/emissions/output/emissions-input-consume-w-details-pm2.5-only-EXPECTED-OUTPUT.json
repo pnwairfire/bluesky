@@ -1130,7 +1130,7 @@
             }
         },
         "splitactivity": {
-            "record_original_growth": false
+            "record_original_activity": false
         },
         "merge": {
             "skip_failures": false

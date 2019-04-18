@@ -493,7 +493,7 @@
         "skip_failed_fires": false,
         "skip_failed_sources": false,
         "splitactivity": {
-            "record_original_growth": false
+            "record_original_activity": false
         },
         "localmet": {},
         "fuelbeds": {

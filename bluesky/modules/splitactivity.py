@@ -23,20 +23,20 @@ def run(fires_manager):
     """
     logging.info("Running merge module")
     fires_manager.processed(__name__, __version__)
-    record_original_growth = Config.get(
-        'splitactivity', 'record_original_growth')
+    record_original_activity = Config.get(
+        'splitactivity', 'record_original_activity')
 
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            _split(fire, record_original_growth)
+            _split(fire, record_original_activity)
 
-def _split(fire, record_original_growth):
+def _split(fire, record_original_activity):
     new_growth = []
     for g in fire.get('growth', []):
         new_growth.extend(_split_growth(g))
 
     if new_growth and new_growth != fire['growth']:  #len(new_growth) != len(fire['growth']):
-        if record_original_growth:
+        if record_original_activity:
             fire['original_growth'] = fire['growth']
         fire['growth'] = new_growth
 

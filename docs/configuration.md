@@ -100,7 +100,7 @@ configuration json data are case-insensitive.***
 
 ##### splitactivity
 
- - ***'config' > 'splitactivity' > 'record_original_growth'*** -- *optional* --
+ - ***'config' > 'splitactivity' > 'record_original_activity'*** -- *optional* --
 
 ##### fuelbeds
 

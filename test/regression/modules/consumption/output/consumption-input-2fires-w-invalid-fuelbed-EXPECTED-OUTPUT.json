@@ -3277,7 +3277,7 @@
             "fccs_version": "2"
         },
         "splitactivity": {
-            "record_original_growth": false
+            "record_original_activity": false
         },
         "localmet": {
             "time_step": 1

@@ -68,7 +68,7 @@ _DEFAULTS = {
         #     "ne": { "lat":None, "lng": None}}}
     },
     "splitactivity": {
-        "record_original_growth": False
+        "record_original_activity": False
     },
     "fuelbeds": {
         # The following defaults are defined in the fccsmap package,
