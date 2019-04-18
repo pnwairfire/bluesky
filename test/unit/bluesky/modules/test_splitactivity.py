@@ -12,7 +12,7 @@ from bluesky.modules import splitactivity
 ## No activity to split
 ##
 
-class TestNoGrowth(object):
+class TestNoActivity(object):
 
     def test(self):
         fire = FIRE_NO_ACTIVITY = {
@@ -50,7 +50,7 @@ BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY = {
     ]
 }
 
-class TestOneGrowthPreFuelbedsNothingSplit(object):
+class TestOneActivityPreFuelbedsNothingSplit(object):
 
     def test_lat_lng(self):
         fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
@@ -179,7 +179,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         splitactivity._split(fire, False)
         assert fire == expected
 
-class TestOneGrowthPreFuelbeds(object):
+class TestOneActivityPreFuelbeds(object):
 
     def test_multi_point(self):
         fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
@@ -276,7 +276,7 @@ class TestOneGrowthPreFuelbeds(object):
 
 
 ##
-## Two Growth Object
+## Two Activity Object
 ##
 
 FIRE_PRE_FUELBEDS_TWO_ACTIVITY = {
@@ -422,7 +422,7 @@ EXPECTED_PRE_FUELBEDS_TWO_ACTIVITY = {
     ]
 }
 
-class TestMultipleGrowthPreFuelbeds(object):
+class TestMultipleActivityPreFuelbeds(object):
 
     def test_mixed_dont_record_orig(self):
         fire = copy.deepcopy(FIRE_PRE_FUELBEDS_TWO_ACTIVITY)

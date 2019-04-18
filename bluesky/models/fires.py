@@ -531,7 +531,7 @@ class FiresManager(object):
     ## Filtering Fires
 
     def filter_fires(self):
-        with FireGrowthFilter(self) as ff:
+        with FireActivityFilter(self) as ff:
             ff.filter()
 
     ## Failures
@@ -908,7 +908,7 @@ class FiresMerger(FiresActionBase):
 ## Fires Filter
 ##
 
-class FireGrowthFilter(FiresActionBase):
+class FireActivityFilter(FiresActionBase):
     """Class for filtering fire activity windows by various criteria.
 
     Note: The logic in this class is organized as a saparate class primarily
@@ -922,7 +922,7 @@ class FireGrowthFilter(FiresActionBase):
         args:
          - fires_manager -- FiresManager object whose fires are to be merged
         """
-        super(FireGrowthFilter, self).__init__(fires_manager)
+        super(FireActivityFilter, self).__init__(fires_manager)
         self._filter_config = Config.get('filter')
         self._filter_fields = set(self._filter_config.keys()) - set(['skip_failures'])
         if not self._filter_fields:

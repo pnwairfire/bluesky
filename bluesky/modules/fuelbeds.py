@@ -35,7 +35,7 @@ def run(fires_manager):
         with fires_manager.fire_failure_handler(fire):
             if not fire.get('activity'):
                 raise ValueError(
-                    "Growth information required to look up fuelbeds")
+                    "Activity information required to look up fuelbeds")
 
             for g in fire['activity']:
                 if not g.get('location'):

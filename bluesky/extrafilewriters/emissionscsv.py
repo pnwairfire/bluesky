@@ -60,7 +60,7 @@ class EmissionsCsvWriter(object):
 
     def _write_fire(self, fire):
         if not fire.get('activity'):
-            raise ValueError("Growth information required to "
+            raise ValueError("Activity information required to "
                 "write emissions csv")
 
         for a in fire['activity']:
