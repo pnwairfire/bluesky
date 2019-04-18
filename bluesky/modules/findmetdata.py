@@ -137,7 +137,7 @@ def _infer_time_windows_from_fires(fires_manager):
             with fires_manager.fire_failure_handler(fire):
                 if 'activity' in fire:
                     # parse_utc_offset makes sure utc offset is defined and valid
-                    for g in fire.growth:
+                    for g in fire.activity:
                         utc_offset = parse_utc_offset(g.get('location', {}).get('utc_offset'))
                         offset = datetime.timedelta(hours=utc_offset)
                         tw = parse_datetimes(g, 'start', 'end')

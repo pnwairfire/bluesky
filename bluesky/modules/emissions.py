@@ -70,7 +70,7 @@ def run(fires_manager):
     # fix keys
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            for g in fire.growth:
+            for g in fire.activity:
                 for fb in g['fuelbeds']:
                     _fix_keys(fb['emissions'])
                     if include_emissions_details:
@@ -82,15 +82,15 @@ def run(fires_manager):
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             # TODO: validate that each fuelbed has emissions data (here, or below) ?
-            for g in fire.growth:
+            for g in fire.activity:
                 g['emissions'] = datautils.summarize([g], 'emissions',
                     include_details=False)
-            fire.emissions = datautils.summarize(fire.growth, 'emissions',
+            fire.emissions = datautils.summarize(fire.activity, 'emissions',
                 include_details=False)
 
     # summarise over all growth objects
     all_growth = list(itertools.chain.from_iterable(
-        [f.growth for f in fires_manager.fires]))
+        [f.activity for f in fires_manager.fires]))
     summary = dict(emissions=datautils.summarize(all_growth, 'emissions'))
     if include_emissions_details:
         summary.update(emissions_details=datautils.summarize(

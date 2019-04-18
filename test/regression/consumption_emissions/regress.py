@@ -120,29 +120,29 @@ def load_scenario(input_filename):
         fire = models.fires.Fire(copy.deepcopy(BASE_FIRE))
         fire.event_of["id"] = str(uuid.uuid4())
         area = int(row_dict['area'])
-        fire.growth[0]['location']['area'] = area
-        fire.growth[0]['location']['ecoregion'] = row_dict['ecoregion']
+        fire.activity[0]['location']['area'] = area
+        fire.activity[0]['location']['ecoregion'] = row_dict['ecoregion']
         # season is deterimined in pipeline consume code by growth start date,
         # so, reverse engineer start date based on season in input file
         if row_dict['season'] == 'spring':
-            fire.growth[0]['start'] = '2019-04-01'
+            fire.activity[0]['start'] = '2019-04-01'
         elif row_dict['season'] == 'summer':
-            fire.growth[0]['start'] = '2019-07-01'
+            fire.activity[0]['start'] = '2019-07-01'
         elif row_dict['season'] == 'fall':
-            fire.growth[0]['start'] = '2019-10-01'
+            fire.activity[0]['start'] = '2019-10-01'
         else:
-            fire.growth[0]['start'] = '2019-01-01'
-        fire.growth[0]['location']['moisture_duff'] = int(row_dict['fm_duff'])
-        fire.growth[0]['location']['moisture_litter'] = int(row_dict['fm_litter'])
-        fire.growth[0]['location']['moisture_1khr'] = int(row_dict['fm_1000hr'])
-        fire.growth[0]['location']['canopy_consumption_pct'] = int(row_dict['can_con_pct'])
-        fire.growth[0]['location']['shrub_blackened_pct'] = int(row_dict['shrub_black_pct'])
-        fire.growth[0]['location']['pile_blackened_pct'] = int(row_dict['pile_black_pct'])
-        fire.growth[0]['location']['output_units'] = row_dict['units']
-        fire.growth[0]['fuelbeds'][0]['fccs_id'] = row_dict['fuelbeds']
+            fire.activity[0]['start'] = '2019-01-01'
+        fire.activity[0]['location']['moisture_duff'] = int(row_dict['fm_duff'])
+        fire.activity[0]['location']['moisture_litter'] = int(row_dict['fm_litter'])
+        fire.activity[0]['location']['moisture_1khr'] = int(row_dict['fm_1000hr'])
+        fire.activity[0]['location']['canopy_consumption_pct'] = int(row_dict['can_con_pct'])
+        fire.activity[0]['location']['shrub_blackened_pct'] = int(row_dict['shrub_black_pct'])
+        fire.activity[0]['location']['pile_blackened_pct'] = int(row_dict['pile_black_pct'])
+        fire.activity[0]['location']['output_units'] = row_dict['units']
+        fire.activity[0]['fuelbeds'][0]['fccs_id'] = row_dict['fuelbeds']
         # See note above about 1 fire + N fuelbeds vs N fires + 1 fuelbed each
-        #fire.growth[0]['fuelbeds'][0]['pct'] = float(area) / float(total_area)
-        fire.growth[0]['fuelbeds'][0]['pct'] = 100.0
+        #fire.activity[0]['fuelbeds'][0]['pct'] = float(area) / float(total_area)
+        fire.activity[0]['fuelbeds'][0]['pct'] = 100.0
         fires_manager.add_fire(fire)
     return fires_manager
 

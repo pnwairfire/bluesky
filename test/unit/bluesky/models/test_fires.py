@@ -382,9 +382,9 @@ class TestFiresManager(object):
         assert datetime.datetime(2014,5,28,19) == fm.latest_end
 
         # same thing, but with time zones specified for two of the fires
-        f1.growth[0]['location']['utc_offset'] = '-07:00'
-        f1.growth[1]['location']['utc_offset'] = '-07:00'
-        f2.growth[0]['location']['utc_offset'] = '03:00' # no longer the latest time
+        f1.activity[0]['location']['utc_offset'] = '-07:00'
+        f1.activity[1]['location']['utc_offset'] = '-07:00'
+        f2.activity[0]['location']['utc_offset'] = '03:00' # no longer the latest time
         assert datetime.datetime(2014,5,26,0) == fm.earliest_start
         assert datetime.datetime(2014,5,29,0) == fm.latest_end
 
@@ -757,7 +757,7 @@ class TestFiresManagerMergeFires(object):
                     fm.merge_fires()
                 assert fm.num_fires == 2
                 assert e_info.value.args[0].index(
-                    fires.FiresMerger.GROWTH_FOR_BOTH_OR_NONE_MSG) > 0
+                    fires.FiresMerger.ACTIVITY_FOR_BOTH_OR_NONE_MSG) > 0
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
@@ -797,7 +797,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.growth[0]['location']['area']))
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.activity[0]['location']['area']))
 
     def test_different_fire_and_fuel_type(self, reset_config):
         # test in both skip and no-skip modes
@@ -829,7 +829,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.growth[0]['location']['area']))
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.activity[0]['location']['area']))
 
             f2.type = f.type
             f2.fuel_type = "activity"
@@ -843,7 +843,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.growth[0]['location']['area']))
+                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.activity[0]['location']['area']))
 
     def test_merge_mixed_success_no_growth(self, reset_config):
         fm = fires.FiresManager()

@@ -164,22 +164,22 @@ class BaseTestEstimatorEstimate(object):
     def test_none_lookup_info(self):
         self.estimator.lookup.look_up = lambda p: None
         with raises(RuntimeError) as e:
-            self.estimator.estimate(self.growth_obj)
+            self.estimator.estimate(self.activity_obj)
 
     def test_empty_lookup_info(self):
         self.estimator.lookup.look_up = lambda p: {}
         with raises(RuntimeError) as e:
-            self.estimator.estimate(self.growth_obj)
+            self.estimator.estimate(self.activity_obj)
 
     def test_lookup_info_percentages_less_than_100(self):
         self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_30
         with raises(RuntimeError) as e:
-            self.estimator.estimate(self.growth_obj)
+            self.estimator.estimate(self.activity_obj)
 
     def test_lookup_info_percentages_greater_than_100(self):
         self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_40_10
         with raises(RuntimeError) as e:
-            self.estimator.estimate(self.growth_obj)
+            self.estimator.estimate(self.activity_obj)
 
     # Test of valid lookup data
 
@@ -191,9 +191,9 @@ class BaseTestEstimatorEstimate(object):
         ]
         # Having 'geojson' key will trigger call to self.estimator.lookup.look_up;
         # The value of GeoJSON is not actually used here
-        self.estimator.estimate(self.growth_obj)
-        assert expected_fuelbeds == self.growth_obj.get('fuelbeds')
-        assert 100.0 == self.growth_obj.get('fuelbeds_total_accounted_for_pct')
+        self.estimator.estimate(self.activity_obj)
+        assert expected_fuelbeds == self.activity_obj.get('fuelbeds')
+        assert 100.0 == self.activity_obj.get('fuelbeds_total_accounted_for_pct')
 
     def test_with_truncation(self):
         self.estimator.lookup.look_up = lambda p: FUELBED_INFO_24_12_48_12_4
@@ -205,19 +205,19 @@ class BaseTestEstimatorEstimate(object):
         ]
         # Having 'geojson' key will trigger call to self.estimator.lookup.look_up;
         # The value of GeoJSON is not actually used here
-        self.estimator.estimate(self.growth_obj)
-        assert expected_fuelbeds == self.growth_obj.get('fuelbeds')
-        assert 96.0 == self.growth_obj.get('fuelbeds_total_accounted_for_pct')
+        self.estimator.estimate(self.activity_obj)
+        assert expected_fuelbeds == self.activity_obj.get('fuelbeds')
+        assert 96.0 == self.activity_obj.get('fuelbeds_total_accounted_for_pct')
 
 class TestEstimatorGetFromGeoJSON(BaseTestEstimatorEstimate):
     def setup(self):
-        self.growth_obj = {"location": {"geojson": GEOJSON}}
+        self.activity_obj = {"location": {"geojson": GEOJSON}}
         super(TestEstimatorGetFromGeoJSON, self).setup()
 
 class TestEstimatorGetFromLatLng(BaseTestEstimatorEstimate):
 
     def setup(self):
-        self.growth_obj = {"location": {"latitude": 46.0, 'longitude': -120.34}}
+        self.activity_obj = {"location": {"latitude": 46.0, 'longitude': -120.34}}
         super(TestEstimatorGetFromLatLng, self).setup()
 
 ##

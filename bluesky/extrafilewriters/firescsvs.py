@@ -193,9 +193,9 @@ def _assign_event_name(event, fire, new_fire):
         event['name'] = name
 
 def _update_event_area(event, fire, new_fire):
-    if any([not g.get('location', {}).get('area') for g in fire.growth]):
+    if any([not a.get('location', {}).get('area') for a in fire.activity]):
         raise ValueError("Fire {} lacks area".format(fire.get('id')))
-    return event.get('total_area', 0.0) + sum([g['location']['area'] for g in fire.growth])
+    return event.get('total_area', 0.0) + sum([a['location']['area'] for a in fire.activity])
 
 def _update_total_heat(event, fire, new_fire):
     if 'total_heat' in event and event['total_heat'] is None:
@@ -273,8 +273,8 @@ class FiresCsvsWriter(object):
         fires = []
         events = {}
         for fire in fires_manager.fires:
-            for g in fire.growth:
-                fires.append({k: l(fire, g) or '' for k, l in FIRE_LOCATIONS_CSV_FIELDS})
+            for a in fire.activity:
+                fires.append({k: l(fire, a) or '' for k, l in FIRE_LOCATIONS_CSV_FIELDS})
             event_id = fire.get('event_of', {}).get('id')
             if event_id:
                 events[event_id] = events.get(event_id, {})

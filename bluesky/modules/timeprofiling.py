@@ -46,7 +46,7 @@ def run(fires_manager):
             #     raise
 
 def _run_fire(hourly_fractions, fire):
-    if (hourly_fractions and len(fire.growth) > 1 and
+    if (hourly_fractions and len(fire.activity) > 1 and
             set([len(e) for p,e in hourly_fractions.items()]) != set([24])):
         # TODO: Support this scenario, but make sure
         # len(hourly_fractions) equals the total number of hours
@@ -57,7 +57,7 @@ def _run_fire(hourly_fractions, fire):
             "profiles supported for fires with multiple growth windows")
 
     _validate_fire(fire)
-    for g in fire.growth:
+    for g in fire.activity:
         tw = parse_datetimes(g, 'start', 'end')
         profiler = StaticTimeProfiler(tw['start'], tw['end'],
             hourly_fractions=hourly_fractions)
@@ -72,7 +72,7 @@ def _run_fire(hourly_fractions, fire):
 def _validate_fire(fire):
     if 'activity' not in fire:
         raise ValueError("Missing growth data required for time profiling")
-    for g in fire.growth:
+    for g in fire.activity:
         if 'start' not in g or 'end' not in g:
             raise ValueError(
                 "Insufficient growth data required for time profiling")

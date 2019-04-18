@@ -67,7 +67,7 @@ class ComputeFunction(object):
     def __call__(self, fire):
         if 'activity' not in fire:
             raise ValueError("Missing growth data required for plumerise")
-        if any([not g.get('location', {}).get('area') for g in fire.growth]):
+        if any([not g.get('location', {}).get('area') for g in fire.activity]):
             raise ValueError("Missing fire growth area required for plumerise")
         self._compute_func(fire)
 
@@ -89,7 +89,7 @@ class ComputeFunction(object):
             #   above (one working dir per all fires), or below (per growth
             #   window)...or just let plumerise create temp workingdir (as
             #   it's currently doing?
-            for g in fire.growth:
+            for g in fire.activity:
                 if not g.get('consumption', {}).get('summary'):
                     raise ValueError("Missing fire growth consumption data "
                         "required for FEPS plumerise")
@@ -131,7 +131,7 @@ class ComputeFunction(object):
 
         def _f(fire):
             fire_frp = fire.get('meta', {}).get('frp')
-            for g in fire.growth:
+            for g in fire.activity:
                 if not g.get('localmet'):
                     raise ValueError(
                         "Missing localmet data required for computing SEV plumerise")

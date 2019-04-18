@@ -158,7 +158,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                     raise ValueError(
                         "Missing fire growth data required for computing dispersion")
                 growth_fields = self._required_growth_fields() + ('fuelbeds', 'location')
-                for g in fire.growth:
+                for g in fire.activity:
                     if any([not g.get(f) for f in growth_fields]):
                         raise ValueError("Each growth window must have {} in "
                             "order to compute {} dispersion".format(

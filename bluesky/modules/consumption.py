@@ -55,7 +55,7 @@ def run(fires_manager):
 
     # summarise over all growth objects
     all_growth = list(itertools.chain.from_iterable(
-        [f.growth for f in fires_manager.fires]))
+        [f.activity for f in fires_manager.fires]))
     fires_manager.summarize(
         consumption=datautils.summarize(all_growth, 'consumption'))
     fires_manager.summarize(
@@ -73,21 +73,21 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
     # results?  If it is simply a matter of parsing separated values from
     # the results, make sure that running all at once produces any performance
     # gain; if it doesn't,then it might not be worth the trouble
-    for g in fire.growth:
-        season = datetimeutils.season_from_date(g.get('start'))
-        for fb in g['fuelbeds']:
-            _run_fuelbed(fb, fuel_loadings_manager, season, g['location'], burn_type, msg_level)
+    for a in fire.activity:
+        season = datetimeutils.season_from_date(a.get('start'))
+        for fb in a['fuelbeds']:
+            _run_fuelbed(fb, fuel_loadings_manager, season, a['location'], burn_type, msg_level)
         # Aggregate consumption and heat over all fuelbeds in the growth window
         # include only per-phase totals, not per category > sub-category > phase
-        g['consumption'] = datautils.summarize([g], 'consumption',
+        a['consumption'] = datautils.summarize([a], 'consumption',
             include_details=False)
-        g['heat'] = datautils.summarize([g], 'heat', include_details=False)
+        a['heat'] = datautils.summarize([a], 'heat', include_details=False)
 
     # Aggregate consumption and heat over all fuelbeds in *all* growth windows;
     # include only per-phase totals, not per category > sub-category > phase
-    fire.consumption = datautils.summarize(fire.growth, 'consumption',
+    fire.consumption = datautils.summarize(fire.activity, 'consumption',
         include_details=False)
-    fire.heat = datautils.summarize(fire.growth, 'heat',
+    fire.heat = datautils.summarize(fire.activity, 'heat',
         include_details=False)
 
 def _run_fuelbed(fb, fuel_loadings_manager, season, location, burn_type, msg_level):
@@ -152,45 +152,45 @@ def _validate_input(fires_manager):
             if not fire.get('activity'):
                 raise ValueError(
                     "Missing growth data required for computing consumption")
-            for g in fire.growth:
+            for a in fire.activity:
                 for k in ('fuelbeds', 'location'):
-                    if not g.get(k):
+                    if not a.get(k):
                         raise ValueError("Missing growth '{}' data required "
                         "for computing consumption".format(k))
                 # only 'area' is required from location
-                if not g['location'].get('area'):
+                if not a['location'].get('area'):
                     raise ValueError("Fire growth location data must "
                         "define area for computing consumption")
-                if not g['location'].get('ecoregion'):
+                if not a['location'].get('ecoregion'):
                     # import EcoregionLookup here so that, if fires do have
                     # ecoregion defined, consumption can be run without mapscript
                     # and other dependencies installed
                     try:
-                        latlng = LatLng(g['location'])
+                        latlng = LatLng(a['location'])
                         if not ecoregion_lookup:
                             from bluesky.ecoregion.lookup import EcoregionLookup
                             implemenation = Config.get('consumption',
                                 'ecoregion_lookup_implemenation')
                             ecoregion_lookup = EcoregionLookup(implemenation)
-                        g['location']['ecoregion'] = ecoregion_lookup.lookup(
+                        a['location']['ecoregion'] = ecoregion_lookup.lookup(
                             latlng.latitude, latlng.longitude)
-                        if not g['location']['ecoregion']:
+                        if not a['location']['ecoregion']:
                             logging.warning("Failed to look up ecoregion for "
                                 "{}, {}".format(latlng.latitude, latlng.longitude))
-                            _use_default_ecoregion(fires_manager, g)
+                            _use_default_ecoregion(fires_manager, a)
 
                     except exceptions.MissingDependencyError as e:
-                        _use_default_ecoregion(fires_manager, g, e)
+                        _use_default_ecoregion(fires_manager, a, e)
 
-                for fb in g['fuelbeds'] :
+                for fb in a['fuelbeds'] :
                     if not fb.get('fccs_id') or not fb.get('pct'):
                         raise ValueError("Each fuelbed must define 'fccs_id' and 'pct'")
 
-def _use_default_ecoregion(fires_manager, g, exc=None):
+def _use_default_ecoregion(fires_manager, a, exc=None):
     default_ecoregion = Config.get('consumption', 'default_ecoregion')
     if default_ecoregion:
         logging.debug('Using default ecoregion %s', default_ecoregion)
-        g['location']['ecoregion'] = default_ecoregion
+        a['location']['ecoregion'] = default_ecoregion
     else:
         logging.debug('No default ecoregion')
         if exc:

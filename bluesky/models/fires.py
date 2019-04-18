@@ -75,13 +75,13 @@ class Fire(dict):
         Doesn't memoize, in case growth windows are added/removed/modified
         """
         # consider only growth windows with start times
-        growths = [g for g in self.get('activity', []) if g.get('start')]
-        if growths:
-            growths = sorted(growths, key=lambda g: g['start'])
+        activity = [a for a in self.get('activity', []) if a.get('start')]
+        if activity:
+            activity = sorted(activity, key=lambda a: a['start'])
             # record  utc offset of initial growth window, in case
             # start_utc is being called
-            self.__utc_offset = growths[0].get('location', {}).get('utc_offset')
-            return datetimeutils.parse_datetime(growths[0]['start'], 'start')
+            self.__utc_offset = activity[0].get('location', {}).get('utc_offset')
+            return datetimeutils.parse_datetime(activity[0]['start'], 'start')
 
     @property
     def start_utc(self):
@@ -99,13 +99,13 @@ class Fire(dict):
           is considered, so this isn't a high priority)
         """
         # consider only growth windows with end times
-        growths = [g for g in self.get('activity', []) if g.get('end')]
-        if growths:
-            growths = sorted(growths, key=lambda g: g['end'])
+        activity = [a for a in self.get('activity', []) if a.get('end')]
+        if activity:
+            activity = sorted(activity, key=lambda a: a['end'])
             # record  utc offset of initial growth window, in case
             # start_utc is being called
-            self.__utc_offset = growths[-1].get('location', {}).get('utc_offset')
-            return datetimeutils.parse_datetime(growths[-1]['end'], 'end')
+            self.__utc_offset = activity[-1].get('location', {}).get('utc_offset')
+            return datetimeutils.parse_datetime(activity[-1]['end'], 'end')
 
     @property
     def end_utc(self):
@@ -837,8 +837,8 @@ class FiresMerger(FiresActionBase):
                 # merge growth; remember, at this point, growth will be
                 # defined for none or all of the fires to be merged
                 if new_combined_fire.get('activity'):
-                    new_combined_fire.growth.extend(copy.deepcopy(fire.growth))
-                    new_combined_fire.growth.sort(key=lambda e: e['start'])
+                    new_combined_fire.activity.extend(copy.deepcopy(fire.activity))
+                    new_combined_fire.activity.sort(key=lambda e: e['start'])
 
                 # TODO: merge anything else?
 
@@ -876,7 +876,7 @@ class FiresMerger(FiresActionBase):
         """
         if combined_fire and (
                 bool(combined_fire.get('activity')) != bool(fire.get('activity'))):
-            self._fail_fire(fire, self.GROWTH_FOR_BOTH_OR_NONE_MSG)
+            self._fail_fire(fire, self.activity_FOR_BOTH_OR_NONE_MSG)
 
         # TODO: check for overlaps
         # TODO: additionally, take into account time zones when checking
