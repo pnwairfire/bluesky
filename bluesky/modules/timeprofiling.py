@@ -50,11 +50,11 @@ def _run_fire(hourly_fractions, fire):
             set([len(e) for p,e in hourly_fractions.items()]) != set([24])):
         # TODO: Support this scenario, but make sure
         # len(hourly_fractions) equals the total number of hours
-        # represented by all growth objects, and pass the appropriate
+        # represented by all activity objects, and pass the appropriate
         # slice into each instantiation of StaticTimeProfiler
         # (or build this into StaticProfiler???)
         raise BlueSkyConfigurationError("Only 24-hour repeatable time "
-            "profiles supported for fires with multiple growth windows")
+            "profiles supported for fires with multiple activity windows")
 
     _validate_fire(fire)
     for g in fire.activity:
@@ -71,8 +71,8 @@ def _run_fire(hourly_fractions, fire):
 
 def _validate_fire(fire):
     if 'activity' not in fire:
-        raise ValueError("Missing growth data required for time profiling")
+        raise ValueError("Missing activity data required for time profiling")
     for g in fire.activity:
         if 'start' not in g or 'end' not in g:
             raise ValueError(
-                "Insufficient growth data required for time profiling")
+                "Insufficient activity data required for time profiling")

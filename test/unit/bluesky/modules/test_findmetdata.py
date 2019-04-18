@@ -12,7 +12,7 @@ from bluesky.models.fires import FiresManager
 from bluesky.modules import findmetdata
 
 
-FIRE_NO_GROWTH = {
+FIRE_NO_ACTIVITY = {
     "id": "SF11C14225236095807750"
 }
 
@@ -80,10 +80,10 @@ class TestGetTimeWindows(object):
         with raises(BlueSkyConfigurationError) as e_info:
             findmetdata._get_time_windows(fm)
 
-    def test_fire_no_growth(self, reset_config):
+    def test_fire_no_activity(self, reset_config):
         fm = FiresManager()
         fm.load({
-            "fires": [FIRE_NO_GROWTH]
+            "fires": [FIRE_NO_ACTIVITY]
         })
         with raises(BlueSkyConfigurationError) as e_info:
             findmetdata._get_time_windows(fm)

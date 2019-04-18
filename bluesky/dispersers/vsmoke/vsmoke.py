@@ -91,7 +91,7 @@ class VSMOKEDispersion(DispersionBase):
         # For each fire run VSMOKE and VSMOKEGIS
         for fire in self._fires:
             # TODO: check to make sure start+num_hours is within fire's
-            #   growth windows
+            #   activity windows
             in_var = INPUTVariables(fire)
 
             utc_offset = fire.get('location', {}).get('utc_offset')

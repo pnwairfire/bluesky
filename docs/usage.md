@@ -922,7 +922,7 @@ is set with the `--log-level` flag.  The log output looks like the following:
 2019-02-22 06:24:48,192 DEBUG: Status logging disabled - not submitting 'Good','Main', 'Start', {}.
 2019-02-22 06:24:48,192 DEBUG: Status logging disabled - not submitting 'Good','Main', 'Finish', {}.
 2019-02-22 06:25:25,566 INFO: Running ingestion module
-2019-02-22 06:25:25,566 DEBUG: Setting growth array in fire object
+2019-02-22 06:25:25,566 DEBUG: Setting activity array in fire object
 2019-02-22 06:25:25,566 DEBUG: Status logging disabled - not submitting 'Good','ingestion', 'Finish', {}.
 2019-02-22 06:25:25,566 DEBUG: Status logging disabled - not submitting 'Good','Main', 'Finish', {}.
 2019-02-22 06:24:48,193 INFO: Fire counts: {'fires': 1}

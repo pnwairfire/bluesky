@@ -44,7 +44,7 @@ class BaseLoader(object):
     def __init__(self, **config):
         self._config = config
 
-        # start and end times, to use in filtering growth windows
+        # start and end times, to use in filtering activity windows
         self._start = self._config.get('start')
         self._end = self._config.get('end')
         self._start = self._start and parse_datetime(self._start, 'start')

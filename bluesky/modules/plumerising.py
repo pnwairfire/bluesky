@@ -35,7 +35,7 @@ def run(fires_manager):
         with fires_manager.fire_failure_handler(fire):
             compute_func(fire)
 
-    # TODO: spread out emissions over plume and set in growth or fuelbed
+    # TODO: spread out emissions over plume and set in activity or fuelbed
     #   objects ??? (be consistent with profiled emissions, setting in
     #   same place or not setting at all)
 
@@ -66,9 +66,9 @@ class ComputeFunction(object):
 
     def __call__(self, fire):
         if 'activity' not in fire:
-            raise ValueError("Missing growth data required for plumerise")
+            raise ValueError("Missing activity data required for plumerise")
         if any([not g.get('location', {}).get('area') for g in fire.activity]):
-            raise ValueError("Missing fire growth area required for plumerise")
+            raise ValueError("Missing fire activity area required for plumerise")
         self._compute_func(fire)
 
     ## compute function generators
@@ -86,12 +86,12 @@ class ComputeFunction(object):
 
         def _f(fire):
             # TODO: create and change to working directory here (per fire),
-            #   above (one working dir per all fires), or below (per growth
+            #   above (one working dir per all fires), or below (per activity
             #   window)...or just let plumerise create temp workingdir (as
             #   it's currently doing?
             for g in fire.activity:
                 if not g.get('consumption', {}).get('summary'):
-                    raise ValueError("Missing fire growth consumption data "
+                    raise ValueError("Missing fire activity consumption data "
                         "required for FEPS plumerise")
 
                 # Fill in missing sunrise / sunset
@@ -99,7 +99,7 @@ class ComputeFunction(object):
                         ('sunrise_hour', 'sunset_hour')]):
                     start = datetimeutils.parse_datetime(g['start'], 'start')
                     if not start:
-                        raise ValueError("Missing fire growth start time "
+                        raise ValueError("Missing fire activity start time "
                             "required by FEPS plumerise")
 
                     # default: UTC
@@ -135,8 +135,8 @@ class ComputeFunction(object):
                 if not g.get('localmet'):
                     raise ValueError(
                         "Missing localmet data required for computing SEV plumerise")
-                # TODO: if fire_frp is defined but growth's frp isn't,
-                #   do we need to multiple by growth's
+                # TODO: if fire_frp is defined but activity's frp isn't,
+                #   do we need to multiple by activity's
                 #   percentage of the fire's total area?
                 g_frp = g.get('frp', fire_frp)
                 plumerise_data = pr.compute(g['localmet'],

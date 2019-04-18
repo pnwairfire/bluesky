@@ -79,8 +79,8 @@ configuration json data are case-insensitive.***
 
 ##### ingestion
 
- - ***'config' > 'ingestion' > 'keep_emissions'*** -- *optional* keep any emissions, if specified, and record in growth object
- - ***'config' > 'ingestion' > 'keep_heat'*** -- *optional* keep heat, if specified, and record in growth object
+ - ***'config' > 'ingestion' > 'keep_emissions'*** -- *optional* keep any emissions, if specified, and record in activity object
+ - ***'config' > 'ingestion' > 'keep_heat'*** -- *optional* keep heat, if specified, and record in activity object
 
 ##### merge
 
@@ -123,7 +123,7 @@ configuration json data are case-insensitive.***
  - ***'config' > 'consumption' > 'ecoregion_lookup_implemenation'*** -- *optional* -- default 'ogr'
 
 The following consume_settings fields define what defaults to use when the field isn't defined
-for a fire's growth object. They also define what synonyms to recognize, if any, for each field
+for a fire's activity object. They also define what synonyms to recognize, if any, for each field
 
  - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'slope' > 'default'*** -- *optional* -- percent, from 1 to 100; default 5
  - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'windspeed' > 'default'*** -- *optional* -- default 6; valid values: 0 to 35
@@ -158,8 +158,8 @@ emissions config
 ##### findmetdata
 
  - ***'config' > 'findmetdata' > 'met_root_dir'*** -- *required* --
- - ***'config' > 'findmetdata' > 'time_window' > 'first_hour'*** -- *required* if fire growth data isn't defined --
- - ***'config' > 'findmetdata' > 'time_window' > 'last_hour'*** -- *required* if fire growth data isn't defined --
+ - ***'config' > 'findmetdata' > 'time_window' > 'first_hour'*** -- *required* if fire activity data isn't defined --
+ - ***'config' > 'findmetdata' > 'time_window' > 'last_hour'*** -- *required* if fire activity data isn't defined --
  - ***'config' > 'findmetdata' > 'met_format'*** -- *optional* -- defaults to 'arl'
  - ***'config' > 'findmetdata' > 'wait' > 'strategy'*** -- *required* if 'wait' section is defined -- 'fixed' or 'backoff'
  - ***'config' > 'findmetdata' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
@@ -175,7 +175,7 @@ emissions config
 
 ##### timeprofiling
 
- - ***'config' > 'timeprofiling' > 'hourly_fractions'*** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the growth window)
+ - ***'config' > 'timeprofiling' > 'hourly_fractions'*** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the activity window)
 
 
 ##### plumerising
@@ -218,8 +218,8 @@ emissions config
 
 ##### dispersion
 
- - ***'config' > 'dispersion' > 'start'*** -- *required* (unless it can be determined from fire growth windows) -- modeling start time (ex. "2015-01-21T00:00:00Z"); 'today' is also recognized, in which case start is set to midnight of the current utc date
- - ***'config' > 'dispersion' > 'num_hours'*** -- *required* (unless it can be determined from fire growth windows) -- number of hours in model run
+ - ***'config' > 'dispersion' > 'start'*** -- *required* (unless it can be determined from fire activity windows) -- modeling start time (ex. "2015-01-21T00:00:00Z"); 'today' is also recognized, in which case start is set to midnight of the current utc date
+ - ***'config' > 'dispersion' > 'num_hours'*** -- *required* (unless it can be determined from fire activity windows) -- number of hours in model run
  - ***'config' > 'dispersion' > 'output_dir'*** -- *required* -- directory to contain output
   - ***'config' > 'dispersion' > 'working_dir'*** -- *required* -- directory to contain working output
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"

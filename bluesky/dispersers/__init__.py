@@ -144,10 +144,10 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         # TODO: aggreagating over all fires (if psossible)
         #  use self.model_start and self.model_end
         #  as disperion time window, and then look at
-        #  growth window(s) of each fire to fill in emissions for each
+        #  activity window(s) of each fire to fill in emissions for each
         #  fire spanning hysplit time window
         # TODO: determine set of arl fires by aggregating arl files
-        #  specified per growth per fire, or expect global arl files
+        #  specified per activity per fire, or expect global arl files
         #  specifications?  (if aggregating over fires, make sure they're
         #  conistent with met domain; if not, raise exception or run them
         #  separately...raising exception would be easier for now)
@@ -156,13 +156,13 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             try:
                 if 'activity' not in fire:
                     raise ValueError(
-                        "Missing fire growth data required for computing dispersion")
-                growth_fields = self._required_activity_fields() + ('fuelbeds', 'location')
+                        "Missing fire activity data required for computing dispersion")
+                activity_fields = self._required_activity_fields() + ('fuelbeds', 'location')
                 for a in fire.activity:
-                    if any([not a.get(f) for f in growth_fields]):
-                        raise ValueError("Each growth window must have {} in "
+                    if any([not a.get(f) for f in activity_fields]):
+                        raise ValueError("Each activity window must have {} in "
                             "order to compute {} dispersion".format(
-                            ','.join(growth_fields), self.__class__.__name__))
+                            ','.join(activity_fields), self.__class__.__name__))
                     if any([not fb.get('emissions') for fb in a['fuelbeds']]):
                         raise ValueError(
                             "Missing emissions data required for computing dispersion")
@@ -175,7 +175,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                     if not any([v is None for v in heat_values]):
                         heat = sum(heat_values)
                         if heat < 1.0e-6:
-                            logging.debug("Fire %s growth window %s - %s has "
+                            logging.debug("Fire %s activity window %s - %s has "
                                 "less than 1.0e-6 total heat; skip...",
                                 fire.id, a['start'], a['end'])
                             continue

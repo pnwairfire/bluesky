@@ -99,12 +99,12 @@ def load_scenario(input_filename):
     to run bsp.
 
     Note that we have various options:
-     - create one fire with one growth window and N fuelbeds, or
-     - create one fire with N growth windows, each with 1 fuelbed, or
-     - create N fires ,each with growth window, and each growth
+     - create one fire with one activity window and N fuelbeds, or
+     - create one fire with N activity windows, each with 1 fuelbed, or
+     - create N fires ,each with activity window, and each activity
        window with with 1 fuelbed
-     - any other combination of fires, growth windows, and fuelbeds
-       that result in N total growth windows
+     - any other combination of fires, activity windows, and fuelbeds
+       that result in N total activity windows
 
     Either should work, assuming the ecoregion is the same for each row
     in the scenario (which is currently the case).  In case this changes
@@ -122,7 +122,7 @@ def load_scenario(input_filename):
         area = int(row_dict['area'])
         fire.activity[0]['location']['area'] = area
         fire.activity[0]['location']['ecoregion'] = row_dict['ecoregion']
-        # season is deterimined in pipeline consume code by growth start date,
+        # season is deterimined in pipeline consume code by activity start date,
         # so, reverse engineer start date based on season in input file
         if row_dict['season'] == 'spring':
             fire.activity[0]['start'] = '2019-04-01'

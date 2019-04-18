@@ -16,13 +16,13 @@
                 }
             ],
             "event_of": {
-                "name": "Activity Fire missing growth and fuelbeds",
+                "name": "Activity Fire missing activity and fuelbeds",
                 "id": "ssdlfjsldfj"
             },
             "error": {
-                "traceback": "Traceback (most recent call last):\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/plumerising.py\", line 35, in run\n    compute_func(fire)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/plumerising.py\", line 63, in __call__\n    raise ValueError(\"Missing growth data required for plumerise\")\nValueError: Missing growth data required for plumerise\n",
+                "traceback": "Traceback (most recent call last):\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/plumerising.py\", line 35, in run\n    compute_func(fire)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/plumerising.py\", line 63, in __call__\n    raise ValueError(\"Missing activity data required for plumerise\")\nValueError: Missing activity data required for plumerise\n",
                 "type": "ValueError",
-                "message": "Missing growth data required for plumerise"
+                "message": "Missing activity data required for plumerise"
             },
             "fuel_type": "natural"
         },

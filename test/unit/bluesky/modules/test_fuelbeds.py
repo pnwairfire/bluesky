@@ -139,7 +139,7 @@ class TestEstimatorInsufficientDataForLookup(object):
         lookup = mock.Mock()
         self.estimator = fuelbeds.Estimator(lookup)
 
-    def test_no_growth(self):
+    def test_no_activity(self):
         with raises(ValueError) as e:
             self.estimator.estimate({})
 

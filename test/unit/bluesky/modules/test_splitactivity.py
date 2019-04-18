@@ -9,13 +9,13 @@ from py.test import raises
 from bluesky.modules import splitactivity
 
 ##
-## No growth to split
+## No activity to split
 ##
 
 class TestNoGrowth(object):
 
     def test(self):
-        fire = FIRE_NO_GROWTH = {
+        fire = FIRE_NO_ACTIVITY = {
             "name": "North fire"
         }
         # Expect no change
@@ -25,10 +25,10 @@ class TestNoGrowth(object):
 
 
 ##
-## One growth object to split
+## One activity object to split
 ##
 
-BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH = {
+BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY = {
     "name": "North fire",
     "activity": [
         {
@@ -53,7 +53,7 @@ BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH = {
 class TestOneGrowthPreFuelbedsNothingSplit(object):
 
     def test_lat_lng(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location']['latitide'] = 47.2
         fire['activity'][0]['location']['longitude'] = 108.2
         # Expect no change
@@ -62,7 +62,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         assert fire == expected
 
     def test_invalid_geojson(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location']['geojson'] = {
             "type": "SDFZZZ123",
             "coordinates": [
@@ -77,7 +77,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
 
 
     def test_point(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location']['geojson'] = {
             "type": "Point",
             "coordinates": [-102.0, 39.5]
@@ -88,7 +88,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         assert fire == expected
 
     def test_line_string(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location']['geojson'] = {
             "type": "LineString",
             "coordinates": [
@@ -102,7 +102,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         assert fire == expected
 
     def test_polygon(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location']['geojson'] = {
            "type": "Polygon",
            "coordinates": [
@@ -117,7 +117,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         assert fire == expected
 
     def test_polygon_with_hole(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location']['geojson'] = {
            "type": "Polygon",
            "coordinates": [
@@ -136,7 +136,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         assert fire == expected
 
     def test_multi_line_string(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location']['geojson'] = {
             "type": "MultiLineString",
             "coordinates": [
@@ -154,7 +154,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
         assert fire == expected
 
     def test_multi_polygon_with_area(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location']['geojson'] = {
             "type": "MultiPolygon",
             "coordinates": [
@@ -182,7 +182,7 @@ class TestOneGrowthPreFuelbedsNothingSplit(object):
 class TestOneGrowthPreFuelbeds(object):
 
     def test_multi_point(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location']['geojson'] = {
             "type": "MultiPoint",
             "coordinates": [
@@ -190,7 +190,7 @@ class TestOneGrowthPreFuelbeds(object):
                 [-101.0, 35.4]
             ]
         }
-        expected = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        expected = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         expected['activity'][0]['location']['area'] /= 2
         expected['activity'].append(copy.deepcopy(expected['activity'][0]))
         expected['activity'][0]['location']['geojson'] = {
@@ -205,7 +205,7 @@ class TestOneGrowthPreFuelbeds(object):
         assert fire == expected
 
     def test_multi_point_no_area(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location']['geojson'] = {
             "type": "MultiPoint",
             "coordinates": [
@@ -213,7 +213,7 @@ class TestOneGrowthPreFuelbeds(object):
                 [-101.0, 35.4]
             ]
         }
-        expected = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        expected = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         expected['activity'][0]['location']['area'] /= 2
         expected['activity'].append(copy.deepcopy(expected['activity'][0]))
         expected['activity'][0]['location']['geojson'] = {
@@ -228,7 +228,7 @@ class TestOneGrowthPreFuelbeds(object):
         assert fire == expected
 
     def test_multi_polygon_no_area(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location'].pop('area')
         fire['activity'][0]['location']['geojson'] = {
             "type": "MultiPolygon",
@@ -279,7 +279,7 @@ class TestOneGrowthPreFuelbeds(object):
 ## Two Growth Object
 ##
 
-FIRE_PRE_FUELBEDS_TWO_GROWTH = {
+FIRE_PRE_FUELBEDS_TWO_ACTIVITY = {
     "name": "North fire",
     "activity": [
         {
@@ -333,7 +333,7 @@ FIRE_PRE_FUELBEDS_TWO_GROWTH = {
         }
     ]
 }
-EXPECTED_PRE_FUELBEDS_TWO_GROWTH = {
+EXPECTED_PRE_FUELBEDS_TWO_ACTIVITY = {
     "name": "North fire",
     "activity": [
         {
@@ -425,15 +425,15 @@ EXPECTED_PRE_FUELBEDS_TWO_GROWTH = {
 class TestMultipleGrowthPreFuelbeds(object):
 
     def test_mixed_dont_record_orig(self):
-        fire = copy.deepcopy(FIRE_PRE_FUELBEDS_TWO_GROWTH)
+        fire = copy.deepcopy(FIRE_PRE_FUELBEDS_TWO_ACTIVITY)
         splitactivity._split(fire, False)
-        assert fire == EXPECTED_PRE_FUELBEDS_TWO_GROWTH
+        assert fire == EXPECTED_PRE_FUELBEDS_TWO_ACTIVITY
 
     def test_mixed_record_orig(self):
-        fire = copy.deepcopy(FIRE_PRE_FUELBEDS_TWO_GROWTH)
+        fire = copy.deepcopy(FIRE_PRE_FUELBEDS_TWO_ACTIVITY)
         splitactivity._split(fire, True)
-        expected = copy.deepcopy(EXPECTED_PRE_FUELBEDS_TWO_GROWTH)
-        expected['original_growth'] = FIRE_PRE_FUELBEDS_TWO_GROWTH['activity']
+        expected = copy.deepcopy(EXPECTED_PRE_FUELBEDS_TWO_ACTIVITY)
+        expected['original_activity'] = FIRE_PRE_FUELBEDS_TWO_ACTIVITY['activity']
         assert fire == expected
 
 
@@ -544,7 +544,7 @@ FIRE_POST_EMISSIONS = {
 class TestSplitActivityPostFuelbeds(object):
 
     def test_basic(self):
-        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_GROWTH)
+        fire = copy.deepcopy(BASE_FIRE_PRE_FUELBEDS_ONE_ACTIVITY)
         fire['activity'][0]['location']['geojson'] = {
            "type": "Polygon",
            "coordinates": [

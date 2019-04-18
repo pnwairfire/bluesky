@@ -32,7 +32,7 @@ if 'NOX' in BLUESKYKML_SPECIES_LIST:
 ##
 ## Functions for extracting fire *location * information to write to csv files
 ##
-## Note: The growth object (arg 'g') is ignored in most of these methods.
+## Note: The activity object (arg 'g') is ignored in most of these methods.
 ##  It's only needed for the start time and area calculation
 ##
 
@@ -52,7 +52,7 @@ def _get_heat(fire, g):
 
 def _get_consumption_field(field):
     def f(fire, g):
-        # If consumption is already summarized for this growth
+        # If consumption is already summarized for this activity
         # window, return summary value
         if g.get('consumption') and g['consumption'].get('summary'):
             return g['consumption']['summary'].get(field)

@@ -70,15 +70,15 @@ class Fire(dict):
 
     @property
     def start(self):
-        """Returns start of initial growth window
+        """Returns start of initial activity window
 
-        Doesn't memoize, in case growth windows are added/removed/modified
+        Doesn't memoize, in case activity windows are added/removed/modified
         """
-        # consider only growth windows with start times
+        # consider only activity windows with start times
         activity = [a for a in self.get('activity', []) if a.get('start')]
         if activity:
             activity = sorted(activity, key=lambda a: a['start'])
-            # record  utc offset of initial growth window, in case
+            # record  utc offset of initial activity window, in case
             # start_utc is being called
             self.__utc_offset = activity[0].get('location', {}).get('utc_offset')
             return datetimeutils.parse_datetime(activity[0]['start'], 'start')
@@ -89,20 +89,20 @@ class Fire(dict):
 
     @property
     def end(self):
-        """Returns end of final growth window
+        """Returns end of final activity window
 
-        Doesn't memoize, in case growth windows are added/removed/modified
+        Doesn't memoize, in case activity windows are added/removed/modified
 
-        TODO: take into account possibility of growth objects having different
+        TODO: take into account possibility of activity objects having different
           utc offsets.  (It's an extreme edge case where one start/end string
           is gt/lt another when utc offset is ignored but not when utc offset
           is considered, so this isn't a high priority)
         """
-        # consider only growth windows with end times
+        # consider only activity windows with end times
         activity = [a for a in self.get('activity', []) if a.get('end')]
         if activity:
             activity = sorted(activity, key=lambda a: a['end'])
-            # record  utc offset of initial growth window, in case
+            # record  utc offset of initial activity window, in case
             # start_utc is being called
             self.__utc_offset = activity[-1].get('location', {}).get('utc_offset')
             return datetimeutils.parse_datetime(activity[-1]['end'], 'end')
@@ -834,7 +834,7 @@ class FiresMerger(FiresActionBase):
             # See note, above, regarding instantiating dict and then deep copying
             new_combined_fire = Fire(copy.deepcopy(dict(combined_fire)))
             try:
-                # merge growth; remember, at this point, growth will be
+                # merge activity; remember, at this point, activity will be
                 # defined for none or all of the fires to be merged
                 if new_combined_fire.get('activity'):
                     new_combined_fire.activity.extend(copy.deepcopy(fire.activity))
@@ -864,14 +864,14 @@ class FiresMerger(FiresActionBase):
         if not keys.issubset(self.ALL_MERGEABLE_FIELDS):
             self._fail_fire(fire, self.INVALID_KEYS_MSG)
 
-    GROWTH_FOR_BOTH_OR_NONE_MSG = ("growth windows must be defined for both "
+    ACTIVITY_FOR_BOTH_OR_NONE_MSG = ("activity windows must be defined for both "
         "fires or neither in order to merge")
-    OVERLAPPING_ACTIVITY_WINDOWS = "growth windows overlap"
+    OVERLAPPING_ACTIVITY_WINDOWS = "activity windows overlap"
     def _check_activity_windows(self, fire, combined_fire):
-        """Makes sure growth windows are defined for all or none,
+        """Makes sure activity windows are defined for all or none,
         and if defined, make sure they don't overlap
 
-        Ultimately, overlapping growth windows could be handled,
+        Ultimately, overlapping activity windows could be handled,
         but at this point it would be overengineering.
         """
         if combined_fire and (
@@ -909,7 +909,7 @@ class FiresMerger(FiresActionBase):
 ##
 
 class FireGrowthFilter(FiresActionBase):
-    """Class for filtering fire growth windows by various criteria.
+    """Class for filtering fire activity windows by various criteria.
 
     Note: The logic in this class is organized as a saparate class primarily
     for maintainability, testibility, and readability.  Some of it was
@@ -994,8 +994,8 @@ class FireGrowthFilter(FiresActionBase):
         """Filter by given filter func
 
         args:
-         - filter_func -- function that takes fire and growth object and returns
-            boolean value indicating whether or not to remove growth object
+         - filter_func -- function that takes fire and activity object and returns
+            boolean value indicating whether or not to remove activity object
         """
         for fire in self._fires_manager.fires:
             if not fire.get('activity'):
@@ -1067,9 +1067,9 @@ class FireGrowthFilter(FiresActionBase):
         " which each must have 'lat' and 'lng'")
     INVALID_BOUNDARY_MSG = "Invalid boundary for filtering"
     MISSING_FIRE_LAT_LNG_MSG = (
-        "Fire growth window must have lat and lng defined to be filtered by location")
+        "Fire activity window must have lat and lng defined to be filtered by location")
     def _get_location_filter(self, **kwargs):
-        """Returns function that checks if fire growth window is within
+        """Returns function that checks if fire activity window is within
         boundary, which should be of the form:
 
             {
@@ -1118,8 +1118,8 @@ class FireGrowthFilter(FiresActionBase):
     SPECIFY_MIN_OR_MAX_MSG = "Specify min and/or max area for filtering"
     INVALID_MIN_MAX_MUST_BE_POS_MSG = "Min and max areas must be positive for filtering"
     INVALID_MIN_MUST_BE_LTE_MAX_MSG = "Min area must be LTE max if both are specified"
-    MISSING_ACTIVITY_AREA_MSG = "Fire growth window must have area defined to be filtered by area"
-    NEGATIVE_ACTIVITY_AREA_MSG = "Fire growth area can't be negative"
+    MISSING_ACTIVITY_AREA_MSG = "Fire activity window must have area defined to be filtered by area"
+    NEGATIVE_ACTIVITY_AREA_MSG = "Fire activity area can't be negative"
     def _get_area_filter(self, **kwargs):
         """Returns funciton that checks if a fire is smaller than some
         max threshold and/or larger than some min threshold.

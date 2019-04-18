@@ -53,13 +53,13 @@ def run(fires_manager):
             _run_fire(fire, fuel_loadings_manager, msg_level)
 
 
-    # summarise over all growth objects
-    all_growth = list(itertools.chain.from_iterable(
+    # summarise over all activity objects
+    all_activity = list(itertools.chain.from_iterable(
         [f.activity for f in fires_manager.fires]))
     fires_manager.summarize(
-        consumption=datautils.summarize(all_growth, 'consumption'))
+        consumption=datautils.summarize(all_activity, 'consumption'))
     fires_manager.summarize(
-        heat=datautils.summarize(all_growth, 'heat'))
+        heat=datautils.summarize(all_activity, 'heat'))
 
 def _run_fire(fire, fuel_loadings_manager, msg_level):
     logging.debug("Consume consumption - fire {}".format(fire.id))
@@ -77,13 +77,13 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
         season = datetimeutils.season_from_date(a.get('start'))
         for fb in a['fuelbeds']:
             _run_fuelbed(fb, fuel_loadings_manager, season, a['location'], burn_type, msg_level)
-        # Aggregate consumption and heat over all fuelbeds in the growth window
+        # Aggregate consumption and heat over all fuelbeds in the activity window
         # include only per-phase totals, not per category > sub-category > phase
         a['consumption'] = datautils.summarize([a], 'consumption',
             include_details=False)
         a['heat'] = datautils.summarize([a], 'heat', include_details=False)
 
-    # Aggregate consumption and heat over all fuelbeds in *all* growth windows;
+    # Aggregate consumption and heat over all fuelbeds in *all* activity windows;
     # include only per-phase totals, not per category > sub-category > phase
     fire.consumption = datautils.summarize(fire.activity, 'consumption',
         include_details=False)
@@ -151,15 +151,15 @@ def _validate_input(fires_manager):
         with fires_manager.fire_failure_handler(fire):
             if not fire.get('activity'):
                 raise ValueError(
-                    "Missing growth data required for computing consumption")
+                    "Missing activity data required for computing consumption")
             for a in fire.activity:
                 for k in ('fuelbeds', 'location'):
                     if not a.get(k):
-                        raise ValueError("Missing growth '{}' data required "
+                        raise ValueError("Missing activity '{}' data required "
                         "for computing consumption".format(k))
                 # only 'area' is required from location
                 if not a['location'].get('area'):
-                    raise ValueError("Fire growth location data must "
+                    raise ValueError("Fire activity location data must "
                         "define area for computing consumption")
                 if not a['location'].get('ecoregion'):
                     # import EcoregionLookup here so that, if fires do have

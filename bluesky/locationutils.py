@@ -12,7 +12,7 @@ class LatLng(object):
     def __init__(self, location):
         if not isinstance(location, dict):
             raise ValueError("Invalid location data required for "
-                "determining single lat/lng for growth window")
+                "determining single lat/lng for activity window")
         self._location = location
         self._compute()
 

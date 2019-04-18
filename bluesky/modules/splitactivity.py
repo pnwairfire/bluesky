@@ -15,7 +15,7 @@ __version__ = "0.1.0"
 
 
 def run(fires_manager):
-    """Split each of the fire's growth windows to be able to process points
+    """Split each of the fire's activity windows to be able to process points
     separately.
 
     Args:
@@ -31,14 +31,14 @@ def run(fires_manager):
             _split(fire, record_original_activity)
 
 def _split(fire, record_original_activity):
-    new_growth = []
+    new_activity = []
     for g in fire.get('activity', []):
-        new_growth.extend(_split_growth(g))
+        new_activity.extend(_split_activity(g))
 
-    if new_growth and new_growth != fire['activity']:  #len(new_growth) != len(fire['activity']):
+    if new_activity and new_activity != fire['activity']:  #len(new_activity) != len(fire['activity']):
         if record_original_activity:
-            fire['original_growth'] = fire['activity']
-        fire['activity'] = new_growth
+            fire['original_activity'] = fire['activity']
+        fire['activity'] = new_activity
 
 # TODO: Support splitting these fields. Only fuelbeds would
 #   be a bit of work to split. For 'consumption', 'emissions',
@@ -47,7 +47,7 @@ CANT_SPLIT_FIELDS = [
     'consumption', 'emissions', 'fuelbeds', 'heat'
 ]
 
-def _split_growth(g):
+def _split_activity(g):
     try:
         geojson = g.get('location', {}).get('geojson')
         if geojson:
@@ -60,33 +60,33 @@ def _split_growth(g):
                     logging.debug("splitactivity doesn't support GeoJSON type %s",
                         geojson.get('type', '(not specified)'))
             else:
-                logging.warning("split growth ")
+                logging.warning("split activity ")
         else:
             logging.debug("splitactivity only supports GeoJSON geometries")
     except:
-        logging.warning("Failed to split growth %s", g)
+        logging.warning("Failed to split activity %s", g)
 
     return [g]
 
 def _split_multipoint(g):
-    logging.debug('splitting multipoint growth object')
-    growth = []
+    logging.debug('splitting multipoint activity object')
+    activity = []
     for coord in g['location']['geojson']['coordinates']:
         new_g = copy.deepcopy(g)
         new_g['location']['geojson']['type'] = 'Point'
         new_g['location']['geojson']['coordinates'] = coord
         if new_g['location'].get('area'):
             new_g['location']['area'] /= len(g['location']['geojson']['coordinates'])
-        growth.append(new_g)
-    return growth
+        activity.append(new_g)
+    return activity
 
 def _split_multipolygon(g):
     if not g['location'].get('area'):
-        growth = []
+        activity = []
         for polygon in g['location']['geojson']['coordinates']:
             new_g = copy.deepcopy(g)
             new_g['location']['geojson']['type'] = 'Polygon'
             new_g['location']['geojson']['coordinates'] = polygon
-            growth.append(new_g)
-        return growth
+            activity.append(new_g)
+        return activity
     return [g]

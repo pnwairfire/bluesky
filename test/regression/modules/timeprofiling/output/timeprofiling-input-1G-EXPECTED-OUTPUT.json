@@ -135,13 +135,13 @@
                 "ecoregion": "southern"
             },
             "event_of": {
-                "name": "Activity Fire missing growth",
+                "name": "Activity Fire missing activity",
                 "id": "ssdlfjsldfj"
             },
             "error": {
-                "traceback": "Traceback (most recent call last):\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 36, in run\n    _run_fire(hourly_fractions, fire)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 58, in _run_fire\n    _validate_fire(fire)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 86, in _validate_fire\n    raise ValueError(\"Missing growth data required for time profiling\")\nValueError: Missing growth data required for time profiling\n",
+                "traceback": "Traceback (most recent call last):\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 36, in run\n    _run_fire(hourly_fractions, fire)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 58, in _run_fire\n    _validate_fire(fire)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 86, in _validate_fire\n    raise ValueError(\"Missing activity data required for time profiling\")\nValueError: Missing activity data required for time profiling\n",
                 "type": "ValueError",
-                "message": "Missing growth data required for time profiling"
+                "message": "Missing activity data required for time profiling"
             },
             "fuel_type": "natural"
         }

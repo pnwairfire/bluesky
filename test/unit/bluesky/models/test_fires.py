@@ -111,61 +111,61 @@ class TestFire(object):
             f.rifsijsflj
 
     def test_start_and_end(self, reset_config):
-        # no growth windows
+        # no activity windows
         f = fires.Fire({})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
-        # empty growth list
+        # empty activity list
         f = fires.Fire({"activity": []})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
-        # one growth window with no 'start'
+        # one activity window with no 'start'
         f = fires.Fire({"activity": [{}]})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
-        # one growth window with None 'start'
+        # one activity window with None 'start'
         f = fires.Fire({"activity": [{'start': None}]})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
-        # multiple growth windows with no 'start'
+        # multiple activity windows with no 'start'
         f = fires.Fire({"activity": [{}, {}]})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
-        # multiple growth windows with None 'start'
+        # multiple activity windows with None 'start'
         f = fires.Fire({"activity": [{'start': None}, {'start': None}]})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
-        # multiple growth windows with None 'end'
+        # multiple activity windows with None 'end'
         f = fires.Fire({"activity": [{'end': None}, {'end': None}]})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
-        # one growth window with start defined
+        # one activity window with start defined
         f = fires.Fire({"activity": [{'start': "2014-05-27T17:00:00"}]})
         assert datetime.datetime(2014,5,27,17,0,0) == f.start
         assert datetime.datetime(2014,5,27,17,0,0) == f.start_utc
         assert None == f.end
         assert None == f.end_utc
-        # one growth window with end defined
+        # one activity window with end defined
         f = fires.Fire({"activity": [{'end': "2014-05-27T17:00:00"}]})
         assert None == f.start
         assert None == f.start_utc
         assert datetime.datetime(2014,5,27,17,0,0) == f.end
         assert datetime.datetime(2014,5,27,17,0,0) == f.end_utc
-        # multiple growth windows, some with 'start' defined, some with end
+        # multiple activity windows, some with 'start' defined, some with end
         # defined, out of order
         f = fires.Fire({"activity": [
             {'start': None, 'end': '2014-05-30T17:00:00'},
@@ -178,7 +178,7 @@ class TestFire(object):
         assert datetime.datetime(2014,5,30,17,0,0) == f.end
         assert datetime.datetime(2014,5,30,17,0,0) == f.end_utc
 
-        # multiple growth windows, all with 'start' & 'end' defined, out of order
+        # multiple activity windows, all with 'start' & 'end' defined, out of order
         f = fires.Fire({"activity": [
             {'start': "2014-05-29T17:00:00", 'end': "2014-05-30T17:00:00"},
             {'start': "2014-05-27T17:00:00", 'end': "2014-05-28T17:00:00"},
@@ -188,7 +188,7 @@ class TestFire(object):
         assert datetime.datetime(2014,5,30,17,0,0) == f.end
         assert datetime.datetime(2014,5,27,17,0,0) == f.start_utc
         assert datetime.datetime(2014,5,30,17,0,0) == f.end_utc
-        # multiple growth windows, all with 'start' & 'end' defined, out of
+        # multiple activity windows, all with 'start' & 'end' defined, out of
         # order, with utc_offset defined
         f = fires.Fire({
             "activity": [
@@ -763,7 +763,7 @@ class TestFiresManagerMergeFires(object):
                 assert fm.num_fires == 2
                 assert [f, f2] == sorted(fm.fires, key=lambda e: int('activity' in e))
 
-    def test_overlapping_growth(self, reset_config):
+    def test_overlapping_activity(self, reset_config):
         # TODO: implemented once check is in place
         pass
 
@@ -777,7 +777,7 @@ class TestFiresManagerMergeFires(object):
                 "event_of":{
                     "id": "ABC"
                 },
-                # growth just used for assertion, below
+                # activity just used for assertion, below
                 "activity": [{"location":{'area': 123}}]
             })
             f2 = fires.Fire({
@@ -785,7 +785,7 @@ class TestFiresManagerMergeFires(object):
                 "event_of":{
                     "id": "SDF"
                 },
-                # growth just used for assertion, below
+                # activity just used for assertion, below
                 "activity": [{"location":{'area': 456}}]
             })
             fm.fires = [f, f2]
@@ -808,14 +808,14 @@ class TestFiresManagerMergeFires(object):
                 'id': '1',
                 "type": "rx",
                 "fuel_type": "natural",
-                # growth just used for assertion, below
+                # activity just used for assertion, below
                 "activity": [{"location":{'area': 123}}]
             })
             f2 = fires.Fire({
                 'id': '1',
                 "type": "wf",
                 "fuel_type": "natural",
-                # growth just used for assertion, below
+                # activity just used for assertion, below
                 "activity": [{"location":{'area': 456}}]
             })
             fm.fires = [f, f2]
@@ -845,7 +845,7 @@ class TestFiresManagerMergeFires(object):
                 assert fm.num_fires == 2
                 assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.activity[0]['location']['area']))
 
-    def test_merge_mixed_success_no_growth(self, reset_config):
+    def test_merge_mixed_success_no_activity(self, reset_config):
         fm = fires.FiresManager()
         #Config.set(True, 'merge', 'skip_failures')
         f = fires.Fire({

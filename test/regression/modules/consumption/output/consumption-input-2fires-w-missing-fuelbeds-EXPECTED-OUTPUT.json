@@ -32,7 +32,7 @@
             "error": {
                 "type": "ValueError",
                 "traceback": "['  File \"/bluesky/bluesky/modules/consumption.py\", line 159, in _validate_input\\n    \"for computing consumption\".format(k))\\n']",
-                "message": "Missing growth 'fuelbeds' data required for computing consumption"
+                "message": "Missing activity 'fuelbeds' data required for computing consumption"
             },
             "fuel_type": "natural",
             "event_of": {

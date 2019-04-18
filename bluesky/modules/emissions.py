@@ -76,8 +76,8 @@ def run(fires_manager):
                     if include_emissions_details:
                         _fix_keys(fb['emissions_details'])
 
-    # For each fire, aggregate emissions over all fuelbeds per growth
-    # window as well as across all growth windows;
+    # For each fire, aggregate emissions over all fuelbeds per activity
+    # window as well as across all activity windows;
     # include only per-phase totals, not per category > sub-category > phase
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
@@ -88,13 +88,13 @@ def run(fires_manager):
             fire.emissions = datautils.summarize(fire.activity, 'emissions',
                 include_details=False)
 
-    # summarise over all growth objects
-    all_growth = list(itertools.chain.from_iterable(
+    # summarise over all activity objects
+    all_activity = list(itertools.chain.from_iterable(
         [f.activity for f in fires_manager.fires]))
-    summary = dict(emissions=datautils.summarize(all_growth, 'emissions'))
+    summary = dict(emissions=datautils.summarize(all_activity, 'emissions'))
     if include_emissions_details:
         summary.update(emissions_details=datautils.summarize(
-            all_growth, 'emissions_details'))
+            all_activity, 'emissions_details'))
     fires_manager.summarize(**summary)
 
 def _fix_keys(emissions):
@@ -151,7 +151,7 @@ class Feps(EmissionsBase):
     def _run_on_fire(self, fire):
         if 'activity' not in fire:
             raise ValueError(
-                "Missing growth data required for computing emissions")
+                "Missing activity data required for computing emissions")
         for a in fire['activity']:
             if 'fuelbeds' not in a:
                raise ValueError(
@@ -197,7 +197,7 @@ class PrichardOneill(EmissionsBase):
     def _run_on_fire(self, fire):
         if 'activity' not in fire:
             raise ValueError(
-                "Missing growth data required for computing emissions")
+                "Missing activity data required for computing emissions")
 
         for a in fire['activity']:
             if 'fuelbeds' not in a:
@@ -253,7 +253,7 @@ class Consume(EmissionsBase):
 
         if 'activity' not in fire:
             raise ValueError(
-                "Missing growth data required for computing consume emissions")
+                "Missing activity data required for computing consume emissions")
 
         burn_type = fire.get("fuel_type") or 'natural'
         # TODO: set burn type to 'activity' if fire["fuel_type"] == 'piles' ?

@@ -192,9 +192,9 @@
                 "id": "SF11E826544"
             },
             "error": {
-                "traceback": "Traceback (most recent call last):\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 36, in run\n    _run_fire(hourly_fractions, fire)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 55, in _run_fire\n    raise BlueSkyConfigurationError(\"Only 24-hour repeatable time \"\nBlueSkyConfigurationError: Only 24-hour repeatable time profiles supported for fires with multiple growth windows\n",
+                "traceback": "Traceback (most recent call last):\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 36, in run\n    _run_fire(hourly_fractions, fire)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 55, in _run_fire\n    raise BlueSkyConfigurationError(\"Only 24-hour repeatable time \"\nBlueSkyConfigurationError: Only 24-hour repeatable time profiles supported for fires with multiple activity windows\n",
                 "type": "BlueSkyConfigurationError",
-                "message": "Only 24-hour repeatable time profiles supported for fires with multiple growth windows"
+                "message": "Only 24-hour repeatable time profiles supported for fires with multiple activity windows"
             },
             "fuel_type": "natural"
         }
@@ -512,8 +512,8 @@
         }
     ],
     "error": {
-        "traceback": "Traceback (most recent call last):\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/models/fires.py\", line 536, in run\n    self._modules[i].run(self)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 36, in run\n    _run_fire(hourly_fractions, fire)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 55, in _run_fire\n    raise BlueSkyConfigurationError(\"Only 24-hour repeatable time \"\nBlueSkyConfigurationError: Only 24-hour repeatable time profiles supported for fires with multiple growth windows\n",
-        "message": "Only 24-hour repeatable time profiles supported for fires with multiple growth windows",
+        "traceback": "Traceback (most recent call last):\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/models/fires.py\", line 536, in run\n    self._modules[i].run(self)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 36, in run\n    _run_fire(hourly_fractions, fire)\n  File \"/Users/jdubowy/code/pnwairfire-bluesky/bluesky/modules/timeprofiling.py\", line 55, in _run_fire\n    raise BlueSkyConfigurationError(\"Only 24-hour repeatable time \"\nBlueSkyConfigurationError: Only 24-hour repeatable time profiles supported for fires with multiple activity windows\n",
+        "message": "Only 24-hour repeatable time profiles supported for fires with multiple activity windows",
         "module": "timeprofiling"
     }
 }

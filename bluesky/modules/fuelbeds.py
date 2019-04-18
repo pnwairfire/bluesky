@@ -40,9 +40,9 @@ def run(fires_manager):
             for g in fire['activity']:
                 if not g.get('location'):
                     raise ValueError(
-                        "growth location information required to look up fuelbeds")
+                        "activity location information required to look up fuelbeds")
                 # TODO: instead of instantiating a new FccsLookUp and Estimator
-                #   for each growth object, create AK and non-AK lookup and
+                #   for each activity object, create AK and non-AK lookup and
                 #   estimator objects that are reused, and set reference to
                 #   correct one here
                 # TODO: is_alaska from lat,lng, not from 'state'
@@ -93,10 +93,10 @@ class Estimator(object):
             if attr.startswith('truncation_'):
                 setattr(self, attr.replace('truncation_', ''), val)
 
-    def estimate(self, growth_obj):
+    def estimate(self, activity_obj):
         """Estimates fuelbed composition based on lat/lng or GeoJSON data.
 
-        If growth_obj['location']['geojson'] is defined, it will look something like
+        If activity_obj['location']['geojson'] is defined, it will look something like
         the following:
 
             {
@@ -114,27 +114,27 @@ class Estimator(object):
                 ]
             }
         """
-        if not growth_obj.get('location'):
+        if not activity_obj.get('location'):
             raise ValueError("Insufficient data for looking up fuelbed information")
 
         fuelbed_info = {}
-        if growth_obj['location'].get('shape_file'):
+        if activity_obj['location'].get('shape_file'):
             raise NotImplementedError("Importing of shape data from file not implemented")
 
-        elif growth_obj['location'].get('geojson'):
-            fuelbed_info = self.lookup.look_up(growth_obj['location']['geojson'])
+        elif activity_obj['location'].get('geojson'):
+            fuelbed_info = self.lookup.look_up(activity_obj['location']['geojson'])
             # fuelbed_info['area'] is in m^2
-            # TDOO: only use fuelbed_info['area'] if growth_obj['location']['area']
+            # TDOO: only use fuelbed_info['area'] if activity_obj['location']['area']
             # isn't already defined?
             if fuelbed_info and fuelbed_info.get('area'):
-                growth_obj['location']['area'] = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
+                activity_obj['location']['area'] = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
 
-        elif growth_obj['location'].get('latitude') and growth_obj['location'].get('longitude'):
+        elif activity_obj['location'].get('latitude') and activity_obj['location'].get('longitude'):
             geo_data = {
                 "type": "Point",
                 "coordinates": [
-                    growth_obj['location']['longitude'],
-                    growth_obj['location']['latitude']
+                    activity_obj['location']['longitude'],
+                    activity_obj['location']['latitude']
                 ]
             }
             logging.debug("Converted lat,lng to geojson: %s", geo_data)
@@ -154,14 +154,14 @@ class Estimator(object):
         fuelbeds = [{'fccs_id':f, 'pct':d['percent']}
             for f,d in fuelbed_info['fuelbeds'].items()]
 
-        growth_obj.update(**self._truncate(fuelbeds))
+        activity_obj.update(**self._truncate(fuelbeds))
 
     def _truncate(self, fuelbeds):
         """Sorts fuelbeds by decreasing percentage, and
 
         Sort fuelbeds by decreasing percentage, use first N fuelbeds that
         reach 90% coverage or 5 count (defaults, both configurable), and
-        then adjust percentages of included growth_objs so that total is 100%.
+        then adjust percentages of included activity_objs so that total is 100%.
         e.g. if 3 fuelbeds, 85%, 8%, and 7%, use only the first and second,
         and then adjust percentages as follows:
           85% -> 85% * 100 / (100 - 7) = 91.4%

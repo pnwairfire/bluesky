@@ -160,7 +160,7 @@ class TestBaseFireSpiderLoader(object):
     def test_marshal_w_start(self):
         expected = copy.deepcopy(MARSHALED)
 
-        # start is before all growth windows
+        # start is before all activity windows
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
             start=datetime.datetime(2015,8,8,7,0,0))
@@ -168,7 +168,7 @@ class TestBaseFireSpiderLoader(object):
             copy.deepcopy(FS_FIRES),
             start="2015-08-08T00:00:00Z")
 
-        # start is in the middle of first growth window
+        # start is in the middle of first activity window
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
             start=datetime.datetime(2015,8,9,14,0,0))
@@ -176,7 +176,7 @@ class TestBaseFireSpiderLoader(object):
             copy.deepcopy(FS_FIRES),
             start="2015-08-09T14:00:00Z")
 
-        # start is in the middle of second growth window
+        # start is in the middle of second activity window
         expected[0]['activity'].pop(0)
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
@@ -185,7 +185,7 @@ class TestBaseFireSpiderLoader(object):
             copy.deepcopy(FS_FIRES),
             start="2015-08-10T14:00:00Z")
 
-        # start is after all growth windows
+        # start is after all activity windows
         expected = []
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
@@ -197,7 +197,7 @@ class TestBaseFireSpiderLoader(object):
     def test_marshal_w_end(self):
         expected = copy.deepcopy(MARSHALED)
 
-        # end is after all growth windows
+        # end is after all activity windows
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
             end=datetime.datetime(2015,8,12,7,0,0))
@@ -205,7 +205,7 @@ class TestBaseFireSpiderLoader(object):
             copy.deepcopy(FS_FIRES),
             end="2015-08-12T00:00:00Z")
 
-        # start is in the middle of second growth window
+        # start is in the middle of second activity window
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
             end=datetime.datetime(2015,8,10,14,0,0))
@@ -213,7 +213,7 @@ class TestBaseFireSpiderLoader(object):
             copy.deepcopy(FS_FIRES),
             end="2015-08-10T14:00:00Z")
 
-        # start is in the middle of first growth window
+        # start is in the middle of first activity window
         expected[0]['activity'].pop()
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
@@ -222,7 +222,7 @@ class TestBaseFireSpiderLoader(object):
             copy.deepcopy(FS_FIRES),
             end="2015-08-09T14:00:00Z")
 
-        # start is before all growth windows
+        # start is before all activity windows
         expected = []
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
@@ -234,7 +234,7 @@ class TestBaseFireSpiderLoader(object):
     def test_marshal_w_start_and_end(self):
         expected = copy.deepcopy(MARSHALED)
 
-        # start/end are outside of growth windows
+        # start/end are outside of activity windows
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
             start=datetime.datetime(2015,8,8,7,0,0),
@@ -244,7 +244,7 @@ class TestBaseFireSpiderLoader(object):
             start="2015-08-08T00:00:00",
             end="2015-08-12T00:00:00Z")
 
-        # start/end are inside, but including all growth windows
+        # start/end are inside, but including all activity windows
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
             start=datetime.datetime(2015,8,9,14,0,0),
@@ -254,7 +254,7 @@ class TestBaseFireSpiderLoader(object):
             start="2015-08-09T14:00:00",
             end="2015-08-10T14:00:00Z")
 
-        # start/end are inside first growth window
+        # start/end are inside first activity window
         expected[0]['activity'].pop()
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
@@ -265,7 +265,7 @@ class TestBaseFireSpiderLoader(object):
             start="2015-08-09T14:00:00",
             end="2015-08-10T01:00:00Z")
 
-        # exclude all growth windows
+        # exclude all activity windows
         expected = []
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),

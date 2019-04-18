@@ -1,7 +1,7 @@
 """bluesky.modules.findmetdata
 
 This module finds met data files to use for a particular domain and time window
-spanning all fire growth periods.
+spanning all fire activity periods.
 """
 
 __author__ = "Joel Dubowy"
@@ -129,8 +129,8 @@ def _infer_time_windows_from_fires(fires_manager):
     time_windows = []
 
     if fires_manager.fires:
-        logging.debug("Met time window determined from fire growth data")
-        # Find earliest and latest datetimes that include all fire growth periods
+        logging.debug("Met time window determined from fire activity data")
+        # Find earliest and latest datetimes that include all fire activity periods
         # TODO: be more intelligent with possible gaps, so that met files for times
         #  when no fire is growing are excluded ?
         for fire in fires_manager.fires:
@@ -142,7 +142,7 @@ def _infer_time_windows_from_fires(fires_manager):
                         offset = datetime.timedelta(hours=utc_offset)
                         tw = parse_datetimes(g, 'start', 'end')
                         if tw['start'] > tw['end']:
-                            raise ValueError("Invalid growth time window - start: {}, end: {}".format(
+                            raise ValueError("Invalid activity time window - start: {}, end: {}".format(
                                 tw['start'], tw['end']))
                         start = tw['start'] - offset
                         end = tw['end'] - offset

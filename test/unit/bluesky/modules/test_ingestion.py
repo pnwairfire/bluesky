@@ -29,7 +29,7 @@ class TestIngestionErrorScenarios(object):
         assert e_info.value.args[0] == ingestion.IngestionErrMsgs.NO_ACTIVITY_OR_BASE_LOCATION
 
     def test_multiple_activity_fields_missing_pct(self, reset_config):
-        # If growth is specified, each object in the array must have
+        # If activity is specified, each object in the array must have
         # 'start', 'end', and 'pct' defined
         with raises(ValueError) as e_info:
             self.ingester.ingest(
@@ -67,7 +67,7 @@ class TestIngestionErrorScenarios(object):
                     }]
                 }
             )
-        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.ONE_GEOJSON_MULTIPLE_GROWTH
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.ONE_GEOJSON_MULTIPLE_ACTIVITY
 
     def test_invalid_top_level_location(self, reset_config):
         # missing area
@@ -113,7 +113,7 @@ class TestIngestionErrorScenarios(object):
                     }]
                 }
             )
-        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.BASE_LOCATION_AT_TOP_OR_PER_GROWTH
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.BASE_LOCATION_AT_TOP_OR_PER_ACTIVITY
 
         # missing area
         with raises(ValueError) as e_info:
@@ -136,9 +136,9 @@ class TestIngestionErrorScenarios(object):
                     }]
                 }
             )
-        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.BASE_LOCATION_AT_TOP_OR_PER_GROWTH
+        assert e_info.value.args[0] == ingestion.IngestionErrMsgs.BASE_LOCATION_AT_TOP_OR_PER_ACTIVITY
 
-    # TODO: test FUELBEDS_AT_TOP_OR_PER_GROWTH
+    # TODO: test FUELBEDS_AT_TOP_OR_PER_ACTIVITY
 
 class TestIngestionValidInput(object):
 
@@ -821,7 +821,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
         Config.set(True, "ingestion", "keep_heat")
         self.ingester = ingestion.FireIngester()
 
-    def test_fire_no_growth(self, reset_config):
+    def test_fire_no_activity(self, reset_config):
         """Emissions and heat in this case aren't currently ingested
         """
         f = {
@@ -857,7 +857,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_fire_with_growth(self, reset_config):
+    def test_fire_with_activity(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "event_of": {
