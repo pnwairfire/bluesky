@@ -387,7 +387,7 @@
         },
         "skip_failed_fires": false,
         "skip_failed_sources": false,
-        "splitgrowth": {
+        "splitactivity": {
             "record_original_growth": false
         },
         "localmet": {},

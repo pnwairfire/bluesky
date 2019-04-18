@@ -1129,7 +1129,7 @@
                 "fire_locations_filename": "fire_locations.csv"
             }
         },
-        "splitgrowth": {
+        "splitactivity": {
             "record_original_growth": false
         },
         "merge": {

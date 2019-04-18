@@ -1851,7 +1851,7 @@
         },
         "skip_failed_fires": true,
         "skip_failed_sources": false,
-        "splitgrowth": {
+        "splitactivity": {
             "record_original_growth": false
         },
         "localmet": {},
