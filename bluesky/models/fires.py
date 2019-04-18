@@ -876,7 +876,7 @@ class FiresMerger(FiresActionBase):
         """
         if combined_fire and (
                 bool(combined_fire.get('activity')) != bool(fire.get('activity'))):
-            self._fail_fire(fire, self.activity_FOR_BOTH_OR_NONE_MSG)
+            self._fail_fire(fire, self.ACTIVITY_FOR_BOTH_OR_NONE_MSG)
 
         # TODO: check for overlaps
         # TODO: additionally, take into account time zones when checking

@@ -752,7 +752,7 @@ class FirePostProcessor(object):
                     # we know this is the only activity object given the check
                     # above; if it's lat+lng+area, we'll adjust the activity
                     # objets portion of the area
-                    g['location'] = copy.deepcopy(top_level_base_location)
+                    a['location'] = copy.deepcopy(top_level_base_location)
                     if fire['location'].get('area'):
                         # This must be the old, deprecated activity and location
                         # structure, so the activity object should either have
