@@ -70,7 +70,7 @@ def _run_fire(hourly_fractions, fire):
                 p: profiler.hourly_fractions[p][i] for p in fields }
 
 def _validate_fire(fire):
-    if 'growth' not in fire:
+    if 'activity' not in fire:
         raise ValueError("Missing growth data required for time profiling")
     for g in fire.growth:
         if 'start' not in g or 'end' not in g:

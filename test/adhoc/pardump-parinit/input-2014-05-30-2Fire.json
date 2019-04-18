@@ -2,7 +2,7 @@
     "fires": [
         {
             "type": "rx",
-            "growth":  [
+            "activity":  [
                 {
                     "location": {
                         "area": 6000.4,
@@ -23,7 +23,7 @@
         },
         {
             "type": "rx",
-            "growth":  [
+            "activity":  [
                 {
                     "location": {
                         "area": 1000.4,

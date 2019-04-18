@@ -75,7 +75,7 @@ BASE_FIRE = {
         "fuel_type": "natural"
         # "id" to be filled in
     },
-    'growth': [{
+    'activity': [{
         "fuelbeds": [{
             # "fccs_id" to be filled in
             # "pct" to be filled in
@@ -405,7 +405,7 @@ def check(actual, expected_partials, expected_totals):
     }
 
     for fire in actual['fires']:
-        fb = fire['growth'][0]['fuelbeds'][0]
+        fb = fire['activity'][0]['fuelbeds'][0]
         fccs_id = fb['fccs_id']
         fb_e = expected_partials[fccs_id]
 

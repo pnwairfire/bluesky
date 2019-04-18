@@ -75,7 +75,7 @@ class Fire(dict):
         Doesn't memoize, in case growth windows are added/removed/modified
         """
         # consider only growth windows with start times
-        growths = [g for g in self.get('growth', []) if g.get('start')]
+        growths = [g for g in self.get('activity', []) if g.get('start')]
         if growths:
             growths = sorted(growths, key=lambda g: g['start'])
             # record  utc offset of initial growth window, in case
@@ -99,7 +99,7 @@ class Fire(dict):
           is considered, so this isn't a high priority)
         """
         # consider only growth windows with end times
-        growths = [g for g in self.get('growth', []) if g.get('end')]
+        growths = [g for g in self.get('activity', []) if g.get('end')]
         if growths:
             growths = sorted(growths, key=lambda g: g['end'])
             # record  utc offset of initial growth window, in case
@@ -836,7 +836,7 @@ class FiresMerger(FiresActionBase):
             try:
                 # merge growth; remember, at this point, growth will be
                 # defined for none or all of the fires to be merged
-                if new_combined_fire.get('growth'):
+                if new_combined_fire.get('activity'):
                     new_combined_fire.growth.extend(copy.deepcopy(fire.growth))
                     new_combined_fire.growth.sort(key=lambda e: e['start'])
 
@@ -857,7 +857,7 @@ class FiresMerger(FiresActionBase):
     # TODO: maybe eventually be able to merge post-consumption, emissions,
     #   etc., but for now only support merging just-ingested fire data
     ALL_MERGEABLE_FIELDS = set(
-        ["id", "event_of", "type", "fuel_type", "growth"])
+        ["id", "event_of", "type", "fuel_type", "activity"])
     INVALID_KEYS_MSG =  "invalid data set"
     def _check_keys(self, fire):
         keys = set(fire.keys())
@@ -875,7 +875,7 @@ class FiresMerger(FiresActionBase):
         but at this point it would be overengineering.
         """
         if combined_fire and (
-                bool(combined_fire.get('growth')) != bool(fire.get('growth'))):
+                bool(combined_fire.get('activity')) != bool(fire.get('activity'))):
             self._fail_fire(fire, self.GROWTH_FOR_BOTH_OR_NONE_MSG)
 
         # TODO: check for overlaps
@@ -998,17 +998,17 @@ class FireGrowthFilter(FiresActionBase):
             boolean value indicating whether or not to remove growth object
         """
         for fire in self._fires_manager.fires:
-            if not fire.get('growth'):
+            if not fire.get('activity'):
                 self._remove_fire(fire)
             else:
                 i = 0
-                while i < len(fire.get('growth', [])):
+                while i < len(fire.get('activity', [])):
                     try:
-                        if filter_func(fire, fire['growth'][i]):
-                            fire['growth'].pop(i)
+                        if filter_func(fire, fire['activity'][i]):
+                            fire['activity'].pop(i)
                             logging.debug('Filtered fire %s (%s)', fire.id,
                                 fire._private_id)
-                            if len(fire.get('growth')) == 0:
+                            if len(fire.get('activity')) == 0:
                                 self._remove_fire(fire)
                                 # Note: `i` must equal zero, and
                                 #   while loop will terminate

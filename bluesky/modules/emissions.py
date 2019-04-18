@@ -149,10 +149,10 @@ class Feps(EmissionsBase):
     CONVERSION_FACTOR = 0.0005 # 1.0 ton / 2000.0 lbs
 
     def _run_on_fire(self, fire):
-        if 'growth' not in fire:
+        if 'activity' not in fire:
             raise ValueError(
                 "Missing growth data required for computing emissions")
-        for g in fire['growth']:
+        for g in fire['activity']:
             if 'fuelbeds' not in g:
                raise ValueError(
                     "Missing fuelbed data required for computing emissions")
@@ -195,11 +195,11 @@ class PrichardOneill(EmissionsBase):
     CONVERSION_FACTOR = 0.001
 
     def _run_on_fire(self, fire):
-        if 'growth' not in fire:
+        if 'activity' not in fire:
             raise ValueError(
                 "Missing growth data required for computing emissions")
 
-        for g in fire['growth']:
+        for g in fire['activity']:
             if 'fuelbeds' not in g:
                 raise ValueError(
                     "Missing fuelbed data required for computing emissions")
@@ -251,7 +251,7 @@ class Consume(EmissionsBase):
     def _run_on_fire(self, fire):
         logging.debug("Consume emissions - fire {}".format(fire.get("id")))
 
-        if 'growth' not in fire:
+        if 'activity' not in fire:
             raise ValueError(
                 "Missing growth data required for computing consume emissions")
 
@@ -260,7 +260,7 @@ class Consume(EmissionsBase):
         if burn_type == 'piles':
             raise ValueError("Consume can't be used for fuel type 'piles'")
 
-        for g in fire['growth']:
+        for g in fire['activity']:
             if 'fuelbeds' not in g:
                 raise ValueError(
                     "Missing fuelbed data required for computing emissions")

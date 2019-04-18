@@ -19,7 +19,7 @@ FIRES = [
     {
         'source': 'GOES-16',
         'type': "wf",
-        "growth":  [
+        "activity":  [
             {
                 # timeprofile should be ignored and replcaced when running
                 # FRP emissions
@@ -76,7 +76,7 @@ FIRES = [
     },
     {
         'type': "rx",
-        "growth":  [
+        "activity":  [
             {
                 "location": {
                     'area': 50.4,
@@ -252,9 +252,9 @@ class TestFepsEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' not in self.fires[1]['growth'][0]['fuelbeds'][0]
+        assert 'emissions_details' not in self.fires[1]['activity'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details(self, reset_config):
         Config.set("feps", 'emissions', "model")
@@ -264,9 +264,9 @@ class TestFepsEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' in self.fires[1]['growth'][0]['fuelbeds'][0]
+        assert 'emissions_details' in self.fires[1]['activity'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
 
     def test_wo_details_PM_only(self, reset_config):
         Config.set("feps", 'emissions', "model")
@@ -277,9 +277,9 @@ class TestFepsEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' not in self.fires[1]['growth'][0]['fuelbeds'][0]
+        assert 'emissions_details' not in self.fires[1]['activity'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
-            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self, reset_config):
         Config.set("feps", 'emissions', "model")
@@ -290,9 +290,9 @@ class TestFepsEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' in self.fires[1]['growth'][0]['fuelbeds'][0]
+        assert 'emissions_details' in self.fires[1]['activity'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
-            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
 
 class TestPrichardOneillEmissions(BaseEmissionsTest):
 
@@ -353,9 +353,9 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' not in self.fires[1]['growth'][0]['fuelbeds'][0]
+        assert 'emissions_details' not in self.fires[1]['activity'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self, reset_config):
         Config.set("prichard-oneill", 'emissions', "model")
@@ -366,9 +366,9 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' in self.fires[1]['growth'][0]['fuelbeds'][0]
+        assert 'emissions_details' in self.fires[1]['activity'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
 
 class TestConsumeEmissions(BaseEmissionsTest):
 
@@ -439,9 +439,9 @@ class TestConsumeEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' not in self.fires[1]['growth'][0]['fuelbeds'][0]
+        assert 'emissions_details' not in self.fires[1]['activity'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details(self, reset_config):
         Config.set("consume", 'emissions', "model")
@@ -451,9 +451,9 @@ class TestConsumeEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' in self.fires[1]['growth'][0]['fuelbeds'][0]
+        assert 'emissions_details' in self.fires[1]['activity'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
 
     def test_wo_details_PM_only(self, reset_config):
         Config.set("consume", 'emissions', "model")
@@ -464,9 +464,9 @@ class TestConsumeEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' not in self.fires[1]['growth'][0]['fuelbeds'][0]
+        assert 'emissions_details' not in self.fires[1]['activity'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
-            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self, reset_config):
         Config.set("consume", 'emissions', "model")
@@ -477,6 +477,6 @@ class TestConsumeEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' in self.fires[1]['growth'][0]['fuelbeds'][0]
+        assert 'emissions_details' in self.fires[1]['activity'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
-            self.fires[1]['growth'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])

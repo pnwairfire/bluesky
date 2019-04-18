@@ -177,7 +177,7 @@ class TestBaseFireSpiderLoader(object):
             start="2015-08-09T14:00:00Z")
 
         # start is in the middle of second growth window
-        expected[0]['growth'].pop(0)
+        expected[0]['activity'].pop(0)
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
             start=datetime.datetime(2015,8,10,14,0,0))
@@ -214,7 +214,7 @@ class TestBaseFireSpiderLoader(object):
             end="2015-08-10T14:00:00Z")
 
         # start is in the middle of first growth window
-        expected[0]['growth'].pop()
+        expected[0]['activity'].pop()
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
             end=datetime.datetime(2015,8,9,14,0,0))
@@ -255,7 +255,7 @@ class TestBaseFireSpiderLoader(object):
             end="2015-08-10T14:00:00Z")
 
         # start/end are inside first growth window
-        expected[0]['growth'].pop()
+        expected[0]['activity'].pop()
         assert expected == self._call_marshal(
             copy.deepcopy(FS_FIRES),
             start=datetime.datetime(2015,8,9,14,0,0),

@@ -59,11 +59,11 @@ class EmissionsCsvWriter(object):
                     self._write_fire(fire)
 
     def _write_fire(self, fire):
-        if not fire.get('growth'):
+        if not fire.get('activity'):
             raise ValueError("Growth information required to "
                 "write emissions csv")
 
-        for g in fire['growth']:
+        for g in fire['activity']:
             self._write_growth(fire, g)
 
     def _write_growth(self, fire, g):

@@ -135,7 +135,7 @@ def _infer_time_windows_from_fires(fires_manager):
         #  when no fire is growing are excluded ?
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
-                if 'growth' in fire:
+                if 'activity' in fire:
                     # parse_utc_offset makes sure utc offset is defined and valid
                     for g in fire.growth:
                         utc_offset = parse_utc_offset(g.get('location', {}).get('utc_offset'))

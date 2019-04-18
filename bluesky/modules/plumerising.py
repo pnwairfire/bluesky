@@ -65,7 +65,7 @@ class ComputeFunction(object):
             }
 
     def __call__(self, fire):
-        if 'growth' not in fire:
+        if 'activity' not in fire:
             raise ValueError("Missing growth data required for plumerise")
         if any([not g.get('location', {}).get('area') for g in fire.growth]):
             raise ValueError("Missing fire growth area required for plumerise")

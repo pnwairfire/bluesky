@@ -40,9 +40,9 @@ def run(fires_manager):
         len(fires_manager.fires))
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            if not fire.get('growth'):
+            if not fire.get('activity'):
                 raise ValueError("Missing growth data required for localmet")
-            for g in fire['growth']:
+            for g in fire['activity']:
                 latlng = LatLng(g.get('location'))
                 # parse_utc_offset makes sure utc offset is defined and valid
                 utc_offset = parse_utc_offset(g.get('location', {}).get('utc_offset'))

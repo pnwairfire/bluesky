@@ -328,7 +328,7 @@ def get_fccs_ids_fires(args, times):
                 }
             ]
         })
-        fires[-1]['growth'][0]['location'].update(**CONSUME_LOCATION_FIELDS)
+        fires[-1]['activity'][0]['location'].update(**CONSUME_LOCATION_FIELDS)
     return fires
 
 def get_coordinates_fires(args, times):
@@ -352,7 +352,7 @@ def get_coordinates_fires(args, times):
                 }
             ]
         })
-        fires[-1]['growth'][0]['location'].update()
+        fires[-1]['activity'][0]['location'].update()
     return fires
 
 MODES = {

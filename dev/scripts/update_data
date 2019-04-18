@@ -8,9 +8,9 @@ import subprocess
 import afscripting
 
 def process_fire(fire):
-    if 'growth' not in fire:
-        fire['growth'] = [{'pct': 100.0}]
-    for g in fire['growth']:
+    if 'activity' not in fire:
+        fire['activity'] = [{'pct': 100.0}]
+    for g in fire['activity']:
         if 'location' in fire:
             g['location'] = copy.deepcopy(fire['location'])
             if g['location'].get('area') and g.get('pct'):

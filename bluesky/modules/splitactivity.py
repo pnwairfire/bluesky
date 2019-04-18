@@ -32,13 +32,13 @@ def run(fires_manager):
 
 def _split(fire, record_original_activity):
     new_growth = []
-    for g in fire.get('growth', []):
+    for g in fire.get('activity', []):
         new_growth.extend(_split_growth(g))
 
-    if new_growth and new_growth != fire['growth']:  #len(new_growth) != len(fire['growth']):
+    if new_growth and new_growth != fire['activity']:  #len(new_growth) != len(fire['activity']):
         if record_original_activity:
-            fire['original_growth'] = fire['growth']
-        fire['growth'] = new_growth
+            fire['original_growth'] = fire['activity']
+        fire['activity'] = new_growth
 
 # TODO: Support splitting these fields. Only fuelbeds would
 #   be a bit of work to split. For 'consumption', 'emissions',

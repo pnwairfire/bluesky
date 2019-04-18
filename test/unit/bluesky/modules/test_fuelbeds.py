@@ -87,7 +87,7 @@ class TestSummarize(object):
     def test_one_fire(self):
         fires = [
             Fire({
-                'growth':[{
+                'activity':[{
                     "location":{"area": 10},
                     "fuelbeds":[
                         {"fccs_id": "1", "pct": 40},
@@ -97,12 +97,12 @@ class TestSummarize(object):
             })
         ]
         summary = fuelbeds.summarize(fires)
-        assert summary == fires[0]['growth'][0]['fuelbeds']
+        assert summary == fires[0]['activity'][0]['fuelbeds']
 
     def test_two_fires(self):
         fires = [
             Fire({
-                'growth':[{
+                'activity':[{
                     "location":{"area": 10},
                     "fuelbeds":[
                         {"fccs_id": "1", "pct": 30},
@@ -111,7 +111,7 @@ class TestSummarize(object):
                 }]
             }),
             Fire({
-                'growth':[{
+                'activity':[{
                     "location":{"area": 5},
                     "fuelbeds":[
                         {"fccs_id": "2", "pct": 10},
@@ -145,11 +145,11 @@ class TestEstimatorInsufficientDataForLookup(object):
 
     def test_no_location(self):
         with raises(ValueError) as e:
-            self.estimator.estimate({'growth':[{}]})
+            self.estimator.estimate({'activity':[{}]})
 
     def test_no_geojson_or_lat_or_lng(self):
         with raises(ValueError) as e:
-            self.estimator.estimate({"growth":[{"location":{}}]})
+            self.estimator.estimate({"activity":[{"location":{}}]})
 
 class BaseTestEstimatorEstimate(object):
     """Base class for testing Estimator.estimate

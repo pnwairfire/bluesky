@@ -154,7 +154,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         # Make sure met files span dispersion time window
         for fire in fires:
             try:
-                if 'growth' not in fire:
+                if 'activity' not in fire:
                     raise ValueError(
                         "Missing fire growth data required for computing dispersion")
                 growth_fields = self._required_growth_fields() + ('fuelbeds', 'location')

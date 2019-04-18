@@ -149,7 +149,7 @@ def _validate_input(fires_manager):
     ecoregion_lookup = None # instantiate only if necessary
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            if not fire.get('growth'):
+            if not fire.get('activity'):
                 raise ValueError(
                     "Missing growth data required for computing consumption")
             for g in fire.growth:

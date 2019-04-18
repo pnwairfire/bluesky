@@ -33,11 +33,11 @@ def run(fires_manager):
 
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            if not fire.get('growth'):
+            if not fire.get('activity'):
                 raise ValueError(
                     "Growth information required to look up fuelbeds")
 
-            for g in fire['growth']:
+            for g in fire['activity']:
                 if not g.get('location'):
                     raise ValueError(
                         "growth location information required to look up fuelbeds")
@@ -69,7 +69,7 @@ def summarize(fires):
     area_by_fccs_id = defaultdict(lambda: 0)
     total_area = 0
     for fire in fires:
-        for g in fire['growth']:
+        for g in fire['activity']:
             total_area += g['location']['area']
             for fb in g['fuelbeds']:
                 area_by_fccs_id[fb['fccs_id']] += (fb['pct'] / 100.0) * g['location']['area']

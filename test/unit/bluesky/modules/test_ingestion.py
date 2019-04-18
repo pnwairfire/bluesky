@@ -165,7 +165,7 @@ class TestIngestionValidInput(object):
             }
         }
         expected = {
-            'growth': [
+            'activity': [
                 {
                     'location': copy.deepcopy(f['location'])
                 }
@@ -255,7 +255,7 @@ class TestIngestionValidInput(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            'growth': [
+            'activity': [
                 {
                     "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
@@ -400,10 +400,10 @@ class TestIngestionValidInput(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            'growth': copy.deepcopy(f['growth'])
+            'activity': copy.deepcopy(f['activity'])
         }
-        expected['growth'][0].pop('pct')
-        expected['growth'][0]['location'].pop('foo')
+        expected['activity'][0].pop('pct')
+        expected['activity'][0]['location'].pop('foo')
         expected_parsed_input = copy.deepcopy(f)
         parsed_input = self.ingester.ingest(f)
         assert expected == f
@@ -442,7 +442,7 @@ class TestIngestionValidInput(object):
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            'growth': [
+            'activity': [
                 {
                     'location': {
                         'geojson': copy.deepcopy(f['location']['geojson']),
@@ -466,7 +466,7 @@ class TestIngestionValidInput(object):
         }
         expected = {
             "id": "SF11C14225236095807750",
-            "growth":[{
+            "activity":[{
                 "start": "2014-05-29T00:00:00",
                 "end": "2014-05-30T00:00:00",
                 "location":{
@@ -491,7 +491,7 @@ class TestIngestionValidInput(object):
         }
         expected = {
             "id": "SF11C14225236095807750",
-            "growth":[{
+            "activity":[{
                 "start": "2015-08-04T00:00:00",
                 "end": "2015-08-05T00:00:00",
                 "location": {
@@ -584,7 +584,7 @@ class TestIngestionValidInput(object):
                 "url": "http://playground.dri.edu/smartfire/events/bd1af2ca-a09d-4b1b-9135-ac41132d2e49"
             },
             "type": "RX",
-            "growth":[{
+            "activity":[{
                 "start": "2014-05-29T00:00:00",
                 "end": "2014-05-30T00:00:00",
                 "location":{
@@ -702,7 +702,7 @@ class TestIngestionValidInput(object):
                 "id": "SF11E120478",
                 "url": "http://128.208.123.111/smartfire/events/623343d2-ad25-4532-acd2-4db6cd75068a",
             },
-            "growth":[{
+            "activity":[{
                 "start": "2015-08-04T00:00:00",
                 "end": "2015-08-05T00:00:00",
                 "location": {
@@ -755,7 +755,7 @@ class TestIngestionValidInput(object):
         }
         expected = {
             "id": "SF11C14225236095807750",
-            'growth': [{
+            'activity': [{
                 "location": {
                     "latitude": 47.0,
                     "longitude": -122.0,
@@ -846,7 +846,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
             "heat": 123123123
         }
         expected = {
-            'growth': [
+            'activity': [
                 {
                     'location': copy.deepcopy(f['location'])
                 }
@@ -936,7 +936,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
         }
         expected = {
             "id": "SF11C14225236095807750",
-            "growth":[{
+            "activity":[{
                 "start": "2014-05-29T00:00:00",
                 "end": "2014-05-30T00:00:00",
                 "location":{
@@ -977,7 +977,7 @@ class TestIngestionKeepEmissionsAndHeat(object):
         }
         expected = {
             "id": "SF11C14225236095807750",
-            "growth":[{
+            "activity":[{
                 "start": "2015-08-04T00:00:00",
                 "end": "2015-08-05T00:00:00",
                 "location": {

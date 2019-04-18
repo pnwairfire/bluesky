@@ -697,7 +697,7 @@ It would become:
 
 Notice:
  - The 'raw' input under processing isn't purely raw, as the fire has been assigned an id ("ac226ee6").  This is the one auto-generated field that you will find under 'processing' > 'parsed_input'.  If the fire object already contains an id, it will be used, in which case the raw fire input is in fact exactly what the user input.
- - The 'area' and 'utc_offset' keys are initially defined at the top level, but, after ingestion, are under the 'growth' > 'location' object.  Similarly, 'name' gets moved under 'event_of' (since names apply to fire events, not to fire locations).
+ - The 'area' and 'utc_offset' keys are initially defined at the top level, but, after ingestion, are under the 'activity' > 'location' object.  Similarly, 'name' gets moved under 'event_of' (since names apply to fire events, not to fire locations).
  - The 'event_id' key gets moved under 'event_of' and is renamed 'id'.
 
 ###### Example 2
@@ -818,7 +818,7 @@ you'll end up with this:
 
 Notice:
  - "foo" and "bar" were ignored (though left in the recorded raw input)
- - "ecoregion" got moved under "growth" > location"
+ - "ecoregion" got moved under "activity" > location"
 
 #### Merge
 
