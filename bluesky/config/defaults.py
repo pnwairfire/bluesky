@@ -67,7 +67,7 @@ _DEFAULTS = {
         #     "sw": { "lat":None, "lng": None},
         #     "ne": { "lat":None, "lng": None}}}
     },
-    "splitgrowth": {
+    "splitactivity": {
         "record_original_growth": False
     },
     "fuelbeds": {
