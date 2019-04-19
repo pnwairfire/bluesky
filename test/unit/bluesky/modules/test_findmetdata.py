@@ -229,3 +229,135 @@ class TestGetTimeWindows(object):
             }
         ]
         assert expected == findmetdata._get_time_windows(fm)
+
+
+class TestMergeTimeWindows(object):
+
+    def test_simple(self):
+        time_windows = [
+            {'start': datetime.datetime(2018, 11, 9, 4, 0), 'end': datetime.datetime(2018, 11, 9, 5, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)}
+        ]
+        expected = [
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)}
+        ]
+        actual = findmetdata._merge_time_windows(time_windows)
+        assert actual == expected
+
+    def test_same_start_times_simple(self):
+        time_windows = [
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 8, 9, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)}
+        ]
+        expected = [
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)}
+        ]
+        actual = findmetdata._merge_time_windows(time_windows)
+        assert actual == expected
+
+
+    def test_same_start_times_real_case_from_sti(self):
+        time_windows = [
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 8, 9, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 8, 9, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 8, 9, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 8, 9, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 8, 9, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 9, 0), 'end': datetime.datetime(2018, 11, 8, 10, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 9, 0), 'end': datetime.datetime(2018, 11, 8, 10, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 9, 0), 'end': datetime.datetime(2018, 11, 8, 10, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 9, 0), 'end': datetime.datetime(2018, 11, 8, 10, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 9, 0), 'end': datetime.datetime(2018, 11, 8, 10, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 10, 0), 'end': datetime.datetime(2018, 11, 8, 11, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 10, 0), 'end': datetime.datetime(2018, 11, 8, 11, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 10, 0), 'end': datetime.datetime(2018, 11, 8, 11, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 10, 0), 'end': datetime.datetime(2018, 11, 8, 11, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 11, 0), 'end': datetime.datetime(2018, 11, 8, 12, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 11, 0), 'end': datetime.datetime(2018, 11, 8, 12, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 11, 0), 'end': datetime.datetime(2018, 11, 8, 12, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 11, 0), 'end': datetime.datetime(2018, 11, 8, 12, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 11, 0), 'end': datetime.datetime(2018, 11, 8, 12, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 12, 0), 'end': datetime.datetime(2018, 11, 8, 13, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 12, 0), 'end': datetime.datetime(2018, 11, 8, 13, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 12, 0), 'end': datetime.datetime(2018, 11, 8, 13, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 12, 0), 'end': datetime.datetime(2018, 11, 8, 13, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 12, 0), 'end': datetime.datetime(2018, 11, 8, 13, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 12, 0), 'end': datetime.datetime(2018, 11, 8, 13, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 12, 0), 'end': datetime.datetime(2018, 11, 8, 13, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 13, 0), 'end': datetime.datetime(2018, 11, 8, 14, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 13, 0), 'end': datetime.datetime(2018, 11, 8, 14, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 13, 0), 'end': datetime.datetime(2018, 11, 8, 14, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 14, 0), 'end': datetime.datetime(2018, 11, 8, 15, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 14, 0), 'end': datetime.datetime(2018, 11, 8, 15, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 14, 0), 'end': datetime.datetime(2018, 11, 8, 15, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 14, 0), 'end': datetime.datetime(2018, 11, 8, 15, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 15, 0), 'end': datetime.datetime(2018, 11, 8, 16, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 15, 0), 'end': datetime.datetime(2018, 11, 8, 16, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 15, 0), 'end': datetime.datetime(2018, 11, 8, 16, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 15, 0), 'end': datetime.datetime(2018, 11, 8, 16, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 17, 0), 'end': datetime.datetime(2018, 11, 8, 18, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 17, 0), 'end': datetime.datetime(2018, 11, 8, 18, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 18, 0), 'end': datetime.datetime(2018, 11, 8, 19, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 18, 0), 'end': datetime.datetime(2018, 11, 8, 19, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 18, 0), 'end': datetime.datetime(2018, 11, 8, 19, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 18, 0), 'end': datetime.datetime(2018, 11, 8, 19, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 19, 0), 'end': datetime.datetime(2018, 11, 8, 20, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 20, 0), 'end': datetime.datetime(2018, 11, 8, 21, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 20, 0), 'end': datetime.datetime(2018, 11, 8, 21, 0)},
+            {'start': datetime.datetime(2018, 11, 8, 21, 0), 'end': datetime.datetime(2018, 11, 8, 22, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 0, 0), 'end': datetime.datetime(2018, 11, 9, 1, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 0, 0), 'end': datetime.datetime(2018, 11, 9, 1, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 0, 0), 'end': datetime.datetime(2018, 11, 9, 1, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 0, 0), 'end': datetime.datetime(2018, 11, 9, 1, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 0, 0), 'end': datetime.datetime(2018, 11, 9, 1, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 1, 0), 'end': datetime.datetime(2018, 11, 9, 2, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 1, 0), 'end': datetime.datetime(2018, 11, 9, 2, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 1, 0), 'end': datetime.datetime(2018, 11, 9, 2, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 1, 0), 'end': datetime.datetime(2018, 11, 9, 2, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 2, 0), 'end': datetime.datetime(2018, 11, 9, 3, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 2, 0), 'end': datetime.datetime(2018, 11, 9, 3, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 2, 0), 'end': datetime.datetime(2018, 11, 9, 3, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 2, 0), 'end': datetime.datetime(2018, 11, 9, 3, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 2, 0), 'end': datetime.datetime(2018, 11, 9, 3, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 3, 0), 'end': datetime.datetime(2018, 11, 9, 4, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 3, 0), 'end': datetime.datetime(2018, 11, 9, 4, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 3, 0), 'end': datetime.datetime(2018, 11, 9, 4, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 3, 0), 'end': datetime.datetime(2018, 11, 9, 4, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 3, 0), 'end': datetime.datetime(2018, 11, 9, 4, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 3, 0), 'end': datetime.datetime(2018, 11, 9, 4, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 3, 0), 'end': datetime.datetime(2018, 11, 9, 4, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 3, 0), 'end': datetime.datetime(2018, 11, 9, 4, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 4, 0), 'end': datetime.datetime(2018, 11, 9, 5, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 4, 0), 'end': datetime.datetime(2018, 11, 9, 5, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 4, 0), 'end': datetime.datetime(2018, 11, 9, 5, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 4, 0), 'end': datetime.datetime(2018, 11, 9, 5, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 4, 0), 'end': datetime.datetime(2018, 11, 9, 5, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 4, 0), 'end': datetime.datetime(2018, 11, 9, 5, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 4, 0), 'end': datetime.datetime(2018, 11, 9, 5, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 4, 0), 'end': datetime.datetime(2018, 11, 9, 5, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 5, 0), 'end': datetime.datetime(2018, 11, 9, 6, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 5, 0), 'end': datetime.datetime(2018, 11, 9, 6, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 5, 0), 'end': datetime.datetime(2018, 11, 9, 6, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 5, 0), 'end': datetime.datetime(2018, 11, 9, 6, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 5, 0), 'end': datetime.datetime(2018, 11, 9, 6, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 5, 0), 'end': datetime.datetime(2018, 11, 9, 6, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 5, 0), 'end': datetime.datetime(2018, 11, 9, 6, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 6, 0), 'end': datetime.datetime(2018, 11, 9, 7, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 6, 0), 'end': datetime.datetime(2018, 11, 9, 7, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 6, 0), 'end': datetime.datetime(2018, 11, 9, 7, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 6, 0), 'end': datetime.datetime(2018, 11, 9, 7, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 6, 0), 'end': datetime.datetime(2018, 11, 9, 7, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 6, 0), 'end': datetime.datetime(2018, 11, 9, 7, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 7, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 7, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 7, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 7, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)},
+            {'start': datetime.datetime(2018, 11, 9, 7, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)}
+        ]
+        expected = [
+            {'start': datetime.datetime(2018, 11, 8, 8, 0), 'end': datetime.datetime(2018, 11, 9, 8, 0)}
+        ]
+        actual = findmetdata._merge_time_windows(time_windows)
+        assert actual == expected
