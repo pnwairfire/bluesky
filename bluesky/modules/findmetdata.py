@@ -101,15 +101,7 @@ def _get_time_windows(fires_manager):
             "wheren't specied and couldn't be inferred from the fire "
             "and configuration data.")
 
-    merged_time_windows = []
-    for tw in sorted(time_windows, key=lambda e: e['start']):
-        if (not merged_time_windows
-                or merged_time_windows[-1]['end']< tw['start']):
-            merged_time_windows.append(tw)
-        else:
-            merged_time_windows[-1]['end'] = tw['end']
-
-    return merged_time_windows
+    return _merge_time_windows(time_windows)
 
 def _get_configured_time_windows(fires_manager):
     time_window = fires_manager.get_config_value('findmetdata', 'time_window')
@@ -161,3 +153,14 @@ def _get_dispersion_time_window(fires_manager):
             'start': start,
             'end': start + datetime.timedelta(hours=num_hours)
         }
+
+def _merge_time_windows(time_windows):
+    merged_time_windows = []
+    for tw in sorted(time_windows, key=lambda e: e['start']):
+        if (not merged_time_windows
+                or merged_time_windows[-1]['end']< tw['start']):
+            merged_time_windows.append(tw)
+        elif merged_time_windows[-1]['end'] < tw['end']:
+            merged_time_windows[-1]['end'] = tw['end']
+
+    return merged_time_windows
