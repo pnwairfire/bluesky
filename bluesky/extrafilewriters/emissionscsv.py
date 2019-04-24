@@ -68,7 +68,7 @@ class EmissionsCsvWriter(object):
 
     def _write_activity(self, fire, a):
         if not a.get('timeprofile'):
-            raisfe ValueError("activity timeprofile information "
+            raise ValueError("activity timeprofile information "
                 "required to write emissions csv")
 
         # Total emissions values may be in a['emissions'], but
