@@ -9,10 +9,17 @@ from py.test import raises
 from bluesky.config import Config
 from bluesky.modules import ingestion
 
-class TestIngestionErrorScenarios(object):
+##
+## Invalid Input
+##
+
+class BaseTestIngestion(object):
 
     def setup(self):
         self.ingester = ingestion.FireIngester()
+
+
+class TestIngestionErrorScenarios(BaseTestIngestion):
 
     ##
     ## Tests For ingest
@@ -140,372 +147,12 @@ class TestIngestionErrorScenarios(object):
 
     # TODO: test FUELBEDS_AT_TOP_OR_PER_ACTIVITY
 
-class TestIngestionValidInput(object):
 
-    def setup(self):
-        self.ingester = ingestion.FireIngester()
+##
+## SF2 Fire data
+##
 
-    def test_fire_with_minimum_fields(self, reset_config):
-        f = {
-            "location": {
-                "geojson": {
-                    "type": "MultiPolygon",
-                    "coordinates": [
-                        [
-                            [
-                                [-121.4522115, 47.4316976],
-                                [-121.3990506, 47.4316976],
-                                [-121.3990506, 47.4099293],
-                                [-121.4522115, 47.4099293],
-                                [-121.4522115, 47.4316976]
-                            ]
-                        ]
-                    ]
-                }
-            }
-        }
-        expected = {
-            'activity': [
-                {
-                    'location': copy.deepcopy(f['location'])
-                }
-            ]
-        }
-        expected_parsed_input = copy.deepcopy(f)
-        parsed_input = self.ingester.ingest(f)
-        assert expected == f
-        assert expected_parsed_input == parsed_input
-
-    def test_fire_with_maximum_optional_fields(self, reset_config):
-        f = {
-            "id": "SF11C14225236095807750",
-            "event_of": {
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            "location": {
-                "geojson": {
-                    "type": "MultiPolygon",
-                    "coordinates": [
-                        [
-                            [
-                                [-121.4522115, 47.4316976],
-                                [-121.3990506, 47.4316976],
-                                [-121.3990506, 47.4099293],
-                                [-121.4522115, 47.4099293],
-                                [-121.4522115, 47.4316976]
-                            ]
-                        ]
-                    ]
-                },
-                "ecoregion": "southern"
-            },
-            "activity": [{
-                "start": "2015-01-20T17:00:00",
-                "end": "2015-01-21T17:00:00",
-                "pct": 100.0
-            }]
-        }
-        expected = {
-            "id": "SF11C14225236095807750",
-            "event_of":{
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            "activity": [{
-                "start": "2015-01-20T17:00:00",
-                "end": "2015-01-21T17:00:00",
-                "location": copy.deepcopy(f['location'])
-            }]
-        }
-        expected_parsed_input = copy.deepcopy(f)
-        parsed_input = self.ingester.ingest(f)
-        assert expected == f
-        assert expected_parsed_input == parsed_input
-
-    def test_flat_fire(self, reset_config):
-        f = {
-            "id": "SF11C14225236095807750",
-            "event_of":{
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            "geojson": {
-                "type": "MultiPolygon",
-                "coordinates": [
-                    [
-                        [
-                            [-121.4522115, 47.4316976],
-                            [-121.3990506, 47.4316976],
-                            [-121.3990506, 47.4099293],
-                            [-121.4522115, 47.4099293],
-                            [-121.4522115, 47.4316976]
-                        ]
-                    ]
-                ]
-            },
-            "ecoregion": "southern",
-            "start": "2015-01-20T17:00:00",
-            "end": "2015-01-21T17:00:00",
-            "utc_offset": "-07:00"
-        }
-        expected = {
-            "id": "SF11C14225236095807750",
-            "event_of":{
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            'activity': [
-                {
-                    "start": "2015-01-20T17:00:00",
-                    "end": "2015-01-21T17:00:00",
-                    'location': {
-                        "geojson": {
-                            "type": "MultiPolygon",
-                            "coordinates": [
-                                [
-                                    [
-                                        [-121.4522115, 47.4316976],
-                                        [-121.3990506, 47.4316976],
-                                        [-121.3990506, 47.4099293],
-                                        [-121.4522115, 47.4099293],
-                                        [-121.4522115, 47.4316976]
-                                    ]
-                                ]
-                            ]
-                        },
-                        "ecoregion": "southern",
-                        "utc_offset": "-07:00"
-                    }
-                }
-            ]
-        }
-        expected_parsed_input = copy.deepcopy(f)
-        parsed_input = self.ingester.ingest(f)
-        assert expected == f
-        assert expected_parsed_input == parsed_input
-
-    def test_flat_and_nested_fire(self, reset_config):
-        f = {
-            "id": "SF11C14225236095807750",
-            "event_of":{
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            "location": {
-                "geojson": {
-                    "type": "MultiPolygon",
-                    "coordinates": [
-                        [
-                            [
-                                [-121.4522115, 47.4316976],
-                                [-121.3990506, 47.4316976],
-                                [-121.3990506, 47.4099293],
-                                [-121.4522115, 47.4099293],
-                                [-121.4522115, 47.4316976]
-                            ]
-                        ]
-                    ]
-                }
-            },
-            "ecoregion": "southern",
-            "activity": [
-                {
-                    "start": "2015-01-20T17:00:00",
-                    "end": "2015-01-21T17:00:00",
-                    "pct": 100.0
-                }
-            ],
-            "meta": {
-                "foo": "bar"
-            },
-            "utc_offset": "-07:00"
-        }
-        expected = {
-            "id": "SF11C14225236095807750",
-            "event_of":{
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            "activity": [
-                {
-                    "start": "2015-01-20T17:00:00",
-                    "end": "2015-01-21T17:00:00",
-                    'location': {
-                        "geojson": {
-                            "type": "MultiPolygon",
-                            "coordinates": [
-                                [
-                                    [
-                                        [-121.4522115, 47.4316976],
-                                        [-121.3990506, 47.4316976],
-                                        [-121.3990506, 47.4099293],
-                                        [-121.4522115, 47.4099293],
-                                        [-121.4522115, 47.4316976]
-                                    ]
-                                ]
-                            ]
-                        },
-                        "ecoregion": "southern",
-                        "utc_offset": "-07:00"
-                    }
-                }
-            ],
-            "meta": {
-                "foo": "bar"
-            }
-        }
-        expected_parsed_input = copy.deepcopy(f)
-        parsed_input = self.ingester.ingest(f)
-        assert expected == f
-        assert expected_parsed_input == parsed_input
-
-    def test_fire_with_ignored_fields(self, reset_config):
-        f = {
-            "id": "SF11C14225236095807750",
-            "event_of":{
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            "activity": [
-                {
-                    "start": "2015-01-20T17:00:00",
-                    "end": "2015-01-21T17:00:00",
-                    "pct": 100.0,
-                    "location": {
-                        "geojson": {
-                            "type": "MultiPolygon",
-                            "coordinates": [
-                                [
-                                    [
-                                        [-121.4522115, 47.4316976],
-                                        [-121.3990506, 47.4316976],
-                                        [-121.3990506, 47.4099293],
-                                        [-121.4522115, 47.4099293],
-                                        [-121.4522115, 47.4316976]
-                                    ]
-                                ]
-                            ]
-                        },
-                        "ecoregion": "southern",
-                        "foo": "bar"
-                    }
-                }
-            ],
-            "bar": "baz"
-        }
-        expected = {
-            "id": "SF11C14225236095807750",
-            "event_of":{
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            'activity': copy.deepcopy(f['activity'])
-        }
-        expected['activity'][0].pop('pct')
-        expected['activity'][0]['location'].pop('foo')
-        expected_parsed_input = copy.deepcopy(f)
-        parsed_input = self.ingester.ingest(f)
-        assert expected == f
-        assert expected_parsed_input == parsed_input
-
-    def test_fire_with_geojson_and_lat_lng(self, reset_config):
-        f = {
-            "id": "SF11C14225236095807750",
-            "event_of":{
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            "location": {
-                "geojson": {
-                    "type": "MultiPolygon",
-                    "coordinates": [
-                        [
-                            [
-                                [-121.4522115, 47.4316976],
-                                [-121.3990506, 47.4316976],
-                                [-121.3990506, 47.4099293],
-                                [-121.4522115, 47.4099293],
-                                [-121.4522115, 47.4316976]
-                            ]
-                        ]
-                    ]
-                },
-                "longitude": -77.379,
-                "latitude": 25.041,
-                "area": 200
-            }
-        }
-        expected = {
-            "id": "SF11C14225236095807750",
-            "event_of":{
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            'activity': [
-                {
-                    'location': {
-                        'geojson': copy.deepcopy(f['location']['geojson']),
-                        "area": 200
-                    }
-                }
-            ]
-        }
-        expected_parsed_input = copy.deepcopy(f)
-        parsed_input = self.ingester.ingest(f)
-        assert expected == f
-        assert expected_parsed_input == parsed_input
-
-    def test_fire_with_old_sf2_date_time(self, reset_config):
-        f = {
-            "id": "SF11C14225236095807750",
-            "latitude": 47.0,
-            "longitude": -122.0,
-            "area": 100.0,
-            "date_time": '201405290000Z'
-        }
-        expected = {
-            "id": "SF11C14225236095807750",
-            "activity":[{
-                "start": "2014-05-29T00:00:00",
-                "end": "2014-05-30T00:00:00",
-                "location":{
-                    "latitude": 47.0,
-                    "longitude": -122.0,
-                    "area": 100.0
-                }
-            }]
-        }
-        expected_parsed_input = copy.deepcopy(f)
-        parsed_input = self.ingester.ingest(f)
-        assert expected == f
-        assert expected_parsed_input == parsed_input
-
-    def test_fire_with_new_sf2_date_time(self, reset_config):
-        f = {
-            "id": "SF11C14225236095807750",
-            "latitude": 47.0,
-            "longitude": -122.0,
-            "area": 100.0,
-            "date_time": '201508040000-04:00'
-        }
-        expected = {
-            "id": "SF11C14225236095807750",
-            "activity":[{
-                "start": "2015-08-04T00:00:00",
-                "end": "2015-08-05T00:00:00",
-                "location": {
-                    "latitude": 47.0,
-                    "longitude": -122.0,
-                    "area": 100.0,
-                    "utc_offset": "-04:00",
-                }
-            }]
-        }
-        expected_parsed_input = copy.deepcopy(f)
-        parsed_input = self.ingester.ingest(f)
-        assert expected == f
-        assert expected_parsed_input == parsed_input
+class TestSF2IngestionValidInput(BaseTestIngestion):
 
     def test_old_sf2_fire(self, reset_config):
         f = {
@@ -743,6 +390,384 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
+    def test_fire_with_old_sf2_date_time(self, reset_config):
+        f = {
+            "id": "SF11C14225236095807750",
+            "latitude": 47.0,
+            "longitude": -122.0,
+            "area": 100.0,
+            "date_time": '201405290000Z'
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "activity":[{
+                "start": "2014-05-29T00:00:00",
+                "end": "2014-05-30T00:00:00",
+                "location":{
+                    "latitude": 47.0,
+                    "longitude": -122.0,
+                    "area": 100.0
+                }
+            }]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+    def test_fire_with_new_sf2_date_time(self, reset_config):
+        f = {
+            "id": "SF11C14225236095807750",
+            "latitude": 47.0,
+            "longitude": -122.0,
+            "area": 100.0,
+            "date_time": '201508040000-04:00'
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "activity":[{
+                "start": "2015-08-04T00:00:00",
+                "end": "2015-08-05T00:00:00",
+                "location": {
+                    "latitude": 47.0,
+                    "longitude": -122.0,
+                    "area": 100.0,
+                    "utc_offset": "-04:00",
+                }
+            }]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+
+##
+## SF2 Fire data
+##
+
+class TestVariousValidInput(BaseTestIngestion):
+
+    def test_fire_with_minimum_fields(self, reset_config):
+        f = {
+            "location": {
+                "geojson": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                        [
+                            [
+                                [-121.4522115, 47.4316976],
+                                [-121.3990506, 47.4316976],
+                                [-121.3990506, 47.4099293],
+                                [-121.4522115, 47.4099293],
+                                [-121.4522115, 47.4316976]
+                            ]
+                        ]
+                    ]
+                }
+            }
+        }
+        expected = {
+            'activity': [
+                {
+                    'location': copy.deepcopy(f['location'])
+                }
+            ]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+    def test_fire_with_maximum_optional_fields(self, reset_config):
+        f = {
+            "id": "SF11C14225236095807750",
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "location": {
+                "geojson": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                        [
+                            [
+                                [-121.4522115, 47.4316976],
+                                [-121.3990506, 47.4316976],
+                                [-121.3990506, 47.4099293],
+                                [-121.4522115, 47.4099293],
+                                [-121.4522115, 47.4316976]
+                            ]
+                        ]
+                    ]
+                },
+                "ecoregion": "southern"
+            },
+            "activity": [{
+                "start": "2015-01-20T17:00:00",
+                "end": "2015-01-21T17:00:00",
+                "pct": 100.0
+            }]
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "activity": [{
+                "start": "2015-01-20T17:00:00",
+                "end": "2015-01-21T17:00:00",
+                "location": copy.deepcopy(f['location'])
+            }]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+    def test_flat_fire(self, reset_config):
+        f = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "geojson": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [
+                        [
+                            [-121.4522115, 47.4316976],
+                            [-121.3990506, 47.4316976],
+                            [-121.3990506, 47.4099293],
+                            [-121.4522115, 47.4099293],
+                            [-121.4522115, 47.4316976]
+                        ]
+                    ]
+                ]
+            },
+            "ecoregion": "southern",
+            "start": "2015-01-20T17:00:00",
+            "end": "2015-01-21T17:00:00",
+            "utc_offset": "-07:00"
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            'activity': [
+                {
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
+                    'location': {
+                        "geojson": {
+                            "type": "MultiPolygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ]
+                                ]
+                            ]
+                        },
+                        "ecoregion": "southern",
+                        "utc_offset": "-07:00"
+                    }
+                }
+            ]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+    def test_flat_and_nested_fire(self, reset_config):
+        f = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "location": {
+                "geojson": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                        [
+                            [
+                                [-121.4522115, 47.4316976],
+                                [-121.3990506, 47.4316976],
+                                [-121.3990506, 47.4099293],
+                                [-121.4522115, 47.4099293],
+                                [-121.4522115, 47.4316976]
+                            ]
+                        ]
+                    ]
+                }
+            },
+            "ecoregion": "southern",
+            "activity": [
+                {
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
+                    "pct": 100.0
+                }
+            ],
+            "meta": {
+                "foo": "bar"
+            },
+            "utc_offset": "-07:00"
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "activity": [
+                {
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
+                    'location': {
+                        "geojson": {
+                            "type": "MultiPolygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ]
+                                ]
+                            ]
+                        },
+                        "ecoregion": "southern",
+                        "utc_offset": "-07:00"
+                    }
+                }
+            ],
+            "meta": {
+                "foo": "bar"
+            }
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+##
+## V4.0.* fire structure
+##
+
+class TestV4_0IngestionValidInput(BaseTestIngestion):
+    """Tests ingestion of v4.0 formatted fires, which are still supported
+    for backwards compatibility.
+    """
+
+    def test_fire_with_ignored_fields(self, reset_config):
+        f = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "activity": [
+                {
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
+                    "pct": 100.0,
+                    "location": {
+                        "geojson": {
+                            "type": "MultiPolygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ]
+                                ]
+                            ]
+                        },
+                        "ecoregion": "southern",
+                        "foo": "bar"
+                    }
+                }
+            ],
+            "bar": "baz"
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            'activity': copy.deepcopy(f['activity'])
+        }
+        expected['activity'][0].pop('pct')
+        expected['activity'][0]['location'].pop('foo')
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
+    def test_fire_with_geojson_and_lat_lng(self, reset_config):
+        f = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            "location": {
+                "geojson": {
+                    "type": "MultiPolygon",
+                    "coordinates": [
+                        [
+                            [
+                                [-121.4522115, 47.4316976],
+                                [-121.3990506, 47.4316976],
+                                [-121.3990506, 47.4099293],
+                                [-121.4522115, 47.4099293],
+                                [-121.4522115, 47.4316976]
+                            ]
+                        ]
+                    ]
+                },
+                "longitude": -77.379,
+                "latitude": 25.041,
+                "area": 200
+            }
+        }
+        expected = {
+            "id": "SF11C14225236095807750",
+            "event_of":{
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
+            'activity': [
+                {
+                    'location': {
+                        'geojson': copy.deepcopy(f['location']['geojson']),
+                        "area": 200
+                    }
+                }
+            ]
+        }
+        expected_parsed_input = copy.deepcopy(f)
+        parsed_input = self.ingester.ingest(f)
+        assert expected == f
+        assert expected_parsed_input == parsed_input
+
     def test_fire_with_consume_synonyms(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
@@ -771,7 +796,7 @@ class TestIngestionValidInput(object):
         assert expected == f
         assert expected_parsed_input == parsed_input
 
-    def test_no_change(self, reset_config):
+    def test_what_used_to_requir_no_change(self, reset_config):
         f = {
             "id": "SF11C14225236095807750",
             "event_of":{
@@ -814,7 +839,7 @@ class TestIngestionValidInput(object):
 ## Keeping emissions and heat
 ##
 
-class TestIngestionKeepEmissionsAndHeat(object):
+class TestIngestionKeepEmissionsAndHeat(BaseTestIngestion):
 
     def setup(self):
         Config.set(True, "ingestion", "keep_emissions")
