@@ -20,10 +20,10 @@ Assume you have the following input data:
                         "name": "First day",
                         "active_areas": [
                             {
-                                "start": "2015-01-20T17:00:00",
-                                "end": "2015-01-21T17:00:00",
-                                "ecoregion": "southern",
-                                "utc_offset": "-09:00"
+                                "start": "2015-08-04T17:00:00",
+                                "end": "2015-08-05T17:00:00",
+                                "ecoregion": "western",
+                                "utc_offset": "-09:00",
                                 "specified_points": [
                                     {
                                         "name": "HMW-32434",
@@ -37,13 +37,15 @@ Assume you have the following input data:
                                         "area": "103"
                                     }
                                 ],
-                                "perimeter_polygon": [
-                                    [-121.45, 47.43],
-                                    [-121.39, 47.43],
-                                    [-121.39, 47.40],
-                                    [-121.45, 47.40],
-                                    [-121.45, 47.43]
-                                ]
+                                "perimeter_polygon": {
+                                    "coordinates": [
+                                        [-121.45, 47.43],
+                                        [-121.39, 47.43],
+                                        [-121.39, 47.40],
+                                        [-121.45, 47.40],
+                                        [-121.45, 47.43]
+                                    ]
+                                }
                             }
                         ]
                     }
