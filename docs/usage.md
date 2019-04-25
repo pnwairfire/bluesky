@@ -54,40 +54,13 @@ Example of redirecting input from file and outputing to stdout
 
 #### Data Format
 
-Note that this section covers the format of the input data
-(json vs csv), not the content.  For information about the
-expected input fields, see the [input data doc](input-data.md)
-
-
 ```bsp``` supports inputting and outputing only json formatted fire data.
-If you have csv formatted fire data, you can use ```bsp-csv2json``` to convert
-your data to json format.  For example, assume fires.csv contains the
-following data:
-
-    id,event_id,latitude,longitude,type,area,date_time,elevation,slope,state,county,country,fips,scc,fuel_1hr,fuel_10hr,fuel_100hr,fuel_1khr,fuel_10khr,fuel_gt10khr,shrub,grass,rot,duff,litter,moisture_1hr,moisture_10hr,moisture_100hr,moisture_1khr,moisture_live,moisture_duff,consumption_flaming,consumption_smoldering,consumption_residual,consumption_duff,min_wind,max_wind,min_wind_aloft,max_wind_aloft,min_humid,max_humid,min_temp,max_temp,min_temp_hour,max_temp_hour,sunrise_hour,sunset_hour,snow_month,rain_days,heat,pm2.5,pm10,co,co2,ch4,nox,nh3,so2,voc,canopy,event_url,fccs_number,owner,sf_event_guid,sf_server,sf_stream_name,timezone,veg
-    SF11C14225236095807750,SF11E826544,25.041,-77.379,RX,99.9999997516,201501200000Z,0.0,10.0,Unknown,,Unknown,-9999,2810015000,,,,,,,,,,,,10.0,12.0,12.0,22.0,130.0,150.0,,,,,6.0,6.0,6.0,6.0,40.0,80.0,13.1,30.0,4,14,7,18,5,8,,,,,,,,,,,,http://playground.dri.edu/smartfire/events/17cde405-cc3a-4555-97d2-77004435a020,,,17cde405-cc3a-4555-97d2-77004435a020,playground.dri.edu,realtime,-5.0,
-
-running ```bsp-csv2json``` like so:
-
-    bsp-csv2json -i fires.csv
-
-would produce the following (written to stdout):
-
-
-    # TODO: fill in output
-
-You can pipe the output of ```bsp-csv2json``` directly into ```bsp```, as long
-as you use the ingestions module, described below:
-
-    bsp-csv2json -i fires.csv | bsp ingestion
-
-Use the '-h' option to see more usage information for ```bsp-csv2json```.
 
 #### Piping
 
 As fire data flow through the modules within ```bsp```, the modules add to the
 data without modifying what's already defined (with the exception of the
-ingestion, merge, and filter modules, described below, which do modify the data).
+merge, and filter modules, described below, which do modify the data).
 Modules further downstream generally work with data produced by upstream
 modules, which means that order of module execution does matter.
 
@@ -151,59 +124,6 @@ work only if you let the results go to STDOUT.  For example:
 
     bsp -i fires.json --indent 4 fuelbeds
 
-#### Ingestion
-
-For each fire, the ingestion module does the following:
-
- 1. Moves the raw fire object to the 'parsed_input' array under the ingestion module's processing record -- In so doing, it keeps a record of the initial data, which will remain untouched.
- 2. Copies recognized fields back into a fire object under the 'fires' array -- In this step, it looks for nested fields both in the correctly nested
-locations as well as in the root fire object.
- 3. Validates the fire data -- For example, if there is no location information, or if the nested location is insufficient, a ```ValueError``` is raised.
-
-Some proposed but not yet implemented tasks:
-
- 1. Copy custom fields up to the top level -- i.e. user-identified fields that should also be copied from the input data up to the top level can be configured.
- 2. Set defaults -- There are no hardcoded defaults, but defaults could be configured
- 3. Sets derived fields -- There's no current need for this, but an example would be to derive
-
-##### Ingestion example
-
-###### Example 1
-
-Assume you start with the following data:
-
-    # TODO: fill in new example
-
-It would become:
-
-    # TODO: fill in output
-
-
-Notice:
- - The 'raw' input under processing isn't purely raw, as the fire has been assigned an id ("ac226ee6").  This is the one auto-generated field that you will find under 'processing' > 'parsed_input'.  If the fire object already contains an id, it will be used, in which case the raw fire input is in fact exactly what the user input.
- - The 'area' and 'utc_offset' keys are initially defined at the top level, but, after ingestion, are under the 'activity' > 'location' object.  Similarly, 'name' gets moved under 'event_of' (since names apply to fire events, not to fire locations).
- - The 'event_id' key gets moved under 'event_of' and is renamed 'id'.
-
-###### Example 2
-
-As a fuller example, starting with the following input data (which we'll
-assume is in fires.json):
-
-    # TODO: fill in new example
-
-if you pass this data through ingestion:
-
-    bsp -i fires.json ingestion
-
-you'll end up with this:
-
-    # TODO: fill in output
-
-
-Notice:
- - "foo" and "bar" were ignored (though left in the recorded raw input)
- - "ecoregion" got moved under "activity" > location"
-
 #### Merge
 
 TODO: fill in this section...
@@ -246,13 +166,12 @@ is set with the `--log-level` flag.  The log output looks like the following:
 2019-02-22 06:24:48,192 INFO: config file options: None
 2019-02-22 06:24:48,192 INFO: version: False
 2019-02-22 06:24:48,192 INFO: no input: False
-2019-02-22 06:24:48,192 INFO: input file: /data/json/1-fire-24hr-20150121-Seattle-WA-post-ingestion.json
+2019-02-22 06:24:48,192 INFO: input file: /data/json/1-fire-24hr-20150121-Seattle-WA.json
 2019-02-22 06:24:48,192 INFO: indent: None
 2019-02-22 06:24:48,192 DEBUG: Status logging disabled - not submitting 'Good','Main', 'Start', {}.
 2019-02-22 06:24:48,192 DEBUG: Status logging disabled - not submitting 'Good','Main', 'Finish', {}.
-2019-02-22 06:25:25,566 INFO: Running ingestion module
-2019-02-22 06:25:25,566 DEBUG: Setting activity array in fire object
-2019-02-22 06:25:25,566 DEBUG: Status logging disabled - not submitting 'Good','ingestion', 'Finish', {}.
+2019-02-22 06:25:25,566 INFO: Running fuelbeds module
+2019-02-22 06:25:25,566 DEBUG: Status logging disabled - not submitting 'Good','fuelbeds', 'Finish', {}.
 2019-02-22 06:25:25,566 DEBUG: Status logging disabled - not submitting 'Good','Main', 'Finish', {}.
 2019-02-22 06:24:48,193 INFO: Fire counts: {'fires': 1}
 ```
@@ -263,7 +182,6 @@ is set with the `--log-level` flag.  The log output looks like the following:
 
 the bluesky package includes these other executables:
 
- - bsp-csv2json - converts csv formated fire data to json format, as expcted by ```bsp```
  - feps_plumerise - computes FEPS plumrise
  - feps_weather -
  - hycm_std - MPI hysplit
@@ -274,6 +192,6 @@ the bluesky package includes these other executables:
  - vsmoke -
 
 
-`bsp-csv2json`, `feps_plumerise`, and `feps_weather` all
-support the  ```-h``` option to get usage information.
+`feps_plumerise`, and `feps_weather` all support the  ```-h``` option to get
+usage information.
 

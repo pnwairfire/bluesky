@@ -139,7 +139,7 @@ run_bsp () {
         -I dispersion.hysplit.NINIT=$NINIT \
         -C dispersion.hysplit.PARINIT=/data/particlefiles/pardump-{today-1:%Y-%m-%d}-$PI_FIRES \
         -B dispersion.hysplit.STOP_IF_NO_PARINIT=false \
-        ingestion fuelbeds consumption emissions \
+        fuelbeds consumption emissions \
         timeprofiling findmetdata localmet plumerising \
         dispersion visualization
     check_return_code

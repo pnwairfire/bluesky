@@ -51,7 +51,7 @@ could run something like the following:
     docker run --rm \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         bluesky bsp \
-        -i /bluesky/test/data/json/fire_locations-2015080500-fromdailycsv-4fires-4days.json \
+        -i /bluesky/test/data/json/2-fires-24hr-20140530-CA.json \
         fuelbeds consumption emissions
 
 ### Using image for development
@@ -76,9 +76,9 @@ Another example, running through emissions:
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
-        -i ./test/data/json/1-fire-24hr-20140530-CA-post-ingestion.json \
+        -i ./test/data/json/2-fires-24hr-20140530-CA.json \
         -o ./output/{run_id}.json \
-        ingestion fuelbeds consumption emissions
+        fuelbeds consumption emissions
 
 
 Another example, running through vsmoke dispersion:
@@ -90,10 +90,10 @@ Another example, running through vsmoke dispersion:
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
-        -i ./test/data/json/1-fire-24hr-20140530-WA-pre-ingestion.json \
+        -i ./test/data/json/2-fires-24hr-20140530-CA.json \
         -o ./output/{run_id}.json \
         -c ./test/config/dispersion/dispersion-vsmoke-24hr.json \
-        ingestion fuelbeds consumption emissions timeprofiling dispersion
+        fuelbeds consumption emissions timeprofiling dispersion
 
 
 Another example, running `bsp` from the repo through HYSPLIT dispersion
@@ -107,10 +107,10 @@ and KML visualization:
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
-        -i ./test/data/json/4-fires-24hr-20140530-CA-post-ingestion.json \
+        -i ./test/data/json/2-fires-24hr-20140530-CA.json \
         -o ./output/{run_id}.json \
-        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM2.5-user-defined-grid-km.json \
-        ingestion fuelbeds consumption emissions \
+        -c ./test/config/fuelbeds-through-visualization/DRI6km-2014053000-24hr-PM2.5-user-defined-grid-km.json \
+        fuelbeds consumption emissions \
         timeprofiling findmetdata localmet plumerising \
         dispersion visualization export
 
@@ -152,10 +152,11 @@ you in the bluesky repo root directory. Now, you can run bsp and step into
 the code as you normally would in development. E.g.:
 
     ./bin/bsp --log-level=DEBUG \
-        -i ./test/data/json/1-fire-24hr-post-ingestion.json \
-        -c ./test/config/ingestion-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
-         ingestion fuelbeds consumption emissions timeprofiling findmetdata localmet \
-         plumerising dispersion visualization export --indent 4 > out.json
+        -i ./test/data/json/2-fires-24hr-20140530-CA.json \
+        -c ./test/config/fuelbeds-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
+        fuelbeds consumption emissions timeprofiling \
+        findmetdata localmet plumerising dispersion \
+        visualization export --indent 4 > out.json
 
 (The './bin/' is not actually necessary in this example, since we put the
 repo bin directory at the head of the PATH env var, but it doesn't hurt to

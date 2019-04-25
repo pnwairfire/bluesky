@@ -52,22 +52,10 @@ Assume you have the following input data:
         ]
     }
 
-Lets say that's in a file called locations.json. piping that into bsp
-and running it through ingestion
+Lets say that's in a file called fires.json. piping that into bsp
+and running it through fuelbeds
 
-    cat ./tmp/locations.json | bsp ingestion
-
-would give you:
-
-
-    # TODO: fill in output
-
-
-Piping that through fuelbeds
-
-    cat ./tmp/locations.json | bsp ingestion fuelbeds
-    # or
-    cat ./tmp/locations.json | bsp ingestion | bsp fuelbeds
+    cat ./tmp/fires.json | bsp fuelbeds
 
 would give you:
 
@@ -75,20 +63,19 @@ would give you:
 
 Piping that through consumption
 
-    cat ./tmp/locations.json | bsp ingestion fuelbeds consumption
+    cat ./tmp/fires.json | bsp fuelbeds consumption
     # or
-    cat ./tmp/locations.json | bsp ingestion | bsp fuelbeds |bsp consumption
+    cat ./tmp/fires.json | bsp fuelbeds |bsp consumption
 
 would give you:
 
     # TODO: fill in output
 
-
 Finally, piping that through emissions
 
-    cat ./tmp/locations.json | bsp ingestion fuelbeds consumption emissions
+    cat ./tmp/fires.json fuelbeds consumption emissions
     # or
-    cat ./tmp/locations.json | bsp ingestion | bsp fuelbeds |bsp consumption | bsp emissions
+    cat ./tmp/fires.json | bsp fuelbeds |bsp consumption | bsp emissions
 
 would give you:
 
