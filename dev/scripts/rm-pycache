@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+find . -name __pycache__ -exec sudo rm -r {} \;
+find . -name '.pytest_cache' -exec sudo rm -r {} \;
