@@ -41,7 +41,7 @@ use something like the following:
             }]
         }]
     }' | docker run --rm -i bluesky \
-        bsp ingestion fuelbeds consumption emissions --indent 4 | less
+        bsp fuelbeds consumption emissions --indent 4 | less
 
 To run bluesky with file input, you'll need to use the '-v' option to
 mount host machine directories in your container.  For example, suppose
@@ -52,7 +52,7 @@ could run something like the following:
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         bluesky bsp \
         -i /bluesky/test/data/json/fire_locations-2015080500-fromdailycsv-4fires-4days.json \
-        ingestion fuelbeds consumption emissions
+        fuelbeds consumption emissions
 
 ### Using image for development
 

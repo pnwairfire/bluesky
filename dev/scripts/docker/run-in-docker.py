@@ -65,7 +65,7 @@ Examples:
       -r /path/to/bluesky/repo/ \\
       -d /path/to/met/:/met/ \\
       -d /path/to/output/dir/ \\
-      -m ingestion -m fuelbeds -m consumption -m emissions \\
+      -m fuelbeds -m consumption -m emissions \\
       -m timeprofiling -m findmetdata -m localmet \\
 
 

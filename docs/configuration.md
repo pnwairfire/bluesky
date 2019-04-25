@@ -76,12 +76,6 @@ configuration json data are case-insensitive.***
  - ***'config' > 'load' > 'sources' > 'request_timeout'*** --
  - ***'config' > 'load' > 'sources' > 'query'*** --
 
-
-##### ingestion
-
- - ***'config' > 'ingestion' > 'keep_emissions'*** -- *optional* keep any emissions, if specified, and record in activity object
- - ***'config' > 'ingestion' > 'keep_heat'*** -- *optional* keep heat, if specified, and record in activity object
-
 ##### merge
 
  - ***'config' > 'merge' > 'skip_failures'*** -- *optional* -- if fires fail to merge, keep separate and move on; default: false

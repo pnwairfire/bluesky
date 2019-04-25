@@ -23,7 +23,6 @@
   - upgrade consume package to v5
   - capture and ignore consume stdout
   - modify consume input defaults
-  - update ingestion to pass through more consume input fields
 - emissions
   - Fix conversion factor for Prichard/Oneill emissions output (values wer half of what they should have been)
   - added regression test case for Prichard/Oneill emissions
@@ -34,3 +33,4 @@
   - 'growth' -> 'activity'
   - nested activity organization, with collections and active areas
   - selected_points & perimeter_polygon objects replacing location object
+  - remove ingestion module and require clients to structure data correctly

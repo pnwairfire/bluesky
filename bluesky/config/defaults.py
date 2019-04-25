@@ -48,10 +48,6 @@ _DEFAULTS = {
         #  'query'
 
     },
-    "ingestion": {
-        "keep_emissions": False,
-        "keep_heat": False
-    },
     "merge": {
         "skip_failures": False
     },

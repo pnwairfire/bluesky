@@ -123,12 +123,11 @@ FIRE_LOCATIONS_CSV_FIELDS = (
         ('event_name', lambda f, g: f.get('event_of', {}).get('name')),
         ('fccs_number', _pick_representative_fuelbed),
 
-        #(which we're now ingesting)
-        # TDOO: add 'VEG'? (Note: sf2 has 'veg' field, which we're *not* ingesting,
-        #   since it seems to be a fuelbed discription which is probably for
+        # TDOO: add 'VEG'? (Note: sf2 has 'veg' field, but
+        #   it seems to be a fuelbed discription which is probably for
         #   the one fccs id in the sf2 feed. This single fccs id and its description
         #   don't necesasrily represent the entire fire area, which could have
-        #   multiple fuelbeds, so ingestion ignores it.  we could set 'VEG' to
+        #   multiple fuelbeds.  we could set 'VEG' to
         #   a concatenation of the fuelbeds or the one one making up the largest
         #   fraction of the fire.)
         ('heat', _get_heat)
@@ -170,7 +169,7 @@ FIRE_LOCATIONS_CSV_FIELDS = (
         ]
     ]
     # TODO: Add other fields if users want them
-    # TODO: add other sf2 fields which we are *not* currently ingesting
+    # TODO: add other sf2 fields
     #    'fuel_1hr', 'fuel_10hr', 'fuel_100hr',
     #    'fuel_1khr', 'fuel_10khr', 'fuel_gt10khr'
     #    'canopy','shrub','grass','rot','duff', 'litter', 'VEG',
