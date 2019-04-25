@@ -17,7 +17,7 @@ Assume you have the following input data:
                 },
                 "activity": [
                     {
-                        "collection_name": "First day",
+                        "name": "First day",
                         "active_areas": [
                             {
                                 "start": "2015-01-20T17:00:00",
