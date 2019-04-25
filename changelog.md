@@ -1,3 +1,8 @@
+## 4.0.7
+ - Fixed conversion factor for Prichard/ONeill emissions output
+
+## 4.0.8
+ - Fixed by in findmetdata time window merging logic
 
 ## 4.1.0
 
@@ -23,6 +28,9 @@
   - Fix conversion factor for Prichard/Oneill emissions output (values wer half of what they should have been)
   - added regression test case for Prichard/Oneill emissions
 - various changes to run-all-fuelbeds.py dev script
-- renamed input data fields
+- findmetdata time window merging logic
+- new input data structure
   - 'fire_information' -> 'fires'
   - 'growth' -> 'activity'
+  - nested activity organization, with collections and active areas
+  - selected_points & perimeter_polygon objects replacing location object
