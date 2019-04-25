@@ -69,6 +69,11 @@ class Fire(dict):
     #     return {k: self[k] for k in self}
 
     @property
+    def active_areas(self):
+        return [a for c in self.get('activity', [])
+            for a in c.get('active_areas', [])]
+
+    @property
     def start(self):
         """Returns start of initial activity window
 
