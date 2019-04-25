@@ -79,14 +79,14 @@ class Fire(dict):
 
         Doesn't memoize, in case activity windows are added/removed/modified
         """
-        # consider only activity windows with start times
-        activity = [a for a in self.get('activity', []) if a.get('start')]
-        if activity:
-            activity = sorted(activity, key=lambda a: a['start'])
-            # record  utc offset of initial activity window, in case
+        # consider only activie areas with start times
+        active_areas = [a for a in self.activity if a.get('start')]
+        if active_areas:
+            active_areas = sorted(active_areas, key=lambda a: a['start'])
+            # record utc offset of initial active area, in case
             # start_utc is being called
-            self.__utc_offset = activity[0].get('location', {}).get('utc_offset')
-            return datetimeutils.parse_datetime(activity[0]['start'], 'start')
+            self.__utc_offset = active_areas[0].get('location', {}).get('utc_offset')
+            return datetimeutils.parse_datetime(active_areas[0]['start'], 'start')
 
     @property
     def start_utc(self):
@@ -103,14 +103,14 @@ class Fire(dict):
           is gt/lt another when utc offset is ignored but not when utc offset
           is considered, so this isn't a high priority)
         """
-        # consider only activity windows with end times
-        activity = [a for a in self.get('activity', []) if a.get('end')]
-        if activity:
-            activity = sorted(activity, key=lambda a: a['end'])
-            # record  utc offset of initial activity window, in case
+        # consider only activie areas with end times
+        active_areas = [a for a in self.activity if a.get('end')]
+        if active_areas:
+            active_areas = sorted(active_areas, key=lambda a: a['end'])
+            # record utc offset of initial active area, in case
             # start_utc is being called
-            self.__utc_offset = activity[-1].get('location', {}).get('utc_offset')
-            return datetimeutils.parse_datetime(activity[-1]['end'], 'end')
+            self.__utc_offset = active_areas[-1].get('location', {}).get('utc_offset')
+            return datetimeutils.parse_datetime(active_areas[-1]['end'], 'end')
 
     @property
     def end_utc(self):
