@@ -37,8 +37,8 @@ Assume you have the following input data:
                                         "area": "103"
                                     }
                                 ],
-                                "perimeter_polygon": {
-                                    "coordinates": [
+                                "perimeter": {
+                                    "polygon": [
                                         [-121.45, 47.43],
                                         [-121.39, 47.43],
                                         [-121.39, 47.40],

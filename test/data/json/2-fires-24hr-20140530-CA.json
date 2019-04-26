@@ -46,8 +46,8 @@
                             "ecoregion": "western",
                             "country": "USA",
                             "state": "CA",
-                            "perimeter_polygon": {
-                                "coordinates": [
+                            "perimeter": {
+                                "polygon": [
                                     [-120.1, 39.4],
                                     [-119.98, 39.4],
                                     [-119.98, 39.3],

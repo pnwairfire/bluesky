@@ -586,14 +586,14 @@ class TestFiresManager(object):
                         {
                             "start": "2014-05-27T17:00:00",
                             "end": "2014-05-28T17:00:00",
-                            'selected_points': [
+                            'specified_points': [
                                 {'area': 34, 'lat': 45.0, 'lng': -120.0},
                             ]
                         },
                         {
                             "start": "2014-05-25T17:00:00",
                             "end": "2014-05-26T17:00:00",
-                            'selected_points': [
+                            'specified_points': [
                                 {'area': 34, 'lat': 45.0, 'lng': -120.0},
                             ]
                         }
@@ -609,7 +609,7 @@ class TestFiresManager(object):
                         {
                             "start": "2014-05-27T19:00:00",
                             "end": "2014-05-28T19:00:00",
-                            'selected_points': [
+                            'specified_points': [
                                 {'area': 132, 'lat': 45.0, 'lng': -120.0},
                             ]
                         }
