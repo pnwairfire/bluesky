@@ -21,7 +21,7 @@ from bluesky.config import Config
 from bluesky.exceptions import (
     BlueSkyImportError, BlueSkyModuleError, BlueSkyDatetimeValueError
 )
-from bluesky.locationutils import LatLng
+from bluesky.locationutils import LatLng, get_total_active_area
 from bluesky.statuslogging import StatusLogger
 
 __all__ = [
@@ -1052,25 +1052,33 @@ class FireActivityFilter(FiresActionBase):
             else:
                 i = 0
                 while i < len(fire.get('activity', [])):
-                    try:
-                        if filter_func(fire, fire['activity'][i]):
-                            fire['activity'].pop(i)
-                            logging.debug('Filtered fire %s (%s)', fire.id,
-                                fire._private_id)
-                            if len(fire.get('activity')) == 0:
-                                self._remove_fire(fire)
-                                # Note: `i` must equal zero, and
-                                #   while loop will terminate
-                        else:
-                            i += 1
-                    except self.FilterError as e:
-                        if self._skip_failures:
-                            i += 1
-                            # str(e) is already detailed
-                            logging.warning(str(e))
-                            continue
-                        else:
-                            raise
+                    j = 0
+                    while j < len(fire['activity'].get('active_areas', [])):
+                        try:
+                            if filter_func(fire, fire['activity'][i]['active_areas'][j]):
+                                fire['activity'][i]['active_areas'].pop(j)
+                                logging.debug('Filtered fire %s (%s)', fire.id,
+                                    fire._private_id)
+                                if len(fire['activity'][i].get('active_areas')) == 0:
+                                    self._remove_fire(fire)
+                                    # Note: `i` must equal zero, and
+                                    #   while loop will terminate
+                            else:
+                                j += 1
+                        except self.FilterError as e:
+                            if self._skip_failures:
+                                j += 1
+                                # str(e) is already detailed
+                                logging.warning(str(e))
+                                continue
+                            else:
+                                raise
+
+                    if len(fire['activity']) == 0:
+                        self._remove_fire(fire)
+                        # Note: `i` must equal zero, and
+                        #   while loop will terminate
+
 
     def _remove_fire(self, fire):
         """Removes fire from fires manager's `fires` list, and adds it
@@ -1101,8 +1109,8 @@ class FireActivityFilter(FiresActionBase):
             # This will never happen if called internally
             raise self.FilterError(self.SPECIFY_FILTER_FIELD_MSG)
 
-        def _filter(fire, g):
-            v = g.get('location', {}).get(filter_field)
+        def _filter(fire, active_area):
+            v = active_area.get(filter_field)
             if whitelist:
                 return not v or v not in whitelist
             else:
@@ -1147,11 +1155,11 @@ class FireActivityFilter(FiresActionBase):
                 any([b['ne'][k] < b['sw'][k] for k in ['lat','lng']])):
             raise self.FilterError(self.INVALID_BOUNDARY_MSG)
 
-        def _filter(fire, g):
-            if not isinstance(g.get('location'), dict):
+        def _filter(fire, active_area):
+            if not isinstance(active_area, dict):
                 self._fail_fire(fire, self.MISSING_FIRE_LAT_LNG_MSG)
             try:
-                latlng = LatLng(g['location'])
+                latlng = LatLng(active_area)
                 lat = latlng.latitude
                 lng = latlng.longitude
             except ValueError as e:
@@ -1167,8 +1175,8 @@ class FireActivityFilter(FiresActionBase):
     SPECIFY_MIN_OR_MAX_MSG = "Specify min and/or max area for filtering"
     INVALID_MIN_MAX_MUST_BE_POS_MSG = "Min and max areas must be positive for filtering"
     INVALID_MIN_MUST_BE_LTE_MAX_MSG = "Min area must be LTE max if both are specified"
-    MISSING_ACTIVITY_AREA_MSG = "Fire activity window must have area defined to be filtered by area"
-    NEGATIVE_ACTIVITY_AREA_MSG = "Fire activity area can't be negative"
+    MISSING_ACTIVITY_AREA_MSG = "Fire active area must have area information to be filtered by area"
+    NEGATIVE_ACTIVITY_AREA_MSG = "Fire active area's total can't be negative"
     def _get_area_filter(self, **kwargs):
         """Returns funciton that checks if a fire is smaller than some
         max threshold and/or larger than some min threshold.
@@ -1184,14 +1192,16 @@ class FireActivityFilter(FiresActionBase):
                 min_area > max_area):
             raise self.FilterError(self.INVALID_MIN_MUST_BE_LTE_MAX_MSG)
 
-        def _filter(fire, g):
-            if (not isinstance(g.get('location'), dict) or
-                    not g['location'].get('area')):
+        def _filter(fire, active_area):
+            try:
+                total_area = get_total_active_area(active_area)
+            except:
                 self._fail_fire(fire, self.MISSING_ACTIVITY_AREA_MSG)
-            elif g['location']['area'] < 0.0:
+
+            if total_active_area < 0.0:
                 self._fail_fire(fire, self.NEGATIVE_ACTIVITY_AREA_MSG)
 
-            return ((min_area is not None and g['location']['area'] < min_area) or
-                (max_area is not None and g['location']['area'] > max_area))
+            return ((min_area is not None and total_active_area < min_area) or
+                (max_area is not None and total_active_area > max_area))
 
         return _filter

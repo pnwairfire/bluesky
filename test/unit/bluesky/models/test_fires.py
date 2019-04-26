@@ -983,14 +983,15 @@ class TestFiresManagerMergeFires(object):
                 'id': '1',
                 "activity":[
                     {
-                        "start": "2014-05-27T17:00:00",
-                        "end": "2014-05-28T17:00:00",
-                        "pct": 100.0,
-                        'location': {
-                            'area': 132,
-                            'latitude': 45.0,
-                            'longitude': -120.0
-                        }
+                        "active_areas": [
+                            {
+                                "start": "2014-05-27T17:00:00",
+                                "end": "2014-05-28T17:00:00",
+                                'specified_points': [
+                                    {'area': 132, 'lat': 45.0, 'lng': -120.0}
+                                ]
+                            }
+                        ]
                     }
                 ]
             })
@@ -1021,7 +1022,9 @@ class TestFiresManagerMergeFires(object):
                     "id": "ABC"
                 },
                 # activity just used for assertion, below
-                "activity": [{"location":{'area': 123}}]
+                "activity": [{
+                    "active_areas": [{'specified_points': [{'area': 123}]}]
+                }]
             })
             f2 = fires.Fire({
                 'id': '1',
@@ -1029,7 +1032,9 @@ class TestFiresManagerMergeFires(object):
                     "id": "SDF"
                 },
                 # activity just used for assertion, below
-                "activity": [{"location":{'area': 456}}]
+                "activity": [{
+                    "active_areas": [{'specified_points': [{'area': 456}]}]
+                }]
             })
             fm.fires = [f, f2]
             if not s:
@@ -1052,14 +1057,18 @@ class TestFiresManagerMergeFires(object):
                 "type": "rx",
                 "fuel_type": "natural",
                 # activity just used for assertion, below
-                "activity": [{"location":{'area': 123}}]
+                "activity": [{
+                    "active_areas": [{'specified_points': [{'area': 123}]}]
+                }]
             })
             f2 = fires.Fire({
                 'id': '1',
                 "type": "wf",
                 "fuel_type": "natural",
                 # activity just used for assertion, below
-                "activity": [{"location":{'area': 456}}]
+                "activity": [{
+                    "active_areas": [{'specified_points': [{'area': 456}]}]
+                }]
             })
             fm.fires = [f, f2]
             assert fm.num_fires == 2
@@ -1133,22 +1142,22 @@ class TestFiresManagerMergeFires(object):
             "fuel_type": "natural",
             "activity": [
                 {
-                    "start": "2014-05-28T17:00:00",
-                    "end": "2014-05-29T17:00:00",
-                    'location': {
-                        'area': 90,
-                        'latitude': 45.0,
-                        'longitude': -120.0
-                    }
-                },
-                {
-                    "start": "2014-05-29T17:00:00",
-                    "end": "2014-05-30T17:00:00",
-                    'location': {
-                        'area': 90,
-                        'latitude': 46.0,
-                        'longitude': -120.0
-                    }
+                    "active_areas": [
+                        {
+                            "start": "2014-05-28T17:00:00",
+                            "end": "2014-05-29T17:00:00",
+                            'specified_points': [
+                                {'area': 90, 'lat': 45.0, 'lng': -120.0}
+                            ]
+                        },
+                        {
+                            "start": "2014-05-29T17:00:00",
+                            "end": "2014-05-30T17:00:00",
+                            'specified_points': [
+                                {'area': 90, 'lat': 46.0, 'lng': -120.0}
+                            ]
+                        }
+                    ]
                 }
             ]
         })
@@ -1158,13 +1167,15 @@ class TestFiresManagerMergeFires(object):
             "fuel_type": "natural",
             "activity": [
                 {
-                    "start": "2014-05-27T17:00:00",
-                    "end": "2014-05-28T17:00:00",
-                    'location': {
-                        'area': 10,
-                        'latitude': 45.0,
-                        'longitude': -120.0
-                    }
+                    "active_areas": [
+                        {
+                            "start": "2014-05-27T17:00:00",
+                            "end": "2014-05-28T17:00:00",
+                            'specified_points': [
+                                {'area': 10, 'lat': 45.0, 'lng': -120.0}
+                            ]
+                        }
+                    ]
                 }
             ]
         })
@@ -1174,13 +1185,15 @@ class TestFiresManagerMergeFires(object):
             "fuel_type": "natural",
             "activity": [
                 {
-                    "start": "2014-05-27T17:00:00",
-                    "end": "2014-05-30T17:00:00",
-                    'location': {
-                        'area': 132,
-                        'latitude': 45.0,
-                        'longitude': -120.0
-                    }
+                    "active_areas": [
+                        {
+                            "start": "2014-05-27T17:00:00",
+                            "end": "2014-05-30T17:00:00",
+                            'specified_points': [
+                                {'area': 132, 'lat': 45.0, 'lng': -120.0}
+                            ]
+                        }
+                    ]
                 }
             ]
         })
@@ -1195,31 +1208,29 @@ class TestFiresManagerMergeFires(object):
                 "fuel_type": "natural",
                 "activity": [
                     {
-                        "start": "2014-05-27T17:00:00",
-                        "end": "2014-05-28T17:00:00",
-                        'location': {
-                            'area': 10,
-                            'latitude': 45.0,
-                            'longitude': -120.0
-                        }
-                    },
-                    {
-                        "start": "2014-05-28T17:00:00",
-                        "end": "2014-05-29T17:00:00",
-                        'location': {
-                            'area': 90,
-                            'latitude': 45.0,
-                            'longitude': -120.0
-                        }
-                    },
-                    {
-                        "start": "2014-05-29T17:00:00",
-                        "end": "2014-05-30T17:00:00",
-                        'location': {
-                            'area': 90,
-                            'latitude': 46.0,
-                            'longitude': -120.0
-                        }
+                        "active_areas": [
+                            {
+                                "start": "2014-05-27T17:00:00",
+                                "end": "2014-05-28T17:00:00",
+                                'specified_points': [
+                                    {'area': 10, 'lat': 45.0, 'lng': -120.0}
+                                ]
+                            },
+                            {
+                                "start": "2014-05-28T17:00:00",
+                                "end": "2014-05-29T17:00:00",
+                                'specified_points': [
+                                    {'area': 90, 'lat': 45.0, 'lng': -120.0}
+                                ]
+                            },
+                            {
+                                "start": "2014-05-29T17:00:00",
+                                "end": "2014-05-30T17:00:00",
+                                'specified_points': [
+                                    {'area': 90, 'lat': 46.0, 'lng': -120.0}
+                                ]
+                            }
+                        ]
                     }
                 ]
             }),
@@ -1229,13 +1240,15 @@ class TestFiresManagerMergeFires(object):
                 "fuel_type": "natural",
                 "activity": [
                     {
-                        "start": "2014-05-27T17:00:00",
-                        "end": "2014-05-30T17:00:00",
-                        'location': {
-                            'area': 132,
-                            'latitude': 45.0,
-                            'longitude': -120.0
-                        }
+                        "active_areas": [
+                            {
+                                "start": "2014-05-27T17:00:00",
+                                "end": "2014-05-30T17:00:00",
+                                'specified_points': [
+                                    {'area': 132, 'lat': 45.0, 'lng': -120.0}
+                                ]
+                            }
+                        ]
                     }
                 ]
             })
