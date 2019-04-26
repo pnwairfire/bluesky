@@ -7,207 +7,141 @@ from py.test import raises
 from bluesky import  locationutils
 
 
-class TestLatLng:
+class TestLatLng(object):
 
-    def test_invalid(self):
-        expected_err_msg = ("Invalid location data required for "
-            "determining single lat/lng for activity window")
+    def test_invalid_active_area(self):
         with raises(ValueError) as e_info:
             locationutils.LatLng(None)
-        assert e_info.value.args[0] == expected_err_msg
+        assert e_info.value.args[0] == locationutils.INVALID_ACTIVE_AREA_INFO
+
         with raises(ValueError) as e_info:
             locationutils.LatLng(1)
-        assert e_info.value.args[0] == expected_err_msg
+        assert e_info.value.args[0] == locationutils.INVALID_ACTIVE_AREA_INFO
+
         with raises(ValueError) as e_info:
             locationutils.LatLng("SDFSDF")
-        assert e_info.value.args[0] == expected_err_msg
+        assert e_info.value.args[0] == locationutils.INVALID_ACTIVE_AREA_INFO
 
-    def test_insufficient(self):
-        expected_err_msg = ("Insufficient location data required "
-            "for determining single lat/lng for location")
+    def test_no_location_info(self):
+        active_area = {
+            "start": "2014-05-27T17:00:00",
+            "end": "2014-05-28T17:00:00"
+        }
         with raises(ValueError) as e_info:
-            locationutils.LatLng({})
-        assert e_info.value.args[0] == expected_err_msg
+            locationutils.LatLng(active_area)
+        assert e_info.value.args[0] == locationutils.MISSING_LOCATION_INFO_FOR_ACTIVE_AREA
+
+    def test_specified_points_missing_lat_lng_info(self):
+        active_area = {
+            "start": "2014-05-27T17:00:00",
+            "end": "2014-05-28T17:00:00",
+            'specified_points': [
+                {'lat': 23.0, 'lng': "SDF"}, # invalid
+            ]
+        }
         with raises(ValueError) as e_info:
-            locationutils.LatLng({'latitude': 46.0})
-        assert e_info.value.args[0] == expected_err_msg
+            locationutils.LatLng(active_area)
+        assert e_info.value.args[0] == locationutils.MISSING_OR_INVALID_LAT_LNG_FOR_SPECIFIED_POINT
 
-    def test_single_lat_lng(self):
-        latlng = locationutils.LatLng({
-            "utc_offset": "-07:00",
-            "longitude": -119.7615805,
-            "area": 10000,
-            "ecoregion": "western",
-            "latitude": 37.909644
-        })
-        assert latlng.latitude == 37.909644
-        assert latlng.longitude == -119.7615805
+        active_area = {
+            "start": "2014-05-27T17:00:00",
+            "end": "2014-05-28T17:00:00",
+            'specified_points': [
+                {'lng': -120.0},  # missing 'lat'
+            ]
+        }
+        with raises(ValueError) as e_info:
+            locationutils.LatLng(active_area)
+        assert e_info.value.args[0] == locationutils.MISSING_OR_INVALID_LAT_LNG_FOR_SPECIFIED_POINT
 
-    def test_geojson_point(self):
-        latlng = locationutils.LatLng({
-            "geojson": {
-                "type": "Point",
-                "coordinates": [-121.4522115, 47.4316976]
-            }
-        })
-        assert latlng.latitude == 47.4316976
-        assert latlng.longitude == -121.4522115
+        active_area = {
+            "start": "2014-05-27T17:00:00",
+            "end": "2014-05-28T17:00:00",
+            'specified_points': [
+                {'area': 34, 'lat': 45.0, 'lng': -120.0},
+                {'lat': 23.0}  # missing 'lng'
+            ]
+        }
+        with raises(ValueError) as e_info:
+            locationutils.LatLng(active_area)
+        assert e_info.value.args[0] == locationutils.MISSING_OR_INVALID_LAT_LNG_FOR_SPECIFIED_POINT
 
-    def test_geojson_linestring(self):
-        latlng = locationutils.LatLng({
-            "geojson": {
-                "type": "LineString",
-                "coordinates": [
-                    [100.0, 2.0],
-                    [101.0, 1.0]
+    def test_perimeter_invalid_coordinates(self):
+        active_area = {
+            "start": "2014-05-27T17:00:00",
+            "end": "2014-05-28T17:00:00",
+            "perimeter": {
+                "polygon": [
+                    ["SDF", 47.43],
+                    [-121.39, 47.43],
+                    [-121.39, 47.40],
+                    [-121.45, 47.40],
+                    [-121.45, 47.43]
                 ]
             }
-        })
-        assert latlng.latitude == 1.5
-        assert latlng.longitude == 100.5
+        }
+        with raises(ValueError) as e_info:
+            locationutils.LatLng(active_area)
+        assert e_info.value.args[0] == locationutils.MISSING_OR_INVALID_COORDINATES_FOR_PERIMETER
 
-    def test_geojson_polygon_no_holes(self):
+
+    def test_single_specified_point(self):
         latlng = locationutils.LatLng({
-            "geojson": {
-                "type": "Polygon",
-                "coordinates": [
-                    [
-                        [100.0, 5.0],
-                        [101.0, 0.0],
-                        [101.0, 1.0],
-                        [100.0, 1.0],
-                        [100.0, 5.0]
-                    ]
+            "start": "2014-05-27T17:00:00",
+            "end": "2014-05-28T17:00:00",
+            'specified_points': [
+                {'area': 34, 'lat': 45.0, 'lng': -120.0}
+            ]
+        })
+        assert latlng.latitude == 45.0
+        assert latlng.longitude == -120.0
+
+    def test_two_specified_points(self):
+        latlng = locationutils.LatLng({
+            "start": "2014-05-27T17:00:00",
+            "end": "2014-05-28T17:00:00",
+            'specified_points': [
+                {'area': 34, 'lat': 45.0, 'lng': -120.0},
+                {'area': 20, 'lat': 35.0, 'lng': -121.0}
+            ]
+        })
+        assert latlng.latitude == 40.0
+        assert latlng.longitude == -120.5
+
+    def test_perimeter(self):
+        latlng = locationutils.LatLng({
+            "perimeter": {
+                "polygon": [
+                    [100.0, 5.0],
+                    [101.0, 0.0],
+                    [101.0, 1.0],
+                    [100.0, 1.0],
+                    [100.0, 5.0]
                 ]
             }
         })
         assert latlng.latitude == 2.4
         assert latlng.longitude == 100.4
 
-    def test_geojson_polygon_holes(self):
+    def test_specified_points_and_perimeter(self):
         latlng = locationutils.LatLng({
-            "geojson": {
-                "type": "Polygon",
-                "coordinates": [
-                    [
-                        [100.0, 5.0],
-                        [101.0, 0.0],
-                        [101.0, 1.0],
-                        [100.0, 1.0],
-                        [100.0, 5.0]
-                    ],
-                    [
-                        [100.8, 0.8],
-                        [100.8, 0.2],
-                        [100.2, 0.2],
-                        [100.2, 0.8],
-                        [100.8, 0.8]
-                    ]
+            "start": "2014-05-27T17:00:00",
+            "end": "2014-05-28T17:00:00",
+            'specified_points': [
+                {'area': 34, 'lat': 45.0, 'lng': -120.0},
+                {'area': 20, 'lat': 35.0, 'lng': -121.0}
+            ],
+            "perimeter": {
+                "polygon": [
+                    [100.0, 5.0],
+                    [101.0, 0.0],
+                    [101.0, 1.0],
+                    [100.0, 1.0],
+                    [100.0, 5.0]
                 ]
             }
         })
-        # centroid computation only considers outer polygon boundary
-        assert latlng.latitude == 2.4
-        assert latlng.longitude == 100.4
+        assert latlng.latitude == 40.0
+        assert latlng.longitude == -120.5
 
-    def test_geojson_multi_point(self):
-        latlng = locationutils.LatLng({
-            "geojson": {
-                "type": "MultiPoint",
-                "coordinates": [
-                    [100.0, 4.5],
-                    [101.0, 1.0]
-                ]
-            }
-        })
-        assert latlng.latitude == 2.75
-        assert latlng.longitude == 100.5
 
-    def test_geojson_multi_linestring(self):
-        latlng = locationutils.LatLng({
-            "geojson": {
-                "type": "MultiLineString",
-                "coordinates": [
-                    [
-                        [100.0, -3.0],
-                        [101.0, 1.0]
-                    ],
-                    [
-                        [102.0, 2.0],
-                        [103.0, 3.0]
-                    ]
-                ]
-            }
-        })
-        assert latlng.latitude == 0.75
-        assert latlng.longitude == 101.5
-
-    def test_geojson_multi_polygon_one(self):
-        latlng = locationutils.LatLng({
-            "geojson": {
-                "type": "MultiPolygon",
-                "coordinates": [
-                    [
-                        [
-                            [-121.4522115, 47.4316976],
-                            [-121.3990506, 47.4316976],
-                            [-121.3990506, 47.4099293],
-                            [-121.4522115, 47.4099293],
-                            [-121.4522115, 47.4316976]
-                        ]
-                    ]
-                ]
-            },
-            "ecoregion": "southern",
-            "state": "KS",
-            "country": "USA",
-            "slope": 20.0,
-            "elevation": 2320.0,
-            "max_humid": 70.0,
-            "utc_offset": "-07:00"
-        })
-        assert latlng.latitude == 47.4316976
-        assert latlng.longitude == -121.4522115
-
-    def test_geojson_multi_polygon_one(self):
-        latlng = locationutils.LatLng({
-            "geojson": {
-                "type": "MultiPolygon",
-                "coordinates": [
-                    [
-                        [
-                            [102.0, 2.0],
-                            [103.0, 2.0],
-                            [103.0, 3.0],
-                            [102.0, 3.0],
-                            [102.0, 2.0]
-                        ]
-                    ],
-                    [
-                        [
-                            [100.0, 0.0],
-                            [101.0, 0.0],
-                            [101.0, 1.0],
-                            [100.0, 1.0],
-                            [100.0, 0.0]
-                        ],
-                        [
-                            [100.2, 0.2],
-                            [100.2, 0.8],
-                            [100.8, 0.8],
-                            [100.8, 0.2],
-                            [100.2, 0.2]
-                        ]
-                    ]
-                ]
-            },
-            "ecoregion": "southern",
-            "state": "KS",
-            "country": "USA",
-            "slope": 20.0,
-            "elevation": 2320.0,
-            "max_humid": 70.0,
-            "utc_offset": "-07:00"
-        })
-        assert latlng.latitude == 1.4
-        assert latlng.longitude == 101.4
