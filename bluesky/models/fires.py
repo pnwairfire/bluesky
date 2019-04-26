@@ -80,6 +80,43 @@ class Fire(dict):
         return [a for c in self.get('activity', [])
             for a in c.get('active_areas', [])]
 
+    POINT_FIELDS = ['lat', 'lng', 'area']
+    INVALID_SPECIFIED_POINT_MSG = ("Each point in an active area's"
+        " specified_points must have fields '{}'".format(POINT_FIELDS))
+    INVALID_PERIMETER_MSG = "An active area's perimeter must have field 'polygon"
+    MISSING_LOCATION_INFO_MSG = ("Each active area must contain "
+        "'specified_points' or 'perimeter'")
+    @property
+    def locations(self):
+        """Returns flat list of fire active area locations (points and
+        perimeters), each paired with reference to the active area that
+        contains it.
+
+        Like the active_areas property, we could memoize this method, but
+        would need to invalidate when adding/removing collections or
+        active areas, or when modifying points or perimeters.
+        """
+        locations = []
+        for aa in self.active_areas:
+            # validate every time this method is called, in case fire activity
+            # data is made invalid mid-run (which should only be possibly
+            # if user imports the bluesky package instead of running 'bsp'
+            if aa.get('specified_points'):
+                if any([any([not p.get(f) for f in self.POINT_FIELDS])
+                        for p in aa['specified_points']]):
+                    raise ValueError(self.INVALID_SPECIFIED_POINT_MSG)
+                locations.extend([(aa, p) for p in aa['specified_points']])
+
+            elif aa.get('perimeter'):
+                if not aa['perimeter'].get('polygon'):
+                    raise ValueError(self.INVALID_PERIMETER_MSG)
+                locations.append((aa, aa['perimeter']))
+
+            else:
+                raise ValueError(self.MISSING_LOCATION_INFO_MSG)
+
+        return locations
+
     @property
     def start(self):
         """Returns start of initial activity window
