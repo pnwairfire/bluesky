@@ -8,6 +8,8 @@ INVALID_ACTIVE_AREA_INFO = "Invalid active area data required for determining si
 MISSING_LOCATION_INFO_FOR_ACTIVE_AREA = "Missing location information for active area"
 MISSING_OR_INVALID_LAT_LNG_FOR_SPECIFIED_POINT = "Missing or invalid lat,lng for specified point"
 MISSING_OR_INVALID_COORDINATES_FOR_PERIMETER = "Missing or invalid coodinates for active area perimeter"
+MISSING_OR_INVALID_AREA_FOR_SPECIFIED_POINT = "Missing or invalid area for specified point"
+MISSING_OR_INVALID_AREA_FOR_PERIMIETER = "Missing or invalid area for active area perimeter"
 
 
 class LatLng(object):
@@ -62,3 +64,20 @@ class LatLng(object):
         else:
             raise ValueError(MISSING_LOCATION_INFO_FOR_ACTIVE_AREA)
 
+
+def get_total_active_area(active_area):
+    if 'specified_points' in active_area:
+        try:
+            area_vals = [float(p.get('area'))
+                for p in active_area['specified_points']]
+        except:
+            raise ValueError(MISSING_OR_INVALID_AREA_FOR_SPECIFIED_POINT)
+        return sum(area_vals)
+    elif 'perimeter' in active_area:
+        try:
+            return float(active_area['perimeter'].get('area'))
+        except:
+            raise ValueError(MISSING_OR_INVALID_AREA_FOR_PERIMIETER)
+        return active_area['perimeter']['area']
+    else:
+        raise ValueError(MISSING_LOCATION_INFO_FOR_ACTIVE_AREA)
