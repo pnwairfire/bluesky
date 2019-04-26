@@ -218,6 +218,179 @@ class TestFire(object):
         assert datetime.datetime(2014,5,28,0,0,0) == f.start_utc
         assert datetime.datetime(2014,5,31,0,0,0) == f.end_utc
 
+    TEST_FIRE = fires.Fire({
+        'id': '1',
+        'activity': [
+            {
+                'active_areas': [
+                    {
+                        "start": "2014-05-27T17:00:00",
+                        "end": "2014-05-28T17:00:00",
+                        'selected_points': [
+                            {'area': 34, 'lat': 45.0, 'lng': -120.0},
+                        ]
+                    },
+                    {
+                        "start": "2014-05-25T17:00:00",
+                        "end": "2014-05-26T17:00:00",
+                        'selected_points': [
+                            {'area': 34, 'lat': 45.0, 'lng': -120.0},
+                        ],
+                        "perimeter_polygon": {
+                            "coordinates": [
+                                [-122.45, 46.43],
+                                [-122.39, 46.43],
+                                [-122.39, 46.40],
+                                [-122.45, 46.40],
+                                [-122.45, 46.43]
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                'active_areas': [
+                    {
+                        "start": "2014-05-29T19:00:00",
+                        "end": "2014-05-30T19:00:00",
+                        "perimeter_polygon": {
+                            "coordinates": [
+                                [-121.45, 47.43],
+                                [-121.39, 47.43],
+                                [-121.39, 47.40],
+                                [-121.45, 47.40],
+                                [-121.45, 47.43]
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    })
+
+    TEST_FIRE_NO_ACTIVITY = fires.Fire({
+        'id': '2'
+    })
+
+    TEST_FIRE_ACTIVITY_NO_LOCATION_INFO = fires.Fire({
+        'id': '1',
+        'activity': [
+            {
+                'active_areas': [
+                    {
+                        "start": "2014-05-25T17:00:00",
+                        "end": "2014-05-26T17:00:00"
+                        # No location information
+                    }
+                ]
+            }
+        ]
+    })
+
+    TEST_FIRE_ACTIVITY_INVALID_SELECTED_POINTS = fires.Fire({
+        'id': '1',
+        'activity': [
+            {
+                'active_areas': [
+                    {
+                        "start": "2014-05-25T17:00:00",
+                        "end": "2014-05-26T17:00:00",
+                        'selected_points': [
+                            {'lat': 45.0, 'lng': -120.0}, # no area
+                        ]
+                    }
+                ]
+            }
+        ]
+    })
+
+    TEST_FIRE_ACTIVITY_INVALID_PERIMETER = fires.Fire({
+        'id': '1',
+        'activity': [
+            {
+                'active_areas': [
+                    {
+                        "start": "2014-05-25T17:00:00",
+                        "end": "2014-05-26T17:00:00",
+                        'perimeter': {} # missing polygon
+                    }
+                ]
+            }
+        ]
+    })
+
+    def test_active_areas(self):
+        # no activity
+        assert [] == self.TEST_FIRE_NO_ACTIVITY.active_areas
+
+        # missing location information
+        expected = [{
+            "start": "2014-05-25T17:00:00",
+            "end": "2014-05-26T17:00:00"
+        }]
+        actual = self.TEST_FIRE_ACTIVITY_NO_LOCATION_INFO.active_areas
+        assert actual == expected
+
+        # invalid selected points
+        expected = [{
+            "start": "2014-05-25T17:00:00",
+            "end": "2014-05-26T17:00:00",
+            'selected_points': [
+                {'lat': 45.0, 'lng': -120.0}, # no area
+            ]
+        }]
+        actual = self.TEST_FIRE_ACTIVITY_INVALID_SELECTED_POINTS.active_areas
+        assert actual == expected
+
+        # invalid active area
+        expected = [{
+            "start": "2014-05-25T17:00:00",
+            "end": "2014-05-26T17:00:00",
+            'perimeter': {} # missing polygon
+        }]
+        actual = self.TEST_FIRE_ACTIVITY_INVALID_PERIMETER.active_areas
+        assert actual == expected
+
+        # mixed activity
+        expected = [{
+            "start": "2014-05-27T17:00:00",
+            "end": "2014-05-28T17:00:00",
+            'selected_points': [
+                {'area': 34, 'lat': 45.0, 'lng': -120.0},
+            ]
+        },
+        {
+            "start": "2014-05-25T17:00:00",
+            "end": "2014-05-26T17:00:00",
+            'selected_points': [
+                {'area': 34, 'lat': 45.0, 'lng': -120.0},
+            ],
+            "perimeter_polygon": {
+                "coordinates": [
+                    [-122.45, 46.43],
+                    [-122.39, 46.43],
+                    [-122.39, 46.40],
+                    [-122.45, 46.40],
+                    [-122.45, 46.43]
+                ]
+            }
+        },
+        {
+            "start": "2014-05-29T19:00:00",
+            "end": "2014-05-30T19:00:00",
+            "perimeter_polygon": {
+                "coordinates": [
+                    [-121.45, 47.43],
+                    [-121.39, 47.43],
+                    [-121.39, 47.40],
+                    [-121.45, 47.40],
+                    [-121.45, 47.43]
+                ]
+            }
+        }]
+        actual = self.TEST_FIRE.active_areas
+        assert actual == expected
+
 
 ##
 ## Tests for FiresManager
