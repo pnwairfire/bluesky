@@ -33,22 +33,17 @@ def run(fires_manager):
 
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            if not fire.get('activity'):
-                raise ValueError(
-                    "Activity information required to look up fuelbeds")
-
-            for a in fire['activity']:
-                if not a.get('location'):
-                    raise ValueError(
-                        "activity location information required to look up fuelbeds")
+            # Note that fire.locations validates that each location object
+            # has either lat+lng+area or polygon
+            for aa, loc in fire.locations:
                 # TODO: instead of instantiating a new FccsLookUp and Estimator
                 #   for each activity object, create AK and non-AK lookup and
                 #   estimator objects that are reused, and set reference to
                 #   correct one here
                 # TODO: is_alaska from lat,lng, not from 'state'
-                lookup = FccsLookUp(is_alaska=a['location'].get('state')=='AK',
+                lookup = FccsLookUp(is_alaska=aa['location'].get('state')=='AK',
                     **Config.get('fuelbeds'))
-                Estimator(lookup).estimate(a)
+                Estimator(lookup).estimate(loc)
 
     # TODO: Add fuel loadings data to each fuelbed object (????)
     #  If we do so here, use bluesky.modules.consumption.FuelLoadingsManager
@@ -93,48 +88,32 @@ class Estimator(object):
             if attr.startswith('truncation_'):
                 setattr(self, attr.replace('truncation_', ''), val)
 
-    def estimate(self, activity_obj):
-        """Estimates fuelbed composition based on lat/lng or GeoJSON data.
-
-        If activity_obj['location']['geojson'] is defined, it will look something like
-        the following:
-
-            {
-                "type": "MultiPolygon",
-                "coordinates": [
-                    [
-                        [
-                            [-84.8194, 30.5222],
-                            [-84.8197, 30.5209],
-                            ...
-                            [-84.8193, 30.5235],
-                            [-84.8194, 30.5222]
-                        ]
-                    ]
-                ]
-            }
+    def estimate(self, loc):
+        """Estimates fuelbed composition based on lat/lng or polygon
         """
-        if not activity_obj.get('location'):
+        if not loc:
             raise ValueError("Insufficient data for looking up fuelbed information")
 
-        fuelbed_info = {}
-        if activity_obj['location'].get('shape_file'):
-            raise NotImplementedError("Importing of shape data from file not implemented")
+        elif loc.get('polygon'):
+            geo_data =  {
+                "type": "Polygon",
+                "coordinates": loc['polygon']
+            }
+            logging.debug("Converted polygon to geojson: %s", geo_data)
+            fuelbed_info = self.lookup.look_up(geo_data)
+            # If loc['area'] is defined, then we want to keep it. We're dealing
+            # with a perimeter which may not be all burning.  If it isn't
+            # defined, then set loc['area'] to fuelbed_info['area']
+            if not loc.get('area') and fuelbed_info and fuelbed_info.get('area'):
+                # fuelbed_info['area'] is in m^2
+                loc['area'] = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
 
-        elif activity_obj['location'].get('geojson'):
-            fuelbed_info = self.lookup.look_up(activity_obj['location']['geojson'])
-            # fuelbed_info['area'] is in m^2
-            # TDOO: only use fuelbed_info['area'] if activity_obj['location']['area']
-            # isn't already defined?
-            if fuelbed_info and fuelbed_info.get('area'):
-                activity_obj['location']['area'] = fuelbed_info['area'] * ACRES_PER_SQUARE_METER
-
-        elif activity_obj['location'].get('latitude') and activity_obj['location'].get('longitude'):
+        elif loc.get('lat') and loc.get('lng'):
             geo_data = {
                 "type": "Point",
                 "coordinates": [
-                    activity_obj['location']['longitude'],
-                    activity_obj['location']['latitude']
+                    loc['lng'],
+                    loc['lat']
                 ]
             }
             logging.debug("Converted lat,lng to geojson: %s", geo_data)
