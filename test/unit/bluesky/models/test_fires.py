@@ -148,42 +148,42 @@ class TestFire(object):
         assert None == f.end
         assert None == f.end_utc
         # multiple activity windows with None 'end'
-        f = fires.Fire({"activity": [{'end': None}, {'end': None}]})
+        f = fires.Fire({"activity": [{'active_areas': [{'end': None}, {'end': None}]}]})
         assert None == f.start
         assert None == f.start_utc
         assert None == f.end
         assert None == f.end_utc
         # one activity window with start defined
-        f = fires.Fire({"activity": [{'start': "2014-05-27T17:00:00"}]})
+        f = fires.Fire({"activity": [{'active_areas': [{'start': "2014-05-27T17:00:00"}]}]})
         assert datetime.datetime(2014,5,27,17,0,0) == f.start
         assert datetime.datetime(2014,5,27,17,0,0) == f.start_utc
         assert None == f.end
         assert None == f.end_utc
         # one activity window with end defined
-        f = fires.Fire({"activity": [{'end': "2014-05-27T17:00:00"}]})
+        f = fires.Fire({"activity": [{'active_areas': [{'end': "2014-05-27T17:00:00"}]}]})
         assert None == f.start
         assert None == f.start_utc
         assert datetime.datetime(2014,5,27,17,0,0) == f.end
         assert datetime.datetime(2014,5,27,17,0,0) == f.end_utc
         # multiple activity windows, some with 'start' defined, some with end
         # defined, out of order
-        f = fires.Fire({"activity": [
+        f = fires.Fire({"activity": [{'active_areas': [
             {'start': None, 'end': '2014-05-30T17:00:00'},
             {'start': "2014-05-29T17:00:00", 'end': None},
             {'start': "2014-05-27T17:00:00", 'end': '2014-05-27T17:00:00'},
             {'start': None, 'end': None}
-            ]})
+            ]}]})
         assert datetime.datetime(2014,5,27,17,0,0) == f.start
         assert datetime.datetime(2014,5,27,17,0,0) == f.start_utc
         assert datetime.datetime(2014,5,30,17,0,0) == f.end
         assert datetime.datetime(2014,5,30,17,0,0) == f.end_utc
 
         # multiple activity windows, all with 'start' & 'end' defined, out of order
-        f = fires.Fire({"activity": [
+        f = fires.Fire({"activity": [{'active_areas': [
             {'start': "2014-05-29T17:00:00", 'end': "2014-05-30T17:00:00"},
             {'start': "2014-05-27T17:00:00", 'end': "2014-05-28T17:00:00"},
             {'start': "2014-05-28T17:00:00", 'end': "2014-05-29T17:00:00"}
-            ]})
+            ]}]})
         assert datetime.datetime(2014,5,27,17,0,0) == f.start
         assert datetime.datetime(2014,5,30,17,0,0) == f.end
         assert datetime.datetime(2014,5,27,17,0,0) == f.start_utc
@@ -193,19 +193,23 @@ class TestFire(object):
         f = fires.Fire({
             "activity": [
                 {
-                    "location": {"utc_offset": '-07:00'},
-                    'start': "2014-05-29T17:00:00",
-                    'end': "2014-05-30T17:00:00"
-                },
-                {
-                    "location": {"utc_offset": '-07:00'},
-                    'start': "2014-05-27T17:00:00",
-                    'end': "2014-05-28T17:00:00"
-                },
-                {
-                    "location": {"utc_offset": '-07:00'},
-                    'start': "2014-05-28T17:00:00",
-                    'end': "2014-05-29T17:00:00"
+                    'active_areas': [
+                        {
+                            "utc_offset": '-07:00',
+                            'start': "2014-05-29T17:00:00",
+                            'end': "2014-05-30T17:00:00"
+                        },
+                        {
+                            "utc_offset": '-07:00',
+                            'start': "2014-05-27T17:00:00",
+                            'end': "2014-05-28T17:00:00"
+                        },
+                        {
+                            "utc_offset": '-07:00',
+                            'start': "2014-05-28T17:00:00",
+                            'end': "2014-05-29T17:00:00"
+                        }
+                    ]
                 }
             ]
         })
@@ -353,14 +357,22 @@ class TestFiresManager(object):
             'id': '1',
             'activity': [
                 {
-                    "start": "2014-05-27T17:00:00",
-                    "end": "2014-05-28T17:00:00",
-                    'location': {'area': 34, 'latitude': 45.0, 'longitude': -120.0},
-                },
-                {
-                    "start": "2014-05-25T17:00:00",
-                    "end": "2014-05-26T17:00:00",
-                    'location': {'area': 34, 'latitude': 45.0, 'longitude': -120.0},
+                    'active_areas': [
+                        {
+                            "start": "2014-05-27T17:00:00",
+                            "end": "2014-05-28T17:00:00",
+                            'selected_points': [
+                                {'area': 34, 'lat': 45.0, 'lng': -120.0},
+                            ]
+                        },
+                        {
+                            "start": "2014-05-25T17:00:00",
+                            "end": "2014-05-26T17:00:00",
+                            'selected_points': [
+                                {'area': 34, 'lat': 45.0, 'lng': -120.0},
+                            ]
+                        }
+                    ]
                 }
             ]
         })
@@ -368,9 +380,15 @@ class TestFiresManager(object):
             'id': '2',
             "activity":[
                 {
-                    "start": "2014-05-27T19:00:00",
-                    "end": "2014-05-28T19:00:00",
-                    'location': {'area': 132, 'latitude': 45.0, 'longitude': -120.0},
+                    'active_areas': [
+                        {
+                            "start": "2014-05-27T19:00:00",
+                            "end": "2014-05-28T19:00:00",
+                            'selected_points': [
+                                {'area': 132, 'lat': 45.0, 'lng': -120.0},
+                            ]
+                        }
+                    ]
                 }
             ]
         })
@@ -382,9 +400,9 @@ class TestFiresManager(object):
         assert datetime.datetime(2014,5,28,19) == fm.latest_end
 
         # same thing, but with time zones specified for two of the fires
-        f1.activity[0]['location']['utc_offset'] = '-07:00'
-        f1.activity[1]['location']['utc_offset'] = '-07:00'
-        f2.activity[0]['location']['utc_offset'] = '03:00' # no longer the latest time
+        f1.activity[0]['active_areas'][0]['utc_offset'] = '-07:00'
+        f1.activity[0]['active_areas'][1]['utc_offset'] = '-07:00'
+        f2.activity[0]['active_areas'][0]['utc_offset'] = '03:00' # no longer the latest time
         assert datetime.datetime(2014,5,26,0) == fm.earliest_start
         assert datetime.datetime(2014,5,29,0) == fm.latest_end
 

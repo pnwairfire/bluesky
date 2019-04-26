@@ -62,6 +62,7 @@ class Fire(dict):
         else:
             self['fuel_type'] =self._validate_fuel_type(self['fuel_type'])
 
+
     ## Properties
 
     # @property
@@ -70,6 +71,12 @@ class Fire(dict):
 
     @property
     def active_areas(self):
+        """Returns flat list of fire active areas.
+
+        We could memoize this method, but would need to invalidate
+        when adding/removing collections or active areas, or when
+        modifying points or perimeters.
+        """
         return [a for c in self.get('activity', [])
             for a in c.get('active_areas', [])]
 
@@ -80,12 +87,12 @@ class Fire(dict):
         Doesn't memoize, in case activity windows are added/removed/modified
         """
         # consider only activie areas with start times
-        active_areas = [a for a in self.activity if a.get('start')]
+        active_areas = [a for a in self.active_areas if a.get('start')]
         if active_areas:
             active_areas = sorted(active_areas, key=lambda a: a['start'])
             # record utc offset of initial active area, in case
             # start_utc is being called
-            self.__utc_offset = active_areas[0].get('location', {}).get('utc_offset')
+            self.__utc_offset = active_areas[0].get('utc_offset')
             return datetimeutils.parse_datetime(active_areas[0]['start'], 'start')
 
     @property
@@ -104,12 +111,12 @@ class Fire(dict):
           is considered, so this isn't a high priority)
         """
         # consider only activie areas with end times
-        active_areas = [a for a in self.activity if a.get('end')]
+        active_areas = [a for a in self.active_areas if a.get('end')]
         if active_areas:
             active_areas = sorted(active_areas, key=lambda a: a['end'])
             # record utc offset of initial active area, in case
             # start_utc is being called
-            self.__utc_offset = active_areas[-1].get('location', {}).get('utc_offset')
+            self.__utc_offset = active_areas[-1].get('utc_offset')
             return datetimeutils.parse_datetime(active_areas[-1]['end'], 'end')
 
     @property
