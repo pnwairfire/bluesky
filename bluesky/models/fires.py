@@ -1054,18 +1054,19 @@ class FireActivityFilter(FiresActionBase):
                 i = 0
                 while i < len(fire.get('activity', [])):
                     j = 0
-                    while j < len(fire['activity'].get('active_areas', [])):
+                    while j < len(fire['activity'][i].get('active_areas', [])):
                         try:
                             if filter_func(fire, fire['activity'][i]['active_areas'][j]):
                                 fire['activity'][i]['active_areas'].pop(j)
                                 logging.debug('Filtered fire %s (%s)', fire.id,
                                     fire._private_id)
-                                if len(fire['activity'][i].get('active_areas')) == 0:
-                                    self._remove_fire(fire)
-                                    # Note: `i` must equal zero, and
+                                if len(fire['activity'][i]['active_areas']) == 0:
+                                    fire['activity'].pop(i)
+                                    # Note: `j` must equal zero, and
                                     #   while loop will terminate
                             else:
                                 j += 1
+
                         except self.FilterError as e:
                             if self._skip_failures:
                                 j += 1
@@ -1079,6 +1080,8 @@ class FireActivityFilter(FiresActionBase):
                         self._remove_fire(fire)
                         # Note: `i` must equal zero, and
                         #   while loop will terminate
+                    else:
+                        i += 1
 
 
     def _remove_fire(self, fire):
