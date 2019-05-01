@@ -1263,7 +1263,7 @@ class TestFiresManagerMergeFires(object):
 ## TODO: unit test fires.FireActivityFilter directly
 ##
 
-class TestFiresManagerFilterFires(object):
+class TestFiresManagerFilterFiresNoneSpecified(object):
 
 
     ## Filtering
@@ -1286,10 +1286,11 @@ class TestFiresManagerFilterFires(object):
         assert fm.num_fires == 1
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
+class TestFiresManagerFilterFiresByCountry(object):
 
-    def test_filter_by_country(self, reset_config):
-        fm = fires.FiresManager()
-        init_fires = [
+    def setup(self):
+        self.fm = fires.FiresManager()
+        self.init_fires = [
             fires.Fire({'id': '01', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '02', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '03', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
@@ -1315,10 +1316,11 @@ class TestFiresManagerFilterFires(object):
             fires.Fire({'id': '13', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
                 "activity": [{"location": {'country': "ZZ"}}, {"location": {'country': "ZZ"}}]}),
         ]
-        fm.fires = init_fires
-        assert fm.num_fires == 13
+        self.fm.fires = self.init_fires
+        assert self.fm.num_fires == 13
 
-        ## empty config
+
+    def test_empty_config(self, reset_config):
         Config.set({}, 'filter', 'country')
         Config.set(False, 'filter', 'skip_failures')
         with raises(fires.FireActivityFilter.FilterError) as e_info:
@@ -1330,7 +1332,7 @@ class TestFiresManagerFilterFires(object):
         assert fm.num_fires == 13
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
-        ## Neither whitelist nor blacklist is specified
+    def test_neither_whitelist_or_blacklist_is_specified(self, reset_config):
         Config.set({'foo': 'bar'}, 'filter', 'country')
         Config.set(False, 'filter', 'skip_failures')
         with raises(fires.FireActivityFilter.FilterError) as e_info:
@@ -1342,7 +1344,7 @@ class TestFiresManagerFilterFires(object):
         assert fm.num_fires == 13
         assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
-        ## Both whitelist nor blacklist are specified
+    def test_both_whitelist_or_blacklist_are_specified(self, reset_config):
         Config.set(False, 'filter', 'skip_failures')
         Config.set(["ZZ"], 'filter', 'country', 'blacklist')
         Config.set(["YY"], 'filter', 'country', 'whitelist')
@@ -1462,23 +1464,28 @@ class TestFiresManagerFilterFires(object):
         assert fm.num_fires == 0
         assert [] == fm.fires
 
+
     def test_filter_by_location(self, reset_config):
 
         fm = fires.FiresManager()
         init_fires = [
-            fires.Fire({'id': '1', 'activity': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
-            fires.Fire({'id': '2', 'activity': [{'location':{'latitude': 50.0, 'longitude': -80.0}}]}),
-            fires.Fire({'id': '3', 'activity': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
-            fires.Fire({'id': '4', 'activity': [{'location':{'latitude': 70.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '5', 'activity': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '6', 'activity': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '7', 'activity': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
-            fires.Fire({'id': '8', 'activity': [{'location':{'latitude': 70.0, 'longitude': -120.0}}]}),
-            fires.Fire({'id': '9', 'activity': [{'location':{'latitude': -10.0, 'longitude': 10.0}}]}),
-            fires.Fire({'id': '10', 'activity': [{'location':{'latitude': -10.0, 'longitude': 10.0}},
-                {'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
-            fires.Fire({'id': '10', 'activity': [{'location':{'latitude': -10.0, 'longitude': 10.0}},
-                {'location':{'latitude': -11.0, 'longitude': 9.0}}]})
+            fires.Fire({'id': '1', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -80.0}]}]}]}),
+            fires.Fire({'id': '2', 'activity': [{'active_areas': [{'specified_points':[{'lat': 45.0, 'lng': -81.0}, {'lat': 55.0, 'lng': -79.0}]}]}]}),
+            fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]}),
+            fires.Fire({'id': '4', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-61, 71], [-61, 69], [-59, 69], [-59, 71], [-61, 71]]}}]}]}),
+            fires.Fire({'id': '5', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -60.0}]}]}]}),
+            fires.Fire({'id': '6', 'activity': [{'active_areas': [{'specified_points':[{'lat': 61.0, 'lng': -60.0}]}]}]}),
+            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]}}]}]}),
+            fires.Fire({'id': '8', 'activity': [{'active_areas': [{'specified_points':[{'lat': 70.0, 'lng': -120.0}]}]}]}),
+            fires.Fire({'id': '9', 'activity': [{'active_areas': [{'specified_points':[{'lat': -10.0, 'lng': 10.0}]}]}]}),
+            fires.Fire({'id': '10', 'activity': [
+                {'active_areas': [{'specified_points': [{'lat': -10.0, 'lng': -10.0}]}]},
+                {'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}
+            ]}),
+            fires.Fire({'id': '10', 'activity': [
+                {'active_areas': [{'specified_points': [{'lat': -10.0, 'lng': 10.0}]}]},
+                {'active_areas': [{'specified_points': [{'lat': -11.0, 'lng': 9.0}]}]},
+            ]})
         ]
         fm.fires = init_fires
         assert fm.num_fires == 11
@@ -1553,15 +1560,15 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": -5.75,"lng": -131.5}},
             'filter', 'location', 'boundary')
         expected = [
-            fires.Fire({'id': '1', 'activity': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
-            fires.Fire({'id': '2', 'activity': [{'location':{'latitude': 50.0, 'longitude': -80.0}}]}),
-            fires.Fire({'id': '3', 'activity': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
-            fires.Fire({'id': '4', 'activity': [{'location':{'latitude': 70.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '5', 'activity': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '6', 'activity': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '7', 'activity': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
-            fires.Fire({'id': '8', 'activity': [{'location':{'latitude': 70.0, 'longitude': -120.0}}]}),
-            fires.Fire({'id': '10', 'activity': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
+            fires.Fire({'id': '1', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -80.0}]}]}]}),
+            fires.Fire({'id': '2', 'activity': [{'active_areas': [{'specified_points':[{'lat': 45.0, 'lng': -81.0}, {'lat': 55.0, 'lng': -79.0}]}]}]}),
+            fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]}),
+            fires.Fire({'id': '4', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-61, 71], [-61, 69], [-59, 69], [-59, 71], [-61, 71]]}}]}]}),
+            fires.Fire({'id': '5', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -60.0}]}]}]}),
+            fires.Fire({'id': '6', 'activity': [{'active_areas': [{'specified_points':[{'lat': 61.0, 'lng': -60.0}]}]}]}),
+            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]}}]}]}),
+            fires.Fire({'id': '8', 'activity': [{'active_areas': [{'specified_points':[{'lat': 70.0, 'lng': -120.0}]}]}]}),
+            fires.Fire({'id': '10', 'activity': [{'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 9
@@ -1572,14 +1579,14 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": -5.75,"lng": -110.5}},
             'filter', 'location', 'boundary')
         expected = [
-            fires.Fire({'id': '1', 'activity': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
-            fires.Fire({'id': '2', 'activity': [{'location':{'latitude': 50.0, 'longitude': -80.0}}]}),
-            fires.Fire({'id': '3', 'activity': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
-            fires.Fire({'id': '4', 'activity': [{'location':{'latitude': 70.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '5', 'activity': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '6', 'activity': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '7', 'activity': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
-            fires.Fire({'id': '10', 'activity': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
+            fires.Fire({'id': '1', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -80.0}]}]}]}),
+            fires.Fire({'id': '2', 'activity': [{'active_areas': [{'specified_points':[{'lat': 45.0, 'lng': -81.0}, {'lat': 55.0, 'lng': -79.0}]}]}]}),
+            fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]}),
+            fires.Fire({'id': '4', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-61, 71], [-61, 69], [-59, 69], [-59, 71], [-61, 71]]}}]}]}),
+            fires.Fire({'id': '5', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -60.0}]}]}]}),
+            fires.Fire({'id': '6', 'activity': [{'active_areas': [{'specified_points':[{'lat': 61.0, 'lng': -60.0}]}]}]}),
+            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]}}]}]}),
+            fires.Fire({'id': '10', 'activity': [{'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 8
@@ -1590,13 +1597,13 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": -5.75,"lng": -110.5}},
             'filter', 'location', 'boundary')
         expected = [
-            fires.Fire({'id': '1', 'activity': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
-            fires.Fire({'id': '2', 'activity': [{'location':{'latitude': 50.0, 'longitude': -80.0}}]}),
-            fires.Fire({'id': '3', 'activity': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
-            fires.Fire({'id': '5', 'activity': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '6', 'activity': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '7', 'activity': [{'location':{'latitude': 60.0, 'longitude': -50.0}}]}),
-            fires.Fire({'id': '10', 'activity': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
+            fires.Fire({'id': '1', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -80.0}]}]}]}),
+            fires.Fire({'id': '2', 'activity': [{'active_areas': [{'specified_points':[{'lat': 45.0, 'lng': -81.0}, {'lat': 55.0, 'lng': -79.0}]}]}]}),
+            fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]}),
+            fires.Fire({'id': '5', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -60.0}]}]}]}),
+            fires.Fire({'id': '6', 'activity': [{'active_areas': [{'specified_points':[{'lat': 61.0, 'lng': -60.0}]}]}]}),
+            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]}}]}]}),
+            fires.Fire({'id': '10', 'activity': [{'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 7
@@ -1607,12 +1614,12 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": -5.75,"lng": -110.5}},
             'filter', 'location', 'boundary')
         expected = [
-            fires.Fire({'id': '1', 'activity': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]}),
-            fires.Fire({'id': '2', 'activity': [{'location':{'latitude': 50.0, 'longitude': -80.0}}]}),
-            fires.Fire({'id': '3', 'activity': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]}),
-            fires.Fire({'id': '5', 'activity': [{'location':{'latitude': 40.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '6', 'activity': [{'location':{'latitude': 61.0, 'longitude': -60.0}}]}),
-            fires.Fire({'id': '10', 'activity': [{'location':{'latitude': 40.0, 'longitude': -80.0}}]})
+            fires.Fire({'id': '1', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -80.0}]}]}]}),
+            fires.Fire({'id': '2', 'activity': [{'active_areas': [{'specified_points':[{'lat': 45.0, 'lng': -81.0}, {'lat': 55.0, 'lng': -79.0}]}]}]}),
+            fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]}),
+            fires.Fire({'id': '5', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -60.0}]}]}]}),
+            fires.Fire({'id': '6', 'activity': [{'active_areas': [{'specified_points':[{'lat': 61.0, 'lng': -60.0}]}]}]}),
+            fires.Fire({'id': '10', 'activity': [{'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 6
@@ -1623,7 +1630,7 @@ class TestFiresManagerFilterFires(object):
             "sw": {"lat": 58.75,"lng": -62}},
             'filter', 'location', 'boundary')
         expected = [
-            fires.Fire({'id': '3', 'activity': [{'location':{'latitude': 60.0, 'longitude': -62.0}}]})
+            fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 1
@@ -1680,16 +1687,18 @@ class TestFiresManagerFilterFires(object):
 
         fm = fires.FiresManager()
         init_fires = [
-            fires.Fire({'id': '1', 'activity': [{'location':{'area': 45}}]}),
-            fires.Fire({'id': '2', 'activity': [{'location':{'area': 95}}]}),
-            fires.Fire({'id': '3', 'activity': [{'location':{'area': 55}}]}),
-            fires.Fire({'id': '4', 'activity': [{'location':{'area': 65}}]}),
-            fires.Fire({'id': '5', 'activity': [{'location':{'area': 85}}]}),
-            fires.Fire({'id': '6', 'activity': [{'location':{'area': 75}}]}),
-            fires.Fire({'id': '7', 'activity': [{'location':{'area': 50}}]}),
-            fires.Fire({'id': '8', 'activity': [{'location':{'area': 30}}]}),
-            fires.Fire({'id': '9', 'activity': [{'location':{'area': 45}},
-                {'location':{'area': 40}}]})
+            fires.Fire({'id': '1', 'activity': [{'active_areas':[{'specified_points': [{'area': 45}]}]} ]}),
+            fires.Fire({'id': '2', 'activity': [{'active_areas':[{'specified_points': [{'area': 55}, {'area': 40}]}]} ]}),
+            fires.Fire({'id': '3', 'activity': [{'active_areas':[{'specified_points': [{'area': 55}]}]} ]}),
+            fires.Fire({'id': '4', 'activity': [{'active_areas':[{'perimeter': {'area': 65}}]} ]}),
+            fires.Fire({'id': '5', 'activity': [{'active_areas':[{'specified_points': [{'area': 85}]}]} ]}),
+            fires.Fire({'id': '6', 'activity': [{'active_areas':[{'specified_points': [{'area': 75}], 'perimeter': {'area': 90}}]}]}),
+            fires.Fire({'id': '7', 'activity': [{'active_areas':[{'specified_points': [{'area': 50}]}]} ]}),
+            fires.Fire({'id': '8', 'activity': [{'active_areas':[{'specified_points': [{'area': 30}]}]} ]}),
+            fires.Fire({'id': '9', 'activity': [
+                {'active_areas':[{'specified_points': [{'area': 45}]}]},
+                {'active_areas':[{'specified_points': [{'area': 40}]}]}
+            ]})
         ]
         fm.fires = init_fires
         assert fm.num_fires == 9
@@ -1756,12 +1765,12 @@ class TestFiresManagerFilterFires(object):
         # min only
         Config.set({'min': 47}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '2', 'activity': [{'location':{'area': 95}}]}),
-            fires.Fire({'id': '3', 'activity': [{'location':{'area': 55}}]}),
-            fires.Fire({'id': '4', 'activity': [{'location':{'area': 65}}]}),
-            fires.Fire({'id': '5', 'activity': [{'location':{'area': 85}}]}),
-            fires.Fire({'id': '6', 'activity': [{'location':{'area': 75}}]}),
-            fires.Fire({'id': '7', 'activity': [{'location':{'area': 50}}]})
+            fires.Fire({'id': '2', 'activity': [{'active_areas':[{'specified_points': [{'area': 95}]}]} ]}),
+            fires.Fire({'id': '3', 'activity': [{'active_areas':[{'specified_points': [{'area': 55}]}]} ]}),
+            fires.Fire({'id': '4', 'activity': [{'active_areas':[{'specified_points': [{'area': 65}]}]} ]}),
+            fires.Fire({'id': '5', 'activity': [{'active_areas':[{'specified_points': [{'area': 85}]}]} ]}),
+            fires.Fire({'id': '6', 'activity': [{'active_areas':[{'specified_points': [{'area': 75}]}]} ]}),
+            fires.Fire({'id': '7', 'activity': [{'active_areas':[{'specified_points': [{'area': 50}]}]} ]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 6
@@ -1769,11 +1778,11 @@ class TestFiresManagerFilterFires(object):
         # max only
         Config.set({'max': 90}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '3', 'activity': [{'location':{'area': 55}}]}),
-            fires.Fire({'id': '4', 'activity': [{'location':{'area': 65}}]}),
-            fires.Fire({'id': '5', 'activity': [{'location':{'area': 85}}]}),
-            fires.Fire({'id': '6', 'activity': [{'location':{'area': 75}}]}),
-            fires.Fire({'id': '7', 'activity': [{'location':{'area': 50}}]})
+            fires.Fire({'id': '3', 'activity': [{'active_areas':[{'specified_points': [{'area': 55}]}]} ]}),
+            fires.Fire({'id': '4', 'activity': [{'active_areas':[{'specified_points': [{'area': 65}]}]} ]}),
+            fires.Fire({'id': '5', 'activity': [{'active_areas':[{'specified_points': [{'area': 85}]}]} ]}),
+            fires.Fire({'id': '6', 'activity': [{'active_areas':[{'specified_points': [{'area': 75}]}]} ]}),
+            fires.Fire({'id': '7', 'activity': [{'active_areas':[{'specified_points': [{'area': 50}]}]} ]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 5
@@ -1782,9 +1791,9 @@ class TestFiresManagerFilterFires(object):
         # both min and max
         Config.set({'min': 52, 'max': 77.0}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '3', 'activity': [{'location':{'area': 55}}]}),
-            fires.Fire({'id': '4', 'activity': [{'location':{'area': 65}}]}),
-            fires.Fire({'id': '6', 'activity': [{'location':{'area': 75}}]})
+            fires.Fire({'id': '3', 'activity': [{'active_areas':[{'specified_points': [{'area': 55}]}]} ]}),
+            fires.Fire({'id': '4', 'activity': [{'active_areas':[{'specified_points': [{'area': 65}]}]} ]}),
+            fires.Fire({'id': '6', 'activity': [{'active_areas':[{'specified_points': [{'area': 75}]}]} ]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 3
@@ -1793,7 +1802,7 @@ class TestFiresManagerFilterFires(object):
         # both min and max
         Config.set({'min': 65, 'max': 65.0}, 'filter', 'area')
         expected = [
-            fires.Fire({'id': '4', 'activity': [{'location':{'area': 65}}]})
+            fires.Fire({'id': '4', 'activity': [{'active_areas':[{'specified_points': [{'area': 65}]}]} ]})
         ]
         fm.filter_fires()
         assert fm.num_fires == 1
@@ -1814,13 +1823,18 @@ class TestFiresManagerFilterFires(object):
         Config.set({'min': 0.0, 'max': 100.0}, 'filter', 'area')
         scenarios = (
             # missing area
-            (fires.Fire({'id': '1', 'activity':[{'location':{}}]}),
+            (fires.Fire({'id': '3', 'activity': [{'active_areas':[{'specified_points': [{}]} ]} ]}),
              fires.FireActivityFilter.MISSING_ACTIVITY_AREA_MSG),
-            # missing location
+            (fires.Fire({'id': '3', 'activity': [{'active_areas':[
+                {'specified_points': [{'area': 23}, {}]} ]} ]}), # second point missing area
+             fires.FireActivityFilter.MISSING_ACTIVITY_AREA_MSG),
+            (fires.Fire({'id': '3', 'activity': [{'active_areas':[{'perimeter': {} }]} ]}),
+             fires.FireActivityFilter.MISSING_ACTIVITY_AREA_MSG),
+            # missing active areas
             (fires.Fire({'id': '1', 'activity':[{}]}),
              fires.FireActivityFilter.MISSING_ACTIVITY_AREA_MSG),
             # negative area
-            (fires.Fire({'id': '1', 'activity':[{'location':{'area': -123}}]}),
+            (fires.Fire({'id': '3', 'activity': [{'active_areas':[{'specified_points': [{'area': -123}]} ]} ]}),
              fires.FireActivityFilter.NEGATIVE_ACTIVITY_AREA_MSG),
         )
         for f, err_msg in scenarios:
