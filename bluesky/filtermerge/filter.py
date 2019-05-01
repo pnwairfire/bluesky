@@ -59,6 +59,7 @@ class FireActivityFilter(FiresActionBase):
             # get filter function
             try:
                 filter_func = self._get_filter_func(filter_field)
+
             except self.FilterError as e:
                 if self._skip_failures:
                     logging.warning("Failed to initialize %s filter: %s",
@@ -174,11 +175,11 @@ class FireActivityFilter(FiresActionBase):
 
 
     SPECIFY_BOUNDARY_MSG = "Specify boundary to filter by location"
-    INVALID_BOUNDARY_FIELDS_MSG = ("Filter boundary must specify 'ne' and 'sw',"
-        " which each must have 'lat' and 'lng'")
+    INVALID_BOUNDARY_FIELDS_MSG = ("Filter boundary must specify"
+        " 'ne' and 'sw', which each must have 'lat' and 'lng'")
     INVALID_BOUNDARY_MSG = "Invalid boundary for filtering"
-    MISSING_FIRE_LAT_LNG_MSG = (
-        "Fire activity window must have lat and lng defined to be filtered by location")
+    MISSING_FIRE_LOCATION_INFO_MSG = ("Fire active areas must"
+        " have location information to be filtered by location")
     def _get_location_filter(self, **kwargs):
         """Returns function that checks if fire activity window is within
         boundary, which should be of the form:
@@ -211,15 +212,15 @@ class FireActivityFilter(FiresActionBase):
 
         def _filter(fire, active_area):
             if not isinstance(active_area, dict):
-                self._fail_fire(fire, self.MISSING_FIRE_LAT_LNG_MSG)
+                self._fail_fire(fire, self.MISSING_FIRE_LOCATION_INFO_MSG)
             try:
                 latlng = LatLng(active_area)
                 lat = latlng.latitude
                 lng = latlng.longitude
             except ValueError as e:
-                self._fail_fire(fire, self.MISSING_FIRE_LAT_LNG_MSG)
+                self._fail_fire(fire, self.MISSING_FIRE_LOCATION_INFO_MSG)
             if not lat or not lng:
-                self._fail_fire(fire, self.MISSING_FIRE_LAT_LNG_MSG)
+                self._fail_fire(fire, self.MISSING_FIRE_LOCATION_INFO_MSG)
 
             return (lat < b['sw']['lat'] or lat > b['ne']['lat'] or
                 lng < b['sw']['lng'] or lng > b['ne']['lng'])
