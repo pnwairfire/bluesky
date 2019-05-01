@@ -249,7 +249,7 @@ class FireActivityFilter(FiresActionBase):
 
         def _filter(fire, active_area):
             try:
-                total_area = get_total_active_area(active_area)
+                total_active_area = get_total_active_area(active_area)
             except:
                 self._fail_fire(fire, self.MISSING_ACTIVITY_AREA_MSG)
 
