@@ -1,3 +1,12 @@
+"""bluesky.filtermerge"""
+
+__author__ = "Joel Dubowy"
+
+import abc
+import logging
+
+from bluesky.config import Config
+
 
 class FiresActionBase(object, metaclass=abc.ABCMeta):
     """Base class for merging or filtering fires

@@ -2,6 +2,7 @@
 
 __author__ = "Joel Dubowy"
 
+from bluesky.config import Config
 from bluesky.filtermerge.merge import FiresMerger
 from bluesky.models import fires
 

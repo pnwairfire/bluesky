@@ -1,3 +1,11 @@
+"""bluesky.filtermerge.filter"""
+
+__author__ = "Joel Dubowy"
+
+import logging
+
+from bluesky.config import Config
+
 from . import FiresActionBase
 
 

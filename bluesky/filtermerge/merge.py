@@ -1,3 +1,9 @@
+"""bluesky.filtermerge.merge"""
+
+__author__ = "Joel Dubowy"
+
+import logging
+
 from . import FiresActionBase
 
 class FiresMerger(FiresActionBase):
