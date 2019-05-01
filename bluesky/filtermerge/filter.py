@@ -107,17 +107,15 @@ class FireActivityFilter(FiresActionBase):
                 i = 0
                 while i < len(fire.get('activity', [])):
                     j = 0
-                    #import pdb;pdb.set_trace()
                     while j < len(fire['activity'][i].get('active_areas', [])):
                         try:
                             if filter_func(fire, fire['activity'][i]['active_areas'][j]):
                                 fire['activity'][i]['active_areas'].pop(j)
                                 logging.debug('Filtered fire %s (%s)', fire.id,
                                     fire._private_id)
-                                if len(fire['activity'][i]['active_areas']) == 0:
-                                    fire['activity'].pop(i)
-                                    # Note: `j` must equal zero, and
-                                    #   while loop will terminate
+                                # Note: if that was the last active area, then
+                                #    `j` must equal zero, and while loop will
+                                #    terminate
                             else:
                                 j += 1
 
@@ -130,12 +128,14 @@ class FireActivityFilter(FiresActionBase):
                             else:
                                 raise
 
-                    if len(fire['activity']) == 0:
-                        self._remove_fire(fire)
-                        # Note: `i` must equal zero, and
-                        #   while loop will terminate
+                    if len(fire['activity'][i]['active_areas']) == 0:
+                        fire['activity'].pop(i)
+
                     else:
                         i += 1
+
+                if len(fire['activity']) == 0:
+                    self._remove_fire(fire)
 
 
     def _remove_fire(self, fire):
