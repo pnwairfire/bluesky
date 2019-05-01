@@ -24,6 +24,8 @@ Assume you have the following input data:
                                 "end": "2015-08-05T17:00:00",
                                 "ecoregion": "western",
                                 "utc_offset": "-09:00",
+                                "country": "USA",
+                                "state": "WA",
                                 "specified_points": [
                                     {
                                         "name": "HMW-32434",
