@@ -1,9 +1,12 @@
+"""Unit tests for bluesky.filtermerge.merge"""
 
-##
-## Tests for Merging
-##
-## TODO: unit test fires.FiresMerger directly
-##
+__author__ = "Joel Dubowy"
+
+from bluesky.filtermerge.merge import FiresMerger
+from bluesky.models import fires
+
+## TODO: unit test fires.FiresMerger directly,
+##    using mock FireManager object
 
 class TestFiresManagerMergeFires(object):
 

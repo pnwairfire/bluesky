@@ -1,31 +1,37 @@
+"""Unit tests for bluesky.filtermerge.filter"""
 
-##
-## Tests for Filtering
-##
-## TODO: unit test fires.FireActivityFilter directly
-##
+__author__ = "Joel Dubowy"
+
+from bluesky.filtermerge.filter import FireActivityFilter
+from bluesky.models import fires
+
+## TODO: unit test fires.FiresMerger directly,
+##    using mock FireManager object
+
 
 class TestFiresManagerFilterFiresNoneSpecified(object):
 
     ## Filtering
 
-    def test_no_filters_specified(self, reset_config):
-        fm = fires.FiresManager()
-        init_fires = [
+    def setup(self, reset_config):
+        self.fm = fires.FiresManager()
+        self.init_fires = [
             fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
         ]
-        fm.fires = init_fires
+        self.fm.fires = self.init_fires
 
+    def test_no_filters_specified(self, reset_config):
         ## No filters specifeid
         Config.set(False, 'filter', 'skip_failures')
         with raises(fires.FireActivityFilter.FilterError) as e_info:
-            fm.filter_fires()
-        assert fm.num_fires == 1
+            self.fm.filter_fires()
+        assert self.fm.num_fires == 1
         assert e_info.value.args[0] == fires.FireActivityFilter.NO_FILTERS_MSG
         Config.set(True, 'filter', 'skip_failures')
-        fm.filter_fires()
-        assert fm.num_fires == 1
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 1
+        assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+
 
 class TestFiresManagerFilterFiresByCountry(object):
 
@@ -68,43 +74,43 @@ class TestFiresManagerFilterFiresByCountry(object):
         Config.set({}, 'filter', 'country')
         Config.set(False, 'filter', 'skip_failures')
         with raises(fires.FireActivityFilter.FilterError) as e_info:
-            fm.filter_fires()
-        assert fm.num_fires == 13
+            self.fm.filter_fires()
+        assert self.fm.num_fires == 13
         assert e_info.value.args[0] == fires.FireActivityFilter.MISSING_FILTER_CONFIG_MSG
         Config.set(True, 'filter', 'skip_failures')
-        fm.filter_fires()
-        assert fm.num_fires == 13
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 13
+        assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
     def test_neither_whitelist_or_blacklist_is_specified(self, reset_config):
         Config.set({'foo': 'bar'}, 'filter', 'country')
         Config.set(False, 'filter', 'skip_failures')
         with raises(fires.FireActivityFilter.FilterError) as e_info:
-            fm.filter_fires()
-        assert fm.num_fires == 13
+            self.fm.filter_fires()
+        assert self.fm.num_fires == 13
         assert e_info.value.args[0] == fires.FireActivityFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
         Config.set(True, 'filter', 'skip_failures')
-        fm.filter_fires()
-        assert fm.num_fires == 13
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 13
+        assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
     def test_both_whitelist_or_blacklist_are_specified(self, reset_config):
         Config.set(False, 'filter', 'skip_failures')
         Config.set(["ZZ"], 'filter', 'country', 'blacklist')
         Config.set(["YY"], 'filter', 'country', 'whitelist')
         with raises(fires.FireActivityFilter.FilterError) as e_info:
-            fm.filter_fires()
-        assert fm.num_fires == 13
+            self.fm.filter_fires()
+        assert self.fm.num_fires == 13
         assert e_info.value.args[0] == fires.FireActivityFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
         Config.set(True, 'filter', 'skip_failures')
-        fm.filter_fires()
-        assert fm.num_fires == 13
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 13
+        assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
         Config.set(False, 'filter', 'skip_failures')
         Config.set(["ZZ"], 'filter', 'country', 'blacklist')
         Config.set(None, 'filter', 'country', 'whitelist')
-        fm.filter_fires()
+        self.fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
                 "activity": [{"active_areas": [{'country': "UK"}]}]}),
@@ -127,13 +133,13 @@ class TestFiresManagerFilterFiresByCountry(object):
             fires.Fire({'id': '12.5', 'name': 'n3.5', 'bar1':'a1', 'baz':'baz1',
                 "activity": [{"active_areas": [{'country': "UK"}]}]}),
         ]
-        assert fm.num_fires == 9
+        assert self.fm.num_fires == 9
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         Config.set(["USA", "CA", "UK", "BZ"],
             'filter', 'country', 'whitelist')
         Config.set(None, 'filter', 'country', 'blacklist')
-        fm.filter_fires()
+        self.fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
                 "activity": [{"active_areas": [{'country': "UK"}]}]}),
@@ -152,12 +158,12 @@ class TestFiresManagerFilterFiresByCountry(object):
             fires.Fire({'id': '12.5', 'name': 'n3.5', 'bar1':'a1', 'baz':'baz1',
                 "activity": [{"active_areas": [{'country': "UK"}]}]}),
         ]
-        assert fm.num_fires == 7
+        assert self.fm.num_fires == 7
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         Config.set(["USA"], 'filter', 'country', 'blacklist')
         Config.set(None, 'filter', 'country', 'whitelist')
-        fm.filter_fires()
+        self.fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
                 "activity": [{"active_areas": [{'country': "UK"}]}]}),
@@ -172,12 +178,12 @@ class TestFiresManagerFilterFiresByCountry(object):
             fires.Fire({'id': '12.5', 'name': 'n3.5', 'bar1':'a1', 'baz':'baz1',
                 "activity": [{"active_areas": [{'country': "UK"}]}]}),
         ]
-        assert fm.num_fires == 5
+        assert self.fm.num_fires == 5
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         Config.set(["USA", "CA", "UK"], 'filter', 'country', 'whitelist')
         Config.set(None, 'filter', 'country', 'blacklist')
-        fm.filter_fires()
+        self.fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
                 "activity": [{"active_areas": [{'country': "UK"}]}]}),
@@ -190,12 +196,12 @@ class TestFiresManagerFilterFiresByCountry(object):
             fires.Fire({'id': '12.5', 'name': 'n3.5', 'bar1':'a1', 'baz':'baz1',
                 "activity": [{"active_areas": [{'country': "UK"}]}]}),
         ]
-        assert fm.num_fires == 4
+        assert self.fm.num_fires == 4
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         Config.set(["USA", "CA"], 'filter', 'country', 'blacklist')
         Config.set(None, 'filter', 'country', 'whitelist')
-        fm.filter_fires()
+        self.fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
                 "activity": [{"active_areas": [{'country': "UK"}]}]}),
@@ -204,27 +210,26 @@ class TestFiresManagerFilterFiresByCountry(object):
             fires.Fire({'id': '12.5', 'name': 'n3.5', 'bar1':'a1', 'baz':'baz1',
                 "activity": [{"active_areas": [{'country': "UK"}]}]}),
         ]
-        assert fm.num_fires == 2
-        assert expected == fm.fires
+        assert self.fm.num_fires == 2
+        assert expected == self.fm.fires
 
         Config.set(["UK", "CA"], 'filter', 'country', 'blacklist')
         Config.set(None, 'filter', 'country', 'whitelist')
-        fm.filter_fires()
-        assert fm.num_fires == 0
-        assert [] == fm.fires
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 0
+        assert [] == self.fm.fires
 
         # call again with no fires
-        fm.filter_fires()
-        assert fm.num_fires == 0
-        assert [] == fm.fires
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 0
+        assert [] == self.fm.fires
 
 
 class TestFiresManagerFilterFiresByLocation(object):
 
-    def test_filter_by_location(self, reset_config):
-
-        fm = fires.FiresManager()
-        init_fires = [
+    def setup(self):
+        self.fm = fires.FiresManager()
+        self.init_fires = [
             fires.Fire({'id': '1', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -80.0}]}]}]}),
             fires.Fire({'id': '2', 'activity': [{'active_areas': [{'specified_points':[{'lat': 45.0, 'lng': -81.0}, {'lat': 55.0, 'lng': -79.0}]}]}]}),
             fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]}),
@@ -243,9 +248,12 @@ class TestFiresManagerFilterFiresByLocation(object):
                 {'active_areas': [{'specified_points': [{'lat': -11.0, 'lng': 9.0}]}]},
             ]})
         ]
-        fm.fires = init_fires
-        assert fm.num_fires == 11
+        self.fm.fires = self.init_fires
+        assert self.fm.num_fires == 11
 
+
+
+    def test_failures(self, reset_config):
         ## Failure situations
         scenarios = (
             # empty config
@@ -292,25 +300,29 @@ class TestFiresManagerFilterFiresByLocation(object):
             # don't skip failures
             Config.set(False, 'filter', 'skip_failures')
             with raises(fires.FireActivityFilter.FilterError) as e_info:
-                fm.filter_fires()
-            assert fm.num_fires == 11
-            assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+                self.fm.filter_fires()
+            assert self.fm.num_fires == 11
+            assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
             assert e_info.value.args[0] == err_msg
             # skip failures
             Config.set(True, 'filter', 'skip_failures')
-            fm.filter_fires()
-            assert fm.num_fires == 11
-            assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+            self.fm.filter_fires()
+            assert self.fm.num_fires == 11
+            assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
+    def test_noops(self):
         ## noops
         Config.set({"ne": {"lat": 88.12, "lng": 40},
             "sw": {"lat": -50.75,"lng": -131.5}},
             'filter', 'location', 'boundary')
-        fm.filter_fires()
-        assert fm.num_fires == 11
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 11
+        assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
-        ## successful filters
+
+    ## TODO: split up into separate test cases
+
+    def test_successful_filtering(self):
         # squeeze sw lat
         Config.set({"ne": {"lat": 88.12, "lng": 40},
             "sw": {"lat": -5.75,"lng": -131.5}},
@@ -326,8 +338,8 @@ class TestFiresManagerFilterFiresByLocation(object):
             fires.Fire({'id': '8', 'activity': [{'active_areas': [{'specified_points':[{'lat': 70.0, 'lng': -120.0}]}]}]}),
             fires.Fire({'id': '10', 'activity': [{'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}]})
         ]
-        fm.filter_fires()
-        assert fm.num_fires == 9
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 9
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze sw lng
@@ -344,8 +356,8 @@ class TestFiresManagerFilterFiresByLocation(object):
             fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]}}]}]}),
             fires.Fire({'id': '10', 'activity': [{'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}]})
         ]
-        fm.filter_fires()
-        assert fm.num_fires == 8
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 8
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze ne lat
@@ -361,8 +373,8 @@ class TestFiresManagerFilterFiresByLocation(object):
             fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]}}]}]}),
             fires.Fire({'id': '10', 'activity': [{'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}]})
         ]
-        fm.filter_fires()
-        assert fm.num_fires == 7
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 7
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze ne lng
@@ -377,8 +389,8 @@ class TestFiresManagerFilterFiresByLocation(object):
             fires.Fire({'id': '6', 'activity': [{'active_areas': [{'specified_points':[{'lat': 61.0, 'lng': -60.0}]}]}]}),
             fires.Fire({'id': '10', 'activity': [{'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}]})
         ]
-        fm.filter_fires()
-        assert fm.num_fires == 6
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 6
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze ne lng
@@ -388,21 +400,21 @@ class TestFiresManagerFilterFiresByLocation(object):
         expected = [
             fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]})
         ]
-        fm.filter_fires()
-        assert fm.num_fires == 1
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 1
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # squeeze out last fire
         Config.set({"ne": {"lat": 63.12, "lng": -61},
             "sw": {"lat": 60.75,"lng": -62}},
             'filter', 'location', 'boundary')
-        fm.filter_fires()
-        assert fm.num_fires == 0
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 0
         assert [] == sorted(fm.fires, key=lambda e: int(e.id))
 
         # call again with no fires
-        fm.filter_fires()
-        assert fm.num_fires == 0
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 0
         assert [] == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## Invalid fire
@@ -424,25 +436,26 @@ class TestFiresManagerFilterFiresByLocation(object):
              fires.FireActivityFilter.MISSING_FIRE_LAT_LNG_MSG),
         )
         for f, err_msg in scenarios:
-            fm.fires = [f]
+            self.fm.fires = [f]
             # don't skip failures
             Config.set(False, 'filter', 'skip_failures')
             with raises(fires.FireActivityFilter.FilterError) as e_info:
-                fm.filter_fires()
-            assert fm.num_fires == 1
-            assert [f] == fm.fires
+                self.fm.filter_fires()
+            assert self.fm.num_fires == 1
+            assert [f] == self.fm.fires
             assert e_info.value.args[0].index(err_msg) > 0
             # skip failures
             Config.set(True, 'filter', 'skip_failures')
-            fm.filter_fires()
-            assert fm.num_fires == 1
-            assert [f] == fm.fires
+            self.fm.filter_fires()
+            assert self.fm.num_fires == 1
+            assert [f] == self.fm.fires
 
 
-    def test_filter_by_area(self, reset_config):
+class TestFiresManagerFilterFiresByArea(object):
 
-        fm = fires.FiresManager()
-        init_fires = [
+    def setup(self):
+        self.fm = fires.FiresManager()
+        self.init_fires = [
             fires.Fire({'id': '1', 'activity': [{'active_areas':[{'specified_points': [{'area': 45}]}]} ]}),
             fires.Fire({'id': '2', 'activity': [{'active_areas':[{'specified_points': [{'area': 55}, {'area': 40}]}]} ]}),
             fires.Fire({'id': '3', 'activity': [{'active_areas':[{'specified_points': [{'area': 55}]}]} ]}),
@@ -456,10 +469,10 @@ class TestFiresManagerFilterFiresByLocation(object):
                 {'active_areas':[{'specified_points': [{'area': 40}]}]}
             ]})
         ]
-        fm.fires = init_fires
-        assert fm.num_fires == 9
+        self.fm.fires = self.init_fires
+        assert self.fm.num_fires == 9
 
-        ## Failure situations
+    def test_failures(self):
         scenarios = (
             # empty config
             ({}, fires.FireActivityFilter.MISSING_FILTER_CONFIG_MSG),
@@ -489,34 +502,36 @@ class TestFiresManagerFilterFiresByLocation(object):
             # don't skip failures
             Config.set(False, 'filter', 'skip_failures')
             with raises(fires.FireActivityFilter.FilterError) as e_info:
-                fm.filter_fires()
-            assert fm.num_fires == 9
-            assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+                self.fm.filter_fires()
+            assert self.fm.num_fires == 9
+            assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
             assert e_info.value.args[0] == err_msg
             # skip failures
             Config.set(True, 'filter', 'skip_failures')
-            fm.filter_fires()
-            assert fm.num_fires == 9
-            assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+            self.fm.filter_fires()
+            assert self.fm.num_fires == 9
+            assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
+    def test_noops(self):
         ## noops
         Config.set(False, 'filter', 'skip_failures')
         # min only
         Config.set({'min': 20}, 'filter', 'area')
-        fm.filter_fires()
-        assert fm.num_fires == 9
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 9
+        assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
         # max only
         Config.set({'max': 120}, 'filter', 'area')
-        fm.filter_fires()
-        assert fm.num_fires == 9
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 9
+        assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
         # both min and max
         Config.set({'min': 20, 'max': 120}, 'filter', 'area')
-        fm.filter_fires()
-        assert fm.num_fires == 9
-        assert init_fires == sorted(fm.fires, key=lambda e: int(e.id))
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 9
+        assert self.init_fires == sorted(fm.fires, key=lambda e: int(e.id))
 
+    def test_successful_filtering(self):
         ## successful filters
         # min only
         Config.set({'min': 47}, 'filter', 'area')
@@ -528,8 +543,8 @@ class TestFiresManagerFilterFiresByLocation(object):
             fires.Fire({'id': '6', 'activity': [{'active_areas':[{'specified_points': [{'area': 75}]}]} ]}),
             fires.Fire({'id': '7', 'activity': [{'active_areas':[{'specified_points': [{'area': 50}]}]} ]})
         ]
-        fm.filter_fires()
-        assert fm.num_fires == 6
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 6
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
         # max only
         Config.set({'max': 90}, 'filter', 'area')
@@ -540,8 +555,8 @@ class TestFiresManagerFilterFiresByLocation(object):
             fires.Fire({'id': '6', 'activity': [{'active_areas':[{'specified_points': [{'area': 75}]}]} ]}),
             fires.Fire({'id': '7', 'activity': [{'active_areas':[{'specified_points': [{'area': 50}]}]} ]})
         ]
-        fm.filter_fires()
-        assert fm.num_fires == 5
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 5
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # both min and max
@@ -551,8 +566,8 @@ class TestFiresManagerFilterFiresByLocation(object):
             fires.Fire({'id': '4', 'activity': [{'active_areas':[{'specified_points': [{'area': 65}]}]} ]}),
             fires.Fire({'id': '6', 'activity': [{'active_areas':[{'specified_points': [{'area': 75}]}]} ]})
         ]
-        fm.filter_fires()
-        assert fm.num_fires == 3
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 3
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # both min and max
@@ -560,19 +575,19 @@ class TestFiresManagerFilterFiresByLocation(object):
         expected = [
             fires.Fire({'id': '4', 'activity': [{'active_areas':[{'specified_points': [{'area': 65}]}]} ]})
         ]
-        fm.filter_fires()
-        assert fm.num_fires == 1
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 1
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
 
         # filter out the rest
         Config.set({'min': 76, 'max': 77.0}, 'filter', 'area')
-        fm.filter_fires()
-        assert fm.num_fires == 0
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 0
         assert [] == sorted(fm.fires, key=lambda e: int(e.id))
 
         # call again with no fires
-        fm.filter_fires()
-        assert fm.num_fires == 0
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 0
         assert [] == sorted(fm.fires, key=lambda e: int(e.id))
 
         ## Invalid fire
@@ -594,16 +609,16 @@ class TestFiresManagerFilterFiresByLocation(object):
              fires.FireActivityFilter.NEGATIVE_ACTIVITY_AREA_MSG),
         )
         for f, err_msg in scenarios:
-            fm.fires = [f]
+            self.fm.fires = [f]
             # don't skip failures
             Config.set(False, 'filter', 'skip_failures')
             with raises(fires.FireActivityFilter.FilterError) as e_info:
-                fm.filter_fires()
-            assert fm.num_fires == 1
-            assert [f] == fm.fires
+                self.fm.filter_fires()
+            assert self.fm.num_fires == 1
+            assert [f] == self.fm.fires
             assert e_info.value.args[0].index(err_msg) > 0
             # skip failures
             Config.set(True, 'filter', 'skip_failures')
-            fm.filter_fires()
-            assert fm.num_fires == 1
-            assert [f] == fm.fires
+            self.fm.filter_fires()
+            assert self.fm.num_fires == 1
+            assert [f] == self.fm.fires

@@ -1,6 +1,5 @@
 from . import FiresActionBase
 
-
 class FiresMerger(FiresActionBase):
     """Class for merging fires with the same id.
 
