@@ -5,6 +5,7 @@ __author__ = "Joel Dubowy"
 import logging
 
 from bluesky.config import Config
+from bluesky.locationutils import LatLng, get_total_active_area
 
 from . import FiresActionBase
 

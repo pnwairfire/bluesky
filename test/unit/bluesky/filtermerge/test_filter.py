@@ -2,6 +2,8 @@
 
 __author__ = "Joel Dubowy"
 
+from py.test import raises
+
 from bluesky.config import Config
 from bluesky.filtermerge.filter import FireActivityFilter
 from bluesky.models import fires

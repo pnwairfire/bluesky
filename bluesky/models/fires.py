@@ -2,12 +2,10 @@
 
 __author__ = "Joel Dubowy"
 
-import copy
 import datetime
 import importlib
 import json
 import logging
-import re
 import sys
 import traceback
 import uuid
@@ -18,11 +16,10 @@ from pyairfire import process
 from bluesky import datautils, datetimeutils, __version__
 from bluesky.config import Config
 from bluesky.exceptions import (
-    BlueSkyImportError, BlueSkyModuleError, BlueSkyDatetimeValueError
+    BlueSkyImportError, BlueSkyModuleError
 )
 from bluesky.filtermerge.filter import FireActivityFilter
 from bluesky.filtermerge.merge import FiresMerger
-from bluesky.locationutils import LatLng, get_total_active_area
 from bluesky.statuslogging import StatusLogger
 
 __all__ = [

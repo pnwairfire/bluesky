@@ -2,6 +2,7 @@
 
 __author__ = "Joel Dubowy"
 
+import copy
 import logging
 
 from . import FiresActionBase
