@@ -1043,8 +1043,9 @@ class FireActivityFilter(FiresActionBase):
         """Filter by given filter func
 
         args:
-         - filter_func -- function that takes fire and activity object and returns
-            boolean value indicating whether or not to remove activity object
+         - filter_func -- function that takes fire and active area object
+            and returns boolean value indicating whether or not to remove
+            active area object.
         """
         for fire in self._fires_manager.fires:
             if not fire.get('activity'):
