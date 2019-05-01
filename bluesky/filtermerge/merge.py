@@ -100,12 +100,12 @@ class FiresMerger(FiresActionBase):
             # We need to instantiate a dict from fire in order to deepcopy it.
             # We need to deepcopy so that that modifications to
             # new_combined_fire don't modify fire
-            new_combined_fire = Fire(copy.deepcopy(dict(fire)))
+            new_combined_fire = self._fire_class(copy.deepcopy(dict(fire)))
             self._fires_manager.remove_fire(fire)
 
         else:
             # See note, above, regarding instantiating dict and then deep copying
-            new_combined_fire = Fire(copy.deepcopy(dict(combined_fire)))
+            new_combined_fire = self._fire_class(copy.deepcopy(dict(combined_fire)))
             try:
                 # merge activity; remember, at this point, activity will be
                 # defined for none or all of the fires to be merged

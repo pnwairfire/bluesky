@@ -12,13 +12,15 @@ class FiresActionBase(object, metaclass=abc.ABCMeta):
     """Base class for merging or filtering fires
     """
 
-    def __init__(self, fires_manager):
+    def __init__(self, fires_manager, fire_class):
         """Constructor
 
         args:
          - fires_manager -- FiresManager object whose fires are to be merged
+         - fire_class -- Fire class to instantiate new fire objects
         """
         self._fires_manager = fires_manager
+        self._fire_class = fire_class
         self._skip_failures = not not Config.get(self.ACTION, 'skip_failures')
 
     def __enter__(self):

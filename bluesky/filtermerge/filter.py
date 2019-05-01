@@ -18,13 +18,14 @@ class FireActivityFilter(FiresActionBase):
     originally in the FiresManager class.
     """
 
-    def __init__(self, fires_manager):
+    def __init__(self, fires_manager, fire_class):
         """Constructor
 
         args:
          - fires_manager -- FiresManager object whose fires are to be merged
+         - fire_class -- Fire class to instantiate new fire objects
         """
-        super(FireActivityFilter, self).__init__(fires_manager)
+        super(FireActivityFilter, self).__init__(fires_manager, fire_class)
         self._filter_config = Config.get('filter')
         self._filter_fields = set(self._filter_config.keys()) - set(['skip_failures'])
         if not self._filter_fields:

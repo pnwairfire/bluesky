@@ -272,7 +272,7 @@ class FiresManager(object):
     def merge_fires(self):
         """Merges fires that have the same id.
         """
-        with FiresMerger(self) as m:
+        with FiresMerger(self, Fire) as m:
             m.merge()
 
     ## IO
@@ -578,7 +578,7 @@ class FiresManager(object):
     ## Filtering Fires
 
     def filter_fires(self):
-        with FireActivityFilter(self) as ff:
+        with FireActivityFilter(self, Fire) as ff:
             ff.filter()
 
     ## Failures
