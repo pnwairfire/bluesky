@@ -1265,7 +1265,6 @@ class TestFiresManagerMergeFires(object):
 
 class TestFiresManagerFilterFiresNoneSpecified(object):
 
-
     ## Filtering
 
     def test_no_filters_specified(self, reset_config):
@@ -1294,30 +1293,33 @@ class TestFiresManagerFilterFiresByCountry(object):
             fires.Fire({'id': '01', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '02', 'name': 'n2', 'bar':'a1', 'baz':'baz1'}),
             fires.Fire({'id': '03', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "ZZ"}}, {"location": {'country': "ZZ"}}]}),
+                "activity": [{"active_areas": [{'country': "ZZ"}, {'country': "ZZ"}]}]}),
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "UK"}}]}),
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
             fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "USA"}}]}),
+                "activity": [{"active_areas": [{'country': "USA"}]}]}),
             fires.Fire({'id': '06', 'name': 'n6', 'bar1': 1 , 'baz':'baz1',
-                "activity": [{"location": {'country': ''}}]}),
+                "activity": [{"active_areas": [{'country': ''}]}]}),
             fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
-                "activity": [{"location": {'country': "CA"}}]}),
+                "activity": [{"active_areas": [{'country': "CA"}]}]}),
             fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
-                "activity": [{"location": {'country': "CA"}}]}),
+                "activity": [{"active_areas": [{'country': "CA"}]}]}),
             fires.Fire({'id': '09', 'name': 'n9', 'bar2': 2 , 'baz':'baz2',
-                "activity": [{"location": {'country': 'Unknown'}}]}),
+                "activity": [{"active_areas": [{'country': 'Unknown'}]}]}),
             fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
-                "activity": [{"location": {"country": "USA"}}]}),
+                "activity": [{"active_areas": [{"country": "USA"}]}]}),
             fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
-                "activity": [{"location": {"country": "BZ"}}]}),
+                "activity": [{"active_areas": [{"country": "BZ"}]}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "ZZ"}}, {"location": {'country': "UK"}}]}),
+                "activity": [{"active_areas": [{'country': "ZZ"}]}, {"active_areas": [{'country': "UK"}]}]}),
+            # 12.5 is same as 12 exept the two active area objects are with the same activity object
+            fires.Fire({'id': '12.5', 'name': 'n3.5', 'bar1':'a1', 'baz':'baz1',
+                "activity": [{"active_areas": [{'country': "ZZ"}, {'country': "UK"}]}]}),
             fires.Fire({'id': '13', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "ZZ"}}, {"location": {'country': "ZZ"}}]}),
+                "activity": [{"active_areas": [{'country': "ZZ"}]}, {"active_areas": [{'country': "ZZ"}]}]})
         ]
         self.fm.fires = self.init_fires
-        assert self.fm.num_fires == 13
+        assert self.fm.num_fires == 14
 
 
     def test_empty_config(self, reset_config):
@@ -1363,23 +1365,25 @@ class TestFiresManagerFilterFiresByCountry(object):
         fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "UK"}}]}),
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
             fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "USA"}}]}),
+                "activity": [{"active_areas": [{'country': "USA"}]}]}),
             fires.Fire({'id': '06', 'name': 'n6', 'bar1': 1 , 'baz':'baz1',
-                "activity": [{"location": {'country': ''}}]}),
+                "activity": [{"active_areas": [{'country': ''}]}]}),
             fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
-                "activity": [{"location": {'country': "CA"}}]}),
+                "activity": [{"active_areas": [{'country': "CA"}]}]}),
             fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
-                "activity": [{"location": {'country': "CA"}}]}),
+                "activity": [{"active_areas": [{'country': "CA"}]}]}),
             fires.Fire({'id': '09', 'name': 'n9', 'bar2': 2 , 'baz':'baz2',
-                "activity": [{"location": {'country': 'Unknown'}}]}),
+                "activity": [{"active_areas": [{'country': 'Unknown'}]}]}),
             fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
-                "activity": [{"location": {"country": "USA"}}]}),
+                "activity": [{"active_areas": [{"country": "USA"}]}]}),
             fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
-                "activity": [{"location": {"country": "BZ"}}]}),
+                "activity": [{"active_areas": [{"country": "BZ"}]}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "UK"}}]}),
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
+            fires.Fire({'id': '12.5', 'name': 'n3.5', 'bar1':'a1', 'baz':'baz1',
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
         ]
         assert fm.num_fires == 9
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
@@ -1390,19 +1394,21 @@ class TestFiresManagerFilterFiresByCountry(object):
         fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "UK"}}]}),
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
             fires.Fire({'id': '05', 'name': 'n5', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "USA"}}]}),
+                "activity": [{"active_areas": [{'country': "USA"}]}]}),
             fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
-                "activity": [{"location": {'country': "CA"}}]}),
+                "activity": [{"active_areas": [{'country': "CA"}]}]}),
             fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
-                "activity": [{"location": {'country': "CA"}}]}),
+                "activity": [{"active_areas": [{'country': "CA"}]}]}),
             fires.Fire({'id': '10', 'name': 'n10', "barj": "jj", "baz": 99,
-                "activity": [{"location": {"country": "USA"}}]}),
+                "activity": [{"active_areas": [{"country": "USA"}]}]}),
             fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
-                "activity": [{"location": {"country": "BZ"}}]}),
+                "activity": [{"active_areas": [{"country": "BZ"}]}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "UK"}}]})
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
+            fires.Fire({'id': '12.5', 'name': 'n3.5', 'bar1':'a1', 'baz':'baz1',
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
         ]
         assert fm.num_fires == 7
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
@@ -1412,15 +1418,17 @@ class TestFiresManagerFilterFiresByCountry(object):
         fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "UK"}}]}),
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
             fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
-                "activity": [{"location": {'country': "CA"}}]}),
+                "activity": [{"active_areas": [{'country': "CA"}]}]}),
             fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
-                "activity": [{"location": {'country': "CA"}}]}),
+                "activity": [{"active_areas": [{'country': "CA"}]}]}),
             fires.Fire({'id': '11', 'name': 'n11', "barj": "jj", "baz": 99,
-                "activity": [{"location": {"country": "BZ"}}]}),
+                "activity": [{"active_areas": [{"country": "BZ"}]}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "UK"}}]})
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
+            fires.Fire({'id': '12.5', 'name': 'n3.5', 'bar1':'a1', 'baz':'baz1',
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
         ]
         assert fm.num_fires == 5
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
@@ -1430,13 +1438,15 @@ class TestFiresManagerFilterFiresByCountry(object):
         fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "UK"}}]}),
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
             fires.Fire({'id': '07', 'name': 'n7', 'bar2':'a2', 'baz':'baz2',
-                "activity": [{"location": {'country': "CA"}}]}),
+                "activity": [{"active_areas": [{'country': "CA"}]}]}),
             fires.Fire({'id': '08', 'name': 'n8', 'bar2':'adfsdf', 'baz':'baz2',
-                "activity": [{"location": {'country': "CA"}}]}),
+                "activity": [{"active_areas": [{'country': "CA"}]}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "UK"}}]})
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
+            fires.Fire({'id': '12.5', 'name': 'n3.5', 'bar1':'a1', 'baz':'baz1',
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
         ]
         assert fm.num_fires == 4
         assert expected == sorted(fm.fires, key=lambda e: int(e.id))
@@ -1446,9 +1456,11 @@ class TestFiresManagerFilterFiresByCountry(object):
         fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "UK"}}]}),
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
             fires.Fire({'id': '12', 'name': 'n3', 'bar1':'a1', 'baz':'baz1',
-                "activity": [{"location": {'country': "UK"}}]})
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
+            fires.Fire({'id': '12.5', 'name': 'n3.5', 'bar1':'a1', 'baz':'baz1',
+                "activity": [{"active_areas": [{'country': "UK"}]}]}),
         ]
         assert fm.num_fires == 2
         assert expected == fm.fires
@@ -1464,6 +1476,8 @@ class TestFiresManagerFilterFiresByCountry(object):
         assert fm.num_fires == 0
         assert [] == fm.fires
 
+
+class TestFiresManagerFilterFiresByLocation(object):
 
     def test_filter_by_location(self, reset_config):
 
