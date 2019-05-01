@@ -35,8 +35,8 @@ copy of the code mounted in the docker container and added
 to the beggining of PATH and PYTHONPATH env vars.
 
     docker run --rm -ti \
-        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
-        -e PYTHONPATH=/bluesky/ -e PATH=/bluesky/bin/:$PATH \
+        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ -e PYTHONPATH=/bluesky/ \
+        -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         bluesky py.test --disable-pytest-warnings
 
 You can also use the ```--collect-only``` option to see a list of all tests.
