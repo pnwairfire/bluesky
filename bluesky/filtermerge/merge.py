@@ -4,6 +4,7 @@ __author__ = "Joel Dubowy"
 
 import copy
 import logging
+import traceback
 
 from . import FiresActionBase
 
@@ -78,6 +79,7 @@ class FiresMerger(FiresActionBase):
                     if combined_fire:
                         # add back what was merge in progress
                         self._fires_manager.add_fire(combined_fire)
+                    logging.debug(traceback.format_exc())
                     raise ValueError(str(e))
                 # else, just log str(e) (which is detailed enough)
                 logging.warning(str(e))
