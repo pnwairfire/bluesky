@@ -143,4 +143,3 @@ class TestLatLng(object):
         })
         assert latlng.latitude == 40.0
         assert latlng.longitude == -120.5
-

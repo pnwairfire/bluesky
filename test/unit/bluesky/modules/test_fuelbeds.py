@@ -88,35 +88,57 @@ class TestSummarize(object):
         fires = [
             Fire({
                 'activity':[{
-                    "location":{"area": 10},
-                    "fuelbeds":[
-                        {"fccs_id": "1", "pct": 40},
-                        {"fccs_id": "2", "pct": 60}
-                    ]
+                    "active_areas":[{
+                        "specified_points": [{
+                            "area": 10,
+                            "lat": 45,
+                            "lng": -118,
+                            "fuelbeds":[
+                                {"fccs_id": "1", "pct": 40},
+                                {"fccs_id": "2", "pct": 60}
+                            ]
+                        }]
+                    }]
                 }]
             })
         ]
+        expected_summary = [
+            {"fccs_id": "1", "pct": 40},
+            {"fccs_id": "2", "pct": 60}
+        ]
         summary = fuelbeds.summarize(fires)
-        assert summary == fires[0]['activity'][0]['fuelbeds']
+        assert summary == expected_summary
 
     def test_two_fires(self):
         fires = [
             Fire({
                 'activity':[{
-                    "location":{"area": 10},
-                    "fuelbeds":[
-                        {"fccs_id": "1", "pct": 30},
-                        {"fccs_id": "2", "pct": 70}
-                    ]
+                    "active_areas":[{
+                        "specified_points": [{
+                            "area": 10,
+                            "lat": 45,
+                            "lng": -118,
+                            "fuelbeds":[
+                                {"fccs_id": "1", "pct": 30},
+                                {"fccs_id": "2", "pct": 70}
+                            ]
+                        }]
+                    }]
                 }]
             }),
             Fire({
                 'activity':[{
-                    "location":{"area": 5},
-                    "fuelbeds":[
-                        {"fccs_id": "2", "pct": 10},
-                        {"fccs_id": "3", "pct": 90}
-                    ]
+                    "active_areas":[{
+                        "specified_points": [{
+                            "area": 5,
+                            "lat": 44,
+                            "lng": -117,
+                            "fuelbeds":[
+                                {"fccs_id": "2", "pct": 10},
+                                {"fccs_id": "3", "pct": 90}
+                            ]
+                        }]
+                    }]
                 }]
             })
         ]
