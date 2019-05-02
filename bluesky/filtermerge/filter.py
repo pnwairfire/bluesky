@@ -5,7 +5,7 @@ __author__ = "Joel Dubowy"
 import logging
 
 from bluesky.config import Config
-from bluesky.locationutils import LatLng, get_total_active_area
+from bluesky.locationutils import LatLng
 
 from . import FiresActionBase
 
@@ -250,7 +250,7 @@ class FireActivityFilter(FiresActionBase):
 
         def _filter(fire, active_area):
             try:
-                total_active_area = get_total_active_area(active_area)
+                total_active_area = active_area.total_area
             except:
                 self._fail_fire(fire, self.MISSING_ACTIVITY_AREA_MSG)
 
