@@ -18,6 +18,12 @@ __all__ = [
 
 __version__ = "0.1.0"
 
+# TODO: set is_alaska based on lat & lng instead from 'state'
+FCCS_LOOKUPS = defaultdict(
+    lambda: FccsLookUp(is_alaska=False, **Config.get('fuelbeds')),
+    AK=FccsLookUp(is_alaska=True, **Config.get('fuelbeds'))
+)
+
 def run(fires_manager):
     """Runs emissions module
 
@@ -33,17 +39,13 @@ def run(fires_manager):
 
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            # Note that fire.locations validates that each location object
-            # has either lat+lng+area or polygon
-            for aa, loc in fire.locations:
-                # TODO: instead of instantiating a new FccsLookUp and Estimator
-                #   for each activity object, create AK and non-AK lookup and
-                #   estimator objects that are reused, and set reference to
-                #   correct one here
-                # TODO: is_alaska from lat,lng, not from 'state'
-                lookup = FccsLookUp(is_alaska=aa['location'].get('state')=='AK',
-                    **Config.get('fuelbeds'))
-                Estimator(lookup).estimate(loc)
+            for aa in fire.active_areas:
+                lookup = FCCS_LOOKUPS[aa.get('state')]
+
+                # Note that aa.locations validates that each location object
+                # has either lat+lng+area or polygon
+                for loc in aa.locations:
+                    Estimator(lookup).estimate(loc)
 
     # TODO: Add fuel loadings data to each fuelbed object (????)
     #  If we do so here, use bluesky.modules.consumption.FuelLoadingsManager
@@ -61,13 +63,17 @@ def summarize(fires):
     if not fires:
         return []
 
+    # TODO: summarize per active_area?  per activity collection
     area_by_fccs_id = defaultdict(lambda: 0)
     total_area = 0
     for fire in fires:
-        for a in fire['activity']:
-            total_area += a['location']['area']
-            for fb in a['fuelbeds']:
-                area_by_fccs_id[fb['fccs_id']] += (fb['pct'] / 100.0) * a['location']['area']
+        for ac in fire['activity']:
+            for aa in ac.get('active_areas'):
+                total_area += aa.total_area
+                for loc in aa.locations:
+                    for fb in loc['fuelbeds']:
+                        area_by_fccs_id[fb['fccs_id']] += (fb['pct'] / 100.0) * loc['area']
+
     summary = [{"fccs_id": fccs_id, "pct": (area / total_area) * 100.0}
         for fccs_id, area in area_by_fccs_id.items()]
     return sorted(summary, key=lambda a: a["fccs_id"])
