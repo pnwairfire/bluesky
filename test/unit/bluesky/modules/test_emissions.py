@@ -16,139 +16,148 @@ from bluesky.models.fires import Fire
 from bluesky.modules import emissions
 
 FIRES = [
-    {
+    Fire({
         'source': 'GOES-16',
         'type': "wf",
         "activity":  [
             {
-                # timeprofile should be ignored and replcaced when running
-                # FRP emissions
-                "timeprofile": {
-                    "2018-06-27T17:00:00": {
-                        'area_fraction': 0.75,
-                        'flaming': 0.75,
-                        'smoldering': 0.3,
-                        'residual': 0.0
-                    },
-                    "2018-06-27T20:00:00": {
-                        'area_fraction': 0.25,
-                        'flaming': 0.25,
-                        'smoldering': 0.7,
-                        'residual': 1.0
-                    }
-                },
-                # Hourly FRP is used for FRP emissions
-                "hourly_frp": {
-                    "2018-06-27T10:00:00": 55.4,
-                    "2018-06-27T11:00:00": 66,
-                    "2018-06-27T12:00:00": 78,
-                    "2018-06-27T13:00:00": 83,
-                    "2018-06-27T18:00:00": 82,
-                    "2018-06-27T19:00:00": 66,
-                    "2018-06-27T20:00:00": 52.5
-                },
-                #55.4 + 66 + 78 + 83 + 82 + 66 + 52.5 = 482.9
-                "frp": 482.9,
-                "location": {
-                    'area': 47.20000000000001,
-                    "geojson": {
-                        "type": "Point",
-                        "coordinates": [-71.362, 50.632],
-                    },
-                    "utc_offset": "-04:00",
-                    'slope': 5,
-                    'windspeed': 5,
-                    'rain_days': 10,
-                    'moisture_10hr': 50,
-                    'length_of_ignition': 120,
-                    'fm_type':  "MEAS-Th",
-                    'moisture_1khr': 50,
-                    'moisture_duff': 50,
-                    'moisture_litter': 30,
-                    'canopy_consumption_pct':  0,
-                    'shrub_blackened_pct':  50,
-                    'pile_blackened_pct':  0
-                },
-                "start": "2018-06-27T00:00:00",
-                "end": "2018-06-28T00:00:00"
-            }
-        ]
-    },
-    {
-        'type': "rx",
-        "activity":  [
-            {
-                "location": {
-                    'area': 50.4,
-                    "geojson": {
-                        "type": "MultiPoint",
-                        "coordinates": [
-                            [-120.362, 45.632],
-                            [-120.3, 45.22]
-                        ]
-                    },
-                    "utc_offset": "-07:00",
-                    "ecoregion": "western",
-                    'slope': 5,
-                    'windspeed': 5,
-                    'rain_days': 10,
-                    'moisture_10hr': 50,
-                    'length_of_ignition': 120,
-                    'fm_type':  "MEAS-Th",
-                    'moisture_1khr': 50,
-                    'moisture_duff': 50,
-                    'moisture_litter': 30,
-                    'canopy_consumption_pct':  0,
-                    'shrub_blackened_pct':  50,
-                    'pile_blackened_pct':  0
-                },
-                "start": "2018-06-27T00:00:00",
-                "end": "2018-06-28T00:00:00",
-                "fuelbeds": [
+                "active_areas": [
                     {
-                        "fccs_id": "52",
-                        "pct": 100.0,
-                        "consumption": {
-                            "foo": {
-                                "bar": {
-                                    "smoldering": [0.0],
-                                    "residual": [200.4],
-                                    "flaming": [0.0]
+                        "start": "2018-06-27T00:00:00",
+                        "end": "2018-06-28T00:00:00",
+                        "utc_offset": "-04:00",
+                        'slope': 5,
+                        'windspeed': 5,
+                        'rain_days': 10,
+                        'moisture_10hr': 50,
+                        'length_of_ignition': 120,
+                        'fm_type':  "MEAS-Th",
+                        'moisture_1khr': 50,
+                        'moisture_duff': 50,
+                        'moisture_litter': 30,
+                        'canopy_consumption_pct':  0,
+                        'shrub_blackened_pct':  50,
+                        'pile_blackened_pct':  0,
+                        "specified_points": [
+                            {
+                                'area': 47.20000000000001,
+                                'lat': 50.632,
+                                'lng': -71.362,
+
+
+                                # timeprofile should be ignored and replcaced when running
+                                # FRP emissions
+                                "timeprofile": {
+                                    "2018-06-27T17:00:00": {
+                                        'area_fraction': 0.75,
+                                        'flaming': 0.75,
+                                        'smoldering': 0.3,
+                                        'residual': 0.0
+                                    },
+                                    "2018-06-27T20:00:00": {
+                                        'area_fraction': 0.25,
+                                        'flaming': 0.25,
+                                        'smoldering': 0.7,
+                                        'residual': 1.0
+                                    }
                                 },
-                                "baz": {
-                                    "smoldering": [900.5],
-                                    "residual": [800.0],
-                                    "flaming": [100.2]
-                                }
-                            },
-                            "boo": {
-                                "blem": {
-                                    "smoldering": [0.0],
-                                    "residual": [0.0],
-                                    "flaming": [200]
-                                }
+                                # Hourly FRP is used for FRP emissions
+                                "hourly_frp": {
+                                    "2018-06-27T10:00:00": 55.4,
+                                    "2018-06-27T11:00:00": 66,
+                                    "2018-06-27T12:00:00": 78,
+                                    "2018-06-27T13:00:00": 83,
+                                    "2018-06-27T18:00:00": 82,
+                                    "2018-06-27T19:00:00": 66,
+                                    "2018-06-27T20:00:00": 52.5
+                                },
+                                #55.4 + 66 + 78 + 83 + 82 + 66 + 52.5 = 482.9
+                                "frp": 482.9,
                             }
-                        },
-                        # heat required by CONSUME
-                        "heat": {
-                            "flaming": [
-                                159765789.2311308
-                            ],
-                            "residual": [
-                                0.0
-                            ],
-                            "smoldering": [
-                                13157759.100788476
-                            ],
-                            "total": [
-                                172923548.3319193
-                            ]
-                        }
+                        ]
                     }
                 ]
             }
         ]
-    }
+    }),
+    Fire({
+        'type': "rx",
+        "activity":  [
+            {
+                "active_areas": [
+                    {
+                        "start": "2018-06-27T00:00:00",
+                        "end": "2018-06-28T00:00:00",
+                        "utc_offset": "-07:00",
+                        "ecoregion": "western",
+                        'slope': 5,
+                        'windspeed': 5,
+                        'rain_days': 10,
+                        'moisture_10hr': 50,
+                        'length_of_ignition': 120,
+                        'fm_type':  "MEAS-Th",
+                        'moisture_1khr': 50,
+                        'moisture_duff': 50,
+                        'moisture_litter': 30,
+                        'canopy_consumption_pct':  0,
+                        'shrub_blackened_pct':  50,
+                        'pile_blackened_pct':  0,
+                        "specified_points": [
+                            {
+                                'area': 50.4,
+                                'lat': 45.632,
+                                'lng': -120.362,
+                                #[-120.3, 45.22]
+
+                                "fuelbeds": [
+                                    {
+                                        "fccs_id": "52",
+                                        "pct": 100.0,
+                                        "consumption": {
+                                            "foo": {
+                                                "bar": {
+                                                    "smoldering": [0.0],
+                                                    "residual": [200.4],
+                                                    "flaming": [0.0]
+                                                },
+                                                "baz": {
+                                                    "smoldering": [900.5],
+                                                    "residual": [800.0],
+                                                    "flaming": [100.2]
+                                                }
+                                            },
+                                            "boo": {
+                                                "blem": {
+                                                    "smoldering": [0.0],
+                                                    "residual": [0.0],
+                                                    "flaming": [200]
+                                                }
+                                            }
+                                        },
+                                        # heat required by CONSUME
+                                        "heat": {
+                                            "flaming": [
+                                                159765789.2311308
+                                            ],
+                                            "residual": [
+                                                0.0
+                                            ],
+                                            "smoldering": [
+                                                13157759.100788476
+                                            ],
+                                            "total": [
+                                                172923548.3319193
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    })
 ]
 
 class fire_failure_manager(object):
@@ -252,9 +261,9 @@ class TestFepsEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' not in self.fires[1]['activity'][0]['fuelbeds'][0]
+        assert 'emissions_details' not in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details(self, reset_config):
         Config.set("feps", 'emissions', "model")
@@ -264,9 +273,9 @@ class TestFepsEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' in self.fires[1]['activity'][0]['fuelbeds'][0]
+        assert 'emissions_details' in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_wo_details_PM_only(self, reset_config):
         Config.set("feps", 'emissions', "model")
@@ -277,9 +286,9 @@ class TestFepsEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' not in self.fires[1]['activity'][0]['fuelbeds'][0]
+        assert 'emissions_details' not in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
-            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self, reset_config):
         Config.set("feps", 'emissions', "model")
@@ -290,9 +299,9 @@ class TestFepsEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' in self.fires[1]['activity'][0]['fuelbeds'][0]
+        assert 'emissions_details' in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
-            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
 class TestPrichardOneillEmissions(BaseEmissionsTest):
 
@@ -353,9 +362,9 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' not in self.fires[1]['activity'][0]['fuelbeds'][0]
+        assert 'emissions_details' not in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self, reset_config):
         Config.set("prichard-oneill", 'emissions', "model")
@@ -366,9 +375,9 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' in self.fires[1]['activity'][0]['fuelbeds'][0]
+        assert 'emissions_details' in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
 class TestConsumeEmissions(BaseEmissionsTest):
 
@@ -439,9 +448,9 @@ class TestConsumeEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' not in self.fires[1]['activity'][0]['fuelbeds'][0]
+        assert 'emissions_details' not in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details(self, reset_config):
         Config.set("consume", 'emissions', "model")
@@ -451,9 +460,9 @@ class TestConsumeEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' in self.fires[1]['activity'][0]['fuelbeds'][0]
+        assert 'emissions_details' in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS,
-            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_wo_details_PM_only(self, reset_config):
         Config.set("consume", 'emissions', "model")
@@ -464,9 +473,9 @@ class TestConsumeEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' not in self.fires[1]['activity'][0]['fuelbeds'][0]
+        assert 'emissions_details' not in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
-            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self, reset_config):
         Config.set("consume", 'emissions', "model")
@@ -477,6 +486,6 @@ class TestConsumeEmissions(BaseEmissionsTest):
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
 
-        assert 'emissions_details' in self.fires[1]['activity'][0]['fuelbeds'][0]
+        assert 'emissions_details' in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
-            self.fires[1]['activity'][0]['fuelbeds'][0]['emissions'])
+            self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])

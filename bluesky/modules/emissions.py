@@ -70,22 +70,28 @@ def run(fires_manager):
     # fix keys
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            for a in fire.activity:
-                for fb in a['fuelbeds']:
-                    _fix_keys(fb['emissions'])
-                    if include_emissions_details:
-                        _fix_keys(fb['emissions_details'])
+            for aa in fire.active_areas:
+                for loc in aa.locations:
+                    for fb in loc['fuelbeds']:
+                        _fix_keys(fb['emissions'])
+                        if include_emissions_details:
+                            _fix_keys(fb['emissions_details'])
 
     # For each fire, aggregate emissions over all fuelbeds per activity
     # window as well as across all activity windows;
     # include only per-phase totals, not per category > sub-category > phase
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            # TODO: validate that each fuelbed has emissions data (here, or below) ?
-            for a in fire.activity:
-                a['emissions'] = datautils.summarize([a], 'emissions',
-                    include_details=False)
-            fire.emissions = datautils.summarize(fire.activity, 'emissions',
+            for ac in fire['activity']:
+                for aa in ac.active_areas:
+                    # TODO: validate that each fuelbed has emissions data
+                    #   (here, or below) ?
+                    aa['emissions'] = datautils.summarize(aa.locations,
+                        'emissions', include_details=False)
+                ac['emissions'] = datautils.summarize(ac.get('active_areas', []),
+                        'emissions', include_details=False)
+
+            fire.emissions = datautils.summarize(fire['activity'], 'emissions',
                 include_details=False)
 
     # summarise over all activity objects
@@ -152,23 +158,24 @@ class Feps(EmissionsBase):
         if 'activity' not in fire:
             raise ValueError(
                 "Missing activity data required for computing emissions")
-        for a in fire['activity']:
-            if 'fuelbeds' not in a:
-               raise ValueError(
-                    "Missing fuelbed data required for computing emissions")
-            for fb in a['fuelbeds']:
-                if 'consumption' not in fb:
-                    raise ValueError(
-                        "Missing consumption data required for computing emissions")
-                _calculate(self.calculator, fb, self.include_emissions_details)
-                # TODO: Figure out if we should indeed convert from lbs to tons;
-                #   if so, uncomment the following
-                # Note: According to BSF, FEPS emissions are in lbs/ton consumed.  Since
-                # consumption is in tons, and since we want emissions in tons, we need
-                # to divide each value by 2000.0
-                # datautils.multiply_nested_data(fb['emissions'], self.CONVERSION_FACTOR)
-                # if self.include_emissions_details:
-                #     datautils.multiply_nested_data(fb['emissions_details'], self.CONVERSION_FACTOR)
+        for aa in fire.active_areas:
+            for loc in aa.locations:
+                if 'fuelbeds' not in loc:
+                   raise ValueError(
+                        "Missing fuelbed data required for computing emissions")
+                for fb in loc['fuelbeds']:
+                    if 'consumption' not in fb:
+                        raise ValueError(
+                            "Missing consumption data required for computing emissions")
+                    _calculate(self.calculator, fb, self.include_emissions_details)
+                    # TODO: Figure out if we should indeed convert from lbs to tons;
+                    #   if so, uncomment the following
+                    # Note: According to BSF, FEPS emissions are in lbs/ton consumed.  Since
+                    # consumption is in tons, and since we want emissions in tons, we need
+                    # to divide each value by 2000.0
+                    # datautils.multiply_nested_data(fb['emissions'], self.CONVERSION_FACTOR)
+                    # if self.include_emissions_details:
+                    #     datautils.multiply_nested_data(fb['emissions_details'], self.CONVERSION_FACTOR)
 
 ##
 ## Prichard / O'Neill
@@ -199,27 +206,28 @@ class PrichardOneill(EmissionsBase):
             raise ValueError(
                 "Missing activity data required for computing emissions")
 
-        for a in fire['activity']:
-            if 'fuelbeds' not in a:
-                raise ValueError(
-                    "Missing fuelbed data required for computing emissions")
-            for fb in a['fuelbeds']:
-                if 'consumption' not in fb:
+        for aa in fire.active_areas:
+            for loc in aa.locations:
+                if 'fuelbeds' not in loc:
                     raise ValueError(
-                        "Missing consumption data required for computing emissions")
-                if 'fccs_id' not in fb:
-                    raise ValueError(
-                        "Missing FCCS Id required for computing emissions")
-                fccs2ef = Fccs2Ef(fb["fccs_id"], is_rx=(fire["type"]=="rx"))
-                calculator = EmissionsCalculator(fccs2ef, species=self.species)
-                _calculate(calculator, fb, self.include_emissions_details)
-                # Convert from lbs to tons
-                # TODO: Update EFs to be tons/ton in a) eflookup package,
-                #   b) just after instantiating look-up objects, above,
-                #   or c) just before calling EmissionsCalculator, above
-                datautils.multiply_nested_data(fb['emissions'], self.CONVERSION_FACTOR)
-                if self.include_emissions_details:
-                    datautils.multiply_nested_data(fb['emissions_details'], self.CONVERSION_FACTOR)
+                        "Missing fuelbed data required for computing emissions")
+                for fb in loc['fuelbeds']:
+                    if 'consumption' not in fb:
+                        raise ValueError(
+                            "Missing consumption data required for computing emissions")
+                    if 'fccs_id' not in fb:
+                        raise ValueError(
+                            "Missing FCCS Id required for computing emissions")
+                    fccs2ef = Fccs2Ef(fb["fccs_id"], is_rx=(fire["type"]=="rx"))
+                    calculator = EmissionsCalculator(fccs2ef, species=self.species)
+                    _calculate(calculator, fb, self.include_emissions_details)
+                    # Convert from lbs to tons
+                    # TODO: Update EFs to be tons/ton in a) eflookup package,
+                    #   b) just after instantiating look-up objects, above,
+                    #   or c) just before calling EmissionsCalculator, above
+                    datautils.multiply_nested_data(fb['emissions'], self.CONVERSION_FACTOR)
+                    if self.include_emissions_details:
+                        datautils.multiply_nested_data(fb['emissions_details'], self.CONVERSION_FACTOR)
 
 ##
 ## CONSUME
@@ -260,17 +268,17 @@ class Consume(EmissionsBase):
         if burn_type == 'piles':
             raise ValueError("Consume can't be used for fuel type 'piles'")
 
-        for a in fire['activity']:
-            if 'fuelbeds' not in a:
-                raise ValueError(
-                    "Missing fuelbed data required for computing emissions")
+        for aa in fire.active_areas:
+            season = datetimeutils.season_from_date(aa.get('start'))
+            for loc in aa.locations:
+                if 'fuelbeds' not in loc:
+                    raise ValueError(
+                        "Missing fuelbed data required for computing emissions")
 
+                for fb in loc['fuelbeds']:
+                    self._run_on_fuelbed(aa, loc, fb, season, burn_type)
 
-            season = datetimeutils.season_from_date(a.get('start'))
-            for fb in a['fuelbeds']:
-                self._run_on_fuelbed(fb, season, a['location'], burn_type)
-
-    def _run_on_fuelbed(self, fb, season, location, burn_type):
+    def _run_on_fuelbed(self, active_area, loc, fb, season, burn_type):
         if 'consumption' not in fb:
             raise ValueError(
                 "Missing consumption data required for computing emissions")
@@ -280,7 +288,7 @@ class Consume(EmissionsBase):
         if 'pct' not in fb:
             raise ValueError(
                 "Missing fuelbed 'ptc' required for computing emissions")
-        if 'ecoregion' not in location:
+        if 'ecoregion' not in active_area:
             raise ValueError(
                 "Missing ecoregion required for computing emissions")
 
@@ -288,9 +296,9 @@ class Consume(EmissionsBase):
              fb['fccs_id'])
         # unlike with consume consumption results, emissions results reflect
         # how you set area and output_units
-        area = (fb['pct'] / 100.0) * location['area']
+        area = (fb['pct'] / 100.0) * loc['area']
         fc = FuelConsumptionForEmissions(fb["consumption"], fb['heat'],
-            area, burn_type, fb['fccs_id'], season, location,
+            area, burn_type, fb['fccs_id'], season, active_area,
             fccs_file=fuel_loadings_csv_filename)
 
         e_fuel_loadings = self.fuel_loadings_manager.get_fuel_loadings(
