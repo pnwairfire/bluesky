@@ -2,6 +2,8 @@
 
 __author__ = "Joel Dubowy"
 
+from py.test import raises
+
 from bluesky.config import Config
 from bluesky.filtermerge.merge import FiresMerger
 from bluesky.models import fires
@@ -145,7 +147,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.activity[0]['location']['area']))
+                assert [f2, f] == fm.fires
 
     def test_different_fire_and_fuel_type(self, reset_config):
         # test in both skip and no-skip modes
@@ -181,7 +183,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.activity[0]['location']['area']))
+                assert [f2, f] == fm.fires
 
             f2.type = f.type
             f2.fuel_type = "activity"
@@ -195,7 +197,7 @@ class TestFiresManagerMergeFires(object):
             else:
                 fm.merge_fires()
                 assert fm.num_fires == 2
-                assert [f, f2] == sorted(fm.fires, key=lambda e: int(e.activity[0]['location']['area']))
+                assert [f2, f] == fm.fires
 
     def test_merge_mixed_success_no_activity(self, reset_config):
         fm = fires.FiresManager()
@@ -310,13 +312,6 @@ class TestFiresManagerMergeFires(object):
                     {
                         "active_areas": [
                             {
-                                "start": "2014-05-27T17:00:00",
-                                "end": "2014-05-28T17:00:00",
-                                'specified_points': [
-                                    {'area': 10, 'lat': 45.0, 'lng': -120.0}
-                                ]
-                            },
-                            {
                                 "start": "2014-05-28T17:00:00",
                                 "end": "2014-05-29T17:00:00",
                                 'specified_points': [
@@ -331,6 +326,18 @@ class TestFiresManagerMergeFires(object):
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "active_areas": [
+                            {
+                                "start": "2014-05-27T17:00:00",
+                                "end": "2014-05-28T17:00:00",
+                                'specified_points': [
+                                    {'area': 10, 'lat': 45.0, 'lng': -120.0}
+                                ]
+                            }
+                        ]
+
                     }
                 ]
             }),
