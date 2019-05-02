@@ -79,3 +79,7 @@ class ActivityCollection(dict):
 
         for i in range(len(self.get('active_areas', []))):
             self['active_areas'][i] = ActiveArea(self['active_areas'][i])
+
+    @property
+    def active_areas(self):
+        return self.get('active_areas', [])

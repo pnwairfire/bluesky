@@ -12,7 +12,7 @@ from bluesky.models import activity
 ##
 
 
-class TestACtiveAreaLocations(object):
+class TestActiveAreaLocations(object):
 
     def test_no_location_info(self):
         with raises(ValueError) as e_info:
@@ -242,3 +242,20 @@ class TestActiveAreaTotalArea(object):
             }
         })
         assert aa.total_area == 54
+
+
+
+##
+## Tests for ActiveArea
+##
+
+
+class TestActivityCollectionActiveAreas(object):
+
+
+    def test_no_active_areas(self):
+        assert [] == activity.ActivityCollection().active_areas
+
+    def test_with_active_areas(self):
+        assert [{'a':2},{}] == activity.ActivityCollection(
+            active_areas=[{'a':2},{}]).active_areas
