@@ -139,14 +139,14 @@ class Estimator(object):
         fuelbeds = [{'fccs_id':f, 'pct':d['percent']}
             for f,d in fuelbed_info['fuelbeds'].items()]
 
-        activity_obj.update(**self._truncate(fuelbeds))
+        loc.update(**self._truncate(fuelbeds))
 
     def _truncate(self, fuelbeds):
         """Sorts fuelbeds by decreasing percentage, and
 
         Sort fuelbeds by decreasing percentage, use first N fuelbeds that
         reach 90% coverage or 5 count (defaults, both configurable), and
-        then adjust percentages of included activity_objs so that total is 100%.
+        then adjust percentages of included location so that total is 100%.
         e.g. if 3 fuelbeds, 85%, 8%, and 7%, use only the first and second,
         and then adjust percentages as follows:
           85% -> 85% * 100 / (100 - 7) = 91.4%
