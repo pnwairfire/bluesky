@@ -68,7 +68,7 @@ def summarize(fires):
     total_area = 0
     for fire in fires:
         for ac in fire['activity']:
-            for aa in ac.get('active_areas'):
+            for aa in ac.active_areas:
                 total_area += aa.total_area
                 for loc in aa.locations:
                     for fb in loc['fuelbeds']:
