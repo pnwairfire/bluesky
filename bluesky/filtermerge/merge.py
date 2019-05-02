@@ -90,7 +90,6 @@ class FiresMerger(FiresActionBase):
             # were combined and thus all removed
             self._fires_manager.add_fire(combined_fire)
 
-
     def _merge_into_combined_fire(self, fire, combined_fire):
         """Merges fires into in-progress combined fire
 
@@ -113,7 +112,13 @@ class FiresMerger(FiresActionBase):
                 # defined for none or all of the fires to be merged
                 if new_combined_fire.get('activity'):
                     new_combined_fire.activity.extend(copy.deepcopy(fire.activity))
-                    new_combined_fire.activity.sort(key=lambda e: e['start'])
+                    # TOOD: should we sort each activity object's active
+                    #   areas list by start timess, and then sort the activity
+                    #   list by the first (and earliest) start time of each
+                    #   activity object's active areas?  The complication is
+                    #   that there could be undefined 'start' values that we'd
+                    #   need to handle
+                    #new_combined_fire.activity.sort(key=lambda a: __min_start__(a))
 
                 # TODO: merge anything else?
 
