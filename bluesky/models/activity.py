@@ -11,10 +11,47 @@ INVALID_LOCATION_MSGS = {
     for k in REQUIRED_LOCATION_FIELDS
 }
 
+class Location(dict):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._active_area = self.pop('active_area', None)
+
+    # TODO: should we use whitelist of fields instead of blacklist,
+    #   to be safer?
+    LOCATION_ONLY_FIELDS = [
+        "start", "end", "utcoffset",
+        "fuelbeds", "emissions", "consumption",
+        "timeprofile"
+        # TOOD: add other fields
+    ]
+
+    def get(self, key):
+        try:
+            return self[key]
+        except KeyError:
+            return None
+
+    def __getitem__(self, attr):
+        try:
+            return super().__getitem__(attr)
+        except KeyError:
+            if self._active_area and attr not in self.LOCATION_ONLY_FIELDS:
+                return self._active_area[attr]
+            raise
+
 class ActiveArea(dict):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        if self.get('specified_points'):
+            self['specified_points'] = [Location(p, active_area=self)
+                for p in self['specified_points']]
+
+        if self.get('perimeter'):
+            self['perimeter'] = Location(self[perimeter], active_area=self)
 
         # TODO: call locations to run validation?
         #self.locations

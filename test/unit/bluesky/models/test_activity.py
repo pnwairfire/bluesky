@@ -8,9 +8,67 @@ from bluesky.models import activity
 
 
 ##
-## Tests for ActiveArea
+## Tests for TestLocation
 ##
 
+class TestLocation(object):
+
+    def test_without_active_area(self):
+        loc = activity.Location({
+            "a": 1
+        })
+        with raises(KeyError) as e_info:
+            loc["b"]
+        assert loc.get("b") == None
+        assert loc["a"] == 1
+        assert loc.get("a") == 1
+        assert loc == {"a": 1}
+
+    def test_with_active_area(self):
+        active_area = {
+            "c": 23,
+            "start": "foo",
+            "end": "bar",
+            "d": 1234
+        }
+        loc = activity.Location({
+            "start": 123,
+            "a": 1,
+            "d": 321
+        }, active_area=active_area)
+
+        # "b" is in neither
+        with raises(KeyError) as e_info:
+            loc["b"]
+        assert loc.get("b") == None
+
+        # a is only in location object
+        assert loc["a"] == 1
+        assert loc.get("a") == 1
+
+        # c is only in active area object
+        assert loc["c"] == 23
+        assert loc.get("c") == 23
+
+        # "d" is defined in both location and active area;
+        # should return value in location object
+        assert loc["d"] == 321
+        assert loc.get("d") == 321
+
+        # "start" and "end" are blacklisted from looking in parent
+        # active area object, so key error if only in active area
+        assert loc["start"] == 123
+        assert loc.get("start") == 123
+        with raises(KeyError) as e_info:
+            loc["end"]
+        assert loc.get("end") == None
+
+        assert loc == {"a": 1, "d": 321, "start": 123}
+
+
+##
+## Tests for ActiveArea
+##
 
 class TestActiveAreaLocations(object):
 
