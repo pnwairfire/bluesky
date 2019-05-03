@@ -22,10 +22,10 @@ Assume you have the following input data:
                             {
                                 "start": "2015-08-04T17:00:00",
                                 "end": "2015-08-05T17:00:00",
-                                "ecoregion": "western",
                                 "utc_offset": "-09:00",
                                 "country": "USA",
                                 "state": "WA",
+                                "ecoregion": "western",
                                 "specified_points": [
                                     {
                                         "name": "HMW-32434",
@@ -36,7 +36,11 @@ Assume you have the following input data:
                                     {
                                         "lat": 47.42,
                                         "lng": -121.43,
-                                        "area": "103"
+                                        "area": "103",
+                                        /* ecoregion and other input fields can
+                                           be defined either per location or
+                                           in the parent active area object */
+                                        "ecoregion": "western"
                                     }
                                 ],
                                 "perimeter": {
