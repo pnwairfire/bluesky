@@ -60,6 +60,11 @@ class ActiveArea(dict):
     MISSING_LOCATION_INFO_MSG = ("Each active area must contain "
         "'specified_points' or 'perimeter'")
 
+    def __getitem__(self, attr):
+        if attr == 'locations':
+            return self.locations
+        return super().__getitem__(attr)
+
     @property
     def locations(self):
         """Returns the specified_points or perimeter polygon as list.

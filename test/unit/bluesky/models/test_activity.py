@@ -73,51 +73,65 @@ class TestLocation(object):
 class TestActiveAreaLocations(object):
 
     def test_no_location_info(self):
+        aa = activity.ActiveArea({
+            "start": "2014-05-25T17:00:00",
+            "end": "2014-05-26T17:00:00"
+            # No location information
+        })
         with raises(ValueError) as e_info:
-            activity.ActiveArea({
-                "start": "2014-05-25T17:00:00",
-                "end": "2014-05-26T17:00:00"
-                # No location information
-            }).locations
-
+            aa.locations
+        assert e_info.value.args[0] == activity.ActiveArea.MISSING_LOCATION_INFO_MSG
+        with raises(ValueError) as e_info:
+            aa['locations']
         assert e_info.value.args[0] == activity.ActiveArea.MISSING_LOCATION_INFO_MSG
 
     def test_invalid_specified_points(self):
         # only point missing area
+        aa = activity.ActiveArea({
+            "start": "2014-05-25T17:00:00",
+            "end": "2014-05-26T17:00:00",
+            'specified_points': [
+                {'lat': 45.0, 'lng': -120.0}, # no area
+            ]
+        })
         with raises(ValueError) as e_info:
-            activity.ActiveArea({
-                "start": "2014-05-25T17:00:00",
-                "end": "2014-05-26T17:00:00",
-                'specified_points': [
-                    {'lat': 45.0, 'lng': -120.0}, # no area
-                ]
-            }).locations
+            aa.locations
+        assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
+        with raises(ValueError) as e_info:
+            aa['locations']
         assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
 
         # one of two points missing area
+        aa = activity.ActiveArea({
+            "start": "2014-05-25T17:00:00",
+            "end": "2014-05-26T17:00:00",
+            'specified_points': [
+                {'area': 34, 'lat': 45.0, 'lng': -120.0},
+                {'lat': 35.0, 'lng': -121.0}
+            ]
+        })
         with raises(ValueError) as e_info:
-            activity.ActiveArea({
-                "start": "2014-05-25T17:00:00",
-                "end": "2014-05-26T17:00:00",
-                'specified_points': [
-                    {'area': 34, 'lat': 45.0, 'lng': -120.0},
-                    {'lat': 35.0, 'lng': -121.0}
-                ]
-            }).locations
+            aa.locations
+        assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
+        with raises(ValueError) as e_info:
+            aa['locations']
         assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
 
     def test_invalid_perimeter(self):
+        aa = activity.ActiveArea({
+            "start": "2014-05-25T17:00:00",
+            "end": "2014-05-26T17:00:00",
+            'perimeter': {
+                # missing polygon
+                "foo": 123
+            }
+        })
         with raises(ValueError) as e_info:
-             activity.ActiveArea({
-                "start": "2014-05-25T17:00:00",
-                "end": "2014-05-26T17:00:00",
-                'perimeter': {
-                    # missing polygon
-                    "foo": 123
-                }
-            }).locations
+            aa.locations
         assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['perimeter']
-
+        with raises(ValueError) as e_info:
+            aa['locations']
+        assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['perimeter']
 
     def test_one_specified_point(self):
         aa = activity.ActiveArea({
@@ -132,6 +146,7 @@ class TestActiveAreaLocations(object):
             {'area': 34.0, 'lat': 45.0, 'lng': -120.0}
         ]
         assert aa.locations == expected
+        assert aa['locations'] == expected
 
     def test_two_specified_points(self):
         aa = activity.ActiveArea({
@@ -147,6 +162,7 @@ class TestActiveAreaLocations(object):
             {'area': 34, 'lat': 44.0, 'lng': -119.0}
         ]
         assert aa.locations == expected
+        assert aa['locations'] == expected
 
     def test_perimeter(self):
         aa = activity.ActiveArea({
@@ -174,6 +190,7 @@ class TestActiveAreaLocations(object):
             }
         ]
         assert aa.locations == expected
+        assert aa['locations'] == expected
 
     def test_mixed(self):
 
@@ -199,6 +216,7 @@ class TestActiveAreaLocations(object):
             {'area': 34, 'lat': 44.0, 'lng': -119.0}
         ]
         assert aa.locations == expected
+        assert aa['locations'] == expected
 
 
 class TestActiveAreaTotalArea(object):
