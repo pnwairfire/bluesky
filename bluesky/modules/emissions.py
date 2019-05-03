@@ -84,8 +84,11 @@ def run(fires_manager):
         with fires_manager.fire_failure_handler(fire):
             for ac in fire['activity']:
                 for aa in ac.active_areas:
-                    # TODO: validate that each fuelbed has emissions data
-                    #   (here, or below) ?
+                    for loc in aa.locations:
+                        # TODO: validate that each fuelbed has emissions data
+                        #   (here, or below) ?
+                        loc['emissions'] = datautils.summarize(loc['fuelbeds'],
+                            'emissions', include_details=False)
                     aa['emissions'] = datautils.summarize(aa.locations,
                         'emissions', include_details=False)
                 ac['emissions'] = datautils.summarize(ac.get('active_areas', []),
