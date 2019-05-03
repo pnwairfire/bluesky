@@ -51,7 +51,7 @@ class ActiveArea(dict):
                 for p in self['specified_points']]
 
         if self.get('perimeter'):
-            self['perimeter'] = Location(self[perimeter], active_area=self)
+            self['perimeter'] = Location(self['perimeter'], active_area=self)
 
         # TODO: call locations to run validation?
         #self.locations
@@ -101,6 +101,8 @@ class ActiveArea(dict):
         "Missing or invalid area for specified point")
     MISSING_OR_INVALID_AREA_FOR_PERIMIETER = (
         "Missing or invalid area for active area perimeter")
+    MISSING_LOCATION_INFO_FOR_ACTIVE_AREA = ("Missing location information"
+        " for determining total active area")
 
     @property
     def total_area(self):
