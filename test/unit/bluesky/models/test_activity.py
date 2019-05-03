@@ -34,7 +34,7 @@ class TestActiveAreaLocations(object):
                     {'lat': 45.0, 'lng': -120.0}, # no area
                 ]
             }).locations
-        assert e_info.value.args[0] == activity.ActiveArea.INVALID_SPECIFIED_POINT_MSG
+        assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
 
         # one of two points missing area
         with raises(ValueError) as e_info:
@@ -46,7 +46,7 @@ class TestActiveAreaLocations(object):
                     {'lat': 35.0, 'lng': -121.0}
                 ]
             }).locations
-        assert e_info.value.args[0] == activity.ActiveArea.INVALID_SPECIFIED_POINT_MSG
+        assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
 
     def test_invalid_perimeter(self):
         with raises(ValueError) as e_info:
@@ -58,7 +58,7 @@ class TestActiveAreaLocations(object):
                     "foo": 123
                 }
             }).locations
-        assert e_info.value.args[0] == activity.ActiveArea.INVALID_PERIMETER_MSG
+        assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['perimeter']
 
 
     def test_one_specified_point(self):
@@ -66,11 +66,12 @@ class TestActiveAreaLocations(object):
             "start": "2014-05-25T17:00:00",
             "end": "2014-05-26T17:00:00",
             'specified_points': [
-                {'area': 34, 'lat': 45.0, 'lng': -120.0}
+                # Note that string area value will be cast to float
+                {'area': '34', 'lat': 45.0, 'lng': -120.0}
             ]
         })
         expected = [
-            {'area': 34, 'lat': 45.0, 'lng': -120.0}
+            {'area': 34.0, 'lat': 45.0, 'lng': -120.0}
         ]
         assert aa.locations == expected
 
