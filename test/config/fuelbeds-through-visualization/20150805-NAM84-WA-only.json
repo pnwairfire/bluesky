@@ -23,7 +23,7 @@
             "species": ["PM2.5"]
         },
         "findmetdata": {
-            "met_root_dir": "/NAM84/",
+            "met_root_dir": "/data/Met/NAM/12km/ARL/",
             "arl": {
                 "index_filename_pattern": "NAM84_ARL_index.csv"
             }
