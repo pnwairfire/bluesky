@@ -61,10 +61,10 @@ set PYTHONPATH and PATH variables in your docker run command.
 
 For example, to just print the helpstring:
 
-    docker run --rm \
+    docker run --rm -ti \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
-        -e PATH=/bluesky/bin/:$PATH \
+        -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         bluesky bsp -h
 
 Another example, running through emissions:
@@ -72,7 +72,7 @@ Another example, running through emissions:
     docker run --rm -ti \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
-        -e PATH=/bluesky/bin/:$PATH \
+        -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
@@ -86,7 +86,7 @@ Another example, running through vsmoke dispersion:
     docker run --rm -ti \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
-        -e PATH=/bluesky/bin/:$PATH \
+        -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
@@ -102,7 +102,7 @@ and KML visualization:
     docker run --rm -ti \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
-        -e PATH=/bluesky/bin/:$PATH \
+        -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         -v $HOME/Met/CANSAC/6km/ARL/:/data/Met/CANSAC/6km/ARL/ \
         -w /bluesky/ \
         bluesky \
@@ -142,7 +142,7 @@ $HOME/docker-bsp-output/
     docker run --rm -ti \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
-        -e PATH=/bluesky/bin/:$PATH \
+        -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         -v $HOME/Met/NAM/12km/ARL/:/data/Met/NAM/12km/ARL/ \
         -w /bluesky/ \
         bluesky bash
