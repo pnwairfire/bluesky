@@ -77,34 +77,10 @@ def run(fires_manager):
                         if include_emissions_details:
                             _fix_keys(fb['emissions_details'])
 
-    # For each fire, aggregate emissions over all fuelbeds per activity
-    # window as well as across all activity windows;
-    # include only per-phase totals, not per category > sub-category > phase
-    for fire in fires_manager.fires:
-        with fires_manager.fire_failure_handler(fire):
-            for ac in fire['activity']:
-                for aa in ac.active_areas:
-                    for loc in aa.locations:
-                        # TODO: validate that each fuelbed has emissions data
-                        #   (here, or below) ?
-                        loc['emissions'] = datautils.summarize(loc['fuelbeds'],
-                            'emissions', include_details=False)
-                    aa['emissions'] = datautils.summarize(aa.locations,
-                        'emissions', include_details=False)
-                ac['emissions'] = datautils.summarize(ac.get('active_areas', []),
-                        'emissions', include_details=False)
-
-            fire.emissions = datautils.summarize(fire['activity'], 'emissions',
-                include_details=False)
-
-    # summarise over all activity objects
-    all_activity = list(itertools.chain.from_iterable(
-        [f.activity for f in fires_manager.fires]))
-    summary = dict(emissions=datautils.summarize(all_activity, 'emissions'))
+    datautils.summarize_all_levels(fires_manager, 'emissions')
     if include_emissions_details:
-        summary.update(emissions_details=datautils.summarize(
-            all_activity, 'emissions_details'))
-    fires_manager.summarize(**summary)
+        datautils.summarize_all_levels(fires_manager, 'emissions_details')
+
 
 def _fix_keys(emissions):
     for k in emissions:
