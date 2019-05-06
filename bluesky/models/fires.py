@@ -4,6 +4,7 @@ __author__ = "Joel Dubowy"
 
 import datetime
 import importlib
+import itertools
 import json
 import logging
 import sys
@@ -82,8 +83,10 @@ class Fire(dict):
         when adding/removing collections or active areas, or when
         modifying points or perimeters.
         """
-        return [a for c in self.get('activity', [])
-            for a in c.get('active_areas', [])]
+        return list(itertools.chain.from_iterable(
+            [ac.active_areas for ac in self.get('activity', [])]
+        ))
+
 
     @property
     def start(self):
