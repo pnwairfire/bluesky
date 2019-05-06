@@ -87,6 +87,15 @@ class Fire(dict):
             [ac.active_areas for ac in self.get('activity', [])]
         ))
 
+    @property
+    def locations(self):
+        """Returns flat list of locations from across all active areas
+
+        Use in summarizing code.
+        """
+        return list(itertools.chain.from_iterable(
+            [aa.locations for aa in self.active_areas]))
+
 
     @property
     def start(self):

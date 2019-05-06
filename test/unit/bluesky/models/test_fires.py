@@ -16,7 +16,7 @@ from numpy.testing import assert_approx_equal
 
 from bluesky import __version__
 from bluesky.config import Config, DEFAULTS
-from bluesky.models import fires
+from bluesky.models import fires, activity
 
 
 class TestFire(object):
@@ -392,6 +392,42 @@ class TestFire(object):
             }
         }]
         actual = self.TEST_FIRE.active_areas
+        assert actual == expected
+
+    def test_locations(self):
+        # no activity
+        assert [] == self.TEST_FIRE_NO_ACTIVITY.locations
+
+        # missing location information
+        with raises(ValueError) as e_info:
+            self.TEST_FIRE_ACTIVITY_NO_LOCATION_INFO.locations
+        assert e_info.value.args[0] == activity.ActiveArea.MISSING_LOCATION_INFO_MSG
+
+        # invalid specified points
+        with raises(ValueError) as e_info:
+            self.TEST_FIRE_ACTIVITY_INVALID_SPECIFIED_POINTS.locations
+        assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
+
+        # invalid perimeter
+        with raises(ValueError) as e_info:
+            self.TEST_FIRE_ACTIVITY_INVALID_PERIMETER.locations
+        assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['perimeter']
+
+        # mixed activity
+        expected = [
+            {'area': 34, 'lat': 45.0, 'lng': -120.0},
+            {'area': 34, 'lat': 44.0, 'lng': -119.0},
+            {
+                "polygon": [
+                    [-121.45, 47.43],
+                    [-121.39, 47.43],
+                    [-121.39, 47.40],
+                    [-121.45, 47.40],
+                    [-121.45, 47.43]
+                ]
+            }
+        ]
+        actual = self.TEST_FIRE.locations
         assert actual == expected
 
 
