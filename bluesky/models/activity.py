@@ -1,3 +1,8 @@
+"""bluesky.models.fires"""
+
+__author__ = "Joel Dubowy"
+
+import itertools
 
 REQUIRED_LOCATION_FIELDS = {
     'specified_points': ['lat', 'lng', 'area'],
@@ -147,3 +152,13 @@ class ActivityCollection(dict):
     @property
     def active_areas(self):
         return self.get('active_areas', [])
+
+    @property
+    def locations(self):
+        """Returns flat list of locations from across all active areas
+
+        Used in summarizing code.
+        """
+        return list(itertools.chain.from_iterable(
+            [aa.locations for aa in self.active_areas]
+        ))

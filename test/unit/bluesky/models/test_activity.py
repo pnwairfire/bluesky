@@ -323,16 +323,114 @@ class TestActiveAreaTotalArea(object):
 
 
 ##
-## Tests for ActiveArea
+## Tests for ActivityCollection
 ##
 
 
 class TestActivityCollectionActiveAreas(object):
 
-
     def test_no_active_areas(self):
         assert [] == activity.ActivityCollection().active_areas
 
     def test_with_active_areas(self):
-        assert [{'a':2},{}] == activity.ActivityCollection(
-            active_areas=[{'a':2},{}]).active_areas
+        ac = activity.ActivityCollection(active_areas=[
+            {
+                "start": "2014-05-25T17:00:00",
+                "end": "2014-05-26T17:00:00",
+                'specified_points': [
+                    {'area': 52, 'lat': 42.0, 'lng': -116.0}
+                ],
+
+            },
+            {}
+        ])
+        expected = [
+            {
+                "start": "2014-05-25T17:00:00",
+                "end": "2014-05-26T17:00:00",
+                'specified_points': [
+                    {'area': 52, 'lat': 42.0, 'lng': -116.0}
+                ],
+
+            },
+            {}
+        ]
+        assert expected == ac.active_areas
+
+
+class TestActivityCollectionLocations(object):
+
+    def test_no_active_areas(self):
+        assert [] == activity.ActivityCollection().locations
+
+    def test_with_active_areas_but_no_locations(self):
+        with raises(ValueError) as e_info:
+            activity.ActivityCollection(active_areas=[
+                activity.ActiveArea({
+                    "start": "2014-05-25T17:00:00",
+                    "end": "2014-05-26T17:00:00",
+                })
+            ]).locations
+        assert e_info.value.args[0] == activity.ActiveArea.MISSING_LOCATION_INFO_MSG
+
+    # TODO: add error cases, or
+
+    def test_with_active_areas_and_locations(self):
+        ac = activity.ActivityCollection({
+            "active_areas": [
+                {
+                    "start": "2014-05-25T17:00:00",
+                    "end": "2014-05-26T17:00:00",
+                    'specified_points': [
+                        {'area': 34, 'lat': 45.0, 'lng': -120.0},
+                        {'area': 34, 'lat': 44.0, 'lng': -119.0}
+                    ],
+                    'perimeter': {
+                        "polygon": [
+                            [-121.45, 47.43],
+                            [-121.39, 47.43],
+                            [-121.39, 47.40],
+                            [-121.45, 47.40],
+                            [-121.45, 47.43]
+                        ]
+                    }
+                },
+                {
+                    "start": "2014-05-25T17:00:00",
+                    "end": "2014-05-26T17:00:00",
+                    'specified_points': [
+                        {'area': 52, 'lat': 42.0, 'lng': -116.0}
+                    ],
+
+                },
+                {
+                    "start": "2014-05-25T17:00:00",
+                    "end": "2014-05-26T17:00:00",
+                    'perimeter': {
+                        "polygon": [
+                            [-111.45, 23.43],
+                            [-111.39, 23.43],
+                            [-111.39, 23.40],
+                            [-111.45, 23.40],
+                            [-111.45, 23.43]
+                        ]
+                    }
+                }
+            ]
+        })
+        expected = [
+            {'area': 34, 'lat': 45.0, 'lng': -120.0},
+            {'area': 34, 'lat': 44.0, 'lng': -119.0},
+            {'area': 52, 'lat': 42.0, 'lng': -116.0},
+            {
+                "polygon": [
+                    [-111.45, 23.43],
+                    [-111.39, 23.43],
+                    [-111.39, 23.40],
+                    [-111.45, 23.40],
+                    [-111.45, 23.43]
+                ]
+            }
+        ]
+
+        assert expected == ac.locations
