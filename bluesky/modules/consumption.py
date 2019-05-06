@@ -52,14 +52,8 @@ def run(fires_manager):
         with fires_manager.fire_failure_handler(fire):
             _run_fire(fire, fuel_loadings_manager, msg_level)
 
-
-    # summarise over all activity objects
-    all_activity = list(itertools.chain.from_iterable(
-        [f.activity for f in fires_manager.fires]))
-    fires_manager.summarize(
-        consumption=datautils.summarize(all_activity, 'consumption'))
-    fires_manager.summarize(
-        heat=datautils.summarize(all_activity, 'heat'))
+    datautils.summarize_all_levels(fires_manager, 'consumption')
+    datautils.summarize_all_levels(fires_manager, 'heat')
 
 def _run_fire(fire, fuel_loadings_manager, msg_level):
     logging.debug("Consume consumption - fire {}".format(fire.id))
@@ -80,16 +74,6 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
                 for fb in loc['fuelbeds']:
                     _run_fuelbed(fb, loc, fuel_loadings_manager, season,
                         burn_type, msg_level)
-                _summarize_consumption_and_heat(loc, loc['fuelbeds'])
-            _summarize_consumption_and_heat(aa, aa.locations)
-        _summarize_consumption_and_heat(ac, ac.get('active_areas', []))
-    _summarize_consumption_and_heat(fire, fire.activity)
-
-def _summarize_consumption_and_heat(obj, objs):
-    obj['consumption'] = datautils.summarize(objs, 'consumption',
-        include_details=False)
-    obj['heat'] = datautils.summarize(objs, 'heat', include_details=False)
-
 
 def _run_fuelbed(fb, location, fuel_loadings_manager, season,
         burn_type, msg_level):
