@@ -33,14 +33,21 @@ def parse_args():
 
     return args
 
-EXTRA_AA_FIELDS = (
+EXTRA_LOC_FIELDS = (
     'fuelbeds',
     'fuelbeds_total_accounted_for_pct',
     'consumption',
+    'heat',
     'emissions',
     'emissions_details',
     # TODO: add fields
 )
+
+TO_COPY_UP = {
+    "consumption",
+    "heat",
+    "emissions"
+}
 
 def convert(input_data):
     fires = (input_data.pop('fires', None)
@@ -56,15 +63,19 @@ def convert(input_data):
             area = loc.pop('area', None)
             geojson = loc.pop('geojson', None)
 
+            aa_template = dict(loc)
             new_a = {'active_areas': []}
 
             loc_template = {}
-            for k in EXTRA_AA_FIELDS:
+            for k in EXTRA_LOC_FIELDS:
                 val = old_a.pop(k, None)
                 if val:
                     loc_template[k] = val
+                    if k in TO_COPY_UP:
+                        new_a[k] = val
+                        aa_template[k] = val
 
-            aa_template = dict(old_a, **loc)
+            aa_template.update(**old_a)
 
             if lat is not None and lng is not None:
                 aa = copy.deepcopy(aa_template)
