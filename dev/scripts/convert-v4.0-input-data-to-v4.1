@@ -35,18 +35,15 @@ def parse_args():
 
 EXTRA_LOC_FIELDS = (
     'fuelbeds',
-    'fuelbeds_total_accounted_for_pct',
-    'consumption',
-    'heat',
-    'emissions',
-    'emissions_details',
+    'fuelbeds_total_accounted_for_pct'
     # TODO: add fields
 )
 
 TO_COPY_UP = {
-    "consumption",
-    "heat",
-    "emissions"
+    'consumption',
+    'heat',
+    'emissions',
+    'emissions_details',
 }
 
 def convert(input_data):
@@ -71,9 +68,12 @@ def convert(input_data):
                 val = old_a.pop(k, None)
                 if val:
                     loc_template[k] = val
-                    if k in TO_COPY_UP:
-                        new_a[k] = val
-                        aa_template[k] = val
+
+            for k in TO_COPY_UP:
+                val = old_a.pop(k, None)
+                if val:
+                    new_a[k] = val
+                    aa_template[k] = val
 
             aa_template.update(**old_a)
 
