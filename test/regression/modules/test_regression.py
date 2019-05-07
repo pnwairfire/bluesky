@@ -87,29 +87,32 @@ def set_logging_color(args):
             logging.StreamHandler.emit)
 
 
-def check_value(expected, actual):
+def check_value(expected, actual, *keys_for_error_log):
     if type(expected) != type(actual):
-        logging.error("types don't match: %s vs. %s",
-            type(expected), type(actual))
+        logging.error("types don't match: %s vs. %s  ('%s')",
+            type(expected), type(actual), "' > '".join(keys_for_error_log))
         return False
 
     if type(expected) == dict:
         if set(expected.keys()) != set(actual.keys()):
-            logging.error("Keys don't match: %s vs. %s",
+            logging.error("Keys don't match: %s vs. %s  ('%s')",
                 ','.join(list(set(expected.keys()))),
-                ','.join(list(set(actual.keys()))))
+                ','.join(list(set(actual.keys()))),
+                "' > '".join(keys_for_error_log))
             return False
         # check all; don't bail after first difference  (so that
         # we see all differing values in output)
-        results = [check_value(expected[k], actual[k]) for k in expected]
+        results = [check_value(expected[k], actual[k],
+            *(keys_for_error_log + (k,))) for k in expected]
         return all(results)
 
     elif type(expected) == list:
         if len(expected) != len(actual):
-            logging.error("list lengths don't match")
+            logging.error("list lengths don't match  ('%s')",
+                "' > '".join(keys_for_error_log))
             return False
         for i in range(len(expected)):
-            if not check_value(expected[i], actual[i]):
+            if not check_value(expected[i], actual[i], *(keys_for_error_log + (str(i),) )):
                 return False
         return True
 
@@ -118,8 +121,8 @@ def check_value(expected, actual):
             # if failure, we want to return False rather than have AssertionError raised
             assert_approx_equal(expected, actual)
         except AssertionError:
-            logging.error("Float values don't match: %s vs. %s",
-                expected, actual)
+            logging.error("Float values don't match: %s vs. %s  ('%s')",
+                expected, actual, "' > '".join(keys_for_error_log))
             return False
         return True
 
@@ -127,8 +130,8 @@ def check_value(expected, actual):
         if expected == actual:
             return True
         else:
-            logging.error("Values don't match: %s vs. %s",
-                expected, actual)
+            logging.error("Values don't match: %s vs. %s  ('%s')",
+                expected, actual, "' > '".join(keys_for_error_log))
             return False
 
 
