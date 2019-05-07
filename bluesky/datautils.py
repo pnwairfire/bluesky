@@ -34,9 +34,9 @@ def summarize_all_levels(fires_manager, key):
                 summarize_fuelbeds(ac, key)
             summarize_fuelbeds(fire, key)
 
-    summarize_top_level(fires_manager, key)
+    summarize_over_all_fires(fires_manager, key)
 
-def summarize_top_level(fires_manager, key):
+def summarize_over_all_fires(fires_manager, key):
     # summarise over all activity objects
     all_locations = list(itertools.chain.from_iterable(
         [f.locations for f in fires_manager.fires]))

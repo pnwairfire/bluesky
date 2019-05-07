@@ -79,7 +79,7 @@ def run(fires_manager):
 
     datautils.summarize_all_levels(fires_manager, 'emissions')
     if include_emissions_details:
-        datautils.summarize_top_level(fires_manager, 'emissions_details')
+        datautils.summarize_over_all_fires(fires_manager, 'emissions_details')
 
 
 def _fix_keys(emissions):
