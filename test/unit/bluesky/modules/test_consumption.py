@@ -58,6 +58,16 @@ class TestConsumptionRunFire(object):
     def test(self):
         # TODO: create mock fuel loading manager class
         fuel_loadings_manager = FuelLoadingsManager()
-        actual = consumption._run_fire(fire, fuel_loadings_manager, 1)
+        consumption._run_fire(fire, fuel_loadings_manager, 1)
+        fb = fire['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
 
-        # TODO: add asserts
+        # TODO: make sure the following, commented out heat is correct
+        expected_heat = {
+            # 'flaming': array([  3.04787217e+09]),
+            # 'residual': array([  1.37547756e+09]),
+            # 'smoldering': array([  1.99089601e+09]),
+            # 'total': array([  6.41424574e+09])
+        }
+        #assert expected_heat == fb['heat']
+
+        #expected_consumption = {}
