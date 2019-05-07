@@ -76,15 +76,18 @@ BASE_FIRE = {
         # "id" to be filled in
     },
     'activity': [{
-        "fuelbeds": [{
-            # "fccs_id" to be filled in
-            # "pct" to be filled in
-        }],
-        "location": {
-            "latitude": 47.4316976,
-            "longitude": -121.3990506,
-            "utc_offset": "-09:00"
-        }
+        "active_areas": [{
+            "utc_offset": "-09:00",
+            "specified_points": [{
+                "fuelbeds": [{
+                    # "fccs_id" to be filled in
+                    # "pct" to be filled in
+                }],
+                "lat": 47.4316976,
+                "lng": -121.3990506,
+
+            }]
+        }]
     }]
 }
 
@@ -120,29 +123,29 @@ def load_scenario(input_filename):
         fire = models.fires.Fire(copy.deepcopy(BASE_FIRE))
         fire.event_of["id"] = str(uuid.uuid4())
         area = int(row_dict['area'])
-        fire.activity[0]['location']['area'] = area
-        fire.activity[0]['location']['ecoregion'] = row_dict['ecoregion']
+        fire.activity[0]['active_areas'][0]['area'] = area
+        fire.activity[0]['active_areas'][0]['ecoregion'] = row_dict['ecoregion']
         # season is deterimined in pipeline consume code by activity start date,
         # so, reverse engineer start date based on season in input file
         if row_dict['season'] == 'spring':
-            fire.activity[0]['start'] = '2019-04-01'
+            fire.activity[0]['active_areas'][0]['start'] = '2019-04-01'
         elif row_dict['season'] == 'summer':
-            fire.activity[0]['start'] = '2019-07-01'
+            fire.activity[0]['active_areas'][0]['start'] = '2019-07-01'
         elif row_dict['season'] == 'fall':
-            fire.activity[0]['start'] = '2019-10-01'
+            fire.activity[0]['active_areas'][0]['start'] = '2019-10-01'
         else:
-            fire.activity[0]['start'] = '2019-01-01'
-        fire.activity[0]['location']['moisture_duff'] = int(row_dict['fm_duff'])
-        fire.activity[0]['location']['moisture_litter'] = int(row_dict['fm_litter'])
-        fire.activity[0]['location']['moisture_1khr'] = int(row_dict['fm_1000hr'])
-        fire.activity[0]['location']['canopy_consumption_pct'] = int(row_dict['can_con_pct'])
-        fire.activity[0]['location']['shrub_blackened_pct'] = int(row_dict['shrub_black_pct'])
-        fire.activity[0]['location']['pile_blackened_pct'] = int(row_dict['pile_black_pct'])
-        fire.activity[0]['location']['output_units'] = row_dict['units']
-        fire.activity[0]['fuelbeds'][0]['fccs_id'] = row_dict['fuelbeds']
+            fire.activity[0]['active_areas'][0]['start'] = '2019-01-01'
+        fire.activity[0]['active_areas'][0]['moisture_duff'] = int(row_dict['fm_duff'])
+        fire.activity[0]['active_areas'][0]['moisture_litter'] = int(row_dict['fm_litter'])
+        fire.activity[0]['active_areas'][0]['moisture_1khr'] = int(row_dict['fm_1000hr'])
+        fire.activity[0]['active_areas'][0]['canopy_consumption_pct'] = int(row_dict['can_con_pct'])
+        fire.activity[0]['active_areas'][0]['shrub_blackened_pct'] = int(row_dict['shrub_black_pct'])
+        fire.activity[0]['active_areas'][0]['pile_blackened_pct'] = int(row_dict['pile_black_pct'])
+        fire.activity[0]['active_areas'][0]['output_units'] = row_dict['units']
+        fire.activity[0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['fccs_id'] = row_dict['fuelbeds']
         # See note above about 1 fire + N fuelbeds vs N fires + 1 fuelbed each
-        #fire.activity[0]['fuelbeds'][0]['pct'] = float(area) / float(total_area)
-        fire.activity[0]['fuelbeds'][0]['pct'] = 100.0
+        #fire.activity[0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['pct'] = float(area) / float(total_area)
+        fire.activity[0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['pct'] = 100.0
         fires_manager.add_fire(fire)
     return fires_manager
 
@@ -405,7 +408,7 @@ def check(actual, expected_partials, expected_totals):
     }
 
     for fire in actual['fires']:
-        fb = fire['activity'][0]['fuelbeds'][0]
+        fb = fire['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         fccs_id = fb['fccs_id']
         fb_e = expected_partials[fccs_id]
 
