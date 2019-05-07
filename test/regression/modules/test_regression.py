@@ -99,10 +99,10 @@ def check_value(expected, actual):
                 ','.join(list(set(expected.keys()))),
                 ','.join(list(set(actual.keys()))))
             return False
-        for k in expected:
-            if not check_value(expected[k], actual[k]):
-                return False
-        return True
+        # check all; don't bail after first difference  (so that
+        # we see all differing values in output)
+        results = [check_value(expected[k], actual[k]) for k in expected]
+        return all(results)
 
     elif type(expected) == list:
         if len(expected) != len(actual):
