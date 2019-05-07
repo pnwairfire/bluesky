@@ -55,6 +55,38 @@ Examples:
     $ ./test/regression/all/test_regression.py --log-level=DEBUG -m emissions
 """
 
+RED = '\x1b[31m' # red
+YELLOW = '\x1b[33m' # yellow
+GREEN = '\x1b[32m' # green
+WHITE = '\x1b[0m' # normal
+
+def add_coloring_to_emit_ansi(fn):
+    # add methods we need to the class
+    def new(*args):
+        levelno = args[1].levelno
+        if(levelno>=50): # FATAL
+            color = RED
+        elif(levelno>=40): # ERROR
+            color = RED
+        elif(levelno>=30): # WARNING
+            color = YELLOW
+        # elif(levelno>=20): # INFO
+        #     color = GREEN
+        # elif(levelno>=10): # DEBUG
+        #     color = '\x1b[35m' # pink
+        else:
+            color = WHITE
+        args[1].msg = color + args[1].msg +  WHITE
+        #print "after"
+        return fn(*args)
+    return new
+
+def set_logging_color(args):
+    if not args.log_file:
+        logging.StreamHandler.emit = add_coloring_to_emit_ansi(
+            logging.StreamHandler.emit)
+
+
 def check_value(expected, actual):
     if type(expected) != type(actual):
         logging.error("types don't match: %s vs. %s",
@@ -180,6 +212,8 @@ if __name__ == "__main__":
     if args.module and args.module not in MODULES:
         logging.error("Module '%s' has no test data or is invalid", args.module)
         sys.exit(1)
+
+    set_logging_color(args)
 
     try:
         test(module=args.module)
