@@ -225,9 +225,9 @@ if __name__ == "__main__":
         test(module=args.module)
 
     except Exception as e:
-        logging.error(e)
+        logging.error(str(e))
         logging.debug(traceback.format_exc())
-        afscripting.utils.exit_with_msg(e)
+        afscripting.utils.exit_with_msg(str(e))
 
     # No need to exit with code when we use the assertions in `test`, above.
     #  (script will return 0 if sucecss and 1 otherwise.)
