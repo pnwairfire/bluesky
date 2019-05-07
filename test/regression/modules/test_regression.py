@@ -196,14 +196,20 @@ def run_input(module, input_file):
 def run_module(module):
     files = [os.path.abspath(f) for f in glob.glob(os.path.join(
         os.path.dirname(__file__), module, 'input', '*')) ]
-    return all([run_input(module, f) for f in files])
+    results = [run_input(module, f) for f in files]
+    logging.info("Results for %s", module)
+    for i, r in enumerate(results):
+        logging.info(' %s: %s%s%s', files[i],
+            GREEN if r else RED, 'PASSED' if r else 'FAILED', WHITE)
+    return all(results)
 
 def test(module=None):
     modules = [module] if module else MODULES
     results = [run_module(module) for module in modules]
     logging.info('Summary:')
     for i, r in enumerate(results):
-        logging.info(' %s: %s', modules[i], 'PASSED' if r else 'FAILED')
+        logging.info(' %s: %s%s%s', modules[i],
+            GREEN if r else RED, 'PASSED' if r else 'FAILED', WHITE)
     assert all(results)
 
 if __name__ == "__main__":
