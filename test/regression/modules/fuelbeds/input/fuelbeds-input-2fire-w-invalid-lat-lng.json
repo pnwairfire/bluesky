@@ -1,42 +1,54 @@
 {
     "fires": [
         {
-            "type": "wildfire",
             "activity": [
                 {
-                    "location": {
-                        "area": 500,
-                        "latitude": 89.0,
-                        "longitude": 115.0,
-                        "utc_offset": "07:00",
-                        "ecoregion": "western"
-                    }
+                    "active_areas": [
+                        {
+                            "ecoregion": "western",
+                            "utc_offset": "07:00",
+                            "specified_points": [
+                                {
+                                    "lng": 115.0,
+                                    "area": 500,
+                                    "lat": 89.0
+                                }
+                            ]
+                        }
+                    ]
                 }
             ],
             "event_of": {
                 "name": "Natural Fire in arctic",
                 "id": "SF11E826544"
             },
-            "id": "SF11C14225236095807750"
+            "id": "SF11C14225236095807750",
+            "type": "wildfire"
         },
         {
-            "type": "wildfire",
             "activity": [
                 {
-                    "location": {
-                        "area": 500,
-                        "latitude": 45.0,
-                        "longitude": -115.0,
-                        "utc_offset": "-07:00",
-                        "ecoregion": "western"
-                    }
+                    "active_areas": [
+                        {
+                            "ecoregion": "western",
+                            "utc_offset": "-07:00",
+                            "specified_points": [
+                                {
+                                    "lng": -115.0,
+                                    "area": 500,
+                                    "lat": 45.0
+                                }
+                            ]
+                        }
+                    ]
                 }
             ],
             "event_of": {
                 "name": "Natural Fire near Snoqualmie Pass, WA",
                 "id": "sdfsdf"
             },
-            "id": "kjldsfjsdfj"
+            "id": "kjldsfjsdfj",
+            "type": "wildfire"
         }
     ]
 }

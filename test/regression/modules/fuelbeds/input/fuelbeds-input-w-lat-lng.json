@@ -1,23 +1,29 @@
 {
     "fires": [
         {
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             "type": "wildfire",
+            "id": "SF11C14225236095807750",
             "activity": [
                 {
-                    "location": {
-                        "area": 500,
-                        "latitude": 45.0,
-                        "longitude": -115.0,
-                        "utc_offset": "-07:00",
-                        "ecoregion": "western"
-                    }
+                    "active_areas": [
+                        {
+                            "ecoregion": "western",
+                            "utc_offset": "-07:00",
+                            "specified_points": [
+                                {
+                                    "area": 500,
+                                    "lng": -115.0,
+                                    "lat": 45.0
+                                }
+                            ]
+                        }
+                    ]
                 }
-            ],
-            "event_of": {
-                "name": "Natural Fire near Snoqualmie Pass, WA",
-                "id": "SF11E826544"
-            },
-            "id": "SF11C14225236095807750"
+            ]
         }
     ]
 }
