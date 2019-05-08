@@ -67,7 +67,7 @@ class ComputeFunction(object):
     def __call__(self, fire):
         if 'activity' not in fire:
             raise ValueError("Missing activity data required for plumerise")
-        if any([not a.get('location', {}).get('area') for a in fire.activity]):
+        if any([not loc.get('area') for loc in fire.locations]):
             raise ValueError("Missing fire activity area required for plumerise")
         self._compute_func(fire)
 
@@ -89,40 +89,42 @@ class ComputeFunction(object):
             #   above (one working dir per all fires), or below (per activity
             #   window)...or just let plumerise create temp workingdir (as
             #   it's currently doing?
-            for a in fire.activity:
-                if not a.get('consumption', {}).get('summary'):
-                    raise ValueError("Missing fire activity consumption data "
-                        "required for FEPS plumerise")
+            for aa in fire.active_areas:
+                start = datetimeutils.parse_datetime(aa['start'], 'start')
+                if not start:
+                    raise ValueError("Missing fire activity start time "
+                        "required by FEPS plumerise")
 
-                # Fill in missing sunrise / sunset
-                if any([a['location'].get(k) is None for k in
-                        ('sunrise_hour', 'sunset_hour')]):
-                    start = datetimeutils.parse_datetime(a['start'], 'start')
-                    if not start:
-                        raise ValueError("Missing fire activity start time "
-                            "required by FEPS plumerise")
+                for loc in aa.locations:
+                    if not loc.get('consumption', {}).get('summary'):
+                        raise ValueError("Missing fire activity consumption data "
+                            "required for FEPS plumerise")
 
-                    # default: UTC
-                    utc_offset = datetimeutils.parse_utc_offset(
-                        a['location'].get('utc_offset', 0.0))
+                    # Fill in missing sunrise / sunset
+                    if any([loc.get(k) is None for k in
+                            ('sunrise_hour', 'sunset_hour')]):
 
-                    # Use NOAA-standard sunrise/sunset calculations
-                    latlng = locationutils.LatLng(a['location'])
-                    s = sun.Sun(lat=latlng.latitude, lng=latlng.longitude)
-                    d = start.date()
-                    # just set them both, even if one is already set
-                    a['location']["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
-                    a['location']["sunset_hour"] = s.sunset_hr(d, utc_offset)
+                        # default: UTC
+                        utc_offset = datetimeutils.parse_utc_offset(
+                            loc.get('utc_offset', 0.0))
 
-                if not a.get('timeprofile'):
-                    raise ValueError("Missing timeprofile data required for "
-                        "computing FEPS plumerise")
+                        # Use NOAA-standard sunrise/sunset calculations
+                        latlng = locationutils.LatLng(loc)
+                        s = sun.Sun(lat=latlng.latitude, lng=latlng.longitude)
+                        d = start.date()
+                        # just set them both, even if one is already set
+                        loc["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
+                        loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
 
-                plumerise_data = pr.compute(a['timeprofile'],
-                    a['consumption']['summary'], a['location'],
-                    working_dir=_get_working_dir(fire))
-                a['plumerise'] = plumerise_data['hours']
-                # TODO: do anything with plumerise_data['heat'] ?
+                    if not aa.get('timeprofile'):
+                        raise ValueError("Missing timeprofile data required for "
+                            "computing FEPS plumerise")
+
+                    plumerise_data = pr.compute(loc['timeprofile'],
+                        loc['consumption']['summary'], loc,
+                        working_dir=_get_working_dir(fire))
+                    loc['plumerise'] = plumerise_data['hours']
+                    # TODO: do anything with plumerise_data['heat'] ?
 
         return _f
 
@@ -131,16 +133,17 @@ class ComputeFunction(object):
 
         def _f(fire):
             fire_frp = fire.get('meta', {}).get('frp')
-            for a in fire.activity:
-                if not a.get('localmet'):
-                    raise ValueError(
-                        "Missing localmet data required for computing SEV plumerise")
-                # TODO: if fire_frp is defined but activity's frp isn't,
-                #   do we need to multiple by activity's
-                #   percentage of the fire's total area?
-                a_frp = a.get('frp', fire_frp)
-                plumerise_data = pr.compute(a['localmet'],
-                    a['location']['area'], frp=a_frp)
-                a['plumerise'] = plumerise_data['hours']
+            for aa in fire.active_areas:
+                for loc in aa.locations:
+                    if not loc.get('localmet'):
+                        raise ValueError(
+                            "Missing localmet data required for computing SEV plumerise")
+                    # TODO: if fire_frp is defined but activity's frp isn't,
+                    #   do we need to multiple by activity's
+                    #   percentage of the fire's total area?
+                    loc_frp = loc.get('frp', fire_frp)
+                    plumerise_data = pr.compute(loc['localmet'],
+                        loc['area'], frp=loc_frp)
+                    loc['plumerise'] = plumerise_data['hours']
 
         return _f
