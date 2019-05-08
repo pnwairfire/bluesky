@@ -32,11 +32,11 @@ class Location(dict):
         # TOOD: add other fields
     ]
 
-    def get(self, key):
+    def get(self, key, *args):
         try:
-            return self[key]
+            return self.__getitem__(key)
         except KeyError:
-            return None
+            return args[0] if len(args) > 0 else None
 
     def __getitem__(self, attr):
         try:

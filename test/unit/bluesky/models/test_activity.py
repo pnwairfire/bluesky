@@ -22,10 +22,13 @@ class TestLocation(object):
         with raises(KeyError) as e_info:
             loc["b"]
         assert loc.get("b") == None
+        assert loc.get("b", "foo") == "foo"
 
         assert "a" in loc
         assert loc["a"] == 1
         assert loc.get("a") == 1
+        assert loc.get("a", "foo") == 1
+
         assert loc == {"a": 1}
 
     def test_with_active_area(self):
@@ -46,32 +49,38 @@ class TestLocation(object):
         with raises(KeyError) as e_info:
             loc["b"]
         assert loc.get("b") == None
+        assert loc.get("b", "foo") == "foo"
 
         # a is only in location object
         assert "a" in loc
         assert loc["a"] == 1
         assert loc.get("a") == 1
+        assert loc.get("a", "foo") == 1
 
         # c is only in active area object
         assert "c" in loc
         assert loc["c"] == 23
         assert loc.get("c") == 23
+        assert loc.get("c", "foo") == 23
 
         # "d" is defined in both location and active area;
         # should return value in location object
         assert "d" in loc
         assert loc["d"] == 321
         assert loc.get("d") == 321
+        assert loc.get("d", "foo") == 321
 
         # "start" and "end" are blacklisted from looking in parent
         # active area object, so key error if only in active area
         assert "start" in loc
         assert loc["start"] == 123
         assert loc.get("start") == 123
+        assert loc.get("start", "foo") == 123
         assert "end" not in loc
         with raises(KeyError) as e_info:
             loc["end"]
         assert loc.get("end") == None
+        assert loc.get("end", "foo") == "foo"
 
         assert loc == {"a": 1, "d": 321, "start": 123}
 
