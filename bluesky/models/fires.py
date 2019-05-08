@@ -540,7 +540,7 @@ class FiresManager(object):
                     # and then raise BlueSkyModuleError, below, so that the calling
                     # code can decide what to do (which, in the case of bsp and
                     # bsp-web, is to dump the data as is)
-                    logging.error(e)
+                    logging.error(str(e))
                     tb = traceback.format_exc()
                     logging.debug(tb)
                     self.error = {

@@ -175,7 +175,7 @@ def run_input(module, input_file):
         # if output file doesn't exist, it means this expection was expected
         # TODO: confirm that this is valid logic
         if os.path.isfile(output_file):
-            logging.error('FAILED - %s - %s', input_file, e)
+            logging.error('FAILED - %s - %s', input_file, str(e))
             return False
         else:
             logging.debug('Caught expected exception')
