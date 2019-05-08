@@ -1,101 +1,324 @@
 {
+    "today": "2016-06-29",
+    "run_config": {
+        "ingestion": {
+            "keep_heat": false,
+            "keep_emissions": false
+        },
+        "merge": {
+            "skip_failures": false
+        },
+        "skip_failed_fires": false,
+        "timeprofiling": {
+            "hourly_fractions": null
+        },
+        "extrafiles": {
+            "dest_dir": null,
+            "firescsvs": {
+                "fire_events_filename": "fire_events.csv",
+                "fire_locations_filename": "fire_locations.csv"
+            },
+            "emissionscsv": {
+                "filename": null
+            },
+            "sets": []
+        },
+        "export": {
+            "email": {
+                "subject": "bluesky run output",
+                "smtp_server": "localhost",
+                "smtp_port": 25,
+                "recipients": null,
+                "password": null,
+                "sender": "bsp@airfire.org",
+                "smtp_starttls": false,
+                "username": null
+            },
+            "extra_exports": [],
+            "modes": [],
+            "upload": {
+                "scp": {
+                    "dest_dir": null,
+                    "host": null,
+                    "port": 22,
+                    "user": null
+                },
+                "extra_exports_dir_name": null,
+                "tarball_name": null,
+                "json_output_filename": "output.json",
+                "handle_existing": "fail",
+                "output_dir_name": null
+            },
+            "localsave": {
+                "dest_dir": null,
+                "json_output_filename": "output.json",
+                "handle_existing": "fail",
+                "extra_exports_dir_name": null,
+                "output_dir_name": null
+            }
+        },
+        "localmet": {},
+        "skip_failed_sources": false,
+        "plumerising": {
+            "sev": {
+                "working_dir": null
+            },
+            "model": "feps",
+            "feps": {
+                "working_dir": null
+            }
+        },
+        "load": {
+            "sources": []
+        },
+        "consumption": {
+            "fuel_loadings": {},
+            "default_ecoregion": null,
+            "ecoregion_lookup_implemenation": "ogr"
+        },
+        "statuslogging": {
+            "domain": null,
+            "api_key": null,
+            "process": null,
+            "enabled": false,
+            "api_endpoint": null,
+            "api_secret": null
+        },
+        "dispersion": {
+            "vsmoke": {
+                "emtqr": -0.75,
+                "grad_rise": true,
+                "tdecay": 2,
+                "json_file": "smoke_dispersion.json",
+                "bkgcoa": 0.0,
+                "dutmfn": 100,
+                "kmz_file": "smoke_dispersion.kmz",
+                "rfrc": -0.75,
+                "dutmfe": 0,
+                "icover": 0,
+                "xbgn": 150,
+                "thot": 4,
+                "ceil": 99999,
+                "temp_fire": 59.0,
+                "cc0crt": 0.02,
+                "irha": 25,
+                "efpm": 30,
+                "viscrt": 0.125,
+                "xntvl": 0.05,
+                "ozinta": 0.0,
+                "mix_ht": 1500.0,
+                "stability": 4,
+                "tconst": 4,
+                "xend": 200,
+                "create_json": true,
+                "pres": 1013.25,
+                "bkgpma": 0.0,
+                "ltofdy": true,
+                "legend_image": "/home/jdubowy/code/pnwairfire-bluesky/bluesky/dispersers/vsmoke/images/aqi_legend.png",
+                "overlay_title": "Peak Hourly PM2.5",
+                "tol": 0.1,
+                "oyinta": 0.0,
+                "efco": 250
+            },
+            "working_dir": null,
+            "num_hours": null,
+            "start": null,
+            "model": "hysplit",
+            "handle_existing": "fail",
+            "output_dir": null,
+            "hysplit": {
+                "vertical_emislevels_reduction_factor": 1,
+                "landuse_file": "/home/jdubowy/code/pnwairfire-bluesky/bluesky/dispersers/hysplit/bdyfiles/LANDUSE.ASC",
+                "make_init_file": false,
+                "max_spacing_latitude": 0.5,
+                "nprocesses": 1,
+                "projection": "LatLon",
+                "ncycl": 0,
+                "top_of_model_domain": 30000.0,
+                "smolder_height": 10.0,
+                "dispersion_offset": 0,
+                "dry_dep_diffusivity": 0.0,
+                "grid_length": 2000,
+                "stop_if_no_parinit": true,
+                "rouglen_file": "/home/jdubowy/code/pnwairfire-bluesky/bluesky/dispersers/hysplit/bdyfiles/ROUGLEN.ASC",
+                "convert_hysplit2netcdf": true,
+                "dispersion_folder": "./input/dispersion",
+                "initd": 0,
+                "wet_dep_below_cloud_scav": 0.0,
+                "tratio": 0.75,
+                "radioactive_half_live": 0.0,
+                "ascdata_file": "/home/jdubowy/code/pnwairfire-bluesky/bluesky/dispersers/hysplit/bdyfiles/ASCDATA.CFG",
+                "max_spacing_longitude": 0.5,
+                "wet_dep_in_cloud_scav": 0.0,
+                "dry_dep_eff_henry": 0.0,
+                "pardump": "./input/dispersion/PARDUMP",
+                "sampling_interval_type": 0,
+                "qcycle": 1.0,
+                "ichem": 0,
+                "width_longitude": null,
+                "height_latitude": null,
+                "skip_invalid_fires": false,
+                "sampling_interval_hour": 1,
+                "sampling_interval_min": 0,
+                "spacing_longitude": null,
+                "nprocesses_max": -1,
+                "mgmin": 10,
+                "vertical_levels": [
+                    100
+                ],
+                "maxpar": 10000000,
+                "ninit": 0,
+                "ndump": 0,
+                "vertical_method": "DATA",
+                "wet_dep_actual_henry": 0.0,
+                "ncpus": 1,
+                "khmax": 72,
+                "particle_shape": 1.0,
+                "center_longitude": null,
+                "fire_intervals": [
+                    0,
+                    100,
+                    200,
+                    500,
+                    1000
+                ],
+                "nfires_per_process": -1,
+                "binaries": {},
+                "delt": 0.0,
+                "user_defined_grid": false,
+                "numpar": 1000,
+                "spacing_latitude": null,
+                "parinit": "./input/dispersion/PARINIT",
+                "dry_dep_mol_weight": 0.0,
+                "grid": {},
+                "compute_grid": false,
+                "center_latitude": null,
+                "dry_dep_velocity": 0.0,
+                "particle_density": 1.0,
+                "dry_dep_reactivity": 0.0,
+                "optimize_grid_resolution": false,
+                "mpi": false,
+                "particle_diameter": 1.0,
+                "output_file_name": "hysplit_conc.nc"
+            }
+        },
+        "visualization": {
+            "target": "dispersion",
+            "hysplit": {
+                "blueskykml_config": {
+                    "dispersiongridoutput": {
+                        "output_dir": null
+                    },
+                    "smokedispersionkmlinput": {
+                        "fire_event_icon": "http://maps.google.com/mapfiles/ms/micons/firedept.png"
+                    }
+                },
+                "create_summary_json": false,
+                "smoke_dispersion_kmz_filename": "smoke_dispersion.kmz",
+                "fire_kmz_filename": "fire_locations.kmz",
+                "fire_locations_csv_filename": "fire_locations.csv",
+                "images_dir": null,
+                "output_dir": null,
+                "fire_events_csv_filename": "fire_events.csv",
+                "data_dir": "",
+                "prettykml": false
+            }
+        },
+        "emissions": {
+            "fuel_loadings": {},
+            "species": [
+                "PM2.5"
+            ],
+            "model": "feps",
+            "include_emissions_details": false
+        },
+        "filter": {
+            "skip_failures": false
+        },
+        "fuelbeds": {
+            "truncation_percentage_threshold": 90.0,
+            "no_sampling": false,
+            "fccs_version": "2",
+            "truncation_count_threshold": 5,
+            "ignored_percent_resampling_threshold": 99.9,
+            "ignored_fuelbeds": [
+                "0",
+                "900"
+            ],
+            "total_pct_threshold": 0.5
+        },
+        "splitactivity": {
+            "record_original_activity": false
+        },
+        "findmetdata": {
+            "met_root_dir": null,
+            "arl": {
+                "max_days_out": 4,
+                "index_filename_pattern": "arl12hrindex.csv"
+            },
+            "time_window": {},
+            "met_format": "arl",
+            "wait": {}
+        }
+    },
+    "processing": [
+        {
+            "module_name": "timeprofiling",
+            "version": "0.1.0",
+            "module": "bluesky.modules.timeprofiling",
+            "timeprofile_version": "0.1.2"
+        }
+    ],
+    "runtime": {
+        "end": "2016-06-29T20:08:15Z",
+        "modules": [
+            {
+                "module_name": "timeprofiling",
+                "end": "2016-06-29T20:08:15Z",
+                "start": "2016-06-29T20:08:15Z",
+                "total": "0h 0m 0s"
+            }
+        ],
+        "start": "2016-06-29T20:08:15Z",
+        "total": "0h 0m 0s"
+    },
     "fires": [
         {
             "event_of": {
-                "name": "Natural Fire near Snoqualmie Pass, WA",
-                "id": "SF11E826544"
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
             },
+            "id": "SF11C14225236095807750",
             "type": "wildfire",
+            "fuel_type": "natural",
             "activity": [
                 {
                     "active_areas": [
                         {
-                            "ecoregion": "southern",
-                            "utc_offset": "-09:00",
                             "end": "2015-01-20T02:00:00",
                             "timeprofile": {
-                                "2015-01-20T00:00:00": {
+                                "2015-01-20T01:00:00": {
                                     "smoldering": 0.5,
                                     "flaming": 0.5,
                                     "area_fraction": 0.5,
                                     "residual": 0.5
                                 },
-                                "2015-01-20T01:00:00": {
+                                "2015-01-20T00:00:00": {
                                     "smoldering": 0.5,
                                     "flaming": 0.5,
                                     "area_fraction": 0.5,
                                     "residual": 0.5
                                 }
                             },
-                            "start": "2015-01-20T00:00:00",
                             "specified_points": [
                                 {
                                     "area": 10000.0,
                                     "fuelbeds": [
                                         {
-                                            "fccs_id": "46",
-                                            "pct": 100.0,
-                                            "fuel_loadings": {
-                                                "w_rotten_gt20_loading": 0.0,
-                                                "duff_lower_loading": 2.16,
-                                                "midstory_loading": 0.0,
-                                                "litter_depth": 1.0,
-                                                "w_stump_rotten_loading": 0.0,
-                                                "moss_depth": 0.0,
-                                                "w_stump_lightered_loading": 0.0,
-                                                "snags_c3_loading": 0.0,
-                                                "nw_primary_perc_live": 0.0,
-                                                "shrubs_primary_perc_live": 0.85,
-                                                "lichen_loading": 0.0,
-                                                "filename": "FB_0046_FCCS.xml",
-                                                "nw_primary_loading": 0.0,
-                                                "w_sound_0_quarter_loading": 0.5,
-                                                "basal_accum_loading": 0.0,
-                                                "understory_loading": 0.0,
-                                                "snags_c1wo_foliage_loading": 0.0,
-                                                "pile_clean_loading": 0.0,
-                                                "w_stump_sound_loading": 0.0,
-                                                "cover_type": 161,
-                                                "squirrel_midden_loading": 0.0,
-                                                "ladderfuels_loading": 0.0,
-                                                "efg_natural": 7,
-                                                "w_rotten_3_9_loading": 0.0,
-                                                "efg_activity": 7,
-                                                "nw_secondary_loading": 0.0,
-                                                "litter_loading": 0.3,
-                                                "shrubs_secondary_perc_live": 0.85,
-                                                "nw_secondary_perc_live": 0.0,
-                                                "snags_c2_loading": 0.0,
-                                                "w_sound_1_3_loading": 1.0,
-                                                "shrubs_primary_loading": 12.061473,
-                                                "lichen_depth": 0.0,
-                                                "snags_c1_foliage_loading": 0.0,
-                                                "moss_loading": 0.0,
-                                                "pile_vdirty_loading": 0.0,
-                                                "duff_lower_depth": 0.2,
-                                                "w_rotten_9_20_loading": 0.0,
-                                                "ecoregion": 260.0,
-                                                "w_sound_9_20_loading": 0.0,
-                                                "pile_dirty_loading": 0.0,
-                                                "w_sound_3_9_loading": 0.0,
-                                                "duff_upper_loading": 0.96,
-                                                "overstory_loading": 0.0,
-                                                "w_sound_gt20_loading": 0.0,
-                                                "shrubs_secondary_loading": 0.172292,
-                                                "w_sound_quarter_1_loading": 1.0,
-                                                "total_available_fuel_loading": 18.153765,
-                                                "duff_upper_depth": 0.2,
-                                                "snags_c1_wood_loading": 0.0
-                                            },
                                             "emissions": {
                                                 "smoldering": {
                                                     "PM2.5": [
                                                         0.011065743225101874
-                                                    ]
-                                                },
-                                                "flaming": {
-                                                    "PM2.5": [
-                                                        0.07199844026240416
                                                     ]
                                                 },
                                                 "total": {
@@ -107,22 +330,82 @@
                                                     "PM2.5": [
                                                         0.0003344695200000001
                                                     ]
+                                                },
+                                                "flaming": {
+                                                    "PM2.5": [
+                                                        0.07199844026240416
+                                                    ]
                                                 }
-                                            }
+                                            },
+                                            "fuel_loadings": {
+                                                "shrubs_secondary_perc_live": 0.85,
+                                                "duff_upper_depth": 0.2,
+                                                "w_rotten_3_9_loading": 0.0,
+                                                "pile_vdirty_loading": 0.0,
+                                                "moss_depth": 0.0,
+                                                "w_sound_gt20_loading": 0.0,
+                                                "total_available_fuel_loading": 18.153765,
+                                                "w_rotten_9_20_loading": 0.0,
+                                                "w_rotten_gt20_loading": 0.0,
+                                                "shrubs_secondary_loading": 0.172292,
+                                                "nw_primary_loading": 0.0,
+                                                "nw_primary_perc_live": 0.0,
+                                                "w_stump_lightered_loading": 0.0,
+                                                "w_sound_3_9_loading": 0.0,
+                                                "lichen_loading": 0.0,
+                                                "midstory_loading": 0.0,
+                                                "shrubs_primary_loading": 12.061473,
+                                                "w_stump_sound_loading": 0.0,
+                                                "cover_type": 161,
+                                                "moss_loading": 0.0,
+                                                "duff_upper_loading": 0.96,
+                                                "lichen_depth": 0.0,
+                                                "snags_c1wo_foliage_loading": 0.0,
+                                                "efg_natural": 7,
+                                                "litter_loading": 0.3,
+                                                "efg_activity": 7,
+                                                "ladderfuels_loading": 0.0,
+                                                "overstory_loading": 0.0,
+                                                "nw_secondary_loading": 0.0,
+                                                "snags_c1_foliage_loading": 0.0,
+                                                "duff_lower_loading": 2.16,
+                                                "filename": "FB_0046_FCCS.xml",
+                                                "pile_dirty_loading": 0.0,
+                                                "snags_c3_loading": 0.0,
+                                                "snags_c1_wood_loading": 0.0,
+                                                "w_sound_0_quarter_loading": 0.5,
+                                                "squirrel_midden_loading": 0.0,
+                                                "pile_clean_loading": 0.0,
+                                                "shrubs_primary_perc_live": 0.85,
+                                                "w_stump_rotten_loading": 0.0,
+                                                "duff_lower_depth": 0.2,
+                                                "w_sound_1_3_loading": 1.0,
+                                                "basal_accum_loading": 0.0,
+                                                "w_sound_quarter_1_loading": 1.0,
+                                                "nw_secondary_perc_live": 0.0,
+                                                "litter_depth": 1.0,
+                                                "snags_c2_loading": 0.0,
+                                                "w_sound_9_20_loading": 0.0,
+                                                "ecoregion": 260.0,
+                                                "understory_loading": 0.0
+                                            },
+                                            "pct": 100.0,
+                                            "fccs_id": "46"
                                         }
                                     ],
                                     "lng": -121.3990506,
                                     "lat": 47.4316976
                                 }
-                            ]
+                            ],
+                            "ecoregion": "southern",
+                            "utc_offset": "-09:00",
+                            "start": "2015-01-20T00:00:00"
                         }
                     ]
                 },
                 {
                     "active_areas": [
                         {
-                            "ecoregion": "southern",
-                            "utc_offset": "-09:00",
                             "end": "2015-01-20T04:00:00",
                             "timeprofile": {
                                 "2015-01-20T02:00:00": {
@@ -138,75 +421,15 @@
                                     "residual": 0.5
                                 }
                             },
-                            "start": "2015-01-20T02:00:00",
                             "specified_points": [
                                 {
                                     "area": 10000.0,
                                     "fuelbeds": [
                                         {
-                                            "fccs_id": "46",
-                                            "pct": 100.0,
-                                            "fuel_loadings": {
-                                                "w_rotten_gt20_loading": 0.0,
-                                                "duff_lower_loading": 2.16,
-                                                "midstory_loading": 0.0,
-                                                "litter_depth": 1.0,
-                                                "w_stump_rotten_loading": 0.0,
-                                                "moss_depth": 0.0,
-                                                "w_stump_lightered_loading": 0.0,
-                                                "snags_c3_loading": 0.0,
-                                                "nw_primary_perc_live": 0.0,
-                                                "shrubs_primary_perc_live": 0.85,
-                                                "lichen_loading": 0.0,
-                                                "filename": "FB_0046_FCCS.xml",
-                                                "nw_primary_loading": 0.0,
-                                                "w_sound_0_quarter_loading": 0.5,
-                                                "basal_accum_loading": 0.0,
-                                                "understory_loading": 0.0,
-                                                "snags_c1wo_foliage_loading": 0.0,
-                                                "pile_clean_loading": 0.0,
-                                                "w_stump_sound_loading": 0.0,
-                                                "cover_type": 161,
-                                                "squirrel_midden_loading": 0.0,
-                                                "ladderfuels_loading": 0.0,
-                                                "efg_natural": 7,
-                                                "w_rotten_3_9_loading": 0.0,
-                                                "efg_activity": 7,
-                                                "nw_secondary_loading": 0.0,
-                                                "litter_loading": 0.3,
-                                                "shrubs_secondary_perc_live": 0.85,
-                                                "nw_secondary_perc_live": 0.0,
-                                                "snags_c2_loading": 0.0,
-                                                "w_sound_1_3_loading": 1.0,
-                                                "shrubs_primary_loading": 12.061473,
-                                                "lichen_depth": 0.0,
-                                                "snags_c1_foliage_loading": 0.0,
-                                                "moss_loading": 0.0,
-                                                "pile_vdirty_loading": 0.0,
-                                                "duff_lower_depth": 0.2,
-                                                "w_rotten_9_20_loading": 0.0,
-                                                "ecoregion": 260.0,
-                                                "w_sound_9_20_loading": 0.0,
-                                                "pile_dirty_loading": 0.0,
-                                                "w_sound_3_9_loading": 0.0,
-                                                "duff_upper_loading": 0.96,
-                                                "overstory_loading": 0.0,
-                                                "w_sound_gt20_loading": 0.0,
-                                                "shrubs_secondary_loading": 0.172292,
-                                                "w_sound_quarter_1_loading": 1.0,
-                                                "total_available_fuel_loading": 18.153765,
-                                                "duff_upper_depth": 0.2,
-                                                "snags_c1_wood_loading": 0.0
-                                            },
                                             "emissions": {
                                                 "smoldering": {
                                                     "PM2.5": [
                                                         0.011065743225101874
-                                                    ]
-                                                },
-                                                "flaming": {
-                                                    "PM2.5": [
-                                                        0.07199844026240416
                                                     ]
                                                 },
                                                 "total": {
@@ -218,303 +441,80 @@
                                                     "PM2.5": [
                                                         0.0003344695200000001
                                                     ]
+                                                },
+                                                "flaming": {
+                                                    "PM2.5": [
+                                                        0.07199844026240416
+                                                    ]
                                                 }
-                                            }
+                                            },
+                                            "fuel_loadings": {
+                                                "shrubs_secondary_perc_live": 0.85,
+                                                "duff_upper_depth": 0.2,
+                                                "w_rotten_3_9_loading": 0.0,
+                                                "pile_vdirty_loading": 0.0,
+                                                "moss_depth": 0.0,
+                                                "w_sound_gt20_loading": 0.0,
+                                                "total_available_fuel_loading": 18.153765,
+                                                "w_rotten_9_20_loading": 0.0,
+                                                "w_rotten_gt20_loading": 0.0,
+                                                "shrubs_secondary_loading": 0.172292,
+                                                "nw_primary_loading": 0.0,
+                                                "nw_primary_perc_live": 0.0,
+                                                "w_stump_lightered_loading": 0.0,
+                                                "w_sound_3_9_loading": 0.0,
+                                                "lichen_loading": 0.0,
+                                                "midstory_loading": 0.0,
+                                                "shrubs_primary_loading": 12.061473,
+                                                "w_stump_sound_loading": 0.0,
+                                                "cover_type": 161,
+                                                "moss_loading": 0.0,
+                                                "duff_upper_loading": 0.96,
+                                                "lichen_depth": 0.0,
+                                                "snags_c1wo_foliage_loading": 0.0,
+                                                "efg_natural": 7,
+                                                "litter_loading": 0.3,
+                                                "efg_activity": 7,
+                                                "ladderfuels_loading": 0.0,
+                                                "overstory_loading": 0.0,
+                                                "nw_secondary_loading": 0.0,
+                                                "snags_c1_foliage_loading": 0.0,
+                                                "duff_lower_loading": 2.16,
+                                                "filename": "FB_0046_FCCS.xml",
+                                                "pile_dirty_loading": 0.0,
+                                                "snags_c3_loading": 0.0,
+                                                "snags_c1_wood_loading": 0.0,
+                                                "w_sound_0_quarter_loading": 0.5,
+                                                "squirrel_midden_loading": 0.0,
+                                                "pile_clean_loading": 0.0,
+                                                "shrubs_primary_perc_live": 0.85,
+                                                "w_stump_rotten_loading": 0.0,
+                                                "duff_lower_depth": 0.2,
+                                                "w_sound_1_3_loading": 1.0,
+                                                "basal_accum_loading": 0.0,
+                                                "w_sound_quarter_1_loading": 1.0,
+                                                "nw_secondary_perc_live": 0.0,
+                                                "litter_depth": 1.0,
+                                                "snags_c2_loading": 0.0,
+                                                "w_sound_9_20_loading": 0.0,
+                                                "ecoregion": 260.0,
+                                                "understory_loading": 0.0
+                                            },
+                                            "pct": 100.0,
+                                            "fccs_id": "46"
                                         }
                                     ],
                                     "lng": -121.3990506,
                                     "lat": 47.4316976
                                 }
-                            ]
+                            ],
+                            "ecoregion": "southern",
+                            "utc_offset": "-09:00",
+                            "start": "2015-01-20T02:00:00"
                         }
                     ]
                 }
-            ],
-            "id": "SF11C14225236095807750",
-            "fuel_type": "natural"
-        }
-    ],
-    "today": "2016-06-29",
-    "runtime": {
-        "start": "2016-06-29T20:08:15Z",
-        "end": "2016-06-29T20:08:15Z",
-        "total": "0h 0m 0s",
-        "modules": [
-            {
-                "start": "2016-06-29T20:08:15Z",
-                "end": "2016-06-29T20:08:15Z",
-                "total": "0h 0m 0s",
-                "module_name": "timeprofiling"
-            }
-        ]
-    },
-    "run_config": {
-        "export": {
-            "upload": {
-                "tarball_name": null,
-                "handle_existing": "fail",
-                "scp": {
-                    "host": null,
-                    "dest_dir": null,
-                    "port": 22,
-                    "user": null
-                },
-                "json_output_filename": "output.json",
-                "output_dir_name": null,
-                "extra_exports_dir_name": null
-            },
-            "localsave": {
-                "dest_dir": null,
-                "json_output_filename": "output.json",
-                "output_dir_name": null,
-                "handle_existing": "fail",
-                "extra_exports_dir_name": null
-            },
-            "email": {
-                "smtp_port": 25,
-                "recipients": null,
-                "subject": "bluesky run output",
-                "smtp_server": "localhost",
-                "smtp_starttls": false,
-                "username": null,
-                "sender": "bsp@airfire.org",
-                "password": null
-            },
-            "extra_exports": [],
-            "modes": []
-        },
-        "extrafiles": {
-            "dest_dir": null,
-            "firescsvs": {
-                "fire_locations_filename": "fire_locations.csv",
-                "fire_events_filename": "fire_events.csv"
-            },
-            "sets": [],
-            "emissionscsv": {
-                "filename": null
-            }
-        },
-        "filter": {
-            "skip_failures": false
-        },
-        "dispersion": {
-            "handle_existing": "fail",
-            "output_dir": null,
-            "model": "hysplit",
-            "vsmoke": {
-                "irha": 25,
-                "xbgn": 150,
-                "thot": 4,
-                "mix_ht": 1500.0,
-                "xend": 200,
-                "rfrc": -0.75,
-                "ozinta": 0.0,
-                "create_json": true,
-                "cc0crt": 0.02,
-                "json_file": "smoke_dispersion.json",
-                "efpm": 30,
-                "xntvl": 0.05,
-                "stability": 4,
-                "oyinta": 0.0,
-                "tdecay": 2,
-                "pres": 1013.25,
-                "legend_image": "/home/jdubowy/code/pnwairfire-bluesky/bluesky/dispersers/vsmoke/images/aqi_legend.png",
-                "viscrt": 0.125,
-                "bkgcoa": 0.0,
-                "kmz_file": "smoke_dispersion.kmz",
-                "overlay_title": "Peak Hourly PM2.5",
-                "dutmfn": 100,
-                "ltofdy": true,
-                "tconst": 4,
-                "grad_rise": true,
-                "bkgpma": 0.0,
-                "emtqr": -0.75,
-                "tol": 0.1,
-                "ceil": 99999,
-                "temp_fire": 59.0,
-                "efco": 250,
-                "icover": 0,
-                "dutmfe": 0
-            },
-            "hysplit": {
-                "output_file_name": "hysplit_conc.nc",
-                "dry_dep_velocity": 0.0,
-                "nprocesses_max": -1,
-                "fire_intervals": [
-                    0,
-                    100,
-                    200,
-                    500,
-                    1000
-                ],
-                "spacing_longitude": null,
-                "particle_diameter": 1.0,
-                "ninit": 0,
-                "khmax": 72,
-                "wet_dep_actual_henry": 0.0,
-                "smolder_height": 10.0,
-                "numpar": 1000,
-                "nfires_per_process": -1,
-                "maxpar": 10000000,
-                "dry_dep_reactivity": 0.0,
-                "ncpus": 1,
-                "center_longitude": null,
-                "optimize_grid_resolution": false,
-                "radioactive_half_live": 0.0,
-                "spacing_latitude": null,
-                "max_spacing_latitude": 0.5,
-                "vertical_method": "DATA",
-                "initd": 0,
-                "dispersion_offset": 0,
-                "sampling_interval_type": 0,
-                "make_init_file": false,
-                "nprocesses": 1,
-                "dispersion_folder": "./input/dispersion",
-                "ascdata_file": "/home/jdubowy/code/pnwairfire-bluesky/bluesky/dispersers/hysplit/bdyfiles/ASCDATA.CFG",
-                "width_longitude": null,
-                "dry_dep_diffusivity": 0.0,
-                "grid_length": 2000,
-                "wet_dep_in_cloud_scav": 0.0,
-                "user_defined_grid": false,
-                "grid": {},
-                "landuse_file": "/home/jdubowy/code/pnwairfire-bluesky/bluesky/dispersers/hysplit/bdyfiles/LANDUSE.ASC",
-                "tratio": 0.75,
-                "center_latitude": null,
-                "binaries": {},
-                "vertical_emislevels_reduction_factor": 1,
-                "pardump": "./input/dispersion/PARDUMP",
-                "compute_grid": false,
-                "mpi": false,
-                "particle_density": 1.0,
-                "ichem": 0,
-                "mgmin": 10,
-                "wet_dep_below_cloud_scav": 0.0,
-                "projection": "LatLon",
-                "particle_shape": 1.0,
-                "rouglen_file": "/home/jdubowy/code/pnwairfire-bluesky/bluesky/dispersers/hysplit/bdyfiles/ROUGLEN.ASC",
-                "dry_dep_eff_henry": 0.0,
-                "top_of_model_domain": 30000.0,
-                "skip_invalid_fires": false,
-                "ncycl": 0,
-                "ndump": 0,
-                "sampling_interval_min": 0,
-                "vertical_levels": [
-                    100
-                ],
-                "qcycle": 1.0,
-                "height_latitude": null,
-                "stop_if_no_parinit": true,
-                "delt": 0.0,
-                "parinit": "./input/dispersion/PARINIT",
-                "convert_hysplit2netcdf": true,
-                "sampling_interval_hour": 1,
-                "max_spacing_longitude": 0.5,
-                "dry_dep_mol_weight": 0.0
-            },
-            "start": null,
-            "num_hours": null,
-            "working_dir": null
-        },
-        "visualization": {
-            "target": "dispersion",
-            "hysplit": {
-                "fire_events_csv_filename": "fire_events.csv",
-                "images_dir": null,
-                "output_dir": null,
-                "fire_kmz_filename": "fire_locations.kmz",
-                "data_dir": "",
-                "fire_locations_csv_filename": "fire_locations.csv",
-                "create_summary_json": false,
-                "smoke_dispersion_kmz_filename": "smoke_dispersion.kmz",
-                "prettykml": false,
-                "blueskykml_config": {
-                    "dispersiongridoutput": {
-                        "output_dir": null
-                    },
-                    "smokedispersionkmlinput": {
-                        "fire_event_icon": "http://maps.google.com/mapfiles/ms/micons/firedept.png"
-                    }
-                }
-            }
-        },
-        "splitactivity": {
-            "record_original_activity": false
-        },
-        "load": {
-            "sources": []
-        },
-        "statuslogging": {
-            "domain": null,
-            "api_endpoint": null,
-            "process": null,
-            "api_secret": null,
-            "api_key": null,
-            "enabled": false
-        },
-        "plumerising": {
-            "feps": {
-                "working_dir": null
-            },
-            "model": "feps",
-            "sev": {
-                "working_dir": null
-            }
-        },
-        "localmet": {},
-        "findmetdata": {
-            "arl": {
-                "max_days_out": 4,
-                "index_filename_pattern": "arl12hrindex.csv"
-            },
-            "time_window": {},
-            "met_root_dir": null,
-            "wait": {},
-            "met_format": "arl"
-        },
-        "ingestion": {
-            "keep_emissions": false,
-            "keep_heat": false
-        },
-        "emissions": {
-            "species": [
-                "PM2.5"
-            ],
-            "model": "feps",
-            "include_emissions_details": false,
-            "fuel_loadings": {}
-        },
-        "timeprofiling": {
-            "hourly_fractions": null
-        },
-        "skip_failed_sources": false,
-        "fuelbeds": {
-            "ignored_fuelbeds": [
-                "0",
-                "900"
-            ],
-            "fccs_version": "2",
-            "ignored_percent_resampling_threshold": 99.9,
-            "no_sampling": false,
-            "truncation_percentage_threshold": 90.0,
-            "total_pct_threshold": 0.5,
-            "truncation_count_threshold": 5
-        },
-        "consumption": {
-            "default_ecoregion": null,
-            "ecoregion_lookup_implemenation": "ogr",
-            "fuel_loadings": {}
-        },
-        "skip_failed_fires": false,
-        "merge": {
-            "skip_failures": false
-        }
-    },
-    "processing": [
-        {
-            "module": "bluesky.modules.timeprofiling",
-            "version": "0.1.0",
-            "timeprofile_version": "0.1.2",
-            "module_name": "timeprofiling"
+            ]
         }
     ]
 }

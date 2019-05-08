@@ -1,74 +1,81 @@
 {
     "fires": [
         {
+            "id": "SF11C14225236095807750",
             "event_of": {
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             },
-            "id": "SF11C14225236095807750",
             "activity": [
                 {
                     "active_areas": [
                         {
-                            "end": "2015-01-20T02:00:00",
+                            "utc_offset": "-09:00",
                             "specified_points": [
                                 {
                                     "area": 20000.0,
                                     "fuelbeds": [
                                         {
+                                            "fccs_id": "46",
                                             "fuel_loadings": {
-                                                "pile_clean_loading": 0.0,
-                                                "nw_primary_loading": 0.0,
-                                                "duff_lower_depth": 0.2,
-                                                "duff_upper_loading": 0.96,
-                                                "w_rotten_3_9_loading": 0.0,
-                                                "nw_secondary_perc_live": 0.0,
-                                                "snags_c2_loading": 0.0,
-                                                "w_rotten_gt20_loading": 0.0,
-                                                "w_sound_9_20_loading": 0.0,
-                                                "duff_lower_loading": 2.16,
-                                                "w_sound_1_3_loading": 1.0,
-                                                "squirrel_midden_loading": 0.0,
-                                                "pile_dirty_loading": 0.0,
-                                                "lichen_depth": 0.0,
-                                                "w_sound_quarter_1_loading": 1.0,
-                                                "shrubs_primary_loading": 12.061473,
-                                                "basal_accum_loading": 0.0,
-                                                "snags_c1_wood_loading": 0.0,
-                                                "efg_activity": 7,
-                                                "filename": "FB_0046_FCCS.xml",
-                                                "w_sound_3_9_loading": 0.0,
-                                                "efg_natural": 7,
-                                                "w_sound_0_quarter_loading": 0.5,
-                                                "understory_loading": 0.0,
-                                                "total_available_fuel_loading": 18.153765,
-                                                "moss_depth": 0.0,
-                                                "nw_primary_perc_live": 0.0,
-                                                "w_rotten_9_20_loading": 0.0,
-                                                "snags_c1wo_foliage_loading": 0.0,
-                                                "nw_secondary_loading": 0.0,
                                                 "snags_c3_loading": 0.0,
-                                                "shrubs_secondary_loading": 0.172292,
-                                                "pile_vdirty_loading": 0.0,
-                                                "overstory_loading": 0.0,
-                                                "ecoregion": 260.0,
-                                                "shrubs_primary_perc_live": 0.85,
-                                                "cover_type": 161,
-                                                "litter_loading": 0.3,
-                                                "w_sound_gt20_loading": 0.0,
-                                                "lichen_loading": 0.0,
-                                                "w_stump_rotten_loading": 0.0,
-                                                "litter_depth": 1.0,
-                                                "moss_loading": 0.0,
-                                                "shrubs_secondary_perc_live": 0.85,
-                                                "snags_c1_foliage_loading": 0.0,
-                                                "ladderfuels_loading": 0.0,
-                                                "duff_upper_depth": 0.2,
+                                                "nw_primary_loading": 0.0,
                                                 "w_stump_sound_loading": 0.0,
+                                                "w_rotten_gt20_loading": 0.0,
+                                                "ecoregion": 260.0,
+                                                "shrubs_secondary_perc_live": 0.85,
                                                 "midstory_loading": 0.0,
-                                                "w_stump_lightered_loading": 0.0
+                                                "efg_natural": 7,
+                                                "shrubs_secondary_loading": 0.172292,
+                                                "cover_type": 161,
+                                                "pile_vdirty_loading": 0.0,
+                                                "filename": "FB_0046_FCCS.xml",
+                                                "duff_upper_loading": 0.96,
+                                                "lichen_loading": 0.0,
+                                                "moss_depth": 0.0,
+                                                "duff_lower_depth": 0.2,
+                                                "nw_primary_perc_live": 0.0,
+                                                "overstory_loading": 0.0,
+                                                "pile_dirty_loading": 0.0,
+                                                "nw_secondary_loading": 0.0,
+                                                "snags_c1_foliage_loading": 0.0,
+                                                "w_sound_1_3_loading": 1.0,
+                                                "pile_clean_loading": 0.0,
+                                                "duff_upper_depth": 0.2,
+                                                "basal_accum_loading": 0.0,
+                                                "duff_lower_loading": 2.16,
+                                                "w_stump_lightered_loading": 0.0,
+                                                "nw_secondary_perc_live": 0.0,
+                                                "w_rotten_9_20_loading": 0.0,
+                                                "w_sound_3_9_loading": 0.0,
+                                                "snags_c1_wood_loading": 0.0,
+                                                "w_rotten_3_9_loading": 0.0,
+                                                "litter_loading": 0.3,
+                                                "total_available_fuel_loading": 18.153765,
+                                                "moss_loading": 0.0,
+                                                "w_stump_rotten_loading": 0.0,
+                                                "w_sound_0_quarter_loading": 0.5,
+                                                "squirrel_midden_loading": 0.0,
+                                                "snags_c2_loading": 0.0,
+                                                "efg_activity": 7,
+                                                "w_sound_quarter_1_loading": 1.0,
+                                                "shrubs_primary_perc_live": 0.85,
+                                                "ladderfuels_loading": 0.0,
+                                                "snags_c1wo_foliage_loading": 0.0,
+                                                "litter_depth": 1.0,
+                                                "lichen_depth": 0.0,
+                                                "shrubs_primary_loading": 12.061473,
+                                                "w_sound_gt20_loading": 0.0,
+                                                "w_sound_9_20_loading": 0.0,
+                                                "understory_loading": 0.0
                                             },
+                                            "pct": 100.0,
                                             "emissions": {
+                                                "flaming": {
+                                                    "PM2.5": [
+                                                        0.07199844026240416
+                                                    ]
+                                                },
                                                 "total": {
                                                     "PM2.5": [
                                                         0.08339865300750604
@@ -79,28 +86,21 @@
                                                         0.011065743225101874
                                                     ]
                                                 },
-                                                "flaming": {
-                                                    "PM2.5": [
-                                                        0.07199844026240416
-                                                    ]
-                                                },
                                                 "residual": {
                                                     "PM2.5": [
                                                         0.0003344695200000001
                                                     ]
                                                 }
-                                            },
-                                            "fccs_id": "46",
-                                            "pct": 100.0
+                                            }
                                         }
                                     ],
                                     "lng": -121.3990506,
                                     "lat": 47.4316976
                                 }
                             ],
-                            "utc_offset": "-09:00",
+                            "start": "2015-01-20T00:00:00",
                             "ecoregion": "southern",
-                            "start": "2015-01-20T00:00:00"
+                            "end": "2015-01-20T02:00:00"
                         }
                     ]
                 }
