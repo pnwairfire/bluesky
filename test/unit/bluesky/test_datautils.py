@@ -114,7 +114,10 @@ class TestSummarizeAllLevels(object):
                     "start": "2014-05-25T17:00:00",
                     "end": "2014-05-26T17:00:00",
                     'specified_points': [
-                        {'area': 34, 'lat': 45.0, 'lng': -120.0}
+                        {
+                            'area': 34, 'lat': 45.0, 'lng': -120.0,
+                            "emissions": {'summary': {'total': 0.0}}
+                        }
                     ],
                     "emissions": {'summary': {'total': 0.0}}
                 }],
@@ -154,7 +157,8 @@ class TestSummarizeAllLevels(object):
                     'specified_points': [
                         {
                             'area': 34, 'lat': 45.0, 'lng': -120.0,
-                            "fuelbeds": {}
+                            "fuelbeds": {},
+                            "emissions": {'summary': {'total': 0.0}}
                         }
                     ],
                     "emissions": {'summary': {'total': 0.0}}
@@ -207,7 +211,8 @@ class TestSummarizeAllLevels(object):
                                     "smoldering":{"PM2.5": [7]},
                                     "total": {"PM2.5": [22]} # incorrect, but should be ignored
                                 }
-                            }]
+                            }],
+                            "emissions": {'summary': {'PM2.5': 17.0, 'total': 17.0}}
                         }
                     ],
                     "emissions": {'summary': {'PM2.5': 17.0, 'total': 17.0}}
@@ -274,33 +279,21 @@ class TestSummarizeAllLevels(object):
                             "fuelbeds": [
                                 {
                                     "emissions": {
-                                        "flaming": {
-                                            "PM2.5": [10]
-                                        },
-                                        "smoldering":{
-                                            "PM2.5": [7]
-                                        },
-                                        "total": {
-                                            "PM2.5": [22] # incorrect, but should be ignored
-                                        },
+                                        "flaming": {"PM2.5": [10]},
+                                        "smoldering":{"PM2.5": [7]},
+                                        "total": {"PM2.5": [22]} # incorrect, but should be ignored
                                     }
                                 },
                                 {
                                     "emissions": {
-                                        "flaming": {
-                                            "PM2.5": [42]
-                                        },
-                                        "residual":{
-                                            "PM2.5": [1],
-                                            "CO": [123]
-                                        },
-                                        "total": {
-                                            "PM2.5": [22] # incorrect, but should be ignored
-                                        },
+                                        "flaming": {"PM2.5": [42]},
+                                        "residual":{"PM2.5": [1],"CO": [123]},
+                                        "total": {"PM2.5": [22]} # incorrect, but should be ignored
                                     }
 
                                 }
-                            ]
+                            ],
+                            "emissions": {'summary': {'PM2.5': 60.0, 'CO': 123.0, 'total': 183.0}}
                         }
                     ],
                     "emissions": {'summary': {'PM2.5': 60.0, 'CO': 123.0, 'total': 183.0}}
@@ -403,7 +396,8 @@ class TestSummarizeAllLevels(object):
                                             },
                                         }
                                     }
-                                ]
+                                ],
+                                "emissions": {'summary': {'PM2.5': 17.0, 'total': 17.0}}
                             }
                         ],
                         "emissions": {'summary': {'PM2.5': 17.0, 'total': 17.0}}
@@ -438,7 +432,8 @@ class TestSummarizeAllLevels(object):
                                             },
                                         }
                                     }
-                                ]
+                                ],
+                                "emissions": {'summary': {'PM2.5': 43.0, 'CO': 123.0, 'total': 166.0}}
                             }
                         ],
                         "emissions": {'summary': {'PM2.5': 43.0, 'CO': 123.0, 'total': 166.0}}

@@ -17,7 +17,8 @@ from pyairfire.data.utils import (
 )
 
 def summarize_fuelbeds(obj, key):
-    locations = [loc for loc in obj.locations if loc.get('fuelbeds')]
+    locations = obj.locations if hasattr(obj, 'locations') else [obj]
+    locations = [loc for loc in locations if loc.get('fuelbeds')]
     obj[key] = summarize(locations, key, include_details=False)
 
 def summarize_all_levels(fires_manager, key):
@@ -30,6 +31,8 @@ def summarize_all_levels(fires_manager, key):
         with fires_manager.fire_failure_handler(fire):
             for ac in fire.get('activity', []):
                 for aa in ac.active_areas:
+                    for loc in aa.locations:
+                        summarize_fuelbeds(loc, key)
                     summarize_fuelbeds(aa, key)
                 summarize_fuelbeds(ac, key)
             summarize_fuelbeds(fire, key)
