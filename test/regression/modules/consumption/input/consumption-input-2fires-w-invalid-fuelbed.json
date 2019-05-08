@@ -1,28 +1,17 @@
 {
     "fires": [
         {
+            "id": "SF11C14225236095807750",
             "activity": [
                 {
                     "active_areas": [
                         {
-                            "moisture_1khr": 50,
-                            "slope": 5,
-                            "fm_type": "MEAS-Th",
-                            "rain_days": 10,
-                            "end": "2015-01-21T15:00:00",
-                            "canopy_consumption_pct": 0,
-                            "moisture_litter": 30,
-                            "moisture_10hr": 50,
-                            "moisture_duff": 50,
-                            "ecoregion": "southern",
-                            "start": "2015-01-20T15:00:00",
-                            "utc_offset": "-09:00",
-                            "length_of_ignition": 120,
                             "windspeed": 5,
-                            "pile_blackened_pct": 0,
                             "specified_points": [
                                 {
+                                    "lng": -121.3990506,
                                     "area": 200,
+                                    "lat": 47.4316976,
                                     "fuelbeds": [
                                         {
                                             "fccs_id": "46",
@@ -36,45 +25,45 @@
                                             "fccs_id": "900",
                                             "pct": 25.0
                                         }
-                                    ],
-                                    "lat": 47.4316976,
-                                    "lng": -121.3990506
+                                    ]
                                 }
                             ],
+                            "end": "2015-01-21T15:00:00",
+                            "moisture_duff": 50,
+                            "canopy_consumption_pct": 0,
+                            "rain_days": 10,
+                            "start": "2015-01-20T15:00:00",
+                            "moisture_litter": 30,
+                            "pile_blackened_pct": 0,
+                            "slope": 5,
+                            "length_of_ignition": 120,
+                            "moisture_10hr": 50,
+                            "fm_type": "MEAS-Th",
+                            "ecoregion": "southern",
+                            "moisture_1khr": 50,
+                            "utc_offset": "-09:00",
                             "shrub_blackened_pct": 50
                         }
                     ]
                 }
             ],
-            "id": "SF11C14225236095807750",
             "event_of": {
                 "id": "SF11E826544",
                 "name": "Natural Fire near Snoqualmie Pass, WA"
             }
         },
         {
+            "id": "lkjrisdfo",
             "activity": [
                 {
                     "active_areas": [
                         {
-                            "moisture_1khr": 50,
-                            "slope": 5,
-                            "fm_type": "MEAS-Th",
-                            "rain_days": 10,
-                            "end": "2015-01-21T15:00:00",
-                            "canopy_consumption_pct": 0,
-                            "moisture_litter": 30,
-                            "moisture_10hr": 50,
-                            "moisture_duff": 50,
-                            "ecoregion": "southern",
-                            "start": "2015-01-20T15:00:00",
-                            "utc_offset": "-09:00",
-                            "length_of_ignition": 120,
                             "windspeed": 5,
-                            "pile_blackened_pct": 0,
                             "specified_points": [
                                 {
+                                    "lng": -121.3990506,
                                     "area": 200,
+                                    "lat": 47.5316976,
                                     "fuelbeds": [
                                         {
                                             "fccs_id": "41",
@@ -84,17 +73,28 @@
                                             "fccs_id": "41",
                                             "pct": 55.0
                                         }
-                                    ],
-                                    "lat": 47.5316976,
-                                    "lng": -121.3990506
+                                    ]
                                 }
                             ],
+                            "end": "2015-01-21T15:00:00",
+                            "moisture_duff": 50,
+                            "canopy_consumption_pct": 0,
+                            "rain_days": 10,
+                            "start": "2015-01-20T15:00:00",
+                            "moisture_litter": 30,
+                            "pile_blackened_pct": 0,
+                            "slope": 5,
+                            "length_of_ignition": 120,
+                            "moisture_10hr": 50,
+                            "fm_type": "MEAS-Th",
+                            "ecoregion": "southern",
+                            "moisture_1khr": 50,
+                            "utc_offset": "-09:00",
                             "shrub_blackened_pct": 50
                         }
                     ]
                 }
             ],
-            "id": "lkjrisdfo",
             "event_of": {
                 "id": "ssdlfjsldfj",
                 "name": "Activity Fire near Snoqualmie Pass, WA"

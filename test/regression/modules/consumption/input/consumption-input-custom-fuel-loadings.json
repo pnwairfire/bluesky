@@ -1,44 +1,44 @@
 {
     "fires": [
         {
-            "id": "SF11C14225236095807750",
             "event_of": {
-                "name": "Natural Fire near Snoqualmie Pass, WA",
-                "id": "SF11E826544"
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
             },
+            "id": "SF11C14225236095807750",
             "activity": [
                 {
                     "active_areas": [
                         {
                             "fm_type": "MEAS-Th",
-                            "windspeed": 5,
                             "slope": 5,
-                            "pile_blackened_pct": 0,
+                            "moisture_duff": 50,
+                            "start": "2015-01-20T17:00:00",
                             "canopy_consumption_pct": 0,
+                            "shrub_blackened_pct": 50,
+                            "windspeed": 5,
+                            "pile_blackened_pct": 0,
                             "specified_points": [
                                 {
+                                    "lat": 47.4316976,
                                     "fuelbeds": [
                                         {
-                                            "pct": 100.0,
-                                            "fccs_id": "10046"
+                                            "fccs_id": "10046",
+                                            "pct": 100.0
                                         }
                                     ],
-                                    "lng": -121.3990506,
                                     "area": 200,
-                                    "lat": 47.4316976
+                                    "lng": -121.3990506
                                 }
                             ],
-                            "shrub_blackened_pct": 50,
-                            "moisture_10hr": 50,
-                            "start": "2015-01-20T17:00:00",
-                            "utc_offset": "-09:00",
-                            "ecoregion": "southern",
-                            "rain_days": 10,
-                            "moisture_litter": 30,
-                            "moisture_1khr": 50,
                             "length_of_ignition": 120,
+                            "moisture_10hr": 50,
+                            "utc_offset": "-09:00",
+                            "moisture_litter": 30,
                             "end": "2015-01-21T17:00:00",
-                            "moisture_duff": 50
+                            "rain_days": 10,
+                            "moisture_1khr": 50,
+                            "ecoregion": "southern"
                         }
                     ]
                 }
