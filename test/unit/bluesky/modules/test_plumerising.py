@@ -51,7 +51,8 @@ FIRE_MISSING_CONSUMPTION = Fire({
                         "lng": -119,
                         "area": 123
                     }],
-                    "timeprofile": {"foo": 1}
+                    "timeprofile": {"foo": 1},
+                    "localmet": {"baz": 444}
                 }
             ]
         }
@@ -72,7 +73,8 @@ FIRE_MISSING_TIMEPROFILE = Fire({
                         "lng": -119,
                         "area": 123,
                         "consumption": {"summary":{"smoldering": 123}}
-                    }]
+                    }],
+                    "localmet": {"baz": 444}
                 }
             ]
         }
@@ -84,6 +86,30 @@ FIRE_MISSING_START_TIME = Fire({
         {
             "active_areas": [
                 {
+                    "end": "2015-01-21T17:00:00",
+                    "ecoregion": "southern",
+                    "utc_offset": "-07:00",
+                    "specified_points": [{
+                        "lat": 45,
+                        "lng": -119,
+                        "area": 123,
+                        "consumption": {"summary":{"smoldering": 123}}
+                    }],
+                    "timeprofile": {"foo": 1},
+                    "localmet": {"baz": 444}
+                }
+            ]
+        }
+    ]
+})
+
+
+FIRE_MISSING_LOCALMET = Fire({
+    "activity": [
+        {
+            "active_areas": [
+                {
+                    "start": "2015-01-20T17:00:00",
                     "end": "2015-01-21T17:00:00",
                     "ecoregion": "southern",
                     "utc_offset": "-07:00",
@@ -116,7 +142,8 @@ FIRE = Fire({
                         "area": 123,
                         "consumption": {"summary":{"smoldering": 123}}
                     }],
-                    "timeprofile": {"foo": 1}
+                    "timeprofile": {"foo": 1},
+                    "localmet": {"baz": 444}
                 },
                 {
                     "pct": 40,
@@ -135,7 +162,8 @@ FIRE = Fire({
                         ],
                         "consumption": {"summary":{"flaming": 434}}
                     },
-                    "timeprofile": {"bar": 2}
+                    "timeprofile": {"bar": 2},
+                    "localmet": {"baz": 444}
                 }
             ]
         }
@@ -226,6 +254,23 @@ class TestPlumeRiseRunFeps(object):
         assert e_info.value.args[0] == plumerising.MISSING_START_TIME_ERROR_MSG
 
     # TODO: test with invalid start time
+
+
+    def test_fire_missing_localmet(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_MISSING_LOCALMET]})
+        plumerising.run(self.fm)
+
+        assert _PR_ARGS == ()
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['feps']
+        loc1 = FIRE_MISSING_LOCALMET['activity'][0]['active_areas'][0]['specified_points'][0]
+        assert _PR_COMPUTE_CALL_ARGS == [
+            ({"foo": 1},{"smoldering": 123}, loc1)
+        ]
+        assert _PR_COMPUTE_CALL_KWARGS == [
+            {'working_dir': None}
+        ]
 
     def test_no_fires(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
