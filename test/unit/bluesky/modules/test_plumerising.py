@@ -50,7 +50,8 @@ FIRE_MISSING_CONSUMPTION = Fire({
                         "lat": 45,
                         "lng": -119,
                         "area": 123
-                    }]
+                    }],
+                    "timeprofile": {"foo": 1}
                 }
             ]
         }
@@ -132,9 +133,9 @@ FIRE = Fire({
                             [-121.45, 47.40],
                             [-121.45, 47.43]
                         ],
-                        "consumption": {"summary":{"flaming": 123}}
+                        "consumption": {"summary":{"flaming": 434}}
                     },
-                    "timeprofile": {"foo": 1}
+                    "timeprofile": {"bar": 2}
                 }
             ]
         }
@@ -151,16 +152,16 @@ _PR_COMPUTE_CALL_KWARGS = None
 class MockPlumeRise(object):
 
     def __init__(self, *args, **kwargs):
-        global _PR_ARGS, _PR_KWARGS, _PR_COMPUTE_CALL_ARGS
+        global _PR_ARGS, _PR_KWARGS, _PR_COMPUTE_CALL_ARGS, _PR_COMPUTE_CALL_KWARGS
         _PR_ARGS = args
         _PR_KWARGS = kwargs
         _PR_COMPUTE_CALL_ARGS = []
-        _PR_COMPUTE_CALL_KWARGS = {}
+        _PR_COMPUTE_CALL_KWARGS = []
 
     def compute(self, *args, **kwargs):
         _PR_COMPUTE_CALL_ARGS.append(args)
-        _PR_COMPUTE_CALL_KWARGS.append(args)
-        return "compute return value"
+        _PR_COMPUTE_CALL_KWARGS.append(kwargs)
+        return {"hours": "compute return value"}
 
 def monkeypatch_plumerise_class(monkeypatch):
     monkeypatch.setattr(sev, 'SEVPlumeRise', MockPlumeRise)
@@ -242,13 +243,19 @@ class TestPlumeRiseRunFeps(object):
         self.fm.load({"fires": [FIRE]})
         plumerising.run(self.fm)
 
-        assert _PR_ARGS == (None, )
-        assert _PR_KWARGS == {}
+        assert _PR_ARGS == ()
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['feps']
+        loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
+        loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
         assert _PR_COMPUTE_CALL_ARGS == [
-            (45.0, -119.0, datetime.datetime(2015, 1, 20, 17, 0), datetime.datetime(2015, 1, 21, 17, 0), -7.0),
-            (47.418, -121.426, datetime.datetime(2015, 1, 21, 17, 0), datetime.datetime(2015, 1, 22, 17, 0), -7.0)
+            ({"foo": 1},{"smoldering": 123}, loc1),
+            ({"bar": 2}, {"flaming": 434}, loc2)
         ]
-
+        assert _PR_COMPUTE_CALL_KWARGS == [
+            {'working_dir': None},
+            {'working_dir': None}
+        ]
+        # TOOD: assert plumerising return value
 
 class TestPlumeRiseRunSev(object):
 
