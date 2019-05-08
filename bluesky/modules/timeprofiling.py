@@ -45,7 +45,7 @@ def run(fires_manager):
             #     TODO: do anything with InvalidEmissionsDataError?
             #     raise
 
-NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS = ("Only 24-hour repeatable"
+NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS_MSG = ("Only 24-hour repeatable"
     " time profiles supported for fires with multiple activity windows")
 
 def _run_fire(hourly_fractions, fire):
@@ -57,7 +57,7 @@ def _run_fire(hourly_fractions, fire):
         # represented by all activity objects, and pass the appropriate
         # slice into each instantiation of StaticTimeProfiler
         # (or build this into StaticProfiler???)
-        raise BlueSkyConfigurationError(NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS)
+        raise BlueSkyConfigurationError(NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS_MSG)
 
     _validate_fire(fire)
     for a in active_areas:
@@ -72,11 +72,13 @@ def _run_fire(hourly_fractions, fire):
             a['timeprofile'][hr.isoformat()] = {
                 p: profiler.hourly_fractions[p][i] for p in fields }
 
+MISSING_ACTIVITY_AREA_MSG = "Missing activity data required for time profiling"
+INSUFFICIENT_ACTIVITY_INFP_MSG = "Insufficient activity data required for time profiling"
+
 def _validate_fire(fire):
     active_areas = fire.active_areas
     if not active_areas:
-        raise ValueError("Missing activity data required for time profiling")
+        raise ValueError(MISSING_ACTIVITY_AREA_MSG)
     for a in active_areas:
         if 'start' not in a or 'end' not in a:
-            raise ValueError(
-                "Insufficient activity data required for time profiling")
+            raise ValueError(INSUFFICIENT_ACTIVITY_INFP_MSG)
