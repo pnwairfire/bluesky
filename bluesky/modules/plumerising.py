@@ -15,6 +15,7 @@ from pyairfire import sun
 
 from bluesky import datautils, datetimeutils, locationutils
 from bluesky.config import Config
+from bluesky.exceptions import BlueSkyConfigurationError
 
 __all__ = [
     'run'
@@ -42,6 +43,10 @@ def run(fires_manager):
     # TODO: set summary?
     # fires_manager.summarize(plumerise=...)
 
+INVALID_PLUMERISE_MODEL_MSG = "Invalid plumerise model: '{}'"
+NO_ACTIVITY_ERROR_MSG = "Missing activity data required for plumerise"
+MISSING_AREA_ERROR_MSG = "Missing fire activity area required for plumerise"
+
 class ComputeFunction(object):
     def __init__(self, fires_manager):
         model = Config.get('plumerising', 'model').lower()
@@ -52,7 +57,7 @@ class ComputeFunction(object):
         generator = getattr(self, '_{}'.format(model), None)
         if not generator:
             raise BlueSkyConfigurationError(
-                "Invalid plumerise model: '{}'".format(model))
+                INVALID_PLUMERISE_MODEL_MSG.format(model))
 
         config = Config.get('plumerising', model)
         self._compute_func = generator(config)
@@ -66,9 +71,12 @@ class ComputeFunction(object):
 
     def __call__(self, fire):
         if 'activity' not in fire:
-            raise ValueError("Missing activity data required for plumerise")
-        if any([not loc.get('area') for loc in fire.locations]):
-            raise ValueError("Missing fire activity area required for plumerise")
+            raise ValueError(NO_ACTIVITY_ERROR_MSG)
+
+        # just calling fire.locations will trigger missing area
+        # exception if any are missing area
+        fire.locations
+
         self._compute_func(fire)
 
     ## compute function generators
