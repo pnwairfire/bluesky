@@ -46,6 +46,11 @@ class Location(dict):
                 return self._active_area[attr]
             raise
 
+    def __contains__(self, attr):
+        return super().__contains__(attr) or (
+            self._active_area and attr not in self.LOCATION_ONLY_FIELDS
+            and attr in self._active_area)
+
 class ActiveArea(dict):
 
     def __init__(self, *args, **kwargs):

@@ -17,9 +17,13 @@ class TestLocation(object):
         loc = activity.Location({
             "a": 1
         })
+
+        assert "b" not in loc
         with raises(KeyError) as e_info:
             loc["b"]
         assert loc.get("b") == None
+
+        assert "a" in loc
         assert loc["a"] == 1
         assert loc.get("a") == 1
         assert loc == {"a": 1}
@@ -38,27 +42,33 @@ class TestLocation(object):
         }, active_area=active_area)
 
         # "b" is in neither
+        assert "b" not in loc
         with raises(KeyError) as e_info:
             loc["b"]
         assert loc.get("b") == None
 
         # a is only in location object
+        assert "a" in loc
         assert loc["a"] == 1
         assert loc.get("a") == 1
 
         # c is only in active area object
+        assert "c" in loc
         assert loc["c"] == 23
         assert loc.get("c") == 23
 
         # "d" is defined in both location and active area;
         # should return value in location object
+        assert "d" in loc
         assert loc["d"] == 321
         assert loc.get("d") == 321
 
         # "start" and "end" are blacklisted from looking in parent
         # active area object, so key error if only in active area
+        assert "start" in loc
         assert loc["start"] == 123
         assert loc.get("start") == 123
+        assert "end" not in loc
         with raises(KeyError) as e_info:
             loc["end"]
         assert loc.get("end") == None
