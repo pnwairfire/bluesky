@@ -37,8 +37,7 @@ FIRE_MISSING_LOCATION_AREA = Fire({
     ]
 })
 
-
-FIRE = Fire({
+FIRE_MISSING_CONSUMPTION = Fire({
     "activity": [
         {
             "active_areas": [
@@ -52,6 +51,71 @@ FIRE = Fire({
                         "lng": -119,
                         "area": 123
                     }]
+                }
+            ]
+        }
+    ]
+})
+
+FIRE_MISSING_TIMEPROFILE = Fire({
+    "activity": [
+        {
+            "active_areas": [
+                {
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
+                    "ecoregion": "southern",
+                    "utc_offset": "-07:00",
+                    "specified_points": [{
+                        "lat": 45,
+                        "lng": -119,
+                        "area": 123,
+                        "consumption": {"summary":{"smoldering": 123}}
+                    }]
+                }
+            ]
+        }
+    ]
+})
+
+FIRE_MISSING_START_TIME = Fire({
+    "activity": [
+        {
+            "active_areas": [
+                {
+                    "end": "2015-01-21T17:00:00",
+                    "ecoregion": "southern",
+                    "utc_offset": "-07:00",
+                    "specified_points": [{
+                        "lat": 45,
+                        "lng": -119,
+                        "area": 123,
+                        "consumption": {"summary":{"smoldering": 123}}
+                    }],
+                    "timeprofile": {"foo": 1}
+                }
+            ]
+        }
+    ]
+})
+
+
+FIRE = Fire({
+    "activity": [
+        {
+            "active_areas": [
+                {
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
+                    "ecoregion": "southern",
+                    "utc_offset": "-07:00",
+                    "specified_points": [{
+                        "lat": 45,
+                        "lng": -119,
+                        "area": 123,
+                        "consumption": {"summary":{"smoldering": 123}}
+                    }],
+                    "timeprofile": {"foo": 1}
                 },
                 {
                     "pct": 40,
@@ -67,8 +131,10 @@ FIRE = Fire({
                             [-121.39, 47.40],
                             [-121.45, 47.40],
                             [-121.45, 47.43]
-                        ]
-                    }
+                        ],
+                        "consumption": {"summary":{"flaming": 123}}
+                    },
+                    "timeprofile": {"foo": 1}
                 }
             ]
         }
@@ -83,6 +149,7 @@ _PR_COMPUTE_CALL_ARGS = None
 _PR_COMPUTE_CALL_KWARGS = None
 
 class MockPlumeRise(object):
+
     def __init__(self, *args, **kwargs):
         global _PR_ARGS, _PR_KWARGS, _PR_COMPUTE_CALL_ARGS
         _PR_ARGS = args
@@ -132,6 +199,32 @@ class TestPlumeRiseRunFeps(object):
         with raises(ValueError) as e_info:
             plumerising.run(self.fm)
         assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
+
+    def test_fire_missing_location_consumption(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_MISSING_CONSUMPTION]})
+        with raises(ValueError) as e_info:
+            plumerising.run(self.fm)
+        assert e_info.value.args[0] == plumerising.MISSING_CONSUMPTION_ERROR_MSG
+
+    def test_fire_missing_timeprofile(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_MISSING_TIMEPROFILE]})
+        with raises(ValueError) as e_info:
+            plumerising.run(self.fm)
+        assert e_info.value.args[0] == plumerising.MISSING_TIMEPROFILE_ERROR_MSG
+
+    def test_fire_missing_start_time(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_MISSING_START_TIME]})
+        with raises(ValueError) as e_info:
+            plumerising.run(self.fm)
+        assert e_info.value.args[0] == plumerising.MISSING_START_TIME_ERROR_MSG
+
+    # TODO: test with invalid start time
 
     def test_no_fires(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)

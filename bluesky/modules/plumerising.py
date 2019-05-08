@@ -46,6 +46,12 @@ def run(fires_manager):
 INVALID_PLUMERISE_MODEL_MSG = "Invalid plumerise model: '{}'"
 NO_ACTIVITY_ERROR_MSG = "Missing activity data required for plumerise"
 MISSING_AREA_ERROR_MSG = "Missing fire activity area required for plumerise"
+MISSING_CONSUMPTION_ERROR_MSG = ("Missing fire activity consumption data "
+    "required for FEPS plumerise")
+MISSING_TIMEPROFILE_ERROR_MSG = ("Missing timeprofile data required for "
+    "computing FEPS plumerise")
+MISSING_START_TIME_ERROR_MSG = ("Missing fire activity start time "
+    "required by FEPS plumerise")
 
 class ComputeFunction(object):
     def __init__(self, fires_manager):
@@ -98,15 +104,17 @@ class ComputeFunction(object):
             #   window)...or just let plumerise create temp workingdir (as
             #   it's currently doing?
             for aa in fire.active_areas:
-                start = datetimeutils.parse_datetime(aa['start'], 'start')
+                start = aa.get('start')
                 if not start:
-                    raise ValueError("Missing fire activity start time "
-                        "required by FEPS plumerise")
+                    raise ValueError(MISSING_START_TIME_ERROR_MSG)
+                start = datetimeutils.parse_datetime(aa.get('start'), 'start')
+
+                if not aa.get('timeprofile'):
+                    raise ValueError(MISSING_TIMEPROFILE_ERROR_MSG)
 
                 for loc in aa.locations:
                     if not loc.get('consumption', {}).get('summary'):
-                        raise ValueError("Missing fire activity consumption data "
-                            "required for FEPS plumerise")
+                        raise ValueError(MISSING_CONSUMPTION_ERROR_MSG)
 
                     # Fill in missing sunrise / sunset
                     if any([loc.get(k) is None for k in
@@ -124,11 +132,7 @@ class ComputeFunction(object):
                         loc["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
                         loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
 
-                    if not aa.get('timeprofile'):
-                        raise ValueError("Missing timeprofile data required for "
-                            "computing FEPS plumerise")
-
-                    plumerise_data = pr.compute(loc['timeprofile'],
+                    plumerise_data = pr.compute(aa['timeprofile'],
                         loc['consumption']['summary'], loc,
                         working_dir=_get_working_dir(fire))
                     loc['plumerise'] = plumerise_data['hours']
