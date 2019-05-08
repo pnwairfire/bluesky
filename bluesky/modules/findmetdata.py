@@ -127,18 +127,16 @@ def _infer_time_windows_from_fires(fires_manager):
         #  when no fire is growing are excluded ?
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
-                if 'activity' in fire:
-                    # parse_utc_offset makes sure utc offset is defined and valid
-                    for a in fire.activity:
-                        utc_offset = parse_utc_offset(a.get('location', {}).get('utc_offset'))
-                        offset = datetime.timedelta(hours=utc_offset)
-                        tw = parse_datetimes(a, 'start', 'end')
-                        if tw['start'] > tw['end']:
-                            raise ValueError("Invalid activity time window - start: {}, end: {}".format(
-                                tw['start'], tw['end']))
-                        start = tw['start'] - offset
-                        end = tw['end'] - offset
-                        time_windows.append({'start': start, 'end': end})
+                for aa in fire.active_areas:
+                    utc_offset = parse_utc_offset(aa.get('utc_offset'))
+                    offset = datetime.timedelta(hours=utc_offset)
+                    tw = parse_datetimes(aa, 'start', 'end')
+                    if tw['start'] > tw['end']:
+                        raise ValueError("Invalid activity time window - start: {}, end: {}".format(
+                            tw['start'], tw['end']))
+                    start = tw['start'] - offset
+                    end = tw['end'] - offset
+                    time_windows.append({'start': start, 'end': end})
 
     return time_windows
 

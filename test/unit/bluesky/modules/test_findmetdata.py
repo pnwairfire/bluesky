@@ -8,67 +8,79 @@ from py.test import raises
 
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
-from bluesky.models.fires import FiresManager
+from bluesky.models.fires import FiresManager, Fire
 from bluesky.modules import findmetdata
 
 
-FIRE_NO_ACTIVITY = {
+FIRE_NO_ACTIVITY = Fire({
     "id": "SF11C14225236095807750"
-}
+})
 
-FIRE_1 = {
+FIRE_1 = Fire({
     "activity": [
         {
-            "start": "2015-01-20T17:00:00",
-            "end": "2015-01-21T17:00:00",
-            "location": {
-                "latitude": 45,
-                "longitude": -119,
-                "ecoregion": "southern",
-                "utc_offset": "-09:00"
-            }
-        },
-        {
-            "pct": 40,
-            "start": "2015-01-20T17:00:00", # SAME TIME WINDOW
-            "end": "2015-01-21T17:00:00",
-            "location": {
-                "latitude": 45,
-                "longitude": -119,
-                "ecoregion": "southern",
-                "utc_offset": "-09:00"
-            }
+            "active_areas": [
+                {
+                    "start": "2015-01-20T17:00:00",
+                    "end": "2015-01-21T17:00:00",
+                    "ecoregion": "southern",
+                    "utc_offset": "-09:00",
+                    "specified_points": [{
+                        "lat": 45,
+                        "lng": -119,
+                    }]
+                },
+                {
+                    "pct": 40,
+                    "start": "2015-01-20T17:00:00", # SAME TIME WINDOW
+                    "end": "2015-01-21T17:00:00",
+                    "ecoregion": "southern",
+                    "utc_offset": "-09:00",
+                    "specified_points": [{
+                        "lat": 45,
+                        "lng": -119,
+                    }]
+                }
+            ]
         }
     ]
-}
-FIRE_2 = {
+})
+FIRE_2 = Fire({
     "activity": [
         {
-            "start": "2015-01-21T17:00:00",
-            "end": "2015-01-22T17:00:00",
-            "location": {
-                "latitude": 45,
-                "longitude": -119,
-                "ecoregion": "southern",
-                "utc_offset": "-09:00"
-            }
+            "active_areas": [
+                {
+                    "start": "2015-01-21T17:00:00",
+                    "end": "2015-01-22T17:00:00",
+                    "ecoregion": "southern",
+                    "utc_offset": "-09:00",
+                    "specified_points": [{
+                        "lat": 45,
+                        "lng": -119,
+                    }]
+                }
+            ]
         }
     ]
-}
-FIRE_3 = {
+})
+FIRE_3 = Fire({
     "activity": [
         {
-            "start": "2015-02-01T17:00:00",
-            "end": "2015-02-02T17:00:00",
-            "location": {
-                "latitude": 45,
-                "longitude": -119,
-                "ecoregion": "southern",
-                "utc_offset": "-07:00"
-            }
+            "active_areas": [
+                {
+                    "start": "2015-02-01T17:00:00",
+                    "end": "2015-02-02T17:00:00",
+                    "ecoregion": "southern",
+                    "utc_offset": "-07:00",
+                    "specified_points": [{
+                        "lat": 45,
+                        "lng": -119,
+                    }]
+                }
+            ]
         }
     ]
-}
+})
 
 class TestGetTimeWindows(object):
 
