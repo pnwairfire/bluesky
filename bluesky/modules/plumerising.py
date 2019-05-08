@@ -46,12 +46,10 @@ def run(fires_manager):
 INVALID_PLUMERISE_MODEL_MSG = "Invalid plumerise model: '{}'"
 NO_ACTIVITY_ERROR_MSG = "Missing activity data required for plumerise"
 MISSING_AREA_ERROR_MSG = "Missing fire activity area required for plumerise"
-MISSING_CONSUMPTION_ERROR_MSG = ("Missing fire activity consumption data "
-    "required for FEPS plumerise")
-MISSING_TIMEPROFILE_ERROR_MSG = ("Missing timeprofile data required for "
-    "computing FEPS plumerise")
-MISSING_START_TIME_ERROR_MSG = ("Missing fire activity start time "
-    "required by FEPS plumerise")
+MISSING_CONSUMPTION_ERROR_MSG = "Missing fire activity consumption data required for FEPS plumerise"
+MISSING_TIMEPROFILE_ERROR_MSG = "Missing timeprofile data required for computing FEPS plumerise"
+MISSING_START_TIME_ERROR_MSG = "Missing fire activity start time required by FEPS plumerise"
+MISSING_LOCALMET_ERROR_MSG = "Missing localmet data required for computing SEV plumerise"
 
 class ComputeFunction(object):
     def __init__(self, fires_manager):
@@ -148,8 +146,7 @@ class ComputeFunction(object):
             for aa in fire.active_areas:
                 for loc in aa.locations:
                     if not loc.get('localmet'):
-                        raise ValueError(
-                            "Missing localmet data required for computing SEV plumerise")
+                        raise ValueError(MISSING_LOCALMET_ERROR_MSG)
                     # TODO: if fire_frp is defined but activity's frp isn't,
                     #   do we need to multiple by activity's
                     #   percentage of the fire's total area?

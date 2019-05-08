@@ -163,7 +163,7 @@ FIRE = Fire({
                         "consumption": {"summary":{"flaming": 434}}
                     },
                     "timeprofile": {"bar": 2},
-                    "localmet": {"baz": 444}
+                    "localmet": {"bazoo": 555}
                 }
             ]
         }
@@ -307,3 +307,110 @@ class TestPlumeRiseRunSev(object):
     def setup(self):
         Config.set('sev', 'plumerising', 'model')
         self.fm = FiresManager()
+
+    def test_fire_no_activity(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_NO_ACTIVITY]})
+        with raises(ValueError) as e_info:
+            plumerising.run(self.fm)
+        assert e_info.value.args[0] == plumerising.NO_ACTIVITY_ERROR_MSG
+
+    def test_fire_missing_location_area(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_MISSING_LOCATION_AREA]})
+        with raises(ValueError) as e_info:
+            plumerising.run(self.fm)
+        assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
+
+    def test_fire_missing_location_consumption(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_MISSING_CONSUMPTION]})
+        plumerising.run(self.fm)
+
+        assert _PR_ARGS == ()
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['sev']
+
+        assert _PR_COMPUTE_CALL_ARGS == [
+            ({"baz": 444},123)
+        ]
+        assert _PR_COMPUTE_CALL_KWARGS == [
+            {'frp': None}
+        ]
+
+
+    def test_fire_missing_timeprofile(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_MISSING_TIMEPROFILE]})
+        plumerising.run(self.fm)
+
+        assert _PR_ARGS == ()
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['sev']
+
+        assert _PR_COMPUTE_CALL_ARGS == [
+            ({"baz": 444},123)
+        ]
+        assert _PR_COMPUTE_CALL_KWARGS == [
+            {'frp': None}
+        ]
+
+
+    def test_fire_missing_start_time(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_MISSING_START_TIME]})
+        plumerising.run(self.fm)
+
+        assert _PR_ARGS == ()
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['sev']
+
+        assert _PR_COMPUTE_CALL_ARGS == [
+            ({"baz": 444}, 123)
+        ]
+        assert _PR_COMPUTE_CALL_KWARGS == [
+            {'frp': None}
+        ]
+
+    # TODO: test with invalid start time
+
+
+    def test_fire_missing_localmet(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_MISSING_LOCALMET]})
+        with raises(ValueError) as e_info:
+            plumerising.run(self.fm)
+        assert e_info.value.args[0] == plumerising.MISSING_LOCALMET_ERROR_MSG
+
+    def test_no_fires(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": []})
+        plumerising.run(self.fm)
+
+        assert _PR_ARGS == ()
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['feps']
+        assert _PR_COMPUTE_CALL_ARGS == []
+
+    def test_one_fire(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE]})
+        plumerising.run(self.fm)
+
+        assert _PR_ARGS == ()
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['feps']
+        loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
+        loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
+        assert _PR_COMPUTE_CALL_ARGS == [
+            ({"baz": 444}, 123),
+            ({"bazoo": 555}, 3232)
+        ]
+        assert _PR_COMPUTE_CALL_KWARGS == [
+            {'frp': None},
+            {'frp': None}
+        ]
+        # TOOD: assert plumerising return value
