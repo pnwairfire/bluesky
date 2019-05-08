@@ -74,6 +74,7 @@ def convert(input_data):
             for k in TO_COPY_UP:
                 val = old_a.pop(k, None)
                 if val:
+                    loc_template[k] = val
                     new_a[k] = val
                     aa_template[k] = val
 
