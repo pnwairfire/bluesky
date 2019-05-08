@@ -3,90 +3,102 @@
         {
             "activity": [
                 {
-                    "end": "2015-01-21T15:00:00",
-                    "location": {
-                        "area": 200,
-                        "latitude": 47.4316976,
-                        "longitude": -121.3990506,
-                        "utc_offset": "-09:00",
-                        "ecoregion": "southern",
-                        "slope": 5,
-                        "windspeed": 5,
-                        "rain_days": 10,
-                        "moisture_10hr": 50,
-                        "length_of_ignition": 120,
-                        "fm_type":  "MEAS-Th",
-                        "moisture_1khr": 50,
-                        "moisture_duff": 50,
-                        "moisture_litter": 30,
-                        "canopy_consumption_pct":  0,
-                        "shrub_blackened_pct":  50,
-                        "pile_blackened_pct":  0
-                    },
-                    "start": "2015-01-20T15:00:00",
-                    "fuelbeds": [
+                    "active_areas": [
                         {
-                            "fccs_id": "46",
-                            "pct": 40.0
-                        },
-                        {
-                            "fccs_id": "0",
-                            "pct": 35.0
-                        },
-                        {
-                            "fccs_id": "900",
-                            "pct": 25.0
+                            "moisture_1khr": 50,
+                            "slope": 5,
+                            "fm_type": "MEAS-Th",
+                            "rain_days": 10,
+                            "end": "2015-01-21T15:00:00",
+                            "canopy_consumption_pct": 0,
+                            "moisture_litter": 30,
+                            "moisture_10hr": 50,
+                            "moisture_duff": 50,
+                            "ecoregion": "southern",
+                            "start": "2015-01-20T15:00:00",
+                            "utc_offset": "-09:00",
+                            "length_of_ignition": 120,
+                            "windspeed": 5,
+                            "pile_blackened_pct": 0,
+                            "specified_points": [
+                                {
+                                    "area": 200,
+                                    "fuelbeds": [
+                                        {
+                                            "fccs_id": "46",
+                                            "pct": 40.0
+                                        },
+                                        {
+                                            "fccs_id": "0",
+                                            "pct": 35.0
+                                        },
+                                        {
+                                            "fccs_id": "900",
+                                            "pct": 25.0
+                                        }
+                                    ],
+                                    "lat": 47.4316976,
+                                    "lng": -121.3990506
+                                }
+                            ],
+                            "shrub_blackened_pct": 50
                         }
                     ]
                 }
             ],
+            "id": "SF11C14225236095807750",
             "event_of": {
-                "name": "Natural Fire near Snoqualmie Pass, WA",
-                "id": "SF11E826544"
-            },
-            "id": "SF11C14225236095807750"
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            }
         },
         {
             "activity": [
                 {
-                    "end": "2015-01-21T15:00:00",
-                    "location": {
-                        "area": 200,
-                        "latitude": 47.5316976,
-                        "longitude": -121.3990506,
-                        "utc_offset": "-09:00",
-                        "ecoregion": "southern",
-                        "slope": 5,
-                        "windspeed": 5,
-                        "rain_days": 10,
-                        "moisture_10hr": 50,
-                        "length_of_ignition": 120,
-                        "fm_type":  "MEAS-Th",
-                        "moisture_1khr": 50,
-                        "moisture_duff": 50,
-                        "moisture_litter": 30,
-                        "canopy_consumption_pct":  0,
-                        "shrub_blackened_pct":  50,
-                        "pile_blackened_pct":  0
-                    },
-                    "start": "2015-01-20T15:00:00",
-                    "fuelbeds": [
+                    "active_areas": [
                         {
-                            "fccs_id": "41",
-                            "pct": 45.0
-                        },
-                        {
-                            "fccs_id": "41",
-                            "pct": 55.0
+                            "moisture_1khr": 50,
+                            "slope": 5,
+                            "fm_type": "MEAS-Th",
+                            "rain_days": 10,
+                            "end": "2015-01-21T15:00:00",
+                            "canopy_consumption_pct": 0,
+                            "moisture_litter": 30,
+                            "moisture_10hr": 50,
+                            "moisture_duff": 50,
+                            "ecoregion": "southern",
+                            "start": "2015-01-20T15:00:00",
+                            "utc_offset": "-09:00",
+                            "length_of_ignition": 120,
+                            "windspeed": 5,
+                            "pile_blackened_pct": 0,
+                            "specified_points": [
+                                {
+                                    "area": 200,
+                                    "fuelbeds": [
+                                        {
+                                            "fccs_id": "41",
+                                            "pct": 45.0
+                                        },
+                                        {
+                                            "fccs_id": "41",
+                                            "pct": 55.0
+                                        }
+                                    ],
+                                    "lat": 47.5316976,
+                                    "lng": -121.3990506
+                                }
+                            ],
+                            "shrub_blackened_pct": 50
                         }
                     ]
                 }
             ],
+            "id": "lkjrisdfo",
             "event_of": {
-                "name": "Activity Fire near Snoqualmie Pass, WA",
-                "id": "ssdlfjsldfj"
-            },
-            "id": "lkjrisdfo"
+                "id": "ssdlfjsldfj",
+                "name": "Activity Fire near Snoqualmie Pass, WA"
+            }
         }
     ]
 }
