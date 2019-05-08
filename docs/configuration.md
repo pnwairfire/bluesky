@@ -92,10 +92,6 @@ configuration json data are case-insensitive.***
  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lat'*** -- *required* if 'location' section is defined --
  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lng'*** -- *required* if 'location' section is defined --
 
-##### splitactivity
-
- - ***'config' > 'splitactivity' > 'record_original_activity'*** -- *optional* --
-
 ##### fuelbeds
 
 - ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- default ['0', '900']
