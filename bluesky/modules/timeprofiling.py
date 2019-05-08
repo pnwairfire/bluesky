@@ -45,19 +45,22 @@ def run(fires_manager):
             #     TODO: do anything with InvalidEmissionsDataError?
             #     raise
 
+NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS = ("Only 24-hour repeatable"
+    " time profiles supported for fires with multiple activity windows")
+
 def _run_fire(hourly_fractions, fire):
-    if (hourly_fractions and len(fire.activity) > 1 and
+    active_areas =  fire.active_areas
+    if (hourly_fractions and len(active_areas) > 1 and
             set([len(e) for p,e in hourly_fractions.items()]) != set([24])):
         # TODO: Support this scenario, but make sure
         # len(hourly_fractions) equals the total number of hours
         # represented by all activity objects, and pass the appropriate
         # slice into each instantiation of StaticTimeProfiler
         # (or build this into StaticProfiler???)
-        raise BlueSkyConfigurationError("Only 24-hour repeatable time "
-            "profiles supported for fires with multiple activity windows")
+        raise BlueSkyConfigurationError(NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS)
 
     _validate_fire(fire)
-    for a in fire.activity:
+    for a in active_areas:
         tw = parse_datetimes(a, 'start', 'end')
         profiler = StaticTimeProfiler(tw['start'], tw['end'],
             hourly_fractions=hourly_fractions)
@@ -70,9 +73,10 @@ def _run_fire(hourly_fractions, fire):
                 p: profiler.hourly_fractions[p][i] for p in fields }
 
 def _validate_fire(fire):
-    if 'activity' not in fire:
+    active_areas = fire.active_areas
+    if not active_areas:
         raise ValueError("Missing activity data required for time profiling")
-    for a in fire.activity:
+    for a in active_areas:
         if 'start' not in a or 'end' not in a:
             raise ValueError(
                 "Insufficient activity data required for time profiling")
