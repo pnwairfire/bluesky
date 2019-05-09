@@ -94,11 +94,9 @@ class VSMOKEDispersion(DispersionBase):
             #   activity windows
             in_var = INPUTVariables(fire)
 
-            utc_offset = fire.get('location', {}).get('utc_offset')
-            utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
-            # TODO: remove following line nad just rename 'timezone' to
-            #  'utc_offset' in all subsequent code
-            timezone = utc_offset
+            # TODO: remove following line nad just use fire.utc_offset
+            #  instead of 'timezone' in all subsequent code
+            timezone = fire.utc_offset
 
             # Get emissions for fire
             if not fire.emissions or not fire.consumption:
