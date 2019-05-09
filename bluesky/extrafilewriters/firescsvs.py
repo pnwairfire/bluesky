@@ -38,9 +38,9 @@ if 'NOX' in BLUESKYKML_SPECIES_LIST:
 
 def _pick_representative_fuelbed(fire, loc):
     sorted_fuelbeds = sorted(loc.get('fuelbeds', []),
-        key=lambda fb: fb['pct'], reverse=True)
+        key=lambda fb: fb.get('pct', 0.0), reverse=True)
     if sorted_fuelbeds:
-        return sorted_fuelbeds[0]['fccs_id']
+        return sorted_fuelbeds[0].get('fccs_id')
 
 def _get_heat(fire, loc):
     if loc.get('fuelbeds'):
@@ -76,6 +76,8 @@ def _get_consumption_field(field):
     return f
 
 def _get_emissions_species(species):
+    # TODO: if any fuelbed has species undefined, abort and set fire'set
+    #   cumulative value to None ?
     def f(fire, loc):
         if loc.get('fuelbeds'):
             species_array = []
@@ -189,12 +191,12 @@ def _assign_event_name(event, fire, new_fire):
         if event.get('name') and name != event['name']:
             logging.warning("Fire {} event name conflict: '{}' != '{}'".format(
                 fire.id, name, event['name']))
-        event['name'] = name
+        return name
 
 def _update_event_area(event, fire, new_fire):
     if any([not loc.get('area') for loc in fire.locations]):
         raise ValueError("Fire {} lacks area".format(fire.get('id')))
-    return event.get('total_area', 0.0) + sum([loc['area'] for loc in fire.loc])
+    return event.get('total_area', 0.0) + sum([loc['area'] for loc in fire.locations])
 
 def _update_total_heat(event, fire, new_fire):
     if 'total_heat' in event and event['total_heat'] is None:
@@ -223,7 +225,7 @@ def _update_total_emissions_species(species):
 #  total_voc,total_bc,total_h2,total_nmoc,total_no,total_no2,total_oc,
 #  total_tpc,total_tpm
 FIRE_EVENTS_CSV_FIELDS = [
-    ('event_name', _assign_event_name),
+    ('name', _assign_event_name),
     ('total_heat', _update_total_heat),
     ('total_area', _update_event_area),
     ('total_nmhc', _update_total_emissions_species('nmhc'))
@@ -279,5 +281,6 @@ class FiresCsvsWriter(object):
                 events_fields[event_id] = events_fields.get(event_id, {})
                 for k, l in FIRE_EVENTS_CSV_FIELDS:
                     events_fields[event_id][k] = l(events_fields[event_id], fire, fires_fields[-1])
+
         logging.debug("events: %s", events_fields)
         return fires_fields, events_fields
