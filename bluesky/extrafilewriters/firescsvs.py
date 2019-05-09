@@ -269,15 +269,15 @@ class FiresCsvsWriter(object):
     def _collect_csv_fields(self, fires):
         # As we iterate through fires, collecting necessary fields, collect
         # events information as well
-        fires = []
-        events = {}
+        fires_fields = []
+        events_fields = {}
         for fire in fires:
             for loc in fire.locations:
-                fires.append({k: l(fire, loc) or '' for k, l in FIRE_LOCATIONS_CSV_FIELDS})
+                fires_fields.append({k: l(fire, loc) or '' for k, l in FIRE_LOCATIONS_CSV_FIELDS})
             event_id = fire.get('event_of', {}).get('id')
             if event_id:
-                events[event_id] = events.get(event_id, {})
+                events_fields[event_id] = events_fields.get(event_id, {})
                 for k, l in FIRE_EVENTS_CSV_FIELDS:
-                    events[event_id][k] = l(events[event_id], fire, fires[-1])
-        logging.debug("events: %s", events)
-        return fires, events
+                    events_fields[event_id][k] = l(events_fields[event_id], fire, fires_fields[-1])
+        logging.debug("events: %s", events_fields)
+        return fires_fields, events_fields
