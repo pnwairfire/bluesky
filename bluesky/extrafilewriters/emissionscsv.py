@@ -59,31 +59,32 @@ class EmissionsCsvWriter(object):
                     self._write_fire(fire)
 
     def _write_fire(self, fire):
-        if not fire.get('activity'):
-            raise ValueError("Activity information required to "
-                "write emissions csv")
+        locations = fire.locations
+        if not locations:
+            raise ValueError(
+                "Missing fire activity data required for computing dispersion")
 
-        for a in fire['activity']:
-            self._write_activity(fire, a)
+        for loc in locations:
+            self._write_location(fire, loc)
 
-    def _write_activity(self, fire, a):
-        if not a.get('timeprofile'):
+    def _write_location(self, fire, loc):
+        if not loc.get('timeprofile'):
             raise ValueError("activity timeprofile information "
                 "required to write emissions csv")
 
         # Total emissions values may be in a['emissions'], but
         # we also need per-phase values, so we need the
         # emissions data in the fuelbeds objects
-        if not a.get('fuelbeds') or not a['fuelbeds'][0].get('emissions'):
+        if not loc.get('fuelbeds') or not loc['fuelbeds'][0].get('emissions'):
             raise ValueError("activity emissions information "
                 "required to write emissions csv")
 
-        for i, ts in enumerate(sorted(list(a.get('timeprofile').keys()))):
-            self._write_row(fire, a, i, ts)
+        for i, ts in enumerate(sorted(list(loc.get('timeprofile').keys()))):
+            self._write_row(fire, loc, i, ts)
 
-    def _write_row(self, fire, a, i, ts):
-        tp = a['timeprofile'][ts]
-        utc_offset = a['location']['utc_offset'] or 'Z'
+    def _write_row(self, fire, loc, i, ts):
+        tp = loc['timeprofile'][ts]
+        utc_offset = loc['utc_offset'] or 'Z'
         row = {
             "fire_id": fire.get('id', ''),
             "hour": str(i),
@@ -98,10 +99,10 @@ class EmissionsCsvWriter(object):
         # Iterate through SPECIES to compute totals
         # by phase; then write out columns in BSF's order
         for s in self.SPECIES:
-            if s in a['fuelbeds'][0]['emissions']['total']:
+            if s in loc['fuelbeds'][0]['emissions']['total']:
                 for f1, f2 in zip(self.PIPELINE_PHASES, self.EMIS_FILE_PHASES):
                     row[s + '_' + f2] = sum([
-                        f['emissions'][f1][s][0] for f in a['fuelbeds']
+                        f['emissions'][f1][s][0] for f in loc['fuelbeds']
                     ]) * tp[f1]
                 row[s + '_emitted'] = sum([row[s + '_' + f2]
                     for f2 in self.EMIS_FILE_PHASES])
@@ -109,13 +110,13 @@ class EmissionsCsvWriter(object):
         # Note: plumerise might not be defined for the timestamp
         # (e.g. bluesky playground only defines plumerise for the
         #  hours in the dispersion time window)
-        if 'plumerise' in g and ts in a['plumerise']:
-            pr = a['plumerise'][ts]
+        if 'plumerise' in loc and ts in loc['plumerise']:
+            pr = loc['plumerise'][ts]
             row['smoldering_fraction'] = pr['smolder_fraction']
             for i, h in enumerate(pr['heights']):
                 row['height_' + str(i)] = h
 
-        row['heat'] = a['heat']['summary']['total'] * tp['area_fraction']
+        row['heat'] = loc['heat']['summary']['total'] * tp['area_fraction']
 
         self.emissions_writer.writerow(
             [row.get(k, '') for k in self.HEADERS])
