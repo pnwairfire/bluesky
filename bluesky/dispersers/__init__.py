@@ -155,19 +155,21 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         #  conistent with met domain; if not, raise exception or run them
         #  separately...raising exception would be easier for now)
         # Make sure met files span dispersion time window
-        activity_fields = self._required_activity_fields() + ('fuelbeds', 'location')
+        activity_fields = self._required_activity_fields() + ('fuelbeds', )
         for fire in fires:
             try:
                 # make sure it has locations, but then iterate through
                 # active areas and then locations
-                if fire.locations:
+                if not fire.locations:
                     raise ValueError(
                         "Missing fire activity data required for computing dispersion")
 
                 for aa in fire.active_areas:
+                    utc_offset = self._get_utc_offset(aa)
                     for loc in aa.locations:
                         try:
-                            self._add_location(fire, aa, loc)
+                            self._add_location(fire, aa, loc,
+                                activity_fields, utc_offset)
 
                         except SkipLocationError:
                             continue
@@ -178,7 +180,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                 else:
                     raise
 
-    def _add_location(self, fire, aa, loc):
+    def _add_location(self, fire, aa, loc, activity_fields, utc_offset):
         if any([not loc.get(f) for f in activity_fields]):
             raise ValueError("Each active area must have {} in "
                 "order to compute {} dispersion".format(
@@ -188,8 +190,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                 "Missing emissions data required for computing dispersion")
 
         heat = self._get_heat(loc)
-        utc_offset = self._get_uct_offset(loc)
-        plumerise, timeprofile = self._get_plumerise_and_timeprofile(loc)
+        plumerise, timeprofile = self._get_plumerise_and_timeprofile(
+            loc, utc_offset)
         emissions = self._get_emissions(loc)
         timeprofiled_emissions = self._get_timeprofiled_emissions(
             timeprofile, emissions)
@@ -204,7 +206,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             id=fire.id,
             meta=fire.get('meta', {}),
             start=aa['start'],
-            area=aa['location']['area'],
+            area=loc['area'],
             latitude=latlng.latitude,
             longitude=latlng.longitude,
             utc_offset=utc_offset,
@@ -218,7 +220,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             f['heat'] = heat
         self._fires.append(f)
 
-    def _get_plumerise_and_timeprofile(self, loc):
+    def _get_plumerise_and_timeprofile(self, loc, utc_offset):
         # TODO: only include plumerise and timeprofile keys within model run
         # time window; and somehow fill in gaps (is this possible?)
         all_plumerise = loc.get('plumerise', {})
@@ -251,7 +253,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             timeprofiled_emissions[dt] = {}
             for e in self.SPECIES:
                 timeprofiled_emissions[dt][e] = sum([
-                    timeprofile[dt][p]*emissions[p].get('PM2.5', 0.0)
+                    timeprofile[dt][p] * emissions[p].get(e, 0.0)
                         for p in PHASES
                 ])
         return timeprofiled_emissions
@@ -278,8 +280,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         # else, just forget about computing heat
         return heat
 
-    def _get_uct_offset(self, loc):
-        utc_offset = loc.get('location', {}).get('utc_offset')
+    def _get_utc_offset(self, aa):
+        utc_offset = aa.get('utc_offset')
         return parse_utc_offset(utc_offset) if utc_offset else 0.0
 
     def _convert_keys_to_datetime(self, d):
