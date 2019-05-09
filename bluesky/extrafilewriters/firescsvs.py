@@ -251,7 +251,7 @@ class FiresCsvsWriter(object):
         self._fire_events_pathname = os.path.join(dest_dir, fe)
 
     def write(self, fires_manager):
-        fires, events = self._collect_csv_fields(fires_manager)
+        fires, events = self._collect_csv_fields(fires_manager.fires)
 
         with open(self._fire_locations_pathname, 'w', encoding="utf-8") as _f:
             f = csv.writer(_f)
@@ -266,12 +266,12 @@ class FiresCsvsWriter(object):
                 f.writerow([e_id] +
                     [str(event[k] or '') for k, l in FIRE_EVENTS_CSV_FIELDS])
 
-    def _collect_csv_fields(self, fires_manager):
+    def _collect_csv_fields(self, fires):
         # As we iterate through fires, collecting necessary fields, collect
         # events information as well
         fires = []
         events = {}
-        for fire in fires_manager.fires:
+        for fire in fires:
             for loc in fire.locations:
                 fires.append({k: l(fire, loc) or '' for k, l in FIRE_LOCATIONS_CSV_FIELDS})
             event_id = fire.get('event_of', {}).get('id')

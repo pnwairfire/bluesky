@@ -181,18 +181,13 @@ class TestFiresCsvsWriterCollectCsvFields(object):
             ]
         })
 
-        fm = fires.FiresManager()
-        fm.add_fire(fire)
-
 
         writer = firescsvs.FiresCsvsWriter('/foo')
-        fires_fields, events_fields = writer._collect_csv_fields(fm)
-        import pdb;pdb.set_trace()
+        fires_fields, events_fields = writer._collect_csv_fields([fire])
 
         expected_fires_fields = [{
             'area': 120.0,
             "canopy_consumption_pct": 23.3,
-
             'ch4': '',
             'co': '',
             'co2': '',
@@ -242,7 +237,11 @@ class TestFiresCsvsWriterCollectCsvFields(object):
             'utc_offset': '-07:00',
             'voc': ''
         }]
-        assert fires_fields == expected_fires_fields
+        assert len(fires_fields) == len(expected_fires_fields)
+        for i in len(fires_fields):
+            assert fires_fields[i].keys() == expected_fires_fields[i].keys()
+            for k in fires_fields[i]:
+                assert fires_fields[i][k] == expected_fires_fields[i][k], "{} differs".format(k)
 
         expected_events_fields = [{}]
         assert events_fields == expected_events_fields
