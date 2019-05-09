@@ -178,7 +178,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                 else:
                     raise
 
-    def _add_location(self, fire, aa, loc)
+    def _add_location(self, fire, aa, loc):
         if any([not loc.get(f) for f in activity_fields]):
             raise ValueError("Each active area must have {} in "
                 "order to compute {} dispersion".format(
