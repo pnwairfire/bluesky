@@ -209,12 +209,12 @@ class TestFiresCsvsWriterCollectCsvFields(object):
             'max_humid': '',
             'max_temp': '',
             'max_temp_hour': '',
-            "min_wind": 34,
+            'max_wind': '',
             'max_wind_aloft': '',
             'min_humid': '',
             'min_temp': '',
             'min_temp_hour': '',
-            'min_wind': '',
+            'min_wind': 34,
             'min_wind_aloft': '',
             'moisture_100hr': '',
             'moisture_10hr': '',
@@ -237,11 +237,12 @@ class TestFiresCsvsWriterCollectCsvFields(object):
             'utc_offset': '-07:00',
             'voc': ''
         }]
+
         assert len(fires_fields) == len(expected_fires_fields)
-        for i in len(fires_fields):
+        for i in range(len(fires_fields)):
             assert fires_fields[i].keys() == expected_fires_fields[i].keys()
             for k in fires_fields[i]:
                 assert fires_fields[i][k] == expected_fires_fields[i][k], "{} differs".format(k)
 
-        expected_events_fields = [{}]
+        expected_events_fields = {}
         assert events_fields == expected_events_fields
