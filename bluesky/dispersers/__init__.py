@@ -41,6 +41,9 @@ SQUARE_METERS_PER_ACRE = 4046.8726
 PHASES = ['flaming', 'smoldering', 'residual']
 TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
+class SkipLocationError(Exception):
+    pass
+
 class DispersionBase(object, metaclass=abc.ABCMeta):
 
     # 'BINARIES' dict should be defined by each subclass which depend on
@@ -152,98 +155,132 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         #  conistent with met domain; if not, raise exception or run them
         #  separately...raising exception would be easier for now)
         # Make sure met files span dispersion time window
+        activity_fields = self._required_activity_fields() + ('fuelbeds', 'location')
         for fire in fires:
             try:
-                if 'activity' not in fire:
+                # make sure it has locations, but then iterate through
+                # active areas and then locations
+                if fire.locations:
                     raise ValueError(
                         "Missing fire activity data required for computing dispersion")
-                activity_fields = self._required_activity_fields() + ('fuelbeds', 'location')
-                for a in fire.activity:
-                    if any([not a.get(f) for f in activity_fields]):
-                        raise ValueError("Each activity window must have {} in "
-                            "order to compute {} dispersion".format(
-                            ','.join(activity_fields), self.__class__.__name__))
-                    if any([not fb.get('emissions') for fb in a['fuelbeds']]):
-                        raise ValueError(
-                            "Missing emissions data required for computing dispersion")
 
-                    # TDOO: handle case where heat is defined by phase, but not total
-                    #   (just make sure each phase is defined, and set total to sum)
-                    heat = None
-                    heat_values = list(itertools.chain.from_iterable(
-                        [fb.get('heat', {}).get('total', [None]) for fb in a['fuelbeds']]))
-                    if not any([v is None for v in heat_values]):
-                        heat = sum(heat_values)
-                        if heat < 1.0e-6:
-                            logging.debug("Fire %s activity window %s - %s has "
-                                "less than 1.0e-6 total heat; skip...",
-                                fire.id, a['start'], a['end'])
+                for aa in fire.active_areas:
+                    for loc in aa.locations:
+                        try:
+                            self._add_location(fire, aa, loc)
+
+                        except SkipLocationError:
                             continue
-                    # else, just forget about heat
-
-                    utc_offset = a.get('location', {}).get('utc_offset')
-                    utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
-
-                    # TODO: only include plumerise and timeprofile keys within model run
-                    # time window; and somehow fill in gaps (is this possible?)
-                    all_plumerise = a.get('plumerise', {})
-                    all_timeprofile = a.get('timeprofile', {})
-                    plumerise = {}
-                    timeprofile = {}
-                    for i in range(self._num_hours):
-                        local_dt = self._model_start + timedelta(hours=(i + utc_offset))
-                        # TODO: will all_plumerise and all_timeprofile always
-                        #    have string value keys
-                        local_dt = local_dt.strftime('%Y-%m-%dT%H:%M:%S')
-                        plumerise[local_dt] = all_plumerise.get(local_dt) or self.MISSING_PLUMERISE_HOUR
-                        timeprofile[local_dt] = all_timeprofile.get(local_dt) or self.MISSING_TIMEPROFILE_HOUR
-
-                    # sum the emissions across all fuelbeds, but keep them separate by phase
-                    emissions = {p: {} for p in PHASES}
-                    for fb in a['fuelbeds']:
-                        for p in PHASES:
-                            for s in fb['emissions'][p]:
-                                emissions[p][s] = (emissions[p].get(s, 0.0)
-                                    + sum(fb['emissions'][p][s]))
-
-                    timeprofiled_emissions = {}
-                    for dt in timeprofile:
-                        timeprofiled_emissions[dt] = {}
-                        for e in self.SPECIES:
-                            timeprofiled_emissions[dt][e] = sum([
-                                timeprofile[dt][p]*emissions[p].get('PM2.5', 0.0)
-                                    for p in PHASES
-                            ])
-
-                    # consumption = datautils.sum_nested_data(
-                    #     [fb.get("consumption", {}) for fb in a['fuelbeds']], 'summary', 'total')
-                    consumption = a['consumption']['summary']
-
-                    latlng = locationutils.LatLng(a['location'])
-
-                    f = Fire(
-                        id=fire.id,
-                        meta=fire.get('meta', {}),
-                        start=a['start'],
-                        area=a['location']['area'],
-                        latitude=latlng.latitude,
-                        longitude=latlng.longitude,
-                        utc_offset=utc_offset,
-                        plumerise=plumerise,
-                        timeprofile=timeprofile,
-                        emissions=emissions,
-                        timeprofiled_emissions=timeprofiled_emissions,
-                        consumption=consumption
-                    )
-                    if heat:
-                        f['heat'] = heat
-                    self._fires.append(f)
 
             except:
                 if self.config('skip_invalid_fires'):
                     continue
                 else:
                     raise
+
+    def _add_location(self, fire, aa, loc)
+        if any([not loc.get(f) for f in activity_fields]):
+            raise ValueError("Each active area must have {} in "
+                "order to compute {} dispersion".format(
+                ','.join(activity_fields), self.__class__.__name__))
+        if any([not fb.get('emissions') for fb in loc['fuelbeds']]):
+            raise ValueError(
+                "Missing emissions data required for computing dispersion")
+
+        heat = self._get_heat(loc)
+        utc_offset = self._get_uct_offset(loc)
+        plumerise, timeprofile = self._get_plumerise_and_timeprofile(loc)
+        emissions = self._get_emissions(loc)
+        timeprofiled_emissions = self._get_timeprofiled_emissions(
+            timeprofile, emissions)
+
+        # consumption = datautils.sum_nested_data(
+        #     [fb.get("consumption", {}) for fb in a['fuelbeds']], 'summary', 'total')
+        consumption = loc['consumption']['summary']
+
+        latlng = locationutils.LatLng(loc)
+
+        f = Fire(
+            id=fire.id,
+            meta=fire.get('meta', {}),
+            start=aa['start'],
+            area=aa['location']['area'],
+            latitude=latlng.latitude,
+            longitude=latlng.longitude,
+            utc_offset=utc_offset,
+            plumerise=plumerise,
+            timeprofile=timeprofile,
+            emissions=emissions,
+            timeprofiled_emissions=timeprofiled_emissions,
+            consumption=consumption
+        )
+        if heat:
+            f['heat'] = heat
+        self._fires.append(f)
+
+    def _get_plumerise_and_timeprofile(self, loc):
+        # TODO: only include plumerise and timeprofile keys within model run
+        # time window; and somehow fill in gaps (is this possible?)
+        all_plumerise = loc.get('plumerise', {})
+        all_timeprofile = loc.get('timeprofile', {})
+        plumerise = {}
+        timeprofile = {}
+        for i in range(self._num_hours):
+            local_dt = self._model_start + timedelta(hours=(i + utc_offset))
+            # TODO: will all_plumerise and all_timeprofile always
+            #    have string value keys
+            local_dt = local_dt.strftime('%Y-%m-%dT%H:%M:%S')
+            plumerise[local_dt] = all_plumerise.get(local_dt) or self.MISSING_PLUMERISE_HOUR
+            timeprofile[local_dt] = all_timeprofile.get(local_dt) or self.MISSING_TIMEPROFILE_HOUR
+
+        return plumerise, timeprofile
+
+    def _get_emissions(self, loc):
+        # sum the emissions across all fuelbeds, but keep them separate by phase
+        emissions = {p: {} for p in PHASES}
+        for fb in loc['fuelbeds']:
+            for p in PHASES:
+                for s in fb['emissions'][p]:
+                    emissions[p][s] = (emissions[p].get(s, 0.0)
+                        + sum(fb['emissions'][p][s]))
+        return emissions
+
+    def _get_timeprofiled_emissions(self, timeprofile, emissions):
+        timeprofiled_emissions = {}
+        for dt in timeprofile:
+            timeprofiled_emissions[dt] = {}
+            for e in self.SPECIES:
+                timeprofiled_emissions[dt][e] = sum([
+                    timeprofile[dt][p]*emissions[p].get('PM2.5', 0.0)
+                        for p in PHASES
+                ])
+        return timeprofiled_emissions
+
+
+    def _get_heat(self, loc):
+        # TDOO: handle case where heat is defined by phase, but not total
+        #   (just make sure each phase is defined, and set total to sum)
+        heat = None
+        heat_values = list(itertools.chain.from_iterable(
+            [fb.get('heat', {}).get('total', [None]) for fb in loc['fuelbeds']]))
+        if not any([v is None for v in heat_values]):
+            heat = sum(heat_values)
+            # I'm not sure why we continue if heat is not defined,
+            # but skip the active area if it's less than 1.0e-6
+            # This came from the BSF code. Maybe we should
+            # just set to None if it's less than 1.0e-6 ?
+            if  heat < 1.0e-6:
+                logging.debug("Fire %s activity window %s - %s has "
+                    "less than 1.0e-6 total heat; skip...",
+                    fire.id, aa['start'], aa['end'])
+                raise SkipLocationError("Heat to low")
+
+        # else, just forget about computing heat
+        return heat
+
+    def _get_uct_offset(self, loc):
+        utc_offset = loc.get('location', {}).get('utc_offset')
+        return parse_utc_offset(utc_offset) if utc_offset else 0.0
 
     def _convert_keys_to_datetime(self, d):
         return { datetime_parsing.parse(k): v for k, v in d.items() }
