@@ -203,7 +203,7 @@ class TestDispersionBaseSetFireData(object):
                     ],
                     "smolder_fraction": 0.05
                 },
-                "2015-08-04T17:00:00": {
+                "2015-08-04T18:00:00": {
                     "emission_fractions": [
                         0.05,0.05,0.05,0.05,0.05,0.05,
                         0.05,0.05,0.05,0.05,0.05,0.05,
@@ -222,7 +222,7 @@ class TestDispersionBaseSetFireData(object):
             "timeprofile": {
                 "2015-08-04T17:00:00": {
                     "area_fraction": 0.1,
-                    "flaming": 0.1,
+                    "flaming": 0.2,
                     "residual": 0.1,
                     "smoldering": 0.1
                 },
@@ -240,9 +240,11 @@ class TestDispersionBaseSetFireData(object):
             },
             "timeprofiled_emissions": {
                 "2015-08-04T17:00:00": {
-                    "PM2.5": 6.427146331  # == 9.545588271207714 * 0.2 + 24.10635856528243 * 0.1 + 21.073928205514225 * 0.1
+                    "CO": 0.0,
+                    "PM2.5": 6.427146331321209  # == 9.545588271207714 * 0.2 + 24.10635856528243 * 0.1 + 21.073928205514225 * 0.1
                 },
                 "2015-08-04T18:00:00": {
+                    "CO": 0.0,
                     'PM2.5': 0.0
                 }
             },
