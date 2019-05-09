@@ -34,12 +34,12 @@ class TestLocation(object):
     def test_with_active_area(self):
         active_area = {
             "c": 23,
-            "start": "foo",
-            "end": "bar",
+            "fuelbeds": "foo",
+            "emissions": "bar",
             "d": 1234
         }
         loc = activity.Location({
-            "start": 123,
+            "fuelbeds": 123,
             "a": 1,
             "d": 321
         }, active_area=active_area)
@@ -70,19 +70,19 @@ class TestLocation(object):
         assert loc.get("d") == 321
         assert loc.get("d", "foo") == 321
 
-        # "start" and "end" are blacklisted from looking in parent
+        # "fuelbeds" and "emissions" are blacklisted from looking in parent
         # active area object, so key error if only in active area
-        assert "start" in loc
-        assert loc["start"] == 123
-        assert loc.get("start") == 123
-        assert loc.get("start", "foo") == 123
-        assert "end" not in loc
+        assert "fuelbeds" in loc
+        assert loc["fuelbeds"] == 123
+        assert loc.get("fuelbeds") == 123
+        assert loc.get("fuelbeds", "foo") == 123
+        assert "emissions" not in loc
         with raises(KeyError) as e_info:
-            loc["end"]
-        assert loc.get("end") == None
-        assert loc.get("end", "foo") == "foo"
+            loc["emissions"]
+        assert loc.get("emissions") == None
+        assert loc.get("emissions", "foo") == "foo"
 
-        assert loc == {"a": 1, "d": 321, "start": 123}
+        assert loc == {"a": 1, "d": 321, "fuelbeds": 123}
 
 
 ##

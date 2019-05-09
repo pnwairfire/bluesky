@@ -26,9 +26,15 @@ class Location(dict):
     # TODO: should we use whitelist of fields instead of blacklist,
     #   to be safer?
     LOCATION_ONLY_FIELDS = [
-        "start", "end", "utcoffset",
+        # This lists fields that may be defined in either or both the
+        # location object or it's parent active area object, and could be
+        # different in the two.  So, if it's not defined in the location
+        # object, we should *not* fall back on the active area object.
+        # Fields like "start", "end", "utcoffset", "timeprofile"
+        # are only in the active area object, and then apply to all
+        # children location objects.  So, it's fine to allow access
+        # to them via the location object.
         "fuelbeds", "emissions", "consumption",
-        "timeprofile"
         # TOOD: add other fields
     ]
 
