@@ -13,24 +13,7 @@ class TestFiresCsvsPickRepresentativeFuelbed(object):
         g = {
             "fuelbeds": 'sdf'
         }
-        with raises(TypeError) as e_info:
-            firescsvs._pick_representative_fuelbed({}, g)
-        # TODO: assert e_info.value.args[0] == '...''
-
-        g = {
-            "fuelbeds": [
-                {"sdf_fccs_id": "46","pct": 100.0}
-            ]
-        }
-        with raises(KeyError) as e_info:
-            firescsvs._pick_representative_fuelbed({}, g)
-        # TODO: assert e_info.value.args[0] == '...''
-        g = {
-            "fuelbeds": [
-                {"fccs_id": "46","sdfsdfpct": 100.0}
-            ]
-        }
-        with raises(KeyError) as e_info:
+        with raises(AttributeError) as e_info:
             firescsvs._pick_representative_fuelbed({}, g)
         # TODO: assert e_info.value.args[0] == '...''
 
@@ -41,6 +24,35 @@ class TestFiresCsvsPickRepresentativeFuelbed(object):
             "activity": []
         }
         assert None == firescsvs._pick_representative_fuelbed({}, g)
+
+    def test_one_fuelbed_no_fccs_id(self):
+        g = {
+            "fuelbeds": [
+                {"pct": 100.0}
+            ]
+        }
+        assert None == firescsvs._pick_representative_fuelbed({}, g)
+
+        g["fuelbeds"][0]["sdf_fccs_id"] = "46"
+        assert None == firescsvs._pick_representative_fuelbed({}, g)
+
+    def test_one_fuelbed_no_pct(self):
+        g = {
+            "fuelbeds": [
+                {"fccs_id": "46"}
+            ]
+        }
+        assert None == firescsvs._pick_representative_fuelbed({}, g)
+
+    def test_two_fuelbeds_one_with_no_pct(self):
+        g = {
+            "fuelbeds": [
+                {"fccs_id": "46"},
+                {"fccs_id": "44","pct": 100.0}
+            ]
+        }
+        assert "44" == firescsvs._pick_representative_fuelbed({}, g)
+
 
     def test_one_fuelbed(self):
         g = {
