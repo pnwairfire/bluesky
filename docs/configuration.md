@@ -50,7 +50,7 @@ configuration json data are case-insensitive.***
 ##### load
 
  - ***'config' > 'load' > 'sources'*** -- *optional* -- array of sources to load fire data from; if not defined or if empty array, nothing is loaded
- - ***'config' > 'load' > 'sources' > 'name'*** -- *required* for each source-- e.g. 'smartfire2'
+ - ***'config' > 'load' > 'sources' > 'name'*** -- *required* for each source-- e.g. 'firespider'
  - ***'config' > 'load' > 'sources' > 'format'*** -- *required* for each source-- e.g. 'csv'
  - ***'config' > 'load' > 'sources' > 'type'*** -- *required* for each source-- e.g. 'file'
  - ***'config' > 'load' > 'sources' > 'wait' > 'strategy'*** -- *required* if 'wait' section is defined -- 'fixed' or 'backoff'

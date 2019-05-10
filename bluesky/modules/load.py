@@ -7,11 +7,11 @@ Example configuration:
             "load": {
                 "sources": [
                     {
-                        "name": "smartfire2",
-                        "format": "CSV",
-                        "type": "file",
-                        "file": "/bluesky/data/fires/fire_locations_%Y%m%d.csv",
-                        "events_file": "/bluesky/data/fires/fire_events_%Y%m%d.csv"
+                        "name": "firespider",
+                        "format": "JSON",
+                        "type": "API",
+                        "endpoint": "https://haze.airfire.org/fire-spider/fires/goes16/archive/fire-spider-goes16-fires-{today:%Y-%m-%d}.json",
+                        "saved_copy_file": "/path/to/log/dir/fire-spider-goes16-fires-{today:%Y-%m-%d}.json"
                     }
                 ]
             }
@@ -21,16 +21,16 @@ Example configuration:
 or, on the command line:
 
     bsp --no-input -B skip_failed_fires=True -J load.sources='[{
-        "name":"smartfire2",
-        "format":"CSV",
-        "type":"file",
-        "file": "/bluesky/data/fires/fire_locations_{yesterday:%Y%m%d}.csv",
-        "events_file": "/bluesky/data/fires/fire_events_{yesterday:%Y%m%d}.csv"
+        "name":"firespider",
+        "format":"JSON",
+        "type":"API",
+        "endpoint": "https://haze.airfire.org/fire-spider/fires/goes16/archive/fire-spider-goes16-fires-{today:%Y-%m-%d}.json",
+        "saved_copy_file": "/path/to/log/dir/fire-spider-goes16-fires-{today:%Y-%m-%d}.json"
     }]' load -o out.json
 
-Currently supported sources:  smartfire2
-Currently supported types: file
-Currently supported formats: CSV
+Currently supported sources:  FireSpider
+Currently supported types: file, API
+Currently supported formats: JSON, CSV
 """
 
 import importlib
