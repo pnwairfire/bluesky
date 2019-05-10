@@ -58,26 +58,33 @@ class EmissionsCsvWriter(object):
                 with fires_manager.fire_failure_handler(fire):
                     self._write_fire(fire)
 
+    MISSING_LOCATONS_ERROR_MSG = (
+        "Missing fire activity data required for computing dispersion")
+
     def _write_fire(self, fire):
         locations = fire.locations
         if not locations:
-            raise ValueError(
-                "Missing fire activity data required for computing dispersion")
+            raise ValueError(self.MISSING_LOCATONS_ERROR_MSG)
 
         for loc in locations:
             self._write_location(fire, loc)
 
+    MISSING_TIMEPROFILE_ERROR_MSG = (
+        "activity timeprofile information required to write emissions csv")
+
+    MISSING_EMISSIONS_ERROR_MSG = (
+        "activity emissions information required to write emissions csv")
+
     def _write_location(self, fire, loc):
         if not loc.get('timeprofile'):
-            raise ValueError("activity timeprofile information "
-                "required to write emissions csv")
+            raise ValueError(self.MISSING_TIMEPROFILE_ERROR_MSG)
 
-        # Total emissions values may be in a['emissions'], but
+        # Total emissions values may be in loc['emissions'], but
         # we also need per-phase values, so we need the
         # emissions data in the fuelbeds objects
-        if not loc.get('fuelbeds') or not loc['fuelbeds'][0].get('emissions'):
-            raise ValueError("activity emissions information "
-                "required to write emissions csv")
+        if not loc.get('fuelbeds') or any(
+                [not l.get('emissions') for l in loc['fuelbeds']]):
+            raise ValueError(self.MISSING_EMISSIONS_ERROR_MSG)
 
         for i, ts in enumerate(sorted(list(loc.get('timeprofile').keys()))):
             self._write_row(fire, loc, i, ts)
