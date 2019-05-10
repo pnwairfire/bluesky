@@ -106,6 +106,10 @@ SIMPLE_MULTI_GROWTH_FIRE_MARSHALED = {
                         }
                     ]
                 },
+            ]
+        },
+        {
+            "active_areas": [
                 {
                     "start": "2019-02-13T00:00:00",
                     "end": "2019-02-14T00:00:00",
@@ -114,11 +118,15 @@ SIMPLE_MULTI_GROWTH_FIRE_MARSHALED = {
                         {
 
                             "area": 344.812,
-                            "latitude": 32.0,
-                            "longitude": -120.0,
+                            "lat": 32.0,
+                            "lng": -120.0,
                         }
                     ]
                 },
+            ]
+        },
+        {
+            "active_areas": [
                 {
                     "start": "2019-02-13T00:00:00",
                     "end": "2019-02-14T00:00:00",
@@ -134,6 +142,10 @@ SIMPLE_MULTI_GROWTH_FIRE_MARSHALED = {
                         ]
                     }
                 },
+            ]
+        },
+        {
+            "active_areas": [
                 {
                     "start": "2019-02-13T00:00:00",
                     "end": "2019-02-14T00:00:00",
@@ -277,7 +289,7 @@ MULTI_GROWTH_FIRE = {
             "start": "2015-08-10T00:00:00",
             "end": "2015-08-11T00:00:00",
             "location": {
-                "area": 300,
+                "area": 300.0,
                 "geojson": {
                     "type": "MultiPoint",
                     "coordinates": [[-120.2, 48.1]]
@@ -288,77 +300,81 @@ MULTI_GROWTH_FIRE = {
     ]
 }
 MULTI_GROWTH_FIRE_MARSHALED =     {
-        "id": "HMS_sdfsdfsdf",
-        "source": "HMS",
-        "name": "HMS_sdfsdfsdf",
-        "fuel_type": "natural",
-        "type": "wildfire",
-        "activity": [
-            {
-                "active_areas": [
-                    {
-                        "start": datetime.datetime(2015,8,9,0,0,0),
-                        "end": datetime.datetime(2015,8,10,0,0,0),
-                        "utc_offset": "-07:00",
-                        "specified_points": [
-                            {
-                                "lat": 48.1,
-                                "lng": -120.2,
-                                "area": 300,
-                            },
-                            {
-                                "lat": 48.2,
-                                "lng": -120.4,
-                                "area": 300,
-                            },
-                            {
-                                "lat": 48.2,
-                                "lng": -120.2,
-                                "area": 300,
-                            }
-                        ],
-                        "timeprofile": {
-                            "2015-08-09T00:00:00": {
-                                'area_fraction': 0.4118236472945892,
-                                'flaming': 0.4118236472945892,
-                                'smoldering': 0.4118236472945892,
-                                'residual': 0.4118236472945892
-                            },
-                            "2015-08-09T06:00:00":  {
-                                'area_fraction': 0.30661322645290584,
-                                'flaming': 0.30661322645290584,
-                                'smoldering': 0.30661322645290584,
-                                'residual': 0.30661322645290584
-                            },
-                            "2015-08-10T02:00:00": {
-                                'area_fraction': 0.28156312625250507,
-                                'flaming': 0.28156312625250507,
-                                'smoldering': 0.28156312625250507,
-                                'residual': 0.28156312625250507
-                            },
+    "id": "HMS_sdfsdfsdf",
+    "source": "HMS",
+    "name": "HMS_sdfsdfsdf",
+    "fuel_type": "natural",
+    "type": "wildfire",
+    "activity": [
+        {
+            "active_areas": [
+                {
+                    "start": "2015-08-09T00:00:00",
+                    "end": "2015-08-10T00:00:00",
+                    "utc_offset": "-07:00",
+                    "specified_points": [
+                        {
+                            "lat": 48.1,
+                            "lng": -120.2,
+                            "area": 300.0,
                         },
-                        "hourly_frp": {
-                            "2015-08-09T00:00:00": 47.333333333333336,
-                            "2015-08-09T06:00:00":  45.0,
-                            "2015-08-10T02:00:00": 53.166666666666664
+                        {
+                            "lat": 48.2,
+                            "lng": -120.4,
+                            "area": 300.0,
+                        },
+                        {
+                            "lat": 48.2,
+                            "lng": -120.2,
+                            "area": 300.0,
                         }
+                    ],
+                    "timeprofile": {
+                        "2015-08-09T00:00:00": {
+                            'area_fraction': 0.4118236472945892,
+                            'flaming': 0.4118236472945892,
+                            'smoldering': 0.4118236472945892,
+                            'residual': 0.4118236472945892
+                        },
+                        "2015-08-09T06:00:00":  {
+                            'area_fraction': 0.30661322645290584,
+                            'flaming': 0.30661322645290584,
+                            'smoldering': 0.30661322645290584,
+                            'residual': 0.30661322645290584
+                        },
+                        "2015-08-10T02:00:00": {
+                            'area_fraction': 0.28156312625250507,
+                            'flaming': 0.28156312625250507,
+                            'smoldering': 0.28156312625250507,
+                            'residual': 0.28156312625250507
+                        },
                     },
-                    {
-                        "start": datetime.datetime(2015,8,10,0,0,0),
-                        "end": datetime.datetime(2015,8,11,0,0,0),
-                        "specified_points": [
-                            {
-                                "lat": 48.1,
-                                "lng": 120.2,
-                                "area": 300,
-                                "utc_offset": "-07:00"
-                            }
-                        ]
+                    "hourly_frp": {
+                        "2015-08-09T00:00:00": 47.333333333333336,
+                        "2015-08-09T06:00:00":  45.0,
+                        "2015-08-10T02:00:00": 53.166666666666664
                     }
-                ]
-            }
-        ]
-    }
+                },
+            ]
+        },
+        {
+            "active_areas": [
+                {
+                    "start": "2015-08-10T00:00:00",
+                    "end": "2015-08-11T00:00:00",
+                    "utc_offset": "-07:00",
+                    "specified_points": [
+                        {
+                            "lat": 48.1,
+                            "lng": -120.2,
+                            "area": 300.0
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
 
 class TestMarshalBlueskyv4_0To4_1(object):
 
@@ -373,7 +389,6 @@ class TestMarshalBlueskyv4_0To4_1(object):
     def test_simple_multi_growth_fire(self):
         expected = [SIMPLE_MULTI_GROWTH_FIRE_MARSHALED]
         actual = self.marshaler.marshal([SIMPLE_MULTI_GROWTH_FIRE])
-        import pdb;pdb.set_trace()
         assert actual == expected
 
     def test_fsv2_goes16_fire(self):
