@@ -1,28 +1,7 @@
 """bluesky.loaders.firespider
-"""
 
-__author__ = "Joel Dubowy"
 
-import datetime
-import json
-import os
-
-from . import BaseApiLoader, BaseJsonFileLoader
-from bluesky.datetimeutils import parse_datetime, parse_utc_offset
-
-__all__ = [
-    'JsonApiLoader',
-    'JsonFileLoader'
-]
-
-class BaseFireSpiderLoader(object):
-
-    START_AFTER_END_ERROR_MSG = "Start must be before end"
-
-    def _marshal(self, fires):
-        """Marshals FireSpider data into bsp's internal structure
-
-        FireSpider structure:
+        FireSpider v1 structure:
 
             {
                 "growth_modules": [
@@ -77,60 +56,121 @@ class BaseFireSpiderLoader(object):
                 "source": "goes16"
             }
 
-        The only thing that needs to be done is to filter out activity
-        windows that are outside of time range. Nothing else needs to
-        be done since all times in the activity objects (activity 'start'
-        and 'end' times, as well as timeprofile and hourly_frp keys)
-        are already in local time.
+        FiresSpider v2 structure
 
-        Note that FireSpider strill (as of 4/17/2019) uses the term 'growth',
-        but this code supports parsing both 'growth' and 'activity', in
-        anticipation of the spider switching to 'activity'
-        """
-        for f in fires:
-            # accept either 'activity' or 'growth'
-            activity = f.pop('activity', []) or f.pop('growth', [])
-            f['activity'] = [a for a in activity if self._within_time_range(a)]
+        ... FILL IN ONCE AVAILABLE ...
 
-        fires = [f for f in fires if f['activity']]
 
-        return fires
+"""
 
-    def _within_time_range(self, a):
-        utc_offset = self._get_utc_offset(a)
-        if a.get('start') and a.get('end'):
-            # convert to datetime objects in place
-            a['start'] = parse_datetime(a.get('start'), 'start')
-            a['end'] = parse_datetime(a.get('end'), 'end')
-            # the activity object's 'start' and 'end' will be in local time;
-            # convert them to UTC to compare with start/end query parameters
-            utc_start = a['start'] - utc_offset
-            utc_end = a['end'] - utc_offset
+__author__ = "Joel Dubowy"
 
-            return ((not self._start or utc_end >= self._start) and
-                (not self._end or utc_start <= self._end ))
+import abc
+import datetime
+import json
+import os
 
-        return False # not necessary, but makes code more readable
+from . import BaseApiLoader, BaseJsonFileLoader
+from bluesky.datetimeutils import parse_datetime, parse_utc_offset
+from bluesky.marshal import Blueskyv4_0To4_1
 
-    def _get_utc_offset(self, a):
-        utc_offset = a.get('location', {}).get('utc_offset')
-        if utc_offset:
-            return datetime.timedelta(hours=parse_utc_offset(utc_offset))
+__all__ = [
+    'JsonApiLoader',
+    'JsonFileLoader'
+]
+
+
+##
+## Loader Classes
+##
+
+class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
+
+    @abc.abstractmethod
+    def _get_fire_data(self):
+        raise NotImplementedError("Implemented by base class")
+
+    def marshal(self, data):
+        # v2 didn't initially have version specified in the output data
+        if not data.get('version') or data['version'] == 2:
+            func = FireSpiderMarshalerV1().marshal
+
+        elif data['version'] == 3:
+            # Nothing needs be done; just return fires
+            func = lambda fires: fires
+
         else:
-            return datetime.timedelta(0)
+            raise NotImplementedError("Support for FireSpider "
+                "version %s not implemented", data['version'])
+
+        return func(data)
+
+    def load(self):
+        data = self._get_fire_data()
+        return self.marshal(data)
 
 class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
     """Loads json formatted fire data from the FireSpider web service
     """
 
-    def load(self):
-        fires = json.loads(self.get(**self._query))['data']
-        return self._marshal(fires)
+    def _get_fire_data(self):
+        return json.loads(self.get(**self._query))
 
 class JsonFileLoader(BaseJsonFileLoader, BaseFireSpiderLoader):
     """Loads json formatted fire data from the FireSpider web service
     """
 
     def load(self):
-        fires_data = super(JsonFileLoader, self).load()
-        return self._marshal(fires_data['data'])
+        return super(JsonFileLoader, self).load()
+
+
+##
+## Marshaling classes
+##
+
+class FireSpiderMarshalerBase(object)
+
+    #START_AFTER_END_ERROR_MSG = "Start must be before end"
+
+    def marshal(self, data):
+        fires = self._marshal(data)
+        return self._prune(fires)
+
+    def prune(self, fires):
+        """Filters out activity windows that are outside of time range.
+        """
+        for f in fires:
+            for a in fire['activity']:
+
+        fires = [f for f in fires if f['activity']]
+
+        return fires
+
+
+    def _within_time_range(self, active_area):
+        """
+        Note that all times in the activity objects (activity 'start'
+        and 'end' times, as well as timeprofile and hourly_frp keys)
+        are already in local time.
+        """
+        utc_offset = self._get_utc_offset(active_area)
+        if active_area.get('start') and active_area.get('end'):
+            # convert to datetime objects in place
+            active_area['start'] = parse_datetime(active_area.get('start'), 'start')
+            active_area['end'] = parse_datetime(active_area.get('end'), 'end')
+            # the activity object's 'start' and 'end' will be in local time;
+            # convert them to UTC to compare with start/end query parameters
+            utc_start = active_area['start'] - utc_offset
+            utc_end = active_area['end'] - utc_offset
+
+            return ((not self._start or utc_end >= self._start) and
+                (not self._end or utc_start <= self._end ))
+
+        return False # not necessary, but makes code more readable
+
+    def _get_utc_offset(self, active_area):
+        utc_offset = active_area.get('utc_offset')
+        if utc_offset:
+            return datetime.timedelta(hours=parse_utc_offset(utc_offset))
+        else:
+            return datetime.timedelta(0)
