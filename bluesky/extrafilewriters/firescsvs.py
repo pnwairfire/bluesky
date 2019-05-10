@@ -38,9 +38,10 @@ if 'NOX' in BLUESKYKML_SPECIES_LIST:
 
 def _pick_representative_fuelbed(fire, loc):
     fuelbeds = [f for f in loc.get('fuelbeds', [])
-        if hasattr(f.get('pct'), 'real') and f.get('fccs_id')]
+        if hasattr(f.get('pct', 0.0), 'real') and f.get('fccs_id')]
     if fuelbeds:
-        fuelbeds = sorted(fuelbeds, key=lambda fb: fb['pct'], reverse=True)
+        fuelbeds = sorted(fuelbeds,
+            key=lambda fb: fb.get('pct', 0.0), reverse=True)
         return fuelbeds[0]['fccs_id']
 
 def _get_heat(fire, loc):

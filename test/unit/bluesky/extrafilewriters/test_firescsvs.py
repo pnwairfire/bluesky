@@ -42,7 +42,7 @@ class TestFiresCsvsPickRepresentativeFuelbed(object):
                 {"fccs_id": "46"}
             ]
         }
-        assert None == firescsvs._pick_representative_fuelbed({}, g)
+        assert "46" == firescsvs._pick_representative_fuelbed({}, g)
 
     def test_two_fuelbeds_one_with_no_pct(self):
         g = {
