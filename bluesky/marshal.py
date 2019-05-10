@@ -5,6 +5,8 @@ __author__ = "Joel Dubowy"
 
 import copy
 
+from bluesky.models.fires import Fire
+
 
 __all__ = [
     "Blueskyv4_0To4_1"
@@ -109,4 +111,4 @@ class Blueskyv4_0To4_1(object):
 
             fire['activity'].append(new_a)
 
-        return fire
+        return Fire(fire)
