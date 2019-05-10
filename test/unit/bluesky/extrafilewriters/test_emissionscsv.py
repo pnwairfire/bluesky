@@ -120,10 +120,12 @@ FIRE = Fire({
                                 }
                             ],
                             "heat": {
-                                "flaming": [1000000000.0],
-                                "smoldering": [4000000000.0],
-                                "residual": [3000000000.0],
-                                "total": [8000000000.0]
+                                "summary": {
+                                    "flaming": 1000000000.0,
+                                    "smoldering": 4000000000.0,
+                                    "residual": 3000000000.0,
+                                    "total": 8000000000.0
+                                }
                             },
                             "plumerise": {
                                 "2015-08-04T17:00:00": {
@@ -176,10 +178,12 @@ FIRE = Fire({
                                 }
                             ],
                             "heat": {
-                                "flaming": [2000000000.0],
-                                "smoldering": [6000000000.0],
-                                "residual": [1000000000.0],
-                                "total": [9000000000.0]
+                                "summary": {
+                                    "flaming": 2000000000.0,
+                                    "smoldering": 6000000000.0,
+                                    "residual": 1000000000.0,
+                                    "total": 9000000000.0
+                                }
                             },
                         }
                     ],
@@ -237,7 +241,7 @@ class TestEmissionsCsvWriterWriteFire(object):
                 2.0, '', '', '', '', '', '', '', '', # emissions - flaming
                 0.5, '', '', '', '', '', '', '', '', # emissions - smoldering
                 2.0, '', '', '', '', '', '', '', '',  # emissions - residual
-                0.05, '', # smoldering fraction, heat
+                0.05, 800000000.0, # smoldering fraction, heat
                 # the rest are plumerise heights
                 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110,
                 120, 130, 140, 150, 160, 170, 180, 190, 200, 210
@@ -250,7 +254,7 @@ class TestEmissionsCsvWriterWriteFire(object):
                 1.0, '', '', '', '', '', '', '', '', # emissions - flaming
                 2.0, '', '', '', '', '', '', '', '', # emissions - smoldering
                 4.0, '', '', '', '', '', '', '', '',  # emissions - residual
-                '', '', # smoldering fraction, heat
+                '', 2400000000.0, # smoldering fraction, heat
                 # the rest are plumerise heights
                 '', '', '', '', '', '', '', '', '', '', '',
                 '', '', '', '', '', '', '', '', '', ''
@@ -263,7 +267,7 @@ class TestEmissionsCsvWriterWriteFire(object):
                  10.0, '', '', '', '', '', '', '', '', # emissions - flaming
                  20.0, '', '', '', '', '', '', '', '', # emissions - smoldering
                  40.0, '', '', '', '', '', '', '', '',  # emissions - residual
-                 '', '',# smoldering fraction, heat
+                 '', 2700000000.0, # smoldering fraction, heat
                 # the rest are plumerise heights
                  '', '', '', '', '', '', '', '', '', '', '',
                  '', '', '', '', '', '', '', '', '', ''
