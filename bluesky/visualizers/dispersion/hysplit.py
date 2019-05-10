@@ -63,8 +63,6 @@ BlueskyKmlArgs = namedtuple('BlueskyKmlArgs', ARGS)
 class HysplitVisualizer(object):
     def __init__(self, fires_manager):
         self._fires_manager = fires_manager
-        self._fires = fires_manager.fires
-        self._run_id = fires_manager.run_id
 
         self._set_dispersion_output_info()
 
