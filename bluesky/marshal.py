@@ -33,6 +33,7 @@ class Blueskyv4_0To4_1(object):
 
     def marshal_fire(self, fire):
         # TODO: break this method up into multiple methods
+        fire = copy.deepcopy(fire)
 
         activity = fire.pop('activity', None) or fire.pop('growth', [])
         fire['activity'] = []
