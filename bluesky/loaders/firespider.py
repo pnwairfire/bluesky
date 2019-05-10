@@ -86,14 +86,19 @@ __all__ = [
 
 class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
 
+    def load(self):
+        data = self._get_fire_data()
+        fires = self._marshal(data)
+        return self._prune(fires)
+
     @abc.abstractmethod
     def _get_fire_data(self):
         raise NotImplementedError("Implemented by base class")
 
-    def marshal(self, data):
+    def _marshal(self, data):
         # v2 didn't initially have version specified in the output data
         if not data.get('version') or data['version'] == 2:
-            func = FireSpiderMarshalerV1().marshal
+            func = Blueskyv4_0To4_1().marshal
 
         elif data['version'] == 3:
             # Nothing needs be done; just return fires
@@ -103,45 +108,16 @@ class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
             raise NotImplementedError("Support for FireSpider "
                 "version %s not implemented", data['version'])
 
-        return func(data)
+        return func(data['data'])
 
-    def load(self):
-        data = self._get_fire_data()
-        return self.marshal(data)
-
-class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
-    """Loads json formatted fire data from the FireSpider web service
-    """
-
-    def _get_fire_data(self):
-        return json.loads(self.get(**self._query))
-
-class JsonFileLoader(BaseJsonFileLoader, BaseFireSpiderLoader):
-    """Loads json formatted fire data from the FireSpider web service
-    """
-
-    def load(self):
-        return super(JsonFileLoader, self).load()
-
-
-##
-## Marshaling classes
-##
-
-class FireSpiderMarshalerBase(object)
-
-    #START_AFTER_END_ERROR_MSG = "Start must be before end"
-
-    def marshal(self, data):
-        fires = self._marshal(data)
-        return self._prune(fires)
-
-    def prune(self, fires):
+    def _prune(self, fires):
         """Filters out activity windows that are outside of time range.
         """
-        for f in fires:
+        for fire in fires:
             for a in fire['activity']:
-
+                a['active_areas'] = [aa for aa in a.active_areas
+                    if self._within_time_range(aa)]
+            fire['activity'] = [a for a in fire['activity'] if a.active_areas]
         fires = [f for f in fires if f['activity']]
 
         return fires
@@ -174,3 +150,19 @@ class FireSpiderMarshalerBase(object)
             return datetime.timedelta(hours=parse_utc_offset(utc_offset))
         else:
             return datetime.timedelta(0)
+
+
+class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
+    """Loads json formatted fire data from the FireSpider web service
+    """
+
+    def _get_fire_data(self):
+        return json.loads(self.get(**self._query))
+
+
+class JsonFileLoader(BaseJsonFileLoader, BaseFireSpiderLoader):
+    """Loads json formatted fire data from the FireSpider web service
+    """
+
+    def _get_fire_data(self):
+        return super(JsonFileLoader, self).load()
