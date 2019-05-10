@@ -15,7 +15,8 @@ NO_GROWTH_FIRE = {
 NO_GROWTH_FIRE_MARSHALED = {
     "id": "dc621621-fdc2-4dbd-8178-a6edc77bb632",
     "source": "GOES-16",
-    "type": "WF",
+    "type": "wildfire",
+    'fuel_type': 'natural',
     "activity": []
 }
 
@@ -90,7 +91,8 @@ SIMPLE_MULTI_GROWTH_FIRE = {
 SIMPLE_MULTI_GROWTH_FIRE_MARSHALED = {
     "id": "dc621621-fdc2-4dbd-8178-a6edc77bb632",
     "source": "GOES-16",
-    "type": "WF",
+    "type": "wildfire",
+    'fuel_type': 'natural',
     "activity": [
         {
             "active_areas": [
@@ -204,7 +206,8 @@ FSV2_GOES16_FIRE = {
 FSV2_GOES16_FIRE_MARSHALED = {
     "id": "dc621621-fdc2-4dbd-8178-a6edc77bb632",
     "source": "GOES-16",
-    "type": "WF",
+    "type": "wildfire",
+    'fuel_type': 'natural',
     "activity": [
         {
             "active_areas": [
