@@ -123,7 +123,11 @@ class EmissionsCsvWriter(object):
             for i, h in enumerate(pr['heights']):
                 row['height_' + str(i)] = h
 
-        row['heat'] = loc['heat']['summary']['total'] * tp['area_fraction']
+        row['heat'] = loc.get('heat', {}).get('summary', {}).get('total')
+        if row['heat']:
+            row['heat'] *= tp['area_fraction']
+        else:
+            row['heat'] = ''
 
         self.emissions_writer.writerow(
             [row.get(k, '') for k in self.HEADERS])
