@@ -15,7 +15,8 @@ NO_GROWTH_FIRE = {
 NO_GROWTH_FIRE_MARSHALED = {
     "id": "dc621621-fdc2-4dbd-8178-a6edc77bb632",
     "source": "GOES-16",
-    "type": "WF"
+    "type": "WF",
+    "activity": []
 }
 
 SIMPLE_MULTI_GROWTH_FIRE = {
@@ -40,7 +41,7 @@ SIMPLE_MULTI_GROWTH_FIRE = {
         },
         {
             "location": {
-                "area": 8290342.812,
+                "area": 344.812,
                 "latitude": 32.0,
                 "longitude": -120.0,
                 "utc_offset": "-06:00"
@@ -50,7 +51,7 @@ SIMPLE_MULTI_GROWTH_FIRE = {
         },
         {
             "location": {
-                "area": 8290342.812,
+                "area": 3000,
                 "geojson": {
                     "type": "MultiPolygon",
                     "coordinates": [[[
@@ -68,7 +69,7 @@ SIMPLE_MULTI_GROWTH_FIRE = {
         },
         {
             "location": {
-                "area": 3214.0,
+                "area": 1000,
                 "geojson": {
                     "type": "Polygon",
                     "coordinates": [[
@@ -90,13 +91,12 @@ SIMPLE_MULTI_GROWTH_FIRE_MARSHALED = {
     "id": "dc621621-fdc2-4dbd-8178-a6edc77bb632",
     "source": "GOES-16",
     "type": "WF",
-    "actvity": [
+    "activity": [
         {
             "active_areas": [
                 {
                     "start": "2019-02-13T00:00:00",
                     "end": "2019-02-14T00:00:00",
-                    "frp": 30.14771428571428,
                     "utc_offset": "-06:00",
                     "specified_points": [
                         {
@@ -104,23 +104,56 @@ SIMPLE_MULTI_GROWTH_FIRE_MARSHALED = {
                             "lng":  -98.675,
                             "area": 8290342.812
                         }
-                    ],
-                    "timeprofile": {
-                        "2019-02-13T18:00:00": {
-                            "area_fraction": 1,
-                            "flaming": 1,
-                            "smoldering": 1,
-                            "residual": 1
+                    ]
+                },
+                {
+                    "start": "2019-02-13T00:00:00",
+                    "end": "2019-02-14T00:00:00",
+                    "utc_offset": "-06:00",
+                    "specified_points": [
+                        {
+
+                            "area": 344.812,
+                            "latitude": 32.0,
+                            "longitude": -120.0,
                         }
-                    },
-                    "hourly_frp": {
-                        "2019-02-13T18:00:00": 30.14771428571428
+                    ]
+                },
+                {
+                    "start": "2019-02-13T00:00:00",
+                    "end": "2019-02-14T00:00:00",
+                    "utc_offset": "-06:00",
+                    "perimeter": {
+                        "area": 3000,
+                        "polygon": [
+                            [-121.4522115,47.4316976],
+                            [-121.3990506,47.4316976],
+                            [-120.3990506,47.4099293],
+                            [-121.4522115,47.4099293],
+                            [-121.4522115,47.4316976]
+                        ]
+                    }
+                },
+                {
+                    "start": "2019-02-13T00:00:00",
+                    "end": "2019-02-14T00:00:00",
+                    "utc_offset": "-06:00",
+                    "perimeter": {
+                        "area": 1000,
+                        "polygon":[
+                            [-121.4522115,47.4316976],
+                            [-121.3990506,47.4316976],
+                            [-120.3990506,47.4099293],
+                            [-121.4522115,47.4099293],
+                            [-121.4522115,47.4316976]
+                        ]
                     }
                 }
             ]
         }
     ]
 }
+
 # This is a GOES-16 fire produced by FireSpider v2
 FSV2_GOES16_FIRE = {
     "id": "dc621621-fdc2-4dbd-8178-a6edc77bb632",
@@ -160,7 +193,7 @@ FSV2_GOES16_FIRE_MARSHALED = {
     "id": "dc621621-fdc2-4dbd-8178-a6edc77bb632",
     "source": "GOES-16",
     "type": "WF",
-    "actvity": [
+    "activity": [
         {
             "active_areas": [
                 {
@@ -332,15 +365,20 @@ class TestMarshalBlueskyv4_0To4_1(object):
     def setup(self):
         self.marshaler = marshal.Blueskyv4_0To4_1()
 
-    def test_simple_multi_growth(self):
+    def test_no_growth_fire(self):
+        expected = [NO_GROWTH_FIRE_MARSHALED]
+        actual = self.marshaler.marshal([NO_GROWTH_FIRE])
+        assert actual == expected
+
+    def test_simple_multi_growth_fire(self):
         expected = [SIMPLE_MULTI_GROWTH_FIRE_MARSHALED]
-        actual = self.marshaler.marshal([SIMPLE_MULTI_GROWTH_FIRE_MARSHALED])
+        actual = self.marshaler.marshal([SIMPLE_MULTI_GROWTH_FIRE])
+        import pdb;pdb.set_trace()
         assert actual == expected
 
     def test_fsv2_goes16_fire(self):
         expected = [FSV2_GOES16_FIRE_MARSHALED]
         actual = self.marshaler.marshal([FSV2_GOES16_FIRE])
-        import pdb;pdb.set_trace()
         assert actual == expected
 
     def test_multi_growth_fire(self):
@@ -350,11 +388,13 @@ class TestMarshalBlueskyv4_0To4_1(object):
 
     def test_miltiple_fires(self):
         expected = [
+            NO_GROWTH_FIRE_MARSHALED,
             SIMPLE_MULTI_GROWTH_FIRE_MARSHALED,
             FSV2_GOES16_FIRE_MARSHALED,
             MULTI_GROWTH_FIRE_MARSHALED,
         ]
         actual = self.marshaler.marshal([
+            NO_GROWTH_FIRE,
             SIMPLE_MULTI_GROWTH_FIRE,
             FSV2_GOES16_FIRE,
             MULTI_GROWTH_FIRE,

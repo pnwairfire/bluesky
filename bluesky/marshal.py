@@ -32,6 +32,8 @@ class Blueskyv4_0To4_1(object):
         return [self.marshal_fire(fire) for fire in fires]
 
     def marshal_fire(self, fire):
+        # TODO: break this method up into multiple methods
+
         activity = fire.pop('activity', None) or fire.pop('growth', [])
         fire['activity'] = []
         for old_a in activity:
