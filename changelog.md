@@ -35,3 +35,4 @@
   - specified_points & perimeter_polygon objects replacing location object
   - remove ingestion module and require clients to structure data correctly
   - remove bsp-csv2json
+- support FireSpider v3 output
