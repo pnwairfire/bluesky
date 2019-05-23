@@ -12,22 +12,19 @@ from bluesky.loaders import firespider
 
 data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 FSV2_INPUT_FILENAME = os.path.join(data_dir, 'fires-spider-v2-input.json')
-FSV2_MARSHALED_FILENAME = os.path.join(data_dir, 'fires-spider-v2-marshaled.json')
-
+FSV2_LOADED_FILENAME = os.path.join(data_dir, 'fires-spider-v2-loaded.json')
 
 
 ##
 ## FireSpider v2
 ##
 
-
-
 class TestFireSpiderLoaderFSV2(object):
 
     def setup(self):
         with open(FSV2_INPUT_FILENAME) as f:
             self._input = json.loads(f.read())
-        with open(FSV2_MARSHALED_FILENAME) as f:
+        with open(FSV2_LOADED_FILENAME) as f:
             self._expected_output = json.loads(f.read())
 
     def _call_marshal(self, fires, start=None, end=None):
@@ -39,8 +36,7 @@ class TestFireSpiderLoaderFSV2(object):
     ## With 'start' option
 
     def test_marshal_no_start_end(self):
-        actual = self._call_marshal(copy.deepcopy(FSV2_FIRE_DATA))
-        assert FSV2_FIRE_DATA_MARSHALED == actual
+        self._call_marshal(copy.deepcopy(FSV2_FIRE_DATA))
 
     def test_marshal_w_start_before_all_activity(self):
         self._call_marshal(start=datetime.datetime(2015,8,8,7,0,0))
