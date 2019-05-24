@@ -115,16 +115,16 @@ class TestLatLngActiveArea(object):
         latlng = locationutils.LatLng({
             "perimeter": {
                 "polygon": [
-                    [100.0, 5.0],
-                    [101.0, 0.0],
-                    [101.0, 1.0],
-                    [100.0, 1.0],
-                    [100.0, 5.0]
+                    [-100.0, 35.0],
+                    [-101.0, 35.0],
+                    [-101.0, 31.0],
+                    [-99.0, 31.0],
+                    [-100.0, 35.0]
                 ]
             }
         })
-        assert latlng.latitude == 2.4
-        assert latlng.longitude == 100.4
+        assert latlng.latitude == 33
+        assert latlng.longitude == -100.25
 
     def test_active_area_with_specified_points_and_perimeter(self):
         latlng = locationutils.LatLng({
@@ -136,11 +136,11 @@ class TestLatLngActiveArea(object):
             ],
             "perimeter": {
                 "polygon": [
-                    [100.0, 5.0],
-                    [101.0, 0.0],
-                    [101.0, 1.0],
-                    [100.0, 1.0],
-                    [100.0, 5.0]
+                    [-100.0, 35.0],
+                    [-101.0, 35.0],
+                    [-101.0, 31.0],
+                    [-99.0, 31.0],
+                    [-100.0, 35.0]
                 ]
             }
         })
@@ -193,12 +193,12 @@ class TestLatLngPerimeter(object):
     def test_valid_perimeter(self):
         latlng = locationutils.LatLng({
             "polygon": [
-                [100.0, 5.0],
-                [101.0, 0.0],
-                [101.0, 1.0],
-                [100.0, 1.0],
-                [100.0, 5.0]
+                [-100.0, 35.0],
+                [-101.0, 35.0],
+                [-101.0, 31.0],
+                [-99.0, 31.0],
+                [-100.0, 35.0]
             ]
         })
-        assert latlng.latitude == 2.4
-        assert latlng.longitude == 100.4
+        assert latlng.latitude == 33
+        assert latlng.longitude == -100.25
