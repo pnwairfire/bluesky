@@ -310,25 +310,31 @@ def get_fccs_ids_fires(args, times):
             "type": args.fire_type,
             "activity": [
                 {
-                    "location": {
-                        "longitude": -120.5906549, #-119.7615805,
-                        "ecoregion": args.ecoregion,
-                        "utc_offset": "-07:00",
-                        "latitude": 39.0704668, #37.909644,
-                        "area": args.area
-                    },
-                    "fuelbeds":[
+                    "active_areas": [
                         {
-                            "pct": 100.0,
-                            "fccs_id": str(fccs_id)
+                            "start": times['start'],
+                            "end": times['end'],
+                            "utc_offset": "-07:00",
+                            "specified_points": [
+                                {
+                                    "lng": -120.5906549, #-119.7615805,
+                                    "lat": 39.0704668, #37.909644,
+                                    "ecoregion": args.ecoregion,
+                                    "area": args.area,
+                                    "fuelbeds":[
+                                        {
+                                            "pct": 100.0,
+                                            "fccs_id": str(fccs_id)
+                                        }
+                                    ],
+                                }
+                            ]
                         }
-                    ],
-                    "start": times['start'],
-                    "end": times['end']
+                    ]
                 }
             ]
         })
-        fires[-1]['activity'][0]['location'].update(**CONSUME_LOCATION_FIELDS)
+        fires[-1]['activity'][0]['active_areas'][0].update(**CONSUME_LOCATION_FIELDS)
     return fires
 
 def get_coordinates_fires(args, times):
@@ -340,19 +346,25 @@ def get_coordinates_fires(args, times):
             "type": args.fire_type,
             "activity": [
                 {
-                    "location": {
-                        "latitude": lat,
-                        "longitude": lng,
-                        "ecoregion": args.ecoregion,
-                        "utc_offset": "-07:00",
-                        "area": args.area
-                    },
-                    "start": times['start'],
-                    "end": times['end']
+                    "active_areas": [
+                        {
+                            "start": times['start'],
+                            "end": times['end'],
+                            "utc_offset": "-07:00",
+                            "specified_points": [
+                                {
+                                    "lat": lat,
+                                    "lng": lng,
+                                    "ecoregion": args.ecoregion,
+                                    "area": args.area
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         })
-        fires[-1]['activity'][0]['location'].update()
+        fires[-1]['activity'][0]['active_areas'][0].update()
     return fires
 
 MODES = {
