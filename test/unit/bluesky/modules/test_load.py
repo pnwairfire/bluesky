@@ -11,7 +11,7 @@ from unittest import mock
 from py.test import raises
 
 from bluesky.exceptions import BlueSkyUnavailableResourceError
-from bluesky.loaders import BaseFileLoader
+from bluesky.loaders.firespider import BaseFireSpiderLoader
 from bluesky.modules import load
 
 
@@ -47,7 +47,7 @@ class TestFSFileLoadSource(object):
             self.total_sleep += seconds
             if add_file_midway and self.sleepcount == 2:
                 with open(self._filename, 'w') as f:
-                    f.write('{}')
+                    f.write('{"data": []}')
 
         monkeypatch.setattr(time, 'sleep', mock_sleep)
 
@@ -55,8 +55,8 @@ class TestFSFileLoadSource(object):
         self.load_counter = 0
         def mock_load(_self):
             self.load_counter += 1
-            return {'data': {}}
-        monkeypatch.setattr(BaseFileLoader, 'load', mock_load)
+            return [{}]
+        monkeypatch.setattr(BaseFireSpiderLoader, 'load', mock_load)
 
     def test_no_file_no_wait(self, monkeypatch):
         self.monkeypatch_sleep(monkeypatch)

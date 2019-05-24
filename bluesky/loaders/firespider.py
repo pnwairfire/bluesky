@@ -109,7 +109,7 @@ class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
             raise NotImplementedError("Support for FireSpider "
                 "version %s not implemented", data['version'])
 
-        return func(data['data'])
+        return func(data.get('data', []))
 
     def _prune(self, fires):
         """Filters out activity windows that are outside of time range.
