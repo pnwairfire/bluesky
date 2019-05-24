@@ -80,7 +80,7 @@ class BaseLoader(object):
         if self._saved_copy_filename:
             try:
                 with open(self._saved_copy_filename, 'w') as f:
-                    f.write(data)
+                    f.write(json.dumps(data))
             except Exception as e:
                 logging.warning("Failed to write loaded data to %s - %s",
                     self._saved_copy_filename, e)
@@ -178,8 +178,7 @@ class BaseApiLoader(BaseLoader):
 
 
 
-    def _load(self):
-
+    def _get(self):
         if self._secret:
             if self._auth_protocol == 'afweb':
                 url = self._form_url()
@@ -227,3 +226,10 @@ class BaseApiLoader(BaseLoader):
         query_string = '&'.join(sorted([
             "%s=%s"%(k, v) for k, v in query_param_tuples]))
         return "{}?{}".format(self._endpoint, query_string)
+
+class BaseJsonApiLoader(BaseApiLoader):
+    """Loads JSON formatted fire and events data from file
+    """
+
+    def _load(self):
+        return json.loads(self._get())

@@ -71,7 +71,7 @@ import json
 import os
 
 from bluesky.models.fires import Fire
-from . import BaseApiLoader, BaseJsonFileLoader
+from . import BaseJsonApiLoader, BaseJsonFileLoader
 from bluesky.datetimeutils import parse_datetime, parse_utc_offset
 from bluesky.marshal import Blueskyv4_0To4_1
 
@@ -146,7 +146,7 @@ class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
             return datetime.timedelta(0)
 
 
-class JsonApiLoader(BaseFireSpiderLoader, BaseApiLoader):
+class JsonApiLoader(BaseFireSpiderLoader, BaseJsonApiLoader):
     """Loads json formatted fire data from the FireSpider web service
     """
 
