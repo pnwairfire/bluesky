@@ -70,6 +70,7 @@ import datetime
 import json
 import os
 
+from bluesky.models.fires import Fire
 from . import BaseApiLoader, BaseJsonFileLoader
 from bluesky.datetimeutils import parse_datetime, parse_utc_offset
 from bluesky.marshal import Blueskyv4_0To4_1
@@ -102,7 +103,7 @@ class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
 
         elif data['version'] == 3:
             # Nothing needs be done; just return fires
-            func = lambda fires: fires
+            func = lambda fires: [Fire(f) for f in fires]
 
         else:
             raise NotImplementedError("Support for FireSpider "
