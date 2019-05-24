@@ -54,63 +54,15 @@ class BaseLoader(object):
         if self._start and self._end and self._start > self._end:
             raise BlueSkyConfigurationError(self.START_AFTER_END_ERROR_MSG)
 
-    def _write_data(self, saved_data_filename, data):
-        if saved_data_filename:
-            try:
-                with open(saved_data_filename, 'w') as f:
-                    f.write(data)
-            except Exception as e:
-                logging.warning("Failed to write loaded data to %s - %s",
-                    saved_data_filename, e)
-
-
-##
-## Files
-##
-
-class BaseFileLoader(BaseLoader, metaclass=abc.ABCMeta):
-
-    def __init__(self, **config):
-        super(BaseFileLoader, self).__init__(**config)
-        self._filename = config.get('file')
-        if not self._filename:
-            raise BlueSkyConfigurationError(
-                "Fires file to load not specified")
-        if not os.path.isfile(self._filename):
-            raise BlueSkyUnavailableResourceError("Fires file to "
-                "load {} does not exist".format(self._filename))
-        self._saved_copy_filename = config.get('saved_copy_file')
-
-        self._events_filename = None
-        if config.get('events_file'):
-            self._events_filename = config['events_file']
-            if not os.path.isfile(self._events_filename):
-                raise BlueSkyUnavailableResourceError("Fire events file to load {} "
-                    "does not exist".format(self._events_filename))
-        self._saved_copy_events_filename = config.get('saved_copy_events_file')
-
-    def _copy_file(self, original, saved_copy_filename):
-        if saved_copy_filename:
-            try:
-                shutil.copyfile(original, saved_copy_filename)
-            except Exception as e:
-                logging.warning("Failed to copy %s to %s - %s",
-                    original, saved_copy_filename, e)
+        self._saved_copy_filename = (self._config.get('saved_copy_file')
+            or self._config.get('saved_data_file'))
 
     def load(self):
-        data = self._load(self._filename)
+        data = self._load()
+        self._save_copy(data)
+
         fires = self._marshal(data)
         fires = self._prune(fires)
-
-        self._copy_file(self._filename, self._saved_copy_filename)
-        if self._events_filename:
-            events_by_id = self._load_events_file(self._events_filename)
-            for f in fires:
-                if f.get('event_id') and f['event_id'] in events_by_id:
-                    name = events_by_id[f['event_id']].get('event_name')
-                    if name:
-                        f["name"] = name
-                    # TODO: set any other fields
 
         return fires
 
@@ -124,24 +76,52 @@ class BaseFileLoader(BaseLoader, metaclass=abc.ABCMeta):
         """
         return fires
 
-    def _load_events_file(self, events_filename):
-        # Note: events_filename's existence was already verified by
-        #  self._get_filename
-        events = self._load(events_filename)
-        self._copy_file(events_filename, self._saved_copy_events_filename)
-        return { e.pop('id'): e for e in events}
+    def _save_copy(self, data):
+        if self._saved_copy_filename:
+            try:
+                with open(self._saved_copy_filename, 'w') as f:
+                    f.write(data)
+            except Exception as e:
+                logging.warning("Failed to write loaded data to %s - %s",
+                    self._saved_copy_filename, e)
 
-    @abc.abstractmethod
-    def _load(self):
-        raise NotImplementedError("Implemented by base class")
+
+##
+## Files
+##
+
+class BaseFileLoader(BaseLoader, metaclass=abc.ABCMeta):
+
+    def __init__(self, **config):
+        super(BaseFileLoader, self).__init__(**config)
+
+        self._filename = config.get('file')
+        if not self._filename:
+            raise BlueSkyConfigurationError(
+                "Fires file to load not specified")
+        if not os.path.isfile(self._filename):
+            raise BlueSkyUnavailableResourceError("Fires file to "
+                "load {} does not exist".format(self._filename))
+
+    def _save_copy(self, data):
+        # initially try to just copy file; if fail, then use super
+        # to write to file
+        if self._saved_copy_filename:
+            try:
+                shutil.copyfile(self._filename, self._saved_copy_filename)
+            except Exception as e:
+                logging.warning(
+                    "Failed to copy %s to %s - %s. Will attempt write to file",
+                    self._filename, self._saved_copy_filename, e)
+                super()._save_copy(data)
 
 
 class BaseJsonFileLoader(BaseFileLoader):
     """Loads JSON formatted fire and events data from file
     """
 
-    def _load(self, filename, saved_copy_filename=None):
-        with open(filename, 'r') as f:
+    def _load(self):
+        with open(self._filename, 'r') as f:
             return json.loads(f.read())
 
 
@@ -149,8 +129,8 @@ class BaseCsvFileLoader(BaseFileLoader):
     """Loads csv formatted fire and events data from file
     """
 
-    def _load(self, filename, saved_copy_filename=None):
-        csv_loader = CSV2JSON(input_file=filename)
+    def _load(self):
+        csv_loader = CSV2JSON(input_file=self._filename)
         return csv_loader._load()
 
 
@@ -197,13 +177,12 @@ class BaseApiLoader(BaseLoader):
                 # TODO: if no timezone info, add 'Z' to end of string ?
 
 
-    def get(self, **query):
-        saved_data_filename = (self._config.get('saved_data_file')
-            or self._config.get('saved_copy_file'))
+
+    def _load(self):
 
         if self._secret:
             if self._auth_protocol == 'afweb':
-                url = self._form_url(**query)
+                url = self._form_url()
                 url = auth.sign_url(url, self._key, self._secret)
             else:
                 raise NotImplementedError(
@@ -212,7 +191,7 @@ class BaseApiLoader(BaseLoader):
         else:
             if self._key:
                 params[self._key_param] = self._key
-            url = self._form_url(**query)
+            url = self._form_url()
 
         req = urllib.request.Request(url)
 
@@ -236,13 +215,11 @@ class BaseApiLoader(BaseLoader):
 
         body =  resp.read().decode('ascii')
 
-        self._write_data(saved_data_filename, body)
-
         return body
 
-    def _form_url(self, **query):
+    def _form_url(self):
         query_param_tuples = []
-        for k, v in query.items():
+        for k, v in self._query.items():
             if isinstance(v, list):
                 query_param_tuples.extend([(k, _v) for _v in v])
             else:
