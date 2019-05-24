@@ -93,11 +93,11 @@ class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def _get_fire_data(self):
-        raise NotImplementedError("Implemented by base class")
+        raise NotImplementedError("Implemented by child class")
 
     def _marshal(self, data):
         # v2 didn't initially have version specified in the output data
-        if not data.get('version') or data['version'] == 2:
+        if not data.get('version') or data['version'] == "2.0.0":
             func = Blueskyv4_0To4_1().marshal
 
         elif data['version'] == 3:
