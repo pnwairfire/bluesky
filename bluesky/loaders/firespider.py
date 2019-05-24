@@ -101,7 +101,7 @@ class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
         if not data.get('version') or data['version'] == "2.0.0":
             func = Blueskyv4_0To4_1().marshal
 
-        elif data['version'] == 3:
+        elif data['version'] == "3.0.0":
             # Nothing needs be done; just return fires
             func = lambda fires: [Fire(f) for f in fires]
 
