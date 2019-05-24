@@ -154,7 +154,7 @@ class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
             return datetime.timedelta(0)
 
 
-class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
+class JsonApiLoader(BaseFireSpiderLoader, BaseApiLoader):
     """Loads json formatted fire data from the FireSpider web service
     """
 
@@ -162,9 +162,9 @@ class JsonApiLoader(BaseApiLoader, BaseFireSpiderLoader):
         return json.loads(self.get(**self._query))
 
 
-class JsonFileLoader(BaseJsonFileLoader, BaseFireSpiderLoader):
+class JsonFileLoader(BaseFireSpiderLoader, BaseJsonFileLoader):
     """Loads json formatted fire data from the FireSpider web service
     """
 
     def _get_fire_data(self):
-        return super(JsonFileLoader, self).load()
+        return super(JsonFileLoader, self)._load(self._filename)
