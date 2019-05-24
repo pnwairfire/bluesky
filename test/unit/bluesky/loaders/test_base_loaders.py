@@ -45,13 +45,11 @@ class TestBaseFileLoader(object):
             f.write('{}')
         l = BaseJsonFileLoader(file=filename)
         assert l._filename == filename
-        assert l._events_filename == None
 
         with open(filename, 'w') as f:
             f.write('a,b,c')
         l = BaseCsvFileLoader(file=filename)
         assert l._filename == filename
-        assert l._events_filename == None
 
     def test_events_file_doesnt_exist(self):
         pass
