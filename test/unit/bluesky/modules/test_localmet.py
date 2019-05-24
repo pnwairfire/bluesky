@@ -140,5 +140,5 @@ class TestLocalMetRun(object):
         assert _ARLP_KWARGS == {'time_step': defaults._DEFAULTS['localmet']['time_step']}
         assert _ARLP_PROFILE_CALL_ARGS == [
             (45.0, -119.0, datetime.datetime(2015, 1, 20, 17, 0), datetime.datetime(2015, 1, 21, 17, 0), -7.0),
-            (47.418, -121.426, datetime.datetime(2015, 1, 21, 17, 0), datetime.datetime(2015, 1, 22, 17, 0), -7.0)
+            (47.415, -121.42, datetime.datetime(2015, 1, 21, 17, 0), datetime.datetime(2015, 1, 22, 17, 0), -7.0)
         ]
