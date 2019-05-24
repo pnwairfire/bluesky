@@ -87,15 +87,6 @@ __all__ = [
 
 class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
 
-    def load(self):
-        data = self._get_fire_data()
-        fires = self._marshal(data)
-        return self._prune(fires)
-
-    @abc.abstractmethod
-    def _get_fire_data(self):
-        raise NotImplementedError("Implemented by child class")
-
     def _marshal(self, data):
         # v2 didn't initially have version specified in the output data
         if not data.get('version') or data['version'] == "2.0.0":
@@ -159,13 +150,10 @@ class JsonApiLoader(BaseFireSpiderLoader, BaseApiLoader):
     """Loads json formatted fire data from the FireSpider web service
     """
 
-    def _get_fire_data(self):
-        return json.loads(self.get(**self._query))
-
+    pass
 
 class JsonFileLoader(BaseFireSpiderLoader, BaseJsonFileLoader):
     """Loads json formatted fire data from the FireSpider web service
     """
 
-    def _get_fire_data(self):
-        return super(JsonFileLoader, self)._load(self._filename)
+    pass

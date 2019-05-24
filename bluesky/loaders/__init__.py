@@ -32,6 +32,7 @@ from bluesky.datetimeutils import parse_datetime
 from bluesky.exceptions import (
     BlueSkyConfigurationError, BlueSkyUnavailableResourceError
 )
+from bluesky.models.fires import Fire
 
 __author__ = "Joel Dubowy"
 
@@ -97,7 +98,10 @@ class BaseFileLoader(BaseLoader, metaclass=abc.ABCMeta):
                     original, saved_copy_filename, e)
 
     def load(self):
-        fires = self._load(self._filename)
+        data = self._load(self._filename)
+        fires = self._marshal(data)
+        fires = self._prune(fires)
+
         self._copy_file(self._filename, self._saved_copy_filename)
         if self._events_filename:
             events_by_id = self._load_events_file(self._events_filename)
@@ -107,6 +111,17 @@ class BaseFileLoader(BaseLoader, metaclass=abc.ABCMeta):
                     if name:
                         f["name"] = name
                     # TODO: set any other fields
+
+        return fires
+
+    def _marshal(self, data):
+        """Hook for child classes to marshal input data to Fire objects
+        """
+        return [Fire(f) for f in data]
+
+    def _prune(self, fires):
+        """Hook for child classes to remove fires
+        """
         return fires
 
     def _load_events_file(self, events_filename):
@@ -125,9 +140,6 @@ class BaseJsonFileLoader(BaseFileLoader):
     """Loads JSON formatted fire and events data from file
     """
 
-    def __init__(self, **config):
-        super(BaseJsonFileLoader, self).__init__(**config)
-
     def _load(self, filename, saved_copy_filename=None):
         with open(filename, 'r') as f:
             return json.loads(f.read())
@@ -136,9 +148,6 @@ class BaseJsonFileLoader(BaseFileLoader):
 class BaseCsvFileLoader(BaseFileLoader):
     """Loads csv formatted fire and events data from file
     """
-
-    def __init__(self, **config):
-        super(BaseCsvFileLoader, self).__init__(**config)
 
     def _load(self, filename, saved_copy_filename=None):
         csv_loader = CSV2JSON(input_file=filename)
