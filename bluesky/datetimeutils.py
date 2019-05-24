@@ -98,7 +98,7 @@ VALID_DATETIME_RANGE = (
     # beginning of unix epoch
     datetime.datetime(1970, 1, 1),
     # 100 years from now
-    datetime.datetime.now() + datetime.timedelta(days=1) * 360 * 100
+    datetime.datetime.now() + datetime.timedelta(days=1) * 365 * 100
 )
 def to_datetime(val, limit_range=False):
     """Returns date[time] object represented by string
