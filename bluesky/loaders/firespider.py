@@ -139,8 +139,10 @@ class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
             utc_start = active_area['start'] - utc_offset
             utc_end = active_area['end'] - utc_offset
 
-            return ((not self._start or utc_end >= self._start) and
+            is_within = ((not self._start or utc_end >= self._start) and
                 (not self._end or utc_start <= self._end ))
+
+            return is_within
 
         return False # not necessary, but makes code more readable
 
