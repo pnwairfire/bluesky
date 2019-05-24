@@ -6,7 +6,6 @@ docker run --rm -ti \
        -v $HOME/Met/CANSAC/6km/ARL/:/data/Met/CANSAC/6km/ARL/  \
        -v $HOME/docker-bsp-output/:/bsp-output/ \
        -e PYTHONPATH=/code/pnwairfire-bluesky/ \
-       -e PATH=/code/pnwairfire-bluesky/bin/:$PATH \
+       -e PATH=/code/pnwairfire-bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
        -w /code/pnwairfire-bluesky/ \
        bluesky bash
-
