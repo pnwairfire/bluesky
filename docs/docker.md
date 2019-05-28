@@ -11,35 +11,36 @@ it will output the bluesky help image.  To run bluesky with piped input,
 use something like the following:
 
     echo '{
-        "fires": [{
-            "id": "SF11C14225236095807750",
-            "event_of": {
-                "id": "SF11E826544",
-                "name": "Natural Fire near Snoqualmie Pass, WA"
-            },
-            "activity": [{
-                "start": "2015-01-20T17:00:00",
-                "end": "2015-01-21T17:00:00",
-                "location": {
-                    "geojson": {
-                        "type": "MultiPolygon",
-                        "coordinates": [
-                            [
-                                [
-                                    [-121.4522115, 47.4316976],
-                                    [-121.3990506, 47.4316976],
-                                    [-121.3990506, 47.4099293],
-                                    [-121.4522115, 47.4099293],
-                                    [-121.4522115, 47.4316976]
-                                ]
-                            ]
+        "fires": [
+            {
+                "id": "SF11C14225236095807750",
+                "event_of": {
+                    "id": "SF11E826544",
+                    "name": "Natural Fire near Snoqualmie Pass, WA"
+                },
+                "activity": [
+                    {
+                        "active_areas": [
+                            {
+                                "start": "2015-01-20T17:00:00",
+                                "end": "2015-01-21T17:00:00",
+                                "ecoregion": "southern",
+                                "utc_offset": "-09:00",
+                                "perimeter": {
+                                    "polygon": [
+                                        [-121.4522115, 47.4316976],
+                                        [-121.3990506, 47.4316976],
+                                        [-121.3990506, 47.4099293],
+                                        [-121.4522115, 47.4099293],
+                                        [-121.4522115, 47.4316976]
+                                    ]
+                                }
+                            }
                         ]
-                    },
-                    "ecoregion": "southern",
-                    "utc_offset": "-09:00"
-                }
-            }]
-        }]
+                    }
+                ]
+            }
+        ]
     }' | docker run --rm -i bluesky \
         bsp fuelbeds consumption emissions --indent 4 | less
 
