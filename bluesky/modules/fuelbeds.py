@@ -103,7 +103,7 @@ class Estimator(object):
         elif loc.get('polygon'):
             geo_data =  {
                 "type": "Polygon",
-                "coordinates": loc['polygon']
+                "coordinates": [loc['polygon']]
             }
             logging.debug("Converted polygon to geojson: %s", geo_data)
             fuelbed_info = self.lookup.look_up(geo_data)
