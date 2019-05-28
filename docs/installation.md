@@ -1,18 +1,50 @@
 # Installation
 
 
-
-
-## Installing with Docker
-
-A Dockerfile is included in this repo. It can be used to run bluesky
-out of the box or as a base environment for development.
+## Pulling Pre-built Docker Image From hub.docker.com
 
 ### Install and Start Docker
 
 See https://www.docker.com/community-edition for platform specific
 installation instructions.
 
+### Pull image
+
+You can pull a pre-built docker image from docker hub:
+
+    docker pull pnwairfire/bluesky:v4.1.0
+
+See the
+[bluesky docker hub page](https://hub.docker.com/r/pnwairfire/bluesky/)
+for more information.
+
+### Add user
+
+If you use the image as is, all files created on mounted host volumes
+will be owned by root.  To add a user to the image with same group
+and user ids as your host machine user, you can use the following
+script included in this repo:
+
+    ./dev/scripts/docker/add-user-to-bluesky-image \
+        -i pnwairfire/bluesky:v4.1.0 -n bluesky2
+
+Then, run bluesky with that user:
+
+    docker run -u bluesky2 bsp -h
+
+Any files created on mounted volumes will be owned by your user.
+
+
+
+
+
+## Building Docker Image
+
+A Dockerfile is included in this repo to build a bluesky image yourself.
+
+### Install and Start Docker
+
+See above.
 
 ### Build Bluesky Docker Image from Dockerfile
 
@@ -24,15 +56,6 @@ installation instructions.
 Note that the build args are so that files saved in mounted host volumes
 are saved as your user.
 
-### Obtain pre-built docker image
-
-As an alternative to building the image yourself, you can use the pre-built
-complete image.
-
-    docker pull pnwairfire/bluesky
-
-See the [bluesky docker hub page](https://hub.docker.com/r/pnwairfire/bluesky/)
-for more information.
 
 
 
