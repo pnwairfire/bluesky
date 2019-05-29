@@ -28,12 +28,12 @@ Assume you have the following input data:
                                         "name": "HMW-32434",
                                         "lat": 47.41,
                                         "lng": -121.41,
-                                        "area": "120"
+                                        "area": 120
                                     },
                                     {
                                         "lat": 47.42,
                                         "lng": -121.43,
-                                        "area": "103",
+                                        "area": 103,
                                         "ecoregion": "western"
                                     }
                                 ],
