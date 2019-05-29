@@ -19,7 +19,7 @@ data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 ## Base test class
 ##
 
-class BaseFireSpiderLoaderClass(object):
+class BaseFireSpiderLoaderTest(object):
 
     def setup(self):
         # with open(FSV2_INPUT_FILENAME) as f:
@@ -132,7 +132,7 @@ class BaseFireSpiderLoaderClass(object):
 ## FireSpider v2
 ##
 
-class TestFireSpiderLoaderFSV2(BaseFireSpiderLoaderClass):
+class TestFireSpiderLoaderFSV2(BaseFireSpiderLoaderTest):
 
     INPUT_FILENAME = os.path.join(data_dir, 'fires-spider-v2-input.json')
     LOADED_FILENAME = os.path.join(data_dir, 'fires-spider-v2-loaded.json')
@@ -142,7 +142,7 @@ class TestFireSpiderLoaderFSV2(BaseFireSpiderLoaderClass):
 ## FireSpider v3
 ##
 
-class TestFireSpiderLoaderFSV3(BaseFireSpiderLoaderClass):
+class TestFireSpiderLoaderFSV3(BaseFireSpiderLoaderTest):
 
     INPUT_FILENAME = os.path.join(data_dir, 'fires-spider-v3-input.json')
     LOADED_FILENAME = os.path.join(data_dir, 'fires-spider-v3-loaded.json')
