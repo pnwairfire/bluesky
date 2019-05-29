@@ -102,49 +102,6 @@ class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
 
         return func(data.get('data', []))
 
-    def _prune(self, fires):
-        """Filters out activity windows that are outside of time range.
-        """
-        for fire in fires:
-            for a in fire['activity']:
-                a['active_areas'] = [aa for aa in a.active_areas
-                    if self._within_time_range(aa)]
-            fire['activity'] = [a for a in fire['activity'] if a.active_areas]
-        fires = [f for f in fires if f['activity']]
-
-        return fires
-
-
-    def _within_time_range(self, active_area):
-        """
-        Note that all times in the activity objects (activity 'start'
-        and 'end' times, as well as timeprofile and hourly_frp keys)
-        are already in local time.
-        """
-        utc_offset = self._get_utc_offset(active_area)
-        if active_area.get('start') and active_area.get('end'):
-            # convert to datetime objects in place
-            active_area['start'] = parse_datetime(active_area.get('start'), 'start')
-            active_area['end'] = parse_datetime(active_area.get('end'), 'end')
-            # the activity object's 'start' and 'end' will be in local time;
-            # convert them to UTC to compare with start/end query parameters
-            utc_start = active_area['start'] - utc_offset
-            utc_end = active_area['end'] - utc_offset
-
-            is_within = ((not self._start or utc_end >= self._start) and
-                (not self._end or utc_start <= self._end ))
-
-            return is_within
-
-        return False # not necessary, but makes code more readable
-
-    def _get_utc_offset(self, active_area):
-        utc_offset = active_area.get('utc_offset')
-        if utc_offset:
-            return datetime.timedelta(hours=parse_utc_offset(utc_offset))
-        else:
-            return datetime.timedelta(0)
-
 
 class JsonApiLoader(BaseFireSpiderLoader, BaseJsonApiLoader):
     """Loads json formatted fire data from the FireSpider web service
