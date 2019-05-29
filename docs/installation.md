@@ -67,15 +67,15 @@ First, install pip3 (with sudo if necessary):
     apt-get install python3-pip
     pip3 install --upgrade pip
 
-Then, to install, for example, v4.0.6, use the following (with sudo if necessary):
+Then, to install, for example, v4.1.0, use the following (with sudo if necessary):
 
-    pip3 install --no-binary gdal --extra-index https://pypi.airfire.org/simple bluesky==4.0.6
+    pip3 install --no-binary gdal --extra-index https://pypi.airfire.org/simple bluesky==4.1.0
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
     --extra-index https://pypi.airfire.org/simple/
-    bluesky==4.0.6
+    bluesky==4.1.0
 
 See the Notes section, below, for information on resolving pip and
 gdal issues.

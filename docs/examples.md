@@ -64,7 +64,7 @@ and running it through fuelbeds
 would give you:
 
     {
-        "bluesky_version": "4.0.6",
+        "bluesky_version": "4.1.0",
         "counts": {
             "fires": 1
         },
@@ -177,7 +177,7 @@ Piping that through consumption
 would give you give you the
 
     {
-        "bluesky_version": "4.0.6",
+        "bluesky_version": "4.1.0",
         "counts": {
             "fires": 1
         },

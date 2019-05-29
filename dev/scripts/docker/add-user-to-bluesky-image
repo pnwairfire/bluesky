@@ -31,14 +31,14 @@ if [ "$show_help" = true ] ; then
     echo ""
     echo "Options:"
     echo "   -h/--help       - show this help message"
-    echo "   -i/--image-name - e.g. 'pnwairfire/bluesky:v4.0.6'; default: '$default_image_name'"
+    echo "   -i/--image-name - e.g. 'pnwairfire/bluesky'; default: '$default_image_name'"
     echo "   -u/--uid        - user id; default $default_uid"
     echo "   -g/--gid        - group id; default $default_gid"
     echo "   -n/--user-name  - default '$default_user_name'"
     echo ""
     echo "Usage:"
     echo "   $0"
-    echo "   $0 -i pnwairfire/bluesky:v4.0.6 -u 2000 -g 2000 -n bluesky2"
+    echo "   $0 -i pnwairfire/bluesky -u 2000 -g 2000 -n bluesky2"
     echo ""
     exit 0
 fi
