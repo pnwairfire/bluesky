@@ -1,0 +1,15 @@
+{
+    "config":{
+        "load": {
+            "sources": [
+                {
+                    "name": "firespider",
+                    "format": "JSON",
+                    "type": "file",
+                    "file": "/bluesky/dev/data/other-sources/fire-spider/fire-spider-fis-fires-2019-05-06.json",
+                    "saved_copy_file": "/bluesky/fire-spider-fis-fires-2019-05-06-SAVED.json"
+                }
+            ]
+        }
+    }
+}

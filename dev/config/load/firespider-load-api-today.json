@@ -6,7 +6,8 @@
                     "name": "firespider",
                     "format": "JSON",
                     "type": "API",
-                    "endpoint": "http://<HOSTNAME>/api/v1/fires/raw/",
+                    "endpoint": "https://<HOSTNAME>/fire-spider/3.0.0/fireinfosystem-persisted/{today-1:%Y-%m-%d}.json",
+                    "saved_copy_file": "/bluesky/saved-fire-spider-v3-fis-API-{today-1:%Y-%m-%d}.json",
                     "start": "{today-10}",
                     "end": "{today+4}"
                 }
