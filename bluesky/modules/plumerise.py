@@ -53,7 +53,7 @@ MISSING_LOCALMET_ERROR_MSG = "Missing localmet data required for computing SEV p
 
 class ComputeFunction(object):
     def __init__(self, fires_manager):
-        model = Config.get('plumerising', 'model').lower()
+        model = Config.get('plumerise', 'model').lower()
         fires_manager.processed(__name__, __version__,
             plumerise_version=plumerise_version, model=model)
 
@@ -63,11 +63,11 @@ class ComputeFunction(object):
             raise BlueSkyConfigurationError(
                 INVALID_PLUMERISE_MODEL_MSG.format(model))
 
-        config = Config.get('plumerising', model)
+        config = Config.get('plumerise', model)
         self._compute_func = generator(config)
 
         if config.get('working_dir'):
-            fires_manager.plumerising = {
+            fires_manager.plumerise = {
                 'output': {
                     'directory': config['working_dir']
                 }

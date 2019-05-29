@@ -182,7 +182,7 @@ _DEFAULTS = {
         "hourly_fractions": None
     },
 
-    "plumerising": {
+    "plumerise": {
         "model": "feps",
         "feps": {
             "working_dir": None

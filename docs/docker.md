@@ -112,7 +112,7 @@ and KML visualization:
         -o ./output/{run_id}.json \
         -c ./test/config/fuelbeds-through-visualization/DRI6km-2014053000-24hr-PM2.5-user-defined-grid-km.json \
         fuelbeds consumption emissions \
-        timeprofiling findmetdata localmet plumerising \
+        timeprofiling findmetdata localmet plumerise \
         dispersion visualization export
 
 
@@ -156,7 +156,7 @@ the code as you normally would in development. E.g.:
         -i ./test/data/json/2-fires-24hr-20140530-CA.json \
         -c ./test/config/fuelbeds-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
         fuelbeds consumption emissions timeprofiling \
-        findmetdata localmet plumerising dispersion \
+        findmetdata localmet plumerise dispersion \
         visualization export --indent 4 > out.json
 
 (The './bin/' is not actually necessary in this example, since we put the

@@ -37,10 +37,10 @@
         "findmetdata": {
             "met_root_dir": "/Met/CANSAC/6km/ARL/"
         },
-        "plumerising": {
+        "plumerise": {
             "model":"feps",
             "feps": {
-                "working_dir": "/data/working/plumerising/{today:%Y-%m-%d}/"
+                "working_dir": "/data/working/plumerise/{today:%Y-%m-%d}/"
             }
         },
         "dispersion": {

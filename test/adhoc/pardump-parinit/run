@@ -129,7 +129,7 @@ run_bsp () {
         -i /data/input-$TODAY-$FIRES.json \
         -o /data/output-$TODAY-$FIRES-$PI_FIRES.json \
         -c /data/config.json \
-        -C plumerising.feps.working_dir=/data/working/plumerising/$TODAY-$FIRES-$PI_FIRES/ \
+        -C plumerise.feps.working_dir=/data/working/plumerise/$TODAY-$FIRES-$PI_FIRES/ \
         -C dispersion.output_dir=/data/output/$TODAY-$FIRES-$PI_FIRES/ \
         -C dispersion.working_dir=/data/working/dispersion/$TODAY-$FIRES-$PI_FIRES/ \
         -B dispersion.hysplit.MAKE_INIT_FILE=$MAKE_INIT_FILE \
@@ -140,7 +140,7 @@ run_bsp () {
         -C dispersion.hysplit.PARINIT=/data/particlefiles/pardump-{today-1:%Y-%m-%d}-$PI_FIRES \
         -B dispersion.hysplit.STOP_IF_NO_PARINIT=false \
         fuelbeds consumption emissions \
-        timeprofiling findmetdata localmet plumerising \
+        timeprofiling findmetdata localmet plumerise \
         dispersion visualization
     check_return_code
 }

@@ -1,7 +1,7 @@
 {
     "config": {
-        "plumerising": {
-            "model": "sev"
+        "plumerise": {
+            "model": "feps"
         },
         "skip_failed_fires": true
     }

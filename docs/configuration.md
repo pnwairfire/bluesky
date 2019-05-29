@@ -167,27 +167,27 @@ emissions config
  - ***'config' > 'timeprofiling' > 'hourly_fractions'*** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the activity window)
 
 
-##### plumerising
+##### plumerise
 
- - ***'config' > 'plumerising' > 'model'*** -- *optional* -- plumerise model; defaults to "feps"
+ - ***'config' > 'plumerise' > 'model'*** -- *optional* -- plumerise model; defaults to "feps"
 
 ###### if feps:
 
- - ***'config' > 'plumerising' > 'feps' > 'feps_weather_binary'*** -- *optional* -- defaults to "feps_weather"
- - ***'config' > 'plumerising' > 'feps' > 'feps_plumerise_binary'*** -- *optional* -- defaults to "feps_plumerise"
- - ***'config' > 'plumerising' > 'feps' > 'plume_top_behavior'*** -- *optional* -- how to model plume top; options: 'Briggs', 'FEPS', 'auto'; defaults to 'auto'
- - ***'config' > 'plumerising' > 'feps' > 'working_dir'*** -- *optional* -- where to write intermediate files; defaults to writing to tmp dir
+ - ***'config' > 'plumerise' > 'feps' > 'feps_weather_binary'*** -- *optional* -- defaults to "feps_weather"
+ - ***'config' > 'plumerise' > 'feps' > 'feps_plumerise_binary'*** -- *optional* -- defaults to "feps_plumerise"
+ - ***'config' > 'plumerise' > 'feps' > 'plume_top_behavior'*** -- *optional* -- how to model plume top; options: 'Briggs', 'FEPS', 'auto'; defaults to 'auto'
+ - ***'config' > 'plumerise' > 'feps' > 'working_dir'*** -- *optional* -- where to write intermediate files; defaults to writing to tmp dir
 
 ###### if sev:
 
- - ***'config' > 'plumerising' > 'sev' > 'alpha'*** -- *optional* -- default: 0.24
- - ***'config' > 'plumerising' > 'sev' > 'beta'*** -- *optional* -- default: 170
- - ***'config' > 'plumerising' > 'sev' > 'ref_power'*** -- *optional* -- default: 1e6
- - ***'config' > 'plumerising' > 'sev' > 'gamma'*** -- *optional* -- default: 0.35
- - ***'config' > 'plumerising' > 'sev' > 'delta'*** -- *optional* -- default: 0.6
- - ***'config' > 'plumerising' > 'sev' > 'ref_n'*** -- *optional* -- default: 2.5e-4
- - ***'config' > 'plumerising' > 'sev' > 'gravity'*** -- *optional* -- default: 9.8
- - ***'config' > 'plumerising' > 'sev' > 'plume_bottom_over_top'*** -- *optional* -- default: 0.5
+ - ***'config' > 'plumerise' > 'sev' > 'alpha'*** -- *optional* -- default: 0.24
+ - ***'config' > 'plumerise' > 'sev' > 'beta'*** -- *optional* -- default: 170
+ - ***'config' > 'plumerise' > 'sev' > 'ref_power'*** -- *optional* -- default: 1e6
+ - ***'config' > 'plumerise' > 'sev' > 'gamma'*** -- *optional* -- default: 0.35
+ - ***'config' > 'plumerise' > 'sev' > 'delta'*** -- *optional* -- default: 0.6
+ - ***'config' > 'plumerise' > 'sev' > 'ref_n'*** -- *optional* -- default: 2.5e-4
+ - ***'config' > 'plumerise' > 'sev' > 'gravity'*** -- *optional* -- default: 9.8
+ - ***'config' > 'plumerise' > 'sev' > 'plume_bottom_over_top'*** -- *optional* -- default: 0.5
 
 
 ##### extrafiles

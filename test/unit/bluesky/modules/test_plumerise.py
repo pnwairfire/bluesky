@@ -11,7 +11,7 @@ from bluesky.config import Config, defaults
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models.fires import FiresManager, Fire
 from bluesky.models import activity
-from bluesky.modules import plumerising
+from bluesky.modules import plumerise
 
 
 FIRE_NO_ACTIVITY = Fire({
@@ -201,16 +201,16 @@ class TestPlumeRiseRun(object):
 
     def test_invalid_module(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
-        Config.set('sdf', 'plumerising', 'model')
+        Config.set('sdf', 'plumerise', 'model')
         fm = FiresManager()
         with raises(BlueSkyConfigurationError) as e_info:
-            plumerising.run(fm)
-        assert e_info.value.args[0] == plumerising.INVALID_PLUMERISE_MODEL_MSG.format('sdf')
+            plumerise.run(fm)
+        assert e_info.value.args[0] == plumerise.INVALID_PLUMERISE_MODEL_MSG.format('sdf')
 
 class TestPlumeRiseRunFeps(object):
 
     def setup(self):
-        Config.set('feps', 'plumerising', 'model')
+        Config.set('feps', 'plumerise', 'model')
         self.fm = FiresManager()
 
     def test_fire_no_activity(self, reset_config, monkeypatch):
@@ -218,15 +218,15 @@ class TestPlumeRiseRunFeps(object):
 
         self.fm.load({"fires": [FIRE_NO_ACTIVITY]})
         with raises(ValueError) as e_info:
-            plumerising.run(self.fm)
-        assert e_info.value.args[0] == plumerising.NO_ACTIVITY_ERROR_MSG
+            plumerise.run(self.fm)
+        assert e_info.value.args[0] == plumerise.NO_ACTIVITY_ERROR_MSG
 
     def test_fire_missing_location_area(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_LOCATION_AREA]})
         with raises(ValueError) as e_info:
-            plumerising.run(self.fm)
+            plumerise.run(self.fm)
         assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
 
     def test_fire_missing_location_consumption(self, reset_config, monkeypatch):
@@ -234,24 +234,24 @@ class TestPlumeRiseRunFeps(object):
 
         self.fm.load({"fires": [FIRE_MISSING_CONSUMPTION]})
         with raises(ValueError) as e_info:
-            plumerising.run(self.fm)
-        assert e_info.value.args[0] == plumerising.MISSING_CONSUMPTION_ERROR_MSG
+            plumerise.run(self.fm)
+        assert e_info.value.args[0] == plumerise.MISSING_CONSUMPTION_ERROR_MSG
 
     def test_fire_missing_timeprofile(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_TIMEPROFILE]})
         with raises(ValueError) as e_info:
-            plumerising.run(self.fm)
-        assert e_info.value.args[0] == plumerising.MISSING_TIMEPROFILE_ERROR_MSG
+            plumerise.run(self.fm)
+        assert e_info.value.args[0] == plumerise.MISSING_TIMEPROFILE_ERROR_MSG
 
     def test_fire_missing_start_time(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_START_TIME]})
         with raises(ValueError) as e_info:
-            plumerising.run(self.fm)
-        assert e_info.value.args[0] == plumerising.MISSING_START_TIME_ERROR_MSG
+            plumerise.run(self.fm)
+        assert e_info.value.args[0] == plumerise.MISSING_START_TIME_ERROR_MSG
 
     # TODO: test with invalid start time
 
@@ -260,10 +260,10 @@ class TestPlumeRiseRunFeps(object):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_LOCALMET]})
-        plumerising.run(self.fm)
+        plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['feps']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
         loc1 = FIRE_MISSING_LOCALMET['activity'][0]['active_areas'][0]['specified_points'][0]
         assert _PR_COMPUTE_CALL_ARGS == [
             ({"foo": 1},{"smoldering": 123}, loc1)
@@ -276,20 +276,20 @@ class TestPlumeRiseRunFeps(object):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": []})
-        plumerising.run(self.fm)
+        plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['feps']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
         assert _PR_COMPUTE_CALL_ARGS == []
 
     def test_one_fire(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE]})
-        plumerising.run(self.fm)
+        plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['feps']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
         loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
         loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
         assert _PR_COMPUTE_CALL_ARGS == [
@@ -300,12 +300,12 @@ class TestPlumeRiseRunFeps(object):
             {'working_dir': None},
             {'working_dir': None}
         ]
-        # TOOD: assert plumerising return value
+        # TOOD: assert plumerise return value
 
 class TestPlumeRiseRunSev(object):
 
     def setup(self):
-        Config.set('sev', 'plumerising', 'model')
+        Config.set('sev', 'plumerise', 'model')
         self.fm = FiresManager()
 
     def test_fire_no_activity(self, reset_config, monkeypatch):
@@ -313,25 +313,25 @@ class TestPlumeRiseRunSev(object):
 
         self.fm.load({"fires": [FIRE_NO_ACTIVITY]})
         with raises(ValueError) as e_info:
-            plumerising.run(self.fm)
-        assert e_info.value.args[0] == plumerising.NO_ACTIVITY_ERROR_MSG
+            plumerise.run(self.fm)
+        assert e_info.value.args[0] == plumerise.NO_ACTIVITY_ERROR_MSG
 
     def test_fire_missing_location_area(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_LOCATION_AREA]})
         with raises(ValueError) as e_info:
-            plumerising.run(self.fm)
+            plumerise.run(self.fm)
         assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
 
     def test_fire_missing_location_consumption(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_CONSUMPTION]})
-        plumerising.run(self.fm)
+        plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['sev']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
 
         assert _PR_COMPUTE_CALL_ARGS == [
             ({"baz": 444},123)
@@ -345,10 +345,10 @@ class TestPlumeRiseRunSev(object):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_TIMEPROFILE]})
-        plumerising.run(self.fm)
+        plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['sev']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
 
         assert _PR_COMPUTE_CALL_ARGS == [
             ({"baz": 444},123)
@@ -362,10 +362,10 @@ class TestPlumeRiseRunSev(object):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_START_TIME]})
-        plumerising.run(self.fm)
+        plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['sev']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
 
         assert _PR_COMPUTE_CALL_ARGS == [
             ({"baz": 444}, 123)
@@ -382,27 +382,27 @@ class TestPlumeRiseRunSev(object):
 
         self.fm.load({"fires": [FIRE_MISSING_LOCALMET]})
         with raises(ValueError) as e_info:
-            plumerising.run(self.fm)
-        assert e_info.value.args[0] == plumerising.MISSING_LOCALMET_ERROR_MSG
+            plumerise.run(self.fm)
+        assert e_info.value.args[0] == plumerise.MISSING_LOCALMET_ERROR_MSG
 
     def test_no_fires(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": []})
-        plumerising.run(self.fm)
+        plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['feps']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
         assert _PR_COMPUTE_CALL_ARGS == []
 
     def test_one_fire(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE]})
-        plumerising.run(self.fm)
+        plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerising']['feps']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
         loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
         loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
         assert _PR_COMPUTE_CALL_ARGS == [
@@ -413,4 +413,4 @@ class TestPlumeRiseRunSev(object):
             {'frp': None},
             {'frp': None}
         ]
-        # TOOD: assert plumerising return value
+        # TOOD: assert plumerise return value
