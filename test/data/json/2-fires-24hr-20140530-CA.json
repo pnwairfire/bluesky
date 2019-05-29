@@ -6,6 +6,12 @@
                 "name": "Natural Fire in North Tahoe",
                 "id": "sdfkj234kljfd"
             },
+            "meta": {
+                "vsmoke": {
+                    "ws": 20,
+                    "wd": 230
+                }
+            },
             "type": "wildfire",
             "activity": [
                 {
@@ -34,6 +40,12 @@
             "event_of": {
                 "name": "Natural Fire near Yosemite, CA",
                 "id": "SF11E826544"
+            },
+            "meta": {
+                "vsmoke": {
+                    "ws": 17,
+                    "wd": 222
+                }
             },
             "type": "wildfire",
             "activity": [
