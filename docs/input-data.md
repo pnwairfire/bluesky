@@ -1,7 +1,7 @@
 ## Input Data
 
 The top level input data fields that bsp recognizes are: ```run_id```,
-```today```, ```config```, and ```fires```.
+```today```, and ```fires```.
 
 ### 'run_id'
 
@@ -21,6 +21,9 @@ are along the pipeline of modules, the more data you need.  (Note, however,
 that some data required by earlier modules can be dropped when you pipe the
 fire data into downstream modules.)
 
+Note that list/array fields, listed below, are denoted with square brackets.
+e.g. ['active_areas']
+
 ##### load
 
 (no required fields)
@@ -35,87 +38,132 @@ TODO: fill in this section...
 
 ##### fuelbeds
 
- - ***'fires' > 'activity' > 'location'*** -- *required* -- containing either single lat/lng + area or GeoJSON data
- - ***'fires' > 'activity' > 'location' > 'state'*** -- *required* if AK -- used to determine which FCCS version to use
+Looking up fuelbeds requires either point data:
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lat'*** -- *required* (if not specifying perimeter) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lng'*** -- *required* (if not specifying perimeter) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'area'*** -- *required* (if not specifying perimeter) --
+
+or perimeter data
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'polygon'*** -- *required* (if not specifying point data) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'area'*** -- *optional* (if not specifying point data) -- filled in by fuelbeds module if not specified
+
+Other fields
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'state'*** -- *required* if AK -- used to determine which FCCS version to use
 
 ##### consumption
 
- - ***'fires' > 'activity' > 'fuelbeds'*** -- *required* -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
- - ***'fires' > 'activity' > 'location' > 'area'*** -- *required* -- fire's total area
- - ***'fires' > 'activity' > 'location' > 'ecoregion'*** -- *required*
- - ***'fires' > 'activity' > 'location' > 'slope'*** -- *optional* -- default: 5
- - ***'fires' > 'activity' > 'location' > 'windspeed'*** -- *optional* -- default: 6
- - ***'fires' > 'activity' > 'location' > 'days_since_rain' or 'rain_days'*** -- *optional* -- default: 10;
- - ***'fires' > 'activity' > 'location' > 'length_of_ignition'*** -- *optional* -- default: 120
- - ***'fires' > 'activity' > 'location' > 'fm_type'*** -- *optional* -- default: "MEAS-Th"
- - ***'fires' > 'activity' > 'location' > 'fuel_moisture_10hr_pct' or 'moisture_10hr'*** -- *optional* -- default: 50
- - ***'fires' > 'activity' > 'location' > 'fuel_moisture_1000hr_pct' or 'moisture_1khr'*** -- *optional* -- default: 30
- - ***'fires' > 'activity' > 'location' > 'fuel_moisture_duff_pct' or 'moisture_duff'*** -- *optional* -- default: 75
- - ***'fires' > 'activity' > 'location' > 'fuel_moisture_litter_pct' or 'moisture_litter'*** -- *optional* -- default: 16
- - ***'fires' > 'activity' > 'location' > 'canopy_consumption_pct'*** -- *optional* -- default: 0
- - ***'fires' > 'activity' > 'location' > 'shrub_blackened_pct'*** -- *optional* -- default: 50
- - ***'fires' > 'activity' > 'location' > 'pile_blackened_pct'*** -- *optional* -- default: 0
- - ***'fires' > 'activity' > 'location' > 'output_units'*** -- *optional* -- default: "tons_ac"
- - ***'fires' > 'activity' > 'type'*** -- *optional* -- fire type ('rx' vs. 'wildfire'); default: 'wildfire'
- - ***'fires' > 'activity' > 'fuel_type'*** -- *optional* -- fuel type ('natural', 'activity', or 'piles'); default: 'natural'
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuelbeds'*** -- *required* -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'area'*** -- *required* -- fire's total area
+
+The following can be defined either under 'specified_points' or 'perimeter'
+objects, or directly under the parent 'active_areas' object
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'ecoregion'*** -- *required*
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'slope'*** -- *optional* -- default: 5
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'windspeed'*** -- *optional* -- default: 6
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'days_since_rain' or 'rain_days'*** -- *optional* -- default: 10;
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'length_of_ignition'*** -- *optional* -- default: 120
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fm_type'*** -- *optional* -- default: "MEAS-Th"
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuel_moisture_10hr_pct' or 'moisture_10hr'*** -- *optional* -- default: 50
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuel_moisture_1000hr_pct' or 'moisture_1khr'*** -- *optional* -- default: 30
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuel_moisture_duff_pct' or 'moisture_duff'*** -- *optional* -- default: 75
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuel_moisture_litter_pct' or 'moisture_litter'*** -- *optional* -- default: 16
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'canopy_consumption_pct'*** -- *optional* -- default: 0
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'shrub_blackened_pct'*** -- *optional* -- default: 50
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'pile_blackened_pct'*** -- *optional* -- default: 0
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'output_units'*** -- *optional* -- default: "tons_ac"
+ - ***['fires'] > 'type'*** -- *optional* -- fire type ('rx' vs. 'wildfire'); default: 'wildfire'
+ - ***['fires'] > 'fuel_type'*** -- *optional* -- fuel type ('natural', 'activity', or 'piles'); default: 'natural'
 
 ###### if an 'rx' burn:
 
- - ***'fires' > 'activity' > 'location' > 'days_since_rain'*** -- *required* -- default: 1
- - ***'fires' > 'activity' > 'location' > 'length_of_ignition'*** -- *required* -- default: 1
- - ***'fires' > 'activity' > 'location' > 'slope'*** -- *optional* -- default: 5
- - ***'fires' > 'activity' > 'location' > 'windspeed'*** -- *optional* -- default: 5
- - ***'fires' > 'activity' > 'location' > 'fuel_moisture_10hr_pct'*** -- *optional* -- default: 50
- - ***'fires' > 'activity' > 'location' > 'fm_type'*** -- *optional* -- default: "MEAS-Th"
+The following can be defined either under 'specified_points' or 'perimeter'
+objects, or directly under the parent 'active_areas' object
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'days_since_rain'*** -- *required* -- default: 1
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'length_of_ignition'*** -- *required* -- default: 1
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'slope'*** -- *optional* -- default: 5
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'windspeed'*** -- *optional* -- default: 5
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuel_moisture_10hr_pct'*** -- *optional* -- default: 50
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fm_type'*** -- *optional* -- default: "MEAS-Th"
 
 ##### emissions
 
- - ***'fires' > 'activity' > 'fuelbeds' > 'consumption'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['fuelbeds'] > 'consumption'*** -- *required* --
 
 ##### findmetdata
 
- - ***'fires' > 'activity'*** -- *required* if time_window isn't specified in the config -- array of activity objects, each containing 'start', 'end'
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'start' *** -- *required* if time_window isn't specified in the config'start', 'end'
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'end' *** -- *required* if time_window isn't specified in the config'start', 'end'
 
 ##### localmet
 
  - ***'met' > 'files'*** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
- - ***'fires' > 'activity' > 'location'*** -- *required* -- fire location information containing 'utc_offset' and either single lat/lng or polygon shape data with multiple lat/lng coordinates
+
+localmet requires either point data:
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lat'*** -- *required* (if not specifying perimeter) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lng'*** -- *required* (if not specifying perimeter) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'area'*** -- *required* (if not specifying perimeter) --
+
+or perimeter data
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'polygon'*** -- *required* (if not specifying point data) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'area'*** -- *required* (if not specifying point data) --
+
+The following can be defined either under 'specified_points' or 'perimeter'
+objects, or directly under the parent 'active_areas' object
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'utc_offset'*** -- *required*
 
 ##### timeprofiling
 
- - ***'fires' > 'activity'*** -- *required* -- array of activity objects, each containing 'start' and 'end'
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'start' *** -- *required* if time_window isn't specified in the config'start', 'end'
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'end' *** -- *required* if time_window isn't specified in the config'start', 'end'
 
 ##### plumerising
 
- - ***'fires' > 'activity' > 'location' > 'area'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'area'*** -- *required* --
 
 ###### If running FEPS model
 
- - ***'fires' > 'activity' > 'location' > 'area'*** -- *required* --
- - ***'fires' > 'activity' > 'fuelbeds' > 'consumption'*** -- *required* --
- - ***'fires' > 'activity' > 'start'*** -- *required* --
- - ***'fires' > 'activity' > 'timeprofile'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'area'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'consumption'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'start'*** -- *required* --
 
-FEPS uses a number of fire 'location' fields. All are optional, as the
-underlying FEPS module has built-in defaults.
+The following can be defined either under 'specified_points' or 'perimeter'
+objects, or directly under the parent 'active_areas' object
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'timeprofile'*** -- *required* --
+
+FEPS uses a number of fire location fields, listed above under the
+'consumption' section. All are optional, as the underlying FEPS module
+has built-in defaults.
 
 ###### If running SEV model
 
- - ***'fires' > 'activity' > 'location' > 'area'*** -- *required* --
- - ***'fires' > 'activity' > 'localmet'*** -- *required* --
- - ***'fires' > 'activity' > 'frp'*** -- *optional* --
- - ***'fires' > 'meta' > 'frp'*** -- *optional* -- used if frp isn't defined in activity object
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'area'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'localmet'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'frp'*** -- *optional* --
+ - ***['fires'] > 'meta' > 'frp'*** -- *optional* -- used if frp isn't defined in activity object
 
 ##### dispersion
 
- - ***'fires' > 'activity' > 'timeprofile'*** -- *required* --
- - ***'fires' > 'activity' > 'fuelbeds' > 'emissions'*** -- *required* --
- - ***'fires' > 'activity' > 'location' > 'utc_offset'*** -- *optional* -- hours off UTC; default: 0.0
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > [required* --
+
+The following can be defined either under 'specified_points' or 'perimeter'
+objects, or directly under the parent 'active_areas' object
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'timeprofile'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'utc_offset'*** -- *optional* -- hours off UTC; default: 0.0
 
 ###### if running hysplit dispersion:
 
 - ***'met' > 'files'*** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
-  - ***'fires' > 'activity' > 'plumerise'*** -- *required* --
+  - ***['fires'] > ['activity'] > 'plumerise'*** -- *required* --
  - ***'met' > 'grid' > 'spacing'*** -- *required* if not specified in config (see below) --
  - ***'met' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *required* if not specified in config (see below) --
  - ***'met' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *required* if not specified in config (see below) --
@@ -126,18 +174,18 @@ underlying FEPS module has built-in defaults.
 
 ###### if running vsmoke dispersion:
 
- - ***'fires' > 'meta' > 'vsmoke' > 'ws'*** -- *required* -- wind speed
- - ***'fires' > 'meta' > 'vsmoke' > 'wd'*** -- *required* -- wind direction
- - ***'fires' > 'meta' > 'vsmoke' > 'stability'*** -- *optional* -- stability
- - ***'fires' > 'meta' > 'vsmoke' > 'mixht'*** -- *optional* -- mixing height
- - ***'fires' > 'meta' > 'vsmoke' > 'temp'*** -- *optional* -- surface temperature
- - ***'fires' > 'meta' > 'vsmoke' > 'pressure'*** -- *optional* -- surface pressure
- - ***'fires' > 'meta' > 'vsmoke' > 'rh'*** -- *optional* -- surface relative humidity
- - ***'fires' > 'meta' > 'vsmoke' > 'sun'*** -- *optional* -- is fire during daylight hours or nighttime
- - ***'fires' > 'meta' > 'vsmoke' > 'oyinta'*** -- *optional* -- initial horizontal dispersion
- - ***'fires' > 'meta' > 'vsmoke' > 'ozinta'*** -- *optional* -- initial vertical dispersion
- - ***'fires' > 'meta' > 'vsmoke' > 'bkgpm'*** -- *optional* -- background PM 2.5
- - ***'fires' > 'meta' > 'vsmoke' > 'bkgco'*** -- *optional* -- background CO
+ - ***['fires'] > 'meta' > 'vsmoke' > 'ws'*** -- *required* -- wind speed
+ - ***['fires'] > 'meta' > 'vsmoke' > 'wd'*** -- *required* -- wind direction
+ - ***['fires'] > 'meta' > 'vsmoke' > 'stability'*** -- *optional* -- stability
+ - ***['fires'] > 'meta' > 'vsmoke' > 'mixht'*** -- *optional* -- mixing height
+ - ***['fires'] > 'meta' > 'vsmoke' > 'temp'*** -- *optional* -- surface temperature
+ - ***['fires'] > 'meta' > 'vsmoke' > 'pressure'*** -- *optional* -- surface pressure
+ - ***['fires'] > 'meta' > 'vsmoke' > 'rh'*** -- *optional* -- surface relative humidity
+ - ***['fires'] > 'meta' > 'vsmoke' > 'sun'*** -- *optional* -- is fire during daylight hours or nighttime
+ - ***['fires'] > 'meta' > 'vsmoke' > 'oyinta'*** -- *optional* -- initial horizontal dispersion
+ - ***['fires'] > 'meta' > 'vsmoke' > 'ozinta'*** -- *optional* -- initial vertical dispersion
+ - ***['fires'] > 'meta' > 'vsmoke' > 'bkgpm'*** -- *optional* -- background PM 2.5
+ - ***['fires'] > 'meta' > 'vsmoke' > 'bkgco'*** -- *optional* -- background CO
 
 ##### visualization
 
@@ -146,14 +194,28 @@ underlying FEPS module has built-in defaults.
  - ***'dispersion' > 'model'*** -- *required* --
  - ***'dispersion' > 'output' > 'directory'*** -- *required* --
  - ***'dispersion' > 'output' > 'grid_filename'*** -- *required* --
- - ***'fires' > 'id'*** -- *required* --
- - ***'fires'> 'activity'  > 'location'*** -- *required* -- containing either single lat/lng + area or GeoJSON data + area
- - ***'fires' > 'type'*** -- *optional* --
- - ***'fires' > 'event_of' > 'name'*** -- *optional* --
- - ***'fires' > 'event_of' > 'id'*** -- *optional* --
- - ***'fires' > 'activity' > 'fuelbeds' > 'emissions'*** -- *optional* --
- - ***'fires' > 'activity' > 'fuelbeds' > 'fccs_id'*** -- *optional* --
- - ***'fires' > 'activity' > 'start'*** -- *required* --
+
+
+Looking up fuelbeds requires either point data:
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lat'*** -- *required* (if not specifying perimeter) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lng'*** -- *required* (if not specifying perimeter) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'area'*** -- *required* (if not specifying perimeter) --
+
+or perimeter data
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'polygon'*** -- *required* (if not specifying point data) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'area'*** -- *required* (if not specifying point data) --
+
+other fields
+
+ - ***['fires'] > 'id'*** -- *required* --
+ - ***['fires'] > 'type'*** -- *optional* --
+ - ***['fires'] > 'event_of' > 'name'*** -- *optional* --
+ - ***['fires'] > 'event_of' > 'id'*** -- *optional* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['fuelbeds'[] > 'emissions'*** -- *optional* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['fuelbeds'] > 'fccs_id'*** -- *optional* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'start'*** -- *required* --
  - ***'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, generates new guid
 
 ##### export
