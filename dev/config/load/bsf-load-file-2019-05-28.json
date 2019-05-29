@@ -1,0 +1,15 @@
+{
+    "config":{
+        "load": {
+            "sources": [
+                {
+                    "name": "bsf",
+                    "format": "CSV",
+                    "type": "file",
+                    "file": "/bluesky/dev/data/other-sources/bsf/fire_locations_20190528.csv",
+                    "saved_copy_file": "/bluesky/tmp/bsf-fires-2019-05-28-SAVED.csv"
+                }
+            ]
+        }
+    }
+}
