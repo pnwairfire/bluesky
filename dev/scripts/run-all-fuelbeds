@@ -454,7 +454,7 @@ def get_command(args, docker_output_dir):
     cmd += " consumption emissions"
 
     if args.produce_emissions_csv or args.run_through_plumerise:
-        cmd += " timeprofiling"
+        cmd += " timeprofile"
     if args.run_through_plumerise:
         cmd += " plumerise"
 

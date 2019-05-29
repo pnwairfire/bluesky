@@ -1,6 +1,6 @@
 {
     "config": {
-        "timeprofiling": {
+        "timeprofile": {
             "hourly_fractions": {
                 "flaming": [
                     0.0057,

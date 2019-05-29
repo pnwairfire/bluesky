@@ -6,7 +6,7 @@
         "emissions": {
             "species": ["PM2.5"]
         },
-        "timeprofiling": {
+        "timeprofile": {
             "__commented_out__hourly_fractions": {
                 "area_fraction": [
                     0.25,0.25,0.25,0.25,0.0,0.0,

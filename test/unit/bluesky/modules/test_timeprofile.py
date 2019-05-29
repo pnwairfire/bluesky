@@ -1,4 +1,4 @@
-"""Unit tests for bluesky.modules.timeprofiling"""
+"""Unit tests for bluesky.modules.timeprofile"""
 
 __author__ = "Joel Dubowy"
 
@@ -6,7 +6,7 @@ from py.test import raises
 
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models import fires
-from bluesky.modules import timeprofiling
+from bluesky.modules import timeprofile
 
 
 class TestTimeprofilingRunFire(object):
@@ -23,7 +23,7 @@ class TestTimeprofilingRunFire(object):
             "area_fraction": [0.8, 0.1, 0.1],
             "residual": [0.8, 0.1, 0.1]
         }
-        #Config.set(hourly_fractions, "timeprofiling","hourly_fractions")
+        #Config.set(hourly_fractions, "timeprofile","hourly_fractions")
 
         fire = fires.Fire({
             "activity": [
@@ -42,8 +42,8 @@ class TestTimeprofilingRunFire(object):
             ]
         })
         with raises(BlueSkyConfigurationError) as e_info:
-            timeprofiling._run_fire(hourly_fractions, fire)
-        assert e_info.value.args[0] == timeprofiling.NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS_MSG
+            timeprofile._run_fire(hourly_fractions, fire)
+        assert e_info.value.args[0] == timeprofile.NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS_MSG
 
         fire = fires.Fire({
             "activity": [
@@ -66,16 +66,16 @@ class TestTimeprofilingRunFire(object):
             ]
         })
         with raises(BlueSkyConfigurationError) as e_info:
-            timeprofiling._run_fire(hourly_fractions, fire)
-        assert e_info.value.args[0] == timeprofiling.NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS_MSG
+            timeprofile._run_fire(hourly_fractions, fire)
+        assert e_info.value.args[0] == timeprofile.NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS_MSG
 
     def test_no_active_areas(self, reset_config):
         fire = fires.Fire({
             "id": "slijlfdsljfsdkljf"
         })
         with raises(ValueError) as e_info:
-            timeprofiling._run_fire(None, fire)
-        assert e_info.value.args[0] == timeprofiling.MISSING_ACTIVITY_AREA_MSG
+            timeprofile._run_fire(None, fire)
+        assert e_info.value.args[0] == timeprofile.MISSING_ACTIVITY_AREA_MSG
 
         fire = fires.Fire({
             "id": "slijlfdsljfsdkljf",
@@ -86,8 +86,8 @@ class TestTimeprofilingRunFire(object):
             ]
         })
         with raises(ValueError) as e_info:
-            timeprofiling._run_fire(None, fire)
-        assert e_info.value.args[0] == timeprofiling.MISSING_ACTIVITY_AREA_MSG
+            timeprofile._run_fire(None, fire)
+        assert e_info.value.args[0] == timeprofile.MISSING_ACTIVITY_AREA_MSG
 
     def test_active_area_missing_start(self, reset_config):
         fire = fires.Fire({
@@ -115,8 +115,8 @@ class TestTimeprofilingRunFire(object):
             ],
         })
         with raises(ValueError) as e_info:
-            timeprofiling._run_fire(None, fire)
-        assert e_info.value.args[0] == timeprofiling.INSUFFICIENT_ACTIVITY_INFP_MSG
+            timeprofile._run_fire(None, fire)
+        assert e_info.value.args[0] == timeprofile.INSUFFICIENT_ACTIVITY_INFP_MSG
 
 
     ##
@@ -151,6 +151,6 @@ class TestTimeprofilingRunFire(object):
                 "smoldering": 0.5
             }
         }
-        timeprofiling._run_fire(None, fire)
+        timeprofile._run_fire(None, fire)
         actual = fire['activity'][0]['active_areas'][0]['timeprofile']
         assert actual == expected

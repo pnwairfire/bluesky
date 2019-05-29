@@ -1,9 +1,9 @@
-"""bluesky.modules.timeprofiling"""
+"""bluesky.modules.timeprofile"""
 
 __author__ = "Joel Dubowy"
 
 import copy
-import timeprofile
+from timeprofile import __version__ as timeprofile_version
 from timeprofile.static import (
     StaticTimeProfiler,
     InvalidHourlyFractionsError,
@@ -19,28 +19,28 @@ from functools import reduce
 __all__ = [
     'run'
 ]
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 def run(fires_manager):
-    """Runs timeprofiling module
+    """Runs timeprofile module
 
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    hourly_fractions = Config.get('timeprofiling', 'hourly_fractions')
+    hourly_fractions = Config.get('timeprofile', 'hourly_fractions')
 
     fires_manager.processed(__name__, __version__,
-        timeprofile_version=timeprofile.__version__)
+        timeprofile_version=timeprofile_version)
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             try:
                 _run_fire(hourly_fractions, fire)
             except InvalidHourlyFractionsError as e:
                 raise BlueSkyConfigurationError(
-                    "Invalid timeprofiling hourly fractions: '{}'".format(str(e)))
+                    "Invalid timeprofile hourly fractions: '{}'".format(str(e)))
             except InvalidStartEndTimesError as e:
                 raise BlueSkyConfigurationError(
-                    "Invalid timeprofiling start end times: '{}'".format(str(e)))
+                    "Invalid timeprofile start end times: '{}'".format(str(e)))
             # except InvalidEmissionsDataError, e:
             #     TODO: do anything with InvalidEmissionsDataError?
             #     raise

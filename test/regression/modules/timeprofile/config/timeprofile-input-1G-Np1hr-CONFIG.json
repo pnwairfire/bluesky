@@ -1,21 +1,25 @@
 {
     "config": {
-        "timeprofiling": {
+        "timeprofile": {
             "hourly_fractions": {
                 "flaming": [
-                    0.9,
+                    0.8,
+                    0.1,
                     0.1
                 ],
                 "smoldering": [
-                    0.9,
+                    0.8,
+                    0.1,
                     0.1
                 ],
                 "area_fraction": [
-                    0.9,
+                    0.8,
+                    0.1,
                     0.1
                 ],
                 "residual": [
-                    0.9,
+                    0.8,
+                    0.1,
                     0.1
                 ]
             }

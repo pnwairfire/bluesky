@@ -162,9 +162,9 @@ emissions config
 
 - ***'config' > 'localmet' > 'time_step'*** -- *optional* -- hour per arl file time step; defaults to 1
 
-##### timeprofiling
+##### timeprofile
 
- - ***'config' > 'timeprofiling' > 'hourly_fractions'*** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the activity window)
+ - ***'config' > 'timeprofile' > 'hourly_fractions'*** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the activity window)
 
 
 ##### plumerise

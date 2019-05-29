@@ -178,7 +178,7 @@ _DEFAULTS = {
         # but we need to define it here so that the code doesn't fail
         "time_step": 1
     },
-    "timeprofiling": {
+    "timeprofile": {
         "hourly_fractions": None
     },
 

@@ -119,7 +119,7 @@ objects, or directly under the parent 'active_areas' object
 
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'utc_offset'*** -- *required*
 
-##### timeprofiling
+##### timeprofile
 
  - ***['fires'] > ['activity'] > ['active_areas'] > 'start' *** -- *required* if time_window isn't specified in the config'start', 'end'
  - ***['fires'] > ['activity'] > ['active_areas'] > 'end' *** -- *required* if time_window isn't specified in the config'start', 'end'

@@ -66,7 +66,7 @@ Examples:
       -d /path/to/met/:/met/ \\
       -d /path/to/output/dir/ \\
       -m fuelbeds -m consumption -m emissions \\
-      -m timeprofiling -m findmetdata -m localmet \\
+      -m timeprofile -m findmetdata -m localmet \\
 
 
 Note about volumes and mounting: mounting directories outside of your home
