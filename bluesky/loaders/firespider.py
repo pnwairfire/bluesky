@@ -88,6 +88,7 @@ __all__ = [
 class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
 
     def _marshal(self, data):
+        # TODO: support config setting 'skip_failures'
         # v2 didn't initially have version specified in the output data
         if not data.get('version') or data['version'] == "2.0.0":
             func = Blueskyv4_0To4_1().marshal
