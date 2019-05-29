@@ -37,10 +37,9 @@ class CsvFileLoader(BaseCsvFileLoader):
         self._skip_failures = config.get('skip_failures')
 
     def _marshal(self, data):
-        self._headers = data[0]
         self._fires = {}
 
-        for row in data[1:]:
+        for row in data:
             try:
                 self._process_row(row)
 
@@ -55,26 +54,80 @@ class CsvFileLoader(BaseCsvFileLoader):
 
         return list(self._fires.values())
 
+    LOCATION_FIELDS = [
+        # structure:  (csv_key, location_attr, conversion_func)
+        # TODO: should we use date_time or timezone fields. They don't
+        #  always match (e.g. one row had '201905280000-04:00' and '-5.0')
+        ("date_time", "utc_offset", lambda val: parse_utc_offset(val[12:])),
+        # string fields
+        ("state", "state", lambda val: val),
+        ("county", "county", lambda val: val),
+        ("country", "country", lambda val: val),
+        # float fields
+        ("latitude", "lat", lambda val: float(val)),
+        ("longitude", "lng", lambda val: float(val)),
+        ("area", "area", lambda val: val and float(val)),
+        ("slope", "slope", lambda val: val and float(val)),
+        ("fuel_1hr", "fuel_1hr", lambda val: val and float(val)),
+        ("fuel_10hr", "fuel_10hr", lambda val: val and float(val)),
+        ("fuel_100hr", "fuel_100hr", lambda val: val and float(val)),
+        ("fuel_1khr", "fuel_1khr", lambda val: val and float(val)),
+        ("fuel_10khr", "fuel_10khr", lambda val: val and float(val)),
+        ("fuel_gt10khr", "fuel_gt10khr", lambda val: val and float(val)),
+        ("moisture_1hr", "moisture_1hr", lambda val: val and float(val)),
+        ("moisture_10hr", "moisture_10hr", lambda val: val and float(val)),
+        ("moisture_100hr", "moisture_100hr", lambda val: val and float(val)),
+        ("moisture_1khr", "moisture_1khr", lambda val: val and float(val)),
+        ("moisture_live", "moisture_live", lambda val: val and float(val)),
+        ("moisture_duff", "moisture_duff", lambda val: val and float(val)),
+        ("min_wind", "min_wind", lambda val: val and float(val)),
+        ("max_wind", "max_wind", lambda val: val and float(val)),
+        ("min_wind_aloft", "min_wind_aloft", lambda val: val and float(val)),
+        ("max_wind_aloft", "max_wind_aloft", lambda val: val and float(val)),
+        ("min_humid", "min_humid", lambda val: val and float(val)),
+        ("max_humid", "max_humid", lambda val: val and float(val)),
+        ("min_temp", "min_temp", lambda val: val and float(val)),
+        ("max_temp", "max_temp", lambda val: val and float(val)),
+        ("min_temp_hour", "min_temp_hour", lambda val: val and float(val)),
+        ("max_temp_hour", "max_temp_hour", lambda val: val and float(val)),
+        ("sunrise_hour", "sunrise_hour", lambda val: val and float(val)),
+        ("sunset_hour", "sunset_hour", lambda val: val and float(val)),
+        ("snow_month", "snow_month", lambda val: val and float(val)),
+        ("rain_days", "rain_days", lambda val: val and float(val))
+    ]
+    # ignored fields: fips, scc, fuel_1hr, fuel_10hr, fuel_100hr, fuel_1khr,
+    #   fuel_10khr, fuel_gt10khr, shrub, grass, rot, duff, litter,
+    #   consumption_flaming, consumption_smoldering,
+    #   consumption_residual, consumption_duff
+    #   heat, pm25, pm10, co, co2, ch4, nox, nh3, so2, voc, VEG,
+    #   canopy, fccs_number, owner, sf_event_guid, sf_server,
+    #   sf_stream_name, timezone
+
+
     def _process_row(self, row):
         fire_id = row.get("id") or str(uuid.uuid4())
         if fire_id not in self._fires:
             self._fires[fire_id] = Fire({
                 "id": fire_id,
+                "event_of": {},
                 "specified_points_by_date": defaultdict(lambda: [])
             })
         start = parse_datetime(row["date_time"][:8])
 
-        self._fires[fire_id]['specified_points_by_date'][start].append({
-            "lat": row["latitude"],
-            "lng": row["longitude"],
-            "utc_offset": parse_utc_offset(row["date_time"][12:]),
-            "area": row["area"]
-        })
+        self._fires[fire_id]['specified_points_by_date'][start].append(
+            {loc_attr: f(row.get(csv_key))
+                for csv_key, loc_attr, f in self.LOCATION_FIELDS})
 
+        # event and type could have been set when the Fire object was
+        # instantiated, but checking amd setting here allow the fields to
+        # be set even if only subsequent rows for the fire have them defined
         if row.get("event_id"):
-            self._fires[fire_id]["event_of"] = {
-                "id": row["event_id"]
-            }
+            self._fires[fire_id]["event_of"]["id"] = row["event_id"]
+        if row.get("event_url"):
+            self._fires[fire_id]["event_of"]["url"] = row["event_url"]
+
+        if row.get("type"):
+            self._fires[fire_id]["type"] = row["type"].lower()
 
         # TODO: other marshaling
 
