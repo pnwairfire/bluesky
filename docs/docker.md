@@ -91,6 +91,7 @@ Another example, running through vsmoke dispersion:
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
+        --run-id vsmoke-{timestamp:%Y%m%dT%H%M%S} \
         -i ./test/data/json/2-fires-24hr-20140530-CA.json \
         -o ./output/{run_id}.json \
         -c ./test/config/dispersion/dispersion-vsmoke-24hr.json \
@@ -108,6 +109,7 @@ and KML visualization:
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
+        --run-id hysplit-{timestamp:%Y%m%dT%H%M%S} \
         -i ./test/data/json/2-fires-24hr-20140530-CA.json \
         -o ./output/{run_id}.json \
         -c ./test/config/fuelbeds-through-visualization/DRI6km-2014053000-24hr-PM2.5-user-defined-grid-km.json \
