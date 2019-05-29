@@ -36,3 +36,5 @@
   - remove ingestion module and require clients to structure data correctly
   - remove bsp-csv2json
 - support FireSpider v3 output
+- rename plumerising module as plumerise
+- rename timeprofiling module as timeprofile
