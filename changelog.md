@@ -2,7 +2,16 @@
  - Fixed conversion factor for Prichard/ONeill emissions output
 
 ## 4.0.8
- - Fixed by in findmetdata time window merging logic
+ - Fixed bug in findmetdata time window merging logic
+
+## 4.0.9
+ - Upgrade to geoutils v1.0.3
+
+## 4.0.10
+ - Upgrade blueskykml to v2.4.3
+
+## 4.0.11
+ - Upgrade met to v1.2.3
 
 ## 4.1.0
 
