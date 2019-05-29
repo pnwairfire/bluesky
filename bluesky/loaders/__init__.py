@@ -62,8 +62,10 @@ class BaseLoader(object):
         self._save_copy(data)
 
         fires = self._marshal(data)
-        # TODO: cast each fire to Fire object, in case child class
+        # cast each fire to Fire object, in case child class
         #   did override _marshal but didn't return Fire objects?
+        # TODO: support config setting 'skip_failures'
+        fires = [Fire(f) for f in fires]
         fires = self._prune(fires)
 
         return fires
@@ -73,8 +75,7 @@ class BaseLoader(object):
     def _marshal(self, data):
         """Hook for child classes to marshal input data to Fire objects
         """
-        # TODO: support config setting 'skip_failures'
-        return [Fire(f) for f in data]
+        return data
 
     ## Pruning
 
