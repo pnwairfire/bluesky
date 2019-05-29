@@ -52,7 +52,7 @@ could run something like the following:
     docker run --rm \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         bluesky bsp \
-        -i /bluesky/test/data/json/2-fires-24hr-20140530-CA.json \
+        -i /bluesky/dev/data/json/2-fires-24hr-20140530-CA.json \
         fuelbeds consumption emissions
 
 ### Using image for development
@@ -77,7 +77,7 @@ Another example, running through emissions:
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
-        -i ./test/data/json/2-fires-24hr-20140530-CA.json \
+        -i ./dev/data/json/2-fires-24hr-20140530-CA.json \
         -o ./output/{run_id}.json \
         fuelbeds consumption emissions
 
@@ -92,9 +92,9 @@ Another example, running through vsmoke dispersion:
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
         --run-id vsmoke-{timestamp:%Y%m%dT%H%M%S} \
-        -i ./test/data/json/2-fires-24hr-20140530-CA.json \
+        -i ./dev/data/json/2-fires-24hr-20140530-CA.json \
         -o ./output/{run_id}.json \
-        -c ./test/config/dispersion/dispersion-vsmoke-24hr.json \
+        -c ./dev/config/dispersion/dispersion-vsmoke-24hr.json \
         fuelbeds consumption emissions timeprofile dispersion
 
 
@@ -110,9 +110,9 @@ and KML visualization:
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
         --run-id hysplit-{timestamp:%Y%m%dT%H%M%S} \
-        -i ./test/data/json/2-fires-24hr-20140530-CA.json \
+        -i ./dev/data/json/2-fires-24hr-20140530-CA.json \
         -o ./output/{run_id}.json \
-        -c ./test/config/fuelbeds-through-visualization/DRI6km-2014053000-24hr-PM2.5-user-defined-grid-km.json \
+        -c ./dev/config/fuelbeds-through-visualization/DRI6km-2014053000-24hr-PM2.5-user-defined-grid-km.json \
         fuelbeds consumption emissions \
         timeprofile findmetdata localmet plumerise \
         dispersion visualization export
@@ -155,8 +155,8 @@ you in the bluesky repo root directory. Now, you can run bsp and step into
 the code as you normally would in development. E.g.:
 
     ./bin/bsp --log-level=DEBUG \
-        -i ./test/data/json/2-fires-24hr-20140530-CA.json \
-        -c ./test/config/fuelbeds-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
+        -i ./dev/data/json/2-fires-24hr-20140530-CA.json \
+        -c ./dev/config/fuelbeds-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
         fuelbeds consumption emissions timeprofile \
         findmetdata localmet plumerise dispersion \
         visualization export --indent 4 > out.json
