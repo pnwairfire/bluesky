@@ -74,7 +74,7 @@ def run(fires_manager):
                 # Let skip_failed_sources be defined at top level
                 # or under 'load' in the config
                 if not (Config.get('skip_failed_sources')
-                        or Config.get('load', 'skip_failed_sources')):
+                        or Config.get('load', 'skip_failed_sources', allow_missing=True)):
                     raise
     finally:
         fires_manager.processed(__name__, __version__,
