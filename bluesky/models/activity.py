@@ -35,6 +35,7 @@ class Location(dict):
         # children location objects.  So, it's fine to allow access
         # to them via the location object.
         "fuelbeds", "emissions", "consumption",
+        # TODO: add 'area' ?
         # TOOD: add other fields
     ]
 
