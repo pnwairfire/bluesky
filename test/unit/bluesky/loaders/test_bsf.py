@@ -42,7 +42,6 @@ class TestBsfLoader(object):
             file=self.INPUT_FILENAME,
             start=start, end=end)
         actual = loader.load()
-        import pdb;pdb.set_trace()
         assert actual == self._expected_output
 
     ## With 'start' option
