@@ -14,7 +14,7 @@
                     "specified_points": [{
                         "area": 101.999999747,
                         "country": "Unknown",
-                        "county": null,
+                        "county": "",
                         "fuel_100hr": null,
                         "fuel_10hr": null,
                         "fuel_10khr": null,
@@ -56,7 +56,7 @@
                     "specified_points": [{
                         "area": 101.999999747,
                         "country": "Unknown",
-                        "county": null,
+                        "county": "",
                         "fuel_100hr": null,
                         "fuel_10hr": null,
                         "fuel_10khr": null,
@@ -108,7 +108,7 @@
                     "specified_points": [{
                         "area": 67.999999831,
                         "country": "USA",
-                        "county": null,
+                        "county": "",
                         "fuel_100hr": 0.25,
                         "fuel_10hr": 0.25,
                         "fuel_10khr": 0.0,
@@ -150,7 +150,7 @@
                     "specified_points": [{
                         "area": 67.999999831,
                         "country": "USA",
-                        "county": null,
+                        "county": "",
                         "fuel_100hr": 0.25,
                         "fuel_10hr": 0.25,
                         "fuel_10khr": 0.0,

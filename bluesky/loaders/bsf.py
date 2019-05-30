@@ -31,7 +31,9 @@ __all__ = [
 ONE_DAY = datetime.timedelta(days=1)
 
 def get_optional_float(val):
-    if val:
+    # CSV2JSON should have already converted floats, but this is just
+    # in case it didn't
+    if val not in ('', None):
         return float(val)
     # else return None
 
@@ -141,7 +143,9 @@ class CsvFileLoader(BaseCsvFileLoader):
     def _post_process_activity(self):
         for fire in self._fires.values():
             fire["activity"] = []
-            for start, specified_points in fire.pop("specified_points_by_date").items():
+            sorted_items = sorted(fire.pop("specified_points_by_date").items(),
+                key=lambda a: a[0])
+            for start, specified_points in sorted_items:
                 fire['activity'].append({
                     "active_areas": [
                         {

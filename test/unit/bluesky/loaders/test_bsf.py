@@ -30,6 +30,7 @@ class TestBsfLoader(object):
         #     self._input = json.loads(f.read())
         with open(self.LOADED_FILENAME) as f:
             self._expected_output = json.loads(f.read())
+            self._expected_output.sort(key=lambda f: f['id'])
         # convert timestamps to datetime objects
         for f in self._expected_output:
             for a in f.get('activity', []):
@@ -42,6 +43,7 @@ class TestBsfLoader(object):
             file=self.INPUT_FILENAME,
             start=start, end=end)
         actual = loader.load()
+        actual.sort(key=lambda f: f['id'])
         assert actual == self._expected_output
 
     ## With 'start' option
