@@ -81,6 +81,7 @@ class TestBsfLoader(object):
         self._call_marshal(end="2019-05-29T14:00:00Z")
 
     def test_marshal_w_end_mid_first_activity_window(self):
+        self._expected_output[0]['activity'].pop()
         self._expected_output[1]['activity'].pop()
         self._call_marshal(end=datetime.datetime(2019,5,28,14,0,0))
         self._call_marshal(end="2019-05-28T14:00:00Z")
@@ -105,10 +106,11 @@ class TestBsfLoader(object):
             end="2019-05-29T14:00:00Z")
 
     def test_marshal_w_start_and_end_inside_first_activity_windows(self):
-        self._expected_output[1]['activity'].pop()
-        self._call_marshal(start=datetime.datetime(2019,5,28,14,0,0),
+        self._expected_output[0]['activity'].pop(1)
+        self._expected_output[1]['activity'].pop(1)
+        self._call_marshal(start=datetime.datetime(2019,5,28,20,0,0),
             end=datetime.datetime(2019,5,29,1,0,0))
-        self._call_marshal(start="2019-05-28T14:00:00Z",
+        self._call_marshal(start="2019-05-28T20:00:00Z",
             end="2019-05-29T01:00:00Z")
 
     def test_marshal_w_start_and_end_exclude_all_activity_windows(self):
