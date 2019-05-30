@@ -97,26 +97,34 @@ class BaseLoader(object):
         Note that all times in the activity objects (activity 'start'
         and 'end' times, as well as timeprofile and hourly_frp keys)
         are already in local time.
+
+        Also note that, though unlikely, the locations (specified points
+        and/or perimeter) in the active area could have different utc offsets.
         """
-        utc_offset = self._get_utc_offset(active_area)
         if active_area.get('start') and active_area.get('end'):
+            utc_offsets = set([self._get_utc_offset(loc)
+                for loc in active_area.locations])
+
             # convert to datetime objects in place
             active_area['start'] = parse_datetime(active_area.get('start'), 'start')
             active_area['end'] = parse_datetime(active_area.get('end'), 'end')
-            # the activity object's 'start' and 'end' will be in local time;
-            # convert them to UTC to compare with start/end query parameters
-            utc_start = active_area['start'] - utc_offset
-            utc_end = active_area['end'] - utc_offset
 
-            is_within = ((not self._start or utc_end >= self._start) and
-                (not self._end or utc_start <= self._end ))
+            utc_offset = False
+            for utc_offset in utc_offsets:
+                # the activity object's 'start' and 'end' will be in local time;
+                # convert them to UTC to compare with start/end query parameters
+                utc_start = active_area['start'] - utc_offset
+                utc_end = active_area['end'] - utc_offset
+
+                is_within = utc_offset or ((not self._start or utc_end >= self._start) and
+                    (not self._end or utc_start <= self._end ))
 
             return is_within
 
         return False # not necessary, but makes code more readable
 
-    def _get_utc_offset(self, active_area):
-        utc_offset = active_area.get('utc_offset')
+    def _get_utc_offset(self, location):
+        utc_offset = location.get('utc_offset')
         if utc_offset:
             return datetime.timedelta(hours=parse_utc_offset(utc_offset))
         else:
