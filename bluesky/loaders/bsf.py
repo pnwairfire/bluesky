@@ -11,6 +11,7 @@ __author__ = "Joel Dubowy"
 
 import datetime
 import logging
+import re
 import traceback
 import uuid
 from collections import defaultdict
@@ -39,9 +40,6 @@ def get_optional_float(val):
 
 LOCATION_FIELDS = [
     # structure:  (csv_key, location_attr, conversion_func)
-    # TODO: should we use date_time or timezone fields. They don't
-    #  always match (e.g. one row had '201905280000-04:00' and '-5.0')
-    ("date_time", "utc_offset", lambda val: parse_utc_offset(val[12:])),
     # string fields
     ("state", "state", lambda val: val),
     ("county", "county", lambda val: val),
@@ -49,7 +47,7 @@ LOCATION_FIELDS = [
     # required float fields
     ("latitude", "lat", lambda val: float(val)),
     ("longitude", "lng", lambda val: float(val)),
-    # optioanl float fields
+    # optional float fields
     ("area", "area", get_optional_float),
     ("slope", "slope", get_optional_float),
     ("fuel_1hr", "fuel_1hr", get_optional_float),
@@ -111,8 +109,6 @@ class CsvFileLoader(BaseCsvFileLoader):
 
         return list(self._fires.values())
 
-
-
     def _process_row(self, row):
         fire_id = row.get("id") or str(uuid.uuid4())
         if fire_id not in self._fires:
@@ -121,11 +117,16 @@ class CsvFileLoader(BaseCsvFileLoader):
                 "event_of": {},
                 "specified_points_by_date": defaultdict(lambda: [])
             })
-        start = parse_datetime(row["date_time"][:8])
 
-        self._fires[fire_id]['specified_points_by_date'][start].append(
-            {loc_attr: f(row.get(csv_key))
-                for csv_key, loc_attr, f in LOCATION_FIELDS})
+        start, utc_offset = self._parse_date_time(row["date_time"])
+        if not start:
+            raise ValueError("Fire location missing time information")
+
+        sp = {loc_attr: f(row.get(csv_key))
+            for csv_key, loc_attr, f in LOCATION_FIELDS}
+        if utc_offset:
+            sp['utc_offset'] = utc_offset
+        self._fires[fire_id]['specified_points_by_date'][start].append(sp)
 
         # event and type could have been set when the Fire object was
         # instantiated, but checking amd setting here allow the fields to
@@ -155,3 +156,52 @@ class CsvFileLoader(BaseCsvFileLoader):
                         }
                     ]
                 })
+
+    # Note: Although 'timezone' (a numberical value) is defined alongsite
+    #   date_time (which may include utc_offset), utc_offset, if defined, reflects
+    #   daylight savings and thus is the true offset from UTC, whereas timezone
+    #   does not change; e.g. an august 5th fire in Florida is listed with timezone
+    #   -5.0 and utc_offset (embedded in the 'date_time' field) '-04:00'
+
+    ## 'date_time'
+    OLD_DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?Z$')
+    DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?([+-]\d{2}\:\d{2})$')
+    DATE_TIME_FMT = "%Y%m%d%H%M"
+
+    def _parse_date_time(self, date_time):
+        """Parses 'date_time' field, found in BSF fire data
+
+        Note: older BSF fire data formatted the date_time field without
+        local timezone information, mis-representing everything as
+        UTC.  E.g.:
+
+            '201405290000Z'
+
+        Newer (and current) SF2 fire data formats date_time like so:
+
+            '201508040000-04:00'
+
+        With true utc offset embedded in the string.
+        """
+        start = None
+        utc_offset = None
+        if date_time:
+            try:
+                m = self.DATE_TIME_MATCHER.match(date_time)
+                if m:
+                    start = datetime.datetime.strptime(
+                        m.group(1), self.DATE_TIME_FMT)
+                    utc_offset = parse_utc_offset(m.group(3))
+                else:
+                    m = self.OLD_DATE_TIME_MATCHER.match(date_time)
+                    if m:
+                        start = datetime.datetime.strptime(
+                            m.group(1), self.DATE_TIME_FMT)
+                        # Note: we don't know utc offset; don't set
+
+            except Exception as e:
+                logging.warn("Failed to parse 'date_time' value %s",
+                    date_time)
+                logging.debug(traceback.format_exc())
+
+        return start, utc_offset
