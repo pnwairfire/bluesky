@@ -1,0 +1,193 @@
+[
+    {
+        "event_of": {
+            "id": "SF11E4186171",
+            "url": "http://128.208.123.111/smartfire/events/eade7d07-3783-495e-ac24-3b9f1f13e4de"
+        },
+        "fuel_type": "natural",
+        "id": "SF11C77574467421602580",
+        "type": "rx",
+        "activity": [
+            {
+                "active_areas": [{
+                    "end": "2019-05-29T00:00:00",
+                    "specified_points": [{
+                        "area": 101.999999747,
+                        "country": "Unknown",
+                        "county": null,
+                        "fuel_100hr": null,
+                        "fuel_10hr": null,
+                        "fuel_10khr": null,
+                        "fuel_1hr": null,
+                        "fuel_1khr": null,
+                        "fuel_gt10khr": null,
+                        "lat": 52.193,
+                        "lng": -100.192,
+                        "max_humid": 80.0,
+                        "max_temp": 30.0,
+                        "max_temp_hour": 14.0,
+                        "max_wind": 6.0,
+                        "max_wind_aloft": 6.0,
+                        "min_humid": 40.0,
+                        "min_temp": 13.0,
+                        "min_temp_hour": 4.0,
+                        "min_wind": 6.0,
+                        "min_wind_aloft": 6.0,
+                        "moisture_100hr": 12.0,
+                        "moisture_10hr": 12.0,
+                        "moisture_1hr": 10.0,
+                        "moisture_1khr": 22.0,
+                        "moisture_duff": 150.0,
+                        "moisture_live": 130.0,
+                        "rain_days": 8.0,
+                        "slope": 10.0,
+                        "snow_month": 5.0,
+                        "state": "Unknown",
+                        "sunrise_hour": 5.0,
+                        "sunset_hour": 21.0,
+                        "utc_offset": -6.0
+                    }],
+                    "start": "2019-05-28T00:00:00"
+                }]
+            },
+            {
+                "active_areas": [{
+                    "end": "2019-05-30T00:00:00",
+                    "specified_points": [{
+                        "area": 101.999999747,
+                        "country": "Unknown",
+                        "county": null,
+                        "fuel_100hr": null,
+                        "fuel_10hr": null,
+                        "fuel_10khr": null,
+                        "fuel_1hr": null,
+                        "fuel_1khr": null,
+                        "fuel_gt10khr": null,
+                        "lat": 52.193,
+                        "lng": -100.192,
+                        "max_humid": 80.0,
+                        "max_temp": 30.0,
+                        "max_temp_hour": 14.0,
+                        "max_wind": 6.0,
+                        "max_wind_aloft": 6.0,
+                        "min_humid": 40.0,
+                        "min_temp": 13.0,
+                        "min_temp_hour": 4.0,
+                        "min_wind": 6.0,
+                        "min_wind_aloft": 6.0,
+                        "moisture_100hr": 12.0,
+                        "moisture_10hr": 12.0,
+                        "moisture_1hr": 10.0,
+                        "moisture_1khr": 22.0,
+                        "moisture_duff": 150.0,
+                        "moisture_live": 130.0,
+                        "rain_days": 8.0,
+                        "slope": 10.0,
+                        "snow_month": 5.0,
+                        "state": "Unknown",
+                        "sunrise_hour": 5.0,
+                        "sunset_hour": 21.0,
+                        "utc_offset": -6.0
+                    }],
+                    "start": "2019-05-29T00:00:00"
+                }]
+            }
+        ]
+    },
+    {
+        "event_of": {
+            "id": "SF11E4146026",
+            "url": "http://128.208.123.111/smartfire/events/f037f5b4-01c3-4223-bee4-8dfc0e7b9967"
+        },
+        "fuel_type": "natural",
+        "id": "SF11C77574457421602580",
+        "type": "rx",
+        "activity": [{
+                "active_areas": [{
+                    "end": "2019-05-29T00:00:00",
+                    "specified_points": [{
+                        "area": 67.999999831,
+                        "country": "USA",
+                        "county": null,
+                        "fuel_100hr": 0.25,
+                        "fuel_10hr": 0.25,
+                        "fuel_10khr": 0.0,
+                        "fuel_1hr": 0.5,
+                        "fuel_1khr": 0.0,
+                        "fuel_gt10khr": 0.0,
+                        "lat": 27.188,
+                        "lng": -81.113,
+                        "max_humid": 80.0,
+                        "max_temp": 30.0,
+                        "max_temp_hour": 14.0,
+                        "max_wind": 6.0,
+                        "max_wind_aloft": 6.0,
+                        "min_humid": 40.0,
+                        "min_temp": 13.0,
+                        "min_temp_hour": 4.0,
+                        "min_wind": 6.0,
+                        "min_wind_aloft": 6.0,
+                        "moisture_100hr": 12.0,
+                        "moisture_10hr": 12.0,
+                        "moisture_1hr": 10.0,
+                        "moisture_1khr": 22.0,
+                        "moisture_duff": 150.0,
+                        "moisture_live": 130.0,
+                        "rain_days": 8.0,
+                        "slope": 10.0,
+                        "snow_month": 5.0,
+                        "state": "FL",
+                        "sunrise_hour": 6.0,
+                        "sunset_hour": 19.0,
+                        "utc_offset": -4.0
+                    }],
+                    "start": "2019-05-28T00:00:00"
+                }]
+            },
+            {
+                "active_areas": [{
+                    "end": "2019-05-30T00:00:00",
+                    "specified_points": [{
+                        "area": 67.999999831,
+                        "country": "USA",
+                        "county": null,
+                        "fuel_100hr": 0.25,
+                        "fuel_10hr": 0.25,
+                        "fuel_10khr": 0.0,
+                        "fuel_1hr": 0.5,
+                        "fuel_1khr": 0.0,
+                        "fuel_gt10khr": 0.0,
+                        "lat": 27.188,
+                        "lng": -81.113,
+                        "max_humid": 80.0,
+                        "max_temp": 30.0,
+                        "max_temp_hour": 14.0,
+                        "max_wind": 6.0,
+                        "max_wind_aloft": 6.0,
+                        "min_humid": 40.0,
+                        "min_temp": 13.0,
+                        "min_temp_hour": 4.0,
+                        "min_wind": 6.0,
+                        "min_wind_aloft": 6.0,
+                        "moisture_100hr": 12.0,
+                        "moisture_10hr": 12.0,
+                        "moisture_1hr": 10.0,
+                        "moisture_1khr": 22.0,
+                        "moisture_duff": 150.0,
+                        "moisture_live": 130.0,
+                        "rain_days": 8.0,
+                        "slope": 10.0,
+                        "snow_month": 5.0,
+                        "state": "FL",
+                        "sunrise_hour": 6.0,
+                        "sunset_hour": 19.0,
+                        "utc_offset": -4.0
+                    }],
+                    "start": "2019-05-29T00:00:00"
+                }]
+            }
+        ]
+    }
+]
+
+
