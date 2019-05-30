@@ -109,14 +109,14 @@ class BaseLoader(object):
             active_area['start'] = parse_datetime(active_area.get('start'), 'start')
             active_area['end'] = parse_datetime(active_area.get('end'), 'end')
 
-            utc_offset = False
+            is_within = False
             for utc_offset in utc_offsets:
                 # the activity object's 'start' and 'end' will be in local time;
                 # convert them to UTC to compare with start/end query parameters
                 utc_start = active_area['start'] - utc_offset
                 utc_end = active_area['end'] - utc_offset
 
-                is_within = utc_offset or ((not self._start or utc_end >= self._start) and
+                is_within = is_within or ((not self._start or utc_end >= self._start) and
                     (not self._end or utc_start <= self._end ))
 
             return is_within
