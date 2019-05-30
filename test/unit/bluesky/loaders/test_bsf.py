@@ -108,8 +108,8 @@ class TestBsfLoader(object):
     def test_marshal_w_start_and_end_inside_first_activity_windows(self):
         self._expected_output[0]['activity'].pop(1)
         self._expected_output[1]['activity'].pop(1)
-        self._call_marshal(start=datetime.datetime(2019,5,28,20,0,0),
-            end=datetime.datetime(2019,5,29,1,0,0))
+        self._call_marshal(start=datetime.datetime(2019,5,28,10,0,0),
+            end=datetime.datetime(2019,5,28,17,0,0))
         self._call_marshal(start="2019-05-28T20:00:00Z",
             end="2019-05-29T01:00:00Z")
 
