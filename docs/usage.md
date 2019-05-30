@@ -154,7 +154,7 @@ while the following is an example of the latter:
 is set with the `--log-level` flag.  The log output looks like the following:
 
 ```
-2019-02-22 06:24:48,191 INFO: BlueSky v4.1.0
+2019-02-22 06:24:48,191 INFO: BlueSky v4.1.1
 2019-02-22 06:24:48,191 INFO: output file: None
 2019-02-22 06:24:48,191 INFO: config options: None
 2019-02-22 06:24:48,191 INFO: module: []

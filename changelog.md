@@ -47,3 +47,7 @@
 - support FireSpider v3 output
 - rename plumerising module as plumerise
 - rename timeprofiling module as timeprofile
+
+## 4.1.1
+
+- added support for loading BSF (BlueSky Framework) fire location csv output data
