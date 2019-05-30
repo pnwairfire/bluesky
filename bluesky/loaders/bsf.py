@@ -30,6 +30,61 @@ __all__ = [
 
 ONE_DAY = datetime.timedelta(days=1)
 
+def get_optional_float(val):
+    if val:
+        return float(val)
+    # else return None
+
+LOCATION_FIELDS = [
+    # structure:  (csv_key, location_attr, conversion_func)
+    # TODO: should we use date_time or timezone fields. They don't
+    #  always match (e.g. one row had '201905280000-04:00' and '-5.0')
+    ("date_time", "utc_offset", lambda val: parse_utc_offset(val[12:])),
+    # string fields
+    ("state", "state", lambda val: val),
+    ("county", "county", lambda val: val),
+    ("country", "country", lambda val: val),
+    # required float fields
+    ("latitude", "lat", lambda val: float(val)),
+    ("longitude", "lng", lambda val: float(val)),
+    # optioanl float fields
+    ("area", "area", get_optional_float),
+    ("slope", "slope", get_optional_float),
+    ("fuel_1hr", "fuel_1hr", get_optional_float),
+    ("fuel_10hr", "fuel_10hr", get_optional_float),
+    ("fuel_100hr", "fuel_100hr", get_optional_float),
+    ("fuel_1khr", "fuel_1khr", get_optional_float),
+    ("fuel_10khr", "fuel_10khr", get_optional_float),
+    ("fuel_gt10khr", "fuel_gt10khr", get_optional_float),
+    ("moisture_1hr", "moisture_1hr", get_optional_float),
+    ("moisture_10hr", "moisture_10hr", get_optional_float),
+    ("moisture_100hr", "moisture_100hr", get_optional_float),
+    ("moisture_1khr", "moisture_1khr", get_optional_float),
+    ("moisture_live", "moisture_live", get_optional_float),
+    ("moisture_duff", "moisture_duff", get_optional_float),
+    ("min_wind", "min_wind", get_optional_float),
+    ("max_wind", "max_wind", get_optional_float),
+    ("min_wind_aloft", "min_wind_aloft", get_optional_float),
+    ("max_wind_aloft", "max_wind_aloft", get_optional_float),
+    ("min_humid", "min_humid", get_optional_float),
+    ("max_humid", "max_humid", get_optional_float),
+    ("min_temp", "min_temp", get_optional_float),
+    ("max_temp", "max_temp", get_optional_float),
+    ("min_temp_hour", "min_temp_hour", get_optional_float),
+    ("max_temp_hour", "max_temp_hour", get_optional_float),
+    ("sunrise_hour", "sunrise_hour", get_optional_float),
+    ("sunset_hour", "sunset_hour", get_optional_float),
+    ("snow_month", "snow_month", get_optional_float),
+    ("rain_days", "rain_days", get_optional_float)
+]
+# ignored fields: fips, scc, fuel_1hr, fuel_10hr, fuel_100hr, fuel_1khr,
+#   fuel_10khr, fuel_gt10khr, shrub, grass, rot, duff, litter,
+#   consumption_flaming, consumption_smoldering,
+#   consumption_residual, consumption_duff
+#   heat, pm25, pm10, co, co2, ch4, nox, nh3, so2, voc, VEG,
+#   canopy, fccs_number, owner, sf_event_guid, sf_server,
+#   sf_stream_name, timezone
+
 class CsvFileLoader(BaseCsvFileLoader):
 
     def __init__(self, **config):
@@ -54,54 +109,6 @@ class CsvFileLoader(BaseCsvFileLoader):
 
         return list(self._fires.values())
 
-    LOCATION_FIELDS = [
-        # structure:  (csv_key, location_attr, conversion_func)
-        # TODO: should we use date_time or timezone fields. They don't
-        #  always match (e.g. one row had '201905280000-04:00' and '-5.0')
-        ("date_time", "utc_offset", lambda val: parse_utc_offset(val[12:])),
-        # string fields
-        ("state", "state", lambda val: val),
-        ("county", "county", lambda val: val),
-        ("country", "country", lambda val: val),
-        # float fields
-        ("latitude", "lat", lambda val: float(val)),
-        ("longitude", "lng", lambda val: float(val)),
-        ("area", "area", lambda val: val and float(val)),
-        ("slope", "slope", lambda val: val and float(val)),
-        ("fuel_1hr", "fuel_1hr", lambda val: val and float(val)),
-        ("fuel_10hr", "fuel_10hr", lambda val: val and float(val)),
-        ("fuel_100hr", "fuel_100hr", lambda val: val and float(val)),
-        ("fuel_1khr", "fuel_1khr", lambda val: val and float(val)),
-        ("fuel_10khr", "fuel_10khr", lambda val: val and float(val)),
-        ("fuel_gt10khr", "fuel_gt10khr", lambda val: val and float(val)),
-        ("moisture_1hr", "moisture_1hr", lambda val: val and float(val)),
-        ("moisture_10hr", "moisture_10hr", lambda val: val and float(val)),
-        ("moisture_100hr", "moisture_100hr", lambda val: val and float(val)),
-        ("moisture_1khr", "moisture_1khr", lambda val: val and float(val)),
-        ("moisture_live", "moisture_live", lambda val: val and float(val)),
-        ("moisture_duff", "moisture_duff", lambda val: val and float(val)),
-        ("min_wind", "min_wind", lambda val: val and float(val)),
-        ("max_wind", "max_wind", lambda val: val and float(val)),
-        ("min_wind_aloft", "min_wind_aloft", lambda val: val and float(val)),
-        ("max_wind_aloft", "max_wind_aloft", lambda val: val and float(val)),
-        ("min_humid", "min_humid", lambda val: val and float(val)),
-        ("max_humid", "max_humid", lambda val: val and float(val)),
-        ("min_temp", "min_temp", lambda val: val and float(val)),
-        ("max_temp", "max_temp", lambda val: val and float(val)),
-        ("min_temp_hour", "min_temp_hour", lambda val: val and float(val)),
-        ("max_temp_hour", "max_temp_hour", lambda val: val and float(val)),
-        ("sunrise_hour", "sunrise_hour", lambda val: val and float(val)),
-        ("sunset_hour", "sunset_hour", lambda val: val and float(val)),
-        ("snow_month", "snow_month", lambda val: val and float(val)),
-        ("rain_days", "rain_days", lambda val: val and float(val))
-    ]
-    # ignored fields: fips, scc, fuel_1hr, fuel_10hr, fuel_100hr, fuel_1khr,
-    #   fuel_10khr, fuel_gt10khr, shrub, grass, rot, duff, litter,
-    #   consumption_flaming, consumption_smoldering,
-    #   consumption_residual, consumption_duff
-    #   heat, pm25, pm10, co, co2, ch4, nox, nh3, so2, voc, VEG,
-    #   canopy, fccs_number, owner, sf_event_guid, sf_server,
-    #   sf_stream_name, timezone
 
 
     def _process_row(self, row):
@@ -116,7 +123,7 @@ class CsvFileLoader(BaseCsvFileLoader):
 
         self._fires[fire_id]['specified_points_by_date'][start].append(
             {loc_attr: f(row.get(csv_key))
-                for csv_key, loc_attr, f in self.LOCATION_FIELDS})
+                for csv_key, loc_attr, f in LOCATION_FIELDS})
 
         # event and type could have been set when the Fire object was
         # instantiated, but checking amd setting here allow the fields to
