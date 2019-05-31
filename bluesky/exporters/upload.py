@@ -57,6 +57,9 @@ class UploadExporter(ExporterBase):
         self._upload_options['scp'].append(copy.deepcopy(c))
         if not self._upload_options['scp'][-1].get('user'):
             self._upload_options['scp'][-1]['user'] = self._current_user
+        if not self._upload_options['scp'][-1].get('port'):
+            self._upload_options['scp'][-1]['port'] = self.config(
+                'scp_defaults', 'port')
 
     LOCAL_HOSTS = set(['localhost', '127.0.0.1'])
     PORT_IN_HOSTNAME_MATCHER = re.compile(':\d+')

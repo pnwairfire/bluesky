@@ -621,12 +621,19 @@ _DEFAULTS = {
             "json_output_filename": "output.json",
 
             "tarball_name": None,
-            "scp": {
-                "host": None,
-                "user": None, # TODO: did this default to 'bluesky' before?
-                "port": 22,
-                "dest_dir": None
+
+            "scp_defaults": {
+                "port": 22
+                # TODO: did 'user' default to 'bluesky' before?
             }
+            # 'scp' can be either a dict or a list of dicts of the following
+            #  form
+            # "scp": {
+            #     "host": None,
+            #     "user": None,
+            #     "port": 22,
+            #     "dest_dir": None
+            # }
         }
     }
 }
