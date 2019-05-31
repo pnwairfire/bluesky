@@ -51,3 +51,7 @@
 ## 4.1.1
 
 - added support for loading BSF (BlueSky Framework) fire location csv output data
+
+## 4.1.2
+
+- Fix support for either dict or list for export > upload > scp config setting
