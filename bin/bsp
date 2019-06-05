@@ -371,6 +371,7 @@ def main():
         exit_with_traceback(e)
 
     fires_manager.dumps(output_file=args.output_file, indent=args.indent)
+    logging.summary("Run complete")
 
 if __name__ == "__main__":
     main()
