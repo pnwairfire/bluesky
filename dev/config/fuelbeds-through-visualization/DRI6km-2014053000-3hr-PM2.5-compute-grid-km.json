@@ -26,6 +26,7 @@
             "hysplit": {
                 "images_dir": "images/",
                 "data_dir": "data/",
+                "create_summary_json": true,
                 "blueskykml_config": {
                     "DispersionGridInput": {
                         "LAYERS": [0,2]
