@@ -160,6 +160,7 @@ class HYSPLITDispersion(DispersionBase):
 
         self._set_met_info(copy.deepcopy(met_info))
         self._output_file_name = self.config('output_file_name')
+        self._has_parinit = []
 
     def _required_activity_fields(self):
         return ('timeprofile', 'plumerise')
@@ -201,7 +202,11 @@ class HYSPLITDispersion(DispersionBase):
                 "grid_parameters": self._grid_params
             },
             "num_processes": self._num_processes,
-            "met_info": self._met_info
+            "met_info": self._met_info,
+            "carryover": {
+                "any": bool(self._has_parinit) and any(self._has_parinit),
+                "all": bool(self._has_parinit) and all(self._has_parinit)
+            }
         }
 
     ##
@@ -447,12 +452,16 @@ class HYSPLITDispersion(DispersionBase):
                     if self.config("STOP_IF_NO_PARINIT"):
                         msg = "Matching particle init file, %s, not found. Stop." % f
                         raise Exception(msg)
-                    else:
-                        msg = "No matching particle initialization file, %s, found; Using no particle initialization" % f
-                        logging.warning(msg)
-                        logging.debug(msg)
-                        ninit_val = 0
+
+                    msg = "No matching particle initialization file, %s, found; Using no particle initialization" % f
+                    logging.warning(msg)
+                    logging.debug(msg)
+                    ninit_val = 0
+                    self._has_parinit.append(False)
+
+                else:
                     logging.info("Using particle initialization file %s" % f)
+                    self._has_parinit.append(True)
 
         # Prepare for run ... get pardump name just in case needed
         pardump = self.config("PARDUMP")

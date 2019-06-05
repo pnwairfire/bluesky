@@ -219,7 +219,9 @@ class HysplitVisualizer(object):
                  "height_latitude": self._grid_params.get("height_latitude"),
                  "center_latitude": self._grid_params.get("center_latitude"),
                  "center_longitude":  self._grid_params.get("center_longitude"),
-                 "model_configuration": "HYSPLIT"
+                 "model_configuration": "HYSPLIT",
+                 "carryover": (self._fires_manager.dispersion and
+                    self._fires_manager.dispersion.get("carryover") or {})
             }
 
             contents_json = json.dumps(contents)
