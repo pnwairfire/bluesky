@@ -55,3 +55,11 @@
 ## 4.1.2
 
 - Fix support for either dict or list for export > upload > scp config setting
+
+## 4.1.3
+
+ - Indicate use of carryover/parinit in dispersion output info and visualization summary.json
+ - Make summary.json more human readable with indents
+ - Upgrade afscripting to v1.1.5
+ - Add custom log level SUMMARY 25
+ - add SUMMARY level messages: bluesky version, input file, output file, 'Run complete', fire counts, 'Modules to be run: ...', 'Running module ...'
