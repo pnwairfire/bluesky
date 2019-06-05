@@ -224,7 +224,7 @@ class HysplitVisualizer(object):
                     self._fires_manager.dispersion.get("carryover") or {})
             }
 
-            contents_json = json.dumps(contents)
+            contents_json = json.dumps(contents, indent=4)
             logging.debug("generating summary.json: %s", contents_json)
             with open(os.path.join(output_directory, 'summary.json'), 'w') as f:
                 f.write(contents_json)
