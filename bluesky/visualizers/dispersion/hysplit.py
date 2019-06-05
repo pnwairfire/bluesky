@@ -225,7 +225,7 @@ class HysplitVisualizer(object):
             }
 
             contents_json = json.dumps(contents, indent=4)
-            logging.debug("generating summary.json: %s", contents_json)
+            logging.debug("generating summary.json: %s", contents)
             with open(os.path.join(output_directory, 'summary.json'), 'w') as f:
                 f.write(contents_json)
 
