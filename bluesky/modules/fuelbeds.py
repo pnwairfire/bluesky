@@ -30,7 +30,6 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    logging.info("Running fuelbeds module")
     fires_manager.processed(__name__, __version__,
         fccsmap_version=fccsmap.__version__)
 

@@ -32,7 +32,6 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    logging.info("Running localmet module")
     fires_manager.processed(__name__, __version__)
     if not fires_manager.met:
         raise ValueError(NO_MET_ERROR_MSG)

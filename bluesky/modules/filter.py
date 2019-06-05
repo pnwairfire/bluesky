@@ -17,7 +17,6 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    logging.info("Running filter module")
     processed_kwargs = {
         "num_fires_before": fires_manager.num_fires
     }

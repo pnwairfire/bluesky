@@ -32,7 +32,6 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    logging.info("Running findmetdata module")
     fires_manager.processed(__name__, __version__)
 
     # TODO: For playground, there will be only one file containing data for

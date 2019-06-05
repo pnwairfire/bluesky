@@ -511,6 +511,8 @@ class FiresManager(object):
         self.runtime = self.runtime or {"modules": []}
         failed = False
 
+        logging.summary("Modules to be run: %s", ', '.join(self._module_names))
+
         with process.RunTimeRecorder(self.runtime):
             for i in range(len(self._modules)):
                 # if one of the modules already failed, then the only thing
@@ -531,6 +533,7 @@ class FiresManager(object):
 
                         # 'run' modifies fires in place
                         self.log_status('Good', self._module_names[i], 'Start')
+                        logging.summary("Running module %s", self._module_names[i])
                         self._modules[i].run(self)
                         self.log_status('Good', self._module_names[i], 'Finish')
                 except Exception as e:

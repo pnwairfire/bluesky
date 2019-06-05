@@ -28,7 +28,6 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    logging.info("Running consumption module")
     # TODO: don't hard code consume_version; either update consume to define
     # it's version in consume.__version__, or execute pip:
     #   $ pip3 freeze |grep consume
