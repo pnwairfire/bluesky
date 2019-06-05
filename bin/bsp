@@ -322,8 +322,12 @@ def setup(args):
     configure_logging(args, fires_manager)
     set_config(args, fires_manager)
 
-    logging.info("BlueSky v%s", __version__)
-    scripting_args.output_args(args)
+    logging.summary("BlueSky v%s", __version__)
+    # Log input file and output file in SUMMARY messages, and skip
+    # them in scripting_args.output_args (which uses INFO level messages)
+    logging.summary("Input File: %s", args.input_file)
+    logging.summary("Output File: %s", args.output_file)
+    scripting_args.output_args(args, skip=['input_file', 'output_file'])
     #afscripting.utils.log_config(args.config_options)
 
     # Note: Calling code handles exception
