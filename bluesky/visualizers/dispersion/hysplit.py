@@ -209,9 +209,10 @@ class HysplitVisualizer(object):
                 pass
 
             contents = {
-                 "output_version": "2.0.0",
-                 # TODO: populate with real values
-                 "dispersion_period": {
+                "websky_version": vis_hysplit_config("websky_version"),
+                "output_version": "2.0.0",
+                # TODO: populate with real values
+                "dispersion_period": {
                     "from": d_from and d_from.strftime("%Y%m%d %HZ"),
                     "to": d_to and d_to.strftime("%Y%m%d %HZ")
                 },
