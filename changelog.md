@@ -63,3 +63,6 @@
  - Upgrade afscripting to v1.1.5
  - Add custom log level SUMMARY 25
  - add SUMMARY level messages: bluesky version, input file, output file, 'Run complete', fire counts, 'Modules to be run: ...', 'Running module ...'
+
+## 4.1.4
+ - Support specifying target WebSky version summary.json
