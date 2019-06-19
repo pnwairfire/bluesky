@@ -105,14 +105,14 @@ and KML visualization:
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-        -v $HOME/Met/CANSAC/6km/ARL/:/data/Met/CANSAC/6km/ARL/ \
+        -v $HOME/Met/CANSAC/4km/ARL/:/data/Met/CANSAC/4km/ARL/ \
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
         --run-id hysplit-{timestamp:%Y%m%dT%H%M%S} \
-        -i ./dev/data/json/2-fires-24hr-20140530-CA.json \
+        -i ./dev/data/json/1-fire-24hr-20190610-CA.json \
         -o ./output/{run_id}.json \
-        -c ./dev/config/fuelbeds-through-visualization/DRI6km-2014053000-24hr-PM2.5-user-defined-grid-km.json \
+        -c ./dev/config/fuelbeds-through-visualization/DRI4km-2019061012-48hr-PM2.5-grid-latlng.json \
         fuelbeds consumption emissions \
         timeprofile findmetdata localmet plumerise \
         dispersion visualization export
