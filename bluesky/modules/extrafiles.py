@@ -10,7 +10,6 @@ __all__ = [
 __version__ = "0.1.0"
 
 import os
-import pdb
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.extrafilewriters import (
@@ -68,7 +67,3 @@ def _get_dest_dir():
         os.makedirs(dest_dir)
 
     return dest_dir
-
-
-
-"""insert CMAQ Smoke Ready files here"""

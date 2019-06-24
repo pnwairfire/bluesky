@@ -160,28 +160,97 @@ class PTHOURRecord(ColumnSpecificRecord):
                    (  1, "-dummy-", str),
                    ( 10, "SCC",     str) ]
 
+
 class SmokeReadyWriter(object):
 
   def __init__(self, dest_dir, **kwargs):
     # make dynamic to accept args
-    filedt = datetime.now()
+    self.filedt = datetime.now()
 
     ptinv = (kwargs.get('ptinv_filename') or
       Config.get('extrafiles', 'smokeready', 'ptinv_filename'))
-    ptinv = filedt.strftime(ptinv)
+    ptinv = self.filedt.strftime(ptinv)
     self._ptinv_pathname = os.path.join(dest_dir, ptinv)
 
     ptday = (kwargs.get('ptday_filename') or
       Config.get('extrafiles', 'smokeready', 'ptday_filename'))
-    ptday = filedt.strftime(ptday)
+    ptday = self.filedt.strftime(ptday)
     self._ptday_pathname = os.path.join(dest_dir, ptday)
 
     pthour = (kwargs.get('pthour_filename') or
       Config.get('extrafiles', 'smokeready', 'pthour_filename'))
-    pthour = filedt.strftime(pthour)
+    pthour = self.filedt.strftime(pthour)
     self._pthour_pathname = os.path.join(dest_dir, pthour)
    
 
   def write(self, fires_manager):
+    fires_info = fires_manager.fires
+    country_process_list = ['US', 'USA', 'United States']
+
+    ptinv = open(self._ptinv_pathname, 'w')
+    ptday = open(self._ptday_pathname, 'w')
+    pthour = open(self._pthour_pathname, 'w')
+
+    ptinv.write("#IDA\n#PTINV\n#COUNTRY %s\n" % country_process_list[0])
+    ptinv.write("#YEAR %d\n" % self.filedt.year)
+    ptinv.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
+    ptinv.write("#DATA PM2_5 PM10 CO NH3 NOX SO2 VOC\n")
+
+    ptday.write("#EMS-95\n#PTDAY\n#COUNTRY %s\n" % country_process_list[0])
+    ptday.write("#YEAR %d\n" % self.filedt.year)
+    ptday.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
+
+    pthour.write("#EMS-95\n#PTHOUR\n#COUNTRY %s\n" % country_process_list[0])
+    pthour.write("#YEAR %d\n" % self.filedt.year)
+    pthour.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
+
+    num_of_fires = 0
+    skip_no_emiss = 0
+    skip_no_plume = 0
+    skip_no_fips = 0
+    skip_no_country = 0
+    total_skipped = 0
+
+    for fire_info in fires_info:
+      for fire_loc in fire_info.locations:
+        pdb.set_trace()
+        if fire_loc["emissions"] is None:
+          skipNoEmis += 1
+          totalSkip += 1
+          continue
+
+        if fire_loc["plumerise"] is None:
+          skipNoPlume += 1
+          totalSkip += 1
+          continue
+
+        if fire_loc['fips'] is None or fireLoc['fips'] == "-9999":
+          skipNoFips += 1
+          totalSkip += 1
+          continue
+
+        if fire_loc['country'] not in countryProcessList:
+          skipNoCountry += 1
+          totalSkip += 1
+          continue
     pdb.set_trace()
-    writer
+
+
+  def _write_ptinv_file(self):
+    ptinv = open(self._ptinv_pathname, 'w')
+    ptinv.write("#IDA\n#PTINV\n#COUNTRY %s\n" % country_process_list[0])
+    ptinv.write("#YEAR %d\n" % self.filedt.year)
+    ptinv.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
+    ptinv.write("#DATA PM2_5 PM10 CO NH3 NOX SO2 VOC\n")
+
+  def _write_ptday_file(self):
+    ptday = open(self._ptday_pathname, 'w')
+    ptday.write("#EMS-95\n#PTDAY\n#COUNTRY %s\n" % country_process_list[0])
+    ptday.write("#YEAR %d\n" % self.filedt.year)
+    ptday.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
+
+  def _write_pthour_file(self):
+    pthour = open(self._pthour_pathname, 'w')
+    pthour.write("#EMS-95\n#PTHOUR\n#COUNTRY %s\n" % country_process_list[0])
+    pthour.write("#YEAR %d\n" % self.filedt.year)
+    pthour.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
