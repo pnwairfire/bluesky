@@ -105,7 +105,7 @@ class Fips(object):
     Defautls to trying the FCC Census API:
     https://geo.fcc.gov/api/census/#!/block/get_block_find
 
-    But will fallback to using the counties_shp file, which is a more
+    Falls back to using the counties_shp file, which is a more
     memory intensive operation.
     """
 
@@ -115,9 +115,30 @@ class Fips(object):
 
         self.lat = lat
         self.lng = lng
-        self._get_fips
+        self._get_fips()
+
+    @property
+    def county_name(self):
+        return self._county_name
+
+    @property
+    def county_fips(self):
+        return self._county_fips
+
+    @property
+    def state_name(self):
+        return self._state_name
+
+    @property
+    def state_fips(self):
+        return self._state_fips
+
+    @property
+    def state_code(self):
+        return self._state_code
 
     def _get_fips(self):
+        # try API and fallback to Shapefile
         url = "https://geo.fcc.gov/api/census/block/find?latitude={}&longitude={}&format=json".format(self.lat, self.lng)
         r = requests.get(url)
 
@@ -128,7 +149,12 @@ class Fips(object):
             self._get_shp_data()
 
     def _process_api_data(self, data):
-        pass
+        # process the response payload from the API
+        self._county_name = data['County']['name']
+        self._county_fips = data['County']['FIPS']
+        self._state_name = data['State']['name']
+        self._state_fips = data['State']['FIPS']
+        self._state_code = data['State']['code']
 
     def _get_shp_data(self):
         # get counties_fips shapefile
@@ -153,8 +179,13 @@ class Fips(object):
         else:
             raise RuntimeError(INVALID_FIPS_RESPONSE)
 
-    def _process_shp_data(self):
-        pass
+    def _process_shp_data(self, data):
+        # process the response payload from the SHP file
+        self._county_name = data.NAME
+        self._county_fips = data.GEOID
+        self._state_name = None
+        self._state_fips = data.STATEFP
+        self._state_code = None
 
 
 
