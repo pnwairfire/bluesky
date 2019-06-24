@@ -10,16 +10,17 @@ __all__ = [
 __version__ = "0.1.0"
 
 import os
-
+import pdb
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.extrafilewriters import (
-    emissionscsv, firescsvs
+    emissionscsv, firescsvs, smokeready
 )
 
 EXTRA_FILE_WRITERS = {
     'emissionscsv': emissionscsv.EmissionsCsvWriter,
-    'firescsvs': firescsvs.FiresCsvsWriter
+    'firescsvs': firescsvs.FiresCsvsWriter,
+    'smokeready': smokeready.SmokeReadyWriter
 }
 
 def run(fires_manager):
@@ -67,3 +68,7 @@ def _get_dest_dir():
         os.makedirs(dest_dir)
 
     return dest_dir
+
+
+
+"""insert CMAQ Smoke Ready files here"""
