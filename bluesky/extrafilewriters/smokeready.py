@@ -181,6 +181,12 @@ class SmokeReadyWriter(object):
       Config.get('extrafiles', 'smokeready', 'pthour_filename'))
     pthour = self.filedt.strftime(pthour)
     self._pthour_pathname = os.path.join(dest_dir, pthour)
+
+    separate_smolder = (kwargs.get('separate_smolder') or
+      Config.get('extrafiles', 'smokeready', 'separate_smolder'))
+    self._separate_smolder = separate_smolder
+
+
    
 
   def write(self, fires_manager):
@@ -214,25 +220,52 @@ class SmokeReadyWriter(object):
     for fire_info in fires_info:
       for fire_loc in fire_info.locations:
         pdb.set_trace()
+
         if fire_loc["emissions"] is None:
-          skipNoEmis += 1
-          totalSkip += 1
+          skip_no_emiss += 1
+          total_skipped += 1
           continue
 
         if fire_loc["plumerise"] is None:
-          skipNoPlume += 1
-          totalSkip += 1
-          continue
-
-        if fire_loc['fips'] is None or fireLoc['fips'] == "-9999":
-          skipNoFips += 1
-          totalSkip += 1
+          skip_no_plume += 1
+          total_skipped += 1
           continue
 
         if fire_loc['country'] not in countryProcessList:
-          skipNoCountry += 1
-          totalSkip += 1
+          skip_no_country += 1
+          total_skipped += 1
           continue
+
+        fips = locationutils.Fips(fire_loc["lat"], fire_loc["lng"])
+        stid = fips.state_fips
+        cyid = fips.county_fips
+        ssc = self._map_scc(fire_info.type)
+        fcid = self._generate_fcid()
+
+        # define fire types, defaults to true
+        if self._separate_smolder:
+            fire_types = ("flame", "smolder")
+        else:
+            fire_types = ("total",)
+
+        # iterate through fire_types
+        for fire_type in fire_types:
+          if fireType == "total":
+              ptid = '1'                 # Point ID
+              skid = '1'                 # Stack ID
+          elif fireType == "flame":
+              ptid = '1'                       # Point ID
+              skid = '1'                       # Stack ID
+              scc = scc[:-2] + "F" + scc[-1]
+          elif fireType == "smolder":
+              ptid = '2'                       # Point ID
+              skid = '2'                       # Stack ID
+              scc = scc[:-2] + "S" + scc[-1]
+          prid = ''                       # Process ID
+          dt = fireLoc['date_time']
+          date = dt.strftime('%m/%d/%y')  # Date
+
+        
     pdb.set_trace()
 
 
@@ -254,3 +287,24 @@ class SmokeReadyWriter(object):
     pthour.write("#EMS-95\n#PTHOUR\n#COUNTRY %s\n" % country_process_list[0])
     pthour.write("#YEAR %d\n" % self.filedt.year)
     pthour.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
+
+  # Mappings provided by BSF (fill_data.py)
+  SCC_CODE_MAPPING = {
+      "wildfires": "2810001000",
+      "wf": "2810001000",
+      "rx": "2810015000",
+      "unknown": "2810090000"
+  }
+
+  def _map_scc(self, fire_type):
+    if type(fire_type) is str:
+      try:
+        return SCC_CODE_MAPPING[fire_type]
+      except:
+        raise ValueError("Invalid Fire Type {}".format(fire_type))
+    else:
+      raise ValueError("Fire Type must be a string")
+
+  # following the paradigmn from fire_information.py in BSF
+  def _generate_fcid(self):
+
