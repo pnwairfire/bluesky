@@ -194,6 +194,10 @@ class SmokeReadyWriter(object):
       Config.get('extrafiles', 'smokeready', 'separate_smolder'))
     self._separate_smolder = separate_smolder
 
+    write_ptinv_totals = (kwargs.get('write_ptinv_totals') or
+      Config.get('extrafiles', 'smokeready', 'write_ptinv_totals'))
+    self._write_ptinv_totals = write_ptinv_totals
+
   # main write function to be called
   def write(self, fires_manager):
     fires_info = fires_manager.fires
@@ -281,6 +285,35 @@ class SmokeReadyWriter(object):
           # dt = fireLoc['date_time']
 
           date = start_dt.strftime('%m/%d/%y')  # Date
+
+          ptinv_rec = PTINVRecord()
+          ptinv_rec.STID = stid
+          ptinv_rec.CYID = cyid
+          ptinv_rec.PLANTID = fcid
+          ptinv_rec.POINTID = ptid
+          ptinv_rec.STACKID = skid
+          ptinv_rec.SCC = scc
+          ptinv_rec.LATC = lat
+          ptinv_rec.LONC = lng
+
+          ptinv_rec_str = str(ptinv_rec)
+
+          if self._write_ptinv_totals:
+            for var, vkey in [('PM2_5', 'pm25'),
+                              ('PM10', 'pm10'),
+                              ('CO', 'co'),
+                              ('NH3', 'nh3'),
+                              ('NOX', 'nox'),
+                              ('SO2', 'so2'),
+                              ('VOC', 'voc')]:
+                if fire_loc["emissions"][vkey] is None: 
+                  continue
+                prec = PTINVPollutantRecord()
+                prec.ANN = fire_loc["emissions"].sum(vkey)
+                prec.AVD = fire_loc["emissions"].sum(vkey)
+                ptinv_rec_str += str(prec)
+
+          ptinv.write(ptinv_rec_str + "\n")
 
           
 
