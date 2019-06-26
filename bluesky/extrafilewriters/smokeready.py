@@ -9,6 +9,7 @@ import pdb
 import os
 import logging
 from datetime import timedelta, datetime
+from afdatetime import parsing as datetime_parsing
 
 import numpy as np
 from bluesky.config import Config
@@ -162,7 +163,14 @@ class PTHOURRecord(ColumnSpecificRecord):
 
 
 class SmokeReadyWriter(object):
-
+  """
+  SmokeReadyWriter is an object class that accepts a destination
+  dir argument for file location and several kwargs specific to the
+  config of the job.
+  
+  param: dest_dir
+  type: str
+  """
   def __init__(self, dest_dir, **kwargs):
     # make dynamic to accept args
     self.filedt = datetime.now()
@@ -186,9 +194,7 @@ class SmokeReadyWriter(object):
       Config.get('extrafiles', 'smokeready', 'separate_smolder'))
     self._separate_smolder = separate_smolder
 
-
-   
-
+  # main write function to be called
   def write(self, fires_manager):
     fires_info = fires_manager.fires
     country_process_list = ['US', 'USA', 'United States']
@@ -213,13 +219,11 @@ class SmokeReadyWriter(object):
     num_of_fires = 0
     skip_no_emiss = 0
     skip_no_plume = 0
-    skip_no_fips = 0
     skip_no_country = 0
     total_skipped = 0
 
     for fire_info in fires_info:
       for fire_loc in fire_info.locations:
-        pdb.set_trace()
 
         if fire_loc["emissions"] is None:
           skip_no_emiss += 1
@@ -231,16 +235,25 @@ class SmokeReadyWriter(object):
           total_skipped += 1
           continue
 
-        if fire_loc['country'] not in countryProcessList:
+        if fire_loc['country'] not in country_process_list:
           skip_no_country += 1
           total_skipped += 1
           continue
 
-        fips = locationutils.Fips(fire_loc["lat"], fire_loc["lng"])
-        stid = fips.state_fips
-        cyid = fips.county_fips
+        cyid, stid = self._get_state_county_fips(fire_loc["lat"], fire_loc["lng"])
         ssc = self._map_scc(fire_info.type)
-        fcid = self._generate_fcid()
+        start_dt =  datetime_parsing.parse(fire_loc['start'])
+        start_hour = start_dt.hour
+        num_hours = len(fire_loc['timeprofile'].keys())
+        num_days = num_hours // 24
+        if num_hours % 24 > 0: num_days += 1
+
+        fcid = self._generate_fcid(start_dt, num_hours, fire_loc["lat"], fire_loc["lng"])
+
+        # num of hours
+        len(fire_loc['timeprofile'].keys())
+        # timedelta
+        sorted(fire_loc['timeprofile'].keys())
 
         # define fire types, defaults to true
         if self._separate_smolder:
@@ -250,23 +263,25 @@ class SmokeReadyWriter(object):
 
         # iterate through fire_types
         for fire_type in fire_types:
-          if fireType == "total":
+          if fire_type == "total":
               ptid = '1'                 # Point ID
               skid = '1'                 # Stack ID
-          elif fireType == "flame":
+          elif fire_type == "flame":
               ptid = '1'                       # Point ID
               skid = '1'                       # Stack ID
               scc = scc[:-2] + "F" + scc[-1]
-          elif fireType == "smolder":
+          elif fire_type == "smolder":
               ptid = '2'                       # Point ID
               skid = '2'                       # Stack ID
               scc = scc[:-2] + "S" + scc[-1]
           prid = ''                       # Process ID
-          dt = fireLoc['date_time']
-          date = dt.strftime('%m/%d/%y')  # Date
+
+          # Does the old fireLoc['date_time'] == ['start'] ?
+          # dt = fireLoc['date_time']
+          date = start_dt.strftime('%m/%d/%y')  # Date
 
         
-    pdb.set_trace()
+          pdb.set_trace()
 
 
   def _write_ptinv_file(self):
@@ -288,15 +303,20 @@ class SmokeReadyWriter(object):
     pthour.write("#YEAR %d\n" % self.filedt.year)
     pthour.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
 
-  # Mappings provided by BSF (fill_data.py)
-  SCC_CODE_MAPPING = {
-      "wildfires": "2810001000",
-      "wf": "2810001000",
-      "rx": "2810015000",
-      "unknown": "2810090000"
-  }
+  def _get_state_county_fips(self, lat, lng):
+    fips = locationutils.Fips(lat, lng)
+    return fips.county_fips, fips.state_fips
 
   def _map_scc(self, fire_type):
+    # Mappings provided by BSF (fill_data.py)
+    SCC_CODE_MAPPING = {
+        "wildfires": "2810001000",
+        "wildfire": "2810001000",
+        "wf": "2810001000",
+        "rx": "2810015000",
+        "unknown": "2810090000"
+    }
+
     if type(fire_type) is str:
       try:
         return SCC_CODE_MAPPING[fire_type]
@@ -305,6 +325,13 @@ class SmokeReadyWriter(object):
     else:
       raise ValueError("Fire Type must be a string")
 
-  # following the paradigmn from fire_information.py in BSF
-  def _generate_fcid(self):
+  # confirm this is necessary to be like in BSF. Couldnt understand where id was
+  # being set. not sure it corresponds to something we need
+  def _generate_fcid(self, start_dt, num_hours, lat, lng):
+    dt_str = start_dt.strftime('%Y%m%d_')
+    lat_str = str(lat).replace('.', '')
+    lng_str = str(lng).replace('.', '')
+
+    return dt_str + str(num_hours) + lat_str + lng_str
+
 
