@@ -9,7 +9,7 @@ import pdb
 import os
 import logging
 from datetime import timedelta, datetime
-from afdatetime import parsing as datetime_parsing
+from afdatetime import parsing as datetime_parsing, timezones
 
 import numpy as np
 from bluesky.config import Config
@@ -240,18 +240,19 @@ class SmokeReadyWriter(object):
           total_skipped += 1
           continue
 
-        cyid, stid = self._get_state_county_fips(fire_loc["lat"], fire_loc["lng"])
+        lat, lng = fire_loc["lat"], fire_loc["lng"]
+        cyid, stid = self._get_state_county_fips(lat, lng)
         ssc = self._map_scc(fire_info.type)
         start_dt =  datetime_parsing.parse(fire_loc['start'])
         start_hour = start_dt.hour
         num_hours = len(fire_loc['timeprofile'].keys())
         num_days = num_hours // 24
         if num_hours % 24 > 0: num_days += 1
+        fcid = self._generate_fcid(start_dt, num_hours, lat, lng)
+        tzonnam = self._set_timezone_name(lat, lng, start_dt)
 
-        fcid = self._generate_fcid(start_dt, num_hours, fire_loc["lat"], fire_loc["lng"])
+        pdb.set_trace()
 
-        # num of hours
-        len(fire_loc['timeprofile'].keys())
         # timedelta
         sorted(fire_loc['timeprofile'].keys())
 
@@ -278,11 +279,10 @@ class SmokeReadyWriter(object):
 
           # Does the old fireLoc['date_time'] == ['start'] ?
           # dt = fireLoc['date_time']
+
           date = start_dt.strftime('%m/%d/%y')  # Date
 
-        
-          pdb.set_trace()
-
+          
 
   def _write_ptinv_file(self):
     ptinv = open(self._ptinv_pathname, 'w')
@@ -333,5 +333,27 @@ class SmokeReadyWriter(object):
     lng_str = str(lng).replace('.', '')
 
     return dt_str + str(num_hours) + lat_str + lng_str
+
+  def _set_timezone_name(self, lat, lng, start_dt):
+    VALID_TIMEZONES = ['GMT','ADT','AST','EDT','EST','CDT','CST','MDT','MST','PDT','PST','AKDT', 'AKST']
+          
+    try:
+      dst_obj = timezones.DstAccurateTimeZone().find(lat, lng, start_dt)
+      tzonnam = dst_obj['abbreviation']
+      
+      if dst_obj['abbreviation'] == 'UTC':
+        tzonnam = 'GMT'
+
+      if tzonnam not in VALID_TIMEZONES:
+        offset = timezones.UtcOffsetFinder().find(lng, lat, start_dt)[1]
+        offset = abs(int(offset.split(':')[0]))
+        tzonnam = ['EST','CST','MST','PST', 'AKST'][tzoffset - 5]
+
+      return tzonnam
+
+    except:
+      # Default to 'EST' if all else fails
+      tzonnam = 'EST'
+      return tzonnam
 
 
