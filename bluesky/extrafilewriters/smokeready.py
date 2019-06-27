@@ -40,7 +40,7 @@ class ColumnSpecificRecord(object):
             if data is None:
                 data = ""
             elif datatype is float:
-                if np.isNaN(data):
+                if np.isnan(data):
                     data = ""
                 elif fieldlen < 5:
                     data = str(int(data))
@@ -198,6 +198,10 @@ class SmokeReadyWriter(object):
       Config.get('extrafiles', 'smokeready', 'write_ptinv_totals'))
     self._write_ptinv_totals = write_ptinv_totals
 
+    write_ptday_file = (kwargs.get('write_ptday_file') or
+      Config.get('extrafiles', 'smokeready', 'write_ptday_file'))
+    self._write_ptday_file = write_ptday_file
+
   # main write function to be called
   def write(self, fires_manager):
     fires_info = fires_manager.fires
@@ -246,23 +250,29 @@ class SmokeReadyWriter(object):
 
         lat, lng = fire_loc["lat"], fire_loc["lng"]
         cyid, stid = self._get_state_county_fips(lat, lng)
-        ssc = self._map_scc(fire_info.type)
+        scc = self._map_scc(fire_info.type)
         start_dt =  datetime_parsing.parse(fire_loc['start'])
         start_hour = start_dt.hour
+
+        # if timeprofile key has 0 values, (for flaming/resid/etc), do we
+        # ignore or still right the value. 
         num_hours = len(fire_loc['timeprofile'].keys())
         num_days = num_hours // 24
         if num_hours % 24 > 0: num_days += 1
         fcid = self._generate_fcid(start_dt, num_hours, lat, lng)
         tzonnam = self._set_timezone_name(lat, lng, start_dt)
 
-        pdb.set_trace()
-
+        
         # timedelta
-        sorted(fire_loc['timeprofile'].keys())
+        # sorted(fire_loc['timeprofile'].keys())
 
-        # define fire types, defaults to true
+        """
+          Define fire types, defaults to total. 
+          NOTE: flame/smolder were changed to flaming/smoldering
+          to be used as keys in the fire_loc['fuelbeds']['emissions'] arr
+        """
         if self._separate_smolder:
-            fire_types = ("flame", "smolder")
+            fire_types = ("flaming", "smoldering")
         else:
             fire_types = ("total",)
 
@@ -271,11 +281,11 @@ class SmokeReadyWriter(object):
           if fire_type == "total":
               ptid = '1'                 # Point ID
               skid = '1'                 # Stack ID
-          elif fire_type == "flame":
+          elif fire_type == "flaming":
               ptid = '1'                       # Point ID
               skid = '1'                       # Stack ID
               scc = scc[:-2] + "F" + scc[-1]
-          elif fire_type == "smolder":
+          elif fire_type == "smoldering":
               ptid = '2'                       # Point ID
               skid = '2'                       # Stack ID
               scc = scc[:-2] + "S" + scc[-1]
@@ -285,7 +295,9 @@ class SmokeReadyWriter(object):
           # dt = fireLoc['date_time']
 
           date = start_dt.strftime('%m/%d/%y')  # Date
+          
 
+          # PTINVRecord
           ptinv_rec = PTINVRecord()
           ptinv_rec.STID = stid
           ptinv_rec.CYID = cyid
@@ -296,24 +308,52 @@ class SmokeReadyWriter(object):
           ptinv_rec.LATC = lat
           ptinv_rec.LONC = lng
 
+          pdb.set_trace()
           ptinv_rec_str = str(ptinv_rec)
 
-          if self._write_ptinv_totals:
-            for var, vkey in [('PM2_5', 'pm25'),
+          EMISSIONS_MAPPING = [('PM2_5', 'pm2.5'),
                               ('PM10', 'pm10'),
                               ('CO', 'co'),
                               ('NH3', 'nh3'),
                               ('NOX', 'nox'),
                               ('SO2', 'so2'),
-                              ('VOC', 'voc')]:
-                if fire_loc["emissions"][vkey] is None: 
+                              ('VOC', 'voc')]
+
+          if self._write_ptinv_totals:
+            for var, vkey in EMISSIONS_MAPPING:
+              for fuelbed in fire_loc['fuelbeds']:
+                if fuelbed['emissions'][fire_type][vkey.upper()] is None:
                   continue
                 prec = PTINVPollutantRecord()
-                prec.ANN = fire_loc["emissions"].sum(vkey)
-                prec.AVD = fire_loc["emissions"].sum(vkey)
+                prec.ANN = fuelbed['emissions'][fire_type][vkey.upper()][0]
+                prec.AVD = fuelbed['emissions'][fire_type][vkey.upper()][0]
                 ptinv_rec_str += str(prec)
 
           ptinv.write(ptinv_rec_str + "\n")
+
+          if self._write_ptday_file:
+            for var, vkey in EMISSIONS_MAPPING:
+              for fuelbed in fire_loc['fuelbeds']:
+                if fuelbed['emissions'][fire_type][vkey.upper()] is None:
+                  continue
+                for day in range(num_days):
+                  dt = start_dt + timedelta(days=day)
+                  date = dt.strftime('%m/%d/%y')
+                  
+                  # PTDAYRecord
+                  ptday_rec = PTDAYRecord()
+                  ptday_rec.STID = stid
+                  ptday_rec.CYID = cyid
+                  ptday_rec.FCID = fcid
+                  ptday_rec.SKID = ptid
+                  ptday_rec.DVID = skid
+                  ptday_rec.PRID = prid
+                  ptday_rec.POLID = var
+                  ptday_rec.DATE = date
+                  ptday_rec.TZONNAM = tzonnam
+
+                  start_slice = max((24 * d) - start_hour, 0)
+                  end_slice = min((24 * (d + 1)) - start_hour, len(fireLoc["emissions"][vkey]))
 
           
 

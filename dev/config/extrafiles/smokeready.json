@@ -8,7 +8,8 @@
                 "ptday_filename": "ptday-%Y%m%d%H.ems95",
                 "pthour_filename": "pthour-%Y%m%d%H.ems95",
                 "separate_smolder": true,
-                "write_ptinv_totals": true
+                "write_ptinv_totals": true,
+                "write_ptday_file": true
             }
         }
     }
