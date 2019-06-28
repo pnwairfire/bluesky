@@ -291,9 +291,6 @@ class SmokeReadyWriter(object):
               scc = scc[:-2] + "S" + scc[-1]
           prid = ''                       # Process ID
 
-          # Does the old fireLoc['date_time'] == ['start'] ?
-          # dt = fireLoc['date_time']
-
           date = start_dt.strftime('%m/%d/%y')  # Date
           
 
@@ -308,7 +305,6 @@ class SmokeReadyWriter(object):
           ptinv_rec.LATC = lat
           ptinv_rec.LONC = lng
 
-          pdb.set_trace()
           ptinv_rec_str = str(ptinv_rec)
 
           EMISSIONS_MAPPING = [('PM2_5', 'pm2.5'),
@@ -322,59 +318,142 @@ class SmokeReadyWriter(object):
           if self._write_ptinv_totals:
             for var, vkey in EMISSIONS_MAPPING:
               for fuelbed in fire_loc['fuelbeds']:
-                if fuelbed['emissions'][fire_type][vkey.upper()] is None:
-                  continue
-                prec = PTINVPollutantRecord()
-                prec.ANN = fuelbed['emissions'][fire_type][vkey.upper()][0]
-                prec.AVD = fuelbed['emissions'][fire_type][vkey.upper()][0]
-                ptinv_rec_str += str(prec)
+                if vkey.upper() in fuelbed['emissions'][fire_type]:
+                  if fuelbed['emissions'][fire_type][vkey.upper()] is None:
+                    continue
+                  prec = PTINVPollutantRecord()
+                  prec.ANN = fuelbed['emissions'][fire_type][vkey.upper()][0]
+                  prec.AVD = fuelbed['emissions'][fire_type][vkey.upper()][0]
+                  ptinv_rec_str += str(prec)
 
           ptinv.write(ptinv_rec_str + "\n")
 
           if self._write_ptday_file:
             for var, vkey in EMISSIONS_MAPPING:
               for fuelbed in fire_loc['fuelbeds']:
-                if fuelbed['emissions'][fire_type][vkey.upper()] is None:
-                  continue
-                for day in range(num_days):
-                  dt = start_dt + timedelta(days=day)
-                  date = dt.strftime('%m/%d/%y')
-                  
-                  # PTDAYRecord
-                  ptday_rec = PTDAYRecord()
-                  ptday_rec.STID = stid
-                  ptday_rec.CYID = cyid
-                  ptday_rec.FCID = fcid
-                  ptday_rec.SKID = ptid
-                  ptday_rec.DVID = skid
-                  ptday_rec.PRID = prid
-                  ptday_rec.POLID = var
-                  ptday_rec.DATE = date
-                  ptday_rec.TZONNAM = tzonnam
+                if vkey.upper() in fuelbed['emissions'][fire_type]:
+                  if fuelbed['emissions'][fire_type][vkey.upper()] is None:
+                    continue
+                  for day in range(num_days):
+                    dt = start_dt + timedelta(days=day)
+                    date = dt.strftime('%m/%d/%y')
+                    
+                    # PTDAYRecord
+                    ptday_rec = PTDAYRecord()
+                    ptday_rec.STID = stid
+                    ptday_rec.CYID = cyid
+                    ptday_rec.FCID = fcid
+                    ptday_rec.SKID = ptid
+                    ptday_rec.DVID = skid
+                    ptday_rec.PRID = prid
+                    ptday_rec.POLID = var
+                    ptday_rec.DATE = date
+                    ptday_rec.TZONNAM = tzonnam
 
-                  start_slice = max((24 * d) - start_hour, 0)
-                  end_slice = min((24 * (d + 1)) - start_hour, len(fireLoc["emissions"][vkey]))
+                    start_slice = max((24 * day) - start_hour, 0)
+                    end_slice = min((24 * (day + 1)) - start_hour, len(fuelbed['emissions'][fire_type][vkey.upper()]))
 
-          
+                    
+                    if fire_type == "flaming":
+                      if isinstance(fuelbed['emissions'][fire_type][vkey.upper()], tuple):
+                          daytot = fuelbed['emissions'][fire_type][vkey.upper()][0]
+                      else:
+                          daytot = sum(tup for tup in fuelbed['emissions'][fire_type][vkey.upper()][start_slice:end_slice])
+                    elif fire_type == "smoldering":
+                      if isinstance(fuelbed['emissions'][fire_type][vkey.upper()], tuple):
+                          daytot = fuelbed['emissions'][fire_type][vkey.upper()][1] + fuelbed['emissions'][fire_type][vkey.upper()][2]
+                      else:
+                          # comment for Yufei
+                          # why are we including residual here?
+                          pdb.set_trace()
+                          smoldering = sum(fuelbed['emissions'][fire_type][vkey.upper()][start_slice:end_slice])
+                          residual = sum(fuelbed['emissions']['residual'][vkey.upper()][start_slice:end_slice])
+                          daytot = smoldering + residual
+                        
+                    else:
+                      if isinstance(fuelbed['emissions'][fire_type][vkey.upper()], tuple):
+                          daytot = sum(fuelbed['emissions'][fire_type][vkey.upper()])
+                      else:
+                          daytot = sum(sum(fuelbed['emissions'][fire_type][vkey.upper()][start_slice:end_slice]))
 
-  def _write_ptinv_file(self):
-    ptinv = open(self._ptinv_pathname, 'w')
-    ptinv.write("#IDA\n#PTINV\n#COUNTRY %s\n" % country_process_list[0])
-    ptinv.write("#YEAR %d\n" % self.filedt.year)
-    ptinv.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
-    ptinv.write("#DATA PM2_5 PM10 CO NH3 NOX SO2 VOC\n")
+                    ptday_rec.DAYTOT = daytot                # Daily total
+                    ptday_rec.SCC = scc                      # Source Classification Code
+                    ptday.write(str(ptday_rec))
 
-  def _write_ptday_file(self):
-    ptday = open(self._ptday_pathname, 'w')
-    ptday.write("#EMS-95\n#PTDAY\n#COUNTRY %s\n" % country_process_list[0])
-    ptday.write("#YEAR %d\n" % self.filedt.year)
-    ptday.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
+          PTHOUR_MAPPING = [('PTOP', "percentile_100"),
+                            ('PBOT', "percentile_000"),
+                            ('LAY1F', "smoldering_fraction"),
+                            ('PM2_5', 'pm2.5'),
+                            ('PM10', 'pm10'),
+                            ('CO', 'co'),
+                            ('NH3', 'nh3'),
+                            ('NOX', 'nox'),
+                            ('SO2', 'so2'),
+                            ('VOC', 'voc')]
 
-  def _write_pthour_file(self):
-    pthour = open(self._pthour_pathname, 'w')
-    pthour.write("#EMS-95\n#PTHOUR\n#COUNTRY %s\n" % country_process_list[0])
-    pthour.write("#YEAR %d\n" % self.filedt.year)
-    pthour.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
+          # for var, vkey in PTHOUR_MAPPING:
+          #   if var in ('PTOP', 'PBOT', 'LAY1F'):
+          #     pdb.set_trace()
+          #     if fire_loc["plumerise"] is None: 
+          #       continue
+          #   else:
+          #     if vkey.upper() in fuelbed['emissions'][fire_type]:
+          #       if fire_loc["emissions"][vkey.upper()] is None: 
+          #         continue
+          #   for day in range(num_days):
+          #       dt = start_dt + timedelta(days=day)
+          #       date = dt.strftime('%m/%d/%y')  # Date
+
+          #       pthour_rec = PTHOURRecord()
+          #       pthour_rec.STID = stid
+          #       pthour_rec.CYID = cyid
+          #       pthour_rec.FCID = fcid
+          #       pthour_rec.SKID = ptid
+          #       pthour_rec.DVID = skid
+          #       pthour_rec.PRID = prid
+          #       pthour_rec.POLID = var
+          #       pthour_rec.DATE = date
+          #       pthour_rec.TZONNAM = tzonnam
+          #       pthour_rec.SCC = scc
+
+                # daytot = 0.0
+                # for hour in range(24):
+                #   h = (d * 24) + hour - start_hour
+                #   if h < 0:
+                #     setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
+                #     continue
+                #   try:
+                #     if var in ('PTOP', 'PBOT', 'LAY1F'):
+                #       if fire_type == "flaming":
+                #         if var == 'LAY1F':
+                #           value = 0.0001
+                #         else:
+                #           value = fire_loc.plume_rise.hours[h][vkey]
+                #       elif fire_type == "smoldering":
+                #         value = {'LAY1F': 1.0, 'PTOP': 0.0, 'PBOT': 0.0}[var]
+                #       else:
+                #         value = fire_loc.plume_rise.hours[h][vkey]
+                #     else:
+                #       if fire_type == "flaming":
+                #         value = fire_loc["emissions"][vkey][h].flame
+                #       elif fire_type == "smoldering":
+                #         value = (fire_loc["emissions"][vkey][h].smold
+                #                 + fire_loc["emissions"][vkey][h].resid)
+                #       else:
+                #         value = fire_loc["emissions"][vkey][h].sum()
+                #       daytot += value
+                #     setattr(pthour_rec, 'HRVAL' + str(hour+1), value)
+                #   except IndexError:
+                #           #self.log.debug("IndexError on hour %d for fire %s" % (h, fire_loc["id"]))
+                #           setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
+
+                #   if var not in ('PTOP', 'PBOT', 'LAY1F'):
+                #       pthour_rec.DAYTOT = daytot
+                  # pthour.write(str(pthour_rec))
+    ptinv.close()
+    if self._write_ptday_file:
+      ptday.close()
+    pthour.close()
 
   def _get_state_county_fips(self, lat, lng):
     fips = locationutils.Fips(lat, lng)
