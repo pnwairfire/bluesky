@@ -66,3 +66,6 @@
 
 ## 4.1.4
  - Support specifying target WebSky version summary.json
+
+## 4.1.5
+ - Support all 3.*.* fire spider versions
