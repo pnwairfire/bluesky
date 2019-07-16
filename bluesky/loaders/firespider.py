@@ -86,10 +86,10 @@ class BaseFireSpiderLoader(object, metaclass=abc.ABCMeta):
     def _marshal(self, data):
         # TODO: support config setting 'skip_failures'
         # v2 didn't initially have version specified in the output data
-        if not data.get('version') or data['version'] == "2.0.0":
+        if not data.get('version') or data['version'].startswith("2."):
             func = Blueskyv4_0To4_1().marshal
 
-        elif data['version'] == "3.0.0":
+        elif data['version'].startswith("3."):
             # Nothing needs be done; just return fires
             func = lambda fires: [Fire(f) for f in fires]
 
