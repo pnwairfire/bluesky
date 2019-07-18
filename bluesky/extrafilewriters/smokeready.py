@@ -1,8 +1,7 @@
 """bluesky.extrafilewriters.SMOKEready
 
-Writes smokeready files in the form:
-
-    ¯\\_(ツ)_//¯
+Writes SMOKE files directly from the BSP. Documentation for file
+formats provided by the CMAS center at https://www.cmascenter.org/smoke/documentation/3.5/html/ch08s02.html.
 
 """
 import pdb
@@ -214,7 +213,7 @@ class SmokeReadyWriter(object):
     ptinv.write("#IDA\n#PTINV\n#COUNTRY %s\n" % country_process_list[0])
     ptinv.write("#YEAR %d\n" % self.filedt.year)
     ptinv.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
-    ptinv.write("#DATA PM2_5 PM10 CO NH3 NOX SO2 VOC\n")
+    ptinv.write("#DATA PM2_5 PM10 CO NH3 NOX SO2 VOC PTOP PBOT LAY1F\n")
 
     ptday.write("#EMS-95\n#PTDAY\n#COUNTRY %s\n" % country_process_list[0])
     ptday.write("#YEAR %d\n" % self.filedt.year)
@@ -260,6 +259,13 @@ class SmokeReadyWriter(object):
         num_days = num_hours // 24
         if num_hours % 24 > 0: num_days += 1
         fcid = self._generate_fcid(start_dt, num_hours, lat, lng)
+
+        """
+        NOTE: In the old BSF runs, timezone was never
+        operational, and defaulted to EST in every output I reviewed. 
+        Per https://www.cmascenter.org/smoke/documentation/2.7/html/ch02s09s14.html,
+        the timezone field is only used if timezone cannot be determined through FIPS code.
+        """
         tzonnam = self._set_timezone_name(lat, lng, start_dt)
 
         
@@ -391,65 +397,65 @@ class SmokeReadyWriter(object):
                             ('SO2', 'so2'),
                             ('VOC', 'voc')]
 
-          # for var, vkey in PTHOUR_MAPPING:
-          #   if var in ('PTOP', 'PBOT', 'LAY1F'):
-          #     pdb.set_trace()
-          #     if fire_loc["plumerise"] is None: 
-          #       continue
-          #   else:
-          #     if vkey.upper() in fuelbed['emissions'][fire_type]:
-          #       if fire_loc["emissions"][vkey.upper()] is None: 
-          #         continue
-          #   for day in range(num_days):
-          #       dt = start_dt + timedelta(days=day)
-          #       date = dt.strftime('%m/%d/%y')  # Date
+          for var, vkey in PTHOUR_MAPPING:
+            if var in ('PTOP', 'PBOT', 'LAY1F'):
+              pdb.set_trace()
+              if fire_loc["plumerise"] is None: 
+                continue
+            else:
+              if vkey.upper() in fuelbed['emissions'][fire_type]:
+                if fire_loc["emissions"][vkey.upper()] is None: 
+                  continue
+            for day in range(num_days):
+                dt = start_dt + timedelta(days=day)
+                date = dt.strftime('%m/%d/%y')  # Date
 
-          #       pthour_rec = PTHOURRecord()
-          #       pthour_rec.STID = stid
-          #       pthour_rec.CYID = cyid
-          #       pthour_rec.FCID = fcid
-          #       pthour_rec.SKID = ptid
-          #       pthour_rec.DVID = skid
-          #       pthour_rec.PRID = prid
-          #       pthour_rec.POLID = var
-          #       pthour_rec.DATE = date
-          #       pthour_rec.TZONNAM = tzonnam
-          #       pthour_rec.SCC = scc
+                pthour_rec = PTHOURRecord()
+                pthour_rec.STID = stid
+                pthour_rec.CYID = cyid
+                pthour_rec.FCID = fcid
+                pthour_rec.SKID = ptid
+                pthour_rec.DVID = skid
+                pthour_rec.PRID = prid
+                pthour_rec.POLID = var
+                pthour_rec.DATE = date
+                pthour_rec.TZONNAM = tzonnam
+                pthour_rec.SCC = scc
 
-                # daytot = 0.0
-                # for hour in range(24):
-                #   h = (d * 24) + hour - start_hour
-                #   if h < 0:
-                #     setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
-                #     continue
-                #   try:
-                #     if var in ('PTOP', 'PBOT', 'LAY1F'):
-                #       if fire_type == "flaming":
-                #         if var == 'LAY1F':
-                #           value = 0.0001
-                #         else:
-                #           value = fire_loc.plume_rise.hours[h][vkey]
-                #       elif fire_type == "smoldering":
-                #         value = {'LAY1F': 1.0, 'PTOP': 0.0, 'PBOT': 0.0}[var]
-                #       else:
-                #         value = fire_loc.plume_rise.hours[h][vkey]
-                #     else:
-                #       if fire_type == "flaming":
-                #         value = fire_loc["emissions"][vkey][h].flame
-                #       elif fire_type == "smoldering":
-                #         value = (fire_loc["emissions"][vkey][h].smold
-                #                 + fire_loc["emissions"][vkey][h].resid)
-                #       else:
-                #         value = fire_loc["emissions"][vkey][h].sum()
-                #       daytot += value
-                #     setattr(pthour_rec, 'HRVAL' + str(hour+1), value)
-                #   except IndexError:
-                #           #self.log.debug("IndexError on hour %d for fire %s" % (h, fire_loc["id"]))
-                #           setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
+                daytot = 0.0
+                for hour in range(24):
+                  h = (d * 24) + hour - start_hour
+                  if h < 0:
+                    setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
+                    continue
+                  try:
+                    if var in ('PTOP', 'PBOT', 'LAY1F'):
+                      if fire_type == "flaming":
+                        if var == 'LAY1F':
+                          value = 0.0001
+                        else:
+                          value = fire_loc.plume_rise.hours[h][vkey]
+                      elif fire_type == "smoldering":
+                        value = {'LAY1F': 1.0, 'PTOP': 0.0, 'PBOT': 0.0}[var]
+                      else:
+                        value = fire_loc.plume_rise.hours[h][vkey]
+                    else:
+                      if fire_type == "flaming":
+                        value = fire_loc["emissions"][vkey][h].flame
+                      elif fire_type == "smoldering":
+                        value = (fire_loc["emissions"][vkey][h].smold
+                                + fire_loc["emissions"][vkey][h].resid)
+                      else:
+                        value = fire_loc["emissions"][vkey][h].sum()
+                      daytot += value
+                    setattr(pthour_rec, 'HRVAL' + str(hour+1), value)
+                  except IndexError:
+                          #self.log.debug("IndexError on hour %d for fire %s" % (h, fire_loc["id"]))
+                          setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
 
-                #   if var not in ('PTOP', 'PBOT', 'LAY1F'):
-                #       pthour_rec.DAYTOT = daytot
-                  # pthour.write(str(pthour_rec))
+                  if var not in ('PTOP', 'PBOT', 'LAY1F'):
+                      pthour_rec.DAYTOT = daytot
+                  pthour.write(str(pthour_rec))
     ptinv.close()
     if self._write_ptday_file:
       ptday.close()
