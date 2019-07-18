@@ -69,3 +69,6 @@
 
 ## 4.1.5
  - Support all 3.*.* fire spider versions
+
+## 4.1.6
+ - Upgrade eflookup to v3.1.2 to get updated Prichard-Oneill emissions factors
