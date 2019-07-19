@@ -278,20 +278,20 @@ class SmokeReadyWriter(object):
           to be used as keys in the fire_loc['fuelbeds']['emissions'] arr
         """
         if self._separate_smolder:
-            fire_types = ("flaming", "smoldering")
+            fire_phases = ("flaming", "smoldering")
         else:
-            fire_types = ("total",)
+            fire_phases = ("total",)
 
-        # iterate through fire_types
-        for fire_type in fire_types:
-          if fire_type == "total":
+        # iterate through fire_phases
+        for fire_phase in fire_phases:
+          if fire_phase == "total":
               ptid = '1'                 # Point ID
               skid = '1'                 # Stack ID
-          elif fire_type == "flaming":
+          elif fire_phase == "flaming":
               ptid = '1'                       # Point ID
               skid = '1'                       # Stack ID
               scc = scc[:-2] + "F" + scc[-1]
-          elif fire_type == "smoldering":
+          elif fire_phase == "smoldering":
               ptid = '2'                       # Point ID
               skid = '2'                       # Stack ID
               scc = scc[:-2] + "S" + scc[-1]
@@ -324,12 +324,12 @@ class SmokeReadyWriter(object):
           if self._write_ptinv_totals:
             for var, vkey in EMISSIONS_MAPPING:
               for fuelbed in fire_loc['fuelbeds']:
-                if vkey.upper() in fuelbed['emissions'][fire_type]:
-                  if fuelbed['emissions'][fire_type][vkey.upper()] is None:
+                if vkey.upper() in fuelbed['emissions'][fire_phase]:
+                  if fuelbed['emissions'][fire_phase][vkey.upper()] is None:
                     continue
                   prec = PTINVPollutantRecord()
-                  prec.ANN = fuelbed['emissions'][fire_type][vkey.upper()][0]
-                  prec.AVD = fuelbed['emissions'][fire_type][vkey.upper()][0]
+                  prec.ANN = fuelbed['emissions'][fire_phase][vkey.upper()][0]
+                  prec.AVD = fuelbed['emissions'][fire_phase][vkey.upper()][0]
                   ptinv_rec_str += str(prec)
 
           ptinv.write(ptinv_rec_str + "\n")
@@ -337,8 +337,8 @@ class SmokeReadyWriter(object):
           if self._write_ptday_file:
             for var, vkey in EMISSIONS_MAPPING:
               for fuelbed in fire_loc['fuelbeds']:
-                if vkey.upper() in fuelbed['emissions'][fire_type]:
-                  if fuelbed['emissions'][fire_type][vkey.upper()] is None:
+                if vkey.upper() in fuelbed['emissions'][fire_phase]:
+                  if fuelbed['emissions'][fire_phase][vkey.upper()] is None:
                     continue
                   for day in range(num_days):
                     dt = start_dt + timedelta(days=day)
@@ -357,30 +357,30 @@ class SmokeReadyWriter(object):
                     ptday_rec.TZONNAM = tzonnam
 
                     start_slice = max((24 * day) - start_hour, 0)
-                    end_slice = min((24 * (day + 1)) - start_hour, len(fuelbed['emissions'][fire_type][vkey.upper()]))
+                    end_slice = min((24 * (day + 1)) - start_hour, len(fuelbed['emissions'][fire_phase][vkey.upper()]))
 
                     
-                    if fire_type == "flaming":
-                      if isinstance(fuelbed['emissions'][fire_type][vkey.upper()], tuple):
-                          daytot = fuelbed['emissions'][fire_type][vkey.upper()][0]
+                    if fire_phase == "flaming":
+                      if isinstance(fuelbed['emissions'][fire_phase][vkey.upper()], tuple):
+                          daytot = fuelbed['emissions'][fire_phase][vkey.upper()][0]
                       else:
-                          daytot = sum(tup for tup in fuelbed['emissions'][fire_type][vkey.upper()][start_slice:end_slice])
-                    elif fire_type == "smoldering":
-                      if isinstance(fuelbed['emissions'][fire_type][vkey.upper()], tuple):
-                          daytot = fuelbed['emissions'][fire_type][vkey.upper()][1] + fuelbed['emissions'][fire_type][vkey.upper()][2]
+                          daytot = sum(tup for tup in fuelbed['emissions'][fire_phase][vkey.upper()][start_slice:end_slice])
+                    elif fire_phase == "smoldering":
+                      if isinstance(fuelbed['emissions'][fire_phase][vkey.upper()], tuple):
+                          daytot = fuelbed['emissions'][fire_phase][vkey.upper()][1] + fuelbed['emissions'][fire_phase][vkey.upper()][2]
                       else:
                           # comment for Yufei
                           # why are we including residual here?
                           pdb.set_trace()
-                          smoldering = sum(fuelbed['emissions'][fire_type][vkey.upper()][start_slice:end_slice])
+                          smoldering = sum(fuelbed['emissions'][fire_phase][vkey.upper()][start_slice:end_slice])
                           residual = sum(fuelbed['emissions']['residual'][vkey.upper()][start_slice:end_slice])
                           daytot = smoldering + residual
                         
                     else:
-                      if isinstance(fuelbed['emissions'][fire_type][vkey.upper()], tuple):
-                          daytot = sum(fuelbed['emissions'][fire_type][vkey.upper()])
+                      if isinstance(fuelbed['emissions'][fire_phase][vkey.upper()], tuple):
+                          daytot = sum(fuelbed['emissions'][fire_phase][vkey.upper()])
                       else:
-                          daytot = sum(sum(fuelbed['emissions'][fire_type][vkey.upper()][start_slice:end_slice]))
+                          daytot = sum(sum(fuelbed['emissions'][fire_phase][vkey.upper()][start_slice:end_slice]))
 
                     ptday_rec.DAYTOT = daytot                # Daily total
                     ptday_rec.SCC = scc                      # Source Classification Code
@@ -403,7 +403,7 @@ class SmokeReadyWriter(object):
               if fire_loc["plumerise"] is None: 
                 continue
             else:
-              if vkey.upper() in fuelbed['emissions'][fire_type]:
+              if vkey.upper() in fuelbed['emissions'].keys():
                 if fire_loc["emissions"][vkey.upper()] is None: 
                   continue
             for day in range(num_days):
@@ -429,24 +429,27 @@ class SmokeReadyWriter(object):
                     setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
                     continue
                   try:
+                    ordered_hours = sorted(fire_loc['plumerise'].keys())
+
                     if var in ('PTOP', 'PBOT', 'LAY1F'):
-                      if fire_type == "flaming":
+                      if fire_phase == "flaming":
                         if var == 'LAY1F':
                           value = 0.0001
                         else:
-                          value = fire_loc.plume_rise.hours[h][vkey]
-                      elif fire_type == "smoldering":
+                          value = fire_loc['plume_rise'].hours[h][vkey]
+                          value = fire_loc['timeprofile'][ordered_hours[2]][fire_phase]
+                      elif fire_phase == "smoldering":
                         value = {'LAY1F': 1.0, 'PTOP': 0.0, 'PBOT': 0.0}[var]
                       else:
-                        value = fire_loc.plume_rise.hours[h][vkey]
+                        value = fire_loc['plume_rise'].hours[h][vkey]
                     else:
-                      if fire_type == "flaming":
-                        value = fire_loc["emissions"][vkey][h].flame
-                      elif fire_type == "smoldering":
-                        value = (fire_loc["emissions"][vkey][h].smold
-                                + fire_loc["emissions"][vkey][h].resid)
+                      if fire_phase == "flaming":
+                        value = (fire_loc['timeprofile'][ordered_hours[h]][fire_phase] * fire_loc['emissions']['summary'][vkey])
+                      elif fire_phase == "smoldering":
+                        value = ((fire_loc['timeprofile'][ordered_hours[h]][fire_phase] * fire_loc['emissions']['summary'][vkey])
+                                + (fire_loc['timeprofile'][ordered_hours[h]][residual] * fire_loc['emissions']['summary'][vkey]))
                       else:
-                        value = fire_loc["emissions"][vkey][h].sum()
+                        value = (fire_loc['timeprofile'][ordered_hours[h]]['total'] * fire_loc['emissions']['summary'][vkey])
                       daytot += value
                     setattr(pthour_rec, 'HRVAL' + str(hour+1), value)
                   except IndexError:
