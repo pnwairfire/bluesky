@@ -4,7 +4,6 @@ Writes SMOKE files directly from the BSP. Documentation for file
 formats provided by the CMAS center at https://www.cmascenter.org/smoke/documentation/3.5/html/ch08s02.html.
 
 """
-import pdb
 import os
 import logging
 from datetime import timedelta, datetime
@@ -371,7 +370,6 @@ class SmokeReadyWriter(object):
                       else:
                           # comment for Yufei
                           # why are we including residual here?
-                          pdb.set_trace()
                           smoldering = sum(fuelbed['emissions'][fire_phase][vkey.upper()][start_slice:end_slice])
                           residual = sum(fuelbed['emissions']['residual'][vkey.upper()][start_slice:end_slice])
                           daytot = smoldering + residual
@@ -398,14 +396,16 @@ class SmokeReadyWriter(object):
                             ('VOC', 'voc')]
 
           for var, vkey in PTHOUR_MAPPING:
+            species_key = vkey.upper()
+
             if var in ('PTOP', 'PBOT', 'LAY1F'):
-              pdb.set_trace()
-              if fire_loc["plumerise"] is None: 
-                continue
+              if fire_loc["plumerise"] is None: continue
             else:
-              if vkey.upper() in fuelbed['emissions'].keys():
-                if fire_loc["emissions"][vkey.upper()] is None: 
-                  continue
+              if species_key not in fuelbed['emissions']['total'].keys(): continue
+
+            # collect sorted hour list
+            ordered_hours = sorted(fire_loc['plumerise'].keys())
+            
             for day in range(num_days):
                 dt = start_dt + timedelta(days=day)
                 date = dt.strftime('%m/%d/%y')  # Date
@@ -429,27 +429,39 @@ class SmokeReadyWriter(object):
                     setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
                     continue
                   try:
-                    ordered_hours = sorted(fire_loc['plumerise'].keys())
+                    plumerise_hour = fire_loc['plumerise'][ordered_hours[h]]
+                    timeprofile_hour = fire_loc['timeprofile'][ordered_hours[h]]
+                    emissions_summary = fire_loc['emissions']['summary']
 
                     if var in ('PTOP', 'PBOT', 'LAY1F'):
                       if fire_phase == "flaming":
                         if var == 'LAY1F':
                           value = 0.0001
+                        elif var == 'PTOP':
+                          value = plumerise_hour['heights'][-1]
+                        elif var == 'PBOT':
+                          value = plumerise_hour['heights'][0]
                         else:
-                          value = fire_loc['plumerise'].hours[h][vkey]
-                          value = fire_loc['timeprofile'][ordered_hours[2]][fire_phase]
+                          value = None
                       elif fire_phase == "smoldering":
                         value = {'LAY1F': 1.0, 'PTOP': 0.0, 'PBOT': 0.0}[var]
                       else:
-                        value = fire_loc['plumerise'].hours[h][vkey]
+                        if var == 'LAY1F':
+                          value = plumerise_hour['smoldering_fraction']
+                        elif var == 'PTOP':
+                          value = plumerise_hour['heights'][-1]
+                        elif var == 'PBOT':
+                          value = plumerise_hour['heights'][0]
+                        else:
+                          value == None
                     else:
                       if fire_phase == "flaming":
-                        value = (fire_loc['timeprofile'][ordered_hours[h]][fire_phase] * fire_loc['emissions']['summary'][vkey])
+                        value = (timeprofile_hour[fire_phase] * emissions_summary[species_key])
                       elif fire_phase == "smoldering":
-                        value = ((fire_loc['timeprofile'][ordered_hours[h]][fire_phase] * fire_loc['emissions']['summary'][vkey])
-                                + (fire_loc['timeprofile'][ordered_hours[h]][residual] * fire_loc['emissions']['summary'][vkey]))
+                        value = ((timeprofile_hour[fire_phase] * emissions_summary[species_key])
+                                + (timeprofile_hour['residual'] * emissions_summary[species_key]))
                       else:
-                        value = (fire_loc['timeprofile'][ordered_hours[h]]['total'] * fire_loc['emissions']['summary'][vkey])
+                        value = (timeprofile_hour['total'] * emissions_summary[species_key])
                       daytot += value
                     setattr(pthour_rec, 'HRVAL' + str(hour+1), value)
                   except IndexError:
@@ -457,7 +469,7 @@ class SmokeReadyWriter(object):
                           setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
 
                   if var not in ('PTOP', 'PBOT', 'LAY1F'):
-                      pthour_rec.DAYTOT = daytot
+                    pthour_rec.DAYTOT = daytot
                   pthour.write(str(pthour_rec))
     ptinv.close()
     if self._write_ptday_file:

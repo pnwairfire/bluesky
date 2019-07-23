@@ -11,7 +11,6 @@ import geopandas as gpd
 import requests
 import json
 
-
 INVALID_LOCATION_DATA = ("Invalid location data required for"
     " determining single, representative lat/lng")
 MISSING_LOCATION_INFO = ("Missing location information for"
