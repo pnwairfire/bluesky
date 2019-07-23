@@ -258,7 +258,7 @@ class SmokeReadyWriter(object):
         num_hours = len(fire_loc['timeprofile'].keys())
         num_days = num_hours // 24
         if num_hours % 24 > 0: num_days += 1
-        fcid = self._generate_fcid(start_dt, num_hours, lat, lng)
+        fcid = self._generate_fcid(fire_info, num_hours, lat, lng)
 
         """
         NOTE: In the old BSF runs, timezone was never
@@ -424,7 +424,7 @@ class SmokeReadyWriter(object):
 
                 daytot = 0.0
                 for hour in range(24):
-                  h = (d * 24) + hour - start_hour
+                  h = (day * 24) + hour - start_hour
                   if h < 0:
                     setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
                     continue
@@ -436,12 +436,12 @@ class SmokeReadyWriter(object):
                         if var == 'LAY1F':
                           value = 0.0001
                         else:
-                          value = fire_loc['plume_rise'].hours[h][vkey]
+                          value = fire_loc['plumerise'].hours[h][vkey]
                           value = fire_loc['timeprofile'][ordered_hours[2]][fire_phase]
                       elif fire_phase == "smoldering":
                         value = {'LAY1F': 1.0, 'PTOP': 0.0, 'PBOT': 0.0}[var]
                       else:
-                        value = fire_loc['plume_rise'].hours[h][vkey]
+                        value = fire_loc['plumerise'].hours[h][vkey]
                     else:
                       if fire_phase == "flaming":
                         value = (fire_loc['timeprofile'][ordered_hours[h]][fire_phase] * fire_loc['emissions']['summary'][vkey])
@@ -488,12 +488,11 @@ class SmokeReadyWriter(object):
 
   # confirm this is necessary to be like in BSF. Couldnt understand where id was
   # being set. not sure it corresponds to something we need
-  def _generate_fcid(self, start_dt, num_hours, lat, lng):
-    dt_str = start_dt.strftime('%Y%m%d_')
+  def _generate_fcid(self, fire_info, num_hours, lat, lng):
+    # Returns the fire_info id, lat/lng, and num of hours burning
     lat_str = str(lat).replace('.', '')
     lng_str = str(lng).replace('.', '')
-
-    return dt_str + str(num_hours) + lat_str + lng_str
+    return fire_info.id + lat_str + lng_str + str(num_hours)
 
   def _set_timezone_name(self, lat, lng, start_dt):
     VALID_TIMEZONES = ['GMT','ADT','AST','EDT','EST','CDT','CST','MDT','MST','PDT','PST','AKDT', 'AKST']

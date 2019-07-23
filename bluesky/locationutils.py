@@ -140,12 +140,15 @@ class Fips(object):
     def _get_fips(self):
         # try API and fallback to Shapefile
         url = "https://geo.fcc.gov/api/census/block/find?latitude={}&longitude={}&format=json".format(self.lat, self.lng)
-        r = requests.get(url)
-
-        if r.status_code == 200:
-            data = json.loads(r.content.decode())
-            self._process_api_data(data)
-        else:
+        
+        try:
+            r = requests.get(url)
+            if r.status_code == 200:
+                data = json.loads(r.content.decode())
+                self._process_api_data(data)
+            else:
+                self._get_shp_data()
+        except:
             self._get_shp_data()
 
     def _process_api_data(self, data):
