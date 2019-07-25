@@ -81,17 +81,12 @@
             "species": ["PM2.5", "PM10", "CO", "CO2"]
         },
         "findmetdata": {
-            "met_root_dir": "/data/Met/PNW/4km/ARL/",
-            "wait": {
-                "strategy": "fixed",
-                "time": 1800,
-                "max_attempts": 6
-            }
+            "met_root_dir": "/data/Met/PNW/4km/ARL/"
         },
         "plumerise": {
             "model":"feps",
             "feps": {
-                "working_dir": "./output/{today:%Y%m%d}00"
+                "working_dir": "./output/plumerise{today:%Y%m%d}00"
             }
         },
         "localmet":{
@@ -100,8 +95,8 @@
             "start": "{today:%Y-%m-%d}T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
-            "output_dir": "./output/{today:%Y%m%d}00",
-            "working_dir": "./output/{today:%Y%m%d}00",
+            "output_dir": "./output/dispersiono_{today:%Y%m%d}00",
+            "working_dir": "./output/dispersionw_{today:%Y%m%d}00",
             "hysplit": {
                 "grid": {
                     "spacing": 4,
@@ -114,7 +109,7 @@
                 "NUMPAR": 3000,
                 "MAXPAR": 10000000,
                 "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
-                "VERTICAL_LEVELS": [100, 10000],
+                "VERTICAL_LEVELS": [100],
                 "INITD": 0,
                 "DELT": -3,
                 "KHMAX": 48,
@@ -141,7 +136,7 @@
                 "data_dir": "data/",
                 "blueskykml_config": {
                     "DispersionGridInput": {
-                        "LAYERS": [0, 1]
+                        "LAYERS": [0]
                     },
                     "DispersionImages": {
                         "DAILY_IMAGES_UTC_OFFSETS": [-11,-10,-9,-8,-7,-6,-5,-4, 0],
@@ -164,7 +159,7 @@
             }
         },
         "extrafiles":{
-            "dest_dir": "./output/{today:%Y%m%d}00/data",
+            "dest_dir": "./output/extrafiles_{today:%Y%m%d}00/data",
             "sets": ["firescsvs", "emissionscsv", "smokeready"],
             "firescsvs": {
                 "fire_locations_filename": "fire_locations.csv",
