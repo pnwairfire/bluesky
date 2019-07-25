@@ -95,8 +95,8 @@
             "start": "{today:%Y-%m-%d}T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
-            "output_dir": "./output/dispersiono_{today:%Y%m%d}00",
-            "working_dir": "./output/dispersionw_{today:%Y%m%d}00",
+            "output_dir": "./output/disp_out_{today:%Y%m%d}00",
+            "working_dir": "./output/disp_work_{today:%Y%m%d}00",
             "hysplit": {
                 "grid": {
                     "spacing": 4,
