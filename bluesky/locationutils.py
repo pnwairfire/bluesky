@@ -110,10 +110,14 @@ class Fips(object):
 
     def __init__(self, lat, lng):
         if type(lat) is not float or type(lng) is not float:
-            raise ValueError(INVALID_LAT_LNG_DATA)
+            try:
+                lat = float(lat)
+                lng = float(lng)
+            except:
+                raise ValueError(INVALID_LAT_LNG_DATA)
 
-        self.lat = lat
-        self.lng = lng
+        self.lat = float(lat)
+        self.lng = float(lng)
         self._get_fips()
 
     @property

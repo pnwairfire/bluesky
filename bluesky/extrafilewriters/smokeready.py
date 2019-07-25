@@ -12,6 +12,7 @@ from afdatetime import parsing as datetime_parsing, timezones
 import numpy as np
 from bluesky.config import Config
 from bluesky import locationutils
+import pdb
 
 class ColumnSpecificRecord(object):
     columndefs = []
@@ -225,29 +226,36 @@ class SmokeReadyWriter(object):
     num_of_fires = 0
     skip_no_emiss = 0
     skip_no_plume = 0
-    skip_no_country = 0
+    skip_no_timeprofile = 0
     total_skipped = 0
 
     for fire_info in fires_info:
       for fire_loc in fire_info.locations:
 
-        if fire_loc["emissions"] is None:
+        if "emissions" not in fire_loc.keys():
           skip_no_emiss += 1
           total_skipped += 1
           continue
 
-        if fire_loc["plumerise"] is None:
+        if "plumerise" not in fire_loc.keys():
           skip_no_plume += 1
           total_skipped += 1
           continue
 
-        if fire_loc['country'] not in country_process_list:
-          skip_no_country += 1
-          total_skipped += 1
+        if "timeprofile" not in fire_loc.keys():
+          skip_no_timeprofile += 1
+          total_skipped +=1
           continue
 
         lat, lng = fire_loc["lat"], fire_loc["lng"]
-        cyid, stid = self._get_state_county_fips(lat, lng)
+
+        # try to get CYID/STID, but skip record if lat/lng invalid
+        try:
+          cyid, stid = self._get_state_county_fips(lat, lng)
+        except ValueError:
+          print("Invalid Lat:%s and/or Invalid Lng:%s" % (lat, lng))
+          continue
+
         scc = self._map_scc(fire_info.type)
         start_dt =  datetime_parsing.parse(fire_loc['start'])
         start_hour = start_dt.hour
