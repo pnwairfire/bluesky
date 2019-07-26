@@ -8,11 +8,9 @@ import os
 import logging
 from datetime import timedelta, datetime
 from afdatetime import parsing as datetime_parsing, timezones
-
 import numpy as np
 from bluesky.config import Config
 from bluesky import locationutils
-import pdb
 
 class ColumnSpecificRecord(object):
     columndefs = []
@@ -226,12 +224,10 @@ class SmokeReadyWriter(object):
     num_of_fires = 0
     skip_no_emiss = 0
     skip_no_plume = 0
-    skip_no_timeprofile = 0
     total_skipped = 0
 
     for fire_info in fires_info:
       for fire_loc in fire_info.locations:
-
         if "emissions" not in fire_loc.keys():
           skip_no_emiss += 1
           total_skipped += 1
@@ -240,11 +236,6 @@ class SmokeReadyWriter(object):
         if "plumerise" not in fire_loc.keys():
           skip_no_plume += 1
           total_skipped += 1
-          continue
-
-        if "timeprofile" not in fire_loc.keys():
-          skip_no_timeprofile += 1
-          total_skipped +=1
           continue
 
         lat, lng = fire_loc["lat"], fire_loc["lng"]
@@ -329,6 +320,7 @@ class SmokeReadyWriter(object):
                               ('VOC', 'voc')]
 
           if self._write_ptinv_totals:
+            logging.debug('Writing SmokeReady PTINV File to %s', self._ptinv_pathname)
             for var, vkey in EMISSIONS_MAPPING:
               for fuelbed in fire_loc['fuelbeds']:
                 if vkey.upper() in fuelbed['emissions'][fire_phase]:
@@ -342,6 +334,7 @@ class SmokeReadyWriter(object):
           ptinv.write(ptinv_rec_str + "\n")
 
           if self._write_ptday_file:
+            logging.debug('Writing SmokeReady PTHOUR File to %s', self._ptday_pathname)
             for var, vkey in EMISSIONS_MAPPING:
               for fuelbed in fire_loc['fuelbeds']:
                 if vkey.upper() in fuelbed['emissions'][fire_phase]:
@@ -403,6 +396,8 @@ class SmokeReadyWriter(object):
                             ('SO2', 'so2'),
                             ('VOC', 'voc')]
 
+
+          logging.debug('Writing SmokeReady PTHOUR File to %s', self._pthour_pathname)
           for var, vkey in PTHOUR_MAPPING:
             species_key = vkey.upper()
 
@@ -476,9 +471,9 @@ class SmokeReadyWriter(object):
                           #self.log.debug("IndexError on hour %d for fire %s" % (h, fire_loc["id"]))
                           setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
 
-                  if var not in ('PTOP', 'PBOT', 'LAY1F'):
-                    pthour_rec.DAYTOT = daytot
-                  pthour.write(str(pthour_rec))
+                if var not in ('PTOP', 'PBOT', 'LAY1F'):
+                  pthour_rec.DAYTOT = daytot
+                pthour.write(str(pthour_rec))
     ptinv.close()
     if self._write_ptday_file:
       ptday.close()
