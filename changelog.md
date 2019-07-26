@@ -72,3 +72,7 @@
 
 ## 4.1.6
  - Upgrade eflookup to v3.1.2 to get updated Prichard-Oneill emissions factors
+
+## 4.1.7
+ - List ARL files in order in the hysplit CONTROL file
+ - Support filtering activity by start and/or end times
