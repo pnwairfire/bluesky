@@ -2,9 +2,11 @@
 
 __author__ = "Joel Dubowy"
 
+import datetime
 import logging
 
 from bluesky.config import Config
+from bluesky.datetimeutils import to_datetime, parse_utc_offset
 from bluesky.locationutils import LatLng
 
 from . import FiresActionBase
@@ -259,5 +261,50 @@ class FireActivityFilter(FiresActionBase):
 
             return ((min_area is not None and total_active_area < min_area) or
                 (max_area is not None and total_active_area > max_area))
+
+        return _filter
+
+
+
+    SPECIFY_TIME_START_AND_OR_END_MSG = "Specify start and/or end to filter by time"
+    INVALID_TIME_START_OR_END_VAL = "Invalid value for time filter config option '{}'"
+    INVALID_START_AFTER_END = ("Start must be before end if both are specified"
+        " for time fileter")
+
+    def _get_time_filter(self, **kwargs):
+        """Returns function that checks if fire activity window is after
+        specified start time and/or before specified end time.
+        """
+        s = kwargs.get('start')
+        e = kwargs.get('end')
+        if not s and not e:
+            raise self.FilterError(self.SPECIFY_TIME_START_AND_OR_END_MSG)
+
+        def _parse(v, key):
+            try:
+                return to_datetime(v)
+            except:
+                raise self.FilterError(
+                    self.INVALID_TIME_START_OR_END_VAL.format(key))
+        s = _parse(s, 'start')
+        e = _parse(e, 'end')
+
+        if s and e and s > e:
+            raise self.FilterError(self.INVALID_START_AFTER_END)
+
+        def _filter(fire, active_area):
+            if not isinstance(active_area, dict):
+                self._fail_fire(fire, self.MISSING_FIRE_LOCATION_INFO_MSG)
+            elif not active_area.get('start') or not active_area.get('end'):
+                self._fail_fire(fire, self.MISSING_FIRE_LOCATION_INFO_MSG)
+
+            utc_offset = datetime.timedelta(hours=parse_utc_offset(
+                active_area.get('utc_offset') or 0))
+            aa_s = to_datetime(active_area['start']) - utc_offset
+            aa_e = to_datetime(active_area['end']) - utc_offset
+
+            # note that this filters if aa's start/end matches cutoff
+            # (e.g. if aa's start and filter's end are both 2019-01-01T00:00:00)
+            return (s and aa_e <= s) or (e and aa_s >= e)
 
         return _filter

@@ -90,6 +90,8 @@ configuration json data are case-insensitive.***
  - ***'config' > 'filter' > 'location' > 'boundary' > 'sw' > 'lng'*** -- *required* if 'location' section is defined --
  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lat'*** -- *required* if 'location' section is defined --
  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lng'*** -- *required* if 'location' section is defined --
+  - ***'config' > 'filter' > 'time' > 'start'*** -- *required* if 'time' section is defined and 'end' isn't specified -- 'start' and 'end' may be specified together
+  - ***'config' > 'filter' > 'time' > 'end'*** --  *required* if 'time' section is defined and 'start' isn't specified -- 'start' and 'end' may be specified together
 
 ##### fuelbeds
 

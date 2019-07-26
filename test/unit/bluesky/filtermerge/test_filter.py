@@ -2,6 +2,8 @@
 
 __author__ = "Joel Dubowy"
 
+import datetime
+
 from py.test import raises
 
 from bluesky.config import Config
@@ -651,3 +653,210 @@ class TestFiresManagerFilterFiresByArea(object):
         self.fm.filter_fires()
         assert self.fm.num_fires == 0
         assert [] == sorted(self.fm.fires, key=lambda e: int(e.id))
+
+
+class TestFiresManagerFilterFiresByTime(object):
+
+    def setup(self):
+        self.fm = fires.FiresManager()
+        self.init_fires = [
+            fires.Fire({'id': '1', 'activity': [
+                {'active_areas': [
+                    # note this is midnight to midnight
+                    {'start': '2019-01-01T17:00:00','end': "2019-01-02T17:00:00","utc_offset": "-07:00",
+                     'specified_points':[{'lat': 40.0, 'lng': -80.0, "area": 90.0}]},
+                    # note that this is midnight to noon
+                    {'start': '2019-01-02T05:00:00','end': "2019-01-02T17:00:00","utc_offset": "-07:00",
+                     'specified_points':[{'lat': 40.1, 'lng': -80.1, "area": 90.0}]}
+                ]},
+                {'active_areas': [
+                    {'start': '2019-01-02T17:00:00','end': "2019-01-03T17:00:00","utc_offset": "-07:00",
+                     'specified_points':[{'lat': 40.2, 'lng': -80.2, "area": 90.0}]}
+                ]}
+            ]}),
+            fires.Fire({'id': '2', 'activity': [
+                {'active_areas': [
+                    {'start': '2019-01-02T20:00:00','end': "2019-01-03T20:00:00","utc_offset": "-04:00",
+                     'specified_points':[{'lat': 30.0, 'lng': -90.0, "area": 90.0},{'lat': 30.5, 'lng': -90.5, "area": 90.0}]}
+                ]},
+                {'active_areas': [
+                    {'start': '2019-01-03T20:00:00','end': "2019-01-04T20:00:00","utc_offset": "-04:00",
+                     'specified_points':[{'lat': 30.1, 'lng': -90.1, "area": 90.0},{'lat': 30.6, 'lng': -90.6, "area": 90.0}]}
+                ]}
+            ]})
+        ]
+        self.fm.fires = self.init_fires
+        assert self.fm.num_fires == 2
+        assert self.fm.num_locations == 7
+
+    def test_invalid_config(self, reset_config):
+        ## Failure situations
+        scenarios = (
+            # empty config
+            ({}, fires.FireActivityFilter.MISSING_FILTER_CONFIG_MSG),
+            # start and end not specified
+            ({'foo': 'bar'}, fires.FireActivityFilter.SPECIFY_TIME_START_AND_OR_END_MSG),
+            # invalid start
+            ({'start': "sdf"},
+                fires.FireActivityFilter.INVALID_TIME_START_OR_END_VAL.format('start')),
+            # invalid end (with valid start)
+            ({'start': "2019-01-01T00:00:00", "end": "sdfsd"},
+                fires.FireActivityFilter.INVALID_TIME_START_OR_END_VAL.format('end')),
+            # start after end
+            ({'start': "2019-01-02T00:00:00", "end": "2019-01-01T00:00:00"},
+                fires.FireActivityFilter.INVALID_START_AFTER_END)
+        )
+        for config, err_msg in scenarios:
+            Config.set(config, 'filter', 'time')
+            # don't skip failures
+            Config.set(False, 'filter', 'skip_failures')
+            with raises(fires.FireActivityFilter.FilterError) as e_info:
+                self.fm.filter_fires()
+            assert self.fm.num_fires == 2
+            assert self.init_fires == sorted(self.fm.fires, key=lambda e: int(e.id))
+            assert e_info.value.args[0] == err_msg
+            # skip failures
+            Config.set(True, 'filter', 'skip_failures')
+            self.fm.filter_fires()
+            assert self.fm.num_fires == 2
+            assert self.init_fires == sorted(self.fm.fires, key=lambda e: int(e.id))
+
+    def test_invalid_fires(self, reset_config):
+        Config.set({"start": "2019-01-01T00:00:00"}, 'filter', 'time')
+        scenarios = (
+            # active_area missing start
+            (fires.Fire({'id': '1', 'activity': [{'active_areas':[{"end": "2019-01-02T17:00:00"}]}]}),
+             fires.FireActivityFilter.MISSING_FIRE_LOCATION_INFO_MSG),
+            # active_area missing end
+            (fires.Fire({'id': '1', 'activity': [{'active_areas':[{"start": "2019-01-01T17:00:00"}]}]}),
+             fires.FireActivityFilter.MISSING_FIRE_LOCATION_INFO_MSG),
+            # active_area missing start and end
+            (fires.Fire({'id': '1', 'activity': [{'active_areas':[{}]}]}),
+             fires.FireActivityFilter.MISSING_FIRE_LOCATION_INFO_MSG)
+        )
+        for f, err_msg in scenarios:
+            self.fm.fires = [f]
+            # don't skip failures
+            Config.set(False, 'filter', 'skip_failures')
+            with raises(fires.FireActivityFilter.FilterError) as e_info:
+                self.fm.filter_fires()
+            assert self.fm.num_fires == 1
+            assert [f] == self.fm.fires
+            assert e_info.value.args[0].index(err_msg) > 0
+            # skip failures
+            Config.set(True, 'filter', 'skip_failures')
+            self.fm.filter_fires()
+            assert self.fm.num_fires == 1
+            assert [f] == self.fm.fires
+
+    def test_noops(self, reset_config):
+        scenarios = [
+            {"start": "2019-01-01T00:00:00"},
+            # filter start/end are in UTC, so this doesn't filter anything, since
+            # the earliest end time, 2019-01-02T17:00:00, is 2019-01-03T00:00:00 UTC
+            {"start": "2019-01-02T20:00:00"},
+            {"start": "2019-01-01T00:00:00"},
+            {"start": datetime.datetime(2019,1,1,0,0,0)},
+            {"start": "2019-01-01T00:00:00", "end": "2019-01-05T00:00:00"},
+            {"end": "2019-01-05T00:00:00"}
+        ]
+
+        for c in scenarios:
+            Config.set(c,'filter', 'time')
+            self.fm.filter_fires()
+            assert self.fm.num_fires == 2
+            assert self.fm.num_locations == 7
+            assert self.init_fires == sorted(self.fm.fires, key=lambda e: int(e.id))
+
+
+    def test_remove_first_two_aa_by_start(self, reset_config):
+        Config.set({"start": "2019-01-03T00:00:00"},'filter', 'time')
+        expected = [
+            fires.Fire({'id': '1', 'activity': [
+                {'active_areas': [
+                    {'start': '2019-01-02T17:00:00','end': "2019-01-03T17:00:00","utc_offset": "-07:00",
+                     'specified_points':[{'lat': 40.2, 'lng': -80.2, "area": 90.0}]}
+                ]}
+            ]}),
+            fires.Fire({'id': '2', 'activity': [
+                {'active_areas': [
+                    {'start': '2019-01-02T20:00:00','end': "2019-01-03T20:00:00","utc_offset": "-04:00",
+                     'specified_points':[{'lat': 30.0, 'lng': -90.0, "area": 90.0},{'lat': 30.5, 'lng': -90.5, "area": 90.0}]}
+                ]},
+                {'active_areas': [
+                    {'start': '2019-01-03T20:00:00','end': "2019-01-04T20:00:00","utc_offset": "-04:00",
+                     'specified_points':[{'lat': 30.1, 'lng': -90.1, "area": 90.0},{'lat': 30.6, 'lng': -90.6, "area": 90.0}]}
+                ]}
+            ]})
+        ]
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 2
+        assert self.fm.num_locations == 5
+        assert expected == sorted(self.fm.fires, key=lambda e: int(e.id))
+
+    def test_remove_all_but_first_aa_by_end(self, reset_config):
+        Config.set({"end": "2019-01-02T07:00:00"},'filter', 'time')
+        expected =  [
+            fires.Fire({'id': '1', 'activity': [
+                {'active_areas': [
+                    {'start': '2019-01-01T17:00:00','end': "2019-01-02T17:00:00","utc_offset": "-07:00",
+                     'specified_points':[{'lat': 40.0, 'lng': -80.0, "area": 90.0}]},
+                ]}
+            ]})
+        ]
+
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 1
+        assert self.fm.num_locations == 1
+        assert expected == sorted(self.fm.fires, key=lambda e: int(e.id))
+
+    def test_remove_all_but_middle_aas_by_start_end(self, reset_config):
+        Config.set({"start": "2019-01-03T00:00:00",
+            "end": "2019-01-04T00:00:00"},'filter', 'time')
+        expected =  [
+            fires.Fire({'id': '1', 'activity': [
+                {'active_areas': [
+                    {'start': '2019-01-02T17:00:00','end': "2019-01-03T17:00:00","utc_offset": "-07:00",
+                     'specified_points':[{'lat': 40.2, 'lng': -80.2, "area": 90.0}]}
+                ]}
+            ]}),
+            fires.Fire({'id': '2', 'activity': [
+                {'active_areas': [
+                    {'start': '2019-01-02T20:00:00','end': "2019-01-03T20:00:00","utc_offset": "-04:00",
+                     'specified_points':[{'lat': 30.0, 'lng': -90.0, "area": 90.0},{'lat': 30.5, 'lng': -90.5, "area": 90.0}]}
+                ]}
+            ]})
+        ]
+
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 2
+        assert self.fm.num_locations == 3
+        assert expected == sorted(self.fm.fires, key=lambda e: int(e.id))
+
+    def test_remove_all_by_start_end(self, reset_config):
+        Config.set({"start": "2019-01-07T00:00:00",
+            "end": "2019-01-08T00:00:00"},'filter', 'time')
+        expected =  []
+
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 0
+        assert self.fm.num_locations == 0
+        assert expected == sorted(self.fm.fires, key=lambda e: int(e.id))
+
+    def test_remove_all_by_start(self, reset_config):
+        Config.set({"start": "2019-01-07T00:00:00"},'filter', 'time')
+        expected =  []
+
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 0
+        assert self.fm.num_locations == 0
+        assert expected == sorted(self.fm.fires, key=lambda e: int(e.id))
+
+    def test_remove_all_by_end(self, reset_config):
+        Config.set({"end": "2019-01-01T00:00:00"},'filter', 'time')
+        expected =  []
+
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 0
+        assert self.fm.num_locations == 0
+        assert expected == sorted(self.fm.fires, key=lambda e: int(e.id))
