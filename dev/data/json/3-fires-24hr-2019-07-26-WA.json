@@ -1,0 +1,130 @@
+{
+    "fire_information": [
+
+        {
+            "id": "201907190000_201907252359_4efdfa84-223e-4df8-9b05-36452a09fd15",
+            "activity": [
+                {
+                    "active_areas": [
+                        {
+                            "utc_offset": "-07:00",
+                            "start": "2019-07-26T00:00:00",
+                            "specified_points": [
+                                {
+                                    "lat": 45.284,
+                                    "frp": 24.357,
+                                    "lng": -120.238,
+                                    "area": 205,
+                                    "source": "HMS_VIIRS"
+                                },
+                                {
+                                    "lat": 45.283,
+                                    "frp": 24.357,
+                                    "lng": -120.243,
+                                    "area": 205,
+                                    "source": "HMS_VIIRS"
+                                },
+                                {
+                                    "lat": 45.288,
+                                    "frp": 26.57,
+                                    "lng": -120.234,
+                                    "area": 205,
+                                    "source": "HMS_VIIRS"
+                                },
+                                {
+                                    "lat": 45.287,
+                                    "frp": 24.357,
+                                    "lng": -120.239,
+                                    "area": 205,
+                                    "source": "HMS_VIIRS"
+                                },
+                                {
+                                    "lat": 45.291,
+                                    "frp": 11.452,
+                                    "lng": -120.241,
+                                    "area": 205,
+                                    "source": "HMS_VIIRS"
+                                }
+                            ],
+                            "end": "2019-07-27T00:00:00"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "201907190000_201907252359_3cfe050f-29c5-48a0-a248-bddac7e1c834",
+            "activity": [
+                {
+                    "active_areas": [
+                        {
+                            "utc_offset": "-07:00",
+                            "start": "2019-07-26T00:00:00",
+                            "specified_points": [
+                                {
+                                    "lat": 46.053,
+                                    "frp": 9.464,
+                                    "lng": -121.126,
+                                    "area": 116,
+                                    "source": "HMS"
+                                }
+                            ],
+                            "end": "2019-07-27T00:00:00"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "201907190000_201907252359_aa759efe-dfe4-470b-a2f8-8d51440bede2",
+            "activity": [
+                {
+                    "active_areas": [
+                        {
+                            "utc_offset": "-07:00",
+                            "start": "2019-07-26T00:00:00",
+                            "specified_points": [
+                                {
+                                    "lat": 49.068,
+                                    "frp": 1.233,
+                                    "lng": -119.694,
+                                    "area": 90,
+                                    "source": "HMS"
+                                },
+                                {
+                                    "lat": 49.065,
+                                    "frp": 1.233,
+                                    "lng": -119.701,
+                                    "area": 90,
+                                    "source": "HMS"
+                                },
+                                {
+                                    "lat": 49.064,
+                                    "frp": 1.233,
+                                    "lng": -119.695,
+                                    "area": 90,
+                                    "source": "HMS"
+                                },
+                                {
+                                    "lat": 49.072,
+                                    "frp": 0.908,
+                                    "lng": -119.699,
+                                    "area": 90,
+                                    "source": "HMS"
+                                },
+                                {
+                                    "lat": 49.071,
+                                    "frp": 0.908,
+                                    "lng": -119.693,
+                                    "area": 90,
+                                    "source": "HMS"
+                                }
+                            ],
+                            "end": "2019-07-27T00:00:00"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
