@@ -295,6 +295,10 @@ class FiresManager(object):
     def num_fires(self):
         return self._num_fires
 
+    @property
+    def num_locations(self):
+        return sum([len(f.locations) for f in self.fires])
+
     @fires.setter
     def fires(self, fires_list):
         self._num_fires = 0
@@ -434,8 +438,8 @@ class FiresManager(object):
     @property
     def counts(self):
         counts = {
-            'fires': len(self.fires),
-            'locations': sum([len(f.locations) for f in self.fires])
+            'fires': self.num_fires,
+            'locations': self.num_locations
         }
         if self.skip_failed_fires:
             counts['failed_fires'] = len(self.failed_fires or [])
