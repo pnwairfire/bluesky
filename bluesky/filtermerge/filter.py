@@ -282,12 +282,17 @@ class FireActivityFilter(FiresActionBase):
 
         def _parse(v, key):
             try:
-                return to_datetime(v)
+                is_local = hasattr(v, 'endswith') and v.endswith('L')
+                return (
+                    to_datetime(v.rstrip('L') if hasattr(v, 'rstrip') else v),
+                    is_local
+                )
             except:
                 raise self.FilterError(
                     self.INVALID_TIME_START_OR_END_VAL.format(key))
-        s = _parse(s, 'start')
-        e = _parse(e, 'end')
+
+        s, s_is_local = _parse(s, 'start')
+        e, e_is_local = _parse(e, 'end')
 
         if s and e and s > e:
             raise self.FilterError(self.INVALID_START_AFTER_END)
@@ -300,8 +305,16 @@ class FireActivityFilter(FiresActionBase):
 
             utc_offset = datetime.timedelta(hours=parse_utc_offset(
                 active_area.get('utc_offset') or 0))
-            aa_s = to_datetime(active_area['start']) - utc_offset
-            aa_e = to_datetime(active_area['end']) - utc_offset
+
+            aa_s = to_datetime(active_area['start'])
+            # check if e_is_local, since we're comparing aa_s against e
+            if not e_is_local:
+                aa_s = aa_s - utc_offset
+
+            aa_e = to_datetime(active_area['end'])
+            # same thing, but s_is_local
+            if not s_is_local:
+                aa_e = aa_e - utc_offset
 
             # note that this filters if aa's start/end matches cutoff
             # (e.g. if aa's start and filter's end are both 2019-01-01T00:00:00)

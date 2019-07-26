@@ -752,9 +752,13 @@ class TestFiresManagerFilterFiresByTime(object):
     def test_noops(self, reset_config):
         scenarios = [
             {"start": "2019-01-01T00:00:00"},
-            # filter start/end are in UTC, so this doesn't filter anything, since
-            # the earliest end time, 2019-01-02T17:00:00, is 2019-01-03T00:00:00 UTC
+            # start time is in UTC, so this doesn't filter anything,
+            # since the earliest end time, 2019-01-02T17:00:00 (local),
+            # is 2019-01-03T00:00:00 UTC
             {"start": "2019-01-02T20:00:00"},
+            # this end time is local, so this doesn't filter anything,
+            # since the latest start time is 2019-01-03T20:00:00 local
+            {"end": "2019-01-03T22:00:00L"},
             {"start": "2019-01-01T00:00:00"},
             {"start": datetime.datetime(2019,1,1,0,0,0)},
             {"start": "2019-01-01T00:00:00", "end": "2019-01-05T00:00:00"},
@@ -845,6 +849,15 @@ class TestFiresManagerFilterFiresByTime(object):
 
     def test_remove_all_by_start(self, reset_config):
         Config.set({"start": "2019-01-07T00:00:00"},'filter', 'time')
+        expected =  []
+
+        self.fm.filter_fires()
+        assert self.fm.num_fires == 0
+        assert self.fm.num_locations == 0
+        assert expected == sorted(self.fm.fires, key=lambda e: int(e.id))
+
+    def test_remove_all_by_start_specified_as_local(self, reset_config):
+        Config.set({"start": "2019-01-04T22:00:00L"},'filter', 'time')
         expected =  []
 
         self.fm.filter_fires()
