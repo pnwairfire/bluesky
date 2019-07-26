@@ -1,9 +1,18 @@
 """bluesky.extrafilewriters.SMOKEready
 
-Writes SMOKE files directly from the BSP. Documentation for file
+Writes three SMOKE Ready File Formats
+- PTINV
+- PTDAY
+- PTHOUR
+
+Documentation for file
 formats provided by the CMAS center at https://www.cmascenter.org/smoke/documentation/3.5/html/ch08s02.html.
 
+Functionality and some methods were ported from the Bluesky-Framework repository.
+The script used as the source for this can be found here:
+https://github.com/pnwairfire/bluesky-framework/blob/e813cb6d01fb41149ec07b176d24acb5eeab6222/src/base/modules/smoke.py
 """
+
 import os
 import logging
 from datetime import timedelta, datetime
@@ -167,24 +176,29 @@ class SmokeReadyWriter(object):
   
   param: dest_dir
   type: str
+
+  configurable kwargs set in the config block:
+    defaults:
+      "ptinv_filename": "ptinv-%Y%m%d%H.ida",
+      "ptday_filename": "ptday-%Y%m%d%H.ems95",
+      "pthour_filename": "pthour-%Y%m%d%H.ems95",
+      "separate_smolder": true,
+      "write_ptinv_totals": true,
+      "write_ptday_file": true
+
+  config can be seen in ./dev/config/extrafiles/smokeready.json
   """
   def __init__(self, dest_dir, **kwargs):
-    # make dynamic to accept args
-    self.filedt = datetime.now()
-
     ptinv = (kwargs.get('ptinv_filename') or
       Config.get('extrafiles', 'smokeready', 'ptinv_filename'))
-    ptinv = self.filedt.strftime(ptinv)
     self._ptinv_pathname = os.path.join(dest_dir, ptinv)
 
     ptday = (kwargs.get('ptday_filename') or
       Config.get('extrafiles', 'smokeready', 'ptday_filename'))
-    ptday = self.filedt.strftime(ptday)
     self._ptday_pathname = os.path.join(dest_dir, ptday)
 
     pthour = (kwargs.get('pthour_filename') or
       Config.get('extrafiles', 'smokeready', 'pthour_filename'))
-    pthour = self.filedt.strftime(pthour)
     self._pthour_pathname = os.path.join(dest_dir, pthour)
 
     separate_smolder = (kwargs.get('separate_smolder') or
@@ -199,6 +213,9 @@ class SmokeReadyWriter(object):
       Config.get('extrafiles', 'smokeready', 'write_ptday_file'))
     self._write_ptday_file = write_ptday_file
 
+    # Pull the file year out of the dynamically set timestamp
+    self.file_year = int(pthour.split('-')[1][:4])
+
   # main write function to be called
   def write(self, fires_manager):
     fires_info = fires_manager.fires
@@ -209,16 +226,16 @@ class SmokeReadyWriter(object):
     pthour = open(self._pthour_pathname, 'w')
 
     ptinv.write("#IDA\n#PTINV\n#COUNTRY %s\n" % country_process_list[0])
-    ptinv.write("#YEAR %d\n" % self.filedt.year)
+    ptinv.write("#YEAR %d\n" % self.file_year)
     ptinv.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
     ptinv.write("#DATA PM2_5 PM10 CO NH3 NOX SO2 VOC PTOP PBOT LAY1F\n")
 
     ptday.write("#EMS-95\n#PTDAY\n#COUNTRY %s\n" % country_process_list[0])
-    ptday.write("#YEAR %d\n" % self.filedt.year)
+    ptday.write("#YEAR %d\n" % self.file_year)
     ptday.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
 
     pthour.write("#EMS-95\n#PTHOUR\n#COUNTRY %s\n" % country_process_list[0])
-    pthour.write("#YEAR %d\n" % self.filedt.year)
+    pthour.write("#YEAR %d\n" % self.file_year)
     pthour.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
 
     num_of_fires = 0
@@ -297,7 +314,6 @@ class SmokeReadyWriter(object):
 
           date = start_dt.strftime('%m/%d/%y')  # Date
           
-
           # PTINVRecord
           ptinv_rec = PTINVRecord()
           ptinv_rec.STID = stid
@@ -480,8 +496,27 @@ class SmokeReadyWriter(object):
     pthour.close()
 
   def _get_state_county_fips(self, lat, lng):
+    """
+      CMAS has a State/County FIPS code that is 5 digits long.
+      Please refer to the documentation here: 
+      https://www.cmascenter.org/smoke/documentation/3.7/html/ch02s03s04.html
+
+      Examples: 
+
+      Tuolumne County (CA):
+        state_fips = '06'
+        county_fips = '06109'
+        CMAS FIPS = '6109'
+
+      Wetzel County (WV)
+        state_fips = '54'
+        county_fips = '54103'
+        CMAS FIPS = '54104'
+    """
     fips = locationutils.Fips(lat, lng)
-    return fips.county_fips, fips.state_fips
+    cyid = fips.county_fips.lstrip(fips.state_fips)
+    stid = fips.state_fips.lstrip('0')
+    return cyid, stid
 
   def _map_scc(self, fire_type):
     # Mappings provided by BSF (fill_data.py)
