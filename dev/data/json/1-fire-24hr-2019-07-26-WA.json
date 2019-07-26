@@ -1,0 +1,27 @@
+{
+    "fire_information": [
+        {
+            "id": "201907190000_201907252359_3cfe050f-29c5-48a0-a248-bddac7e1c834",
+            "activity": [
+                {
+                    "active_areas": [
+                        {
+                            "utc_offset": "-07:00",
+                            "start": "2019-07-26T00:00:00",
+                            "specified_points": [
+                                {
+                                    "lat": 46.053,
+                                    "frp": 9.464,
+                                    "lng": -121.126,
+                                    "area": 116,
+                                    "source": "HMS"
+                                }
+                            ],
+                            "end": "2019-07-27T00:00:00"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

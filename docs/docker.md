@@ -98,7 +98,7 @@ Another example, running through vsmoke dispersion:
         fuelbeds consumption emissions timeprofile dispersion
 
 
-Another example, running `bsp` from the repo through HYSPLIT dispersion
+Two more examples, running `bsp` from the repo through HYSPLIT dispersion
 and KML visualization:
 
     docker run --rm -ti \
@@ -115,7 +115,23 @@ and KML visualization:
         -c ./dev/config/fuelbeds-through-visualization/DRI4km-2019061012-48hr-PM2.5-grid-latlng.json \
         fuelbeds consumption emissions \
         timeprofile findmetdata localmet plumerise \
-        dispersion visualization export
+        dispersion visualization
+
+    docker run --rm -ti \
+        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
+        -e PYTHONPATH=/bluesky/ \
+        -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+        -v $HOME/Met/PNW/4km/ARL/:/data/Met/PNW/4km/ARL/ \
+        -w /bluesky/ \
+        bluesky \
+        bsp --log-level=DEBUG --indent 4 \
+        --run-id 1-fire-24hr-2019-07-26-WA-{timestamp:%Y%m%dT%H%M%S} \
+        -i dev/data/json/1-fire-24hr-2019-07-26-WA.json \
+        -o ./output/{run_id}.json \
+        -c ./dev/config/fuelbeds-through-visualization/PNW4km-2019072600-24hr-PM2.5.json \
+        fuelbeds consumption emissions \
+        timeprofile findmetdata localmet plumerise \
+        dispersion visualization
 
 
 Remember that, in the last dispersion example, the dispersion output
