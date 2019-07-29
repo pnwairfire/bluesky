@@ -76,3 +76,6 @@
 ## 4.1.7
  - List ARL files in order in the hysplit CONTROL file
  - Support filtering activity by start and/or end times
+
+## 4.1.8
+ - Fix bug in hysplit code where, when using tranches, all fires were being run in each tranche
