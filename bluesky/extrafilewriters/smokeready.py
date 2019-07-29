@@ -284,14 +284,7 @@ class SmokeReadyWriter(object):
         tzonnam = self._set_timezone_name(lat, lng, start_dt)
 
         
-        # timedelta
-        # sorted(fire_loc['timeprofile'].keys())
-
-        """
-          Define fire types, defaults to total. 
-          NOTE: flame/smolder were changed to flaming/smoldering
-          to be used as keys in the fire_loc['fuelbeds']['emissions'] arr
-        """
+        # Define fire types, defaults to total. 
         if self._separate_smolder:
             fire_phases = ("flaming", "smoldering")
         else:
@@ -314,6 +307,19 @@ class SmokeReadyWriter(object):
 
           date = start_dt.strftime('%m/%d/%y')  # Date
           
+        
+
+          EMISSIONS_MAPPING = [('PM2_5', 'pm2.5'),
+                              ('PM10', 'pm10'),
+                              ('CO', 'co'),
+                              ('NH3', 'nh3'),
+                              ('NOX', 'nox'),
+                              ('SO2', 'so2'),
+                              ('VOC', 'voc')]
+
+          """
+          PTINV
+          """
           # PTINVRecord
           ptinv_rec = PTINVRecord()
           ptinv_rec.STID = stid
@@ -326,14 +332,6 @@ class SmokeReadyWriter(object):
           ptinv_rec.LONC = lng
 
           ptinv_rec_str = str(ptinv_rec)
-
-          EMISSIONS_MAPPING = [('PM2_5', 'pm2.5'),
-                              ('PM10', 'pm10'),
-                              ('CO', 'co'),
-                              ('NH3', 'nh3'),
-                              ('NOX', 'nox'),
-                              ('SO2', 'so2'),
-                              ('VOC', 'voc')]
 
           if self._write_ptinv_totals:
             logging.debug('Writing SmokeReady PTINV File to %s', self._ptinv_pathname)
@@ -349,6 +347,9 @@ class SmokeReadyWriter(object):
 
           ptinv.write(ptinv_rec_str + "\n")
 
+          """
+          PTDAY
+          """
           if self._write_ptday_file:
             logging.debug('Writing SmokeReady PTHOUR File to %s', self._ptday_pathname)
             for var, vkey in EMISSIONS_MAPPING:
@@ -401,6 +402,9 @@ class SmokeReadyWriter(object):
                     ptday_rec.SCC = scc                      # Source Classification Code
                     ptday.write(str(ptday_rec))
 
+          """
+          PTHOUR
+          """
           PTHOUR_MAPPING = [('PTOP', "percentile_100"),
                             ('PBOT', "percentile_000"),
                             ('LAY1F', "smoldering_fraction"),
@@ -429,6 +433,7 @@ class SmokeReadyWriter(object):
                 dt = start_dt + timedelta(days=day)
                 date = dt.strftime('%m/%d/%y')  # Date
 
+                # PTHOUR Record
                 pthour_rec = PTHOURRecord()
                 pthour_rec.STID = stid
                 pthour_rec.CYID = cyid
@@ -537,7 +542,8 @@ class SmokeReadyWriter(object):
       raise ValueError("Fire Type must be a string")
 
   # confirm this is necessary to be like in BSF. Couldnt understand where id was
-  # being set. not sure it corresponds to something we need
+  # being set. not sure it corresponds to something we need. I'm concerened the ID will be too long,
+  # or the '-' for negative lng will corrupt the file. 
   def _generate_fcid(self, fire_info, num_hours, lat, lng):
     # Returns the fire_info id, lat/lng, and num of hours burning
     lat_str = str(lat).replace('.', '')
