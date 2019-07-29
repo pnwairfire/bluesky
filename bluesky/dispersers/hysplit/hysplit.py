@@ -395,21 +395,7 @@ class HYSPLITDispersion(DispersionBase):
         # each call to _run_process.
         # The only things that change from call to call are working_dir,
         # fires, and tranch_num
-
-        for f in self._met_info['files']:
-            # bluesky.modules.dispersion.run will have weeded out met
-            # files that aren't relevant to this dispersion run
-            self._create_sym_link(f,
-                os.path.join(working_dir, os.path.basename(f)))
-
-        # Create sym links to ancillary data files (note: HYSPLIT49 balks
-        # if it can't find ASCDATA.CFG).
-        self._create_sym_link(self.config("ASCDATA_FILE"),
-            os.path.join(working_dir, 'ASCDATA.CFG'))
-        self._create_sym_link(self.config("LANDUSE_FILE"),
-            os.path.join(working_dir, 'LANDUSE.ASC'))
-        self._create_sym_link(self.config("ROUGLEN_FILE"),
-            os.path.join(working_dir, 'ROUGLEN.ASC'))
+        self._create_sym_links_for_process(working_dir)
 
         emissions_file = os.path.join(working_dir, "EMISS.CFG")
         control_file = os.path.join(working_dir, "CONTROL")
@@ -553,6 +539,22 @@ class HYSPLITDispersion(DispersionBase):
                 for f in pardumpFiles:
                     self._archive_file(f)
                     #shutil.copy2(os.path.join(working_dir, f), self._run_output_dir)
+
+    def _create_sym_links_for_process(self, working_dir):
+        for f in self._met_info['files']:
+            # bluesky.modules.dispersion.run will have weeded out met
+            # files that aren't relevant to this dispersion run
+            self._create_sym_link(f,
+                os.path.join(working_dir, os.path.basename(f)))
+
+        # Create sym links to ancillary data files (note: HYSPLIT49 balks
+        # if it can't find ASCDATA.CFG).
+        self._create_sym_link(self.config("ASCDATA_FILE"),
+            os.path.join(working_dir, 'ASCDATA.CFG'))
+        self._create_sym_link(self.config("LANDUSE_FILE"),
+            os.path.join(working_dir, 'LANDUSE.ASC'))
+        self._create_sym_link(self.config("ROUGLEN_FILE"),
+            os.path.join(working_dir, 'ROUGLEN.ASC'))
 
     def _get_hour_data(self, dt, fire):
         if fire.plumerise and fire.timeprofile:
