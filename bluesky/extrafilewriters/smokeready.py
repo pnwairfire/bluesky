@@ -255,7 +255,7 @@ class SmokeReadyWriter(object):
           total_skipped += 1
           continue
 
-        lat, lng = fire_loc["lat"], fire_loc["lng"]
+        lat, lng = fire_loc['lat'], fire_loc['lng']
 
         # try to get CYID/STID, but skip record if lat/lng invalid
         try:
@@ -309,13 +309,13 @@ class SmokeReadyWriter(object):
           
         
 
-          EMISSIONS_MAPPING = [('PM2_5', 'pm2.5'),
-                              ('PM10', 'pm10'),
-                              ('CO', 'co'),
-                              ('NH3', 'nh3'),
-                              ('NOX', 'nox'),
-                              ('SO2', 'so2'),
-                              ('VOC', 'voc')]
+          EMISSIONS_MAPPING = [('PM2_5', "pm2.5"),
+                              ('PM10', "pm10"),
+                              ('CO', "co"),
+                              ('NH3', "nh3"),
+                              ('NOX', "nox"),
+                              ('SO2', "so2"),
+                              ('VOC', "voc")]
 
           """
           PTINV
@@ -408,13 +408,13 @@ class SmokeReadyWriter(object):
           PTHOUR_MAPPING = [('PTOP', "percentile_100"),
                             ('PBOT', "percentile_000"),
                             ('LAY1F', "smoldering_fraction"),
-                            ('PM2_5', 'pm2.5'),
-                            ('PM10', 'pm10'),
-                            ('CO', 'co'),
-                            ('NH3', 'nh3'),
-                            ('NOX', 'nox'),
-                            ('SO2', 'so2'),
-                            ('VOC', 'voc')]
+                            ('PM2_5', "pm2.5"),
+                            ('PM10', "pm10"),
+                            ('CO', "co"),
+                            ('NH3', "nh3"),
+                            ('NOX', "nox"),
+                            ('SO2', "so2"),
+                            ('VOC', "voc")]
 
 
           logging.debug('Writing SmokeReady PTHOUR File to %s', self._pthour_pathname)
@@ -422,7 +422,7 @@ class SmokeReadyWriter(object):
             species_key = vkey.upper()
 
             if var in ('PTOP', 'PBOT', 'LAY1F'):
-              if fire_loc["plumerise"] is None: continue
+              if fire_loc['plumerise'] is None: continue
             else:
               if species_key not in fuelbed['emissions']['total'].keys(): continue
 
@@ -489,12 +489,13 @@ class SmokeReadyWriter(object):
                       daytot += value
                     setattr(pthour_rec, 'HRVAL' + str(hour+1), value)
                   except IndexError:
-                          #self.log.debug("IndexError on hour %d for fire %s" % (h, fire_loc["id"]))
+                          self.log.debug("IndexError on hour %d for fire" % (h))
                           setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
 
                 if var not in ('PTOP', 'PBOT', 'LAY1F'):
                   pthour_rec.DAYTOT = daytot
                 pthour.write(str(pthour_rec))
+    # Close Files
     ptinv.close()
     if self._write_ptday_file:
       ptday.close()
@@ -541,7 +542,7 @@ class SmokeReadyWriter(object):
     else:
       raise ValueError("Fire Type must be a string")
 
-  # confirm this is necessary to be like in BSF. Couldnt understand where id was
+  # Confirm this is necessary to be like in BSF. Couldnt understand where id was
   # being set. not sure it corresponds to something we need. I'm concerened the ID will be too long,
   # or the '-' for negative lng will corrupt the file. 
   def _generate_fcid(self, fire_info, num_hours, lat, lng):
