@@ -26,6 +26,9 @@
                         }
                     }
                 },
+                "NPROCESSES": 2,
+                "NFIRES_PER_PROCESS": -1,
+                "NPROCESSES_MAX": -1,
                 "NUMPAR": 500,
                 "MAXPAR": 12000
             }

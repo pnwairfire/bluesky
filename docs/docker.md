@@ -125,8 +125,8 @@ and KML visualization:
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
-        --run-id 1-fire-24hr-2019-07-26-WA-{timestamp:%Y%m%dT%H%M%S} \
-        -i dev/data/json/1-fire-24hr-2019-07-26-WA.json \
+        --run-id 2-fires-24hr-2019-07-26-WA-{timestamp:%Y%m%dT%H%M%S} \
+        -i dev/data/json/2-fires-24hr-2019-07-26-WA.json \
         -o ./output/{run_id}.json \
         -c ./dev/config/fuelbeds-through-visualization/PNW4km-2019072600-24hr-PM2.5.json \
         fuelbeds consumption emissions \
