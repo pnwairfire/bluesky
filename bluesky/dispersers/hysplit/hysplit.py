@@ -487,9 +487,9 @@ class HYSPLITDispersion(DispersionBase):
         else:
             NCPUS = 1
 
-        self._write_emissions(emissions_file)
-        self._write_control_file(control_file, output_conc_file)
-        self._write_setup_file(emissions_file, setup_file, ninit_val, NCPUS, tranche_num)
+        self._write_emissions(fires, emissions_file)
+        self._write_control_file(fires, control_file, output_conc_file)
+        self._write_setup_file(fires, emissions_file, setup_file, ninit_val, NCPUS, tranche_num)
 
         try:
             # Run HYSPLIT
@@ -571,7 +571,7 @@ class HYSPLITDispersion(DispersionBase):
             hysplit_utils.dummy_timeprofile_hour(self._num_hours))
 
 
-    def _write_emissions(self, emissions_file):
+    def _write_emissions(self, fires, emissions_file):
         # A value slightly above ground level at which to inject smoldering
         # emissions into the model.
         smolder_height = self.config("SMOLDER_HEIGHT")
@@ -586,7 +586,7 @@ class HYSPLITDispersion(DispersionBase):
                 dt = self._model_start + datetime.timedelta(hours=hour)
                 dt_str = dt.strftime("%y %m %d %H")
 
-                num_fires = len(self._fires)
+                num_fires = len(fires)
                 #num_heights = 21 # 20 quantile gaps, plus ground level
                 num_heights = self.num_output_quantiles + 1
                 num_sources = num_fires * num_heights
@@ -601,7 +601,7 @@ class HYSPLITDispersion(DispersionBase):
                 fires_wo_emissions = 0
 
                 # Loop through the fire locations
-                for fire in self._fires:
+                for fire in fires:
                     # Get some properties from the fire location
                     lat = fire.latitude
                     lon = fire.longitude
@@ -713,8 +713,8 @@ class HYSPLITDispersion(DispersionBase):
         self._grid_params = hysplit_utils.get_grid_params(
             met_info=self._met_info, fires=self._fires)
 
-    def _write_control_file(self, control_file, concFile):
-        num_fires = len(self._fires)
+    def _write_control_file(self, fires, control_file, concFile):
+        num_fires = len(fires)
         num_heights = self.num_output_quantiles + 1  # number of quantiles used, plus ground level
         num_sources = num_fires * num_heights
 
@@ -811,7 +811,7 @@ class HYSPLITDispersion(DispersionBase):
             f.write("%d\n" % num_sources)
 
             # Source locations
-            for fire in self._fires:
+            for fire in fires:
                 for height in range(num_heights):
                     f.write("%9.3f %9.3f %9.3f\n" % (fire.latitude, fire.longitude, sourceHeight))
 
@@ -925,7 +925,7 @@ class HYSPLITDispersion(DispersionBase):
             # non-zero requires the definition of a deposition grid
             f.write("0.0\n")
 
-    def _write_setup_file(self, emissions_file, setup_file, ninit_val, ncpus, tranche_num):
+    def _write_setup_file(self, fires, emissions_file, setup_file, ninit_val, ncpus, tranche_num):
         # Advanced setup options
         # adapted from Robert's HysplitGFS Perl script
 
@@ -948,7 +948,7 @@ class HYSPLITDispersion(DispersionBase):
 
         # set numpar (if 0 then set to num_fires * num_heights)
         # else set to value given (hysplit default of 500)
-        num_fires = len(self._fires)
+        num_fires = len(fires)
         num_heights = self.num_output_quantiles + 1
         numpar_val = int(self.config("NUMPAR"))
         num_sources = numpar_val
