@@ -164,12 +164,14 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                     raise ValueError(
                         "Missing fire activity data required for computing dispersion")
 
+                loc_num = 0
                 for aa in fire.active_areas:
                     utc_offset = self._get_utc_offset(aa)
                     for loc in aa.locations:
                         try:
                             self._add_location(fire, aa, loc,
-                                activity_fields, utc_offset)
+                                activity_fields, utc_offset, loc_num)
+                            loc_num += 1
 
                         except SkipLocationError:
                             continue
@@ -180,7 +182,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                 else:
                     raise
 
-    def _add_location(self, fire, aa, loc, activity_fields, utc_offset):
+    def _add_location(self, fire, aa, loc, activity_fields, utc_offset, loc_num):
         if any([not loc.get(f) for f in activity_fields]):
             raise ValueError("Each active area must have {} in "
                 "order to compute {} dispersion".format(
@@ -203,7 +205,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         latlng = locationutils.LatLng(loc)
 
         f = Fire(
-            id=fire.id,
+            id="{}-{}".format(fire.id, loc_num),
             meta=fire.get('meta', {}),
             start=aa['start'],
             area=loc['area'],
