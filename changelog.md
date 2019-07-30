@@ -79,3 +79,6 @@
 
 ## 4.1.8
  - Fix bug in hysplit code where, when using tranches, all fires were being run in each tranche
+
+## 4.1.9
+ - distribute fire locations evenly in tranches, ignoring parent fires

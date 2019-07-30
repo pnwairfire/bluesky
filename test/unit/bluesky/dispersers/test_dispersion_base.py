@@ -163,7 +163,7 @@ class TestDispersionBaseSetFireData(object):
         })
 
         expected_fire = fires.Fire({
-            "id": "SF11C14225236095807750",
+            "id": "SF11C14225236095807750-0",
             "meta": {},
             "start": "2015-08-04T17:00:00",
             "area": 120.0,
