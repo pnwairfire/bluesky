@@ -14,7 +14,7 @@ from met.arl import arlfinder
 from bluesky import io
 from bluesky.config import Config
 from bluesky.datetimeutils import (
-    parse_datetimes, is_round_hour, parse_utc_offset
+    parse_datetimes, is_round_hour, parse_utc_offset, to_datetime
 )
 from bluesky.exceptions import (
     BlueSkyConfigurationError, BlueSkyUnavailableResourceError
@@ -41,6 +41,7 @@ def run(fires_manager):
 
     met_finder = _get_met_finder(fires_manager)
     time_windows = _get_time_windows(fires_manager)
+    accepted_forecasts_config = _get_accepted_forecasts_config()
 
     wait_config = Config.get('findmetdata','wait')
     @io.wait_for_availability(wait_config)
@@ -55,10 +56,11 @@ def run(fires_manager):
         if not files:
             raise BlueSkyUnavailableResourceError("No met files found")
 
+        files = _filter_forecasts(accepted_forecasts_config, files)
+
         return files
 
     fires_manager.met = {"files": _find()}
-
 
 
 def _get_met_root_dir(fires_manager):
@@ -84,6 +86,8 @@ def _get_met_finder(fires_manager):
     else:
         raise BlueSkyConfigurationError(
             "Invalid or unsupported met data format: '{}'".format(met_format))
+
+## Time windows
 
 def _get_time_windows(fires_manager):
     time_windows = [
@@ -159,3 +163,39 @@ def _merge_time_windows(time_windows):
             merged_time_windows[-1]['end'] = tw['end']
 
     return merged_time_windows
+
+
+## Accepted forecasts
+
+def _get_accepted_forecasts_config():
+    accepted_forecasts_config = Config.get('findmetdata', 'accepted_forecasts')
+    if accepted_forecasts_config:
+        for k in ('init_times', 'met_file_name_pattern'):
+            if not accepted_forecasts_config.get(k):
+                raise BlueSkyConfigurationError("Config 'findmetdata' > "
+                    "'accepted_forecasts' settings must define '{}'".format(k))
+
+        accepted_forecasts_config['init_times'] = sorted([
+            to_datetime(i, extra_formats=["%Y%m%d%H"])
+                for i in accepted_forecasts_config.get('init_times', [])
+        ])
+    return accepted_forecasts_config
+
+
+def _filter_forecasts(config, files):
+    if not config:
+        return files
+
+    filtered_files = []
+    for init_time in config['init_times']:
+        to_match = init_time.strftime(
+            config['met_file_name_pattern'])
+        filtered_files.extend([
+            f for f in files if f['file'].find(to_match) > -1
+        ])
+
+    if not filtered_files:
+        raise BlueSkyUnavailableResourceError("Waiting for forecasts: {}".format(
+            ', '.join([i.strftime("%Y-%m-%d %HZ") for i in config['init_times']])))
+
+    return filtered_files

@@ -1,0 +1,24 @@
+{
+    "config": {
+        "findmetdata": {
+            "met_root_dir": "/data/Met/PNW/4km/ARL/",
+            "met_format": "arl",
+            "arl": {
+                "index_filename_pattern": "arl12hrindex.csv"
+            },
+            "time_window": {
+                "first_hour": "2019-07-27T00:00:00",
+                "last_hour": "2019-07-27T12:00:00"
+            },
+            "accepted_forecasts": {
+                "met_file_name_pattern": "%Y%m%d%H/wrfout_d3",
+                "init_times": ["2019072600", "2019072700"]
+            },
+            "wait": {
+                "strategy": "fixed",
+                "time": 3,
+                "max_attempts": 2
+            }
+        }
+    }
+}
