@@ -542,9 +542,7 @@ class SmokeReadyWriter(object):
     else:
       raise ValueError("Fire Type must be a string")
 
-  # Confirm this is necessary to be like in BSF. Couldnt understand where id was
-  # being set. not sure it corresponds to something we need. I'm concerened the ID will be too long,
-  # or the '-' for negative lng will corrupt the file. 
+  # This is how the PTINV file links back to the ptday/pthour emissions files
   def _generate_fcid(self, fire_info, num_hours, lat, lng):
     # Returns the fire_info id, lat/lng, and num of hours burning
     lat_str = str(lat).replace('.', '')
