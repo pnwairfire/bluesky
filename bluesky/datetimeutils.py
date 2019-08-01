@@ -100,7 +100,7 @@ VALID_DATETIME_RANGE = (
     # 100 years from now
     datetime.datetime.now() + datetime.timedelta(days=1) * 365 * 100
 )
-def to_datetime(val, limit_range=False):
+def to_datetime(val, limit_range=False, extra_formats=[]):
     """Returns date[time] object represented by string
     """
     # the preceeding '_' in '_val' isn't necessary given scoping rules,
@@ -108,6 +108,8 @@ def to_datetime(val, limit_range=False):
     def _invalid(_val):
         raise BlueSkyDatetimeValueError(
             "Invalid datetime string value: {}".format(_val))
+
+    extra_formats = _TO_DATETIME_EXTRA_FORMATS + extra_formats
 
     if val is not None:
         # We need to check for datetime before date, since date
@@ -118,7 +120,7 @@ def to_datetime(val, limit_range=False):
             return datetime.datetime(val.year, val.month, val.day)
         elif hasattr(val, 'lower'):
             try:
-                dt = parse_dt(val, extra_formats=_TO_DATETIME_EXTRA_FORMATS)
+                dt = parse_dt(val, extra_formats=extra_formats)
                 # sanity check:
                 if limit_range and (dt < VALID_DATETIME_RANGE[0]
                         or dt > VALID_DATETIME_RANGE[1]):
