@@ -205,7 +205,7 @@ def _filter_forecasts(config, files):
         ])
 
     if not filtered_files:
-        raise BlueSkyUnavailableResourceError("Waiting for forecasts: {}".format(
+        raise BlueSkyUnavailableResourceError("Only accepting forecasts: {}".format(
             ', '.join([i.strftime("%Y-%m-%d %HZ") for i in config['init_times']])))
 
     return filtered_files
