@@ -56,6 +56,16 @@ def run(fires_manager):
         if not files:
             raise BlueSkyUnavailableResourceError("No met files found")
 
+        # It's possible that the following filtering by forecast whitelist
+        # will result in waiting on a forecast that
+        # already exists, but was passed over by arlfinder.ArlFinder because
+        # there were newer data.  To avoid that situation, we'd need to
+        # move the forecast whitelist logic into arlfinder.ArlFinder.
+        # The practical use case for this forecast whitelist logic, however,
+        # is to wait for the latest applicable met data for the dispersion
+        # window (e.g. to wait for 2019-07-31 OOZ met data for the
+        # run starting at 2019-07-31T00:00:00), which should never result
+        # in waiting for already existing data.
         files = _filter_forecasts(accepted_forecasts_config, files)
 
         return files
