@@ -18,7 +18,7 @@ setup(
     packages=find_packages(),
     scripts=[
         'bin/bsp',
-        'bin/bsp-run-stats'
+        'bin/bsp-run-info'
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
