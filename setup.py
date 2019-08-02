@@ -17,7 +17,8 @@ setup(
     author_email='jdubowy@gmail.com',
     packages=find_packages(),
     scripts=[
-        'bin/bsp'
+        'bin/bsp',
+        'bin/bsp-run-stats'
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
