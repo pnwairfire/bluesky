@@ -5,10 +5,13 @@ import json
 import sys
 import os
 
-root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
-sys.path.insert(0, root_dir)
-
-from bluesky import models
+try:
+    from bluesky import models
+except:
+    import os
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
+    sys.path.insert(0, root_dir)
+    from bluesky import models
 
 EXAMPLES_STRING = """
 Examples:
@@ -24,10 +27,19 @@ def parse_args():
     return parser.parse_args()
 
 def count(input_data):
-    fires = input_data.pop('fires', None) or input_data.pop('fire_information', [])
+    fires = input_data.get('fires', None) or input_data.get('fire_information', [])
     num_locations = sum([len(models.fires.Fire(f).locations) for f in fires])
-    print("Fires: {}".format(len(fires)))
-    print("Locations: {}".format(num_locations))
+    print("Fire counts")
+    print("  Fires: {}".format(len(fires)))
+    print("  Locations: {}".format(num_locations))
+
+def runtime(input_data):
+    print("Runtime")
+    rt_info = input_data.get('runtime')
+    print("  Total: {}".format(rt_info.get('total', '?')))
+    print("  Modules")
+    for m in rt_info.get('modules'):
+        print("    {}: {}".format(m['module_name'], m['total']))
 
 def main():
     args = parse_args()
@@ -36,7 +48,7 @@ def main():
         input_data = json.loads(f.read())
 
     count(input_data)
-
+    runtime(input_data)
 
 if __name__ == "__main__":
     main()

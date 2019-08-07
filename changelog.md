@@ -85,3 +85,6 @@
 
 ## 4.1.10
  - Support restricting findmetdata to specific allowed forecasts (e.g. to allow 2019-07-31 00Z met data but not 2019-07-30 00Z for a 7/31 run)
+
+## 4.1.11
+ - Added bsp-run-info script
