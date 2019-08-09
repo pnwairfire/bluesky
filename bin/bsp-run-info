@@ -26,29 +26,25 @@ def parse_args():
     parser.formatter_class = argparse.RawTextHelpFormatter
     return parser.parse_args()
 
-def count(input_data):
-    fires = input_data.get('fires', None) or input_data.get('fire_information', [])
-    num_locations = sum([len(models.fires.Fire(f).locations) for f in fires])
+def count(fires_manager):
     print("Fire counts")
-    print("  Fires: {}".format(len(fires)))
-    print("  Locations: {}".format(num_locations))
+    print("  Fires: {}".format(fires_manager.num_fires))
+    print("  Locations: {}".format(fires_manager.num_locations))
 
-def runtime(input_data):
+def runtime(fires_manager):
     print("Runtime")
-    rt_info = input_data.get('runtime')
-    print("  Total: {}".format(rt_info.get('total', '?')))
+    print("  Total: {}".format(fires_manager.runtime.get('total', '?')))
     print("  Modules")
-    for m in rt_info.get('modules'):
+    for m in fires_manager.runtime.get('modules'):
         print("    {}: {}".format(m['module_name'], m['total']))
 
 def main():
     args = parse_args()
+    fires_manager = models.fires.FiresManager()
+    fires_manager.loads(input_file=args.input)
 
-    with open(args.input, 'r') as f:
-        input_data = json.loads(f.read())
-
-    count(input_data)
-    runtime(input_data)
+    count(fires_manager)
+    runtime(fires_manager)
 
 if __name__ == "__main__":
     main()
