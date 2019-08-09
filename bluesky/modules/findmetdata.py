@@ -66,6 +66,16 @@ def run(fires_manager):
         # window (e.g. to wait for 2019-07-31 OOZ met data for the
         # run starting at 2019-07-31T00:00:00), which should never result
         # in waiting for already existing data.
+
+        # TODO: move whitelist logic into findmetdata package. support three modes:
+        #   - any met:  e.g. allow 7/27 met for 7/28 run if 7/28 met isn't available
+        #   - want only met thats newer than spcified data; e.g. for 7/28 run,
+        #     don't allow use of 7/27 data, but allow met after 7/28 for
+        #     hours in dispersion that are after 7/28 (which can happen if re-running
+        #     past data)
+        #   - want specificc date for run;  e.g. for 7/28 run, only allow 7/28 met,
+        #     even for hours after 7/28 in dispersion window
+
         files = _filter_forecasts(accepted_forecasts_config, files)
 
         return files
