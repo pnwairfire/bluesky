@@ -24,7 +24,6 @@ import os
 import urllib
 import shutil
 
-from afweb import auth
 from pyairfire.io import CSV2JSON
 
 from bluesky import datetimeutils
@@ -197,7 +196,6 @@ class BaseCsvFileLoader(BaseFileLoader):
 class BaseApiLoader(BaseLoader):
 
     DEFAULT_KEY_PARAM = "_k"
-    DEFAULT_AUTH_PROTOCOL = "afweb"
     DEFAULT_REQUEST_TIMEOUT = 10 # seconds
 
     DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%Z'
@@ -236,13 +234,9 @@ class BaseApiLoader(BaseLoader):
 
     def _get(self):
         if self._secret:
-            if self._auth_protocol == 'afweb':
-                url = self._form_url()
-                url = auth.sign_url(url, self._key, self._secret)
-            else:
-                raise NotImplementedError(
-                    "{} auth protocol not supported".format(
-                    self._auth_protocol))
+            raise NotImplementedError(
+                "No auth protocols currently supported".format(
+                self._auth_protocol))
         else:
             if self._key:
                 params[self._key_param] = self._key
