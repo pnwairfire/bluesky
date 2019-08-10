@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+import argparse
+import sys
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+
+import plotly.express as px
+
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+app.layout = html.Div(children=[
+    html.H1(children='Bluesky Output Inspector'),
+
+    html.Div(children='''
+        Visualize BlueSky Output
+    '''),
+
+    dcc.Graph(
+        id='example-graph',
+        figure={
+            'data': [
+                {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'SF'},
+                {'x': [1, 2, 3], 'y': [2, 4, 5], 'type': 'bar', 'name': u'Montréal'},
+            ],
+            'layout': {
+                'title': 'Dash Data Visualization'
+            }
+        }
+    )
+])
+
+EXAMPLES_STRING = """
+Examples:
+
+    {script} -d -i output.json -p 8050
+
+ """.format(script=sys.argv[0])
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input', help="bsp output file", required=True)
+    parser.add_argument('-d', '--debug', help="run flask app in debug mode",
+        action="store_true")
+    parser.add_argument('-p', '--port', help="port; default 8050",
+        default="8050")
+    parser.epilog = EXAMPLES_STRING
+    parser.formatter_class = argparse.RawTextHelpFormatter
+    return parser.parse_args()
+
+if __name__ == '__main__':
+    args = parse_args()
+    app.run_server(debug=args.debug,  host='0.0.0.0')
