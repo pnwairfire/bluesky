@@ -34,7 +34,3 @@ app.layout = html.Div(children=[
     )
 ])
 
-@app.server.route('/favicon.ico')
-def favicon():
-    return flask.send_from_directory(
-        os.path.join(app.server.root_path, 'assets'), 'favicon.ico')
