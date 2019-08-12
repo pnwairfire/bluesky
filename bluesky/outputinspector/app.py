@@ -1,7 +1,9 @@
+import os
+
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-
+import flask
 import plotly.express as px
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -30,3 +32,8 @@ app.layout = html.Div(children=[
         multiple=False
     )
 ])
+
+@app.server.route('/favicon.ico')
+def favicon():
+    return flask.send_from_directory(
+        os.path.join(app.server.root_path, 'assets'), 'favicon.ico')
