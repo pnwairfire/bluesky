@@ -25,11 +25,11 @@ def parse_args():
     parser.add_argument('-d', '--debug', help="run flask app in debug mode",
         action="store_true")
     parser.add_argument('-p', '--port', help="port; default 8050",
-        default="8050")
+        default=8050, type=int)
     parser.epilog = EXAMPLES_STRING
     parser.formatter_class = argparse.RawTextHelpFormatter
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = parse_args()
-    app.run_server(debug=args.debug,  host='0.0.0.0')
+    outputinspector.app.app.run_server(debug=args.debug,  host='0.0.0.0', port=args.port)
