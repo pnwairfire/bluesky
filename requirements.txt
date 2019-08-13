@@ -17,3 +17,4 @@ Fiona==1.7.2
 shapely==1.5.7
 dash==1.1.1
 dash-daq==0.1.0
+dash-bootstrap-components==0.7.0

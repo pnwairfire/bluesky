@@ -32,4 +32,5 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    outputinspector.app.app.run_server(debug=args.debug,  host='0.0.0.0', port=args.port)
+    app = outputinspector.app.create_app(args.input)
+    app.run_server(debug=args.debug,  host='0.0.0.0', port=args.port)
