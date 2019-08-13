@@ -11,6 +11,7 @@ import plotly.express as px
 from dash.dependencies import Input, Output
 
 from bluesky import analysis
+from . import firesmap
 
 def get_navbar():
     return dbc.NavbarSimple(
@@ -55,8 +56,8 @@ FIRE_TABLE_COLUMNS = [
     'total_consumption', 'total_emissions', 'PM2.5'
 ]
 
-def get_fires_map(data, summarized_fires):
-    return "Show map with points here"
+
+
 
 def get_fires_data_table(data, summarized_fires):
 
@@ -81,8 +82,7 @@ def get_body(data, summarized_fires):
                 [
                     dbc.Col(
                         [
-                            html.Div("Fires Map"),
-                            get_fires_map(data, summarized_fires)
+                            firesmap.get_fires_map(data, summarized_fires)
                         ],
                         md=4,
                     ),
