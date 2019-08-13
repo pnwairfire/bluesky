@@ -61,7 +61,7 @@ def get_fires_data_table(data, summarized_fires):
 
     return dt.DataTable(
         id='fires-table',
-        data=summarized_fires,
+        data=[sf['flat_summary'] for sf in summarized_fires],
         columns=[{'id': c, 'name': c} for c in FIRE_TABLE_COLUMNS],
         style_table={
             'maxHeight': '250px',
