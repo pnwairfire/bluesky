@@ -28,6 +28,7 @@ def get_navbar():
         brand="BlueSky Output Inspector",
         brand_href="#",
         sticky="top",
+        fluid=True
     )
 
 def get_upload_box():
@@ -68,9 +69,9 @@ def get_fires_data_table(data, summarized_fires):
             'overflowY': 'scroll'
         },
         sort_action='native',
-        filter_action='native'
+        filter_action='native',
+        row_selectable='single',  #'multi',
         # editable=False,
-        # row_selectable=True
     )
 
 def get_body(data, summarized_fires):
@@ -80,31 +81,44 @@ def get_body(data, summarized_fires):
                 [
                     dbc.Col(
                         [
+                            html.Div("Fires Map"),
                             get_fires_map(data, summarized_fires)
                         ],
                         md=4,
                     ),
                     dbc.Col(
                         [
-                            html.H2("Graph"),
-                            dcc.Graph(
-                                figure={"data": []}
-                            ),
-                        ]
-                    ),
+                            html.Div("Fires Table"),
+                            get_fires_data_table(data, summarized_fires)
+                        ],
+                        md=8
+                    )
                 ]
             ),
             dbc.Row(
                 [
                     dbc.Col(
                         [
-                            html.Div("Fires Table"),
-                            get_fires_data_table(data, summarized_fires)
-                        ]
+                            html.H2("Emissions"),
+                            dcc.Graph(
+                                figure={"data": []}
+                            ),
+                        ],
+                        md=4,
+                    ),
+                    dbc.Col(
+                        [
+                            html.H2("Plumerise"),
+                            dcc.Graph(
+                                figure={"data": []}
+                            ),
+                        ],
+                        md=4,
                     )
                 ]
             )
         ],
+        fluid=True,
         className="mt-4",
     )
 
