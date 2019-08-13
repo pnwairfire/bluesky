@@ -10,7 +10,7 @@ import flask
 import plotly.express as px
 from dash.dependencies import Input, Output
 
-
+from bluesky import analysis
 
 def get_navbar():
     return dbc.NavbarSimple(
@@ -49,18 +49,22 @@ def get_upload_box():
         multiple=False
     )
 
-
-FIRE_TABLE_COLUMNS = ['id']
+FIRE_TABLE_COLUMNS = [
+    'id', 'total_consumption', 'total_emissions', 'PM2.5',
+    'num_locations', 'total_area', 'start', 'end',
+]
 
 def get_fires_data_table(data):
-    fire_row_data = []
-    for f in data.get('fires'):
-        fire_row_data.append({'id': f.get('id')})
+    fire_row_data = [analysis.SummarizedFire(f) for f in data.get('fires')]
 
     return dt.DataTable(
         id='fires-table',
         data=fire_row_data,
         columns=[{'id': c, 'name': c} for c in FIRE_TABLE_COLUMNS],
+        style_table={
+            'maxHeight': '300',
+            'overflowY': 'scroll'
+        },
         # editable=False,
         # row_selectable=True
     )
