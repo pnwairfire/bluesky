@@ -66,7 +66,7 @@ def get_fires_data_table(data, summarized_fires):
         data=[sf['flat_summary'] for sf in summarized_fires],
         columns=[{'id': c, 'name': c} for c in FIRE_TABLE_COLUMNS],
         style_table={
-            'maxHeight': '250px',
+            'maxHeight': '500px',
             'overflowY': 'scroll'
         },
         sort_action='native',
@@ -82,13 +82,14 @@ def get_body(data, summarized_fires):
                 [
                     dbc.Col(
                         [
+                            html.H4("Fires Map"),
                             firesmap.get_fires_map(data, summarized_fires)
                         ],
                         md=4,
                     ),
                     dbc.Col(
                         [
-                            html.Div("Fires Table"),
+                            html.H4("Fires Table"),
                             get_fires_data_table(data, summarized_fires)
                         ],
                         md=8
@@ -99,7 +100,7 @@ def get_body(data, summarized_fires):
                 [
                     dbc.Col(
                         [
-                            html.H2("Emissions"),
+                            html.H4("Emissions"),
                             dcc.Graph(
                                 figure={"data": []}
                             ),
@@ -108,7 +109,7 @@ def get_body(data, summarized_fires):
                     ),
                     dbc.Col(
                         [
-                            html.H2("Plumerise"),
+                            html.H4("Plumerise"),
                             dcc.Graph(
                                 figure={"data": []}
                             ),

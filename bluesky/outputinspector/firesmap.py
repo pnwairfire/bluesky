@@ -78,7 +78,6 @@ def get_fires_map(data, summarized_fires):
     return html.Div(
         id="well-map-container",
         children=[
-            html.Div("Fires Map"),
             # dcc.RadioItems(
             #     id="mapbox-view-selector",
             #     options=[
