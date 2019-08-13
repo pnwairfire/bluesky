@@ -50,33 +50,37 @@ def get_upload_box():
     )
 
 FIRE_TABLE_COLUMNS = [
-    'id', 'total_consumption', 'total_emissions', 'PM2.5',
-    'num_locations', 'total_area', 'start', 'end',
+    'id', 'lat', 'lng', 'num_locations', 'start', 'end', 'total_area',
+    'total_consumption', 'total_emissions', 'PM2.5'
 ]
 
-def get_fires_data_table(data):
-    fire_row_data = [analysis.SummarizedFire(f) for f in data.get('fires')]
+def get_fires_map(data, summarized_fires):
+    return "Show map with points here"
+
+def get_fires_data_table(data, summarized_fires):
 
     return dt.DataTable(
         id='fires-table',
-        data=fire_row_data,
+        data=summarized_fires,
         columns=[{'id': c, 'name': c} for c in FIRE_TABLE_COLUMNS],
         style_table={
-            'maxHeight': '300',
+            'maxHeight': '250px',
             'overflowY': 'scroll'
         },
+        sort_action='native',
+        filter_action='native'
         # editable=False,
         # row_selectable=True
     )
 
-def get_body(data):
+def get_body(data, summarized_fires):
     return dbc.Container(
         [
             dbc.Row(
                 [
                     dbc.Col(
                         [
-                            "Show map with points here"
+                            get_fires_map(data, summarized_fires)
                         ],
                         md=4,
                     ),
@@ -95,7 +99,7 @@ def get_body(data):
                     dbc.Col(
                         [
                             html.Div("Fires Table"),
-                            get_fires_data_table(data)
+                            get_fires_data_table(data, summarized_fires)
                         ]
                     )
                 ]
@@ -115,10 +119,11 @@ def create_app(bluesky_output_file):
     if bluesky_output_file:
         with open(os.path.abspath(bluesky_output_file)) as f:
             data = json.load(f)
+    summarized_fires = [analysis.SummarizedFire(f) for f in data.get('fires')]
 
     app = dash.Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS)
     app.title = "Bluesky Output Inspector"
-    app.layout = html.Div([get_navbar(), get_body(data)])
+    app.layout = html.Div([get_navbar(), get_body(data, summarized_fires)])
 
 
     ##
