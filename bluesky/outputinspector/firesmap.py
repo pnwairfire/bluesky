@@ -1,13 +1,9 @@
 import dash_core_components as dcc
 import dash_html_components as html
+import pandas as pd
+import plotly.graph_objs as go
 
 MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiYWlyZmlyZXNlcnZlciIsImEiOiJjanphZG1pbTMwMTdrM21wYnNsN3plYXU2In0.Rc6xMtWYwgpdR58D0U1XuQ"
-
-
-import dash
-import dash_core_components as dcc
-import dash_html_components as html
-import pandas as pd
 
 COLOR_SCALE = [
     [0,"rgb(5, 10, 172)"],
