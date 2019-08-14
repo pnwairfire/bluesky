@@ -10,8 +10,7 @@ import flask
 import plotly.express as px
 from dash.dependencies import Input, Output
 
-from bluesky import analysis
-from . import firesmap
+from . import analysis, firesmap
 
 def get_navbar():
     return dbc.NavbarSimple(
