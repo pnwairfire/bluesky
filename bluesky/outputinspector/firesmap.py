@@ -14,8 +14,7 @@ COLOR_SCALE = [
     [5000,"rgb(220, 220, 220)"]
 ]
 
-
-def get_map(data, summarized_fires):
+def generate_map(summarized_fires):
     fires = [sf['flat_summary'] for sf in summarized_fires]
     df = pd.DataFrame(fires)
     df['text'] = df['total_area'].astype(str) + ' acre fire'
@@ -66,12 +65,9 @@ def get_map(data, summarized_fires):
     return dcc.Graph(id='graph', figure=fig)
 
 
+def get_fires_map(app, data, summarized_fires):
 
-
-
-def get_fires_map(data, summarized_fires):
-
-    return html.Div(
+    map = html.Div(
         id="well-map-container",
         children=[
             # dcc.RadioItems(
@@ -87,6 +83,10 @@ def get_fires_map(data, summarized_fires):
             #     ],
             #     value="basic",
             # ),
-            get_map(data, summarized_fires)
+            generate_map(summarized_fires)
         ]
     )
+
+
+
+    return map

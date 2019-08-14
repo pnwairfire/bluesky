@@ -74,7 +74,7 @@ def get_fires_data_table(data, summarized_fires):
         # editable=False,
     )
 
-def get_body(data, summarized_fires):
+def get_body(app, data, summarized_fires):
     return dbc.Container(
         [
             dbc.Row(
@@ -82,7 +82,7 @@ def get_body(data, summarized_fires):
                     dbc.Col(
                         [
                             html.H4("Fires Map"),
-                            firesmap.get_fires_map(data, summarized_fires)
+                            firesmap.get_fires_map(app, data, summarized_fires)
                         ],
                         md=4,
                     ),
@@ -137,7 +137,7 @@ def create_app(bluesky_output_file):
 
     app = dash.Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS)
     app.title = "Bluesky Output Inspector"
-    app.layout = html.Div([get_navbar(), get_body(data, summarized_fires)])
+    app.layout = html.Div([get_navbar(), get_body(app, data, summarized_fires)])
 
 
     ##
