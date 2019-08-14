@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 import dash
 import dash_table as dt
@@ -9,8 +10,9 @@ import dash_html_components as html
 import flask
 import plotly.express as px
 from dash.dependencies import Input, Output
+from dash.exceptions import PreventUpdate
 
-from . import analysis, firesmap, firestable, upload
+from . import analysis, firesmap, firestable, upload, graphs
 
 def get_navbar(data):
     return dbc.NavbarSimple(
@@ -39,44 +41,32 @@ def get_body(mapbox_access_token, data, summarized_fires_by_id):
                 [
                     dbc.Col(
                         [
-                            html.H4("Fires Map"),
-                            firesmap.get_fires_map(mapbox_access_token,
-                                data, summarized_fires_by_id)
+                            html.Div(id="fires-map-container", children=[
+                                firesmap.get_fires_map(mapbox_access_token,
+                                    summarized_fires_by_id),
+                                html.Div("Select fires to see in the table",
+                                    className="caption")
+                            ])
                         ],
-                        md=4,
+                        lg=5,
                     ),
                     dbc.Col(
                         [
-                            html.H4("Fires Table"),
-                            firestable.get_fires_data_table(
-                                summarized_fires_by_id)
+                            html.Div(id='fires-table-container', children=[
+                                firestable.get_fires_data_table(
+                                    summarized_fires_by_id),
+                                html.Div("Select a fire to see emissions and plumerise graphs",
+                                    className="caption")
+                            ])
                         ],
-                        md=8
+                        lg=7
                     )
                 ]
             ),
-            dbc.Row(
-                [
-                    dbc.Col(
-                        [
-                            html.H4("Emissions"),
-                            dcc.Graph(
-                                figure={"data": []}
-                            ),
-                        ],
-                        md=4,
-                    ),
-                    dbc.Col(
-                        [
-                            html.H4("Plumerise"),
-                            dcc.Graph(
-                                figure={"data": []}
-                            ),
-                        ],
-                        md=4,
-                    )
-                ]
-            )
+            dbc.Row([
+                dbc.Col([html.Div(id='emissions-container')],md=4),
+                dbc.Col([html.Div(id='plumerise-container')],md=4)
+            ])
         ],
         fluid=True,
         className="mt-4",
@@ -104,8 +94,70 @@ def create_app(bluesky_output_file, mapbox_access_token=None):
     ])
     app.summarized_fires_by_id = summarized_fires_by_id
 
-    firesmap.define_callbacks(app)
-    firestable.define_callbacks(app)
-    upload.define_callbacks(app)
+    define_callbacks(app)
 
     return app
+
+
+##
+## Callbacks
+##
+
+ID_EXTRACTOR = re.compile('data-id="([^"]+)"')
+
+def define_callbacks(app):
+
+    # Update fires table when fires are selected on map
+
+    @app.callback(
+        Output("fires-table", "data"),
+        [
+            Input("fires-map", "selectedData"),
+        ],
+    )
+    def update_fires_table_from_map(map_selected_data):
+        if map_selected_data:
+            selected_fires = []
+            for p in  map_selected_data['points']:
+                fire_id = ID_EXTRACTOR.findall(p['text'])[0]
+                selected_fires.append(app.summarized_fires_by_id[fire_id])
+        else:
+            selected_fires = app.summarized_fires_by_id.values()
+
+        return firestable.process_fires(selected_fires)
+
+    # Update graphs when fire is selected in table
+
+    @app.callback([
+        Output('emissions-container', "children"),
+        Output('plumerise-container', "children")],
+        [Input('fires-table', "derived_virtual_data"),
+         Input('fires-table', "derived_virtual_selected_rows")])
+    def update_graphs(rows, selected_rows):
+        # if not selected_rows:
+        #     raise PreventUpdate
+        selected_rows = selected_rows or []
+
+        fire_ids = [rows[i]['id'] for i in selected_rows]
+        selected_fires = [app.summarized_fires_by_id[fid] for fid in fire_ids]
+
+        emissions_graph = graphs.get_emissions_graph(selected_fires)
+        plumerise_graph = graphs.get_plumerise_graph(selected_fires)
+
+        return [
+            [emissions_graph],
+            [plumerise_graph]
+        ]
+
+    # Load data from uploaded output
+
+    # @app.callback(
+    #     Output("", ""),
+    #     [Input("upload-data", "filename"), Input("upload-data", "contents")],
+    # )
+    # def update_output(uploaded_filenames, uploaded_file_contents):
+    #     """Save uploaded files and regenerate the file list."""
+
+    #     if uploaded_filenames is not None and uploaded_file_contents is not None:
+    #         data = json.load(uploaded_file_contents)
+

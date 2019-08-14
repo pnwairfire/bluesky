@@ -1,0 +1,12 @@
+.caption {
+    font-style: italic;
+    font-size: small;;
+}
+
+#fires-table-container .caption {
+    margin-top: 15px;
+}
+
+.row {
+    margin-bottom: 20px;
+}

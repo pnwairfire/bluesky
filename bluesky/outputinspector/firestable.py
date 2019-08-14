@@ -1,5 +1,3 @@
-import re
-
 import dash_table as dt
 from dash.dependencies import Input, Output
 
@@ -24,25 +22,3 @@ def get_fires_data_table(summarized_fires_by_id):
         row_selectable='single',  #'multi',
         # editable=False,
     )
-
-ID_EXTRACTOR = re.compile('data-id="([^"]+)"')
-
-def define_callbacks(app):
-
-    # Update fires table
-    @app.callback(
-        Output("fires-table", "data"),
-        [
-            Input("fires-map", "selectedData"),
-        ],
-    )
-    def update_bar(map_selected_data):
-        if map_selected_data:
-            selected_fires = []
-            for p in  map_selected_data['points']:
-                fire_id = ID_EXTRACTOR.findall(p['text'])[0]
-                selected_fires.append(app.summarized_fires_by_id[fire_id])
-        else:
-            selected_fires = app.summarized_fires_by_id.values()
-
-        return process_fires(selected_fires)

@@ -19,17 +19,3 @@ def get_upload_box():
         },
         multiple=False
     )
-
-def define_callbacks(app):
-
-    # @app.callback(
-    #     Output("", ""),
-    #     [Input("upload-data", "filename"), Input("upload-data", "contents")],
-    # )
-    # def update_output(uploaded_filenames, uploaded_file_contents):
-    #     """Save uploaded files and regenerate the file list."""
-
-    #     if uploaded_filenames is not None and uploaded_file_contents is not None:
-    #         data = json.load(uploaded_file_contents)
-
-    pass

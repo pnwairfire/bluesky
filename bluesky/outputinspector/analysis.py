@@ -53,6 +53,9 @@ class SummarizedFire(dict):
             'end': max([aa['end'] for aa in self.active_areas])
         }
 
+    def get_time_profiled_emissions(self):
+        pass
+
 def summarized_fires_by_id(fires):
     summarized_fires = [SummarizedFire(f) for f in fires]
     return {

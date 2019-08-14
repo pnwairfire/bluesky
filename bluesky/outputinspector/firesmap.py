@@ -12,7 +12,7 @@ COLOR_SCALE = [
     [5000,"rgb(220, 220, 220)"]
 ]
 
-def generate_map(mapbox_access_token, summarized_fires_by_id):
+def get_fires_map(mapbox_access_token, summarized_fires_by_id):
     fires = [sf['flat_summary'] for sf in summarized_fires_by_id.values()]
     df = pd.DataFrame(fires)
     df['text'] = ('<span data-id="' + df['id'] + '">'
@@ -38,7 +38,7 @@ def generate_map(mapbox_access_token, summarized_fires_by_id):
             #     'width': 1,
             #     'color': 'rgba(102, 102, 102)'
             # },
-            #'colorscale': COLOR_SCALE,
+            'colorscale': 'thermal', #COLOR_SCALE,
             'cmin': 0,
             'color': df['total_area'],
             'cmax': df['total_area'].max(),
@@ -81,30 +81,3 @@ def generate_map(mapbox_access_token, summarized_fires_by_id):
 
 
     return dcc.Graph(id='fires-map', figure=fig)
-
-
-def get_fires_map(mapbox_access_token, data, summarized_fires_by_id):
-
-    return html.Div(
-        id="fires-map-container",
-        children=[
-            # dcc.RadioItems(
-            #     id="mapbox-view-selector",
-            #     options=[
-            #         {"label": "basic", "value": "basic"},
-            #         {"label": "satellite", "value": "satellite"},
-            #         {"label": "outdoors", "value": "outdoors"},
-            #         {
-            #             "label": "satellite-street",
-            #             "value": "mapbox://styles/mapbox/satellite-streets-v9",
-            #         },
-            #     ],
-            #     value="basic",
-            # ),
-            generate_map(mapbox_access_token, summarized_fires_by_id)
-        ]
-    )
-
-def define_callbacks(app):
-
-    pass
