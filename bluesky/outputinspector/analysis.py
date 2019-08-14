@@ -7,10 +7,10 @@ class SummarizedFire(dict):
 
         self.active_areas = self.fire.active_areas
         self.locations = self.fire.locations
-        self.set_lat_lng()
-        self.set_flat_summary()
+        self._set_lat_lng()
+        self._set_flat_summary()
 
-    def set_lat_lng(self):
+    def _set_lat_lng(self):
         lat_lngs = [locationutils.LatLng(l) for l in self.locations]
 
         def get_min_max(vals):
@@ -37,7 +37,7 @@ class SummarizedFire(dict):
             }
         }
 
-    def set_flat_summary(self):
+    def _set_flat_summary(self):
         self['flat_summary'] = {
             'id': self.fire.get('id'),
             'avg_lat': self['lat_lng']['lat']['avg'],
@@ -52,3 +52,9 @@ class SummarizedFire(dict):
             'start': min([aa['start'] for aa in self.active_areas]),
             'end': max([aa['end'] for aa in self.active_areas])
         }
+
+def summarized_fires_by_id(fires):
+    summarized_fires = [SummarizedFire(f) for f in fires]
+    return {
+        sf.fire['id']: sf for sf in summarized_fires
+    }
