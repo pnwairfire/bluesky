@@ -74,7 +74,7 @@ def get_fires_data_table(data, summarized_fires):
         # editable=False,
     )
 
-def get_body(app, data, summarized_fires):
+def get_body(app, mapbox_access_token, data, summarized_fires):
     return dbc.Container(
         [
             dbc.Row(
@@ -82,7 +82,8 @@ def get_body(app, data, summarized_fires):
                     dbc.Col(
                         [
                             html.H4("Fires Map"),
-                            firesmap.get_fires_map(app, data, summarized_fires)
+                            firesmap.get_fires_map(app, mapbox_access_token,
+                                data, summarized_fires)
                         ],
                         md=4,
                     ),
@@ -128,7 +129,7 @@ EXTERNAL_STYLESHEETS = [
     #, 'https://codepen.io/chriddyp/pen/bWLwgP.css'
 ]
 
-def create_app(bluesky_output_file):
+def create_app(bluesky_output_file, mapbox_access_token=None):
     data = {}
     if bluesky_output_file:
         with open(os.path.abspath(bluesky_output_file)) as f:
@@ -137,7 +138,10 @@ def create_app(bluesky_output_file):
 
     app = dash.Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS)
     app.title = "Bluesky Output Inspector"
-    app.layout = html.Div([get_navbar(), get_body(app, data, summarized_fires)])
+    app.layout = html.Div([
+        get_navbar(),
+        get_body(app, mapbox_access_token, data, summarized_fires)
+    ])
 
 
     ##

@@ -26,11 +26,14 @@ def parse_args():
         action="store_true")
     parser.add_argument('-p', '--port', help="port; default 8050",
         default=8050, type=int)
+    parser.add_argument('-m', '--mapbox-access-token', help="to use mapbox maps")
+
     parser.epilog = EXAMPLES_STRING
     parser.formatter_class = argparse.RawTextHelpFormatter
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = parse_args()
-    app = outputinspector.app.create_app(args.input)
+    app = outputinspector.app.create_app(args.input,
+        mapbox_access_token=args.mapbox_access_token)
     app.run_server(debug=args.debug,  host='0.0.0.0', port=args.port)
