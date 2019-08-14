@@ -64,8 +64,8 @@ def get_body(mapbox_access_token, data, summarized_fires_by_id):
                 ]
             ),
             dbc.Row([
-                dbc.Col([html.Div(id='emissions-container')],md=4),
-                dbc.Col([html.Div(id='plumerise-container')],md=4)
+                dbc.Col([html.Div(id='emissions-container')],lg=6),
+                dbc.Col([html.Div(id='plumerise-container')],lg=6)
             ])
         ],
         fluid=True,
