@@ -1,7 +1,11 @@
 import dash_core_components as dcc
 import dash_html_components as html
 
-def get_upload_box():
+##
+## Used for app layout
+##
+
+def get_upload_box_layout():
     return dcc.Upload(
         id="upload-data",
         children=html.Div(

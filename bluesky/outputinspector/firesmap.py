@@ -3,6 +3,11 @@ import dash_html_components as html
 import pandas as pd
 import plotly.graph_objs as go
 
+
+##
+## Used by Callbacks
+##
+
 COLOR_SCALE = [
     [0,"rgb(5, 10, 172)"],
     [100,"rgb(40, 60, 190)"],
@@ -78,11 +83,11 @@ def get_fires_map_layout(mapbox_access_token):
         #title = "Fire Locations"
     )
 
-def get_fires_map_figure(mapbox_access_token, summarized_fires_by_id):
+def get_fires_map(mapbox_access_token, summarized_fires_by_id):
     data = get_fires_map_data(mapbox_access_token, summarized_fires_by_id)
     layout = get_fires_map_layout(mapbox_access_token)
-    return {'data':data, 'layout': layout}
-
-def get_fires_map(mapbox_access_token, summarized_fires_by_id):
-    fig = get_fires_map_figure(mapbox_access_token, summarized_fires_by_id)
-    return dcc.Graph(id='fires-map', figure=fig)
+    fig = {'data':data, 'layout': layout}
+    return [
+        dcc.Graph(id='fires-map', figure=fig),
+        html.Div("Select fires to see in the table", className="caption")
+    ]

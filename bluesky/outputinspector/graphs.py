@@ -42,7 +42,6 @@ def get_emissions_graph_elements(summarized_fires):
         html.Div("Timeprofiled Emissions")
     ]
 
-
 def get_plumerise_graph_elements(summarized_fires):
     if not summarized_fires:
         return [html.Div("")]

@@ -21,7 +21,7 @@ Examples:
  """.format(script=sys.argv[0])
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-i', '--input', help="bsp output file", required=True)
+    parser.add_argument('-i', '--input', help="bsp output file")
     parser.add_argument('-d', '--debug', help="run flask app in debug mode",
         action="store_true")
     parser.add_argument('-p', '--port', help="port; default 8050",
@@ -34,6 +34,6 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    app = outputinspector.app.create_app(args.input,
+    app = outputinspector.app.create_app(bluesky_output_file=args.input,
         mapbox_access_token=args.mapbox_access_token)
     app.run_server(debug=args.debug,  host='0.0.0.0', port=args.port)

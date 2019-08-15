@@ -15,11 +15,11 @@ from dash.exceptions import PreventUpdate
 
 from . import analysis, firesmap, firestable, upload, graphs
 
-def get_navbar(data):
+def get_navbar():
     return dbc.NavbarSimple(
         children=[
-            html.Div("run: {}".format(data.get('run_id')), id="run-id"),
-            dbc.NavItem(upload.get_upload_box()),
+            html.Div("", id="run-id"),
+            dbc.NavItem(upload.get_upload_box_layout()),
             # dbc.DropdownMenu(
             #     nav=True,
             #     in_navbar=True,
@@ -35,43 +35,28 @@ def get_navbar(data):
         fluid=True
     )
 
-def get_body(mapbox_access_token, data, summarized_fires_by_id):
+def get_body():
     return dbc.Container(
         [
-            dbc.Row(
-                [
-                    dbc.Col(
-                        [
-                            html.Div(id="fires-map-container", children=[
-                                firesmap.get_fires_map(mapbox_access_token,
-                                    summarized_fires_by_id),
-                                html.Div("Select fires to see in the table",
-                                    className="caption")
-                            ])
-                        ],
-                        lg=5,
-                    ),
-                    dbc.Col(
-                        [
-                            html.Div(id='fires-table-container', children=[
-                                firestable.get_fires_data_table(
-                                    summarized_fires_by_id),
-                                html.Div("Select a fire to see emissions and plumerise graphs",
-                                    className="caption")
-                            ])
-                        ],
-                        lg=7
-                    )
-                ]
-            ),
             dbc.Row([
-                dbc.Col([html.Div(id='emissions-container')],lg=6),
-                dbc.Col([html.Div(id='plumerise-container')],lg=6)
+                dbc.Col([html.Div(id="fires-map-container")], lg=5),
+                dbc.Col([html.Div(id='fires-table-container')], lg=7)
+            ]),
+            dbc.Row([
+                dbc.Col([html.Div(id='emissions-container')], lg=6),
+                dbc.Col([html.Div(id='plumerise-container')], lg=6)
             ])
         ],
         fluid=True,
         className="mt-4",
     )
+
+def serve_layout():
+    return html.Div([
+        html.Div(session_id, id='session-id', style={'display': 'none'}),
+        get_navbar(),
+        get_body()
+    ])
 
 
 EXTERNAL_STYLESHEETS = [
@@ -79,19 +64,17 @@ EXTERNAL_STYLESHEETS = [
     #, 'https://codepen.io/chriddyp/pen/bWLwgP.css'
 ]
 
-def create_app(bluesky_output_file, mapbox_access_token=None):
+def create_app(bluesky_output_file=None, mapbox_access_token=None):
     data = {}
     if bluesky_output_file:
         with open(os.path.abspath(bluesky_output_file)) as f:
             data = json.load(f)
-    summarized_fires_by_id = analysis.summarized_fires_by_id(data.get('fires'))
+    summarized_fires_by_id = analysis.summarized_fires_by_id(
+        data.get('fires', []))
 
     app = dash.Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS)
     app.title = "Bluesky Output Inspector"
-    app.layout = html.Div([
-        get_navbar(data),
-        get_body(mapbox_access_token, data, summarized_fires_by_id)
-    ])
+    app.layout = serve_layout
     app.summarized_fires_by_id = summarized_fires_by_id
     define_callbacks(app, mapbox_access_token)
 
@@ -105,11 +88,41 @@ def create_app(bluesky_output_file, mapbox_access_token=None):
 ID_EXTRACTOR = re.compile('data-id="([^"]+)"')
 
 def define_callbacks(app, mapbox_access_token):
+    # Suppress errors because some callbacks are are assigned to
+    # components that will be genreated by other callbacks
+    # (and thus aren't in the initial layout)
+    app.config.suppress_callback_exceptions=True
+
+    # Load data from uploaded output
+
+    @app.callback(
+        Output('fires-map-container', 'children'),
+        [
+            Input("upload-data", "filename"),
+            Input("upload-data", "contents")
+        ]
+    )
+    def update_output(uploaded_filenames, uploaded_file_contents):
+        if uploaded_file_contents is None:
+            if not app.summarized_fires_by_id:
+                # Initial app load, and '-i' wasn't specified
+                raise PreventUpdate
+            # else, leave app.summarized_fires_by_id as is
+
+        else:
+            content_type, content_string = uploaded_file_contents.split(',')
+            decoded = base64.b64decode(content_string).decode()
+            data = json.loads(decoded)
+            app.summarized_fires_by_id = analysis.summarized_fires_by_id(
+                data.get('fires', []))
+
+        return firesmap.get_fires_map(mapbox_access_token,
+            app.summarized_fires_by_id)
 
     # Update fires table when fires are selected on map
 
     @app.callback(
-        Output("fires-table", "data"),
+        Output("fires-table-container", "children"),
         [
             Input("fires-map", "selectedData"),
             Input("fires-map", "clickData"),
@@ -133,7 +146,7 @@ def define_callbacks(app, mapbox_access_token):
                 selected_fires = get_selected_fires(data['points'])
         # else, leave as complete set of fires
 
-        return firestable.process_fires(selected_fires)
+        return firestable.get_fires_table(selected_fires)
 
     # Update graphs when fire is selected in table
 
@@ -162,24 +175,3 @@ def define_callbacks(app, mapbox_access_token):
             emissions_graph,
             plumerise_graph
         ]
-
-    # Load data from uploaded output
-
-    @app.callback(
-        Output('fires-map', 'figure'),
-        [
-            Input("upload-data", "filename"),
-            Input("upload-data", "contents")
-        ]
-    )
-    def update_output(uploaded_filenames, uploaded_file_contents):
-        if uploaded_file_contents is None:
-            raise PreventUpdate
-
-        content_type, content_string = uploaded_file_contents.split(',')
-        decoded = base64.b64decode(content_string).decode()
-        data = json.loads(decoded)
-        app.summarized_fires_by_id = analysis.summarized_fires_by_id(data.get('fires'))
-
-        return {'data': firesmap.get_fires_map_data(
-                mapbox_access_token, app.summarized_fires_by_id)}
