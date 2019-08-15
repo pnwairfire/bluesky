@@ -7,17 +7,14 @@ from bluesky import models, locationutils
 class SummarizedFire(dict):
 
     def __init__(self, fire):
-        self.fire = models.fires.Fire(fire)
+        fire = models.fires.Fire(fire)
 
-        self.active_areas = self.fire.active_areas
-        self.locations = self.fire.locations
-        self._set_lat_lng()
-        self._set_flat_summary()
-        # lazy generate timeprofiles emissions, and memoize
-        self._timeprofiled_emissions = None
+        self._set_lat_lng(fire)
+        self._set_flat_summary(fire)
+        self._set_timeprofiled_emissions(fire)
 
-    def _set_lat_lng(self):
-        lat_lngs = [locationutils.LatLng(l) for l in self.locations]
+    def _set_lat_lng(self, fire):
+        lat_lngs = [locationutils.LatLng(l) for l in fire.locations]
 
         def get_min_max(vals):
             return min(vals), max(vals), sum(vals) / len(vals)
@@ -43,41 +40,40 @@ class SummarizedFire(dict):
             }
         }
 
-    def _set_flat_summary(self):
+    def _set_flat_summary(self, fire):
+        active_areas = fire.active_areas
+        locations = fire.locations
         self['flat_summary'] = {
-            'id': self.fire.get('id'),
+            'id': fire.get('id'),
             'avg_lat': self['lat_lng']['lat']['avg'],
             'lat': self['lat_lng']['lat']['pretty_str'],
             'avg_lng':  self['lat_lng']['lng']['avg'],
             'lng': self['lat_lng']['lat']['pretty_str'],
-            'total_consumption': self.fire.consumption['summary']['total'],
-            'total_emissions': self.fire.emissions['summary']['total'],
-            'PM2.5': self.fire.emissions['summary']['PM2.5'],
-            'num_locations': len(self.locations),
-            'total_area': sum([l['area'] for l in self.locations]),
-            'start': min([aa['start'] for aa in self.active_areas]),
-            'end': max([aa['end'] for aa in self.active_areas])
+            'total_consumption': fire.consumption['summary']['total'],
+            'total_emissions': fire.emissions['summary']['total'],
+            'PM2.5': fire.emissions['summary']['PM2.5'],
+            'num_locations': len(locations),
+            'total_area': sum([l['area'] for l in locations]),
+            'start': min([aa['start'] for aa in active_areas]),
+            'end': max([aa['end'] for aa in active_areas])
         }
 
-    def get_timeprofiled_emissions(self):
-        if self._timeprofiled_emissions is None:
-            all_loc_emissions = defaultdict(lambda: defaultdict(lambda: 0.0))
-            for aa in self.fire.active_areas:
-                for loc in aa.locations:
-                    emissions = self._get_emissions(loc)
-                    per_species = {}
-                    for s in emissions:
-                        for t in sorted(aa.get('timeprofile', {}).keys()):
-                            d = aa['timeprofile'][t]
-                            all_loc_emissions[t][s] += sum([
-                                d[p]*emissions[s][p] for p in self.PHASES
-                            ])
+    def _set_timeprofiled_emissions(self, fire):
+        all_loc_emissions = defaultdict(lambda: defaultdict(lambda: 0.0))
+        for aa in fire.active_areas:
+            for loc in aa.locations:
+                emissions = self._get_emissions(loc)
+                per_species = {}
+                for s in emissions:
+                    for t in sorted(aa.get('timeprofile', {}).keys()):
+                        d = aa['timeprofile'][t]
+                        all_loc_emissions[t][s] += sum([
+                            d[p]*emissions[s][p] for p in self.PHASES
+                        ])
 
-            self._timeprofiled_emissions = pd.DataFrame([
-                dict(all_loc_emissions[t], dt=t) for t in sorted(all_loc_emissions.keys())
-            ])
-
-        return self._timeprofiled_emissions
+        self.timeprofiled_emissions = pd.DataFrame([
+            dict(all_loc_emissions[t], dt=t) for t in sorted(all_loc_emissions.keys())
+        ])
 
     PHASES = ['flaming', 'smoldering', 'residual']
 
@@ -99,5 +95,5 @@ class SummarizedFire(dict):
 def summarized_fires_by_id(fires):
     summarized_fires = [SummarizedFire(f) for f in fires]
     return {
-        sf.fire['id']: sf for sf in summarized_fires
+        sf['flat_summary']['id']: sf for sf in summarized_fires
     }

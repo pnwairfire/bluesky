@@ -10,13 +10,12 @@ def get_emissions_graph_elements(summarized_fires):
     # Note that there should only be one fire
     data = []
     for f in summarized_fires:
-        tes_df = f.get_timeprofiled_emissions()
-        if tes_df is not None and not tes_df.empty:
-            species = [k for k in tes_df.keys() if k != 'dt']
+        if not f.timeprofiled_emissions.empty:
+            species = [k for k in f.timeprofiled_emissions.keys() if k != 'dt']
             for s in species:
                 data.append({
-                    'x': tes_df['dt'],
-                    'y': tes_df[s],
+                    'x': f.timeprofiled_emissions['dt'],
+                    'y': f.timeprofiled_emissions[s],
                     'text': ['a', 'b', 'c', 'd'],
                     'customdata': ['c.a', 'c.b', 'c.c', 'c.d'],
                     'name': s,
