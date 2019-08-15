@@ -17,8 +17,8 @@ def get_emissions_graph_elements(summarized_fires):
                     'text': ['a', 'b', 'c', 'd'],
                     'customdata': ['c.a', 'c.b', 'c.c', 'c.d'],
                     'name': '{}, {} - PM2.5'.format(per_loc_te['lat'], per_loc_te['lng']),
-                    'mode': 'markers',
-                    'marker': {'size': 12}
+                    'mode': 'lines+markers',
+                    'marker': {'size': 5}
                 })
 
     if not data:

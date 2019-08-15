@@ -66,7 +66,8 @@ class SummarizedFire(dict):
                     per_species = {}
                     for s in emissions:
                         per_species[s] = []
-                        for t, d in aa.get('timeprofile', {}).items():
+                        for t in sorted(aa.get('timeprofile', {}).keys()):
+                            d = aa['timeprofile'][t]
                             per_species[s].append({
                                 'dt': t,
                                 'val': sum([
