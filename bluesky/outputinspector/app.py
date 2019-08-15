@@ -13,44 +13,7 @@ import plotly.express as px
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 
-from . import analysis, firesmap, firestable, upload, graphs
-
-def get_navbar():
-    return dbc.NavbarSimple(
-        children=[
-            html.Div("", id="run-id"),
-            dbc.NavItem(upload.get_upload_box_layout()),
-            # dbc.DropdownMenu(
-            #     nav=True,
-            #     in_navbar=True,
-            #     label="Menu",
-            #     children=[
-            #         dbc.DropdownMenuItem("Entry 1")
-            #     ]
-            # )
-        ],
-        brand="BlueSky Output Inspector",
-        brand_href="#",
-        sticky="top",
-        fluid=True
-    )
-
-def get_body():
-    return dbc.Container(
-        [
-            dbc.Row([
-                dbc.Col([html.Div(id="fires-map-container")], lg=5),
-                dbc.Col([html.Div(id='fires-table-container')], lg=7)
-            ]),
-            dbc.Row([
-                dbc.Col([html.Div(id='emissions-container')], lg=6),
-                dbc.Col([html.Div(id='plumerise-container')], lg=6)
-            ])
-        ],
-        fluid=True,
-        className="mt-4",
-    )
-
+from . import analysis, firesmap, firestable, graphs, layout
 
 
 EXTERNAL_STYLESHEETS = [
@@ -67,13 +30,7 @@ def create_app(bluesky_output_file=None, mapbox_access_token=None):
         initial_data.get('fires', []))
 
     def serve_layout():
-        return html.Div([
-            dcc.Input(id='summarized-fires-by-id-state', type='text',
-                value=analysis.SummarizedFiresEncoder().encode(initial_summarized_fires_by_id),
-                style={'display': 'none'}),
-            get_navbar(),
-            get_body()
-        ])
+        return layout.get_layout(initial_summarized_fires_by_id)
 
     app = dash.Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS)
     app.title = "Bluesky Output Inspector"
