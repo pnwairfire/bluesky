@@ -10,7 +10,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import flask
 import plotly.express as px
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 
 from . import analysis, firesmap, firestable, upload, graphs
@@ -51,12 +51,6 @@ def get_body():
         className="mt-4",
     )
 
-def serve_layout():
-    return html.Div([
-        html.Div(session_id, id='session-id', style={'display': 'none'}),
-        get_navbar(),
-        get_body()
-    ])
 
 
 EXTERNAL_STYLESHEETS = [
@@ -65,18 +59,27 @@ EXTERNAL_STYLESHEETS = [
 ]
 
 def create_app(bluesky_output_file=None, mapbox_access_token=None):
-    data = {}
+    initial_data = {}
     if bluesky_output_file:
         with open(os.path.abspath(bluesky_output_file)) as f:
-            data = json.load(f)
-    summarized_fires_by_id = analysis.summarized_fires_by_id(
-        data.get('fires', []))
+            initial_data = json.load(f)
+    initial_summarized_fires_by_id = analysis.summarized_fires_by_id(
+        initial_data.get('fires', []))
+
+    def serve_layout():
+        return html.Div([
+            dcc.Input(id='summarized-fires-by-id-state', type='text',
+                value=analysis.SummarizedFiresEncoder().encode(initial_summarized_fires_by_id),
+                style={'display': 'none'}),
+            get_navbar(),
+            get_body()
+        ])
 
     app = dash.Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS)
     app.title = "Bluesky Output Inspector"
     app.layout = serve_layout
-    app.summarized_fires_by_id = summarized_fires_by_id
-    define_callbacks(app, mapbox_access_token)
+    define_callbacks(app, mapbox_access_token,
+        initial_summarized_fires_by_id)
 
     return app
 
@@ -87,7 +90,8 @@ def create_app(bluesky_output_file=None, mapbox_access_token=None):
 
 ID_EXTRACTOR = re.compile('data-id="([^"]+)"')
 
-def define_callbacks(app, mapbox_access_token):
+def define_callbacks(app, mapbox_access_token,
+        initial_summarized_fires_by_id):
     # Suppress errors because some callbacks are are assigned to
     # components that will be genreated by other callbacks
     # (and thus aren't in the initial layout)
@@ -96,7 +100,7 @@ def define_callbacks(app, mapbox_access_token):
     # Load data from uploaded output
 
     @app.callback(
-        Output('fires-map-container', 'children'),
+        Output('summarized-fires-by-id-state', 'value'),
         [
             Input("upload-data", "filename"),
             Input("upload-data", "contents")
@@ -104,20 +108,31 @@ def define_callbacks(app, mapbox_access_token):
     )
     def update_output(uploaded_filenames, uploaded_file_contents):
         if uploaded_file_contents is None:
-            if not app.summarized_fires_by_id:
+            if not initial_summarized_fires_by_id:
                 # Initial app load, and '-i' wasn't specified
                 raise PreventUpdate
-            # else, leave app.summarized_fires_by_id as is
+            summarized_fires_by_id_json = analysis.SummarizedFiresEncoder().encode(
+                initial_summarized_fires_by_id)
 
         else:
             content_type, content_string = uploaded_file_contents.split(',')
             decoded = base64.b64decode(content_string).decode()
             data = json.loads(decoded)
-            app.summarized_fires_by_id = analysis.summarized_fires_by_id(
-                data.get('fires', []))
+            summarized_fires_by_id_json = analysis.SummarizedFiresEncoder().encode(
+                analysis.summarized_fires_by_id(data.get('fires', [])))
 
+        return summarized_fires_by_id_json
+
+    # Update map when new output data is loaded
+    @app.callback(
+        Output('fires-map-container', 'children'),
+        [
+            Input('summarized-fires-by-id-state', 'value')
+        ]
+    )
+    def update_fires_map_from_loaded_output(summarized_fires_by_id_json):
         return firesmap.get_fires_map(mapbox_access_token,
-            app.summarized_fires_by_id)
+            json.loads(summarized_fires_by_id_json))
 
     # Update fires table when fires are selected on map
 
@@ -128,17 +143,23 @@ def define_callbacks(app, mapbox_access_token):
             Input("fires-map", "clickData"),
             Input("fires-map", "figure")
         ],
+        [
+            State('summarized-fires-by-id-state', 'value')
+        ]
     )
-    def update_fires_table_from_map(*args):
+    def update_fires_table_from_map(selected_data, click_data, figure,
+            summarized_fires_by_id_json):
+        summarized_fires_by_id = json.loads(summarized_fires_by_id_json)
+
         def get_selected_fires(points):
             selected_fires = []
             for p in  points:
                 fire_id = ID_EXTRACTOR.findall(p['text'])[0]
-                selected_fires.append(app.summarized_fires_by_id[fire_id])
+                selected_fires.append(summarized_fires_by_id[fire_id])
             return selected_fires
 
         ctx = dash.callback_context
-        selected_fires = app.summarized_fires_by_id.values()
+        selected_fires = summarized_fires_by_id.values()
         if ctx.triggered:
             prop_id = ctx.triggered[0]['prop_id']
             data = ctx.triggered[0]['value']
@@ -158,15 +179,20 @@ def define_callbacks(app, mapbox_access_token):
         [
             Input('fires-table', "derived_virtual_data"),
             Input('fires-table', "derived_virtual_selected_rows")
+        ],
+        [
+            State('summarized-fires-by-id-state', 'value')
         ]
     )
-    def update_graphs(rows, selected_rows):
+    def update_graphs(rows, selected_rows, summarized_fires_by_id_json):
+        summarized_fires_by_id = json.loads(summarized_fires_by_id_json)
+
         # if not selected_rows:
         #     raise PreventUpdate
         selected_rows = selected_rows or []
 
         fire_ids = [rows[i]['id'] for i in selected_rows]
-        selected_fires = [app.summarized_fires_by_id[fid] for fid in fire_ids]
+        selected_fires = [summarized_fires_by_id[fid] for fid in fire_ids]
 
         emissions_graph = graphs.get_emissions_graph_elements(selected_fires)
         plumerise_graph = graphs.get_plumerise_graph_elements(selected_fires)

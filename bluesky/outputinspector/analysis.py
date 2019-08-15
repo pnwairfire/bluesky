@@ -1,8 +1,20 @@
+import datetime
+import json
 from collections import defaultdict
 
-import pandas as pd
-
 from bluesky import models, locationutils
+
+class SummarizedFiresEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, 'tolist'):
+            return obj.tolist()
+        elif isinstance(obj, datetime.date):
+            return obj.isoformat()
+        # elif isinstance(obj, pd.DataFrame):
+        #     return obj.to_json()
+
+        return json.JSONEncoder.default(self, obj)
+
 
 class SummarizedFire(dict):
 
@@ -71,9 +83,9 @@ class SummarizedFire(dict):
                             d[p]*emissions[s][p] for p in self.PHASES
                         ])
 
-        self.timeprofiled_emissions = pd.DataFrame([
+        self['timeprofiled_emissions'] = [
             dict(all_loc_emissions[t], dt=t) for t in sorted(all_loc_emissions.keys())
-        ])
+        ]
 
     PHASES = ['flaming', 'smoldering', 'residual']
 
