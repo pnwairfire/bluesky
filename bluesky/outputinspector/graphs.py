@@ -33,6 +33,8 @@ def get_emissions_graph_elements(summarized_fires):
             figure={
                 'data': data,
                 'layout': {
+                    'title': 'Emissions from fire(s) {}'.format(','.join(
+                        f['flat_summary']['id'] for f in summarized_fires)),
                     'clickmode': 'event+select'
                 }
             }

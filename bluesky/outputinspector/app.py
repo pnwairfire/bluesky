@@ -112,26 +112,41 @@ def define_callbacks(app, mapbox_access_token):
         Output("fires-table", "data"),
         [
             Input("fires-map", "selectedData"),
+            Input("fires-map", "clickData"),
+            Input("fires-map", "figure")
         ],
     )
-    def update_fires_table_from_map(map_selected_data):
-        if map_selected_data:
+    def update_fires_table_from_map(*args):
+        def get_selected_fires(points):
             selected_fires = []
-            for p in  map_selected_data['points']:
+            for p in  points:
                 fire_id = ID_EXTRACTOR.findall(p['text'])[0]
                 selected_fires.append(app.summarized_fires_by_id[fire_id])
-        else:
-            selected_fires = app.summarized_fires_by_id.values()
+            return selected_fires
+
+        ctx = dash.callback_context
+        selected_fires = app.summarized_fires_by_id.values()
+        if ctx.triggered:
+            prop_id = ctx.triggered[0]['prop_id']
+            data = ctx.triggered[0]['value']
+            if prop_id in ('fires-map.clickData', 'fires-map.selectedData'):
+                selected_fires = get_selected_fires(data['points'])
+        # else, leave as complete set of fires
 
         return firestable.process_fires(selected_fires)
 
     # Update graphs when fire is selected in table
 
-    @app.callback([
-        Output('emissions-container', "children"),
-        Output('plumerise-container', "children")],
-        [Input('fires-table', "derived_virtual_data"),
-         Input('fires-table', "derived_virtual_selected_rows")])
+    @app.callback(
+        [
+            Output('emissions-container', "children"),
+            Output('plumerise-container', "children")
+        ],
+        [
+            Input('fires-table', "derived_virtual_data"),
+            Input('fires-table', "derived_virtual_selected_rows")
+        ]
+    )
     def update_graphs(rows, selected_rows):
         # if not selected_rows:
         #     raise PreventUpdate
@@ -151,9 +166,11 @@ def define_callbacks(app, mapbox_access_token):
     # Load data from uploaded output
 
     @app.callback(
-        #[Output('fires-map', 'figure'), Output("fires-table", "data")],
         Output('fires-map', 'figure'),
-        [Input("upload-data", "filename"), Input("upload-data", "contents")],
+        [
+            Input("upload-data", "filename"),
+            Input("upload-data", "contents")
+        ]
     )
     def update_output(uploaded_filenames, uploaded_file_contents):
         if uploaded_file_contents is None:
@@ -165,11 +182,4 @@ def define_callbacks(app, mapbox_access_token):
         app.summarized_fires_by_id = analysis.summarized_fires_by_id(data.get('fires'))
 
         return {'data': firesmap.get_fires_map_data(
-            mapbox_access_token, app.summarized_fires_by_id)}
-        # return [
-        #     firesmap.get_fires_map_figure(
-        #         mapbox_access_token, app.summarized_fires_by_id),
-        #     firestable.process_fires(app.summarized_fires_by_id.values())
-        # ]
-        # return firesmap.get_fires_map_figure(mapbox_access_token,
-        #     app.summarized_fires_by_id)
+                mapbox_access_token, app.summarized_fires_by_id)}
