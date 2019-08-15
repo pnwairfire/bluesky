@@ -95,6 +95,8 @@ def define_callbacks(app, mapbox_access_token,
 
     @app.callback(
         [
+            Output('fuelbeds-container', "children"),
+            Output('consumption-container', "children"),
             Output('emissions-container', "children"),
             Output('plumerise-container', "children")
         ],
@@ -116,10 +118,10 @@ def define_callbacks(app, mapbox_access_token,
         fire_ids = [rows[i]['id'] for i in selected_rows]
         selected_fires = [summarized_fires_by_id[fid] for fid in fire_ids]
 
-        emissions_graph = graphs.get_emissions_graph_elements(selected_fires)
-        plumerise_graph = graphs.get_plumerise_graph_elements(selected_fires)
 
         return [
-            emissions_graph,
-            plumerise_graph
+            graphs.get_fuelbeds_graph_elements(selected_fires),
+            graphs.get_consumption_graph_elements(selected_fires),
+            graphs.get_emissions_graph_elements(selected_fires),
+            graphs.get_plumerise_graph_elements(selected_fires)
         ]

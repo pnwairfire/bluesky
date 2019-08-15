@@ -1,6 +1,6 @@
 .caption {
     font-style: italic;
-    font-size: small;;
+    font-size: small;
 }
 
 #fires-table-container .caption {
@@ -9,4 +9,12 @@
 
 .row {
     margin-bottom: 20px;
+}
+
+.empty-graph {
+    min-height: 200px;
+    /*vertical-align: middle;*/
+    padding: 50px;
+    font-style: italic;
+    font-size: small;
 }

@@ -2,6 +2,19 @@ import dash_html_components as html
 import dash_core_components as dcc
 import pandas as pd
 
+def get_fuelbeds_graph_elements(summarized_fires):
+    if not summarized_fires:
+        return [html.Div("")]
+
+    return [html.Div("(fuelbeds graph coming soon)", className="empty-graph")]
+
+def get_consumption_graph_elements(summarized_fires):
+    if not summarized_fires:
+        return [html.Div("")]
+
+    return [html.Div("(consumption graph coming soon)", className="empty-graph")]
+
+
 def get_emissions_graph_elements(summarized_fires):
     if not summarized_fires:
         return [html.Div("")]
@@ -26,7 +39,7 @@ def get_emissions_graph_elements(summarized_fires):
                 })
 
     if not data:
-        return [html.Div("(no emissions for fire)")]
+        return [html.Div("(no emissions for fire)", className="empty-graph")]
 
     return [
         dcc.Graph(
@@ -47,4 +60,4 @@ def get_plumerise_graph_elements(summarized_fires):
     if not summarized_fires:
         return [html.Div("")]
 
-    return [html.Div("")]  # TEMP
+    return [html.Div("(plumerise graph coming soon)", className="empty-graph")]  # TEMP
