@@ -141,12 +141,12 @@ def define_callbacks(app):
         fire_ids = [rows[i]['id'] for i in selected_rows]
         selected_fires = [app.summarized_fires_by_id[fid] for fid in fire_ids]
 
-        emissions_graph = graphs.get_emissions_graph(selected_fires)
-        plumerise_graph = graphs.get_plumerise_graph(selected_fires)
+        emissions_graph = graphs.get_emissions_graph_elements(selected_fires)
+        plumerise_graph = graphs.get_plumerise_graph_elements(selected_fires)
 
         return [
-            [emissions_graph],
-            [plumerise_graph]
+            emissions_graph,
+            plumerise_graph
         ]
 
     # Load data from uploaded output

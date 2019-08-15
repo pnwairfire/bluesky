@@ -1,3 +1,5 @@
+import pandas as pd
+
 from bluesky import models, locationutils
 
 class SummarizedFire(dict):
@@ -9,6 +11,8 @@ class SummarizedFire(dict):
         self.locations = self.fire.locations
         self._set_lat_lng()
         self._set_flat_summary()
+        # lazy generate timeprofiles emissions, and memoize
+        self._timeprofiled_emissions = None
 
     def _set_lat_lng(self):
         lat_lngs = [locationutils.LatLng(l) for l in self.locations]
@@ -53,8 +57,50 @@ class SummarizedFire(dict):
             'end': max([aa['end'] for aa in self.active_areas])
         }
 
-    def get_time_profiled_emissions(self):
-        pass
+    def get_timeprofiled_emissions(self):
+        if not self._timeprofiled_emissions:
+            self._timeprofiled_emissions = []
+            for aa in self.fire.active_areas:
+                for loc in aa.locations:
+                    emissions = self._get_emissions(loc)
+                    per_species = {}
+                    for s in emissions:
+                        per_species[s] = []
+                        for t, d in aa.get('timeprofile', {}).items():
+                            per_species[s].append({
+                                'dt': t,
+                                'val': sum([
+                                    d[p]*emissions[s][p] for p in self.PHASES
+                                ])
+                            })
+                    if per_species:
+                        lat_lng = locationutils.LatLng(loc)
+                        self._timeprofiled_emissions.append({
+                            # TODO: specify if specifed_point or perimeter?
+                            'lat': lat_lng.latitude,
+                            'lng': lat_lng.longitude,
+                            'area': loc.get('area'),
+                            'timeprofiled_emissions': {s: pd.DataFrame(v) for s,v in per_species.items()}
+                        })
+
+        return self._timeprofiled_emissions
+
+    PHASES = ['flaming', 'smoldering', 'residual']
+
+    def _get_emissions(self, loc):
+        # sum the emissions across all fuelbeds, but keep them separate by phase
+        # we want species to be the outer dict and phase the innter
+        emissions = {}
+        for fb in loc['fuelbeds']:
+            for p in self.PHASES:
+                for s in fb['emissions'][p]:
+                    emissions[s] = emissions.get(s, {})
+                    # fb['emissions'][p][s] is an array of one value
+                    emissions[s][p] = (emissions[s].get(p, 0.0)
+                        + sum(fb['emissions'][p][s]))
+        return emissions
+
+
 
 def summarized_fires_by_id(fires):
     summarized_fires = [SummarizedFire(f) for f in fires]
