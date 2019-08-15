@@ -1,3 +1,4 @@
+import base64
 import json
 import os
 import re
@@ -83,7 +84,6 @@ def create_app(bluesky_output_file, mapbox_access_token=None):
     if bluesky_output_file:
         with open(os.path.abspath(bluesky_output_file)) as f:
             data = json.load(f)
-
     summarized_fires_by_id = analysis.summarized_fires_by_id(data.get('fires'))
 
     app = dash.Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS)
@@ -93,8 +93,7 @@ def create_app(bluesky_output_file, mapbox_access_token=None):
         get_body(mapbox_access_token, data, summarized_fires_by_id)
     ])
     app.summarized_fires_by_id = summarized_fires_by_id
-
-    define_callbacks(app)
+    define_callbacks(app, mapbox_access_token)
 
     return app
 
@@ -105,7 +104,7 @@ def create_app(bluesky_output_file, mapbox_access_token=None):
 
 ID_EXTRACTOR = re.compile('data-id="([^"]+)"')
 
-def define_callbacks(app):
+def define_callbacks(app, mapbox_access_token):
 
     # Update fires table when fires are selected on map
 
@@ -151,13 +150,26 @@ def define_callbacks(app):
 
     # Load data from uploaded output
 
-    # @app.callback(
-    #     Output("", ""),
-    #     [Input("upload-data", "filename"), Input("upload-data", "contents")],
-    # )
-    # def update_output(uploaded_filenames, uploaded_file_contents):
-    #     """Save uploaded files and regenerate the file list."""
+    @app.callback(
+        #[Output('fires-map', 'figure'), Output("fires-table", "data")],
+        Output('fires-map', 'figure'),
+        [Input("upload-data", "filename"), Input("upload-data", "contents")],
+    )
+    def update_output(uploaded_filenames, uploaded_file_contents):
+        if uploaded_file_contents is None:
+            raise PreventUpdate
 
-    #     if uploaded_filenames is not None and uploaded_file_contents is not None:
-    #         data = json.load(uploaded_file_contents)
+        content_type, content_string = uploaded_file_contents.split(',')
+        decoded = base64.b64decode(content_string).decode()
+        data = json.loads(decoded)
+        app.summarized_fires_by_id = analysis.summarized_fires_by_id(data.get('fires'))
 
+        return {'data': firesmap.get_fires_map_data(
+            mapbox_access_token, app.summarized_fires_by_id)}
+        # return [
+        #     firesmap.get_fires_map_figure(
+        #         mapbox_access_token, app.summarized_fires_by_id),
+        #     firestable.process_fires(app.summarized_fires_by_id.values())
+        # ]
+        # return firesmap.get_fires_map_figure(mapbox_access_token,
+        #     app.summarized_fires_by_id)

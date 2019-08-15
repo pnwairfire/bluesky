@@ -12,7 +12,7 @@ COLOR_SCALE = [
     [5000,"rgb(220, 220, 220)"]
 ]
 
-def get_fires_map(mapbox_access_token, summarized_fires_by_id):
+def get_fires_map_data(mapbox_access_token, summarized_fires_by_id):
     fires = [sf['flat_summary'] for sf in summarized_fires_by_id.values()]
     df = pd.DataFrame(fires)
     df['text'] = ('<span data-id="' + df['id'] + '">'
@@ -20,7 +20,7 @@ def get_fires_map(mapbox_access_token, summarized_fires_by_id):
 
     # TODO: get working when using 'go.Scattermapbox'
     _f = go.Scattermapbox if mapbox_access_token else go.Scattergeo
-    data = [_f(
+    return [_f(
         #type='scattergeo',
         #locationmode='USA-states',
         lon=df['avg_lng'],
@@ -48,7 +48,8 @@ def get_fires_map(mapbox_access_token, summarized_fires_by_id):
         }
     )]
 
-    # layout = dict(
+def get_fires_map_layout(mapbox_access_token):
+    # return dict(
     #         colorbar = True,
     #         geo = dict(
     #             scope='usa',
@@ -61,7 +62,7 @@ def get_fires_map(mapbox_access_token, summarized_fires_by_id):
     #             subunitwidth = 0.5
     #         ),
     #     )
-    layout = go.Layout(
+    return go.Layout(
         autosize=True,
         mapbox=go.layout.Mapbox(
             accesstoken=mapbox_access_token,
@@ -77,7 +78,11 @@ def get_fires_map(mapbox_access_token, summarized_fires_by_id):
         #title = "Fire Locations"
     )
 
-    fig = {'data':data, 'layout': layout}
+def get_fires_map_figure(mapbox_access_token, summarized_fires_by_id):
+    data = get_fires_map_data(mapbox_access_token, summarized_fires_by_id)
+    layout = get_fires_map_layout(mapbox_access_token)
+    return {'data':data, 'layout': layout}
 
-
+def get_fires_map(mapbox_access_token, summarized_fires_by_id):
+    fig = get_fires_map_figure(mapbox_access_token, summarized_fires_by_id)
     return dcc.Graph(id='fires-map', figure=fig)
