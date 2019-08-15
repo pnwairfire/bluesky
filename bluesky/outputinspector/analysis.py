@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import pandas as pd
 
 from bluesky import models, locationutils
@@ -58,31 +60,22 @@ class SummarizedFire(dict):
         }
 
     def get_timeprofiled_emissions(self):
-        if not self._timeprofiled_emissions:
-            self._timeprofiled_emissions = []
+        if self._timeprofiled_emissions is None:
+            all_loc_emissions = defaultdict(lambda: defaultdict(lambda: 0.0))
             for aa in self.fire.active_areas:
                 for loc in aa.locations:
                     emissions = self._get_emissions(loc)
                     per_species = {}
                     for s in emissions:
-                        per_species[s] = []
                         for t in sorted(aa.get('timeprofile', {}).keys()):
                             d = aa['timeprofile'][t]
-                            per_species[s].append({
-                                'dt': t,
-                                'val': sum([
-                                    d[p]*emissions[s][p] for p in self.PHASES
-                                ])
-                            })
-                    if per_species:
-                        lat_lng = locationutils.LatLng(loc)
-                        self._timeprofiled_emissions.append({
-                            # TODO: specify if specifed_point or perimeter?
-                            'lat': lat_lng.latitude,
-                            'lng': lat_lng.longitude,
-                            'area': loc.get('area'),
-                            'timeprofiled_emissions': {s: pd.DataFrame(v) for s,v in per_species.items()}
-                        })
+                            all_loc_emissions[t][s] += sum([
+                                d[p]*emissions[s][p] for p in self.PHASES
+                            ])
+
+            self._timeprofiled_emissions = pd.DataFrame([
+                dict(all_loc_emissions[t], dt=t) for t in sorted(all_loc_emissions.keys())
+            ])
 
         return self._timeprofiled_emissions
 

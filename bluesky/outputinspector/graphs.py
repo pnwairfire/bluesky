@@ -5,27 +5,29 @@ def get_emissions_graph_elements(summarized_fires):
     if not summarized_fires:
         return [html.Div("")]
 
-    # if one fire, show timeprofiled emissions per location as well
-    # as total; if multiple fires, show only total
+    # timeprofiled emissions are summed across all locations, and
+    # each species is graphed
+    # Note that there should only be one fire
     data = []
     for f in summarized_fires:
-        for per_loc_te in f.get_timeprofiled_emissions():
-            if 'PM2.5' in per_loc_te['timeprofiled_emissions']:
+        tes_df = f.get_timeprofiled_emissions()
+        if tes_df is not None and not tes_df.empty:
+            species = [k for k in tes_df.keys() if k != 'dt']
+            for s in species:
                 data.append({
-                    'x': per_loc_te['timeprofiled_emissions']['PM2.5']['dt'],
-                    'y': per_loc_te['timeprofiled_emissions']['PM2.5']['val'],
+                    'x': tes_df['dt'],
+                    'y': tes_df[s],
                     'text': ['a', 'b', 'c', 'd'],
                     'customdata': ['c.a', 'c.b', 'c.c', 'c.d'],
-                    'name': '{}, {} - PM2.5'.format(per_loc_te['lat'], per_loc_te['lng']),
+                    'name': s,
                     'mode': 'lines+markers',
                     'marker': {'size': 5}
                 })
 
     if not data:
-        return [html.Div("(no PM2.5 emissions for fire)")]
+        return [html.Div("(no emissions for fire)")]
 
     return [
-        html.Div("Timeprofiled Emissions"),
         dcc.Graph(
             id='emissions-graph',
             figure={
@@ -34,7 +36,8 @@ def get_emissions_graph_elements(summarized_fires):
                     'clickmode': 'event+select'
                 }
             }
-        )
+        ),
+        html.Div("Timeprofiled Emissions")
     ]
 
 
