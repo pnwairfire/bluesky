@@ -56,10 +56,10 @@ def get_body():
                 dbc.Col([html.Div(id='summary-emissions-container')], lg=4),
             ]),
             dbc.Row([
-                dbc.Col([html.Div(id='fuelbeds-container')], lg=12)
+                dbc.Col([html.Div(id='plumerise-container')], lg=12)
             ]),
             dbc.Row([
-                dbc.Col([html.Div(id='plumerise-container')], lg=6)
+                dbc.Col([html.Div(id='fuelbeds-container')], lg=12)
             ])
         ],
         fluid=True,

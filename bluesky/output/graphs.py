@@ -118,13 +118,13 @@ def get_fuelbeds_graph_elements(summarized_fires):
     graphs = []
     for f in summarized_fires:
         flat_fuelbeds = []
-        for i, aa in enumerate(f['active_areas']):
-            for loc_id, fuelbeds in aa['fuelbeds'].items():
-                for f in fuelbeds:
+        for aa in f['active_areas']:
+            for loc in aa['locations']:
+                for f in loc['fuelbeds']:
                     flat_fuelbeds.append({
                         'aa': aa['id'],
+                        'loc': loc['id'],
                         'fccs': 'FCCS ' + f['fccs_id'],
-                        'loc': loc_id,
                         'pct': f['pct']
                     })
 

@@ -25,7 +25,7 @@ class SummarizedFire(dict):
         self._set_lat_lng(fire)
         self._set_flat_summary(fire)
         self._set_fire_data(fire)
-        self._set_per_active_area_data(fire)
+        self._set_per_location_data(fire)
 
     def _set_lat_lng(self, fire):
         lat_lngs = [locationutils.LatLng(l) for l in fire.locations]
@@ -130,7 +130,40 @@ class SummarizedFire(dict):
                         + sum(fb['emissions'][p][s]))
         return emissions
 
-    def _set_plumerise(self, fire):
+    ##
+    ## Per ActiveArea Data
+    ##
+
+    def _set_per_location_data(self, fire):
+        self['active_areas'] = []
+        for i, aa in enumerate(fire.active_areas):
+            # set location ids
+
+            self['active_areas'].append({
+                "id": "#{} {} - {}".format(i, aa['start'], aa['end']),
+                "start": aa['start'],
+                "end": aa['end'],
+                'locations': []
+            })
+            for j, loc in enumerate(aa.locations):
+                lat_lng = locationutils.LatLng(loc)
+                self['active_areas'][-1]['locations'].append({
+                    "id": "#{} {},{}".format(
+                        j, lat_lng.latitude, lat_lng.longitude),
+                    "fuelbeds": fuelbeds.summarize([self._wrap_loc_in_fire(loc)]),
+                    "plumerise": self._get_location_plumerise(loc)
+                })
+
+    def _wrap_loc_in_fire(self, loc):
+        return models.fires.Fire({
+            'activity':[{
+                'active_areas':[{
+                    'specified_points': [loc]
+                }]
+            }]
+        })
+
+    def _get_location_plumerise(self, loc):
         # # sum the consumption across all fuelbeds and phases, but keep them
         # # separate by category
         # self['plumerise_per_location'] = defaultdict(lambda: [])
@@ -144,43 +177,6 @@ class SummarizedFire(dict):
         #                     for p in self.PHASES])
         #     }
         pass
-
-    ##
-    ## Per ActiveArea Data
-    ##
-
-    def _set_per_active_area_data(self, fire):
-        self['active_areas'] = []
-        for i, aa in enumerate(fire.active_areas):
-            # set location ids
-            for j, loc in enumerate(aa.locations):
-                lat_lng = locationutils.LatLng(loc)
-                loc['id'] = "#{} {},{}".format(
-                    j, lat_lng.latitude, lat_lng.longitude)
-
-            self['active_areas'].append({
-                "id": "#{} {} - {}".format(i, aa['start'], aa['end']),
-                "start": aa['start'],
-                "end": aa['end'],
-                "fuelbeds": self._get_active_area_fuelbeds(aa),
-                # "consumption": self._set_consumption(aa),
-                # "timeprofiled_emissions": self._set_timeprofiled_emissions(aa),
-                # "plumerise": self._set_plumerise(aa)
-            })
-
-    def _wrap_loc_in_fire(self, loc):
-        return models.fires.Fire({
-            'activity':[{
-                'active_areas':[{
-                    'specified_points': [loc]
-                }]
-            }]
-        })
-
-    def _get_active_area_fuelbeds(self, aa):
-        return {loc['id']: fuelbeds.summarize([self._wrap_loc_in_fire(loc)])
-                for loc in aa.locations}
-
 
 def summarized_fires_by_id(fires):
     summarized_fires = [SummarizedFire(f) for f in fires]

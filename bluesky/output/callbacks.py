@@ -98,8 +98,8 @@ def define_callbacks(app, mapbox_access_token,
             Output('summary-fuelbeds-container', "children"),
             Output('summary-consumption-container', "children"),
             Output('summary-emissions-container', "children"),
-            Output('fuelbeds-container', "children"),
-            Output('plumerise-container', "children")
+            Output('plumerise-container', "children"),
+            Output('fuelbeds-container', "children")
         ],
         [
             Input('fires-table', "derived_virtual_data"),
@@ -123,6 +123,6 @@ def define_callbacks(app, mapbox_access_token,
             graphs.get_summary_fuelbeds_graph_elements(selected_fires),
             graphs.get_summary_consumption_graph_elements(selected_fires),
             graphs.get_summary_emissions_graph_elements(selected_fires),
-            graphs.get_fuelbeds_graph_elements(selected_fires),
-            graphs.get_plumerise_graph_elements(selected_fires)
+            graphs.get_plumerise_graph_elements(selected_fires),
+            graphs.get_fuelbeds_graph_elements(selected_fires)
         ]
