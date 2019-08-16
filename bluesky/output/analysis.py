@@ -148,8 +148,8 @@ class SummarizedFire(dict):
             for j, loc in enumerate(aa.locations):
                 lat_lng = locationutils.LatLng(loc)
                 self['active_areas'][-1]['locations'].append({
-                    "id": "#{} {},{}".format(
-                        j, lat_lng.latitude, lat_lng.longitude),
+                    "id": "#{}/#{} {},{}".format(
+                        i, j, lat_lng.latitude, lat_lng.longitude),
                     "fuelbeds": fuelbeds.summarize([self._wrap_loc_in_fire(loc)]),
                     "plumerise": self._get_location_plumerise(loc)
                 })

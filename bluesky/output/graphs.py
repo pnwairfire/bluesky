@@ -31,19 +31,20 @@ def get_summary_fuelbeds_graph_elements(summarized_fires):
         return [html.Div("")]
 
     # TODO: make sure this handles multple selected fires
-    data = []
+    graphs = []
     for f in summarized_fires:
         df = pd.DataFrame(f['fuelbeds'])
         if not df.empty:
-            data.append(go.Bar(
-                name=get_fire_label(f),
-                x='fccs ' + df['fccs_id'], y=df['pct']
+            graphs.append(dcc.Graph(
+                id='summary-emissions-graph-'+f['flat_summary']['id'],
+                figure=go.Figure(data=[go.Pie(
+                    labels='FCCS ' + df['fccs_id'], values=df['pct'])])
             ))
 
-    if not data:
+    if not graphs:
         return [html.Div("(no fuelbeds for fire)", className="empty-graph")]
 
-    return generate_bar_graph_elements('summary-fuelbeds-graph', data, "Fuelbeds")
+    return [html.H4("Fuelbeds")] + graphs + [html.Div("Fuelbeds by activity collection, by location", className="caption")]
 
 def get_summary_consumption_graph_elements(summarized_fires):
     if not summarized_fires:
@@ -126,6 +127,13 @@ def get_fuelbeds_graph_elements(summarized_fires):
     if not summarized_fires:
         return [html.Div("")]
 
+
+
+    # TODO: look at https://plot.ly/python/pie-charts/#pie-charts-in-subplots
+
+
+
+
     # TODO: handle multple selected fires ?
     graphs = []
     for f in summarized_fires:
@@ -153,8 +161,6 @@ def get_fuelbeds_graph_elements(summarized_fires):
         graphs = [html.Div("(no fuelbed information)", className="empty-graph")]
 
     return [html.H4("Fuelbeds")] + graphs + [html.Div("Fuelbeds by activity collection, by location", className="caption")]
-    #return generate_bar_graph_elements('fuelbeds-graph', data, "Fuelbeds")
-
 
 def get_plumerise_graph_elements(summarized_fires):
     if not summarized_fires:
@@ -176,9 +182,9 @@ def get_plumerise_graph_elements(summarized_fires):
         df = pd.DataFrame(flat_plumerise)
         if not df.empty:
             graphs.append(
-                dcc.Graph(id='fuelbeds-graph',
+                dcc.Graph(id='plumerise-graph',
                     figure=px.bar(df, x="time", y="height", color="loc",
-                        barmode="group", facet_col="aa", #facet_row="day",
+                        barmode="group", #facet_col="aa", #facet_row="day",
                         # category_orders={"day": ["Thur", "Fri", "Sat", "Sun"],
                         #       "time": ["Lunch", "Dinner"]}
                         #height=400
@@ -191,4 +197,3 @@ def get_plumerise_graph_elements(summarized_fires):
         graphs = [html.Div("(no plumerise information)", className="empty-graph")]
 
     return [html.H4("Plumerise")] + graphs + [html.Div("Plumerise by activity collection, by location", className="caption")]
-    #return generate_bar_graph_elements('fuelbeds-graph', data, "Fuelbeds")
