@@ -164,20 +164,12 @@ class SummarizedFire(dict):
         })
 
     def _get_location_plumerise(self, loc):
-        return
-        # # sum the consumption across all fuelbeds and phases, but keep them
-        # # separate by category
-        # self['plumerise_per_location'] = defaultdict(lambda: [])
-        # for i, loc in enuerate(fire.locations):
-        #     lat_lng = locationutils.LatLng(loc)
-        #     loc_id = "#{} {},{}".format(i, loc.latitude, loc.longitude)
-        #     for c in fb['']:
-        #             for sc in fb['consumption'][c]:
-        #                 # Each fb['consumption'][c][sc][p] is an array of one value
-        #                 consumption[c] += sum([sum(fb['consumption'][c][sc][p])
-        #                     for p in self.PHASES])
-        #     }
-        pass
+        return [
+            {
+                't': t,
+                'heights': d['heights']
+            } for t, d in loc.get('plumerise', {}).items()
+        ]
 
 def summarized_fires_by_id(fires):
     summarized_fires = [SummarizedFire(f) for f in fires]

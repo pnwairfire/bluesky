@@ -104,11 +104,23 @@ def get_summary_emissions_graph_elements(summarized_fires):
         html.Div("", className="caption")
     ]
 
+##
+## Per-location graphs
+##
 
 def get_active_area_index():
     # TODO: eventually want to add dropdown to select active area, for
     #  now just use first active area
     return 0
+
+def flatten(f, data_id, create_rows):
+    flattened = []
+    for aa in f['active_areas']:
+        for loc in aa['locations']:
+            for d in loc[data_id]:
+                vals = create_rows(aa,loc,d)
+                flattened.extend(vals)
+    return flattened
 
 def get_fuelbeds_graph_elements(summarized_fires):
     if not summarized_fires:
@@ -117,16 +129,12 @@ def get_fuelbeds_graph_elements(summarized_fires):
     # TODO: handle multple selected fires ?
     graphs = []
     for f in summarized_fires:
-        flat_fuelbeds = []
-        for aa in f['active_areas']:
-            for loc in aa['locations']:
-                for f in loc['fuelbeds']:
-                    flat_fuelbeds.append({
-                        'aa': aa['id'],
-                        'loc': loc['id'],
-                        'fccs': 'FCCS ' + f['fccs_id'],
-                        'pct': f['pct']
-                    })
+        flat_fuelbeds = flatten(f, 'fuelbeds', lambda aa,loc,d: [{
+            'fccs': 'FCCS ' + d['fccs_id'],
+            'pct': d['pct'],
+            'aa': aa['id'],
+            'loc':loc['id']
+        }])
 
         df = pd.DataFrame(flat_fuelbeds)
         if not df.empty:
@@ -152,4 +160,35 @@ def get_plumerise_graph_elements(summarized_fires):
     if not summarized_fires:
         return [html.Div("")]
 
-    return [html.Div("(plumerise graph coming soon)", className="empty-graph")]  # TEMP
+    # TODO: handle multple selected fires ?
+    graphs = []
+    for f in summarized_fires:
+        def create_rows(aa,loc,d):
+            return [{
+                    'time': d['t'],
+                    'level': i,
+                    'height': h,
+                    'aa': aa['id'],
+                    'loc':loc['id']
+                } for i, h in enumerate(d['heights'])]
+        flat_plumerise = flatten(f, 'plumerise', create_rows)
+
+        df = pd.DataFrame(flat_plumerise)
+        if not df.empty:
+            graphs.append(
+                dcc.Graph(id='fuelbeds-graph',
+                    figure=px.bar(df, x="time", y="height", color="loc",
+                        barmode="group", facet_col="aa", #facet_row="day",
+                        # category_orders={"day": ["Thur", "Fri", "Sat", "Sun"],
+                        #       "time": ["Lunch", "Dinner"]}
+                        #height=400
+                    )
+                )
+            )
+
+
+    if not graphs:
+        graphs = [html.Div("(no plumerise information)", className="empty-graph")]
+
+    return [html.H4("Plumerise")] + graphs + [html.Div("Plumerise by activity collection, by location", className="caption")]
+    #return generate_bar_graph_elements('fuelbeds-graph', data, "Fuelbeds")
