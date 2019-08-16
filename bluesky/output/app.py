@@ -26,7 +26,7 @@ def create_app(bluesky_output_file=None, mapbox_access_token=None):
         return layout.get_layout(initial_summarized_fires_by_id)
 
     app = dash.Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS)
-    app.title = "Bluesky Output Inspector"
+    app.title = "Bluesky Output Visualizer"
     app.layout = serve_layout
     callbacks.define_callbacks(app, mapbox_access_token,
         initial_summarized_fires_by_id)

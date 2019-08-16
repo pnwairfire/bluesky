@@ -37,7 +37,7 @@ def get_navbar():
             #     ]
             # )
         ],
-        brand="BlueSky Output Inspector",
+        brand="BlueSky Output Visualizer",
         brand_href="#",
         sticky="top",
         fluid=True
