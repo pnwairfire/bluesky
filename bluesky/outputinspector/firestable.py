@@ -19,7 +19,7 @@ def get_fires_table(summarized_fires):
         data=get_fires_table_data(summarized_fires),
         columns=[{'id': c, 'name': c} for c in FIRE_TABLE_COLUMNS],
         style_table={
-            'maxHeight': '500px',
+            'maxHeight': '400px',
             'overflowY': 'scroll'
         },
         sort_action='native',

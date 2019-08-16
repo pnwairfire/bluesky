@@ -3,27 +3,15 @@ import dash_core_components as dcc
 import pandas as pd
 import plotly.graph_objects as go
 
-def get_fuelbeds_graph_elements(summarized_fires):
-    if not summarized_fires:
-        return [html.Div("")]
 
-    # Note that there should only be one fire
-    # TODO: handle multple selected fires
-    data = []
-    for f in summarized_fires:
-        df = pd.DataFrame(f['fuelbeds'])
-        if not df.empty:
-            data.append(go.Bar(
-                name='fire ' + f['flat_summary']['id'][0:5]+'...'+f['flat_summary']['id'][-5:],
-                x='fccs ' + df['fccs_id'], y=df['pct']
-            ))
+def get_fire_label(fire):
+    return ('fire ' + fire['flat_summary']['id'][0:5] + '...'
+        + fire['flat_summary']['id'][-5:])
 
-    if not data:
-        return [html.Div("(no fuelbeds for fire)", className="empty-graph")]
-
+def generate_bar_graph_elements(graph_id, data, caption):
     return [
         dcc.Graph(
-            id='fuelbeds-graph',
+            id=graph_id,
             figure={
                 'data': data,
                 'layout': {
@@ -32,16 +20,43 @@ def get_fuelbeds_graph_elements(summarized_fires):
                 }
             }
         ),
-        html.Div("Fuelbeds", className="caption")
+        html.Div(caption, className="caption")
     ]
 
+def get_fuelbeds_graph_elements(summarized_fires):
+    if not summarized_fires:
+        return [html.Div("")]
+
+    # TODO: make sure this handles multple selected fires
+    data = []
+    for f in summarized_fires:
+        df = pd.DataFrame(f['fuelbeds'])
+        if not df.empty:
+            data.append(go.Bar(
+                name=get_fire_label(f),
+                x='fccs ' + df['fccs_id'], y=df['pct']
+            ))
+
+    if not data:
+        return [html.Div("(no fuelbeds for fire)", className="empty-graph")]
+
+    return generate_bar_graph_elements('fuelbeds-graph', data, "Fuelbeds")
 
 def get_consumption_graph_elements(summarized_fires):
     if not summarized_fires:
         return [html.Div("")]
 
-    return [html.Div("(consumption graph coming soon)", className="empty-graph")]
+    # TODO: make sure this handles multple selected fires
+    data = []
+    for f in summarized_fires:
+        df = pd.DataFrame([dict(c=c, v=v) for c,v in f['consumption_by_category'].items()])
+        if not df.empty:
+            data.append(go.Bar(name=get_fire_label(f), x=df['c'], y=df['v']))
 
+    if not data:
+        return [html.Div("(no fuelbeds for fire)", className="empty-graph")]
+
+    return generate_bar_graph_elements('consumption-graph', data, "Consumption")
 
 def get_emissions_graph_elements(summarized_fires):
     if not summarized_fires:

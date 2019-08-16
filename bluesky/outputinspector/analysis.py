@@ -25,6 +25,7 @@ class SummarizedFire(dict):
         self._set_lat_lng(fire)
         self._set_flat_summary(fire)
         self._set_fuelbeds(fire)
+        self._set_consumption(fire)
         self._set_timeprofiled_emissions(fire)
 
     def _set_lat_lng(self, fire):
@@ -76,11 +77,24 @@ class SummarizedFire(dict):
         # throw away 'total_area' return value
         self['fuelbeds'] = fuelbeds.summarize([fire])
 
+    def _set_consumption(self, fire):
+        # sum the consumption across all fuelbeds and phases, but keep them
+        # separate by category
+        consumption = defaultdict(lambda: 0.0)
+        for loc in fire.locations:
+            for fb in loc['fuelbeds']:
+                for c in fb['consumption']:
+                    for sc in fb['consumption'][c]:
+                        # Each fb['consumption'][c][sc][p] is an array of one value
+                        consumption[c] += sum([sum(fb['consumption'][c][sc][p])
+                            for p in self.PHASES])
+        self['consumption_by_category'] = dict(consumption)
+
     def _set_timeprofiled_emissions(self, fire):
         all_loc_emissions = defaultdict(lambda: defaultdict(lambda: 0.0))
         for aa in fire.active_areas:
             for loc in aa.locations:
-                emissions = self._get_emissions(loc)
+                emissions = self._get_location_emissions(loc)
                 per_species = {}
                 for s in emissions:
                     for t in sorted(aa.get('timeprofile', {}).keys()):
@@ -95,7 +109,8 @@ class SummarizedFire(dict):
 
     PHASES = ['flaming', 'smoldering', 'residual']
 
-    def _get_emissions(self, loc):
+
+    def _get_location_emissions(self, loc):
         # sum the emissions across all fuelbeds, but keep them separate by phase
         # we want species to be the outer dict and phase the innter
         emissions = {}
