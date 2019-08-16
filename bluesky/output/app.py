@@ -14,7 +14,8 @@ EXTERNAL_STYLESHEETS = [
     #, 'https://codepen.io/chriddyp/pen/bWLwgP.css'
 ]
 
-def create_app(bluesky_output_file=None, mapbox_access_token=None):
+def create_app(bluesky_output_file=None, mapbox_access_token=None,
+        url_path_prefix=None):
     initial_data = {}
     if bluesky_output_file:
         with open(os.path.abspath(bluesky_output_file)) as f:
@@ -25,7 +26,8 @@ def create_app(bluesky_output_file=None, mapbox_access_token=None):
     def serve_layout():
         return layout.get_layout(initial_summarized_fires_by_id)
 
-    app = dash.Dash(__name__, external_stylesheets=EXTERNAL_STYLESHEETS)
+    app = dash.Dash(__name__, url_base_pathname=url_path_prefix,
+        external_stylesheets=EXTERNAL_STYLESHEETS)
     app.title = "Bluesky Output Visualizer"
     app.layout = serve_layout
     callbacks.define_callbacks(app, mapbox_access_token,
