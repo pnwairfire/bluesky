@@ -3,6 +3,7 @@ import json
 from collections import defaultdict
 
 from bluesky import models, locationutils
+from bluesky.modules import fuelbeds
 
 class SummarizedFiresEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -23,6 +24,7 @@ class SummarizedFire(dict):
 
         self._set_lat_lng(fire)
         self._set_flat_summary(fire)
+        self._set_fuelbeds(fire)
         self._set_timeprofiled_emissions(fire)
 
     def _set_lat_lng(self, fire):
@@ -69,6 +71,10 @@ class SummarizedFire(dict):
             'start': min([aa['start'] for aa in active_areas]),
             'end': max([aa['end'] for aa in active_areas])
         }
+
+    def _set_fuelbeds(self, fire):
+        # throw away 'total_area' return value
+        self['fuelbeds'] = fuelbeds.summarize([fire])
 
     def _set_timeprofiled_emissions(self, fire):
         all_loc_emissions = defaultdict(lambda: defaultdict(lambda: 0.0))

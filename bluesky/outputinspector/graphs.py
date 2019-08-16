@@ -1,12 +1,40 @@
 import dash_html_components as html
 import dash_core_components as dcc
 import pandas as pd
+import plotly.graph_objects as go
 
 def get_fuelbeds_graph_elements(summarized_fires):
     if not summarized_fires:
         return [html.Div("")]
 
-    return [html.Div("(fuelbeds graph coming soon)", className="empty-graph")]
+    # Note that there should only be one fire
+    # TODO: handle multple selected fires
+    data = []
+    for f in summarized_fires:
+        df = pd.DataFrame(f['fuelbeds'])
+        if not df.empty:
+            data.append(go.Bar(
+                name='fire ' + f['flat_summary']['id'][0:5]+'...'+f['flat_summary']['id'][-5:],
+                x='fccs ' + df['fccs_id'], y=df['pct']
+            ))
+
+    if not data:
+        return [html.Div("(no fuelbeds for fire)", className="empty-graph")]
+
+    return [
+        dcc.Graph(
+            id='fuelbeds-graph',
+            figure={
+                'data': data,
+                'layout': {
+                    'clickmode': 'event+select',
+                    'barmode':'group'
+                }
+            }
+        ),
+        html.Div("Fuelbeds", className="caption")
+    ]
+
 
 def get_consumption_graph_elements(summarized_fires):
     if not summarized_fires:
@@ -22,6 +50,7 @@ def get_emissions_graph_elements(summarized_fires):
     # timeprofiled emissions are summed across all locations, and
     # each species is graphed
     # Note that there should only be one fire
+    # TODO: handle multple selected fires
     data = []
     for f in summarized_fires:
         df = pd.DataFrame(f['timeprofiled_emissions'])
@@ -47,13 +76,13 @@ def get_emissions_graph_elements(summarized_fires):
             figure={
                 'data': data,
                 'layout': {
-                    'title': 'Emissions from fire(s) {}'.format(','.join(
-                        f['flat_summary']['id'] for f in summarized_fires)),
+                    # 'title': 'Emissions from fire(s) {}'.format(','.join(
+                    #     f['flat_summary']['id'] for f in summarized_fires)),
                     'clickmode': 'event+select'
                 }
             }
         ),
-        html.Div("Timeprofiled Emissions")
+        html.Div("Timeprofiled Emissions", className="caption")
     ]
 
 def get_plumerise_graph_elements(summarized_fires):

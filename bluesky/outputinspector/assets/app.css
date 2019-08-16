@@ -1,6 +1,7 @@
 .caption {
     font-style: italic;
     font-size: small;
+    padding-left: 40px;
 }
 
 #fires-table-container .caption {
