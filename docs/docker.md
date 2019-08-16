@@ -228,18 +228,9 @@ like the following:
         -e /input/fire_events.csv \
         -o /output/
 
-#### BlueSky Output Inspector
+#### BlueSky Output Visualizer
 
-    docker run --rm -ti \
-        -p 8050:8050 \
-        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
-        -e PYTHONPATH=/bluesky/ \
-        -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-        -w /bluesky/ \
-        bluesky \
-        ./bin/bsp-output-inspector  -d -i output.json -p 8050
-
-and then load http://localhost:8050/ in a browser (e.g. Chrome or FireFox).
+See [the output visualizer doc](docs/output-visualizer.md)
 
 #### Other tools
 
