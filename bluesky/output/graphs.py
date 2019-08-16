@@ -61,9 +61,9 @@ def get_fuelbeds_graph_elements(summarized_fires):
             )
 
     if not graphs:
-        return [html.Div("(no fuelbed information)", className="empty-graph")]
+        graphs = [html.Div("(no fuelbed information)", className="empty-graph")]
 
-    return graphs + [html.Div("Fuelbeds by activity collection, by location", className="caption")]
+    return [html.H4("Fuelbeds")] + graphs + [html.Div("Fuelbeds by activity collection, by location", className="caption")]
     #return generate_bar_graph_elements('fuelbeds-graph', data, "Fuelbeds")
 
 
