@@ -63,9 +63,9 @@ class SummarizedFire(dict):
             'lat': self['lat_lng']['lat']['pretty_str'],
             'avg_lng':  self['lat_lng']['lng']['avg'],
             'lng': self['lat_lng']['lat']['pretty_str'],
-            'total_consumption': fire.consumption['summary']['total'],
-            'total_emissions': fire.emissions['summary']['total'],
-            'PM2.5': fire.emissions['summary']['PM2.5'],
+            'total_consumption': fire.get('consumption', {}).get('summary',{}).get('total'),
+            'total_emissions': fire.get('emissions', {}).get('summary',{}).get('total'),
+            'PM2.5': fire.get('emissions', {}).get('summary',{}).get('PM2.5'),
             'num_locations': len(locations),
             'total_area': sum([l['area'] for l in locations]),
             'start': min([aa['start'] for aa in active_areas]),
@@ -90,9 +90,9 @@ class SummarizedFire(dict):
         # separate by category
         consumption = defaultdict(lambda: 0.0)
         for loc in fire.locations:
-            for fb in loc['fuelbeds']:
-                for c in fb['consumption']:
-                    for sc in fb['consumption'][c]:
+            for fb in loc.get('fuelbeds', []):
+                for c in fb.get('consumption', {}):
+                    for sc in fb['consumption'].get(c, {}):
                         # Each fb['consumption'][c][sc][p] is an array of one value
                         consumption[c] += sum([sum(fb['consumption'][c][sc][p])
                             for p in self.PHASES])
@@ -121,9 +121,9 @@ class SummarizedFire(dict):
         # sum the emissions across all fuelbeds, but keep them separate by phase
         # we want species to be the outer dict and phase the innter
         emissions = {}
-        for fb in loc['fuelbeds']:
+        for fb in loc.get('fuelbeds', []):
             for p in self.PHASES:
-                for s in fb['emissions'][p]:
+                for s in fb['emissions'].get(p, {}):
                     emissions[s] = emissions.get(s, {})
                     # fb['emissions'][p][s] is an array of one value
                     emissions[s][p] = (emissions[s].get(p, 0.0)
@@ -164,6 +164,7 @@ class SummarizedFire(dict):
         })
 
     def _get_location_plumerise(self, loc):
+        return
         # # sum the consumption across all fuelbeds and phases, but keep them
         # # separate by category
         # self['plumerise_per_location'] = defaultdict(lambda: [])
