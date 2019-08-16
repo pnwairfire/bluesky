@@ -74,14 +74,15 @@ class SummarizedFire(dict):
 
     def _set_data_per_active_area(self, fire):
         self['active_areas'] = []
-        for aa in fire.active_areas:
+        for i, aa in enumerate(fire.active_areas):
             # set location ids
-            for i, loc in enumerate(aa.locations):
+            for j, loc in enumerate(aa.locations):
                 lat_lng = locationutils.LatLng(loc)
                 loc['id'] = "#{} {},{}".format(
-                    i, lat_lng.latitude, lat_lng.longitude)
+                    j, lat_lng.latitude, lat_lng.longitude)
 
             self['active_areas'].append({
+                "id": "#{} {} - {}".format(i, aa['start'], aa['end']),
                 "start": aa['start'],
                 "end": aa['end'],
                 "fuelbeds": self._set_fuelbeds(aa),

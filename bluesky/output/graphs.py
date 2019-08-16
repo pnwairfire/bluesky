@@ -36,30 +36,34 @@ def get_fuelbeds_graph_elements(summarized_fires):
     # TODO: handle multple selected fires ?
     graphs = []
     for f in summarized_fires:
-        if f['active_areas']:
-            aa_idx = get_active_area_index()
-            aa = f['active_areas'][aa_idx]
-            flat_fuelbeds = []
+        flat_fuelbeds = []
+        for i, aa in enumerate(f['active_areas']):
             for loc_id, fuelbeds in aa['fuelbeds'].items():
                 for f in fuelbeds:
                     flat_fuelbeds.append({
+                        'aa': aa['id'],
                         'fccs': 'FCCS ' + f['fccs_id'],
                         'loc': loc_id,
                         'pct': f['pct']
                     })
 
-            df = pd.DataFrame(flat_fuelbeds)
-            if not df.empty:
-                graphs.append(
-                    dcc.Graph(id='fuelbeds-graph',
-                        figure=px.bar(df, x="fccs", y="pct", color='loc',
-                            barmode='group', height=400))
+        df = pd.DataFrame(flat_fuelbeds)
+        if not df.empty:
+            graphs.append(
+                dcc.Graph(id='fuelbeds-graph',
+                    figure=px.bar(df, x="fccs", y="pct", color="loc",
+                        barmode="group", facet_col="aa", #facet_row="day",
+                        # category_orders={"day": ["Thur", "Fri", "Sat", "Sun"],
+                        #       "time": ["Lunch", "Dinner"]}
+                        #height=400
+                    )
                 )
+            )
 
     if not graphs:
         return [html.Div("(no fuelbed information)", className="empty-graph")]
 
-    return graphs
+    return graphs + [html.Div("Fuelbeds by activity collection, by location", className="caption")]
     #return generate_bar_graph_elements('fuelbeds-graph', data, "Fuelbeds")
 
 
