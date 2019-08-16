@@ -2,14 +2,13 @@
 
 __author__ = "Joel Dubowy"
 
+import argparse
 import logging
 import os
 import re
 import subprocess
 import sys
 import traceback
-
-import afscripting
 
 try:
     from bluesky import  __version__
@@ -18,13 +17,6 @@ except:
     sys.path.insert(0, root_dir)
     from bluesky import __version__
 
-REQUIRED_ARGS = []
-OPTIONAL_ARGS = [
-    # TODO: add option to specify version, to avoid prompt ?
-    # TODO: add option to upload to docker hub, to avoid prompt ?
-    # TODO: add back option to override image name to use instead of 'bluesky' ?
-    #    (This option was removed because I never used it)
-]
 
 EXAMPLES_STR = """
 Examples:
@@ -38,13 +30,29 @@ FINAL_INSTRUCTIONS = """
     To upload:
 """.format(version=__version__)
 
+def exit_with_msg(msg, exit_code=1):
+    """Prints message and exits
+    """
+    sys.stderr.write("\n%s\n\n" % (msg))
+    sys.exit(exit_code)
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    # TODO: add option to specify version, to avoid prompt ?
+    # TODO: add option to upload to docker hub, to avoid prompt ?
+    # TODO: add back option to override image name to use instead of 'bluesky' ?
+    #    (This option was removed because I never used it)
+    parser.epilog = EXAMPLES_STR
+    parser.formatter_class = argparse.RawTextHelpFormatter
+    return parser.parse_args()
+
+
 def _call(cmd_args):
     sys.stdout.write("Calling '{}'\n".format(' '.join(cmd_args)))
     r = subprocess.call(cmd_args)
     if r:
-        afscripting.utils.exit_with_msg(
-            "Command '{}' returned error code {}".format(' '.join(cmd_args), r),
-            exit_code=r)
+        msg = "Command '{}' returned error code {}".format(' '.join(cmd_args), r)
+        exit_with_msg(msg, exit_code=r)
 
 def build():
     dockerfile_pathname = os.path.join(REPO_ROOT_DIR, 'Dockerfile')
@@ -71,8 +79,7 @@ def upload(tag_version):
         _call(['docker', 'push', 'pnwairfire/bluesky:' + tag_version])
 
 if __name__ == "__main__":
-    parser, args = afscripting.args.parse_args(REQUIRED_ARGS, OPTIONAL_ARGS,
-        epilog=EXAMPLES_STR)
+    args = parse_args()
     build()
     tag_version = tag()
     upload(tag_version)
