@@ -146,35 +146,15 @@ def get_fuelbeds_graph_elements(summarized_fires):
         fig = make_subplots(rows=num_rows, cols=num_columns,
             specs=[[{'type':'domain'}] * num_columns] * num_rows,
             subplot_titles=subplot_titles)
-        #annotations = []
         for i, aa in enumerate(f['active_areas']):
-            # annotations.append({
-            #     'text': aa['start'][:10],# '{}-{}'.format(aa['start'], aa['end']),
-            #     'x': 0,
-            #     'y': 1.0 - ((1.0/num_rows) * i), # + (1.0/(num_rows*2))),
-            #     #'font_size': ,
-            #     'showarrow': False
-            # })
             for j, l in enumerate(aa['locations']):
-                # if i == 0:
-                #     annotations.append({
-                #         'text': '{},{}'.format(l['lat'], l['lng']),
-                #         'x': (1.0/num_columns) * j + (1.0/(num_columns*2)),
-                #         'y': 1.0,
-                #         #'font_size': ,
-                #         'showarrow': False
-                #     })
                 df = pd.DataFrame(l['fuelbeds'])
                 fig.add_trace(go.Pie(labels='FCCS ' + df['fccs_id'], #name=l['id'],
                     values=df['pct']), i+1, j+1)
 
-        # fig.update_layout(
-        #     #title_text="Fuelbeds per location within each active area",
-        #     annotations=annotations)
         graphs.append(dcc.Graph(
             id='fuelbeds-' + f['flat_summary']['id'],
             figure=fig))
-
 
     if not graphs:
         graphs = [html.Div("(no fuelbed information)", className="empty-graph")]
