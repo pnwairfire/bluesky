@@ -88,7 +88,7 @@ def get_fires_map(mapbox_access_token, summarized_fires_by_id):
     layout = get_fires_map_layout(mapbox_access_token)
     fig = {'data':data, 'layout': layout}
     return [
-        html.H4("Fire Locations"),
+        html.H4("Fires"),
         dcc.Graph(id='fires-map', figure=fig),
         html.Div("Select fires to see in the table", className="caption")
     ]

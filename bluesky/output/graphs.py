@@ -26,6 +26,10 @@ def generate_bar_graph_elements(graph_id, data, title, caption=''):
         html.Div(caption, className="caption")
     ]
 
+##
+## Summary fire graphs
+##
+
 def get_summary_fuelbeds_graph_elements(summarized_fires):
     if not summarized_fires:
         return [html.Div("")]
@@ -109,89 +113,64 @@ def get_summary_emissions_graph_elements(summarized_fires):
 ## Per-location graphs
 ##
 
-def get_active_area_index():
-    # TODO: eventually want to add dropdown to select active area, for
-    #  now just use first active area
-    return 0
 
-def flatten(f, data_id, create_rows):
-    flattened = []
-    for aa in f['active_areas']:
-        for loc in aa['locations']:
-            for d in loc[data_id]:
-                vals = create_rows(aa,loc,d)
-                flattened.extend(vals)
-    return flattened
-
-
-def get_subplot_title(f, aa_idx, l_idx):
-    if l_idx < len(f['active_areas'][aa_idx]['locations']):
-        aa = f['active_areas'][aa_idx]
-        l = f['active_areas'][aa_idx]['locations'][l_idx]
-        return '{} {},{}'.format(aa['start'][:10], l['lat'], l['lng'])
-
-def get_fuelbeds_graph_elements(summarized_fires):
-    if not summarized_fires:
+def get_location_fuelbeds_graph_elements(locations):
+    if not locations:
         return [html.Div("")]
 
-    # See https://plot.ly/python/pie-charts/#pie-charts-in-subplots
-
-    # TODO: handle multple selected fires ?
+    # TODO: make sure this handles multple selected fires
     graphs = []
-    for f in summarized_fires:
-        num_rows = len(f['active_areas'])
-        num_columns = max([len(aa['locations']) for aa in f['active_areas']])
-        subplot_titles = [get_subplot_title(f, i, j)
-            for i in range(num_rows) for j in range(num_columns)]
-        fig = make_subplots(rows=num_rows, cols=num_columns,
-            specs=[[{'type':'domain'}] * num_columns] * num_rows,
-            subplot_titles=subplot_titles)
-        for i, aa in enumerate(f['active_areas']):
-            for j, l in enumerate(aa['locations']):
-                df = pd.DataFrame(l['fuelbeds'])
-                fig.add_trace(go.Pie(labels='FCCS ' + df['fccs_id'], #name=l['id'],
-                    values=df['pct']), i+1, j+1)
-
-        graphs.append(dcc.Graph(
-            id='fuelbeds-' + f['flat_summary']['id'],
-            figure=fig))
+    for l in locations:
+        df = pd.DataFrame(l['fuelbeds'])
+        if not df.empty:
+            graphs.append(dcc.Graph(
+                id='location-fuelbeds-graph-'+l['id'],
+                figure=go.Figure(data=[go.Pie(
+                    labels='FCCS ' + df['fccs_id'], values=df['pct'])])
+            ))
 
     if not graphs:
-        graphs = [html.Div("(no fuelbed information)", className="empty-graph")]
+        return [html.Div("(no fuelbeds for location)", className="empty-graph")]
 
-    return [html.H4("Fuelbeds")] + graphs + [html.Div("Fuelbeds by activity collection, by location", className="caption")]
+    return [html.H4("Location Fuelbeds")] + graphs + [html.Div("Fuelbeds by location", className="caption")]
 
-def get_plumerise_graph_elements(summarized_fires):
+def get_location_consumption_graph_elements(locations):
+    return [html.Div("(emissions graph to come")]
+
+def get_location_emissions_graph_elements(locations):
+    return [html.Div("(emissions graph to come")]
+
+def get_location_plumerise_graph_elements(summarized_fires):
     if not summarized_fires:
         return [html.Div("")]
 
     # TODO: handle multple selected fires ?
     graphs = []
-    for f in summarized_fires:
-        def create_rows(aa,loc,d):
-            return [{
-                    'time': d['t'],
-                    'level': i,
-                    'height': h,
-                    'aa': aa['id'],
-                    'loc':loc['id']
-                } for i, h in enumerate(d['heights'])]
-        flat_plumerise = flatten(f, 'plumerise', create_rows)
+    # for f in summarized_fires:
+    #     def create_rows(aa,loc,d):
+    #         return [{
+    #                 'time': d['t'],
+    #                 'level': i,
+    #                 'height': h,
+    #                 'aa': aa['id'],
+    #                 'loc':loc['id']
+    #             } for i, h in enumerate(d['heights'])]
+    #     flat_plumerise = flatten(f, 'plumerise', create_rows)
 
-        df = pd.DataFrame(flat_plumerise)
-        if not df.empty:
-            # df.set_index('level')
-            graphs.append(
-                dcc.Graph(id='plumerise-graph',
-                    figure=px.scatter(df, x="time", y="height", color="level")
-                    # figure=px.bar(df, x="time", y="height", color="loc",
-                    #     barmode="group", #facet_col="aa", #facet_row="day",
-                    #     # category_orders={"day": ["Thur", "Fri", "Sat", "Sun"],
-                    #     #       "time": ["Lunch", "Dinner"]}
-                    #     #height=400
-                    # )
-                )
-            )
+    #     df = pd.DataFrame(flat_plumerise)
+    #     if not df.empty:
+    #         # df.set_index('level')
+    #         graphs.append(
+    #             dcc.Graph(id='plumerise-graph',
+    #                 figure=px.scatter(df, x="time", y="height", color="level")
+    #                 # figure=px.bar(df, x="time", y="height", color="loc",
+    #                 #     barmode="group", #facet_col="aa", #facet_row="day",
+    #                 #     # category_orders={"day": ["Thur", "Fri", "Sat", "Sun"],
+    #                 #     #       "time": ["Lunch", "Dinner"]}
+    #                 #     #height=400
+    #                 # )
+    #             )
+    #         )
 
 
     if not graphs:

@@ -4,10 +4,11 @@ import re
 
 import dash
 
+import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 
-from . import analysis, firesmap, firestable, graphs
+from . import analysis, firesmap, firestable, locationstable, graphs
 
 
 ID_EXTRACTOR = re.compile('data-id="([^"]+)"')
@@ -98,8 +99,7 @@ def define_callbacks(app, mapbox_access_token,
             Output('summary-fuelbeds-container', "children"),
             Output('summary-consumption-container', "children"),
             Output('summary-emissions-container', "children"),
-            Output('plumerise-container', "children"),
-            Output('fuelbeds-container', "children")
+            Output('locations-table-container', "children")
         ],
         [
             Input('fires-table', "derived_virtual_data"),
@@ -109,7 +109,7 @@ def define_callbacks(app, mapbox_access_token,
             State('summarized-fires-by-id-state', 'value')
         ]
     )
-    def update_graphs(rows, selected_rows, summarized_fires_by_id_json):
+    def update_fire_graphs_and_table(rows, selected_rows, summarized_fires_by_id_json):
         summarized_fires_by_id = json.loads(summarized_fires_by_id_json)
 
         # if not selected_rows:
@@ -123,6 +123,49 @@ def define_callbacks(app, mapbox_access_token,
             graphs.get_summary_fuelbeds_graph_elements(selected_fires),
             graphs.get_summary_consumption_graph_elements(selected_fires),
             graphs.get_summary_emissions_graph_elements(selected_fires),
-            graphs.get_plumerise_graph_elements(selected_fires),
-            graphs.get_fuelbeds_graph_elements(selected_fires)
+            locationstable.get_locations_table(selected_fires),
+            # graphs.get_plumerise_graph_elements(selected_fires),
+            # graphs.get_fuelbeds_graph_elements(selected_fires)
+        ]
+
+    @app.callback(
+        [
+            Output('location-fuelbeds-container', "children"),
+            Output('location-consumption-container', "children"),
+            Output('location-emissions-container', "children"),
+            Output('location-plumerise-container', "children")
+        ],
+        [
+            Input('locations-table', "derived_virtual_data"),
+            Input('locations-table', "derived_virtual_selected_rows")
+        ],
+        [
+            State('summarized-fires-by-id-state', 'value')
+        ]
+    )
+    def update_location_graphs(rows, selected_rows, summarized_fires_by_id_json):
+        if not selected_rows:
+            return [html.Div("")]* 4
+
+        summarized_fires_by_id = json.loads(summarized_fires_by_id_json)
+
+        # if not selected_rows:
+        #     raise PreventUpdate
+        selected_rows = selected_rows or []
+
+        fire_ids = [rows[i]['fire_id'] for i in selected_rows]
+        location_ids = [rows[i]['id'] for i in selected_rows]
+
+        selected_fires = [summarized_fires_by_id[fid] for fid in fire_ids]
+        selected_locations = []
+        for f in selected_fires:
+            for aa in f['active_areas']:
+                selected_locations.extend([l for l in aa['locations']
+                    if l['id'] in location_ids])
+
+        return [
+            graphs.get_location_fuelbeds_graph_elements(selected_locations),
+            graphs.get_location_consumption_graph_elements(selected_locations),
+            graphs.get_location_emissions_graph_elements(selected_locations),
+            graphs.get_location_plumerise_graph_elements(selected_locations)
         ]
