@@ -3,7 +3,7 @@ import dash_core_components as dcc
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-
+from plotly.subplots import make_subplots
 
 
 def get_fire_label(fire):
@@ -36,7 +36,7 @@ def get_summary_fuelbeds_graph_elements(summarized_fires):
         df = pd.DataFrame(f['fuelbeds'])
         if not df.empty:
             graphs.append(dcc.Graph(
-                id='summary-emissions-graph-'+f['flat_summary']['id'],
+                id='summary-fuelbeds-graph-'+f['flat_summary']['id'],
                 figure=go.Figure(data=[go.Pie(
                     labels='FCCS ' + df['fccs_id'], values=df['pct'])])
             ))
@@ -44,7 +44,7 @@ def get_summary_fuelbeds_graph_elements(summarized_fires):
     if not graphs:
         return [html.Div("(no fuelbeds for fire)", className="empty-graph")]
 
-    return [html.H4("Fuelbeds")] + graphs + [html.Div("Fuelbeds by activity collection, by location", className="caption")]
+    return [html.H4("Fuelbeds")] + graphs + [html.Div("Fuelbeds by Fire", className="caption")]
 
 def get_summary_consumption_graph_elements(summarized_fires):
     if not summarized_fires:
@@ -58,7 +58,7 @@ def get_summary_consumption_graph_elements(summarized_fires):
             data.append(go.Bar(name=get_fire_label(f), x=df['c'], y=df['v']))
 
     if not data:
-        return [html.Div("(no fuelbeds for fire)", className="empty-graph")]
+        return [html.Div("(no consumption for fire)", className="empty-graph")]
 
     return generate_bar_graph_elements('summary-consumption-graph', data, "Consumption")
 
@@ -123,39 +123,58 @@ def flatten(f, data_id, create_rows):
                 flattened.extend(vals)
     return flattened
 
+
+def get_subplot_title(f, aa_idx, l_idx):
+    if l_idx < len(f['active_areas'][aa_idx]['locations']):
+        aa = f['active_areas'][aa_idx]
+        l = f['active_areas'][aa_idx]['locations'][l_idx]
+        return '{} {},{}'.format(aa['start'][:10], l['lat'], l['lng'])
+
 def get_fuelbeds_graph_elements(summarized_fires):
     if not summarized_fires:
         return [html.Div("")]
 
-
-
-    # TODO: look at https://plot.ly/python/pie-charts/#pie-charts-in-subplots
-
-
-
+    # See https://plot.ly/python/pie-charts/#pie-charts-in-subplots
 
     # TODO: handle multple selected fires ?
     graphs = []
     for f in summarized_fires:
-        flat_fuelbeds = flatten(f, 'fuelbeds', lambda aa,loc,d: [{
-            'fccs': 'FCCS ' + d['fccs_id'],
-            'pct': d['pct'],
-            'aa': aa['id'],
-            'loc':loc['id']
-        }])
+        num_rows = len(f['active_areas'])
+        num_columns = max([len(aa['locations']) for aa in f['active_areas']])
+        subplot_titles = [get_subplot_title(f, i, j)
+            for i in range(num_rows) for j in range(num_columns)]
+        fig = make_subplots(rows=num_rows, cols=num_columns,
+            specs=[[{'type':'domain'}] * num_columns] * num_rows,
+            subplot_titles=subplot_titles)
+        #annotations = []
+        for i, aa in enumerate(f['active_areas']):
+            # annotations.append({
+            #     'text': aa['start'][:10],# '{}-{}'.format(aa['start'], aa['end']),
+            #     'x': 0,
+            #     'y': 1.0 - ((1.0/num_rows) * i), # + (1.0/(num_rows*2))),
+            #     #'font_size': ,
+            #     'showarrow': False
+            # })
+            for j, l in enumerate(aa['locations']):
+                # if i == 0:
+                #     annotations.append({
+                #         'text': '{},{}'.format(l['lat'], l['lng']),
+                #         'x': (1.0/num_columns) * j + (1.0/(num_columns*2)),
+                #         'y': 1.0,
+                #         #'font_size': ,
+                #         'showarrow': False
+                #     })
+                df = pd.DataFrame(l['fuelbeds'])
+                fig.add_trace(go.Pie(labels='FCCS ' + df['fccs_id'], #name=l['id'],
+                    values=df['pct']), i+1, j+1)
 
-        df = pd.DataFrame(flat_fuelbeds)
-        if not df.empty:
-            graphs.append(
-                dcc.Graph(id='fuelbeds-graph',
-                    figure=px.bar(df, x="fccs", y="pct", color="loc",
-                        barmode="group", facet_col="aa", #facet_row="day",
-                        # category_orders={"day": ["Thur", "Fri", "Sat", "Sun"],
-                        #       "time": ["Lunch", "Dinner"]}
-                        #height=400
-                    )
-                )
-            )
+        # fig.update_layout(
+        #     #title_text="Fuelbeds per location within each active area",
+        #     annotations=annotations)
+        graphs.append(dcc.Graph(
+            id='fuelbeds-' + f['flat_summary']['id'],
+            figure=fig))
+
 
     if not graphs:
         graphs = [html.Div("(no fuelbed information)", className="empty-graph")]
