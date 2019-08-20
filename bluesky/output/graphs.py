@@ -180,14 +180,16 @@ def get_plumerise_graph_elements(summarized_fires):
 
         df = pd.DataFrame(flat_plumerise)
         if not df.empty:
+            # df.set_index('level')
             graphs.append(
                 dcc.Graph(id='plumerise-graph',
-                    figure=px.bar(df, x="time", y="height", color="loc",
-                        barmode="group", #facet_col="aa", #facet_row="day",
-                        # category_orders={"day": ["Thur", "Fri", "Sat", "Sun"],
-                        #       "time": ["Lunch", "Dinner"]}
-                        #height=400
-                    )
+                    figure=px.scatter(df, x="time", y="height", color="level")
+                    # figure=px.bar(df, x="time", y="height", color="loc",
+                    #     barmode="group", #facet_col="aa", #facet_row="day",
+                    #     # category_orders={"day": ["Thur", "Fri", "Sat", "Sun"],
+                    #     #       "time": ["Lunch", "Dinner"]}
+                    #     #height=400
+                    # )
                 )
             )
 
