@@ -18,7 +18,8 @@ setup(
     packages=find_packages(),
     scripts=[
         'bin/bsp',
-        'bin/bsp-run-info'
+        'bin/bsp-run-info',
+        'bin/bsp-output-visualizer'
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",

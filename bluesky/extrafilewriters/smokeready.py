@@ -20,6 +20,7 @@ from afdatetime import parsing as datetime_parsing, timezones
 import numpy as np
 from bluesky.config import Config
 from bluesky import locationutils
+import pdb
 
 class ColumnSpecificRecord(object):
     columndefs = []
@@ -376,7 +377,6 @@ class SmokeReadyWriter(object):
                     start_slice = max((24 * day) - start_hour, 0)
                     end_slice = min((24 * (day + 1)) - start_hour, len(fuelbed['emissions'][fire_phase][vkey.upper()]))
 
-                    
                     if fire_phase == "flaming":
                       if isinstance(fuelbed['emissions'][fire_phase][vkey.upper()], tuple):
                           daytot = fuelbed['emissions'][fire_phase][vkey.upper()][0]

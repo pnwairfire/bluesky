@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+import argparse
+import sys
+
+
+try:
+    from bluesky import output
+except:
+    import os
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
+    sys.path.insert(0, root_dir)
+    from bluesky import output
+
+
+EXAMPLES_STRING = """
+Examples:
+
+    {script} -d -i output.json -p 8050
+
+ """.format(script=sys.argv[0])
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--bluesky-output-file', help="bsp output file")
+    parser.add_argument('-d', '--debug', help="run flask app in debug mode",
+        action="store_true")
+    parser.add_argument('--url-path-prefix', help="url path prefix; e.g. /bluesky-output/")
+    parser.add_argument('-p', '--port', help="port; default 8050",
+        default=8050, type=int)
+    parser.add_argument('-m', '--mapbox-access-token', help="to use mapbox maps")
+
+    parser.epilog = EXAMPLES_STRING
+    parser.formatter_class = argparse.RawTextHelpFormatter
+    return parser.parse_args()
+
+if __name__ == '__main__':
+    args = parse_args()
+    app = output.app.create_app(
+        bluesky_output_file=args.bluesky_output_file,
+        mapbox_access_token=args.mapbox_access_token,
+        url_path_prefix=args.url_path_prefix
+    )
+    app.run_server(debug=args.debug,  host='0.0.0.0', port=args.port)

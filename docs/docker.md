@@ -228,6 +228,10 @@ like the following:
         -e /input/fire_events.csv \
         -o /output/
 
+#### BlueSky Output Visualizer
+
+See [the output visualizer doc](docs/output-visualizer.md)
+
 #### Other tools
 
 There are a number of other executables installed as dependencies of bluesky.

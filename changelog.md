@@ -88,3 +88,6 @@
 
 ## 4.1.11
  - Added bsp-run-info script
+
+## 4.1.12
+ - Initial version of bsp-output-visualizer

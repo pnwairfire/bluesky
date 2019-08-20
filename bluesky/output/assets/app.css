@@ -1,0 +1,21 @@
+.caption {
+    font-style: italic;
+    font-size: small;
+    padding-left: 40px;
+}
+
+#fires-table-container .caption {
+    margin-top: 15px;
+}
+
+.row {
+    margin-bottom: 20px;
+}
+
+.empty-graph {
+    min-height: 200px;
+    /*vertical-align: middle;*/
+    padding: 50px;
+    font-style: italic;
+    font-size: small;
+}
