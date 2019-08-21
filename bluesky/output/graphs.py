@@ -51,29 +51,37 @@ def generate_fuelbeds_graph_elements(fires_or_locations, obj_type, graph_id_func
         + [html.Div("Fuelbeds by {}".format(obj_type), className="caption")]
     )
 
+def generate_consumption_graph_elements(fires_or_locations, obj_type,
+        graph_name_func, graph_id):
+    if not fires_or_locations:
+        return [html.Div("")]
+
+    # TODO: make sure this handles multple selected fires/locations
+    data = []
+    for fol in fires_or_locations:
+        df = pd.DataFrame([dict(c=c, v=v) for c,v in fol['consumption_by_category'].items()])
+        if not df.empty:
+            data.append(go.Bar(name=graph_name_func(fol), x=df['c'], y=df['v']))
+
+    if not data:
+        return [html.Div("(no consumption for {})".format(obj_type),
+            className="empty-graph")]
+
+    return generate_bar_graph_elements(graph_id, data,
+        "Consumption by {}".format(obj_type))
+
+
 ##
 ## Summary fire graphs
 ##
 
 def get_summary_fuelbeds_graph_elements(summarized_fires):
     return generate_fuelbeds_graph_elements(summarized_fires, "fire",
-        lambda fol: 'summary-fuelbeds-graph-' + fol['flat_summary']['id'])
+        lambda fol: 'summary-fuelbeds-graph')
 
 def get_summary_consumption_graph_elements(summarized_fires):
-    if not summarized_fires:
-        return [html.Div("")]
-
-    # TODO: make sure this handles multple selected fires
-    data = []
-    for f in summarized_fires:
-        df = pd.DataFrame([dict(c=c, v=v) for c,v in f['consumption_by_category'].items()])
-        if not df.empty:
-            data.append(go.Bar(name=get_fire_label(f), x=df['c'], y=df['v']))
-
-    if not data:
-        return [html.Div("(no consumption for fire)", className="empty-graph")]
-
-    return generate_bar_graph_elements('summary-consumption-graph', data, "Consumption")
+    return generate_consumption_graph_elements(summarized_fires, "fire",
+        get_fire_label, 'summary-consumption-graph')
 
 def get_summary_emissions_graph_elements(summarized_fires):
     if not summarized_fires:
@@ -128,7 +136,8 @@ def get_location_fuelbeds_graph_elements(locations):
         lambda fol: 'location-fuelbeds-graph-' + fol['id'])
 
 def get_location_consumption_graph_elements(locations):
-    return [html.Div("(emissions graph to come")]
+    return generate_consumption_graph_elements(locations, "location",
+        lambda fol: "...", 'location-consumption-graph')
 
 def get_location_emissions_graph_elements(locations):
     return [html.Div("(emissions graph to come")]

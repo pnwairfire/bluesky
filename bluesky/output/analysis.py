@@ -98,7 +98,7 @@ class SummarizedFire(dict):
                     "id": "#{}/#{} {},{}".format(
                         i, j, lat_lng.latitude, lat_lng.longitude),
                     "fuelbeds": fuelbeds.summarize([self._wrap_loc_in_fire(loc)]),
-                    'consumption': self._get_location_consumption(loc),
+                    'consumption_by_category': self._get_location_consumption(loc),
                     "emissions": self._get_location_emissions(loc),
                     "plumerise": self._get_location_plumerise(loc)
                 })
@@ -165,8 +165,8 @@ class SummarizedFire(dict):
         consumption = defaultdict(lambda: 0.0)
         for aa in self['active_areas']:
             for loc in aa['locations']:
-                for c in loc['consumption']:
-                    consumption[c] += loc['consumption'][c]
+                for c in loc['consumption_by_category']:
+                    consumption[c] += loc['consumption_by_category'][c]
         self['consumption_by_category'] = dict(consumption)
 
     def _set_fire_timeprofiled_emissions(self, fire):
