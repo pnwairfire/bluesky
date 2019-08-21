@@ -72,21 +72,8 @@ def generate_consumption_graph_elements(fires_or_locations, obj_type,
     return generate_bar_graph_elements(graph_id, data,
         "Consumption by {}".format(obj_type))
 
-
-##
-## Summary fire graphs
-##
-
-def get_summary_fuelbeds_graph_elements(summarized_fires):
-    return generate_fuelbeds_graph_elements(summarized_fires, "fire",
-        lambda fol: 'summary-fuelbeds-graph')
-
-def get_summary_consumption_graph_elements(summarized_fires):
-    return generate_consumption_graph_elements(summarized_fires, "fire",
-        get_fire_label, 'summary-consumption-graph')
-
-def get_summary_emissions_graph_elements(summarized_fires):
-    if not summarized_fires:
+def generate_emissions_graph_elements(fires_or_locations, obj_type, graph_id):
+    if not fires_or_locations:
         return [html.Div("")]
 
     # timeprofiled emissions are summed across all locations, and
@@ -94,8 +81,12 @@ def get_summary_emissions_graph_elements(summarized_fires):
     # Note that there should only be one fire
     # TODO: handle multple selected fires
     data = []
-    for f in summarized_fires:
-        df = pd.DataFrame(f['timeprofiled_emissions'])
+    for fol in fires_or_locations:
+        timeprofiled_emissions = [
+            dict(fol['timeprofiled_emissions'][t], dt=t) for t in sorted(fol['timeprofiled_emissions'].keys())
+        ]
+
+        df = pd.DataFrame(timeprofiled_emissions)
         if not df.empty:
             species = [k for k in df.keys() if k != 'dt']
             for s in species:
@@ -110,12 +101,13 @@ def get_summary_emissions_graph_elements(summarized_fires):
                 })
 
     if not data:
-        return [html.Div("(no emissions for fire)", className="empty-graph")]
+        return [html.Div("(no emissions for {]})".format(obj_type),
+            className="empty-graph")]
 
     return [
         html.H5("Timeprofiled Emissions"),
         dcc.Graph(
-            id='summary-emissions-graph',
+            id=graph_id,
             figure={
                 'data': data,
                 'layout': {
@@ -127,6 +119,23 @@ def get_summary_emissions_graph_elements(summarized_fires):
         ),
         html.Div("", className="caption")
     ]
+
+##
+## Summary fire graphs
+##
+
+def get_summary_fuelbeds_graph_elements(summarized_fires):
+    return generate_fuelbeds_graph_elements(summarized_fires, "fire",
+        lambda fol: 'summary-fuelbeds-graph')
+
+def get_summary_consumption_graph_elements(summarized_fires):
+    return generate_consumption_graph_elements(summarized_fires, "fire",
+        get_fire_label, 'summary-consumption-graph')
+
+def get_summary_emissions_graph_elements(summarized_fires):
+    return generate_emissions_graph_elements(summarized_fires, "fire",
+        'summary-emissions-graph')
+
 
 ##
 ## Per-location graphs
@@ -142,7 +151,8 @@ def get_location_consumption_graph_elements(locations):
         lambda fol: "...", 'location-consumption-graph')
 
 def get_location_emissions_graph_elements(locations):
-    return [html.Div("(emissions graph to come")]
+    return generate_emissions_graph_elements(locations, "location",
+        'location-emissions-graph')
 
 def get_location_plumerise_graph_elements(locations):
     if not locations:

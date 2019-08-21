@@ -91,6 +91,9 @@ class SummarizedFire(dict):
             })
             for j, loc in enumerate(aa.locations):
                 lat_lng = locationutils.LatLng(loc)
+                emissions = self._get_location_emissions(loc)
+                timeprofiled_emissions = self._get_location_timeprofiled_emissions(
+                    aa, loc, emissions)
                 self['active_areas'][-1]['locations'].append({
                     "lat": lat_lng.latitude,
                     "lng": lat_lng.longitude,
@@ -99,7 +102,8 @@ class SummarizedFire(dict):
                         i, j, lat_lng.latitude, lat_lng.longitude),
                     "fuelbeds": fuelbeds.summarize([self._wrap_loc_in_fire(loc)]),
                     'consumption_by_category': self._get_location_consumption(loc),
-                    "emissions": self._get_location_emissions(loc),
+                    "emissions": emissions,
+                    'timeprofiled_emissions': timeprofiled_emissions,
                     "plumerise": self._get_location_plumerise(loc)
                 })
 
@@ -111,6 +115,8 @@ class SummarizedFire(dict):
                 }]
             }]
         })
+
+    PHASES = ['flaming', 'smoldering', 'residual']
 
     def _get_location_consumption(self, loc):
         consumption = defaultdict(lambda: 0.0)
@@ -136,6 +142,16 @@ class SummarizedFire(dict):
                         + sum(fb['emissions'][p][s]))
         return emissions
 
+    def _get_location_timeprofiled_emissions(self, aa, loc, emissions):
+        tp_emissions = defaultdict(lambda: defaultdict(lambda: 0.0))
+        per_species = {}
+        for s in emissions:
+            for t in sorted(aa.get('timeprofile', {}).keys()):
+                d = aa['timeprofile'][t]
+                tp_emissions[t][s] += sum([
+                    d[p]*emissions[s][p] for p in self.PHASES
+                ])
+        return tp_emissions
 
     def _get_location_plumerise(self, loc):
         return [
@@ -153,14 +169,14 @@ class SummarizedFire(dict):
 
     def _set_fire_data(self, fire):
         self._set_fire_fuelbeds(fire)
-        self._set_fire_consumption(fire)
-        self._set_fire_timeprofiled_emissions(fire)
+        self._set_fire_consumption()
+        self._set_fire_timeprofiled_emissions()
 
     def _set_fire_fuelbeds(self, fire):
         # throw away 'total_area' return value
         self['fuelbeds'] = fuelbeds.summarize([fire])
 
-    def _set_fire_consumption(self, fire):
+    def _set_fire_consumption(self):
         # sum the consumption across all fuelbeds and phases, but keep them
         # separate by category
         consumption = defaultdict(lambda: 0.0)
@@ -170,28 +186,14 @@ class SummarizedFire(dict):
                     consumption[c] += loc['consumption_by_category'][c]
         self['consumption_by_category'] = dict(consumption)
 
-    def _set_fire_timeprofiled_emissions(self, fire):
-        all_loc_emissions = defaultdict(lambda: defaultdict(lambda: 0.0))
-        # we need to iterate through the native fire object's active areas
-        # to get time profile (since we don't store it under self['active_areas']),
-        # but then we need to iterated through self['active_aresa'][..]['locations']
-        # to get the already summarized, location specific emissions
-        for i, aa in enumerate(fire.active_areas):
-            for j, loc in enumerate(aa.locations):
-                emissions = self['active_areas'][i]['locations'][j]['emissions']
-                per_species = {}
-                for s in emissions:
-                    for t in sorted(aa.get('timeprofile', {}).keys()):
-                        d = aa['timeprofile'][t]
-                        all_loc_emissions[t][s] += sum([
-                            d[p]*emissions[s][p] for p in self.PHASES
-                        ])
-
-        self['timeprofiled_emissions'] = [
-            dict(all_loc_emissions[t], dt=t) for t in sorted(all_loc_emissions.keys())
-        ]
-
-    PHASES = ['flaming', 'smoldering', 'residual']
+    def _set_fire_timeprofiled_emissions(self):
+        self['timeprofiled_emissions'] = defaultdict(
+            lambda: defaultdict(lambda: 0.0))
+        for aa in self['active_areas']:
+            for loc in aa['locations']:
+                for t, t_dict in loc['timeprofiled_emissions'].items():
+                    for s, val in t_dict.items():
+                        self['timeprofiled_emissions'][t][s] += val
 
 
 def summarized_fires_by_id(fires):
