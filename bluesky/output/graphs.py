@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import dash_html_components as html
 import dash_core_components as dcc
 import pandas as pd
@@ -149,14 +151,25 @@ def get_location_plumerise_graph_elements(locations):
     # TODO: handle multple selected locations ?
     graphs = []
     for loc in locations:
+        # plumerise_by_level = defaultdict(lambda: [])
+        # for p in loc['plumerise']:
+        #     for level, h in enumerate(p['heights']):
+        #         plumerise_by_level[level].append(dict(height=h, time=p['t']))
+        # fig = go.Figure()
+        # for level, vals in plumerise_by_level.items():
+        #     df = pd.DataFrame(vals)
+        #     fig.add_trace(go.Scatter(df, x="time", y="height"))
+        # graphs.append(dcc.Graph(id='location-plumerise-graph', figure=fig))
+
         flat_plumerise = [dict(height=h, time=p['t'], level=i)
-            for p in loc['plumerise'] for i, h in enumerate(p['heights'])]
+             for p in loc['plumerise'] for i, h in enumerate(p['heights'])]
+        flat_plumerise.sort(key=lambda e: e['time'])
         df = pd.DataFrame(flat_plumerise)
         if not df.empty:
             # df.set_index('level')
             graphs.append(
                 dcc.Graph(id='location-plumerise-graph',
-                    figure=px.scatter(df, x="time", y="height", color="level")
+                    figure=px.line(df, x="time", y="height", color="level")
                     # figure=px.bar(df, x="time", y="height", color="loc",
                     #     barmode="group", #facet_col="aa", #facet_row="day",
                     #     # category_orders={"day": ["Thur", "Fri", "Sat", "Sun"],
