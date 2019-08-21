@@ -133,7 +133,7 @@ def get_summary_emissions_graph_elements(summarized_fires):
 
 def get_location_fuelbeds_graph_elements(locations):
     return generate_fuelbeds_graph_elements(locations, "location",
-        lambda fol: 'location-fuelbeds-graph-' + fol['id'])
+        lambda fol: 'location-fuelbeds-graph')
 
 def get_location_consumption_graph_elements(locations):
     return generate_consumption_graph_elements(locations, "location",
@@ -142,40 +142,36 @@ def get_location_consumption_graph_elements(locations):
 def get_location_emissions_graph_elements(locations):
     return [html.Div("(emissions graph to come")]
 
-def get_location_plumerise_graph_elements(summarized_fires):
-    if not summarized_fires:
+def get_location_plumerise_graph_elements(locations):
+    if not locations:
         return [html.Div("")]
 
-    # TODO: handle multple selected fires ?
+    # TODO: handle multple selected locations ?
     graphs = []
-    # for f in summarized_fires:
-    #     def create_rows(aa,loc,d):
-    #         return [{
-    #                 'time': d['t'],
-    #                 'level': i,
-    #                 'height': h,
-    #                 'aa': aa['id'],
-    #                 'loc':loc['id']
-    #             } for i, h in enumerate(d['heights'])]
-    #     flat_plumerise = flatten(f, 'plumerise', create_rows)
-
-    #     df = pd.DataFrame(flat_plumerise)
-    #     if not df.empty:
-    #         # df.set_index('level')
-    #         graphs.append(
-    #             dcc.Graph(id='plumerise-graph',
-    #                 figure=px.scatter(df, x="time", y="height", color="level")
-    #                 # figure=px.bar(df, x="time", y="height", color="loc",
-    #                 #     barmode="group", #facet_col="aa", #facet_row="day",
-    #                 #     # category_orders={"day": ["Thur", "Fri", "Sat", "Sun"],
-    #                 #     #       "time": ["Lunch", "Dinner"]}
-    #                 #     #height=400
-    #                 # )
-    #             )
-    #         )
+    for loc in locations:
+        flat_plumerise = [dict(height=h, time=p['t'], level=i)
+            for p in loc['plumerise'] for i, h in enumerate(p['heights'])]
+        df = pd.DataFrame(flat_plumerise)
+        if not df.empty:
+            # df.set_index('level')
+            graphs.append(
+                dcc.Graph(id='location-plumerise-graph',
+                    figure=px.scatter(df, x="time", y="height", color="level")
+                    # figure=px.bar(df, x="time", y="height", color="loc",
+                    #     barmode="group", #facet_col="aa", #facet_row="day",
+                    #     # category_orders={"day": ["Thur", "Fri", "Sat", "Sun"],
+                    #     #       "time": ["Lunch", "Dinner"]}
+                    #     #height=400
+                    # )
+                )
+            )
 
 
     if not graphs:
         graphs = [html.Div("(no plumerise information)", className="empty-graph")]
 
-    return [html.H4("Plumerise")] + graphs + [html.Div("Plumerise by activity collection, by location", className="caption")]
+    return (
+        [html.H4("Location Plumerise")]
+        + graphs
+        + [html.Div("Plumerise at the specified location", className="caption")]
+    )
