@@ -28,7 +28,7 @@ def generate_bar_graph_elements(graph_id, data, title, caption=''):
         html.Div(caption, className="caption")
     ]
 
-def generate_fuelbeds_graph_elements(fires_or_locations, obj_type, graph_id_func):
+def generate_fuelbeds_graph_elements(fires_or_locations, graph_id):
     if not fires_or_locations:
         return [html.Div("")]
 
@@ -38,23 +38,19 @@ def generate_fuelbeds_graph_elements(fires_or_locations, obj_type, graph_id_func
         df = pd.DataFrame(fol['fuelbeds'])
         if not df.empty:
             graphs.append(dcc.Graph(
-                id=graph_id_func(fol),
+                id=graph_id,
                 figure=go.Figure(data=[go.Pie(
                     labels='FCCS ' + df['fccs_id'], values=df['pct'])])
             ))
 
     if not graphs:
-        return [html.Div("(no fuelbeds for {})".format(obj_type),
+        return [html.Div("(no fuelbeds)",
             className="empty-graph")]
 
-    return (
-        [html.H4("Fuelbeds".format(obj_type.capitalize()))]
-        + graphs
-        + [html.Div("Fuelbeds by {}".format(obj_type), className="caption")]
-    )
+    return [html.H5("Fuelbeds")] + graphs
 
-def generate_consumption_graph_elements(fires_or_locations, obj_type,
-        graph_name_func, graph_id):
+def generate_consumption_graph_elements(fires_or_locations, graph_id,
+        graph_name_func):
     if not fires_or_locations:
         return [html.Div("")]
 
@@ -66,13 +62,12 @@ def generate_consumption_graph_elements(fires_or_locations, obj_type,
             data.append(go.Bar(name=graph_name_func(fol), x=df['c'], y=df['v']))
 
     if not data:
-        return [html.Div("(no consumption for {})".format(obj_type),
+        return [html.Div("(no consumption)",
             className="empty-graph")]
 
-    return generate_bar_graph_elements(graph_id, data,
-        "Consumption by {}".format(obj_type))
+    return generate_bar_graph_elements(graph_id, data, "Consumption")
 
-def generate_emissions_graph_elements(fires_or_locations, obj_type, graph_id):
+def generate_emissions_graph_elements(fires_or_locations, graph_id):
     if not fires_or_locations:
         return [html.Div("")]
 
@@ -101,11 +96,10 @@ def generate_emissions_graph_elements(fires_or_locations, obj_type, graph_id):
                 })
 
     if not data:
-        return [html.Div("(no emissions for {]})".format(obj_type),
-            className="empty-graph")]
+        return [html.Div("(no emissions)", className="empty-graph")]
 
     return [
-        html.H5("Timeprofiled Emissions"),
+        html.H5("Emissions Profile"),
         dcc.Graph(
             id=graph_id,
             figure={
@@ -125,15 +119,15 @@ def generate_emissions_graph_elements(fires_or_locations, obj_type, graph_id):
 ##
 
 def get_fire_fuelbeds_graph_elements(summarized_fires):
-    return generate_fuelbeds_graph_elements(summarized_fires, "fire",
-        lambda fol: 'fire-fuelbeds-graph')
+    return generate_fuelbeds_graph_elements(summarized_fires,
+        'fire-fuelbeds-graph')
 
 def get_fire_consumption_graph_elements(summarized_fires):
-    return generate_consumption_graph_elements(summarized_fires, "fire",
-        get_fire_label, 'fire-consumption-graph')
+    return generate_consumption_graph_elements(summarized_fires,
+        'fire-consumption-graph', get_fire_label)
 
 def get_fire_emissions_graph_elements(summarized_fires):
-    return generate_emissions_graph_elements(summarized_fires, "fire",
+    return generate_emissions_graph_elements(summarized_fires,
         'fire-emissions-graph')
 
 
@@ -143,15 +137,15 @@ def get_fire_emissions_graph_elements(summarized_fires):
 
 
 def get_location_fuelbeds_graph_elements(locations):
-    return generate_fuelbeds_graph_elements(locations, "location",
-        lambda fol: 'location-fuelbeds-graph')
+    return generate_fuelbeds_graph_elements(locations,
+        'location-fuelbeds-graph')
 
 def get_location_consumption_graph_elements(locations):
-    return generate_consumption_graph_elements(locations, "location",
-        lambda fol: "...", 'location-consumption-graph')
+    return generate_consumption_graph_elements(locations,
+        'location-consumption-graph', lambda fol: "...")
 
 def get_location_emissions_graph_elements(locations):
-    return generate_emissions_graph_elements(locations, "location",
+    return generate_emissions_graph_elements(locations,
         'location-emissions-graph')
 
 def get_location_plumerise_graph_elements(locations):
