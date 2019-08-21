@@ -160,9 +160,16 @@ def get_location_plumerise_graph_elements(locations):
         #     df = pd.DataFrame(vals)
         #     fig.add_trace(go.Scatter(df, x="time", y="height"))
         # graphs.append(dcc.Graph(id='location-plumerise-graph', figure=fig))
-
-        flat_plumerise = [dict(height=h, time=p['t'], level=i)
-             for p in loc['plumerise'] for i, h in enumerate(p['heights'])]
+        def plume_hour_dict(p, h, i):
+            return dict(
+                height=h,
+                time=p['t'],
+                level=i,
+                emissions_fraction=(p['emission_fractions'][i]
+                    if i < len(p['emission_fractions']) else None)
+            )
+        flat_plumerise = [plume_hour_dict(p, h, i)
+            for p in loc['plumerise'] for i, h in enumerate(p['heights'])]
         flat_plumerise.sort(key=lambda e: e['time'])
         df = pd.DataFrame(flat_plumerise)
         if not df.empty:

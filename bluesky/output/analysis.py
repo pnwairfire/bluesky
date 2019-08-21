@@ -141,7 +141,8 @@ class SummarizedFire(dict):
         return [
             {
                 't': t,
-                'heights': d['heights']
+                'heights': d['heights'],
+                'emission_fractions': d['emission_fractions']
             } for t, d in loc.get('plumerise', {}).items()
         ]
 
