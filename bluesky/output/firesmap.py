@@ -6,8 +6,31 @@ import plotly.graph_objs as go
 
 
 ##
-## Used by Callbacks
+## general helpers
 ##
+
+def get_data_frame(summarized_fires_by_id):
+    fires = [sf['flat_summary'] for sf in summarized_fires_by_id.values()]
+    df = pd.DataFrame(fires)
+    df['text'] = ('<span data-id="' + df['id'] + '">'
+        + df['total_area'].astype(str) + ' acre fire</span>')
+    return df
+
+def get_mapbox_figure(mapbox_access_token, summarized_fires_by_id):
+    px.set_mapbox_access_token(mapbox_access_token)
+    df = get_data_frame(summarized_fires_by_id)
+    fig = px.scatter_mapbox(df,
+        lat="avg_lat",
+        lon="avg_lng",
+        text='text',
+        size="total_area",
+        size_max=15,
+        zoom=4,
+        #color="total_area",
+        #color_continuous_scale=px.colors.colorbrewer.YlOrRd
+    )
+
+    return fig
 
 COLOR_SCALE = [
     [0,"rgb(5, 10, 172)"],
@@ -18,109 +41,31 @@ COLOR_SCALE = [
     [5000,"rgb(220, 220, 220)"]
 ]
 
-def get_fires_map_data(mapbox_access_token, summarized_fires_by_id):
-    fires = [sf['flat_summary'] for sf in summarized_fires_by_id.values()]
-    df = pd.DataFrame(fires)
-    df['text'] = ('<span data-id="' + df['id'] + '">'
-        + df['total_area'].astype(str) + ' acre fire</span>')
+def get_figure(mapbox_access_token, summarized_fires_by_id):
+    df = get_data_frame(summarized_fires_by_id)
 
-    # TODO: make use of mapbox_access_token, if defined
-    #_f = go.Scattermapbox if mapbox_access_token else go.Scattergeo
-
-    # return [
-    #     px.scatter_geo(
-    #         df, lat='avg_lat', lon='avg_lng',
-    #         text='text',
-    #         color="total_area",
-    #         hover_name="text",
-    #         size="total_area",
-    #         projection="natural earth"
-    #     )
-    # ]
-
-    return [
-        go.Scattergeo(
-            lon=df['avg_lng'],
-            lat=df['avg_lat'],
-            text=df['text'],
-            meta={'id':df['id']},
-            mode='markers',
-            marker={
-                'size': 5 + 18 * df['total_area'] / 30000,
-                'opacity': 0.8,
-                'symbol': 'circle',
-                #'colorscale': 'thermal', #COLOR_SCALE,
-                #'cmin': 0,
-                #'color': df['total_area'],
-                #'cmax': df['total_area'].max(),
-                #'colorbar': {
-                #    'title': "Total Area"
-                #}
-            }
-        )
-    ]
-    # return [_f(
-    #     #type='scattergeo',
-    #     #locationmode='USA-states',
-    #     lon=df['avg_lng'],
-    #     lat=df['avg_lat'],
-    #     text=df['text'],
-    #     meta={'id':df['id']},
-    #     mode='markers',
-    #     marker={
-    #         'size': 8,
-    #         'opacity': 0.8,
-    #         #'reversescale': True,
-    #         #'autocolorscale': False,
-    #         'symbol': 'circle',
-    #         # 'line': {
-    #         #     'width': 1,
-    #         #     'color': 'rgba(102, 102, 102)'
-    #         # },
-    #         'colorscale': 'thermal', #COLOR_SCALE,
-    #         'cmin': 0,
-    #         'size': df['total_area'],
-    #         'cmax': df['total_area'].max(),
-    #         'colorbar': {
-    #             'title': "Total Area"
-    #         }
-    #     }
-    # )]
-
-def get_fires_map_layout(mapbox_access_token):
-    # return dict(
-    #         colorbar = True,
-    #         geo = dict(
-    #             scope='usa',
-    #             projection=dict( type='albers usa' ),
-    #             showland = True,
-    #             landcolor = "rgb(250, 250, 250)",
-    #             subunitcolor = "rgb(217, 217, 217)",
-    #             countrycolor = "rgb(217, 217, 217)",
-    #             countrywidth = 0.5,
-    #             subunitwidth = 0.5
-    #         ),
-    #     )
-    return go.Layout(
-        autosize=True,
-        mapbox=go.layout.Mapbox(
-            accesstoken=mapbox_access_token,
-            bearing=10,
-            pitch=60,
-            zoom=13,
-            center=  {
-                'lat':40.721319,
-                'lon':-73.987130
-            },
-            style="mapbox://styles/mapbox/streets-v11"
-        ),
-        #title = "Fire Locations"
+    return px.scatter_geo(df,
+        lat='avg_lat',
+        lon='avg_lng',
+        text='text',
+        #color="total_area",
+        #color_continuous_scale=px.colors.colorbrewer.YlOrRd,
+        hover_name="text",
+        size="total_area",
+        projection="natural earth"
     )
 
+##
+## Main function
+##
+
 def get_fires_map(mapbox_access_token, summarized_fires_by_id):
-    data = get_fires_map_data(mapbox_access_token, summarized_fires_by_id)
-    layout = get_fires_map_layout(mapbox_access_token)
-    fig = {'data':data, 'layout': layout}
+    if mapbox_access_token:
+        fig = get_mapbox_figure(mapbox_access_token, summarized_fires_by_id)
+
+    else:
+        fig = get_figure(mapbox_access_token, summarized_fires_by_id)
+
     return [
         dcc.Graph(id='fires-map', figure=fig),
         html.Div("Select fires to see in the table", className="caption")

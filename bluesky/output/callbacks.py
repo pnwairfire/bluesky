@@ -194,7 +194,7 @@ def define_callbacks(app, mapbox_access_token,
     )
     def update_location_graphs(rows, selected_rows, summarized_fires_by_id_json):
         if not selected_rows:
-            return [[]] * 4 # list of 4 empty lists
+            return [[]] * 5 # list of 4 empty lists
 
         summarized_fires_by_id = json.loads(summarized_fires_by_id_json)
 
