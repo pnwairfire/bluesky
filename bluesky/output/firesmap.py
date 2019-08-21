@@ -63,6 +63,6 @@ def get_fires_map(mapbox_access_token, summarized_fires):
         fig = get_figure(mapbox_access_token, summarized_fires)
 
     return [
-        dcc.Graph(id='fires-map', figure=fig),
-        html.Div("Select fires to see in the table", className="caption")
+        html.Div("Select fires to see in the table", className="caption"),
+        dcc.Graph(id='fires-map', figure=fig)
     ]

@@ -51,8 +51,7 @@ def get_locations_table(summarized_fires):
     )
 
     return [
-        html.H5("Fire Locations"),
-        locations_table,
-        html.Div("Select a location to see emissions and plumerise graphs",
-            className="caption")
+        html.Div("Select a location to see emissions and plumerise graphs below",
+            className="caption"),
+        locations_table
     ]

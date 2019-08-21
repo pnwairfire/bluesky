@@ -19,7 +19,7 @@ def get_fires_table(summarized_fires):
         data=get_fires_table_data(summarized_fires),
         columns=[{'id': c, 'name': c} for c in FIRE_TABLE_COLUMNS],
         style_table={
-            'maxHeight': '400px',
+            'maxHeight': '500px',
             'overflowY': 'scroll'
         },
         sort_action='native',
@@ -29,7 +29,7 @@ def get_fires_table(summarized_fires):
     )
 
     return [
-        fires_table,
-        html.Div("Select a fire to see emissions and plumerise graphs",
-            className="caption")
+        html.Div("Select a fire to see emissions and plumerise graphs below",
+            className="caption"),
+        fires_table
     ]
