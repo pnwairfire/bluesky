@@ -124,17 +124,17 @@ def generate_emissions_graph_elements(fires_or_locations, obj_type, graph_id):
 ## Summary fire graphs
 ##
 
-def get_summary_fuelbeds_graph_elements(summarized_fires):
+def get_fire_fuelbeds_graph_elements(summarized_fires):
     return generate_fuelbeds_graph_elements(summarized_fires, "fire",
-        lambda fol: 'summary-fuelbeds-graph')
+        lambda fol: 'fire-fuelbeds-graph')
 
-def get_summary_consumption_graph_elements(summarized_fires):
+def get_fire_consumption_graph_elements(summarized_fires):
     return generate_consumption_graph_elements(summarized_fires, "fire",
-        get_fire_label, 'summary-consumption-graph')
+        get_fire_label, 'fire-consumption-graph')
 
-def get_summary_emissions_graph_elements(summarized_fires):
+def get_fire_emissions_graph_elements(summarized_fires):
     return generate_emissions_graph_elements(summarized_fires, "fire",
-        'summary-emissions-graph')
+        'fire-emissions-graph')
 
 
 ##

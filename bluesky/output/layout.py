@@ -54,9 +54,9 @@ def get_body():
                 dbc.Col([html.Div(id='fires-table-container')], lg=7)
             ]),
             dbc.Row([
-                dbc.Col([html.Div(id='summary-fuelbeds-container')], lg=4),
-                dbc.Col([html.Div(id='summary-consumption-container')], lg=4),
-                dbc.Col([html.Div(id='summary-emissions-container')], lg=4),
+                dbc.Col([html.Div(id='fire-fuelbeds-container')], lg=4),
+                dbc.Col([html.Div(id='fire-consumption-container')], lg=4),
+                dbc.Col([html.Div(id='fire-emissions-container')], lg=4),
             ]),
             dbc.Row([
                 dbc.Col([html.Div(id='locations-table-container')], lg=12)
