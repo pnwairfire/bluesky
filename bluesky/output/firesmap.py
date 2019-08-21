@@ -5,10 +5,6 @@ import plotly.express as px
 import plotly.graph_objs as go
 
 
-##
-## general helpers
-##
-
 def get_data_frame(summarized_fires):
     # preserve original order of fires, so that we can look up selected fires
     fires = [summarized_fires['fires_by_id'][f_id]['flat_summary']
@@ -31,6 +27,7 @@ def get_mapbox_figure(mapbox_access_token, summarized_fires):
         #color="total_area",
         #color_continuous_scale=px.colors.colorbrewer.YlOrRd
     )
+    fig.update_traces(marker=dict(color='red'))
 
     return fig
 
@@ -46,7 +43,7 @@ COLOR_SCALE = [
 def get_figure(mapbox_access_token, summarized_fires):
     df = get_data_frame(summarized_fires)
 
-    return px.scatter_geo(df,
+    fig = px.scatter_geo(df,
         lat='avg_lat',
         lon='avg_lng',
         #color="total_area",
@@ -55,15 +52,13 @@ def get_figure(mapbox_access_token, summarized_fires):
         size="total_area",
         projection="natural earth"
     )
+    fig.update_traces(marker=dict(color='red'))
 
-##
-## Main function
-##
+    return fig
 
 def get_fires_map(mapbox_access_token, summarized_fires):
     if mapbox_access_token:
         fig = get_mapbox_figure(mapbox_access_token, summarized_fires)
-
     else:
         fig = get_figure(mapbox_access_token, summarized_fires)
 
