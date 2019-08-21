@@ -4,6 +4,7 @@ import re
 
 import dash
 
+import dash_bootstrap_components as dbc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
@@ -79,10 +80,12 @@ def define_callbacks(app, mapbox_access_token,
         return [
             [layout.get_upload_box_layout()],
             [
-                html.H3(children=[
-                    "Fires loaded from ",
-                    html.Span(bluesky_output_file_name)
-                ])
+                dbc.Alert(children=[
+                        "Fires loaded from ",
+                        html.Span(bluesky_output_file_name)
+                    ],
+                    color="secondary"
+                )
             ],
             firesmap.get_fires_map(mapbox_access_token,summarized_fires_by_id)
         ]
@@ -126,6 +129,7 @@ def define_callbacks(app, mapbox_access_token,
 
     @app.callback(
         [
+            Output('fire-header', "children"),
             Output('fire-fuelbeds-container', "children"),
             Output('fire-consumption-container', "children"),
             Output('fire-emissions-container', "children"),
@@ -139,7 +143,7 @@ def define_callbacks(app, mapbox_access_token,
             State('summarized-fires-by-id-state', 'value')
         ]
     )
-    def update_fire_graphs_and_table(rows, selected_rows, summarized_fires_by_id_json):
+    def update_fire_graphs_and_locations_table(rows, selected_rows, summarized_fires_by_id_json):
         summarized_fires_by_id = json.loads(summarized_fires_by_id_json)
 
         # if not selected_rows:
@@ -149,7 +153,21 @@ def define_callbacks(app, mapbox_access_token,
         fire_ids = [rows[i]['id'] for i in selected_rows]
         selected_fires = [summarized_fires_by_id[fid] for fid in fire_ids]
 
+        def get_fire_header(selected_fires):
+            # TODO: handle multiple fires ?
+            if len(selected_fires) == 1:
+                return [
+                    dbc.Alert(children=[
+                            "Fire ",
+                            html.Span(selected_fires[0]['flat_summary']['id'])
+                        ],
+                        color="secondary"
+                    )
+                ]
+            return []
+
         return [
+            get_fire_header(selected_fires),
             graphs.get_fire_fuelbeds_graph_elements(selected_fires),
             graphs.get_fire_consumption_graph_elements(selected_fires),
             graphs.get_fire_emissions_graph_elements(selected_fires),

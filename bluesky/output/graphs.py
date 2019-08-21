@@ -48,7 +48,7 @@ def generate_fuelbeds_graph_elements(fires_or_locations, obj_type, graph_id_func
             className="empty-graph")]
 
     return (
-        [html.H4("{} Fuelbeds".format(obj_type.capitalize()))]
+        [html.H4("Fuelbeds".format(obj_type.capitalize()))]
         + graphs
         + [html.Div("Fuelbeds by {}".format(obj_type), className="caption")]
     )
