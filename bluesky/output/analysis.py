@@ -95,6 +95,8 @@ class SummarizedFire(dict):
                 timeprofiled_emissions = self._get_location_timeprofiled_emissions(
                     aa, loc, emissions)
                 self['active_areas'][-1]['locations'].append({
+                    "start": aa["start"],
+                    "end": aa["end"],
                     "lat": lat_lng.latitude,
                     "lng": lat_lng.longitude,
                     "area": loc["area"],

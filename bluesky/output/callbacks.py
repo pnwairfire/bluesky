@@ -81,7 +81,7 @@ def define_callbacks(app, mapbox_access_token,
             [layout.get_upload_box_layout()],
             [
                 dbc.Alert(children=[
-                        "Fires loaded from ",
+                        "Output File:",
                         html.Span(bluesky_output_file_name)
                     ],
                     color="secondary"
@@ -158,7 +158,7 @@ def define_callbacks(app, mapbox_access_token,
             if len(selected_fires) == 1:
                 return [
                     dbc.Alert(children=[
-                            "Fire ",
+                            "Fire:",
                             html.Span(selected_fires[0]['flat_summary']['id'])
                         ],
                         color="secondary"
@@ -178,6 +178,7 @@ def define_callbacks(app, mapbox_access_token,
 
     @app.callback(
         [
+            Output('location-header', "children"),
             Output('location-fuelbeds-container', "children"),
             Output('location-consumption-container', "children"),
             Output('location-emissions-container', "children"),
@@ -193,7 +194,7 @@ def define_callbacks(app, mapbox_access_token,
     )
     def update_location_graphs(rows, selected_rows, summarized_fires_by_id_json):
         if not selected_rows:
-            return [html.Div("")]* 4
+            return [[]] * 4 # list of 4 empty lists
 
         summarized_fires_by_id = json.loads(summarized_fires_by_id_json)
 
@@ -211,7 +212,26 @@ def define_callbacks(app, mapbox_access_token,
                 selected_locations.extend([l for l in aa['locations']
                     if l['id'] in location_ids])
 
+        def get_location_header(selected_locations):
+            # TODO: handle multiple locations ?
+            if len(selected_locations) == 1:
+                l = selected_locations[0]
+                return [
+                    dbc.Alert(children=[
+                            "Location:",
+                            html.Span("{}, {}".format(
+                                l["lat"], l["lng"])),
+                            html.Span("{} - {}".format(
+                                l["start"], l["end"]))
+                        ],
+                        color="secondary"
+                    )
+                ]
+            return []
+
+
         return [
+            get_location_header(selected_locations),
             graphs.get_location_fuelbeds_graph_elements(selected_locations),
             graphs.get_location_consumption_graph_elements(selected_locations),
             graphs.get_location_emissions_graph_elements(selected_locations),

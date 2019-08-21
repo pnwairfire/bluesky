@@ -47,14 +47,14 @@ def get_body():
     return dbc.Container(
         [
             dbc.Row([
-                dbc.Col([html.Div(id="top-header", className="section-hader")], lg=12)
+                dbc.Col([html.Div(id="top-header", className="section-header")], lg=12)
             ]),
             dbc.Row([
                 dbc.Col([html.Div(id="fires-map-container")], lg=5),
                 dbc.Col([html.Div(id='fires-table-container')], lg=7)
             ]),
             dbc.Row([
-                dbc.Col([html.Div(id="fire-header", className="section-hader")], lg=12)
+                dbc.Col([html.Div(id="fire-header", className="section-header")], lg=12)
             ]),
             dbc.Row([
                 dbc.Col([html.Div(id='fire-fuelbeds-container')], lg=4),
@@ -65,7 +65,7 @@ def get_body():
                 dbc.Col([html.Div(id='locations-table-container')], lg=12)
             ]),
             dbc.Row([
-                dbc.Col([html.Div(id="location-header", className="section-hader")], lg=12)
+                dbc.Col([html.Div(id="location-header", className="section-header")], lg=12)
             ]),
             dbc.Row([
                 dbc.Col([html.Div(id='location-fuelbeds-container')], lg=4),

@@ -22,7 +22,8 @@
 /*#top-header {
     font-size: 25px;
 }*/
-#section-header span {
+.section-header span {
+    padding-left: 20px;
     font-weight: bold;
     font-style: italic;
 }
