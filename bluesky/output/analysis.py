@@ -65,7 +65,7 @@ class SummarizedFire(dict):
             'avg_lng':  self['lat_lng']['lng']['avg'],
             'lng': self['lat_lng']['lat']['pretty_str'],
             'total_consumption': fire.get('consumption', {}).get('summary',{}).get('total'),
-            'total_emissions': fire.get('emissions', {}).get('summary',{}).get('total'),
+            #'total_emissions': fire.get('emissions', {}).get('summary',{}).get('total'),
             'PM2.5': fire.get('emissions', {}).get('summary',{}).get('PM2.5'),
             'num_locations': len(locations),
             'total_area': sum([l['area'] for l in locations]),

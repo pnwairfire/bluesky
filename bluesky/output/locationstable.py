@@ -20,9 +20,9 @@ def flatten_location(fire, aa, loc):
         "lat": loc["lat"],
         "lng": loc["lng"],
         "area": loc["area"],
-        "total_consumption": 0.0,
-        "total_emissions": 0.0,
-        "PM2.5": 0.0
+        "total_consumption": sum(loc['consumption_by_category'].values()),
+        "total_emissions": sum([v for d in loc['emissions'].values() for v in d.values()]),
+        "PM2.5": sum(loc['emissions'].get('PM2.5',{}).values())
     }
 
 def get_locations_table(summarized_fires):
