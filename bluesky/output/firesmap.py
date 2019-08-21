@@ -14,7 +14,8 @@ def get_data_frame(summarized_fires):
     fires = [summarized_fires['fires_by_id'][f_id]['flat_summary']
         for f_id in summarized_fires['ids_in_order']]
     df = pd.DataFrame(fires)
-    df['text'] = df['total_area'].astype(str)
+    df['text'] = (df['total_area'].astype(str)  + ' acre fire'
+        + ' at ' + df['avg_lat'].astype(str) + ', ' + df['avg_lng'].astype(str))
     return df
 
 def get_mapbox_figure(mapbox_access_token, summarized_fires):
@@ -23,7 +24,7 @@ def get_mapbox_figure(mapbox_access_token, summarized_fires):
     fig = px.scatter_mapbox(df,
         lat="avg_lat",
         lon="avg_lng",
-        text='text',
+        #text='text',
         size="total_area",
         size_max=15,
         zoom=4,
@@ -48,7 +49,6 @@ def get_figure(mapbox_access_token, summarized_fires):
     return px.scatter_geo(df,
         lat='avg_lat',
         lon='avg_lng',
-        text='text',
         #color="total_area",
         #color_continuous_scale=px.colors.colorbrewer.YlOrRd,
         hover_name="text",
