@@ -19,3 +19,11 @@
     font-style: italic;
     font-size: small;
 }
+/*#top-header {
+    font-size: 25px;
+}*/
+#top-header span {
+    font-weight: bold;
+    font-style: italic;
+}
+}

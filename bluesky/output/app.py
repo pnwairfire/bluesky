@@ -24,13 +24,14 @@ def create_app(bluesky_output_file=None, mapbox_access_token=None,
         initial_data.get('fires', []))
 
     def serve_layout():
-        return layout.get_layout(initial_summarized_fires_by_id)
+        return layout.get_layout(bluesky_output_file,
+            initial_summarized_fires_by_id)
 
     app = dash.Dash(__name__, url_base_pathname=url_path_prefix,
         external_stylesheets=EXTERNAL_STYLESHEETS)
     app.title = "Bluesky Output Visualizer"
     app.layout = serve_layout
     callbacks.define_callbacks(app, mapbox_access_token,
-        initial_summarized_fires_by_id)
+        initial_summarized_fires_by_id, bluesky_output_file)
 
     return app

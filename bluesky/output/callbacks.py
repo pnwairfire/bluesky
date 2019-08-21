@@ -14,7 +14,7 @@ from . import analysis, firesmap, firestable, locationstable, graphs
 ID_EXTRACTOR = re.compile('data-id="([^"]+)"')
 
 def define_callbacks(app, mapbox_access_token,
-        initial_summarized_fires_by_id):
+        initial_summarized_fires_by_id, initial_bluesky_output_file_name):
     # Suppress errors because some callbacks are are assigned to
     # components that will be genreated by other callbacks
     # (and thus aren't in the initial layout)
@@ -23,7 +23,10 @@ def define_callbacks(app, mapbox_access_token,
     # Load data from uploaded output
 
     @app.callback(
-        Output('summarized-fires-by-id-state', 'value'),
+        [
+            Output('summarized-fires-by-id-state', 'value'),
+            Output('bluesky-output-file-name', 'value')
+        ],
         [
             Input("upload-data", "filename"),
             Input("upload-data", "contents")
@@ -36,26 +39,47 @@ def define_callbacks(app, mapbox_access_token,
                 raise PreventUpdate
             summarized_fires_by_id_json = analysis.SummarizedFiresEncoder().encode(
                 initial_summarized_fires_by_id)
+            bluesky_output_file_name = initial_bluesky_output_file_name
 
         else:
+            bluesky_output_file_name = uploaded_filenames
             content_type, content_string = uploaded_file_contents.split(',')
             decoded = base64.b64decode(content_string).decode()
             data = json.loads(decoded)
             summarized_fires_by_id_json = analysis.SummarizedFiresEncoder().encode(
                 analysis.summarized_fires_by_id(data.get('fires', [])))
 
-        return summarized_fires_by_id_json
+        return summarized_fires_by_id_json, bluesky_output_file_name
 
     # Update map when new output data is loaded
     @app.callback(
-        Output('fires-map-container', 'children'),
         [
-            Input('summarized-fires-by-id-state', 'value')
+            Output('top-header', 'children'),
+            Output('fires-map-container', 'children')
+        ],
+        [
+            Input('summarized-fires-by-id-state', 'value'),
+            Input('bluesky-output-file-name', 'value')
         ]
     )
-    def update_fires_map_from_loaded_output(summarized_fires_by_id_json):
-        return firesmap.get_fires_map(mapbox_access_token,
-            json.loads(summarized_fires_by_id_json))
+    def update_fires_map_from_loaded_output(summarized_fires_by_id_json,
+            bluesky_output_file_name):
+        summarized_fires_by_id = json.loads(summarized_fires_by_id_json)
+
+        if not summarized_fires_by_id:
+            return [
+                [html.Div("")],
+                [html.Div("")]
+            ]
+        return [
+            [
+                html.H3(children=[
+                    "Fires loaded from ",
+                    html.Span(bluesky_output_file_name)
+                ])
+            ],
+            firesmap.get_fires_map(mapbox_access_token,summarized_fires_by_id)
+        ]
 
     # Update fires table when fires are selected on map
 
