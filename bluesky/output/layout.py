@@ -80,11 +80,11 @@ def get_body():
         className="mt-4",
     )
 
-def get_layout(bluesky_output_file, initial_summarized_fires_by_id):
+def get_layout(bluesky_output_file, initial_summarized_fires):
     init_state = analysis.SummarizedFiresEncoder().encode(
-        initial_summarized_fires_by_id)
+        initial_summarized_fires)
     return html.Div([
-        dcc.Input(id='summarized-fires-by-id-state', type='text',
+        dcc.Input(id='summarized-fires-state', type='text',
             value=init_state, style={'display': 'none'}),
         dcc.Input(id='bluesky-output-file-name', type='text',
             value=bluesky_output_file or "", style={'display': 'none'}),

@@ -198,8 +198,9 @@ class SummarizedFire(dict):
                         self['timeprofiled_emissions'][t][s] += val
 
 
-def summarized_fires_by_id(fires):
+def summarized_fires(fires):
     summarized_fires = [SummarizedFire(f) for f in fires]
     return {
-        sf['flat_summary']['id']: sf for sf in summarized_fires
+        "ids_in_order": [sf['flat_summary']['id'] for sf in summarized_fires],
+        "fires_by_id": {sf['flat_summary']['id']: sf for sf in summarized_fires}
     }

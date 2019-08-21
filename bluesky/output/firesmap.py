@@ -9,16 +9,17 @@ import plotly.graph_objs as go
 ## general helpers
 ##
 
-def get_data_frame(summarized_fires_by_id):
-    fires = [sf['flat_summary'] for sf in summarized_fires_by_id.values()]
+def get_data_frame(summarized_fires):
+    # preserve original order of fires, so that we can look up selected fires
+    fires = [summarized_fires['fires_by_id'][f_id]['flat_summary']
+        for f_id in summarized_fires['ids_in_order']]
     df = pd.DataFrame(fires)
-    df['text'] = ('<span data-id="' + df['id'] + '">'
-        + df['total_area'].astype(str) + ' acre fire</span>')
+    df['text'] = df['total_area'].astype(str)
     return df
 
-def get_mapbox_figure(mapbox_access_token, summarized_fires_by_id):
+def get_mapbox_figure(mapbox_access_token, summarized_fires):
     px.set_mapbox_access_token(mapbox_access_token)
-    df = get_data_frame(summarized_fires_by_id)
+    df = get_data_frame(summarized_fires)
     fig = px.scatter_mapbox(df,
         lat="avg_lat",
         lon="avg_lng",
@@ -41,8 +42,8 @@ COLOR_SCALE = [
     [5000,"rgb(220, 220, 220)"]
 ]
 
-def get_figure(mapbox_access_token, summarized_fires_by_id):
-    df = get_data_frame(summarized_fires_by_id)
+def get_figure(mapbox_access_token, summarized_fires):
+    df = get_data_frame(summarized_fires)
 
     return px.scatter_geo(df,
         lat='avg_lat',
@@ -59,12 +60,12 @@ def get_figure(mapbox_access_token, summarized_fires_by_id):
 ## Main function
 ##
 
-def get_fires_map(mapbox_access_token, summarized_fires_by_id):
+def get_fires_map(mapbox_access_token, summarized_fires):
     if mapbox_access_token:
-        fig = get_mapbox_figure(mapbox_access_token, summarized_fires_by_id)
+        fig = get_mapbox_figure(mapbox_access_token, summarized_fires)
 
     else:
-        fig = get_figure(mapbox_access_token, summarized_fires_by_id)
+        fig = get_figure(mapbox_access_token, summarized_fires)
 
     return [
         dcc.Graph(id='fires-map', figure=fig),
