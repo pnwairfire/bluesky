@@ -30,7 +30,7 @@ def generate_bar_graph_elements(graph_id, data, title, caption=''):
 
 def generate_fuelbeds_graph_elements(fires_or_locations, graph_id):
     if not fires_or_locations:
-        return [html.Div("")]
+        return []
 
     # TODO: make sure this handles multple selected fires/locations
     graphs = []
@@ -52,7 +52,7 @@ def generate_fuelbeds_graph_elements(fires_or_locations, graph_id):
 def generate_consumption_graph_elements(fires_or_locations, graph_id,
         graph_name_func):
     if not fires_or_locations:
-        return [html.Div("")]
+        return []
 
     # TODO: make sure this handles multple selected fires/locations
     data = []
@@ -69,7 +69,7 @@ def generate_consumption_graph_elements(fires_or_locations, graph_id,
 
 def generate_emissions_graph_elements(fires_or_locations, graph_id):
     if not fires_or_locations:
-        return [html.Div("")]
+        return []
 
     # timeprofiled emissions are summed across all locations, and
     # each species is graphed
@@ -150,7 +150,7 @@ def get_location_emissions_graph_elements(locations):
 
 def get_location_plumerise_graph_elements(locations):
     if not locations:
-        return [html.Div("")]
+        return []
 
     # TODO: handle multple selected locations ?
     graphs = []
