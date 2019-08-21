@@ -1,6 +1,7 @@
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objs as go
 
 
@@ -23,35 +24,68 @@ def get_fires_map_data(mapbox_access_token, summarized_fires_by_id):
     df['text'] = ('<span data-id="' + df['id'] + '">'
         + df['total_area'].astype(str) + ' acre fire</span>')
 
-    # TODO: get working when using 'go.Scattermapbox'
-    _f = go.Scattermapbox if mapbox_access_token else go.Scattergeo
-    return [_f(
-        #type='scattergeo',
-        #locationmode='USA-states',
-        lon=df['avg_lng'],
-        lat=df['avg_lat'],
-        text=df['text'],
-        meta={'id':df['id']},
-        mode='markers',
-        marker={
-            'size': 8,
-            'opacity': 0.8,
-            #'reversescale': True,
-            #'autocolorscale': False,
-            'symbol': 'circle',
-            # 'line': {
-            #     'width': 1,
-            #     'color': 'rgba(102, 102, 102)'
-            # },
-            'colorscale': 'thermal', #COLOR_SCALE,
-            'cmin': 0,
-            'color': df['total_area'],
-            'cmax': df['total_area'].max(),
-            'colorbar': {
-                'title': "Total Area"
+    # TODO: make use of mapbox_access_token, if defined
+    #_f = go.Scattermapbox if mapbox_access_token else go.Scattergeo
+
+    # return [
+    #     px.scatter_geo(
+    #         df, lat='avg_lat', lon='avg_lng',
+    #         text='text',
+    #         color="total_area",
+    #         hover_name="text",
+    #         size="total_area",
+    #         projection="natural earth"
+    #     )
+    # ]
+
+    return [
+        go.Scattergeo(
+            lon=df['avg_lng'],
+            lat=df['avg_lat'],
+            text=df['text'],
+            meta={'id':df['id']},
+            mode='markers',
+            marker={
+                'size': 5 + 18 * df['total_area'] / 30000,
+                'opacity': 0.8,
+                'symbol': 'circle',
+                #'colorscale': 'thermal', #COLOR_SCALE,
+                #'cmin': 0,
+                #'color': df['total_area'],
+                #'cmax': df['total_area'].max(),
+                #'colorbar': {
+                #    'title': "Total Area"
+                #}
             }
-        }
-    )]
+        )
+    ]
+    # return [_f(
+    #     #type='scattergeo',
+    #     #locationmode='USA-states',
+    #     lon=df['avg_lng'],
+    #     lat=df['avg_lat'],
+    #     text=df['text'],
+    #     meta={'id':df['id']},
+    #     mode='markers',
+    #     marker={
+    #         'size': 8,
+    #         'opacity': 0.8,
+    #         #'reversescale': True,
+    #         #'autocolorscale': False,
+    #         'symbol': 'circle',
+    #         # 'line': {
+    #         #     'width': 1,
+    #         #     'color': 'rgba(102, 102, 102)'
+    #         # },
+    #         'colorscale': 'thermal', #COLOR_SCALE,
+    #         'cmin': 0,
+    #         'size': df['total_area'],
+    #         'cmax': df['total_area'].max(),
+    #         'colorbar': {
+    #             'title': "Total Area"
+    #         }
+    #     }
+    # )]
 
 def get_fires_map_layout(mapbox_access_token):
     # return dict(
