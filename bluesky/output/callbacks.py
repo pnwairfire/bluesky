@@ -8,7 +8,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 
-from . import analysis, firesmap, firestable, locationstable, graphs
+from . import analysis, firesmap, firestable, locationstable, graphs, layout
 
 
 ID_EXTRACTOR = re.compile('data-id="([^"]+)"')
@@ -54,6 +54,7 @@ def define_callbacks(app, mapbox_access_token,
     # Update map when new output data is loaded
     @app.callback(
         [
+            Output('navbar-upload-box', 'children'),
             Output('top-header', 'children'),
             Output('fires-map-container', 'children')
         ],
@@ -68,10 +69,15 @@ def define_callbacks(app, mapbox_access_token,
 
         if not summarized_fires_by_id:
             return [
-                [html.Div("")],
-                [html.Div("")]
+                [],
+                [
+                    html.Div(className="main-body-upload-box-container",
+                        children=[layout.get_upload_box_layout()])
+                ],
+                []
             ]
         return [
+            [layout.get_upload_box_layout()],
             [
                 html.H3(children=[
                     "Fires loaded from ",

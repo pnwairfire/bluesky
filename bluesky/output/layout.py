@@ -8,7 +8,7 @@ def get_upload_box_layout():
     return dcc.Upload(
         id="upload-data",
         children=html.Div(
-            ["Drag and drop or click to select a Bluesky output JSON file to upload."]
+            ["Drag and drop or click to select a Bluesky output JSON file."]
         ),
         style={
             "width": "100%",
@@ -27,7 +27,7 @@ def get_navbar():
     return dbc.NavbarSimple(
         children=[
             html.Div("", id="run-id"),
-            dbc.NavItem(get_upload_box_layout()),
+            dbc.NavItem(id="navbar-upload-box"),
             # dbc.DropdownMenu(
             #     nav=True,
             #     in_navbar=True,
