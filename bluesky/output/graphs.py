@@ -26,29 +26,38 @@ def generate_bar_graph_elements(graph_id, data, title, caption=''):
         html.Div(caption, className="caption")
     ]
 
-##
-## Summary fire graphs
-##
-
-def get_summary_fuelbeds_graph_elements(summarized_fires):
-    if not summarized_fires:
+def generate_fuelbeds_graph_elements(fires_or_locations, obj_type, graph_id_func):
+    if not fires_or_locations:
         return [html.Div("")]
 
-    # TODO: make sure this handles multple selected fires
+    # TODO: make sure this handles multple selected fires/locations
     graphs = []
-    for f in summarized_fires:
-        df = pd.DataFrame(f['fuelbeds'])
+    for fol in fires_or_locations:
+        df = pd.DataFrame(fol['fuelbeds'])
         if not df.empty:
             graphs.append(dcc.Graph(
-                id='summary-fuelbeds-graph-'+f['flat_summary']['id'],
+                id=graph_id_func(fol),
                 figure=go.Figure(data=[go.Pie(
                     labels='FCCS ' + df['fccs_id'], values=df['pct'])])
             ))
 
     if not graphs:
-        return [html.Div("(no fuelbeds for fire)", className="empty-graph")]
+        return [html.Div("(no fuelbeds for {})".format(obj_type),
+            className="empty-graph")]
 
-    return [html.H4("Fuelbeds")] + graphs + [html.Div("Fuelbeds by Fire", className="caption")]
+    return (
+        [html.H4("{} Fuelbeds".format(obj_type.capitalize()))]
+        + graphs
+        + [html.Div("Fuelbeds by {}".format(obj_type), className="caption")]
+    )
+
+##
+## Summary fire graphs
+##
+
+def get_summary_fuelbeds_graph_elements(summarized_fires):
+    return generate_fuelbeds_graph_elements(summarized_fires, "fire",
+        lambda fol: 'summary-fuelbeds-graph-' + fol['flat_summary']['id'])
 
 def get_summary_consumption_graph_elements(summarized_fires):
     if not summarized_fires:
@@ -115,24 +124,8 @@ def get_summary_emissions_graph_elements(summarized_fires):
 
 
 def get_location_fuelbeds_graph_elements(locations):
-    if not locations:
-        return [html.Div("")]
-
-    # TODO: make sure this handles multple selected fires
-    graphs = []
-    for l in locations:
-        df = pd.DataFrame(l['fuelbeds'])
-        if not df.empty:
-            graphs.append(dcc.Graph(
-                id='location-fuelbeds-graph-'+l['id'],
-                figure=go.Figure(data=[go.Pie(
-                    labels='FCCS ' + df['fccs_id'], values=df['pct'])])
-            ))
-
-    if not graphs:
-        return [html.Div("(no fuelbeds for location)", className="empty-graph")]
-
-    return [html.H4("Location Fuelbeds")] + graphs + [html.Div("Fuelbeds by location", className="caption")]
+    return generate_fuelbeds_graph_elements(locations, "location",
+        lambda fol: 'location-fuelbeds-graph-' + fol['id'])
 
 def get_location_consumption_graph_elements(locations):
     return [html.Div("(emissions graph to come")]
