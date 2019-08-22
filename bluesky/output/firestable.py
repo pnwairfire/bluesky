@@ -25,6 +25,18 @@ def get_fires_table(summarized_fires):
         sort_action='native',
         filter_action='native',
         row_selectable='single',  #'multi',
+        style_cell_conditional=[
+            {
+                'textAlign': 'left'
+            }
+        ],
+        style_data_conditional=[
+            {
+                'if': {'row_index': 'odd'},
+                'backgroundColor': 'rgb(248, 248, 248)'
+            }
+        ],
+        style_as_list_view=True,
         # editable=False,
     )
 
