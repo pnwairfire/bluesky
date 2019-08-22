@@ -25,6 +25,7 @@ class SummarizedFire(dict):
 
         self._set_lat_lng(fire)
         self._set_flat_summary(fire)
+        self['area'] = self['flat_summary']['total_area']
         self._set_per_location_data(fire)
         self._set_fire_data(fire)
 
@@ -73,6 +74,11 @@ class SummarizedFire(dict):
             'end': max([aa['end'] for aa in active_areas])
         }
 
+    ##
+    ## General Helpes
+    ##
+    def fuelbeds_list_to_dict(self, fuelbeds):
+         return {f['fccs_id']: f['pct'] for f in fuelbeds}
 
     ##
     ## Per Location Data
@@ -102,7 +108,8 @@ class SummarizedFire(dict):
                     "area": loc["area"],
                     "id": "#{}/#{} {},{}".format(
                         i, j, lat_lng.latitude, lat_lng.longitude),
-                    "fuelbeds": fuelbeds.summarize([self._wrap_loc_in_fire(loc)]),
+                    "fuelbeds": self.fuelbeds_list_to_dict(
+                        fuelbeds.summarize([self._wrap_loc_in_fire(loc)])),
                     'consumption_by_category': self._get_location_consumption(loc),
                     "emissions": emissions,
                     'timeprofiled_emissions': timeprofiled_emissions,
@@ -176,7 +183,8 @@ class SummarizedFire(dict):
 
     def _set_fire_fuelbeds(self, fire):
         # throw away 'total_area' return value
-        self['fuelbeds'] = fuelbeds.summarize([fire])
+        self['fuelbeds'] = self.fuelbeds_list_to_dict(
+            fuelbeds.summarize([fire]))
 
     def _set_fire_consumption(self):
         # sum the consumption across all fuelbeds and phases, but keep them

@@ -28,26 +28,36 @@ def generate_bar_graph_elements(graph_id, data, title, caption=''):
         html.Div(caption, className="caption")
     ]
 
+def aggergate_fuelbeds(fires_or_locations):
+    pct_by_id = defaultdict(lambda: 0.0)
+    total_area = sum([fol['area'] for fol in fires_or_locations])
+    for fol in fires_or_locations:
+        area_fraction = fol['area'] / total_area
+        for fccs_id, pct in fol['fuelbeds'].items():
+            pct_by_id[fccs_id] += area_fraction * pct
+
+    # convert to list
+    return [
+        {'fccs_id': fccs_id, 'pct': pct} for fccs_id, pct in pct_by_id.items()
+    ]
+
 def generate_fuelbeds_graph_elements(fires_or_locations, graph_id):
     if not fires_or_locations:
         return []
 
-    # TODO: make sure this handles multple selected fires/locations
-    graphs = []
-    for fol in fires_or_locations:
-        df = pd.DataFrame(fol['fuelbeds'])
-        if not df.empty:
-            graphs.append(dcc.Graph(
-                #id=graph_id,
-                figure=go.Figure(data=[go.Pie(
-                    labels='FCCS ' + df['fccs_id'], values=df['pct'])])
-            ))
-
-    if not graphs:
+    fuelbeds = aggergate_fuelbeds(fires_or_locations)
+    df = pd.DataFrame(fuelbeds)
+    if df.empty:
         return [html.Div("(no fuelbeds)",
             className="empty-graph")]
 
-    return [html.H5("Fuelbeds")] + graphs
+    data = [
+        go.Pie(labels='FCCS ' + df['fccs_id'], values=df['pct'])
+    ]
+    figure = go.Figure(data=data)
+    graph = dcc.Graph(id=graph_id, figure=figure)
+
+    return [html.H5("Fuelbeds"), graph]
 
 def generate_consumption_graph_elements(fires_or_locations, graph_id,
         graph_name_func):
