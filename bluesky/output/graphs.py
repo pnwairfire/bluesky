@@ -73,7 +73,7 @@ def generate_consumption_graph_elements(fires_or_locations, graph_id):
     if df.empty:
         return [html.Div("(no consumption)",
             className="empty-graph")]
-    data = go.Bar(x=df['c'], y=df['v']) #name="...",
+    data = [go.Bar(x=df['c'], y=df['v'])]
 
     return generate_bar_graph_elements(graph_id, data, "Consumption")
 
