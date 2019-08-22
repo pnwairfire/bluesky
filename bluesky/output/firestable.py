@@ -23,7 +23,7 @@ def get_fires_table(summarized_fires):
             'overflowY': 'scroll'
         },
         sort_action='native',
-        filter_action='native',
+        #filter_action='native',
         row_selectable='multi',  #'single',
         style_cell_conditional=[
             {

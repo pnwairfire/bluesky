@@ -47,7 +47,7 @@ def get_locations_table(summarized_fires):
             'overflowY': 'scroll'
         },
         sort_action='native',
-        filter_action='native',
+        #filter_action='native',
         row_selectable='single',  #'multi',
         style_cell_conditional=[
             {
