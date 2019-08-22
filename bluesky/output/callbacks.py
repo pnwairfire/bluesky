@@ -155,9 +155,13 @@ def define_callbacks(app, mapbox_access_token,
             if len(selected_fires) >= 1:
                 return [
                     dbc.Alert(children=[
-                            "Fire(s):",
-                            html.Span(','.join([sf['flat_summary']['id']
-                                for sf in selected_fires]))
+                            html.Div("Fire{} represented in the graphs below:".format(
+                                "s" if len(selected_fires) > 1 else "")),
+                            html.Ul(children=[
+                                html.Li(children=[html.Span(sf['flat_summary']['id'])])
+                                     for sf in selected_fires
+                            ])
+
                         ],
                         color="secondary"
                     )
