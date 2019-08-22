@@ -26,12 +26,14 @@ def flatten_location(fire, aa, loc):
     }
 
 def get_locations_table(summarized_fires):
-    if not summarized_fires:
-        return [html.Div("")]
+    # Note: We need to return a table, even if `data` is empty, to trigger
+    #   callbacks that clear out the location header and graphs. This happens
+    #   after loading an output file.  We'll just hide the table if `data`
+    #   is empty
 
     # TODO: handle multple selected fires ?
     data = []
-    for f in summarized_fires:
+    for f in (summarized_fires or []):
         for aa in f['active_areas']:
             for l in aa['locations']:
                 data.append(flatten_location(f, aa, l))
@@ -51,7 +53,9 @@ def get_locations_table(summarized_fires):
     )
 
     return [
-        html.Div("Select a location to see emissions and plumerise graphs below",
-            className="caption"),
-        locations_table
+        html.Div(className="hidden" if not data else "", children=[
+            html.Div("Select a location to see emissions and plumerise graphs below",
+                className="caption"),
+            locations_table
+        ])
     ]

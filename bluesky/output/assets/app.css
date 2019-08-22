@@ -18,6 +18,10 @@
     margin-bottom: 20px;
 }
 
+.hidden {
+    display: none;
+}
+
 .empty-graph {
     min-height: 200px;
     /*vertical-align: middle;*/
