@@ -24,7 +24,7 @@ def generate_bar_graph_elements(graph_id, data, title, caption=''):
         html.Div(caption, className="caption")
     ]
 
-def aggergate_fuelbeds(fires_or_locations):
+def aggregate_fuelbeds(fires_or_locations):
     fuelbeds = defaultdict(lambda: 0.0)
     total_area = sum([fol['area'] for fol in fires_or_locations])
     for fol in fires_or_locations:
@@ -41,11 +41,10 @@ def generate_fuelbeds_graph_elements(fires_or_locations, graph_id):
     if not fires_or_locations:
         return []
 
-    fuelbeds = aggergate_fuelbeds(fires_or_locations)
+    fuelbeds = aggregate_fuelbeds(fires_or_locations)
     df = pd.DataFrame(fuelbeds)
     if df.empty:
-        return [html.Div("(no fuelbeds)",
-            className="empty-graph")]
+        return [html.Div("(no fuelbeds)", className="empty-graph")]
 
     data = [
         go.Pie(labels='FCCS ' + df['fccs_id'], values=df['pct'])
@@ -71,42 +70,45 @@ def generate_consumption_graph_elements(fires_or_locations, graph_id):
     consumption = aggregate_consumption(fires_or_locations)
     df = pd.DataFrame(consumption)
     if df.empty:
-        return [html.Div("(no consumption)",
-            className="empty-graph")]
+        return [html.Div("(no consumption)", className="empty-graph")]
     data = [go.Bar(x=df['c'], y=df['v'])]
 
     return generate_bar_graph_elements(graph_id, data, "Consumption")
+
+def aggregate_timeprofiled_emissions(fires_or_locations):
+    emissions = defaultdict(lambda: defaultdict(lambda: 0.0))
+    for fol in fires_or_locations:
+        for t, t_dict in fol['timeprofiled_emissions'].items():
+            for s, val in t_dict.items():
+                emissions[t][s] += val
+    return emissions
 
 def generate_emissions_graph_elements(fires_or_locations, graph_id):
     if not fires_or_locations:
         return []
 
-    # timeprofiled emissions are summed across all locations, and
-    # each species is graphed
-    # Note that there should only be one fire
-    # TODO: handle multple selected fires
-    data = []
-    for fol in fires_or_locations:
-        timeprofiled_emissions = [
-            dict(fol['timeprofiled_emissions'][t], dt=t) for t in sorted(fol['timeprofiled_emissions'].keys())
-        ]
-
-        df = pd.DataFrame(timeprofiled_emissions)
-        if not df.empty:
-            species = [k for k in df.keys() if k != 'dt']
-            for s in species:
-                data.append({
-                    'x': df['dt'],
-                    'y': df[s],
-                    'text': ['a', 'b', 'c', 'd'],
-                    'customdata': ['c.a', 'c.b', 'c.c', 'c.d'],
-                    'name': s,
-                    'mode': 'lines+markers',
-                    'marker': {'size': 5}
-                })
-
-    if not data:
+    # timeprofiled emissions are summed across all locations of all fires,
+    # and each species is graphed
+    timeprofiled_emissions = aggregate_timeprofiled_emissions(fires_or_locations)
+    timeprofiled_emissions = [
+        dict(timeprofiled_emissions[t], dt=t) for t in sorted(timeprofiled_emissions.keys())
+    ]
+    df = pd.DataFrame(timeprofiled_emissions)
+    if df.empty:
         return [html.Div("(no emissions)", className="empty-graph")]
+
+    species = [k for k in df.keys() if k != 'dt']
+    data = []
+    for s in species:
+        data.append({
+            'x': df['dt'],
+            'y': df[s],
+            'text': ['a', 'b', 'c', 'd'],
+            'customdata': ['c.a', 'c.b', 'c.c', 'c.d'],
+            'name': s,
+            'mode': 'lines+markers',
+            'marker': {'size': 5}
+        })
 
     return [
         html.H5("Emissions Profile"),
