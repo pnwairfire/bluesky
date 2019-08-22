@@ -19,8 +19,6 @@ def define_callbacks(app, mapbox_access_token,
     # (and thus aren't in the initial layout)
     app.config.suppress_callback_exceptions=True
 
-    # Load data from uploaded output
-
     @app.callback(
         [
             Output('summarized-fires-state', 'value'),
@@ -32,6 +30,10 @@ def define_callbacks(app, mapbox_access_token,
         ]
     )
     def update_output(uploaded_filenames, uploaded_file_contents):
+        """Loads data from an uploaded output file, processes the fire
+        data to create summarized data, and saves the summary data and
+        output file name to browser text fields.
+        """
         if uploaded_file_contents is None:
             if not initial_summarized_fires:
                 # Initial app load, and '-i' wasn't specified
@@ -50,7 +52,6 @@ def define_callbacks(app, mapbox_access_token,
 
         return summarized_fires_json, bluesky_output_file_name
 
-    # Update map when new output data is loaded
     @app.callback(
         [
             Output('navbar-upload-box', 'children'),
@@ -64,6 +65,8 @@ def define_callbacks(app, mapbox_access_token,
     )
     def update_fires_map_from_loaded_output(summarized_fires_json,
             bluesky_output_file_name):
+        """Updates the fires map when new summarized data is
+        """
         summarized_fires = json.loads(summarized_fires_json)
 
         if not summarized_fires['fires_by_id']:
@@ -88,7 +91,6 @@ def define_callbacks(app, mapbox_access_token,
             firesmap.get_fires_map(mapbox_access_token, summarized_fires)
         ]
 
-    # Update fires table when fires are selected on map
 
     @app.callback(
         Output("fires-table-container", "children"),
@@ -103,6 +105,8 @@ def define_callbacks(app, mapbox_access_token,
     )
     def update_fires_table_from_map(selected_data, click_data, figure,
             summarized_fires_json):
+        """Updates fires table when a fire is selected on the map.
+        """
         summarized_fires = json.loads(summarized_fires_json)
 
         def get_selected_fires(points):
@@ -123,7 +127,6 @@ def define_callbacks(app, mapbox_access_token,
 
         return firestable.get_fires_table(selected_fires)
 
-    # Update graphs when fire is selected in table
 
     @app.callback(
         [
@@ -141,7 +144,11 @@ def define_callbacks(app, mapbox_access_token,
             State('summarized-fires-state', 'value')
         ]
     )
-    def update_fire_graphs_and_locations_table(rows, selected_rows, summarized_fires_json):
+    def update_fire_graphs_and_locations_table(rows, selected_rows,
+            summarized_fires_json):
+        """Generates fire graphs and locations table when a fire is
+        selected in the fires table.
+        """
         summarized_fires = json.loads(summarized_fires_json)
 
         # if not selected_rows:
@@ -191,6 +198,9 @@ def define_callbacks(app, mapbox_access_token,
         ]
     )
     def update_location_graphs(rows, selected_rows, summarized_fires_json):
+        """Generates location graphs when a location is selected in the
+        locations table.
+        """
         if not selected_rows:
             return [[]] * 5 # list of 4 empty lists
 
