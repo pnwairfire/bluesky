@@ -8,10 +8,6 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
-def get_fire_label(fire):
-    return ('fire ' + fire['flat_summary']['id'][0:5] + '...'
-        + fire['flat_summary']['id'][-5:])
-
 def generate_bar_graph_elements(graph_id, data, title, caption=''):
     return [
         html.H5(title),
@@ -29,16 +25,16 @@ def generate_bar_graph_elements(graph_id, data, title, caption=''):
     ]
 
 def aggergate_fuelbeds(fires_or_locations):
-    pct_by_id = defaultdict(lambda: 0.0)
+    fuelbeds = defaultdict(lambda: 0.0)
     total_area = sum([fol['area'] for fol in fires_or_locations])
     for fol in fires_or_locations:
         area_fraction = fol['area'] / total_area
         for fccs_id, pct in fol['fuelbeds'].items():
-            pct_by_id[fccs_id] += area_fraction * pct
+            fuelbeds[fccs_id] += area_fraction * pct
 
     # convert to list
     return [
-        {'fccs_id': fccs_id, 'pct': pct} for fccs_id, pct in pct_by_id.items()
+        {'fccs_id': fccs_id, 'pct': pct} for fccs_id, pct in fuelbeds.items()
     ]
 
 def generate_fuelbeds_graph_elements(fires_or_locations, graph_id):
@@ -59,21 +55,25 @@ def generate_fuelbeds_graph_elements(fires_or_locations, graph_id):
 
     return [html.H5("Fuelbeds"), graph]
 
-def generate_consumption_graph_elements(fires_or_locations, graph_id,
-        graph_name_func):
+def aggregate_consumption(fires_or_locations):
+    consumption = defaultdict(lambda: 0.0)
+    for fol in fires_or_locations:
+        for cat, val in fol['consumption_by_category'].items():
+            consumption[cat] += val
+
+    # convert to list
+    return [{'c': c, 'v': v} for c,v in consumption.items()]
+
+def generate_consumption_graph_elements(fires_or_locations, graph_id):
     if not fires_or_locations:
         return []
 
-    # TODO: make sure this handles multple selected fires/locations
-    data = []
-    for fol in fires_or_locations:
-        df = pd.DataFrame([dict(c=c, v=v) for c,v in fol['consumption_by_category'].items()])
-        if not df.empty:
-            data.append(go.Bar(name=graph_name_func(fol), x=df['c'], y=df['v']))
-
-    if not data:
+    consumption = aggregate_consumption(fires_or_locations)
+    df = pd.DataFrame(consumption)
+    if df.empty:
         return [html.Div("(no consumption)",
             className="empty-graph")]
+    data = go.Bar(x=df['c'], y=df['v']) #name="...",
 
     return generate_bar_graph_elements(graph_id, data, "Consumption")
 
@@ -134,7 +134,7 @@ def get_fire_fuelbeds_graph_elements(summarized_fires):
 
 def get_fire_consumption_graph_elements(summarized_fires):
     return generate_consumption_graph_elements(summarized_fires,
-        'fire-consumption-graph', get_fire_label)
+        'fire-consumption-graph')
 
 def get_fire_emissions_graph_elements(summarized_fires):
     return generate_emissions_graph_elements(summarized_fires,
@@ -152,7 +152,7 @@ def get_location_fuelbeds_graph_elements(locations):
 
 def get_location_consumption_graph_elements(locations):
     return generate_consumption_graph_elements(locations,
-        'location-consumption-graph', lambda fol: "...")
+        'location-consumption-graph')
 
 def get_location_emissions_graph_elements(locations):
     return generate_emissions_graph_elements(locations,
