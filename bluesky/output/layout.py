@@ -86,6 +86,8 @@ def get_layout(bluesky_output_file, initial_summarized_fires):
     return html.Div([
         dcc.Input(id='summarized-fires-state', type='text',
             value=init_state, style={'display': 'none'}),
+        # dcc.Input(id='selected-fire-state', type='text',
+        #     value=init_state, style={'display': 'none'}),
         dcc.Input(id='bluesky-output-file-name', type='text',
             value=bluesky_output_file or "", style={'display': 'none'}),
         get_navbar(),

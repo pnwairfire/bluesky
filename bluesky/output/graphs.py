@@ -38,7 +38,7 @@ def generate_fuelbeds_graph_elements(fires_or_locations, graph_id):
         df = pd.DataFrame(fol['fuelbeds'])
         if not df.empty:
             graphs.append(dcc.Graph(
-                id=graph_id,
+                #id=graph_id,
                 figure=go.Figure(data=[go.Pie(
                     labels='FCCS ' + df['fccs_id'], values=df['pct'])])
             ))

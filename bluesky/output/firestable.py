@@ -11,7 +11,7 @@ FIRE_TABLE_COLUMNS = [
     'total_consumption', 'total_emissions', 'PM2.5'
 ]
 def get_fires_table_data(summarized_fires):
-    return [sf['flat_summary'] for sf in summarized_fires]
+    return [sf['flat_summary'] for sf in summarized_fires['fires_by_id'].values()]
 
 def get_fires_table(summarized_fires):
     fires_table = dt.DataTable(
@@ -24,7 +24,7 @@ def get_fires_table(summarized_fires):
         },
         sort_action='native',
         filter_action='native',
-        row_selectable='single',  #'multi',
+        row_selectable='multi',  #'single',
         style_cell_conditional=[
             {
                 'textAlign': 'left'

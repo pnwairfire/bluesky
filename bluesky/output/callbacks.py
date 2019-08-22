@@ -29,7 +29,7 @@ def define_callbacks(app, mapbox_access_token,
             Input("upload-data", "contents")
         ]
     )
-    def update_output(uploaded_filenames, uploaded_file_contents):
+    def load_output(uploaded_filenames, uploaded_file_contents):
         """Loads data from an uploaded output file, processes the fire
         data to create summarized data, and saves the summary data and
         output file name to browser text fields.
@@ -56,16 +56,18 @@ def define_callbacks(app, mapbox_access_token,
         [
             Output('navbar-upload-box', 'children'),
             Output('top-header', 'children'),
-            Output('fires-map-container', 'children')
+            Output('fires-map-container', 'children'),
+            Output("fires-table-container", "children")
         ],
         [
             Input('summarized-fires-state', 'value'),
             Input('bluesky-output-file-name', 'value')
         ]
     )
-    def update_fires_map_from_loaded_output(summarized_fires_json,
+    def update_fires_map_and_table_from_loaded_output(summarized_fires_json,
             bluesky_output_file_name):
-        """Updates the fires map when new summarized data is
+        """Updates the fires map and table when new summarized data
+        are generated and recroded.
         """
         summarized_fires = json.loads(summarized_fires_json)
 
@@ -76,6 +78,7 @@ def define_callbacks(app, mapbox_access_token,
                     html.Div(className="main-body-upload-box-container",
                         children=[layout.get_upload_box_layout()])
                 ],
+                [],
                 []
             ]
         return [
@@ -88,44 +91,24 @@ def define_callbacks(app, mapbox_access_token,
                     color="secondary"
                 )
             ],
-            firesmap.get_fires_map(mapbox_access_token, summarized_fires)
+            firesmap.get_fires_map(mapbox_access_token, summarized_fires),
+            firestable.get_fires_table(summarized_fires)
         ]
 
-
-    @app.callback(
-        Output("fires-table-container", "children"),
-        [
-            Input("fires-map", "selectedData"),
-            Input("fires-map", "clickData"),
-            Input("fires-map", "figure")
-        ],
-        [
-            State('summarized-fires-state', 'value')
-        ]
-    )
-    def update_fires_table_from_map(selected_data, click_data, figure,
-            summarized_fires_json):
-        """Updates fires table when a fire is selected on the map.
-        """
-        summarized_fires = json.loads(summarized_fires_json)
-
-        def get_selected_fires(points):
-            selected_fires = []
-            for p in  points:
-                fire_id = summarized_fires['ids_in_order'][p['pointIndex']]
-                selected_fires.append(summarized_fires['fires_by_id'][fire_id])
-            return selected_fires
-
-        ctx = dash.callback_context
-        selected_fires = summarized_fires['fires_by_id'].values()
-        if ctx.triggered:
-            prop_id = ctx.triggered[0]['prop_id']
-            data = ctx.triggered[0]['value']
-            if prop_id in ('fires-map.clickData', 'fires-map.selectedData'):
-                selected_fires = get_selected_fires(data['points'])
-        # else, leave as complete set of fires
-
-        return firestable.get_fires_table(selected_fires)
+    # @app.callback(
+    #     [
+    #         Output('fires-table', "derived_virtual_selected_rows")
+    #     ],
+    #     [
+    #         Input("fires-map", "selectedData"),
+    #         Input("fires-map", "clickData")
+    #     ],
+    #     [
+    #         State('summarized-fires-state', 'value')
+    #     ]
+    # )
+    # def select_table_row_from_clicked_map_marker(selected_data, clickData,
+    #         summarized_fires_json):
 
 
     @app.callback(
@@ -137,6 +120,9 @@ def define_callbacks(app, mapbox_access_token,
             Output('locations-table-container', "children")
         ],
         [
+            Input("fires-map", "selectedData"),
+            Input("fires-map", "clickData"),
+            #Input("fires-map", "figure"),
             Input('fires-table', "derived_virtual_data"),
             Input('fires-table', "derived_virtual_selected_rows")
         ],
@@ -144,27 +130,34 @@ def define_callbacks(app, mapbox_access_token,
             State('summarized-fires-state', 'value')
         ]
     )
-    def update_fire_graphs_and_locations_table(rows, selected_rows,
-            summarized_fires_json):
+    def update_fire_graphs_and_locations_table(selected_data, click_data, #figure,
+            table_rows, selected_rows, summarized_fires_json):
         """Generates fire graphs and locations table when a fire is
         selected in the fires table.
         """
         summarized_fires = json.loads(summarized_fires_json)
 
-        # if not selected_rows:
-        #     raise PreventUpdate
-        selected_rows = selected_rows or []
+        ctx = dash.callback_context
+        fire_ids = []
+        if ctx.triggered:
+            prop_id = ctx.triggered[0]['prop_id']
+            data = ctx.triggered[0]['value']
+            if prop_id in ('fires-map.clickData', 'fires-map.selectedData'):
+                fire_ids = [summarized_fires['ids_in_order'][p['pointIndex']]
+                    for p in data['points']]
+            elif prop_id == 'fires-table.derived_virtual_selected_rows':
+                fire_ids = [table_rows[i]['id'] for i in data]
 
-        fire_ids = [rows[i]['id'] for i in selected_rows]
-        selected_fires = [summarized_fires['fires_by_id'][fid] for fid in fire_ids]
+        selected_fires = [summarized_fires['fires_by_id'][i] for i in fire_ids]
 
         def get_fire_header(selected_fires):
             # TODO: handle multiple fires ?
-            if len(selected_fires) == 1:
+            if len(selected_fires) >= 1:
                 return [
                     dbc.Alert(children=[
-                            "Fire:",
-                            html.Span(selected_fires[0]['flat_summary']['id'])
+                            "Fire(s):",
+                            html.Span(','.join([sf['flat_summary']['id']
+                                for sf in selected_fires]))
                         ],
                         color="secondary"
                     )
