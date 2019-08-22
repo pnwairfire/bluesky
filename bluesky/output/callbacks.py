@@ -95,20 +95,36 @@ def define_callbacks(app, mapbox_access_token,
             firestable.get_fires_table(summarized_fires)
         ]
 
-    # @app.callback(
-    #     [
-    #         Output('fires-table', "derived_virtual_selected_rows")
-    #     ],
-    #     [
-    #         Input("fires-map", "selectedData"),
-    #         Input("fires-map", "clickData")
-    #     ],
-    #     [
-    #         State('summarized-fires-state', 'value')
-    #     ]
-    # )
-    # def select_table_row_from_clicked_map_marker(selected_data, clickData,
-    #         summarized_fires_json):
+    @app.callback(
+        [
+            Output('fires-table', "selected_rows")
+        ],
+        [
+            Input('fires-table', "data"),
+            Input("fires-map", "selectedData"),
+            Input("fires-map", "clickData")
+        ],
+        [
+            State('summarized-fires-state', 'value')
+        ]
+    )
+    def select_table_row_from_clicked_map_marker(table_rows, selected_data,
+            clickData, summarized_fires_json):
+        summarized_fires = json.loads(summarized_fires_json)
+
+        ctx = dash.callback_context
+        row_ids = []
+        if ctx.triggered:
+            prop_id = ctx.triggered[0]['prop_id']
+            data = ctx.triggered[0]['value']
+            if prop_id in ('fires-map.clickData', 'fires-map.selectedData'):
+                # create dict for fast lookup in determining row ids
+                fire_ids = {summarized_fires['ids_in_order'][p['pointIndex']]:1
+                    for p in data['points']}
+                row_ids = [i for i,r in enumerate(table_rows)
+                    if r['id'] in fire_ids]
+
+        return [row_ids]
 
 
     @app.callback(
@@ -120,9 +136,6 @@ def define_callbacks(app, mapbox_access_token,
             Output('locations-table-container', "children")
         ],
         [
-            Input("fires-map", "selectedData"),
-            Input("fires-map", "clickData"),
-            #Input("fires-map", "figure"),
             Input('fires-table', "derived_virtual_data"),
             Input('fires-table', "derived_virtual_selected_rows")
         ],
@@ -130,8 +143,8 @@ def define_callbacks(app, mapbox_access_token,
             State('summarized-fires-state', 'value')
         ]
     )
-    def update_fire_graphs_and_locations_table(selected_data, click_data, #figure,
-            table_rows, selected_rows, summarized_fires_json):
+    def update_fire_graphs_and_locations_table(table_rows, selected_rows,
+            summarized_fires_json):
         """Generates fire graphs and locations table when a fire is
         selected in the fires table.
         """
@@ -142,10 +155,7 @@ def define_callbacks(app, mapbox_access_token,
         if ctx.triggered:
             prop_id = ctx.triggered[0]['prop_id']
             data = ctx.triggered[0]['value']
-            if prop_id in ('fires-map.clickData', 'fires-map.selectedData'):
-                fire_ids = [summarized_fires['ids_in_order'][p['pointIndex']]
-                    for p in data['points']]
-            elif prop_id == 'fires-table.derived_virtual_selected_rows':
+            if prop_id == 'fires-table.derived_virtual_selected_rows':
                 fire_ids = [table_rows[i]['id'] for i in data]
 
         selected_fires = [summarized_fires['fires_by_id'][i] for i in fire_ids]
