@@ -9,7 +9,7 @@ Brians-MacBook-Pro:apps-consumeGIT briandrye$ python consume_batch.py -l 3 -o ~/
 I [Joel] had to rerun consume_batch.py in order to generate the feps emissions input files (which weren't updated in the repo when the output files were updated).  I did so with the following
 
 ```
-docker run --rm -ti -v $HOME/code/pnwairfire-fera-apps-consume/:/consume/ \
+docker run --rm -ti --user bluesky -v $HOME/code/pnwairfire-fera-apps-consume/:/consume/ \
     -v $HOME/code/pnwairfire-bluesky/test/regression/consumption_emissions/data/consume_consume/:/data/ \
     -w /consume/ bluesky bash
 for i in `find /data/ -maxdepth 1 -path "*scen_*" ! -path "*out.csv" ! -path "*feps*"|sed -e 's/\.csv//g'`; do

@@ -49,7 +49,7 @@ mount host machine directories in your container.  For example, suppose
 you've got the bluesky git repo in $HOME/code/pnwairfire-bluesky/, you
 could run something like the following:
 
-    docker run --rm \
+    docker run --rm -ti --user bluesky \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         bluesky bsp \
         -i /bluesky/dev/data/json/2-fires-24hr-20140530-CA.json \
@@ -62,7 +62,7 @@ set PYTHONPATH and PATH variables in your docker run command.
 
 For example, to just print the helpstring:
 
-    docker run --rm -ti \
+    docker run --rm -ti --user bluesky \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
@@ -70,7 +70,7 @@ For example, to just print the helpstring:
 
 Another example, running through emissions:
 
-    docker run --rm -ti \
+    docker run --rm -ti --user bluesky \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
@@ -84,7 +84,7 @@ Another example, running through emissions:
 
 Another example, running through vsmoke dispersion:
 
-    docker run --rm -ti \
+    docker run --rm -ti --user bluesky \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
@@ -101,7 +101,7 @@ Another example, running through vsmoke dispersion:
 Two more examples, running `bsp` from the repo through HYSPLIT dispersion
 and KML visualization:
 
-    docker run --rm -ti \
+    docker run --rm -ti --user bluesky \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
@@ -117,7 +117,7 @@ and KML visualization:
         timeprofile findmetdata localmet plumerise \
         dispersion visualization
 
-    docker run --rm -ti \
+    docker run --rm -ti --user bluesky \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
@@ -158,7 +158,7 @@ NAM84 met data in $HOME/Met/NAM/12km/ARL/, and that you want your bsp ouput in
 $HOME/docker-bsp-output/
 
 
-    docker run --rm -ti \
+    docker run --rm -ti --user bluesky \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \

@@ -3,7 +3,10 @@ generates graphs from bluesky output.
 
 To run it, use:
 
-    docker run --rm -ti -p 8050:8050 --name bsp-output-visualizer bluesky \
+    docker run --rm -ti --user bluesky \
+        -p 8050:8050 \
+        --name bsp-output-visualizer \
+        bluesky \
         bsp-output-visualizer -p 8050
 
 And then load http://localhost:8050/ in a web browser (e.g. Chrome or FireFox).
@@ -21,7 +24,7 @@ and use the `-i` option. For example, assuming your output files is
 To run the app in debug mode with your local copy of the bluesky code,
 use the following (assuming you're in the repo root directory):
 
-    docker run --rm -ti \
+    docker run --rm -ti --user bluesky \
         -p 8050:8050 \
         --name bsp-output-visualizer \
         -v $PWD/:/bluesky/ \
@@ -33,5 +36,9 @@ use the following (assuming you're in the repo root directory):
 
 To run in the background with named container and path prefix:
 
-    docker run --rm -d -p 8050:8050 --name bsp-output-visualizer bluesky \
-        bsp-output-visualizer -p 8050 --url-path-prefix /bluesky-output/v1/
+    docker run --rm -d --user bluesky \
+        -p 8050:8050 \
+        --name bsp-output-visualizer \
+        bluesky \
+        bsp-output-visualizer -p 8050 \
+        --url-path-prefix /bluesky-output/v1/

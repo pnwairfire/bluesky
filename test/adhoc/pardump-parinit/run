@@ -121,7 +121,7 @@ run_bsp () {
     echo "Running $TODAY, $FIRES, $PARINIT_STR, $PARDUMP_STR"
     echo
 
-    docker run --rm -ti -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
+    docker run --rm -ti --user bluesky -v $DIR/:/data/ -v $HOME/Met/:/Met/ \
         -v $REPO_DIR/:/bluesky/ -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:$PATH bluesky \
         bsp --log-level DEBUG --indent 4 --today=$TODAY \
