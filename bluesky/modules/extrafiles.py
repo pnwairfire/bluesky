@@ -28,7 +28,7 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    file_sets = [m.lower() for m in Config.get('extrafiles', 'sets')]
+    file_sets = [m.lower() for m in Config().get('extrafiles', 'sets')]
     fires_manager.processed(__name__, __version__, sets=file_sets)
 
     dest_dir = _get_dest_dir()
@@ -57,7 +57,7 @@ def get_extra_file_writers(file_sets, dest_dir):
     return writers
 
 def _get_dest_dir():
-    dest_dir = Config.get('extrafiles', 'dest_dir')
+    dest_dir = Config().get('extrafiles', 'dest_dir')
     if not dest_dir:
         raise BlueSkyConfigurationError("Specify extrafiles destination dir "
             "('config' > 'extrafiles' > 'dest_dir')")

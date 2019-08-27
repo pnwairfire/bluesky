@@ -30,7 +30,7 @@ CONSUME_VERSION_STR = '.'.join([
     ]
 ])
 
-SETTINGS = Config.get('consumption', 'consume_settings')
+SETTINGS = Config().get('consumption', 'consume_settings')
 # User can configure output_units
 SETTINGS['all']['output_units'] = {
     # The default in the consume package is 'tons_ac'. When we tried

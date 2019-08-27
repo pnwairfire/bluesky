@@ -23,7 +23,7 @@ class TestTimeprofilingRunFire(object):
             "area_fraction": [0.8, 0.1, 0.1],
             "residual": [0.8, 0.1, 0.1]
         }
-        #Config.set(hourly_fractions, "timeprofile","hourly_fractions")
+        #Config().set(hourly_fractions, "timeprofile","hourly_fractions")
 
         fire = fires.Fire({
             "activity": [

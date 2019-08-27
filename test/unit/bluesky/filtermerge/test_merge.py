@@ -59,7 +59,7 @@ class TestFiresManagerMergeFires(object):
         for s in (True, False):
             # i.e. top-level location is old structure
             fm = fires.FiresManager()
-            Config.set(s, 'merge', 'skip_failures')
+            Config().set(s, 'merge', 'skip_failures')
             f = fires.Fire({'id': '1', 'location': {'area': 132}})
             f2 = fires.Fire({'id': '1', 'location': {'area': 132}})
             fm.fires = [f, f2]
@@ -77,7 +77,7 @@ class TestFiresManagerMergeFires(object):
         # test in both skip and no-skip modes
         for s in (True, False):
             fm = fires.FiresManager()
-            Config.set(s, 'merge', 'skip_failures')
+            Config().set(s, 'merge', 'skip_failures')
             f = fires.Fire({
                 'id': '1'
             })
@@ -117,7 +117,7 @@ class TestFiresManagerMergeFires(object):
         # test in both skip and no-skip modes
         for s in (True, False):
             fm = fires.FiresManager()
-            Config.set(s, 'merge', 'skip_failures')
+            Config().set(s, 'merge', 'skip_failures')
             f = fires.Fire({
                 'id': '1',
                 "event_of":{
@@ -153,7 +153,7 @@ class TestFiresManagerMergeFires(object):
         # test in both skip and no-skip modes
         for s in (True, False):
             fm = fires.FiresManager()
-            Config.set(s, 'merge', 'skip_failures')
+            Config().set(s, 'merge', 'skip_failures')
             f = fires.Fire({
                 'id': '1',
                 "type": "rx",
@@ -201,7 +201,7 @@ class TestFiresManagerMergeFires(object):
 
     def test_merge_mixed_success_no_activity(self, reset_config):
         fm = fires.FiresManager()
-        #Config.set(True, 'merge', 'skip_failures')
+        #Config().set(True, 'merge', 'skip_failures')
         f = fires.Fire({
             'id': '1',
             "type": "rx",
@@ -237,7 +237,7 @@ class TestFiresManagerMergeFires(object):
 
     def test_merge_mixed_success(self, reset_config):
         fm = fires.FiresManager()
-        #Config.set(True, 'merge', 'skip_failures')
+        #Config().set(True, 'merge', 'skip_failures')
         f = fires.Fire({
             'id': '1',
             "type": "rx",

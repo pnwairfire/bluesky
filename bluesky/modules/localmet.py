@@ -37,7 +37,7 @@ def run(fires_manager):
         raise ValueError(NO_MET_ERROR_MSG)
 
     arl_profiler = arlprofiler.ArlProfiler(fires_manager.met.get('files'),
-        time_step=Config.get('localmet', 'time_step'))
+        time_step=Config().get('localmet', 'time_step'))
     logging.debug("Extracting localmet data for %d fires",
         len(fires_manager.fires))
     for fire in fires_manager.fires:

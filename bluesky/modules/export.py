@@ -24,10 +24,10 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    modes = [m.lower() for m in Config.get('export', 'modes')]
+    modes = [m.lower() for m in Config().get('export', 'modes')]
     fires_manager.processed(__name__, __version__, modes=modes)
 
-    extra_exports = Config.get('export', 'extra_exports')
+    extra_exports = Config().get('export', 'extra_exports')
 
     exporters = []
     for mode in modes:

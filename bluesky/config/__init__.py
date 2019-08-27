@@ -17,22 +17,27 @@ __all__ = [
     "DEFAULTS"
 ]
 
-class ConfigManager(object):
+# we'll make config data thread safe by storing in thread local,
+# which must be defined once in main thread.
+thread_local_data = threading.local()
+
+class Config(object):
 
     # This is a Singleton, to facilitate making this module thread safe
     # (e.g. when using threads to execute different runs with different
     # configuration in parallel)
 
-    _instance = None
-    def __new__(klass, *args, **kwargs):
-        if not isinstance(klass._instance, klass):
-            klass._instance = object.__new__(klass, *args, **kwargs)
-        return klass._instance
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(thread_local_data, 'config_manager'):
+            thread_local_data.config_manager = object.__new__(cls)
+        return thread_local_data.config_manager
 
     def __init__(self):
-        # make config data thread safe
-        self._data = threading.local()
-        self.reset()
+        # __init__ will be called
+        if not hasattr(self, '_initialized'):
+            self._data = thread_local_data
+            self.reset()
+            self._initialized = True
 
     ##
     ## Main interface
@@ -130,6 +135,3 @@ class ConfigManager(object):
                 # TODO: any other replacements?
 
         return val
-
-# For convenience and backwards compatibility
-Config = ConfigManager()

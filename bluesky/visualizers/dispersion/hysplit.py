@@ -34,13 +34,13 @@ from bluesky.dispersers.hysplit import hysplit_utils
 ##
 
 def disp_config(*keys):
-    return Config.get('dispersion', *keys)
+    return Config().get('dispersion', *keys)
 
 def vis_hysplit_config(*keys):
-    return Config.get('visualization', 'hysplit', *keys)
+    return Config().get('visualization', 'hysplit', *keys)
 
 def disp_hysplit_config(*keys):
-    return Config.get('dispersion', 'hysplit', *keys)
+    return Config().get('dispersion', 'hysplit', *keys)
 
 
 ###

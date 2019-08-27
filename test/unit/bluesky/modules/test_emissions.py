@@ -253,8 +253,8 @@ class TestFepsEmissions(BaseEmissionsTest):
     }
 
     def test_wo_details(self, reset_config):
-        Config.set("feps", 'emissions', "model")
-        Config.set(False, 'emissions', "include_emissions_details")
+        Config().set("feps", 'emissions', "model")
+        Config().set(False, 'emissions', "include_emissions_details")
 
         emissions.Feps(fire_failure_manager).run(self.fires)
 
@@ -266,8 +266,8 @@ class TestFepsEmissions(BaseEmissionsTest):
             self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details(self, reset_config):
-        Config.set("feps", 'emissions', "model")
-        Config.set(True, 'emissions', "include_emissions_details")
+        Config().set("feps", 'emissions', "model")
+        Config().set(True, 'emissions', "include_emissions_details")
         emissions.Feps(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
@@ -278,9 +278,9 @@ class TestFepsEmissions(BaseEmissionsTest):
             self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_wo_details_PM_only(self, reset_config):
-        Config.set("feps", 'emissions', "model")
-        Config.set(False, 'emissions', "include_emissions_details")
-        Config.set(['PM2.5', 'PM10'], 'emissions', "species")
+        Config().set("feps", 'emissions', "model")
+        Config().set(False, 'emissions', "include_emissions_details")
+        Config().set(['PM2.5', 'PM10'], 'emissions', "species")
         emissions.Feps(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
@@ -291,9 +291,9 @@ class TestFepsEmissions(BaseEmissionsTest):
             self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self, reset_config):
-        Config.set("feps", 'emissions', "model")
-        Config.set(True, 'emissions', "include_emissions_details")
-        Config.set(['PM2.5', 'PM10'], 'emissions', "species")
+        Config().set("feps", 'emissions', "model")
+        Config().set(True, 'emissions', "include_emissions_details")
+        Config().set(['PM2.5', 'PM10'], 'emissions', "species")
         emissions.Feps(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
@@ -354,9 +354,9 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
     # a huge set
 
     def test_wo_details_PM_only(self, reset_config):
-        Config.set("prichard-oneill", 'emissions', "model")
-        Config.set(False, 'emissions', "include_emissions_details")
-        Config.set(self.SPECIES, 'emissions', "species")
+        Config().set("prichard-oneill", 'emissions', "model")
+        Config().set(False, 'emissions', "include_emissions_details")
+        Config().set(self.SPECIES, 'emissions', "species")
         emissions.PrichardOneill(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
@@ -367,9 +367,9 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
             self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self, reset_config):
-        Config.set("prichard-oneill", 'emissions', "model")
-        Config.set(True, 'emissions', "include_emissions_details")
-        Config.set(self.SPECIES, 'emissions', "species")
+        Config().set("prichard-oneill", 'emissions', "model")
+        Config().set(True, 'emissions', "include_emissions_details")
+        Config().set(self.SPECIES, 'emissions', "species")
         emissions.PrichardOneill(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
@@ -441,8 +441,8 @@ class TestConsumeEmissions(BaseEmissionsTest):
     }
 
     def test_wo_details(self, reset_config):
-        Config.set("consume", 'emissions', "model")
-        Config.set(False, 'emissions', "include_emissions_details")
+        Config().set("consume", 'emissions', "model")
+        Config().set(False, 'emissions', "include_emissions_details")
         emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
@@ -453,8 +453,8 @@ class TestConsumeEmissions(BaseEmissionsTest):
             self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details(self, reset_config):
-        Config.set("consume", 'emissions', "model")
-        Config.set(True, 'emissions', "include_emissions_details")
+        Config().set("consume", 'emissions', "model")
+        Config().set(True, 'emissions', "include_emissions_details")
         emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
@@ -465,9 +465,9 @@ class TestConsumeEmissions(BaseEmissionsTest):
             self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_wo_details_PM_only(self, reset_config):
-        Config.set("consume", 'emissions', "model")
-        Config.set(False, 'emissions', "include_emissions_details")
-        Config.set(['PM2.5', 'PM10'], 'emissions', "species")
+        Config().set("consume", 'emissions', "model")
+        Config().set(False, 'emissions', "include_emissions_details")
+        Config().set(['PM2.5', 'PM10'], 'emissions', "species")
         emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
@@ -478,9 +478,9 @@ class TestConsumeEmissions(BaseEmissionsTest):
             self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
 
     def test_with_details_PM_only(self, reset_config):
-        Config.set("consume", 'emissions', "model")
-        Config.set(True, 'emissions', "include_emissions_details")
-        Config.set(['PM2.5', 'PM10'], 'emissions', "species")
+        Config().set("consume", 'emissions', "model")
+        Config().set(True, 'emissions', "include_emissions_details")
+        Config().set(['PM2.5', 'PM10'], 'emissions', "species")
         emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (

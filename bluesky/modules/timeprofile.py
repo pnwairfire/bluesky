@@ -27,7 +27,7 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    hourly_fractions = Config.get('timeprofile', 'hourly_fractions')
+    hourly_fractions = Config().get('timeprofile', 'hourly_fractions')
 
     fires_manager.processed(__name__, __version__,
         timeprofile_version=timeprofile_version)

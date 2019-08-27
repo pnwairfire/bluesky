@@ -23,7 +23,7 @@ __all__ = [
 
 
 def config(*keys):
-    return Config.get('dispersion', 'hysplit', *keys)
+    return Config().get('dispersion', 'hysplit', *keys)
 
 ##
 ## Tranching

@@ -210,7 +210,7 @@ class MockEmissionsWriter(object):
 class TestEmissionsCsvWriterWriteFire(object):
 
     def setup(self):
-        Config.set('foo.csv', 'extrafiles', 'emissionscsv', 'filename')
+        Config().set('foo.csv', 'extrafiles', 'emissionscsv', 'filename')
         self.writer = emissionscsv.EmissionsCsvWriter('/tmp/')
         self.writer.emissions_writer = MockEmissionsWriter()
 

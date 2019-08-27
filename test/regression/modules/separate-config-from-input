@@ -43,9 +43,9 @@ def process_input(module, input_file):
         output_data = json.loads(f.read())
 
     output_data.pop('config') # throw away what's there
-    Config.reset()
-    Config.set(config)
-    output_data['run_config'] = Config.get()
+    Config().reset()
+    Config().set(config)
+    output_data['run_config'] = Config().get()
     with open(output_file, "w") as f:
         f.write(json.dumps(output_data, indent=4))
 

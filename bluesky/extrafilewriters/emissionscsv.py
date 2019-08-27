@@ -19,7 +19,7 @@ from bluesky.exceptions import BlueSkyConfigurationError
 class EmissionsCsvWriter(object):
 
     def __init__(self, dest_dir):
-        self._filename = Config.get('extrafiles', 'emissionscsv', 'filename')
+        self._filename = Config().get('extrafiles', 'emissionscsv', 'filename')
         if not self._filename:
             raise BlueSkyConfigurationError("Specify destination "
                 "('config' > 'extrafiles' > 'emissionscsv' > 'filename')")

@@ -65,12 +65,12 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
     def _log_config(self):
         # TODO: bail if logging level is less than DEBUG (to avoid list and
         #   set operations)
-        _c = Config.get('dispersion', self._model)
+        _c = Config().get('dispersion', self._model)
         for c in sorted(_c.keys()):
             logging.debug('Dispersion config setting - %s = %s', c, _c[c])
 
     def config(self, *keys, **kwargs):
-        return Config.get('dispersion', self._model, *keys, **kwargs)
+        return Config().get('dispersion', self._model, *keys, **kwargs)
 
     def run(self, fires, start, num_hours, output_dir, working_dir=None):
         """Runs hysplit

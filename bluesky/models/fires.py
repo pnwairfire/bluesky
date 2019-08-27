@@ -316,7 +316,7 @@ class FiresManager(object):
         self._manually_set_today = False
         self._processed_today = True
         self._today = datetimeutils.today_utc()
-        Config.set_today(self._today)
+        Config().set_today(self._today)
 
     @property
     def today(self):
@@ -343,7 +343,7 @@ class FiresManager(object):
         if self._manually_set_today and previous_today != new_today:
             raise TypeError(self.TODAY_IS_IMMUTABLE_MSG)
 
-        Config.set_today(new_today)
+        Config().set_today(new_today)
 
         self._manually_set_today = True
 
@@ -353,7 +353,7 @@ class FiresManager(object):
         self._maually_set_run_id = False
         # default to guid, but manual set will still be allowed
         self._run_id = str(uuid.uuid4())
-        Config.set_run_id(self._run_id)
+        Config().set_run_id(self._run_id)
 
     @property
     def run_id(self):
@@ -370,7 +370,7 @@ class FiresManager(object):
         self._run_id = datetimeutils.fill_in_datetime_strings(
             run_id, today=self.today)
 
-        Config.set_run_id(self._run_id)
+        Config().set_run_id(self._run_id)
 
     ## modules
 
@@ -406,16 +406,16 @@ class FiresManager(object):
     @property
     def config(self):
         raise DeprecationWarning(
-            "Get config with bluesky.config.Config.get")
+            "Get config with bluesky.config.Config().get")
 
     @config.setter
     def config(self, config):
         raise DeprecationWarning(
-            "Set config with bluesky.config.Config.set")
+            "Set config with bluesky.config.Config().set")
 
     def get_config_value(cls, *keys, **kwargs):
         raise DeprecationWarning(
-            "Get config values with bluesky.config.Config.get")
+            "Get config values with bluesky.config.Config().get")
 
     ##
     ## Helper properties
@@ -505,9 +505,9 @@ class FiresManager(object):
         if not getattr(self, '_status_logger'):
             # init_time will be converted to string if it's datetime.date[time]
             init_time = (
-                Config.get('dispersion', 'start', allow_missing=True)
+                Config().get('dispersion', 'start', allow_missing=True)
                 or self.today)
-            sl_config = Config.get('statuslogging')
+            sl_config = Config().get('statuslogging')
             setattr(self, '_status_logger', StatusLogger(init_time, **sl_config))
         self._status_logger.log(status, step, action, **extra_fields)
 
@@ -638,7 +638,7 @@ class FiresManager(object):
 
     @property
     def skip_failed_fires(self):
-        return not not Config.get('skip_failed_fires')
+        return not not Config().get('skip_failed_fires')
 
     ## Loading data
 
@@ -704,7 +704,7 @@ class FiresManager(object):
 
         return dict(self._meta, fires=self.fires, today=self.today,
             run_id=self.run_id, counts=self.counts, bluesky_version=__version__,
-            run_config=Config.get())
+            run_config=Config().get())
 
     def dumps(self, output_stream=None, output_file=None, indent=None):
         if output_stream and output_file:
