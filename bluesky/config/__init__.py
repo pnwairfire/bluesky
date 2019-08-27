@@ -18,14 +18,14 @@ __all__ = [
 ]
 
 # we'll make config data thread safe by storing in thread local,
-# which must be defined once in main thread.
+# which must be defined once, in main thread.
 thread_local_data = threading.local()
 
 class Config(object):
 
     # This is a Singleton, to facilitate making this module thread safe
-    # (e.g. when using threads to execute different runs with different
-    # configuration in parallel)
+    # (e.g. when using threads to execute parallel runs with different
+    # configurations)
 
     def __new__(cls, *args, **kwargs):
         if not hasattr(thread_local_data, 'config_manager'):
@@ -33,7 +33,8 @@ class Config(object):
         return thread_local_data.config_manager
 
     def __init__(self):
-        # __init__ will be called
+        # __init__ will be called each time __new__ is called. So, we need to
+        # keep track of initialization to abort subsequent reinitialization
         if not hasattr(self, '_initialized'):
             self._data = thread_local_data
             self.reset()
