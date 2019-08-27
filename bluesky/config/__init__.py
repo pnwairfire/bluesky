@@ -1,4 +1,5 @@
 import copy
+import threading
 
 import afconfig
 
@@ -16,74 +17,76 @@ __all__ = [
     "DEFAULTS"
 ]
 
+class ConfigManager(object):
 
-class Config:
+    # This is a Singleton, to facilitate making this module thread safe
+    # (e.g. when using threads to execute different runs with different
+    # configuration in parallel)
 
-    _RUN_ID = None
-    _TODAY = None
-    _RAW_CONFIG = copy.deepcopy(DEFAULTS)
-    _CONFIG = copy.deepcopy(_RAW_CONFIG)
-    _IM_CONFIG = afconfig.ImmutableConfigDict(_CONFIG)
+    _instance = None
+    def __new__(klass, *args, **kwargs):
+        if not isinstance(klass._instance, klass):
+            klass._instance = object.__new__(klass, *args, **kwargs)
+        return klass._instance
 
-    def __new__(cls):
-        # Never instantiate. Always return class object
-        return cls
+    def __init__(self):
+        # make config data thread safe
+        self._data = threading.local()
+        self.reset()
 
-    @classmethod
-    def reset(cls):
-        cls._RUN_ID = None
-        cls._TODAY = None
-        cls._RAW_CONFIG = copy.deepcopy(DEFAULTS)
-        cls._CONFIG = copy.deepcopy(cls._RAW_CONFIG)
-        cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
+    ##
+    ## Main interface
+    ##
 
-        return cls
+    def reset(self):
+        self._data._RUN_ID = None
+        self._data._TODAY = None
+        self._data._RAW_CONFIG = copy.deepcopy(DEFAULTS)
+        self._data._CONFIG = copy.deepcopy(self._data._RAW_CONFIG)
+        self._data._IM_CONFIG = afconfig.ImmutableConfigDict(self._data._CONFIG)
 
-    @classmethod
-    def merge(cls, config_dict):
+        return self
+
+    def merge(self, config_dict):
         if config_dict:
             config_dict = to_lowercase_keys(config_dict)
-            cls._RAW_CONFIG = afconfig.merge_configs(
-                cls._RAW_CONFIG, config_dict)
-            cls._CONFIG = afconfig.merge_configs(cls._CONFIG,
-                cls.replace_config_wildcards(copy.deepcopy(config_dict)))
-            cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
+            self._data._RAW_CONFIG = afconfig.merge_configs(
+                self._data._RAW_CONFIG, config_dict)
+            self._data._CONFIG = afconfig.merge_configs(self._data._CONFIG,
+                self.replace_config_wildcards(copy.deepcopy(config_dict)))
+            self._data._IM_CONFIG = afconfig.ImmutableConfigDict(self._data._CONFIG)
 
-        return cls
+        return self
 
-    @classmethod
-    def set(cls, config_dict, *keys):
+    def set(self, config_dict, *keys):
         config_dict = to_lowercase_keys(config_dict)
         if keys:
             keys = [k.lower() for k in keys]
-            afconfig.set_config_value(cls._RAW_CONFIG,
+            afconfig.set_config_value(self._data._RAW_CONFIG,
                 copy.deepcopy(config_dict), *keys)
-            afconfig.set_config_value(cls._CONFIG,
-                cls.replace_config_wildcards(copy.deepcopy(config_dict)),
+            afconfig.set_config_value(self._data._CONFIG,
+                self.replace_config_wildcards(copy.deepcopy(config_dict)),
                 *keys)
-            cls._IM_CONFIG = afconfig.ImmutableConfigDict(cls._CONFIG)
+            self._data._IM_CONFIG = afconfig.ImmutableConfigDict(self._data._CONFIG)
 
         else:
-            cls._RAW_CONFIG = copy.deepcopy(DEFAULTS)
-            cls._CONFIG = copy.deepcopy(cls._RAW_CONFIG)
-            cls.merge(config_dict)
+            self._data._RAW_CONFIG = copy.deepcopy(DEFAULTS)
+            self._data._CONFIG = copy.deepcopy(self._data._RAW_CONFIG)
+            self.merge(config_dict)
 
-        return cls
+        return self
 
-    @classmethod
-    def set_today(cls, today):
-        if today and cls._TODAY != today:
-            cls._TODAY = today
-            cls.set(cls._RAW_CONFIG)
+    def set_today(self, today):
+        if today and self._data._TODAY != today:
+            self._data._TODAY = today
+            self.set(self._data._RAW_CONFIG)
 
-    @classmethod
-    def set_run_id(cls, run_id):
-        if run_id and cls._RUN_ID != run_id:
-            cls._RUN_ID = run_id
-            cls.set(cls._RAW_CONFIG)
+    def set_run_id(self, run_id):
+        if run_id and self._data._RUN_ID != run_id:
+            self._data._RUN_ID = run_id
+            self.set(self._data._RAW_CONFIG)
 
-    @classmethod
-    def get(cls, *keys, **kwargs):
+    def get(self, *keys, **kwargs):
         if 'default' in kwargs:
             raise DeprecationWarning("config defaults are specified in "
                 "bluesky.config.defaults module")
@@ -92,24 +95,23 @@ class Config:
             keys = [k.lower() for k in keys]
             # default behavior is to fail if key isn't in user's config
             # or in default config
-            return afconfig.get_config_value(cls._IM_CONFIG, *keys,
+            return afconfig.get_config_value(self._data._IM_CONFIG, *keys,
                 fail_on_missing_key=not kwargs.get('allow_missing'))
 
         else:
-            return cls._IM_CONFIG
+            return self._data._IM_CONFIG
 
-    @classmethod
-    def replace_config_wildcards(cls, val):
+    def replace_config_wildcards(self, val):
         if isinstance(val, dict):
             for k in val:
-                val[k] = cls.replace_config_wildcards(val[k])
+                val[k] = self.replace_config_wildcards(val[k])
         elif isinstance(val, list):
-            val = [cls.replace_config_wildcards(v) for v in val]
+            val = [self.replace_config_wildcards(v) for v in val]
         elif hasattr(val, 'lower'):  # i.e. it's a string
             if val:
                 # first, fill in any datetime control codes or wildcards
                 val = datetimeutils.fill_in_datetime_strings(val,
-                    today=cls._TODAY)
+                    today=self._data._TODAY)
 
                 # then, see if the resulting string purely represents a datetime
                 try:
@@ -122,9 +124,12 @@ class Config:
                     # in strings to prevent conversion to datetime object
                     val = val.replace('{datetime-parse-buster}', '')
 
-                    if cls._RUN_ID:
-                        val = val.replace('{run_id}', cls._RUN_ID)
+                    if self._data._RUN_ID:
+                        val = val.replace('{run_id}', self._data._RUN_ID)
 
                 # TODO: any other replacements?
 
         return val
+
+# For convenience and backwards compatibility
+Config = ConfigManager()

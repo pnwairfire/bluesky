@@ -114,62 +114,62 @@ class TestGetAndSet(object):
     def test_setting_config_run_id_today(self, reset_config):
         # setting
         Config.set({"FOO": "{run_id}_{today-2:%Y%m%d}_bar", "bar": "baz"})
-        assert Config._RUN_ID == None
-        assert Config._TODAY == None
+        assert Config._data._RUN_ID == None
+        assert Config._data._TODAY == None
         EXPECTED_RAW =  dict(DEFAULTS,
             foo="{run_id}_{today-2:%Y%m%d}_bar", bar="baz")
         EXPECTED = dict(DEFAULTS,
             foo="{run_id}_20160418_bar", bar="baz")
-        assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED
+        assert Config._data._RAW_CONFIG == EXPECTED_RAW
+        assert Config._data._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         # set today
         Config.set_today(datetime.datetime(2019, 1, 5, 10, 12, 1))
-        assert Config._RUN_ID == None
-        assert Config._TODAY == datetime.datetime(2019,1,5,10,12,1)
+        assert Config._data._RUN_ID == None
+        assert Config._data._TODAY == datetime.datetime(2019,1,5,10,12,1)
         EXPECTED_RAW =  dict(DEFAULTS,
             foo="{run_id}_{today-2:%Y%m%d}_bar", bar="baz")
         EXPECTED = dict(DEFAULTS,
             foo="{run_id}_20190103_bar", bar="baz")
-        assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED
+        assert Config._data._RAW_CONFIG == EXPECTED_RAW
+        assert Config._data._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         # set again; datetime wildcard should be filled in
         Config.set({"fOO": "{run_id}_{today:%Y%m%d%H}_bar", "bar": "sdfsdf"})
-        assert Config._RUN_ID == None
-        assert Config._TODAY == datetime.datetime(2019,1,5,10,12,1)
+        assert Config._data._RUN_ID == None
+        assert Config._data._TODAY == datetime.datetime(2019,1,5,10,12,1)
         EXPECTED_RAW =  dict(DEFAULTS,
             foo="{run_id}_{today:%Y%m%d%H}_bar", bar="sdfsdf")
         EXPECTED = dict(DEFAULTS,
             foo="{run_id}_2019010510_bar", bar="sdfsdf")
-        assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED
+        assert Config._data._RAW_CONFIG == EXPECTED_RAW
+        assert Config._data._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         # set run_id
         Config.set_run_id("abc123")
-        assert Config._RUN_ID == "abc123"
-        assert Config._TODAY == datetime.datetime(2019,1,5,10,12,1)
+        assert Config._data._RUN_ID == "abc123"
+        assert Config._data._TODAY == datetime.datetime(2019,1,5,10,12,1)
         EXPECTED_RAW =  dict(DEFAULTS,
             foo="{run_id}_{today:%Y%m%d%H}_bar", bar="sdfsdf")
         EXPECTED = dict(DEFAULTS,
             foo="abc123_2019010510_bar", bar="sdfsdf")
-        assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED
+        assert Config._data._RAW_CONFIG == EXPECTED_RAW
+        assert Config._data._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         # set again; datetime and run_id wildcards should be filled in
         Config.set({"foo": "FOO_{run_id}_{today:%Y%m%d%H}_bar", "bar": "zz"})
-        assert Config._RUN_ID == "abc123"
-        assert Config._TODAY == datetime.datetime(2019,1,5,10,12,1)
+        assert Config._data._RUN_ID == "abc123"
+        assert Config._data._TODAY == datetime.datetime(2019,1,5,10,12,1)
         EXPECTED_RAW =  dict(DEFAULTS,
             foo="FOO_{run_id}_{today:%Y%m%d%H}_bar", bar="zz")
         EXPECTED = dict(DEFAULTS,
             foo="FOO_abc123_2019010510_bar", bar="zz")
-        assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED
+        assert Config._data._RAW_CONFIG == EXPECTED_RAW
+        assert Config._data._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         # set in individual values
@@ -177,16 +177,16 @@ class TestGetAndSet(object):
         Config.set(200, "BAAAR")
         Config.set("sdfsdf{run_id}", "baz", "a")
         Config.set("{run_id}", "BAZ", "b")
-        assert Config._RUN_ID == "abc123"
-        assert Config._TODAY == datetime.datetime(2019,1,5,10,12,1)
+        assert Config._data._RUN_ID == "abc123"
+        assert Config._data._TODAY == datetime.datetime(2019,1,5,10,12,1)
         EXPECTED_RAW =  dict(DEFAULTS,
             foo="FOO_{run_id}_{today:%Y%m%d%H}_bar", bar=100, baaar=200,
             baz={"a": "sdfsdf{run_id}", "b": "{run_id}"})
         EXPECTED = dict(DEFAULTS,
             foo="FOO_abc123_2019010510_bar", bar=100, baaar=200,
             baz={"a": "sdfsdfabc123", "b": "abc123"})
-        assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED
+        assert Config._data._RAW_CONFIG == EXPECTED_RAW
+        assert Config._data._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         assert self._ORIGINAL_DEFAULTS == DEFAULTS
@@ -212,10 +212,10 @@ class TestMerge(object):
         EXPECTED = dict(DEFAULTS, **{
             "foo": {"a": "{run_id}-20160420","b": 222,"c": 333,"d": 444}
         })
-        assert Config._RUN_ID == None
-        assert Config._TODAY == None
-        assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED
+        assert Config._data._RUN_ID == None
+        assert Config._data._TODAY == None
+        assert Config._data._RAW_CONFIG == EXPECTED_RAW
+        assert Config._data._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         Config.set_today(datetime.datetime(2019, 2, 4))
@@ -225,10 +225,10 @@ class TestMerge(object):
         EXPECTED = dict(DEFAULTS, **{
             "foo": {"a": "{run_id}-20190204","b": 222,"c": 333,"d": 444}
         })
-        assert Config._RUN_ID == None
-        assert Config._TODAY == datetime.datetime(2019, 2, 4)
-        assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED
+        assert Config._data._RUN_ID == None
+        assert Config._data._TODAY == datetime.datetime(2019, 2, 4)
+        assert Config._data._RAW_CONFIG == EXPECTED_RAW
+        assert Config._data._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         Config.merge({
@@ -248,10 +248,10 @@ class TestMerge(object):
             "bar": {"b": "b"},
             "b": "b"
         })
-        assert Config._RUN_ID == None
-        assert Config._TODAY == datetime.datetime(2019, 2, 4)
-        assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED
+        assert Config._data._RUN_ID == None
+        assert Config._data._TODAY == datetime.datetime(2019, 2, 4)
+        assert Config._data._RAW_CONFIG == EXPECTED_RAW
+        assert Config._data._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         Config.merge({
@@ -275,10 +275,10 @@ class TestMerge(object):
             "b": "b",
             "c": "c"
         })
-        assert Config._RUN_ID == None
-        assert Config._TODAY == datetime.datetime(2019, 2, 4)
-        assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED
+        assert Config._data._RUN_ID == None
+        assert Config._data._TODAY == datetime.datetime(2019, 2, 4)
+        assert Config._data._RAW_CONFIG == EXPECTED_RAW
+        assert Config._data._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         Config.set("444444", 'foo', 'd')
@@ -331,10 +331,10 @@ class TestMerge(object):
             "dci": "23",
             "dcf": "123.23"
         })
-        assert Config._RUN_ID == None
-        assert Config._TODAY == datetime.datetime(2019, 2, 4)
-        assert Config._RAW_CONFIG == EXPECTED_RAW
-        assert Config._CONFIG == EXPECTED
+        assert Config._data._RUN_ID == None
+        assert Config._data._TODAY == datetime.datetime(2019, 2, 4)
+        assert Config._data._RAW_CONFIG == EXPECTED_RAW
+        assert Config._data._CONFIG == EXPECTED
         assert Config.get() == EXPECTED
 
         assert self._ORIGINAL_DEFAULTS == DEFAULTS
