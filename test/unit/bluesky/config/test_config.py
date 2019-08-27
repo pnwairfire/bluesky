@@ -4,6 +4,7 @@ __author__ = "Joel Dubowy"
 
 import copy
 import datetime
+import threading
 
 from freezegun import freeze_time
 from py.test import raises
@@ -338,3 +339,38 @@ class TestMerge(object):
         assert Config().get() == EXPECTED
 
         assert self._ORIGINAL_DEFAULTS == DEFAULTS
+
+
+class TestThreadSafety(object):
+
+    def test_getting_defaults(self, reset_config):
+
+
+        class T(threading.Thread):
+            def  __init__(self, i):
+                super(T, self).__init__()
+                self.i = i
+                # we need to record exception in order to re-raise it
+                # in the main thread
+                self.exception = None
+
+            def run(self):
+                try:
+                    # getting defaults
+                    assert Config().get() == DEFAULTS
+                    assert Config().get('skip_failed_fires') == False
+                    Config().set(self.i, 'skip_failed_fires')
+                    assert Config().get('skip_failed_fires') == self.i
+                except Exception as e:
+                    self.exception = e
+
+        threads = []
+        for i in range(2):
+            t = T(i)
+            t.start()
+            threads.append(t)
+
+        for t in threads:
+            t.join()
+            if t.exception:
+                raise t.exception
