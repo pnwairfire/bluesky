@@ -196,6 +196,7 @@ class BaseCsvFileLoader(BaseFileLoader):
 class BaseApiLoader(BaseLoader):
 
     DEFAULT_KEY_PARAM = "_k"
+    DEFAULT_AUTH_PROTOCOL = None
     DEFAULT_REQUEST_TIMEOUT = 10 # seconds
 
     DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S%Z'
