@@ -68,6 +68,10 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
     # gain; if it doesn't,then it might not be worth the trouble
     for ac in fire['activity']:
         for aa in ac.active_areas:
+            if not aa.get('start'):
+                raise RuntimeError(
+                    "Active area start time required to run consumption.")
+
             season = datetimeutils.season_from_date(aa.get('start'))
             for loc in aa.locations:
                 for fb in loc['fuelbeds']:
