@@ -20,7 +20,6 @@ from afdatetime import parsing as datetime_parsing, timezones
 import numpy as np
 from bluesky.config import Config
 from bluesky import locationutils
-import pdb
 
 class ColumnSpecificRecord(object):
     columndefs = []
