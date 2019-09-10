@@ -1,0 +1,16 @@
+{
+    "config": {
+        "extrafiles":{
+            "dest_dir": "/bluesky/output/extrafiles/{run_id}/",
+            "sets": ["smokeready"],
+            "smokeready": {
+                "ptinv_filename": "ptinv-{today:%Y%m%d%H}.ida",
+                "ptday_filename": "ptday-{today:%Y%m%d%H}.ems95",
+                "pthour_filename": "pthour-{today:%Y%m%d%H}.ems95",
+                "separate_smolder": true,
+                "write_ptinv_totals": true,
+                "write_ptday_file": true
+            }
+        }
+    }
+}

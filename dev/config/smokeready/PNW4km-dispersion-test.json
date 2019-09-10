@@ -1,0 +1,181 @@
+{
+    "config": {
+        "skip_failed_fires": true,
+        "load": {
+            "sources": [
+                {
+                    "name": "firespider",
+                    "format": "JSON",
+                    "type": "file",
+                    "file": "/bluesky/dev/data/json/1-fire-24hr-20190728-OR.json",
+                    "saved_copy_file": "/bluesky/tmp/fire-34fr-test-SAVED.json"
+                }
+            ]
+        },
+        "filter":{
+            "location":{
+                "boundary": {
+                    "sw": {"lng": -128.6, "lat": 40},
+                    "ne": {"lng": -107, "lat": 49.7}
+                }
+            }
+        },
+        "fuelbeds": {
+            "ignored_fuelbeds": ["900"]
+        },
+        "consumption": {
+            "default_ecoregion": "western",
+            "fuel_loadings": {
+                "0": {
+                    "overstory_loading": 0.000000,
+                    "midstory_loading": 0.000000,
+                    "understory_loading": 0.000000,
+                    "snags_c1_foliage_loading": 0.000000,
+                    "snags_c1wo_foliage_loading": 0.000000,
+                    "snags_c1_wood_loading": 0.000000,
+                    "snags_c2_loading": 0.000000,
+                    "snags_c3_loading": 0.000000,
+                    "shrubs_primary_loading": 9.821751,
+                    "shrubs_secondary_loading": 0.000000,
+                    "shrubs_primary_perc_live": 75.000000,
+                    "shrubs_secondary_perc_live": 0.000000,
+                    "nw_primary_loading": 0.000000,
+                    "nw_secondary_loading": 0.000000,
+                    "nw_primary_perc_live": 0.000000,
+                    "nw_secondary_perc_live": 0.000000,
+                    "w_sound_0_quarter_loading": 0.500000,
+                    "w_sound_quarter_1_loading": 0.250000,
+                    "w_sound_1_3_loading": 0.250000,
+                    "w_sound_3_9_loading": 0.000000,
+                    "w_sound_9_20_loading": 0.000000,
+                    "w_sound_gt20_loading": 0.000000,
+                    "w_rotten_3_9_loading": 0.000000,
+                    "w_rotten_9_20_loading": 0.000000,
+                    "w_rotten_gt20_loading": 0.000000,
+                    "w_stump_sound_loading": 0.000000,
+                    "w_stump_rotten_loading": 0.000000,
+                    "w_stump_lightered_loading": 0.000000,
+                    "litter_depth": 2.000000,
+                    "litter_loading": 4.650000,
+                    "lichen_depth": 0.000000,
+                    "lichen_loading": 0.000000,
+                    "moss_depth": 0.000000,
+                    "moss_loading": 0.000000,
+                    "basal_accum_loading": 0.000000,
+                    "squirrel_midden_loading": 0.000000,
+                    "ladderfuels_loading": 0.000000,
+                    "duff_lower_depth": 0.000000,
+                    "duff_lower_loading": 0.000000,
+                    "duff_upper_depth": 0.100000,
+                    "duff_upper_loading": 0.600000,
+                    "pile_clean_loading": 0.000000,
+                    "pile_dirty_loading": 0.000000,
+                    "pile_vdirty_loading": 0.000000,
+                    "total_available_fuel_loading": 16.071751,
+                    "efg_natural": 7,
+                    "efg_activity": 7
+                }
+            }
+        },
+        "emissions": {
+            "species": ["PM2.5", "PM10", "CO", "CO2"]
+        },
+        "findmetdata": {
+            "met_root_dir": "/data/Met/PNW/4km/ARL/"
+        },
+        "plumerise": {
+            "model":"feps",
+            "feps": {
+                "working_dir": "./output/plumerise{today:%Y%m%d}00"
+            }
+        },
+        "localmet":{
+        },
+        "dispersion": {
+            "start": "{today:%Y-%m-%d}T00:00:00",
+            "num_hours": 24,
+            "model": "hysplit",
+            "output_dir": "./output/test_disp_out_{today:%Y%m%d}00",
+            "working_dir": "./output/test_disp_work_{today:%Y%m%d}00",
+            "hysplit": {
+                "grid": {
+                    "spacing": 4,
+                    "projection": "LCC",
+                    "boundary": {
+                        "sw": {"lng": -128.6, "lat": 40},
+                        "ne": {"lng": -107, "lat": 49.7}
+                    }
+                },
+                "NUMPAR": 3000,
+                "MAXPAR": 10000000,
+                "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
+                "VERTICAL_LEVELS": [100],
+                "INITD": 0,
+                "DELT": -3,
+                "KHMAX": 48,
+                "MPI": false,
+                "NCPUS": 1,
+                "NPROCESSES": 1,
+                "NFIRES_PER_PROCESS": -1,
+                "NPROCESSES_MAX": -1,
+                "MAKE_INIT_FILE": true,
+                "NDUMP": 24,
+                "NCYCL": 0,
+                "PARDUMP": "./output/pardump-{today:%Y-%m-%d}",
+                "NINIT": 1,
+                "PARINIT": "./output/pardump-{today-1:%Y-%m-%d}",
+                "STOP_IF_NO_PARINIT": false
+            }
+        },
+        "visualization": {
+            "target": "dispersion",
+            "hysplit": {
+                "websky_version": "2",
+                "create_summary_json": true,
+                "images_dir": "images/",
+                "data_dir": "data/",
+                "blueskykml_config": {
+                    "DispersionGridInput": {
+                        "LAYERS": [0]
+                    },
+                    "DispersionImages": {
+                        "DAILY_IMAGES_UTC_OFFSETS": [-11,-10,-9,-8,-7,-6,-5,-4, 0],
+                        "REPROJECT_IMAGES": "True"
+                    },
+                    "DispersionGridOutput": {
+                        "HOURLY_COLORS": "GrayColorBar",
+                        "THREE_HOUR_COLORS": "GrayColorBar",
+                        "DAILY_COLORS": "GrayColorBar"
+                    },
+                    "GrayColorBar": {
+                        "DEFINE_RGB": "true",
+                        "DATA_LEVELS": "0 1 12 35 55 150 250 350 500 2000",
+                        "RED": " 0 200 175 150 125 100 75 50 25",
+                        "GREEN": "0 200 175 150 125 100 75 50 25",
+                        "BLUE": "0 200 175 150 125 100 75 50 25",
+                        "IMAGE_OPACITY_FACTOR": "0.7"
+                    }
+                }
+            }
+        },
+        "extrafiles":{
+            "dest_dir": "./output/extrafiles_{today:%Y%m%d}00/data",
+            "sets": ["firescsvs", "emissionscsv", "smokeready"],
+            "firescsvs": {
+                "fire_locations_filename": "fire_locations.csv",
+                "fire_events_filename": "fire_events.csv"
+            },
+            "emissionscsv": {
+                "filename": "fire_emissions.csv"
+            },
+            "smokeready": {
+                "ptinv_filename": "ptinv-{today:%Y%m%d%H}.ida",
+                "ptday_filename": "ptday-{today:%Y%m%d%H}.ems95",
+                "pthour_filename": "pthour-{today:%Y%m%d%H}.ems95",
+                "separate_smolder": true,
+                "write_ptinv_totals": true,
+                "write_ptday_file": true
+            }
+        }
+    }
+}
