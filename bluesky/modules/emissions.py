@@ -47,9 +47,9 @@ def run(fires_manager):
      - consumption > fuel_loadings -- considered if fuel loadings aren't
         specified in the emissions config
     """
-    model = Config.get('emissions', 'model')
+    model = Config().get('emissions', 'model')
 
-    include_emissions_details = Config.get(
+    include_emissions_details = Config().get(
         'emissions', 'include_emissions_details')
     fires_manager.processed(__name__, __version__, model=model,
         emitcalc_version=emitcalc_version, eflookup_version=eflookup_version,
@@ -102,9 +102,9 @@ class EmissionsBase(object, metaclass=abc.ABCMeta):
 
     def __init__(self, fire_failure_handler):
         self.fire_failure_handler = fire_failure_handler
-        self.include_emissions_details = Config.get(
+        self.include_emissions_details = Config().get(
             'emissions', 'include_emissions_details')
-        self.species = Config.get('emissions', 'species')
+        self.species = Config().get('emissions', 'species')
 
     @abc.abstractmethod
     def run(self, fires):
@@ -219,8 +219,8 @@ class Consume(EmissionsBase):
 
         self.species = self.species and [e.upper() for e in self.species]
 
-        all_fuel_loadings = (Config.get('emissions','fuel_loadings')
-            or Config.get('consumption','fuel_loadings'))
+        all_fuel_loadings = (Config().get('emissions','fuel_loadings')
+            or Config().get('consumption','fuel_loadings'))
         self.fuel_loadings_manager = FuelLoadingsManager(
             all_fuel_loadings=all_fuel_loadings)
 

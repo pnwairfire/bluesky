@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-docker run --rm -ti \
+docker run --rm -ti --user bluesky \
        -v $HOME/code/:/code/ \
        -v $HOME/Met/NAM/12km/ARL/:/data/Met/NAM/12km/ARL/ \
        -v $HOME/Met/CANSAC/6km/ARL/:/data/Met/CANSAC/6km/ARL/  \

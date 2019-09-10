@@ -303,13 +303,13 @@ def set_config(args, fires_manager):
     #  (with tests)
 
     # merge loaded file options
-    Config.merge(args.config_file_options)
-    Config.merge(args.config_options)
+    Config().merge(args.config_file_options)
+    Config().merge(args.config_options)
 
     if args.dump_config:
         logging.info("Configuration:")
         # TODO: prune any config not relevant to modules specified
-        sys.stdout.write(json.dumps(Config.get(),
+        sys.stdout.write(json.dumps(Config().get(),
             indent=args.indent, cls=models.fires.FireEncoder))
         sys.exit(0)
 

@@ -11,7 +11,7 @@ FIRE_TABLE_COLUMNS = [
     'total_consumption', 'total_emissions', 'PM2.5'
 ]
 def get_fires_table_data(summarized_fires):
-    return [sf['flat_summary'] for sf in summarized_fires]
+    return [sf['flat_summary'] for sf in summarized_fires['fires_by_id'].values()]
 
 def get_fires_table(summarized_fires):
     fires_table = dt.DataTable(
@@ -19,17 +19,29 @@ def get_fires_table(summarized_fires):
         data=get_fires_table_data(summarized_fires),
         columns=[{'id': c, 'name': c} for c in FIRE_TABLE_COLUMNS],
         style_table={
-            'maxHeight': '400px',
+            'maxHeight': '500px',
             'overflowY': 'scroll'
         },
         sort_action='native',
-        filter_action='native',
-        row_selectable='single',  #'multi',
+        #filter_action='native',
+        row_selectable='multi',  #'single',
+        style_cell_conditional=[
+            {
+                'textAlign': 'left'
+            }
+        ],
+        style_data_conditional=[
+            {
+                'if': {'row_index': 'odd'},
+                'backgroundColor': 'rgb(248, 248, 248)'
+            }
+        ],
+        style_as_list_view=True,
         # editable=False,
     )
 
     return [
-        fires_table,
-        html.Div("Select a fire to see emissions and plumerise graphs",
-            className="caption")
+        html.Div("Select a fire to see emissions and plumerise graphs below",
+            className="caption"),
+        fires_table
     ]

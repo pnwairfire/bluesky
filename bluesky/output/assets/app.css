@@ -1,15 +1,25 @@
 .caption {
     font-style: italic;
-    font-size: small;
-    padding-left: 40px;
+    /*font-size: small;*/
+}
+#fires-map-container .caption {
+    padding-left: 80px;
 }
 
-#fires-table-container .caption {
-    margin-top: 15px;
+#fires-table {
+    margin-top: 55px;
+}
+
+#locations-table {
+    margin-top: 25px;
 }
 
 .row {
     margin-bottom: 20px;
+}
+
+.hidden {
+    display: none;
 }
 
 .empty-graph {
@@ -18,4 +28,18 @@
     padding: 50px;
     font-style: italic;
     font-size: small;
+}
+/*#top-header {
+    font-size: 25px;
+}*/
+.section-header span {
+    padding-left: 20px;
+    font-weight: bold;
+    font-style: italic;
+}
+
+@media (min-width: 1000px) {
+    .main-body-upload-box-container {
+        margin: 0 25%;
+    }
 }

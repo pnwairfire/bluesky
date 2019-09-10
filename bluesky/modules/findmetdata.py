@@ -43,7 +43,7 @@ def run(fires_manager):
     time_windows = _get_time_windows(fires_manager)
     accepted_forecasts_config = _get_accepted_forecasts_config()
 
-    wait_config = Config.get('findmetdata','wait')
+    wait_config = Config().get('findmetdata','wait')
     @io.wait_for_availability(wait_config)
     def _find():
         files = []
@@ -89,7 +89,7 @@ def _get_met_root_dir(fires_manager):
     # TODO: specify domain instead of met_root_dir, and somehow configure (not
     # in the code, since this is open source), per domain, the root dir, arl file
     # name pattern, etc.
-    met_root_dir = Config.get('findmetdata', 'met_root_dir')
+    met_root_dir = Config().get('findmetdata', 'met_root_dir')
     if not met_root_dir:
         raise BlueSkyConfigurationError("Config setting 'met_root_dir' "
             "required by findmetdata module")
@@ -98,9 +98,9 @@ def _get_met_root_dir(fires_manager):
 
 def _get_met_finder(fires_manager):
     met_root_dir = _get_met_root_dir(fires_manager)
-    met_format = Config.get('findmetdata', 'met_format').lower()
+    met_format = Config().get('findmetdata', 'met_format').lower()
     if met_format == "arl":
-        arl_config = Config.get('findmetdata', 'arl')
+        arl_config = Config().get('findmetdata', 'arl')
         logging.debug("ARL config: %s", arl_config)
         return arlfinder.ArlFinder(met_root_dir, **arl_config)
     else:
@@ -125,7 +125,7 @@ def _get_time_windows(fires_manager):
     return _merge_time_windows(time_windows)
 
 def _get_configured_time_windows(fires_manager):
-    time_window = Config.get('findmetdata', 'time_window')
+    time_window = Config().get('findmetdata', 'time_window')
     if time_window:
         logging.debug("Met time window specified in the config")
         time_window = parse_datetimes(time_window, 'first_hour', 'last_hour')
@@ -165,8 +165,8 @@ def _infer_time_windows_from_fires(fires_manager):
 
 
 def _get_dispersion_time_window(fires_manager):
-    start = Config.get('dispersion', 'start')
-    num_hours = Config.get('dispersion', 'num_hours')
+    start = Config().get('dispersion', 'start')
+    num_hours = Config().get('dispersion', 'num_hours')
     if start and num_hours:
         return {
             'start': start,
@@ -188,7 +188,7 @@ def _merge_time_windows(time_windows):
 ## Accepted forecasts
 
 def _get_accepted_forecasts_config():
-    accepted_forecasts_config = Config.get('findmetdata', 'accepted_forecasts')
+    accepted_forecasts_config = Config().get('findmetdata', 'accepted_forecasts')
     if accepted_forecasts_config:
         for k in ('init_times', 'met_file_name_pattern'):
             if not accepted_forecasts_config.get(k):

@@ -55,7 +55,7 @@ def run(fires_manager):
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
     successfully_loaded_sources = []
-    sources = Config.get('load', 'sources')
+    sources = Config().get('load', 'sources')
     if not sources:
         raise BlueSkyConfigurationError("No sources specified for load module")
     try:
@@ -72,8 +72,8 @@ def run(fires_manager):
             except:
                 # Let skip_failed_sources be defined at top level
                 # or under 'load' in the config
-                if not (Config.get('skip_failed_sources')
-                        or Config.get('load', 'skip_failed_sources', allow_missing=True)):
+                if not (Config().get('skip_failed_sources')
+                        or Config().get('load', 'skip_failed_sources', allow_missing=True)):
                     raise
     finally:
         fires_manager.processed(__name__, __version__,

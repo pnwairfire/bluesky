@@ -20,7 +20,7 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    target = Config.get('visualization', 'target').lower()
+    target = Config().get('visualization', 'target').lower()
     processed_kwargs = {"target": target}
     visualization_info = {"target": target}
     try:
@@ -56,7 +56,7 @@ def run(fires_manager):
 def get_dispersion_model(fires_manager):
     if fires_manager.dispersion and fires_manager.dispersion.get('model'):
         return fires_manager.dispersion['model']
-    model = Config.get('dispersion', 'model')
+    model = Config().get('dispersion', 'model')
     if model:
         return model.lower()
 

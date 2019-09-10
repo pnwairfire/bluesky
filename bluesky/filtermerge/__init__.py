@@ -21,7 +21,7 @@ class FiresActionBase(object, metaclass=abc.ABCMeta):
         """
         self._fires_manager = fires_manager
         self._fire_class = fire_class
-        self._skip_failures = not not Config.get(self.ACTION, 'skip_failures')
+        self._skip_failures = not not Config().get(self.ACTION, 'skip_failures')
 
     def __enter__(self):
         logging.info("Number of fires before running %s: %s", self.ACTION,

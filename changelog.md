@@ -91,3 +91,11 @@
 
 ## 4.1.12
  - Initial version of bsp-output-visualizer
+
+## 4.1.13
+ - Minor updates to build-docker-image
+ - Second version of bsp-output-visualizer
+ - Refactored configuration management to be thread safe (to be able to execute parallel runs with different configurations in separate threads)
+
+## 4.1.14
+ - bug fix and added error handling

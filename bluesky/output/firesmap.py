@@ -1,12 +1,35 @@
 import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objs as go
 
 
-##
-## Used by Callbacks
-##
+def get_data_frame(summarized_fires):
+    # preserve original order of fires, so that we can look up selected fires
+    fires = [summarized_fires['fires_by_id'][f_id]['flat_summary']
+        for f_id in summarized_fires['ids_in_order']]
+    df = pd.DataFrame(fires)
+    df['text'] = (df['total_area'].astype(str)  + ' acre fire'
+        + ' at ' + df['avg_lat'].astype(str) + ', ' + df['avg_lng'].astype(str))
+    return df
+
+def get_mapbox_figure(mapbox_access_token, summarized_fires):
+    px.set_mapbox_access_token(mapbox_access_token)
+    df = get_data_frame(summarized_fires)
+    fig = px.scatter_mapbox(df,
+        lat="avg_lat",
+        lon="avg_lng",
+        #text='text',
+        size="total_area",
+        size_max=15,
+        zoom=4,
+        #color="total_area",
+        #color_continuous_scale=px.colors.colorbrewer.YlOrRd
+    )
+    fig.update_traces(marker=dict(color='red'))
+
+    return fig
 
 COLOR_SCALE = [
     [0,"rgb(5, 10, 172)"],
@@ -17,77 +40,29 @@ COLOR_SCALE = [
     [5000,"rgb(220, 220, 220)"]
 ]
 
-def get_fires_map_data(mapbox_access_token, summarized_fires_by_id):
-    fires = [sf['flat_summary'] for sf in summarized_fires_by_id.values()]
-    df = pd.DataFrame(fires)
-    df['text'] = ('<span data-id="' + df['id'] + '">'
-        + df['total_area'].astype(str) + ' acre fire</span>')
+def get_figure(mapbox_access_token, summarized_fires):
+    df = get_data_frame(summarized_fires)
 
-    # TODO: get working when using 'go.Scattermapbox'
-    _f = go.Scattermapbox if mapbox_access_token else go.Scattergeo
-    return [_f(
-        #type='scattergeo',
-        #locationmode='USA-states',
-        lon=df['avg_lng'],
-        lat=df['avg_lat'],
-        text=df['text'],
-        meta={'id':df['id']},
-        mode='markers',
-        marker={
-            'size': 8,
-            'opacity': 0.8,
-            #'reversescale': True,
-            #'autocolorscale': False,
-            'symbol': 'circle',
-            # 'line': {
-            #     'width': 1,
-            #     'color': 'rgba(102, 102, 102)'
-            # },
-            'colorscale': 'thermal', #COLOR_SCALE,
-            'cmin': 0,
-            'color': df['total_area'],
-            'cmax': df['total_area'].max(),
-            'colorbar': {
-                'title': "Total Area"
-            }
-        }
-    )]
-
-def get_fires_map_layout(mapbox_access_token):
-    # return dict(
-    #         colorbar = True,
-    #         geo = dict(
-    #             scope='usa',
-    #             projection=dict( type='albers usa' ),
-    #             showland = True,
-    #             landcolor = "rgb(250, 250, 250)",
-    #             subunitcolor = "rgb(217, 217, 217)",
-    #             countrycolor = "rgb(217, 217, 217)",
-    #             countrywidth = 0.5,
-    #             subunitwidth = 0.5
-    #         ),
-    #     )
-    return go.Layout(
-        autosize=True,
-        mapbox=go.layout.Mapbox(
-            accesstoken=mapbox_access_token,
-            bearing=10,
-            pitch=60,
-            zoom=13,
-            center=  {
-                'lat':40.721319,
-                'lon':-73.987130
-            },
-            style="mapbox://styles/mapbox/streets-v11"
-        ),
-        #title = "Fire Locations"
+    fig = px.scatter_geo(df,
+        lat='avg_lat',
+        lon='avg_lng',
+        #color="total_area",
+        #color_continuous_scale=px.colors.colorbrewer.YlOrRd,
+        hover_name="text",
+        size="total_area",
+        projection="natural earth"
     )
+    fig.update_traces(marker=dict(color='red'))
 
-def get_fires_map(mapbox_access_token, summarized_fires_by_id):
-    data = get_fires_map_data(mapbox_access_token, summarized_fires_by_id)
-    layout = get_fires_map_layout(mapbox_access_token)
-    fig = {'data':data, 'layout': layout}
+    return fig
+
+def get_fires_map(mapbox_access_token, summarized_fires):
+    if mapbox_access_token:
+        fig = get_mapbox_figure(mapbox_access_token, summarized_fires)
+    else:
+        fig = get_figure(mapbox_access_token, summarized_fires)
+
     return [
-        dcc.Graph(id='fires-map', figure=fig),
-        html.Div("Select fires to see in the table", className="caption")
+        html.Div("Select fires to see in the table", className="caption"),
+        dcc.Graph(id='fires-map', figure=fig)
     ]

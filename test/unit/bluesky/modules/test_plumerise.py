@@ -201,7 +201,7 @@ class TestPlumeRiseRun(object):
 
     def test_invalid_module(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
-        Config.set('sdf', 'plumerise', 'model')
+        Config().set('sdf', 'plumerise', 'model')
         fm = FiresManager()
         with raises(BlueSkyConfigurationError) as e_info:
             plumerise.run(fm)
@@ -210,7 +210,7 @@ class TestPlumeRiseRun(object):
 class TestPlumeRiseRunFeps(object):
 
     def setup(self):
-        Config.set('feps', 'plumerise', 'model')
+        Config().set('feps', 'plumerise', 'model')
         self.fm = FiresManager()
 
     def test_fire_no_activity(self, reset_config, monkeypatch):
@@ -305,7 +305,7 @@ class TestPlumeRiseRunFeps(object):
 class TestPlumeRiseRunSev(object):
 
     def setup(self):
-        Config.set('sev', 'plumerise', 'model')
+        Config().set('sev', 'plumerise', 'model')
         self.fm = FiresManager()
 
     def test_fire_no_activity(self, reset_config, monkeypatch):

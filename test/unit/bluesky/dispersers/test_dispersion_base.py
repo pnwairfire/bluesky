@@ -21,10 +21,10 @@ class FakeDisperser(DispersionBase):
 class TestDispersionBaseConfig(object):
 
     def setup(self):
-        Config.set(2.2, "dispersion", "hysplit", "QCYCLE")
-        Config.set(333, "dispersion", "hysplit", "numpar")
-        Config.set(34, "dispersion", "hysplit", "FOO")
-        Config.set(100, "dispersion", "hysplit", "bar")
+        Config().set(2.2, "dispersion", "hysplit", "QCYCLE")
+        Config().set(333, "dispersion", "hysplit", "numpar")
+        Config().set(34, "dispersion", "hysplit", "FOO")
+        Config().set(100, "dispersion", "hysplit", "bar")
 
         self.d = FakeDisperser({})
 

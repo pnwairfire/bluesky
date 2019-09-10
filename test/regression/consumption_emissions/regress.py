@@ -462,8 +462,8 @@ def run(args):
     success = True
     for input_filename in input_filenames:
         fires_manager = load_scenario(input_filename)
-        Config.set(args.emissions_model, 'emissions', 'model')
-        Config.set(args.include_emissions_details,
+        Config().set(args.emissions_model, 'emissions', 'model')
+        Config().set(args.include_emissions_details,
             'emissions','include_emissions_details')
         fires_manager.modules = ['consumption', 'emissions']
         fires_manager.run()

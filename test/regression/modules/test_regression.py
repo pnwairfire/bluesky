@@ -162,7 +162,7 @@ def run_input(module, input_file):
 
     logging.debug('Running bsp on %s', input_file)
     try:
-        Config.set(config)
+        Config().set(config)
         fires_manager = models.fires.FiresManager()
         fires_manager.loads(input_file=input_file)
         fires_manager.modules = [module]

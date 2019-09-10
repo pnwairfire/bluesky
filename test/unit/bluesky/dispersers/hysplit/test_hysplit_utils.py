@@ -505,13 +505,13 @@ class TestGridParamsFromGrid(object):
 class TestGetGridParams(object):
 
     def test_user_defined_grid(self, reset_config):
-        Config.set(True, "dispersion", "hysplit" , "USER_DEFINED_GRID")
-        Config.set(36.5, "dispersion", "hysplit" , "CENTER_LATITUDE")
-        Config.set(-119.0, "dispersion", "hysplit", "CENTER_LONGITUDE")
-        Config.set(25.0, "dispersion", "hysplit" , "WIDTH_LONGITUDE")
-        Config.set(17.5, "dispersion", "hysplit" , "HEIGHT_LATITUDE")
-        Config.set(0.05, "dispersion", "hysplit" , "SPACING_LONGITUDE")
-        Config.set(0.05, "dispersion", "hysplit" , "SPACING_LATITUDE")
+        Config().set(True, "dispersion", "hysplit" , "USER_DEFINED_GRID")
+        Config().set(36.5, "dispersion", "hysplit" , "CENTER_LATITUDE")
+        Config().set(-119.0, "dispersion", "hysplit", "CENTER_LONGITUDE")
+        Config().set(25.0, "dispersion", "hysplit" , "WIDTH_LONGITUDE")
+        Config().set(17.5, "dispersion", "hysplit" , "HEIGHT_LATITUDE")
+        Config().set(0.05, "dispersion", "hysplit" , "SPACING_LONGITUDE")
+        Config().set(0.05, "dispersion", "hysplit" , "SPACING_LATITUDE")
         expected = {
             'center_latitude': 36.5,
             'center_longitude': -119.0,
@@ -523,7 +523,7 @@ class TestGetGridParams(object):
         assert expected == hysplit_utils.get_grid_params()
 
     def test_grid(self, reset_config):
-        Config.set( {
+        Config().set( {
             "spacing": 6.0,
             "boundary": {
                 "ne": {
@@ -555,23 +555,23 @@ class TestGetGridParams(object):
 
         ## Missing spacing
 
-        Config.set(True, "dispersion", "hysplit" , "compute_grid")
+        Config().set(True, "dispersion", "hysplit" , "compute_grid")
         with raises(BlueSkyConfigurationError) as e_info:
             hysplit_utils.get_grid_params(fires=fires_one)
         assert e_info.value.args[0] == ("Config settings 'spacing_latitude' "
                 "and 'spacing_longitude' required to compute hysplit grid")
 
-        Config.reset()
-        Config.set(True, "dispersion", "hysplit" , "compute_grid")
-        Config.set(0.05, 'dispersion', 'hysplit', 'spacing_longitude')
+        Config().reset()
+        Config().set(True, "dispersion", "hysplit" , "compute_grid")
+        Config().set(0.05, 'dispersion', 'hysplit', 'spacing_longitude')
         with raises(BlueSkyConfigurationError) as e_info:
             hysplit_utils.get_grid_params(fires=fires_one)
         assert e_info.value.args[0] == ("Config settings 'spacing_latitude' "
                 "and 'spacing_longitude' required to compute hysplit grid")
 
-        Config.reset()
-        Config.set(True, "dispersion", "hysplit" , "compute_grid")
-        Config.set(0.05, 'dispersion', 'hysplit', 'spacing_latitude')
+        Config().reset()
+        Config().set(True, "dispersion", "hysplit" , "compute_grid")
+        Config().set(0.05, 'dispersion', 'hysplit', 'spacing_latitude')
         with raises(BlueSkyConfigurationError) as e_info:
             hysplit_utils.get_grid_params(fires=fires_one)
         assert e_info.value.args[0] == ("Config settings 'spacing_latitude' "
@@ -580,10 +580,10 @@ class TestGetGridParams(object):
 
         ## no fires or two many fires
 
-        Config.reset()
-        Config.set(True, "dispersion", "hysplit" , "compute_grid")
-        Config.set(0.05, 'dispersion', 'hysplit', 'spacing_latitude')
-        Config.set(0.05, 'dispersion', 'hysplit', 'spacing_longitude')
+        Config().reset()
+        Config().set(True, "dispersion", "hysplit" , "compute_grid")
+        Config().set(0.05, 'dispersion', 'hysplit', 'spacing_latitude')
+        Config().set(0.05, 'dispersion', 'hysplit', 'spacing_longitude')
 
         with raises(ValueError) as e_info:
             hysplit_utils.get_grid_params()
@@ -604,7 +604,7 @@ class TestGetGridParams(object):
         assert expected == hysplit_utils.get_grid_params(fires=fires_one)
 
         # custom grid length (default is 2000)
-        Config.set(1000, 'dispersion', 'hysplit', 'grid_length')
+        Config().set(1000, 'dispersion', 'hysplit', 'grid_length')
         expected = {
             'center_latitude': 40.0,
             'center_longitude': -118.5,

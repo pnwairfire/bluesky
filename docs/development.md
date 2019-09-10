@@ -20,7 +20,7 @@ The following starts an ipython session with docker with your local
 copy of the code mounted in the docker container and added
 to the beggining of PATH and PYTHONPATH env vars.
 
-    docker run --rm -ti \
+    docker run --rm -ti --user bluesky \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
@@ -35,7 +35,7 @@ within docker with your local
 copy of the code mounted in the docker container and added
 to the beggining of PATH and PYTHONPATH env vars.
 
-    docker run --rm -ti \
+    docker run --rm -ti --user bluesky \
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \

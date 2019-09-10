@@ -362,8 +362,8 @@ class TestEstimatorCustomTruncation(object):
 
     def setup(self):
         lookup = mock.Mock()
-        Config.set(75.0, "fuelbeds", "truncation_percentage_threshold")
-        Config.set(2, "fuelbeds", "truncation_count_threshold")
+        Config().set(75.0, "fuelbeds", "truncation_percentage_threshold")
+        Config().set(2, "fuelbeds", "truncation_count_threshold")
         self.estimator_w_options = fuelbeds.Estimator(lookup)
 
     def test_truncate_empty_set(self):
@@ -452,8 +452,8 @@ class TestEstimatorNoTruncation(object):
 
     def setup(self):
         lookup = mock.Mock()
-        Config.set(None, "fuelbeds", "truncation_percentage_threshold")
-        Config.set(None, "fuelbeds", "truncation_count_threshold")
+        Config().set(None, "fuelbeds", "truncation_percentage_threshold")
+        Config().set(None, "fuelbeds", "truncation_count_threshold")
         self.estimator_no_truncation = fuelbeds.Estimator(lookup)
 
 

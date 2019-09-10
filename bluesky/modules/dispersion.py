@@ -30,7 +30,7 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    model = Config.get('dispersion', 'model').lower()
+    model = Config().get('dispersion', 'model').lower()
     processed_kwargs = {}
     try:
         module, klass = _get_module_and_class(model)
@@ -110,8 +110,8 @@ def _get_module_and_class(model):
 SECONDS_PER_HOUR = 3600
 
 def _get_time(fires_manager):
-    start = Config.get('dispersion', 'start')
-    num_hours = Config.get('dispersion', 'num_hours')
+    start = Config().get('dispersion', 'start')
+    num_hours = Config().get('dispersion', 'num_hours')
 
     if not start or num_hours is None:
         s = fires_manager.earliest_start # needed for 'start' and 'num_hours'
@@ -132,14 +132,14 @@ def _get_time(fires_manager):
 
 
 def _get_dirs(fires_manager):
-    handle_existing = Config.get('dispersion', 'handle_existing')
+    handle_existing = Config().get('dispersion', 'handle_existing')
 
-    output_dir = Config.get('dispersion', 'output_dir')
+    output_dir = Config().get('dispersion', 'output_dir')
     if not output_dir:
         raise ValueError("Specify dispersion output directory")
     create_dir_or_handle_existing(output_dir, handle_existing)
 
-    working_dir = Config.get('dispersion', 'working_dir')
+    working_dir = Config().get('dispersion', 'working_dir')
     if working_dir:
         create_dir_or_handle_existing(working_dir, handle_existing)
 

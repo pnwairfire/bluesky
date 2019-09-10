@@ -146,7 +146,7 @@ class TestGetTimeWindows(object):
 
     def test_with_dispersion_window_no_fires(self, reset_config):
         fm = FiresManager()
-        Config.set({
+        Config().set({
             "dispersion": {
                 "start": "2014-05-29T19:00:00Z",
                 "num_hours": 12
@@ -162,7 +162,7 @@ class TestGetTimeWindows(object):
 
     def test_with_configured_time_window_no_fires(self, reset_config):
         fm = FiresManager()
-        Config.set({
+        Config().set({
             "findmetdata": {
                 "time_window": {
                     "first_hour": "2016-01-04T04:00:00Z",
@@ -180,7 +180,7 @@ class TestGetTimeWindows(object):
 
     def test_with_dispersion_and_configured_time_window_no_fires(self, reset_config):
         fm = FiresManager()
-        Config.set({
+        Config().set({
             "dispersion": {
                 "start": "2014-05-29T19:00:00Z",
                 "num_hours": 12
@@ -210,7 +210,7 @@ class TestGetTimeWindows(object):
         fm.load({
                 "fires": [FIRE_1, FIRE_2, FIRE_3],
         })
-        Config.set( {
+        Config().set( {
             "dispersion": {
                 "start": "2014-05-29T19:00:00Z",
                 "num_hours": 12

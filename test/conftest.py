@@ -11,10 +11,10 @@ from bluesky.config import Config
 
 @pytest.fixture(scope="function")
 def reset_config():
-    Config.reset()
-    return Config
+    Config().reset()
+    return Config()
 
 # def setup_method(self, method):
 #     """setup_method is invoked for every test method of a class.
 #     """
-#     Config.reset()
+#     Config().reset()

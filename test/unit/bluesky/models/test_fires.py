@@ -783,7 +783,7 @@ class TestFiresManager(object):
             fires.Fire({'id': '2', 'name': 'n2'})
         ]
         assert fires_manager.num_fires == 2
-        Config.set({"skip_failed_fires": True})
+        Config().set({"skip_failed_fires": True})
         assert fires_manager.skip_failed_fires
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
@@ -804,7 +804,7 @@ class TestFiresManager(object):
             fires.Fire({'id': '1', 'name': 'n1'}),
             fires.Fire({'id': '2', 'name': 'n2'})
         ]
-        Config.set({"skip_failed_fires": False})
+        Config().set({"skip_failed_fires": False})
         assert fires_manager.num_fires == 2
         assert not fires_manager.skip_failed_fires
         for fire in fires_manager.fires:

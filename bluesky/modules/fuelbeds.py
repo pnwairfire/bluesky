@@ -20,8 +20,8 @@ __version__ = "0.1.0"
 
 # TODO: set is_alaska based on lat & lng instead from 'state'
 FCCS_LOOKUPS = defaultdict(
-    lambda: FccsLookUp(is_alaska=False, **Config.get('fuelbeds')),
-    AK=FccsLookUp(is_alaska=True, **Config.get('fuelbeds'))
+    lambda: FccsLookUp(is_alaska=False, **Config().get('fuelbeds')),
+    AK=FccsLookUp(is_alaska=True, **Config().get('fuelbeds'))
 )
 
 def run(fires_manager):
@@ -34,7 +34,7 @@ def run(fires_manager):
         fccsmap_version=fccsmap.__version__)
 
     logging.debug('Using FCCS version %s',
-        Config.get('fuelbeds', 'fccs_version'))
+        Config().get('fuelbeds', 'fccs_version'))
 
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
@@ -89,7 +89,7 @@ class Estimator(object):
         self.lookup = lookup
 
         # Is this necessary?
-        for attr, val in Config.get('fuelbeds').items():
+        for attr, val in Config().get('fuelbeds').items():
             if attr.startswith('truncation_'):
                 setattr(self, attr.replace('truncation_', ''), val)
 
@@ -130,7 +130,7 @@ class Estimator(object):
         if not fuelbed_info or not fuelbed_info.get('fuelbeds'):
             # TODO: option to ignore failures ?
             raise RuntimeError("Failed to lookup fuelbed information")
-        elif Config.get('fuelbeds', 'total_pct_threshold') < abs(100.0 - sum(
+        elif Config().get('fuelbeds', 'total_pct_threshold') < abs(100.0 - sum(
                 [d['percent'] for d in fuelbed_info['fuelbeds'].values()])):
             raise RuntimeError("Fuelbed percentages don't add up to 100% - {fuelbeds}".format(
                 fuelbeds=fuelbed_info['fuelbeds']))
