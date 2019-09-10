@@ -99,3 +99,6 @@
 
 ## 4.1.14
  - bug fix and added error handling
+
+## 4.1.15
+ - New smokeready extrafiles module
