@@ -155,13 +155,11 @@ emissions config
  - ***'config' > 'findmetdata' > 'wait' > 'strategy'*** -- *required* if 'wait' section is defined -- 'fixed' or 'backoff'
  - ***'config' > 'findmetdata' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
  - ***'config' > 'findmetdata' > 'wait' > 'max_attempts'*** -- *required* if 'wait' section is defined  -- max number of attempts
- - ***'config' > 'findmetdata' > 'accepted_forecasts' > 'init_times'*** -- *required* if 'accepted_formats' section is defined  -- initialization times of forecasts to accept met data from (e.g. `["2019072600", "2019072700"]` or `["2019-07-27T00:00:00"]`)
- - ***'config' > 'findmetdata' > 'accepted_forecasts' > 'met_file_name_pattern'*** -- *required* if 'accepted_formats' section is defined -- pattern, with `strftime` wildcards, to match forecasts in met file name (e.g. `"/data/Met/PNW/4km/ARL/%Y%m%d%H/wrfout_d3"`)
-
 
 ###### if arl:
  - ***'config' > 'findmetdata' > 'arl' > 'index_filename_pattern'*** -- *optional* -- defaults to 'arl12hrindex.csv'
  - ***'config' > 'findmetdata' > 'arl' > 'max_days_out'*** -- *optional* -- defaults to 4
+ - ***'config' > 'findmetdata' > 'arl' > 'accepted_forecasts'*** -- *optional*  -- initialization times of forecasts to accept met data from (e.g. `["20190725", "2019072600", "2019072700"]` or `["2019-07-27T00:00:00"]`; note that 00Z is assumed if hours are not specified)
 
 ##### localmet
 

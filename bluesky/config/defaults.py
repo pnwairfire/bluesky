@@ -160,18 +160,16 @@ _DEFAULTS = {
         # if it has keys, even if the first and last hours are None
         "time_window": {}, # {"first_hour": None,"last_hour": None}
 
-        # We need to default 'wait' and 'accepted_forecasts' to empty dicts,
-        # since being set empty dicts in the config indicates that we aren't
-        # waiting or specifying accepted forecasts (which is the default
-        # behavior for each)
+        # We need to default 'wait' to an empty dict, since an empty dict
+        # indicates that we aren't waiting (which is the default behavior)
         "wait": {}, # {"strategy": None,"time": None,"max_attempts": None},
-        "accepted_forecasts": {}, # "met_file_name_pattern": None, "init_times":None}
 
         "met_format": "arl",
         "arl": {
-            # The following two defaults are dfined in the met package
-            # TODO: should we comment them out here and leave "arl"
+            # The following defaults are defined in the met package
+            # TODO: should we comment them out here and leave the "arl"
             #    sub-config as an empty dict
+            "accepted_forecasts": None,
             "index_filename_pattern": "arl12hrindex.csv",
             "max_days_out": 4
         }

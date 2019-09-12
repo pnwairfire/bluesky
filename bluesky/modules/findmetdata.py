@@ -41,7 +41,6 @@ def run(fires_manager):
 
     met_finder = _get_met_finder(fires_manager)
     time_windows = _get_time_windows(fires_manager)
-    accepted_forecasts_config = _get_accepted_forecasts_config()
 
     wait_config = Config().get('findmetdata','wait')
     @io.wait_for_availability(wait_config)
@@ -55,28 +54,6 @@ def run(fires_manager):
 
         if not files:
             raise BlueSkyUnavailableResourceError("No met files found")
-
-        # It's possible that the following filtering by forecast whitelist
-        # will result in waiting on a forecast that
-        # already exists, but was passed over by arlfinder.ArlFinder because
-        # there were newer data.  To avoid that situation, we'd need to
-        # move the forecast whitelist logic into arlfinder.ArlFinder.
-        # The practical use case for this forecast whitelist logic, however,
-        # is to wait for the latest applicable met data for the dispersion
-        # window (e.g. to wait for 2019-07-31 OOZ met data for the
-        # run starting at 2019-07-31T00:00:00), which should never result
-        # in waiting for already existing data.
-
-        # TODO: move whitelist logic into findmetdata package. support three modes:
-        #   - any met:  e.g. allow 7/27 met for 7/28 run if 7/28 met isn't available
-        #   - want only met thats newer than spcified data; e.g. for 7/28 run,
-        #     don't allow use of 7/27 data, but allow met after 7/28 for
-        #     hours in dispersion that are after 7/28 (which can happen if re-running
-        #     past data)
-        #   - want specificc date for run;  e.g. for 7/28 run, only allow 7/28 met,
-        #     even for hours after 7/28 in dispersion window
-
-        files = _filter_forecasts(accepted_forecasts_config, files)
 
         return files
 
@@ -183,39 +160,3 @@ def _merge_time_windows(time_windows):
             merged_time_windows[-1]['end'] = tw['end']
 
     return merged_time_windows
-
-
-## Accepted forecasts
-
-def _get_accepted_forecasts_config():
-    accepted_forecasts_config = Config().get('findmetdata', 'accepted_forecasts')
-    if accepted_forecasts_config:
-        for k in ('init_times', 'met_file_name_pattern'):
-            if not accepted_forecasts_config.get(k):
-                raise BlueSkyConfigurationError("Config 'findmetdata' > "
-                    "'accepted_forecasts' settings must define '{}'".format(k))
-
-        accepted_forecasts_config['init_times'] = sorted([
-            to_datetime(i, extra_formats=["%Y%m%d%H"])
-                for i in accepted_forecasts_config.get('init_times', [])
-        ])
-    return accepted_forecasts_config
-
-
-def _filter_forecasts(config, files):
-    if not config:
-        return files
-
-    filtered_files = []
-    for init_time in config['init_times']:
-        to_match = init_time.strftime(
-            config['met_file_name_pattern'])
-        filtered_files.extend([
-            f for f in files if f['file'].find(to_match) > -1
-        ])
-
-    if not filtered_files:
-        raise BlueSkyUnavailableResourceError("Only accepting forecasts: {}".format(
-            ', '.join([i.strftime("%Y-%m-%d %HZ") for i in config['init_times']])))
-
-    return filtered_files
