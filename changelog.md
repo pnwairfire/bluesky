@@ -102,3 +102,6 @@
 
 ## 4.1.15
  - New smokeready extrafiles module
+
+## 4.1.16
+ - Upgrade met to v1.2.4
