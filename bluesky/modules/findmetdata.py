@@ -73,16 +73,23 @@ def _get_met_root_dir(fires_manager):
     logging.debug("Met root dir: %s", met_root_dir)
     return met_root_dir
 
+MET_FINDERS = {
+    "arl": arlfinder.ArlFinder
+}
+
 def _get_met_finder(fires_manager):
-    met_root_dir = _get_met_root_dir(fires_manager)
     met_format = Config().get('findmetdata', 'met_format').lower()
-    if met_format == "arl":
-        arl_config = Config().get('findmetdata', 'arl')
-        logging.debug("ARL config: %s", arl_config)
-        return arlfinder.ArlFinder(met_root_dir, **arl_config)
-    else:
+
+    finder_klass = MET_FINDERS.get(met_format)
+    if not finder_klass:
         raise BlueSkyConfigurationError(
             "Invalid or unsupported met data format: '{}'".format(met_format))
+
+    met_config = Config().get('findmetdata', met_format)
+    logging.debug("%s config: %s", met_format, met_config)
+
+    met_root_dir = _get_met_root_dir(fires_manager)
+    return finder_klass(met_root_dir, **met_config)
 
 ## Time windows
 
