@@ -190,27 +190,27 @@ class SmokeReadyWriter(object):
   """
   def __init__(self, dest_dir, **kwargs):
     ptinv = (kwargs.get('ptinv_filename') or
-      Config.get('extrafiles', 'smokeready', 'ptinv_filename'))
+      Config().get('extrafiles', 'smokeready', 'ptinv_filename'))
     self._ptinv_pathname = os.path.join(dest_dir, ptinv)
 
     ptday = (kwargs.get('ptday_filename') or
-      Config.get('extrafiles', 'smokeready', 'ptday_filename'))
+      Config().get('extrafiles', 'smokeready', 'ptday_filename'))
     self._ptday_pathname = os.path.join(dest_dir, ptday)
 
     pthour = (kwargs.get('pthour_filename') or
-      Config.get('extrafiles', 'smokeready', 'pthour_filename'))
+      Config().get('extrafiles', 'smokeready', 'pthour_filename'))
     self._pthour_pathname = os.path.join(dest_dir, pthour)
 
     separate_smolder = (kwargs.get('separate_smolder') or
-      Config.get('extrafiles', 'smokeready', 'separate_smolder'))
+      Config().get('extrafiles', 'smokeready', 'separate_smolder'))
     self._separate_smolder = separate_smolder
 
     write_ptinv_totals = (kwargs.get('write_ptinv_totals') or
-      Config.get('extrafiles', 'smokeready', 'write_ptinv_totals'))
+      Config().get('extrafiles', 'smokeready', 'write_ptinv_totals'))
     self._write_ptinv_totals = write_ptinv_totals
 
     write_ptday_file = (kwargs.get('write_ptday_file') or
-      Config.get('extrafiles', 'smokeready', 'write_ptday_file'))
+      Config().get('extrafiles', 'smokeready', 'write_ptday_file'))
     self._write_ptday_file = write_ptday_file
 
     # Pull the file year out of the dynamically set timestamp

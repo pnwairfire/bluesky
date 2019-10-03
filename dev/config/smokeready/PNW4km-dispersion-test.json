@@ -86,7 +86,7 @@
         "plumerise": {
             "model":"feps",
             "feps": {
-                "working_dir": "./output/plumerise{today:%Y%m%d}00"
+                "working_dir": "/bluesky/output/plumerise{today:%Y%m%d}00"
             }
         },
         "localmet":{
@@ -95,8 +95,9 @@
             "start": "{today:%Y-%m-%d}T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
-            "output_dir": "./output/test_disp_out_{today:%Y%m%d}00",
-            "working_dir": "./output/test_disp_work_{today:%Y%m%d}00",
+            "handle_existing": "replace",
+            "output_dir": "/bluesky/output/test_disp_out_{today:%Y%m%d}00",
+            "working_dir": "/bluesky/output/test_disp_work_{today:%Y%m%d}00",
             "hysplit": {
                 "grid": {
                     "spacing": 4,
@@ -121,9 +122,9 @@
                 "MAKE_INIT_FILE": true,
                 "NDUMP": 24,
                 "NCYCL": 0,
-                "PARDUMP": "./output/pardump-{today:%Y-%m-%d}",
+                "PARDUMP": "/blueskuy/output/pardump-{today:%Y-%m-%d}",
                 "NINIT": 1,
-                "PARINIT": "./output/pardump-{today-1:%Y-%m-%d}",
+                "PARINIT": "/blueskuy/output/pardump-{today-1:%Y-%m-%d}",
                 "STOP_IF_NO_PARINIT": false
             }
         },
@@ -159,7 +160,7 @@
             }
         },
         "extrafiles":{
-            "dest_dir": "./output/extrafiles_{today:%Y%m%d}00/data",
+            "dest_dir": "/blueskuy/output/extrafiles_{today:%Y%m%d}00/data",
             "sets": ["firescsvs", "emissionscsv", "smokeready"],
             "firescsvs": {
                 "fire_locations_filename": "fire_locations.csv",
