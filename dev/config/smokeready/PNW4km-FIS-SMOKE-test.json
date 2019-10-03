@@ -95,6 +95,7 @@
             "start": "{today:%Y-%m-%d}T00:00:00",
             "num_hours": 24,
             "model": "hysplit",
+            "handle_existing": "replace",
             "output_dir": "/bluesky/output/disp_out_{today:%Y%m%d}00",
             "working_dir": "/bluesky/output/disp_work_{today:%Y%m%d}00",
             "hysplit": {

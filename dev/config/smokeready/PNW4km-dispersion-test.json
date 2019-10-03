@@ -122,9 +122,9 @@
                 "MAKE_INIT_FILE": true,
                 "NDUMP": 24,
                 "NCYCL": 0,
-                "PARDUMP": "/blueskuy/output/pardump-{today:%Y-%m-%d}",
+                "PARDUMP": "/bluesky/output/pardump-{today:%Y-%m-%d}",
                 "NINIT": 1,
-                "PARINIT": "/blueskuy/output/pardump-{today-1:%Y-%m-%d}",
+                "PARINIT": "/bluesky/output/pardump-{today-1:%Y-%m-%d}",
                 "STOP_IF_NO_PARINIT": false
             }
         },
@@ -160,7 +160,7 @@
             }
         },
         "extrafiles":{
-            "dest_dir": "/blueskuy/output/extrafiles_{today:%Y%m%d}00/data",
+            "dest_dir": "/bluesky/output/extrafiles_{today:%Y%m%d}00/data",
             "sets": ["firescsvs", "emissionscsv", "smokeready"],
             "firescsvs": {
                 "fire_locations_filename": "fire_locations.csv",
