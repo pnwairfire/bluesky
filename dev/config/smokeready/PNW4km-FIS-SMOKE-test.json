@@ -8,7 +8,7 @@
                     "format": "JSON",
                     "type": "API",
                     "endpoint": "https://airfire-data-exports.s3-us-west-2.amazonaws.com/fire-spider/v3/fireinfosystem-persisted/{today-1:%Y-%m-%d}.json",
-                    "saved_copy_file": "/blueskuy/output/fire-spider-fis-fires-{today-1:%Y-%m-%d}.json"
+                    "saved_copy_file": "/bluesky/output/fire-spider-fis-fires-{today-1:%Y-%m-%d}.json"
                 }
             ]
         },
