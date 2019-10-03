@@ -159,7 +159,7 @@
             }
         },
         "extrafiles":{
-            "dest_dir": "/blueskuy/output/extrafiles_{today:%Y%m%d}00/data",
+            "dest_dir": "/bluesky/output/extrafiles_{today:%Y%m%d}00/data",
             "sets": ["firescsvs", "emissionscsv", "smokeready"],
             "firescsvs": {
                 "fire_locations_filename": "fire_locations.csv",
