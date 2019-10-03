@@ -1,17 +1,6 @@
 {
     "config": {
         "skip_failed_fires": true,
-        "load": {
-            "sources": [
-                {
-                    "name": "firespider",
-                    "format": "JSON",
-                    "type": "file",
-                    "file": "/bluesky/dev/data/json/1-fire-24hr-20190728-OR.json",
-                    "saved_copy_file": "/bluesky/tmp/fire-34fr-test-SAVED.json"
-                }
-            ]
-        },
         "filter":{
             "location":{
                 "boundary": {
