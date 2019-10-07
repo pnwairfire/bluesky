@@ -17,6 +17,7 @@ import os
 import shutil
 import subprocess
 from datetime import timedelta
+from collections import defaultdict
 
 from pyairfire import osutils
 from afdatetime import parsing as datetime_parsing
@@ -104,6 +105,11 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
         self._set_fire_data(fires)
 
+        # TODO: only merge fires if hysplit, or make it configurable ???
+        self._fires = self._merge_fires(self._fires)
+        # TODO: should we pop 'end' from each fire object, since it's
+        #   only used in _merge_fires logic?
+
         with osutils.create_working_dir(working_dir=self._working_dir) as wdir:
             r = self._run(wdir)
 
@@ -182,6 +188,113 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                 else:
                     raise
 
+
+    ## Merging Fires
+
+    def _merge_fires(self, fires):
+        fires_by_lat_lng = defaultdict(lambda: [])
+        for f in sorted(fires, key=lambda f: f['start']):
+            key = (f.latitude, f.longitude)
+            merged = False
+
+            # Sort fires_by_lat_lng[key] for unit testing purposes - for
+            # deterministic behavior (since f could potentially merge with
+            # possibly multiple fires in fires_by_lat_lng[key])
+            # TODO: this shouldn't be a significant performance hit, but
+            #   currently unit tests are structured so that the sorting
+            #   doesn't come into play, so we could remove it for now.
+            for i, f_merged in enumerate(sorted(fires_by_lat_lng[key], key=lambda f: f['start'])):
+                if (not self._do_fires_overlap(f, f_merged)
+                        and not self._do_fire_metas_conflict(f, f_merged)):
+                    # replace f_merged with f_merged merged with f
+                    fires_by_lat_lng[key][i] = self._merge_two_fires(f_merged, f)
+                    merged = True
+
+            if not merged:
+                # just add it
+                fires_by_lat_lng[key].append(f)
+
+        # return flattened list
+        return list(itertools.chain.from_iterable(fires_by_lat_lng.values()))
+
+    def _do_fires_overlap(self, f1, f2):
+        return (f1['start'] < f2['end']) and (f2['start'] < f1['end'])
+
+    def _do_fire_metas_conflict(self, f1, f2):
+        for k in set(f1['meta'].keys()).intersection(f2['meta'].keys()):
+            if f1['meta'][k] != f2['meta'][k]:
+                return True
+
+        return False
+
+    def _merge_two_fires(self, f_merged, f):
+        new_f_merged = Fire(
+            id='combined-fire-{}-{}'.format(
+                # f1.id might have 'combined-fire-', but f2.id won't
+                f_merged.id.replace('combined-fire-', '')[:8], f.id[:8]
+            ),
+            # we know at this point that their meta dicts don't conflict
+            meta=dict(f_merged.meta, **f.meta),
+            # there may be a gap between f_merged['end'] and f['start']
+            # but no subsequent fires will be in that gap, since
+            # fires were sorted by 'start'
+            # Note: we need to use f_merged['start'] instead of f_merged.start
+            #   because the Fire model has special property 'start' that
+            #   returns the first start time of all active_areas in the fire's
+            #   activity, and since we're not using nested activity here,
+            #   f_merged.start returns 'None' rather than the actual value
+            #   set in _add_location
+            start=f_merged['start'],
+            # end will only be used when merging fires
+            # Note: see note about 'start', above
+            end=f['end'],
+            area=f_merged.area + f.area,
+            # f_merged and f have the same lat,lng (o.w. they wouldn't
+            # be merged)
+            latitude=f_merged.latitude,
+            longitude=f_merged.longitude,
+            # the offsets could be different, but only if on DST transition
+            # TODO: Should we worry about this?  If so, we should add same
+            #   utc offset to criteria for deciding to merge or not
+            utc_offset=f_merged.utc_offset,
+            plumerise=self._merge_hourly_data(
+                f_merged.plumerise, f.plumerise, f['start']),
+            timeprofile=self._merge_hourly_data(
+                f_merged.timeprofile, f.timeprofile, f['start']),
+            emissions=self._sum_data(f_merged.emissions, f.emissions),
+            timeprofiled_emissions=self._merge_hourly_data(
+                f_merged.timeprofiled_emissions, f.timeprofiled_emissions,
+                f['start']),
+            consumption=self._sum_data(f_merged.consumption, f.consumption)
+        )
+        if 'heat' in f_merged or 'heat' in f:
+            new_f_merged['heat'] = f_merged.get('heat', 0.0) + f.get('heat', 0.0)
+        return new_f_merged
+
+    def _merge_hourly_data(self, data1, data2, start2):
+        pruned_data2 = {k: v for k, v in data2.items() if k >= start2}
+        return dict(data1, **pruned_data2)
+
+    def _sum_data(self, data1, data2):
+        summed_data = {}
+        for k in set(data1.keys()).union(data2.keys()):
+            if k not in data1:
+                summed_data[k] = data2[k]
+            elif k not in data2:
+                summed_data[k] = data1[k]
+            else:
+                # we know that data1 and data2 will have the same structure,
+                # so that, if 'k' is in both dicts, that values will both be
+                # either numeric or dicts
+                if isinstance(data1[k], dict):
+                    summed_data[k] = self._sum_data(data1[k], data2[k])
+                else:
+                    summed_data[k] = data1[k] + data2[k]
+
+        return summed_data
+
+    ## Creating fires out of locations
+
     def _add_location(self, fire, aa, loc, activity_fields, utc_offset, loc_num):
         if any([not loc.get(f) for f in activity_fields]):
             raise ValueError("Each active area must have {} in "
@@ -208,6 +321,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             id="{}-{}".format(fire.id, loc_num),
             meta=fire.get('meta', {}),
             start=aa['start'],
+            end=aa['end'],
             area=loc['area'],
             latitude=latlng.latitude,
             longitude=latlng.longitude,
@@ -288,6 +402,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
     def _convert_keys_to_datetime(self, d):
         return { datetime_parsing.parse(k): v for k, v in d.items() }
+
 
     def _archive_file(self, filename, src_dir=None, suffix=None):
         archived_filename = os.path.basename(filename)
