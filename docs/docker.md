@@ -91,10 +91,10 @@ Another example, running through vsmoke dispersion:
         -w /bluesky/ \
         bluesky \
         bsp --log-level=DEBUG --indent 4 \
-        --run-id vsmoke-{timestamp:%Y%m%dT%H%M%S} \
-        -i ./dev/data/json/2-fires-24hr-20140530-CA.json \
+        --run-id vsmoke-1-fire-72-hr-{timestamp:%Y%m%dT%H%M%S} \
+        -i ./dev/data/json/1-fire-72hr-20140530-CA.json \
         -o ./output/{run_id}.json \
-        -c ./dev/config/dispersion/dispersion-vsmoke-24hr.json \
+        -c ./dev/config/dispersion/dispersion-vsmoke-72hr.json \
         fuelbeds consumption emissions timeprofile dispersion
 
 
