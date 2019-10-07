@@ -48,49 +48,51 @@ class TestDispersionBaseConfig(object):
         assert self.d.config('BAR') == 100
         assert self.d.config('bar') == 100
 
-class TestDispersionBaseSetFireData(object):
 
-    CONSUMPTION = {
-        "summary": {
-            "flaming": 1311.2071801109494,
-            "residual": 1449.3962581338644,
-            "smoldering": 1267.0712004277434,
-            "total": 4027.6746386725567
-        }
+CONSUMPTION = {
+    "summary": {
+        "flaming": 1311.2071801109494,
+        "residual": 1449.3962581338644,
+        "smoldering": 1267.0712004277434,
+        "total": 4027.6746386725567
     }
-    PLUMERISE_HOUR = {
-        "emission_fractions": [
-            0.01,0.05,0.05,0.05,0.05,0.05,
-            0.09,0.09,0.09,0.05,0.05,0.05,
-            0.05,0.05,0.05,0.05,0.05,0.05,
-            0.01,0.01
-        ],
-        "heights": [
-            141.438826,200.84066925000002,260.2425125,
-            319.64435575,379.046199,438.44804225,
-            497.84988549999997,557.25172875,616.6535719999999,
-            676.0554152499999,735.4572585000001,794.85910175,
-            854.260945,913.66278825,973.0646314999999,
-            1032.46647475,1091.868318,1151.27016125,
-            1210.6720045,1270.0738477500001,1329.475691
-        ],
-        "smolder_fraction": 0.05
-    }
-    EMPTY_PLUMERISE_HOUR = {
-        "emission_fractions": [
-            0.05,0.05,0.05,0.05,0.05,0.05,
-            0.05,0.05,0.05,0.05,0.05,0.05,
-            0.05,0.05,0.05,0.05,0.05,0.05,
-            0.05,0.05
-        ],
-        "heights": [
-            0.0,0.0,0.0,0.0,0.0,0.0,
-            0.0,0.0,0.0,0.0,0.0,0.0,
-            0.0,0.0,0.0,0.0,0.0,0.0,
-            0.0,0.0,0.0
-        ],
-        "smolder_fraction": 0.0
-    }
+}
+PLUMERISE_HOUR = {
+    "emission_fractions": [
+        0.01,0.05,0.05,0.05,0.05,0.05,
+        0.09,0.09,0.09,0.05,0.05,0.05,
+        0.05,0.05,0.05,0.05,0.05,0.05,
+        0.01,0.01
+    ],
+    "heights": [
+        141.438826,200.84066925000002,260.2425125,
+        319.64435575,379.046199,438.44804225,
+        497.84988549999997,557.25172875,616.6535719999999,
+        676.0554152499999,735.4572585000001,794.85910175,
+        854.260945,913.66278825,973.0646314999999,
+        1032.46647475,1091.868318,1151.27016125,
+        1210.6720045,1270.0738477500001,1329.475691
+    ],
+    "smolder_fraction": 0.05
+}
+EMPTY_PLUMERISE_HOUR = {
+    "emission_fractions": [
+        0.05,0.05,0.05,0.05,0.05,0.05,
+        0.05,0.05,0.05,0.05,0.05,0.05,
+        0.05,0.05,0.05,0.05,0.05,0.05,
+        0.05,0.05
+    ],
+    "heights": [
+        0.0,0.0,0.0,0.0,0.0,0.0,
+        0.0,0.0,0.0,0.0,0.0,0.0,
+        0.0,0.0,0.0,0.0,0.0,0.0,
+        0.0,0.0,0.0
+    ],
+    "smolder_fraction": 0.0
+}
+
+
+class TestDispersionBaseSetFireData(object):
 
     def setup(self):
         self.d = FakeDisperser({})
@@ -112,7 +114,7 @@ class TestDispersionBaseSetFireData(object):
                             "specified_points": [
                                 {
                                     "area": 120.0,
-                                    "consumption": self.CONSUMPTION,
+                                    "consumption": CONSUMPTION,
                                     "fuelbeds": [
                                         {
                                             "emissions": {
@@ -134,7 +136,7 @@ class TestDispersionBaseSetFireData(object):
                                     "lat": 47.41,
                                     "lng": -121.41,
                                     "plumerise": {
-                                        "2015-08-04T17:00:00": self.PLUMERISE_HOUR
+                                        "2015-08-04T17:00:00": PLUMERISE_HOUR
                                     },
                                     "rain_days": 8,
                                     "slope": 20.0,
@@ -146,10 +148,8 @@ class TestDispersionBaseSetFireData(object):
                             "state": "WA",
                             "timeprofile": {
                                 "2015-08-04T17:00:00": {
-                                    "area_fraction": 0.1,
-                                    "flaming": 0.2,
-                                    "residual": 0.1,
-                                    "smoldering": 0.1
+                                    "area_fraction": 0.1, "flaming": 0.2,
+                                    "residual": 0.1, "smoldering": 0.1
                                 }
                             }
                         }
@@ -167,21 +167,17 @@ class TestDispersionBaseSetFireData(object):
             "longitude": -121.41,
             "utc_offset": -7.0,
             "plumerise": {
-                "2015-08-04T17:00:00": self.PLUMERISE_HOUR,
-                "2015-08-04T18:00:00": self.EMPTY_PLUMERISE_HOUR
+                "2015-08-04T17:00:00": PLUMERISE_HOUR,
+                "2015-08-04T18:00:00": EMPTY_PLUMERISE_HOUR
             },
             "timeprofile": {
                 "2015-08-04T17:00:00": {
-                    "area_fraction": 0.1,
-                    "flaming": 0.2,
-                    "residual": 0.1,
-                    "smoldering": 0.1
+                    "area_fraction": 0.1, "flaming": 0.2,
+                    "residual": 0.1, "smoldering": 0.1
                 },
                 "2015-08-04T18:00:00": {
-                    "area_fraction": 0.0,
-                    "flaming": 0.0,
-                    "residual": 0.0,
-                    "smoldering": 0.0
+                    "area_fraction": 0.0, "flaming": 0.0,
+                    "residual": 0.0, "smoldering": 0.0
                 }
             },
             "emissions": {
@@ -191,15 +187,13 @@ class TestDispersionBaseSetFireData(object):
             },
             "timeprofiled_emissions": {
                 "2015-08-04T17:00:00": {
-                    "CO": 0.0,
-                    "PM2.5": 6.427146331321209  # == 9.545588271207714 * 0.2 + 24.10635856528243 * 0.1 + 21.073928205514225 * 0.1
+                    "CO": 0.0, "PM2.5": 6.427146331321209  # == 9.545588271207714 * 0.2 + 24.10635856528243 * 0.1 + 21.073928205514225 * 0.1
                 },
                 "2015-08-04T18:00:00": {
-                    "CO": 0.0,
-                    'PM2.5': 0.0
+                    "CO": 0.0, 'PM2.5': 0.0
                 }
             },
-            "consumption": self.CONSUMPTION['summary'],
+            "consumption": CONSUMPTION['summary'],
             "heat": 64442794218.7609
         })
 
@@ -225,7 +219,7 @@ class TestDispersionBaseSetFireData(object):
                             "specified_points": [
                                 {
                                     "area": 120.0,
-                                    "consumption": self.CONSUMPTION,
+                                    "consumption": CONSUMPTION,
                                     "fuelbeds": [
                                         {
                                             "emissions": {
@@ -247,7 +241,7 @@ class TestDispersionBaseSetFireData(object):
                                     "lat": 47.41,
                                     "lng": -121.41,
                                     "plumerise": {
-                                        "2015-08-04T17:00:00": self.PLUMERISE_HOUR
+                                        "2015-08-04T17:00:00": PLUMERISE_HOUR
                                     },
                                     "rain_days": 8,
                                     "slope": 20.0,
@@ -259,10 +253,8 @@ class TestDispersionBaseSetFireData(object):
                             "state": "WA",
                             "timeprofile": {
                                 "2015-08-04T17:00:00": {
-                                    "area_fraction": 0.1,
-                                    "flaming": 0.2,
-                                    "residual": 0.1,
-                                    "smoldering": 0.1
+                                    "area_fraction": 0.1, "flaming": 0.2,
+                                    "residual": 0.1, "smoldering": 0.1
                                 }
                             }
                         }
@@ -277,7 +269,7 @@ class TestDispersionBaseSetFireData(object):
                             "specified_points": [
                                 {
                                     "area": 120.0,
-                                    "consumption": self.CONSUMPTION,
+                                    "consumption": CONSUMPTION,
                                     "fuelbeds": [
                                         {
                                             "emissions": {
@@ -299,7 +291,7 @@ class TestDispersionBaseSetFireData(object):
                                     "lat": 47.41,
                                     "lng": -121.41,
                                     "plumerise": {
-                                        "2015-08-04T18:00:00": self.PLUMERISE_HOUR
+                                        "2015-08-04T18:00:00": PLUMERISE_HOUR
                                     },
                                     "rain_days": 8,
                                     "slope": 20.0,
@@ -311,10 +303,8 @@ class TestDispersionBaseSetFireData(object):
                             "state": "WA",
                             "timeprofile": {
                                 "2015-08-04T18:00:00": {
-                                    "area_fraction": 0.1,
-                                    "flaming": 0.2,
-                                    "residual": 0.1,
-                                    "smoldering": 0.1
+                                    "area_fraction": 0.1, "flaming": 0.2,
+                                    "residual": 0.1, "smoldering": 0.1
                                 }
                             }
                         }
@@ -333,21 +323,17 @@ class TestDispersionBaseSetFireData(object):
                 "longitude": -121.41,
                 "utc_offset": -7.0,
                 "plumerise": {
-                    "2015-08-04T17:00:00": self.PLUMERISE_HOUR,
-                    "2015-08-04T18:00:00": self.EMPTY_PLUMERISE_HOUR
+                    "2015-08-04T17:00:00": PLUMERISE_HOUR,
+                    "2015-08-04T18:00:00": EMPTY_PLUMERISE_HOUR
                 },
                 "timeprofile": {
                     "2015-08-04T17:00:00": {
-                        "area_fraction": 0.1,
-                        "flaming": 0.2,
-                        "residual": 0.1,
-                        "smoldering": 0.1
+                        "area_fraction": 0.1, "flaming": 0.2,
+                        "residual": 0.1, "smoldering": 0.1
                     },
                     "2015-08-04T18:00:00": {
-                        "area_fraction": 0.0,
-                        "flaming": 0.0,
-                        "residual": 0.0,
-                        "smoldering": 0.0
+                        "area_fraction": 0.0, "flaming": 0.0,
+                        "residual": 0.0, "smoldering": 0.0
                     }
                 },
                 "emissions": {
@@ -357,15 +343,13 @@ class TestDispersionBaseSetFireData(object):
                 },
                 "timeprofiled_emissions": {
                     "2015-08-04T17:00:00": {
-                        "CO": 0.0,
-                        "PM2.5": 6.427146331321209  # == 9.545588271207714 * 0.2 + 24.10635856528243 * 0.1 + 21.073928205514225 * 0.1
+                        "CO": 0.0, "PM2.5": 6.427146331321209  # == 9.545588271207714 * 0.2 + 24.10635856528243 * 0.1 + 21.073928205514225 * 0.1
                     },
                     "2015-08-04T18:00:00": {
-                        "CO": 0.0,
-                        'PM2.5': 0.0
+                        "CO": 0.0, 'PM2.5': 0.0
                     }
                 },
-                "consumption": self.CONSUMPTION['summary'],
+                "consumption": CONSUMPTION['summary'],
                 "heat": 64442794218.7609
             }),
             fires.Fire({
@@ -377,21 +361,17 @@ class TestDispersionBaseSetFireData(object):
                 "longitude": -121.41,
                 "utc_offset": -7.0,
                 "plumerise": {
-                    "2015-08-04T17:00:00": self.EMPTY_PLUMERISE_HOUR,
-                    "2015-08-04T18:00:00": self.PLUMERISE_HOUR
+                    "2015-08-04T17:00:00": EMPTY_PLUMERISE_HOUR,
+                    "2015-08-04T18:00:00": PLUMERISE_HOUR
                 },
                 "timeprofile": {
                     "2015-08-04T17:00:00": {
-                        "area_fraction": 0.0,
-                        "flaming": 0.0,
-                        "residual": 0.0,
-                        "smoldering": 0.0
+                        "area_fraction": 0.0, "flaming": 0.0,
+                        "residual": 0.0, "smoldering": 0.0
                     },
                     "2015-08-04T18:00:00": {
-                        "area_fraction": 0.1,
-                        "flaming": 0.2,
-                        "residual": 0.1,
-                        "smoldering": 0.1
+                        "area_fraction": 0.1, "flaming": 0.2,
+                        "residual": 0.1, "smoldering": 0.1
                     }
                 },
                 "emissions": {
@@ -401,15 +381,13 @@ class TestDispersionBaseSetFireData(object):
                 },
                 "timeprofiled_emissions": {
                     "2015-08-04T17:00:00": {
-                        "CO": 0.0,
-                        "PM2.5": 0.0
+                        "CO": 0.0, "PM2.5": 0.0
                     },
                     "2015-08-04T18:00:00": {
-                        "CO": 0.0,
-                        "PM2.5": 6.427146331321209  # == 9.545588271207714 * 0.2 + 24.10635856528243 * 0.1 + 21.073928205514225 * 0.1
+                        "CO": 0.0, "PM2.5": 6.427146331321209  # == 9.545588271207714 * 0.2 + 24.10635856528243 * 0.1 + 21.073928205514225 * 0.1
                     }
                 },
-                "consumption": self.CONSUMPTION['summary'],
+                "consumption": CONSUMPTION['summary'],
                 "heat": 64442794218.7609
             })
         ]
