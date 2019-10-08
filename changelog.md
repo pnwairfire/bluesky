@@ -105,3 +105,6 @@
 
 ## 4.1.16
  - Upgrade met to v1.2.4
+
+## 4.1.17
+ - Merge dispersion fire objects to reduce number of zero-emissions points
