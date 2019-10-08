@@ -1,0 +1,77 @@
+{
+    "fire_information": [
+        {
+            "id": "SF11C14225236095807750",
+            "event_of": {
+                "name": "Natural Fire in North Tahoe",
+                "id": "sdfkj234kljfd"
+            },
+            "meta": {
+                "vsmoke": {
+                    "ws": 20,
+                    "wd": 230
+                }
+            },
+            "type": "wildfire",
+            "activity": [
+                {
+                    "active_areas": [
+                        {
+                            "start": "2014-05-29T17:00:00",
+                            "end": "2014-05-30T17:00:00",
+                            "utc_offset": "-07:00",
+                            "ecoregion": "western",
+                            "country": "USA",
+                            "state": "CA",
+                            "specified_points": [
+                                {
+                                    "lng": -119.7615805,
+                                    "lat": 37.909644,
+                                    "area": 10000
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "active_areas": [
+                        {
+                            "start": "2014-05-30T17:00:00",
+                            "end": "2014-05-31T17:00:00",
+                            "utc_offset": "-07:00",
+                            "ecoregion": "western",
+                            "country": "USA",
+                            "state": "CA",
+                            "specified_points": [
+                                {
+                                    "lng": -119.7615805,
+                                    "lat": 37.909644,
+                                    "area": 10000
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "active_areas": [
+                        {
+                            "start": "2014-05-31T17:00:00",
+                            "end": "2014-06-01T17:00:00",
+                            "utc_offset": "-07:00",
+                            "ecoregion": "western",
+                            "country": "USA",
+                            "state": "CA",
+                            "specified_points": [
+                                {
+                                    "lng": -119.7615805,
+                                    "lat": 37.909644,
+                                    "area": 10000
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
