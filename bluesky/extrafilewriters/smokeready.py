@@ -415,7 +415,6 @@ class SmokeReadyWriter(object):
                             ('SO2', "so2"),
                             ('VOC', "voc")]
 
-
           logging.debug('Writing SmokeReady PTHOUR File to %s', self._pthour_pathname)
           for var, vkey in PTHOUR_MAPPING:
             species_key = vkey.upper()
@@ -479,11 +478,30 @@ class SmokeReadyWriter(object):
                           value == None
                     else:
                       if fire_phase == "flaming":
-                        value = (timeprofile_hour[fire_phase] * emissions_summary[species_key])
+                        flaming_total = 0.0
+                        # required to use phase specific emissions. iterates through fuelbeds and sums species
+                        for fuelbed in fire_loc['fuelbeds']:
+                          if species_key in fuelbed['emissions'][fire_phase].keys():
+                            flaming_total += sum(fuelbed['emissions'][fire_phase][species_key])
+                        value = (timeprofile_hour[fire_phase] * flaming_total)
+                      
                       elif fire_phase == "smoldering":
-                        value = ((timeprofile_hour[fire_phase] * emissions_summary[species_key])
-                                + (timeprofile_hour['residual'] * emissions_summary[species_key]))
+                        smoldering_total = 0.0
+                        residual_total = 0.0
+                        # required to use phase specific emissions. iterates through fuelbeds and sums species
+                        for fuelbed in fire_loc['fuelbeds']:
+                          if species_key in fuelbed['emissions'][fire_phase].keys():
+                            smoldering_total += sum(fuelbed['emissions'][fire_phase][species_key])
+                        smoldering_value = (timeprofile_hour[fire_phase] * smoldering_total)
+                        # required to use phase specific emissions. iterates through fuelbeds and sums species
+                        for fuelbed in fire_loc['fuelbeds']:
+                          if species_key in fuelbed['emissions']['residual'].keys():
+                            residual_total += sum(fuelbed['emissions']['residual'][species_key])
+                        residual_value = (timeprofile_hour['residual'] * residual_total)
+                        # smoke wants smoldering + residual
+                        value = smoldering_value + residual_value
                       else:
+                        # fallback to total
                         value = (timeprofile_hour['total'] * emissions_summary[species_key])
                       daytot += value
                     setattr(pthour_rec, 'HRVAL' + str(hour+1), value)
