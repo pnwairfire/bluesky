@@ -108,3 +108,7 @@
 
 ## 4.1.17
  - Merge dispersion fire objects to reduce number of zero-emissions points
+
+## 4.1.18
+ - Don't group fires into sets before tranching for hysplit
+ - Updates in smokeready extrafiles module
