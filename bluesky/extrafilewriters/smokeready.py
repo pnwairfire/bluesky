@@ -478,31 +478,19 @@ class SmokeReadyWriter(object):
                           value == None
                     else:
                       if fire_phase == "flaming":
-                        flaming_total = 0.0
-                        # required to use phase specific emissions. iterates through fuelbeds and sums species
-                        for fuelbed in fire_loc['fuelbeds']:
-                          if species_key in fuelbed['emissions'][fire_phase].keys():
-                            flaming_total += sum(fuelbed['emissions'][fire_phase][species_key])
-                        value = (timeprofile_hour[fire_phase] * flaming_total)
-                      
+                        flaming_total = self._phase_emissions_for_species(fire_loc, fire_phase, species_key)
+                        value = (timeprofile_hour[fire_phase] * flaming_total)                      
                       elif fire_phase == "smoldering":
-                        smoldering_total = 0.0
-                        residual_total = 0.0
-                        # required to use phase specific emissions. iterates through fuelbeds and sums species
-                        for fuelbed in fire_loc['fuelbeds']:
-                          if species_key in fuelbed['emissions'][fire_phase].keys():
-                            smoldering_total += sum(fuelbed['emissions'][fire_phase][species_key])
+                        smoldering_total = self._phase_emissions_for_species(fire_loc, fire_phase, species_key)
+                        residual_total = self._phase_emissions_for_species(fire_loc, 'residual', species_key)
                         smoldering_value = (timeprofile_hour[fire_phase] * smoldering_total)
-                        # required to use phase specific emissions. iterates through fuelbeds and sums species
-                        for fuelbed in fire_loc['fuelbeds']:
-                          if species_key in fuelbed['emissions']['residual'].keys():
-                            residual_total += sum(fuelbed['emissions']['residual'][species_key])
                         residual_value = (timeprofile_hour['residual'] * residual_total)
                         # smoke wants smoldering + residual
                         value = smoldering_value + residual_value
                       else:
                         # fallback to total
-                        value = (timeprofile_hour['total'] * emissions_summary[species_key])
+                        if species_key in emissions_summary.keys():
+                          value = emissions_summary[species_key]
                       daytot += value
                     setattr(pthour_rec, 'HRVAL' + str(hour+1), value)
                   except IndexError:
@@ -587,5 +575,18 @@ class SmokeReadyWriter(object):
       # Default to 'EST' if all else fails
       tzonnam = 'EST'
       return tzonnam
+
+  def _phase_emissions_for_species(self, fire_loc, phase, species):
+    """
+    To get species specific emission levels at each phase 
+    we need to iterate through the fuelbeds. Requires a valid
+    fire location object.
+    """
+    total = 0.0
+    for fuelbed in fire_loc['fuelbeds']:
+      if species in fuelbed['emissions'][phase].keys():
+        total += sum(fuelbed['emissions'][phase][species])
+    return total
+
 
 
