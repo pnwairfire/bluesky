@@ -229,10 +229,12 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
     def _merge_two_fires(self, f_merged, f):
         new_f_merged = Fire(
-            id='combined-fire-{}-{}'.format(
-                # f1.id might have 'combined-fire-', but f2.id won't
-                f_merged.id.replace('combined-fire-', '')[:8], f.id[:8]
-            ),
+            # We'll let the new fire be assigned a new id
+            # It's possible, but not likely, that locations from different
+            # fires will get merged together.  This set of original fire
+            # ids isn't currently used other than in log messages, but
+            # could be used in tranching
+            original_fire_ids=f_merged.original_fire_ids.union(f.original_fire_ids),
             # we know at this point that their meta dicts don't conflict
             meta=dict(f_merged.meta, **f.meta),
             # there may be a gap between f_merged['end'] and f['start']
@@ -319,6 +321,9 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
         f = Fire(
             id="{}-{}".format(fire.id, loc_num),
+            # See note above, in _merge_two_fires, about why
+            # original_fire_ids is a set instead of scalar
+            original_fire_ids=set([fire.id]),
             meta=fire.get('meta', {}),
             start=aa['start'],
             end=aa['end'],
@@ -390,7 +395,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             if  heat < 1.0e-6:
                 logging.debug("Fire %s activity window %s - %s has "
                     "less than 1.0e-6 total heat; skip...",
-                    fire.id, aa['start'], aa['end'])
+                    '/'.join(fire.original_fire_ids), aa['start'], aa['end'])
                 raise SkipLocationError("Heat to low")
 
         # else, just forget about computing heat

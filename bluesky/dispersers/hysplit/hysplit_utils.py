@@ -30,29 +30,27 @@ def config(*keys):
 ##
 
 def create_fire_sets(fires):
-    """Creates sets of fires, grouping by location
+    """Creates sets of fires
 
-    A single fire location may show up multiple times if it lasted multiple days,
-    since there's one FireLocationData per location per day.  We don't want to
-    split up any location into multiple tranches, so we'll group FireLocationData
-    objects by location id and then tranche the location fire sets.
+    This originally intended to group 'fires' by location (i.e. lat,lng),
+    but failed to do so, and then became moot once we started merging
+    'fires' with the same location.
 
-    @todo: make sure fire locations from any particular event don't get split up into
-      multiple HYSPLIT runs ???  (use fires[N]['metadata']['sf_event_guid']) ?
+    We're keeping this hook in here in case we do eventually want to group
+    fires by some criteria (e.g. the original fire event, geographical
+    proximity, etc).  For now, though, it just produces len(fires) sets,
+    each with one fire.
     """
-
-    fires_dict = {e: [] for e in set([f.id for f in fires])}
-    for f in fires:
-        fires_dict[f.id].append(f)
-    return  list(fires_dict.values())
+    return  [[f] for f in fires]
 
 def create_fire_tranches(fire_sets, num_processes):
     """Creates tranches of FireLocationData, each tranche to be processed by its
     own HYSPLIT process.
 
-    @todo: More sophisticated tranching (ex. taking into account acreage, location, etc.).
+    @todo: More sophisticated tranching (e.g. taking into account acreage,
+    location, etc.; to keep the number of fires in each tranche as close
+    as possible to to # fires / # tranches).
     """
-
     n_sets = len(fire_sets)
     num_processes = min(n_sets, num_processes)  # just to be sure
     min_n_fire_sets_per_process = n_sets // num_processes

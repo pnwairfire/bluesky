@@ -3,6 +3,7 @@
 
 import copy
 import datetime
+import uuid
 
 from bluesky.config import Config
 from bluesky.dispersers import DispersionBase
@@ -161,6 +162,7 @@ class TestDispersionBaseSetFireData(object):
 
         expected_fire = fires.Fire({
             "id": "SF11C14225236095807750-0",
+            "original_fire_ids": {"SF11C14225236095807750"},
             "meta": {},
             "start": "2015-08-04T17:00:00",
             "end": "2015-08-05T17:00:00",
@@ -318,6 +320,7 @@ class TestDispersionBaseSetFireData(object):
         expected_fires = [
             fires.Fire({
                 "id": "SF11C14225236095807750-0",
+                "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {},
                 "start": "2015-08-04T17:00:00",
                 "end": "2015-08-04T18:00:00",
@@ -357,6 +360,7 @@ class TestDispersionBaseSetFireData(object):
             }),
             fires.Fire({
                 "id": "SF11C14225236095807750-1",
+                "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {},
                 "start": "2015-08-04T18:00:00",
                 "end": "2015-08-04T19:00:00",
@@ -408,6 +412,7 @@ class TestDispersionBaseMergeFires(object):
 
     FIRE_1 = fires.Fire({
         "id": "SF11C14225236095807750-0",
+        "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar'},
         "start": "2015-08-04T17:00:00", "end": "2015-08-04T19:00:00",
         "area": 120.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
@@ -437,6 +442,7 @@ class TestDispersionBaseMergeFires(object):
     # no conflicting meta, same location, but overlapping time window
     FIRE_OVERLAPPING_TIME_WINDOWS = fires.Fire({
         "id": "SF11C14225236095807750-0",
+        "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar'},
         "start": "2015-08-04T18:00:00", "end": "2015-08-04T20:00:00",
         "area": 120.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
@@ -466,6 +472,7 @@ class TestDispersionBaseMergeFires(object):
     # contiguous time windows, no conflicting meta, same location
     FIRE_CONTIGUOUS_TIME_WINDOWS = fires.Fire({
         "id": "SF11C14225236095807750-0",
+        "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar', 'bar': 'asdasd'},
         "start": "2015-08-04T19:00:00", "end": "2015-08-04T21:00:00",
         "area": 100.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
@@ -495,6 +502,7 @@ class TestDispersionBaseMergeFires(object):
     # non contiguous time windows, no conflicting meta, same location
     FIRE_NON_CONTIGUOUS_TIME_WINDOWS = fires.Fire({
         "id": "SF11C14225236095807750-0",
+        "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar', 'bar': 'sdf'},
         "start": "2015-08-04T20:00:00", "end": "2015-08-04T22:00:00",
         "area": 120.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
@@ -523,6 +531,7 @@ class TestDispersionBaseMergeFires(object):
 
     FIRE_CONFLICTING_META = fires.Fire({
         "id": "SF11C14225236095807750-0",
+        "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'baz'},
         "start": "2015-08-04T20:00:00", "end": "2015-08-04T22:00:00",
         "area": 120.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
@@ -551,6 +560,7 @@ class TestDispersionBaseMergeFires(object):
 
     FIRE_DIFFERENT_LAT_LNG = fires.Fire({
         "id": "SF11C14225236095807750-0",
+        "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {},
         "start": "2015-08-04T20:00:00", "end": "2015-08-04T22:00:00",
         "area": 120.0, "latitude": 47.0, "longitude": -121.0, "utc_offset": -7.0,
@@ -638,7 +648,9 @@ class TestDispersionBaseMergeFires(object):
 
     ## Cases that merge
 
-    def test_non_contiguous_time_windows(self):
+    def test_non_contiguous_time_windows(self, monkeypatch):
+        monkeypatch.setattr(uuid, 'uuid4', lambda: '1234abcd')
+
         original_fire_1 = copy.deepcopy(self.FIRE_1)
         original_fire_non_contiguous_time_windows = copy.deepcopy(self.FIRE_NON_CONTIGUOUS_TIME_WINDOWS)
 
@@ -647,7 +659,8 @@ class TestDispersionBaseMergeFires(object):
 
         expected_merged_fires = [
             fires.Fire({
-                "id": "combined-fire-SF11C142-SF11C142",
+                "id": "1234abcd",
+                "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'sdf'},
                 "start": "2015-08-04T17:00:00", "end": "2015-08-04T22:00:00",
                 "area": 240.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
@@ -694,7 +707,9 @@ class TestDispersionBaseMergeFires(object):
         assert self.FIRE_1 == original_fire_1
         assert self.FIRE_NON_CONTIGUOUS_TIME_WINDOWS == original_fire_non_contiguous_time_windows
 
-    def test_contiguous_time_windows(self):
+    def test_contiguous_time_windows(self, monkeypatch):
+        monkeypatch.setattr(uuid, 'uuid4', lambda: '1234abcd')
+
         original_fire_1 = copy.deepcopy(self.FIRE_1)
         original_fire_contiguous_time_windows = copy.deepcopy(self.FIRE_CONTIGUOUS_TIME_WINDOWS)
 
@@ -703,7 +718,8 @@ class TestDispersionBaseMergeFires(object):
 
         expected_merged_fires = [
             fires.Fire({
-                "id": "combined-fire-SF11C142-SF11C142",
+                "id": "1234abcd",
+                "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'asdasd'},
                 "start": "2015-08-04T17:00:00", "end": "2015-08-04T21:00:00",
                 "area": 220.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
@@ -750,7 +766,9 @@ class TestDispersionBaseMergeFires(object):
         assert self.FIRE_1 == original_fire_1
         assert self.FIRE_CONTIGUOUS_TIME_WINDOWS == original_fire_contiguous_time_windows
 
-    def test_all(self):
+    def test_all(self, monkeypatch):
+        monkeypatch.setattr(uuid, 'uuid4', lambda: '1234abcd')
+
         original_fire_1 = copy.deepcopy(self.FIRE_1)
         original_overlapping_time_windows = copy.deepcopy(self.FIRE_OVERLAPPING_TIME_WINDOWS)
         original_fire_contiguous_time_windows = copy.deepcopy(self.FIRE_CONTIGUOUS_TIME_WINDOWS)
@@ -770,7 +788,8 @@ class TestDispersionBaseMergeFires(object):
         expected_merged_fires = [
             # FIRE_1 merged with FIRE_CONTIGUOUS_TIME_WINDOWS
             fires.Fire({
-                "id": "combined-fire-SF11C142-SF11C142",
+                "id": "1234abcd",
+                "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'asdasd'},
                 "start": "2015-08-04T17:00:00", "end": "2015-08-04T21:00:00",
                 "area": 220.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
@@ -811,7 +830,8 @@ class TestDispersionBaseMergeFires(object):
             # FIRE_OVERLAPPING_TIME_WINDOWS merged with
             # FIRE_NON_CONTIGUOUS_TIME_WINDOWS
             fires.Fire({
-                "id": "combined-fire-SF11C142-SF11C142",
+                "id": "1234abcd",
+                "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'sdf'},
                 "start": "2015-08-04T18:00:00", "end": "2015-08-04T22:00:00",
                 "area": 240.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,

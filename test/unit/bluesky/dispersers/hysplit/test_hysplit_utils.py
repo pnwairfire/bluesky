@@ -39,11 +39,15 @@ class TestCreateFireSets(object):
             MockFireLocationData(1)
         ]
         expected_sets = [
-            [fires[0], fires[2], fires[7], fires[8]],  # id 1
-            [fires[1]],  # id 2
-            [fires[6]],  # id 3
-            [fires[3], fires[4]],  # id 4
-            [fires[5]]  #id 100
+            [fires[0]],
+            [fires[2]],
+            [fires[7]],
+            [fires[8]],
+            [fires[1]],
+            [fires[6]],
+            [fires[3]],
+            [fires[4]],
+            [fires[5]]
         ]
         fire_sets = hysplit_utils.create_fire_sets(fires)
         # order not preserved, so sort results
