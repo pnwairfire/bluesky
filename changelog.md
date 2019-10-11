@@ -112,3 +112,6 @@
 ## 4.1.18
  - Don't group fires into sets before tranching for hysplit
  - Updates in smokeready extrafiles module
+
+## 4.1.19
+ - Upgrade met to v1.2.5
