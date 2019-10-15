@@ -414,7 +414,8 @@ class TestDispersionBaseMergeFires(object):
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar'},
-        "start": "2015-08-04T17:00:00", "end": "2015-08-04T19:00:00",
+        "start": datetime.datetime(2015,8,4,17,0,0),
+        "end": datetime.datetime(2015,8,4,19,0,0),
         "area": 120.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
         "plumerise": {
             "2015-08-04T17:00:00": PLUMERISE_HOUR,
@@ -444,7 +445,8 @@ class TestDispersionBaseMergeFires(object):
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar'},
-        "start": "2015-08-04T18:00:00", "end": "2015-08-04T20:00:00",
+        "start": datetime.datetime(2015,8,4,18,0,0),
+        "end": datetime.datetime(2015,8,4,20,0,0),
         "area": 120.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
         "plumerise": {
             "2015-08-04T18:00:00": PLUMERISE_HOUR,
@@ -474,7 +476,8 @@ class TestDispersionBaseMergeFires(object):
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar', 'bar': 'asdasd'},
-        "start": "2015-08-04T19:00:00", "end": "2015-08-04T21:00:00",
+        "start": datetime.datetime(2015,8,4,19,0,0),
+        "end": datetime.datetime(2015,8,4,21,0,0),
         "area": 100.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
         "plumerise": {
             "2015-08-04T19:00:00": PLUMERISE_HOUR,
@@ -504,7 +507,8 @@ class TestDispersionBaseMergeFires(object):
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar', 'bar': 'sdf'},
-        "start": "2015-08-04T20:00:00", "end": "2015-08-04T22:00:00",
+        "start": datetime.datetime(2015,8,4,20,0,0),
+        "end": datetime.datetime(2015,8,4,22,0,0),
         "area": 120.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
         "plumerise": {
             "2015-08-04T20:00:00": PLUMERISE_HOUR,
@@ -533,7 +537,8 @@ class TestDispersionBaseMergeFires(object):
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'baz'},
-        "start": "2015-08-04T20:00:00", "end": "2015-08-04T22:00:00",
+        "start": datetime.datetime(2015,8,4,20,0,0),
+        "end": datetime.datetime(2015,8,4,22,0,0),
         "area": 120.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
         "plumerise": {
             "2015-08-04T20:00:00": PLUMERISE_HOUR,
@@ -562,7 +567,8 @@ class TestDispersionBaseMergeFires(object):
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {},
-        "start": "2015-08-04T20:00:00", "end": "2015-08-04T22:00:00",
+        "start": datetime.datetime(2015,8,4,20,0,0),
+        "end": datetime.datetime(2015,8,4,22,0,0),
         "area": 120.0, "latitude": 47.0, "longitude": -121.0, "utc_offset": -7.0,
         "plumerise": {
             "2015-08-04T20:00:00": PLUMERISE_HOUR,
@@ -662,7 +668,8 @@ class TestDispersionBaseMergeFires(object):
                 "id": "1234abcd",
                 "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'sdf'},
-                "start": "2015-08-04T17:00:00", "end": "2015-08-04T22:00:00",
+                "start": datetime.datetime(2015,8,4,17,0,0),
+                "end": datetime.datetime(2015,8,4,22,0,0),
                 "area": 240.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
                 "plumerise": {
                     "2015-08-04T17:00:00": PLUMERISE_HOUR,
@@ -721,7 +728,8 @@ class TestDispersionBaseMergeFires(object):
                 "id": "1234abcd",
                 "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'asdasd'},
-                "start": "2015-08-04T17:00:00", "end": "2015-08-04T21:00:00",
+                "start": datetime.datetime(2015,8,4,17,0,0),
+                "end": datetime.datetime(2015,8,4,21,0,0),
                 "area": 220.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
                 "plumerise": {
                     "2015-08-04T17:00:00": PLUMERISE_HOUR,
@@ -791,7 +799,8 @@ class TestDispersionBaseMergeFires(object):
                 "id": "1234abcd",
                 "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'asdasd'},
-                "start": "2015-08-04T17:00:00", "end": "2015-08-04T21:00:00",
+                "start": datetime.datetime(2015,8,4,17,0,0),
+                "end": datetime.datetime(2015,8,4,21,0,0),
                 "area": 220.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
                 "plumerise": {
                     "2015-08-04T17:00:00": PLUMERISE_HOUR,
@@ -833,7 +842,8 @@ class TestDispersionBaseMergeFires(object):
                 "id": "1234abcd",
                 "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'sdf'},
-                "start": "2015-08-04T18:00:00", "end": "2015-08-04T22:00:00",
+                "start": datetime.datetime(2015,8,4,18,0,0),
+                "end": datetime.datetime(2015,8,4,22,0,0),
                 "area": 240.0, "latitude": 47.41, "longitude": -121.41, "utc_offset": -7.0,
                 "plumerise": {
                     "2015-08-04T18:00:00": PLUMERISE_HOUR,

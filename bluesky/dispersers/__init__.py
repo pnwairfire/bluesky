@@ -274,8 +274,16 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         return new_f_merged
 
     def _merge_hourly_data(self, data1, data2, start2):
-        pruned_data2 = {k: v for k, v in data2.items() if k >= start2}
+        pruned_data2 = {k: v for k, v in data2.items()
+            if self._on_or_after(k, start2)}
         return dict(data1, **pruned_data2)
+
+    def _on_or_after(self, dt1, dt2):
+        # make sure same type, and convert to datetimes if not
+        if type(dt1) != type(dt2):
+            dt1 = datetime_parsing.parse(dt1)
+            dt2 = datetime_parsing.parse(dt2)
+        return dt1 >= dt2
 
     def _sum_data(self, data1, data2):
         summed_data = {}
