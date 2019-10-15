@@ -115,3 +115,6 @@
 
 ## 4.1.19
  - Upgrade met to v1.2.5
+
+## 4.1.20
+ - Handle comparison of string and datetime objects when merging fires for dispersion
