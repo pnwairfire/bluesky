@@ -12,14 +12,6 @@
                 }
             ]
         },
-        "filter":{
-            "location":{
-                "boundary": {
-                    "sw": {"lng": -128.6, "lat": 40},
-                    "ne": {"lng": -107, "lat": 49.7}
-                }
-            }
-        },
         "fuelbeds": {
             "ignored_fuelbeds": ["900"]
         },
@@ -87,76 +79,6 @@
             "model":"feps",
             "feps": {
                 "working_dir": "/bluesky/output/plumerise{today:%Y%m%d}00"
-            }
-        },
-        "localmet":{
-        },
-        "dispersion": {
-            "start": "{today:%Y-%m-%d}T00:00:00",
-            "num_hours": 24,
-            "model": "hysplit",
-            "handle_existing": "replace",
-            "output_dir": "/bluesky/output/disp_out_{today:%Y%m%d}00",
-            "working_dir": "/bluesky/output/disp_work_{today:%Y%m%d}00",
-            "hysplit": {
-                "grid": {
-                    "spacing": 4,
-                    "projection": "LCC",
-                    "boundary": {
-                        "sw": {"lng": -128.6, "lat": 40},
-                        "ne": {"lng": -107, "lat": 49.7}
-                    }
-                },
-                "NUMPAR": 3000,
-                "MAXPAR": 10000000,
-                "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 5,
-                "VERTICAL_LEVELS": [100],
-                "INITD": 0,
-                "DELT": -3,
-                "KHMAX": 48,
-                "MPI": false,
-                "NCPUS": 1,
-                "NPROCESSES": 1,
-                "NFIRES_PER_PROCESS": -1,
-                "NPROCESSES_MAX": -1,
-                "MAKE_INIT_FILE": true,
-                "NDUMP": 24,
-                "NCYCL": 0,
-                "PARDUMP": "/bluesky/output/pardump-{today:%Y-%m-%d}",
-                "NINIT": 1,
-                "PARINIT": "/bluesky/output/pardump-{today-1:%Y-%m-%d}",
-                "STOP_IF_NO_PARINIT": false
-            }
-        },
-        "visualization": {
-            "target": "dispersion",
-            "hysplit": {
-                "websky_version": "2",
-                "create_summary_json": true,
-                "images_dir": "images/",
-                "data_dir": "data/",
-                "blueskykml_config": {
-                    "DispersionGridInput": {
-                        "LAYERS": [0]
-                    },
-                    "DispersionImages": {
-                        "DAILY_IMAGES_UTC_OFFSETS": [-11,-10,-9,-8,-7,-6,-5,-4, 0],
-                        "REPROJECT_IMAGES": "True"
-                    },
-                    "DispersionGridOutput": {
-                        "HOURLY_COLORS": "GrayColorBar",
-                        "THREE_HOUR_COLORS": "GrayColorBar",
-                        "DAILY_COLORS": "GrayColorBar"
-                    },
-                    "GrayColorBar": {
-                        "DEFINE_RGB": "true",
-                        "DATA_LEVELS": "0 1 12 35 55 150 250 350 500 2000",
-                        "RED": " 0 200 175 150 125 100 75 50 25",
-                        "GREEN": "0 200 175 150 125 100 75 50 25",
-                        "BLUE": "0 200 175 150 125 100 75 50 25",
-                        "IMAGE_OPACITY_FACTOR": "0.7"
-                    }
-                }
             }
         },
         "extrafiles":{
