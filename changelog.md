@@ -118,3 +118,6 @@
 
 ## 4.1.20
  - Handle comparison of string and datetime objects when merging fires for dispersion
+
+ ## 4.1.21
+ - Added data error handling in smokeready extrafiles module
