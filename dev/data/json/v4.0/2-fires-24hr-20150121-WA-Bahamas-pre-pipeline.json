@@ -1,6 +1,6 @@
 {
     "run_id": "2-fire-24hr-20150121-WA-Bahamas-{today}",
-    "fires": [
+    "fire_information": [
         {
             "event_id": "SF11E826544",
             "name": "Some Rx Fire in the Bahamas with consumption inputs provided",

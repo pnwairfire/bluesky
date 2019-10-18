@@ -1,6 +1,6 @@
 {
     "run_id": "1-fire-24hr-20140530-CA-{today}",
-    "fires": [
+    "fire_information": [
         {
             "type": "wildfire",
             "id": "SF11C14225236095807750",

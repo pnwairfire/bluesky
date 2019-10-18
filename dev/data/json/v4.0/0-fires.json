@@ -1,4 +1,4 @@
 {
     "run_id": "0-fires-{today}",
-    "fires": []
+    "fire_information": []
 }
