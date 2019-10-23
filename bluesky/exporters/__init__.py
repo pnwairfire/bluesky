@@ -324,7 +324,7 @@ class ExporterBase(object):
                 matches.append(os.path.join(root, filename))
         return [m.replace(directory, '').lstrip('/') for m in matches]
 
-    def _get_tarball_pathname(seld, dest):
+    def _get_tarball_pathname(self, dest):
         tarball_name = self.config('tarball_name')
         if tarball_name:
             os.path.join(dest, tarball_name)
