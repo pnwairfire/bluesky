@@ -136,7 +136,7 @@ and KML visualization:
 
 Remember that, in the last dispersion example, the dispersion output
 will be under `$HOME/code/pnwairfire-bluesky/output/dispersion-output/bsp-dispersion-output/`
-on your host machine, not under `/bluesky/output/dispersion-output/`.
+on your host machine, not under `/bluesky/output/output/`.
 The export directory will be under
 `$HOME/code/pnwairfire-bluesky/output/exports/`.
 

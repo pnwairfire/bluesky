@@ -4,8 +4,8 @@
             "start": "2014-05-30T05:00:00Z",
             "num_hours": 2,
             "model": "hysplit",
-            "output_dir": "/bluesky/output/dispersion-output/{run_id}/",
-            "working_dir": "/bluesky/output/dispersion-working/{run_id}/"
+            "output_dir": "/bluesky/output/output/{run_id}/",
+            "working_dir": "/bluesky/output/working/{run_id}/"
         }
     }
 }
