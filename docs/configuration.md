@@ -371,8 +371,9 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 
 ##### export
 
-- ***'config' > 'export' > 'modes' -- *optional* -- defaults to ['email']
+- ***'config' > 'export' > 'modes'*** -- *optional* -- defaults to ['email']
 - ***'config' > 'export' > 'extra_exports'*** -- *optional* -- array of extra output files to export (ex. 'dispersion' or 'visualization' outputs); defaults to none
+- ***'config' > 'export' > 'tarzip'*** -- *optional* -- whether or not to create zipped tarballs of directories being under extra exports; defaults to `false`
 
 ###### if using email:
 
