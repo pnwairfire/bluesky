@@ -594,7 +594,6 @@ _DEFAULTS = {
     "export": {
         "modes": [],
         "extra_exports": [],
-        "tarzip": False,
         "email": {
             # handle_existing needs to be defined here for exporter
             # code not to fail, even though it's not relevant to email
@@ -637,6 +636,9 @@ _DEFAULTS = {
             #     "dest_dir": None
             # }
         }
+    },
+    "archive": {
+        'tarzip': []
     }
 }
 

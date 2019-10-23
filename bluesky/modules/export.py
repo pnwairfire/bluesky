@@ -8,10 +8,6 @@ __all__ = [
 
 __version__ = "0.1.0"
 
-import logging
-import shutil
-
-from bluesky import io
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.exporters import email, upload, localsave
@@ -46,18 +42,3 @@ def run(fires_manager):
     # info needs to be in the fires_manager before it's dumped to json
     for exporter in exporters:
         exporter.export(fires_manager)
-
-    tarzip(fires_manager, extra_exports)
-
-def tarzip(fires_manager, extra_exports):
-    if Config().get('export', 'tarzip'):
-        dirs_to_tarzip = set()
-        for ee in extra_exports:
-            info = getattr(fires_manager, ee)
-            if info and info.get('output', {}).get('directory'):
-                logging.debug("Dir to tarzip: %s", info['output']['directory'])
-                dirs_to_tarzip.add(info['output']['directory'])
-        for d in dirs_to_tarzip:
-            logging.debug("tarzipping: %s", d)
-            io.create_tarball(d)
-            shutil.rmtree(d)

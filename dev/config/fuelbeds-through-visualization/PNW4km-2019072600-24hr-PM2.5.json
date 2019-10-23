@@ -58,12 +58,15 @@
                 "filename": "fire_emissions.csv"
             }
         },
-       "export": {
+        "export": {
             "modes": ["localsave"],
             "extra_exports": ["dispersion", "visualization", "plumerise", "extrafiles"],
             "localsave": {
                 "dest_dir": "/bluesky/output/exports/"
             }
+        },
+       "archive": {
+            "tarzip": ["dispersion", "visualization", "plumerise", "extrafiles"]
         }
     }
 }

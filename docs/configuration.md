@@ -373,7 +373,6 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 
 - ***'config' > 'export' > 'modes'*** -- *optional* -- defaults to ['email']
 - ***'config' > 'export' > 'extra_exports'*** -- *optional* -- array of extra output files to export (ex. 'dispersion' or 'visualization' outputs); defaults to none
-- ***'config' > 'export' > 'tarzip'*** -- *optional* -- whether or not to create zipped tarballs of directories being under extra exports; defaults to `false`
 
 ###### if using email:
 
@@ -404,6 +403,10 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
  - ***'config' > 'export' > 'upload' > 'scp' > 'user'*** - *optional* if uploading via scp (which is currently the only supported upload mode) -- username to use in scp; defaults to 'bluesky'
  - ***'config' > 'export' > 'upload' > 'scp' > 'port'*** - *optional* if uploading via scp (which is currently the only supported upload mode) -- port to use in scp; defaults to 22
  - ***'config' > 'export' > 'upload' > 'scp' > 'dest_dir'*** - *required* if uploading via scp (which is currently the only supported upload mode) -- destination directory on remote host to contain output directory
+
+##### archive
+
+- ***'config' > 'export' > 'tarzip'*** -- *optional* -- list of modules whose output directories should be tar'd and zipped and then deleted; defaults empty list
 
 ##### statuslogging
 
