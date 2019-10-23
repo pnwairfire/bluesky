@@ -6,6 +6,12 @@
         "findmetdata": {
             "met_root_dir": "/data/Met/PNW/4km/ARL/"
         },
+        "plumerise": {
+            "model":"feps",
+            "feps": {
+                "working_dir": "/bluesky/output/plumerise/{run_id}/"
+            }
+        },
         "dispersion": {
             "start": "2019-07-26T00:00:00",
             "num_hours": 24,
@@ -41,9 +47,20 @@
                 "create_summary_json": true
             }
         },
-        "export": {
+         "extrafiles":{
+            "dest_dir": "/bluesky/output/extrafiles/{run_id}/",
+            "sets": ["firescsvs", "emissionscsv"],
+            "firescsvs": {
+                "fire_locations_filename": "fire_locations.csv",
+                "fire_events_filename": "fire_events.csv"
+            },
+            "emissionscsv": {
+                "filename": "fire_emissions.csv"
+            }
+        },
+       "export": {
             "modes": ["localsave"],
-            "extra_exports": ["dispersion", "visualization"],
+            "extra_exports": ["dispersion", "visualization", "plumerise", "extrafiles"],
             "localsave": {
                 "dest_dir": "/bluesky/output/exports/"
             }
