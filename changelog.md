@@ -124,3 +124,7 @@
 
 ## 4.1.22
  - Added `archive` module, which currently supports creating zipped tarballs of module-specific output directories (dispersion, plumerise, extrafiles, etc.), and then deleting the original directory
+
+## 4.1.23
+ - Fixed bug where tranched hysplit threads where using configuration defaults, ignoring configuration overrides specified by user
+ - Fixed adhoc pardump / parinit hysplit test
