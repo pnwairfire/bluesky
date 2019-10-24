@@ -65,7 +65,7 @@
                 "dest_dir": "/bluesky/output/exports/"
             }
         },
-       "archive": {
+        "archive": {
             "tarzip": ["dispersion", "visualization", "plumerise", "extrafiles"]
         }
     }
