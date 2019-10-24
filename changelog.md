@@ -119,5 +119,8 @@
 ## 4.1.20
  - Handle comparison of string and datetime objects when merging fires for dispersion
 
- ## 4.1.21
+## 4.1.21
  - Added data error handling in smokeready extrafiles module
+
+## 4.1.22
+ - Added `archive` module, which currently supports creating zipped tarballs of module-specific output directories (dispersion, plumerise, extrafiles, etc.), and then deleting the original directory
