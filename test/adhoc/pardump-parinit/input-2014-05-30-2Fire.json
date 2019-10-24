@@ -1,46 +1,62 @@
 {
     "fires": [
         {
-            "type": "rx",
-            "activity":  [
+            "fuel_type": "natural",
+            "activity": [
                 {
-                    "location": {
-                        "area": 6000.4,
-                        "geojson": {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [-119.55, 39.5],
-                                [-119.60, 39.6]
+                    "active_areas": [
+                        {
+                            "start": "2014-05-30T00:00:00",
+                            "end": "2014-05-31T00:00:00",
+                            "utc_offset": "-07:00",
+                            "ecoregion": "western",
+                            "specified_points": [
+                                {
+                                    "lng": -119.55,
+                                    "area": 3000.2,
+                                    "lat": 39.5
+                                },
+                                {
+                                    "lng": -119.6,
+                                    "area": 3000.2,
+                                    "lat": 39.6
+                                }
                             ]
-                        },
-                        "utc_offset": "-07:00",
-                        "ecoregion": "western"
-                    },
-                    "start": "2014-05-30T00:00:00",
-                    "end": "2014-05-31T00:00:00"
+                        }
+                    ]
                 }
-            ]
+            ],
+            "id": "9ac8ca0b",
+            "type": "rx"
         },
         {
-            "type": "rx",
-            "activity":  [
+            "fuel_type": "natural",
+            "activity": [
                 {
-                    "location": {
-                        "area": 1000.4,
-                        "geojson": {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [-119.50, 39.4],
-                                [-119.45, 39.5]
+                    "active_areas": [
+                        {
+                            "start": "2014-05-30T00:00:00",
+                            "end": "2014-05-31T00:00:00",
+                            "utc_offset": "-07:00",
+                            "ecoregion": "western",
+                            "specified_points": [
+                                {
+                                    "lng": -119.5,
+                                    "area": 500.2,
+                                    "lat": 39.4
+                                },
+                                {
+                                    "lng": -119.45,
+                                    "area": 500.2,
+                                    "lat": 39.5
+                                }
                             ]
-                        },
-                        "utc_offset": "-07:00",
-                        "ecoregion": "western"
-                    },
-                    "start": "2014-05-30T00:00:00",
-                    "end": "2014-05-31T00:00:00"
+                        }
+                    ]
                 }
-            ]
+            ],
+            "id": "5de92d1f",
+            "type": "rx"
         }
     ]
 }
