@@ -49,7 +49,7 @@ def convert(input_data):
     fires = (input_data.pop('fires', None)
         or input_data.pop('fire_information', []))
 
-    input_data['fires'] = Blueskyv4_0To4_1().marshal(fires)
+    input_data['fires'] = marshal.Blueskyv4_0To4_1().marshal(fires)
 
     return input_data
 
