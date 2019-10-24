@@ -56,6 +56,7 @@ import datetime
 
 from afdatetime.parsing import parse_datetime
 
+from bluesky.config import Config
 from bluesky.models.fires import Fire
 from .. import (
     DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE, PHASES
@@ -324,9 +325,10 @@ class HYSPLITDispersion(DispersionBase):
     def _run_parallel(self, working_dir):
         runner = self
         class T(threading.Thread):
-            def  __init__(self, fires, working_dir, tranche_num):
+            def  __init__(self, fires, config, working_dir, tranche_num):
                 super(T, self).__init__()
                 self.fires = fires
+                self.config = config
                 self.working_dir = working_dir
                 if not os.path.exists(working_dir):
                     os.makedirs(working_dir)
@@ -334,6 +336,9 @@ class HYSPLITDispersion(DispersionBase):
                 self.exc = None
 
             def run(self):
+                # We need to set config to what was loaded in the main thread.
+                # Otherwise, we'll just be using defaults
+                Config().set(self.config)
                 try:
                     runner._run_process(self.fires, self.working_dir,
                         self.tranche_num)
@@ -343,11 +348,13 @@ class HYSPLITDispersion(DispersionBase):
         fire_tranches = hysplit_utils.create_fire_tranches(
             self._fire_sets, self._num_processes)
         threads = []
+        main_thread_config = Config().get()
         for nproc in range(len(fire_tranches)):
             fires = fire_tranches[nproc]
             # Note: no need to set _context.basedir; it will be set to workdir
             logging.info("Starting thread to run HYSPLIT on %d fires." % (len(fires)))
-            t = T(fires, os.path.join(working_dir, str(nproc)), nproc)
+            t = T(fires, main_thread_config,
+                os.path.join(working_dir, str(nproc)), nproc)
             t.start()
             threads.append(t)
 
