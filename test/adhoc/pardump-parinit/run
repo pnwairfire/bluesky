@@ -12,11 +12,11 @@ show_help_message () {
     echo ""
     echo "Usage:"
     echo
-    echo "   %0 <date>,<fires>,<pardump-fires>,<MAKE_INIT_FILE>,<NINIT>"
+    echo "   $0 <date>,<fires>,<pardump-fires>,<MAKE_INIT_FILE>,<NINIT>"
     echo
     echo "   $0 2014-05-29,1Fire,na,true,0 \\"
     echo "      2014-05-30,1Fire,1Fire,true,1 2014-05-30,1Fire,na,true,0 \\"
-    echo "      2014-05-30,2Fire,1Fire,true,1 2014-05-30,2Fire,na,true,0 \\"
+    echo "      2014-05-30,2Fire,1Fire,true,1 2014-05-30,2Fire,na,true,0"
     echo
     echo "   $0 2014-05-29,2Fire,pardump,true,0 \\"
     echo "      2014-05-30,1Fire,2Fire,true,1 2014-05-30,1Fire,na,true,0 \\"
