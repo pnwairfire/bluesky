@@ -9,6 +9,7 @@ __all__ = [
 __version__ = "0.1.0"
 
 import logging
+import os
 import shutil
 
 from bluesky import io
@@ -32,6 +33,7 @@ def tarzip(fires_manager):
             logging.debug("Dir to tarzip: %s", info['output']['directory'])
             dirs_to_tarzip.add(info['output']['directory'])
     for d in dirs_to_tarzip:
-        logging.debug("tarzipping: %s", d)
-        io.create_tarball(d)
-        shutil.rmtree(d)
+        if os.path.exists(d):
+            logging.debug("tarzipping: %s", d)
+            io.create_tarball(d)
+            shutil.rmtree(d)
