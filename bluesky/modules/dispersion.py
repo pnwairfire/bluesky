@@ -46,7 +46,7 @@ def run(fires_manager):
         output_dir, working_dir = _get_dirs(fires_manager)
 
         # further validation of start and num_hours done in 'run'
-        dispersion_info = disperser.run(fires_manager.fires, start,
+        dispersion_info = disperser.run(fires_manager, start,
             num_hours, output_dir, working_dir=working_dir)
         dispersion_info.update(model=model)
         # TODO: store dispersion into in summary?

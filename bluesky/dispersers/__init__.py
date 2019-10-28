@@ -73,11 +73,11 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
     def config(self, *keys, **kwargs):
         return Config().get('dispersion', self._model, *keys, **kwargs)
 
-    def run(self, fires, start, num_hours, output_dir, working_dir=None):
+    def run(self, fires_manager, start, num_hours, output_dir, working_dir=None):
         """Runs hysplit
 
         args:
-         - fires - list of fires to run through hysplit
+         - fires_manager - FiresManager object
          - start - model run start hour
          - num_hours - number of hours in model run
          - output_dir - directory to contain output
@@ -103,12 +103,16 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         self._working_dir = working_dir and os.path.abspath(working_dir)
         # osutils.create_working_dir will create working dir if necessary
 
-        self._set_fire_data(fires)
+        self._set_fire_data(fires_manager.fires)
 
         # TODO: only merge fires if hysplit, or make it configurable ???
         self._fires = self._merge_fires(self._fires)
         # TODO: should we pop 'end' from each fire object, since it's
         #   only used in _merge_fires logic?
+
+        notes = "Filtered fires merged and processed by dispersion"
+        fires_manager.log_status('Good', 'dispersion', 'Continue',
+            number_of_locations=len(self._fires), notes=notes)
 
         with osutils.create_working_dir(working_dir=self._working_dir) as wdir:
             r = self._run(wdir)
