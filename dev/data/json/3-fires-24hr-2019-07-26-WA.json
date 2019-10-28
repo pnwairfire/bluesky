@@ -3,6 +3,12 @@
 
         {
             "id": "201907190000_201907252359_4efdfa84-223e-4df8-9b05-36452a09fd15",
+            "meta": {
+                "vsmoke": {
+                    "ws": 20,
+                    "wd": 230
+                }
+            },
             "activity": [
                 {
                     "active_areas": [
@@ -54,6 +60,12 @@
         },
         {
             "id": "201907190000_201907252359_3cfe050f-29c5-48a0-a248-bddac7e1c834",
+            "meta": {
+                "vsmoke": {
+                    "ws": 22,
+                    "wd": 220
+                }
+            },
             "activity": [
                 {
                     "active_areas": [
@@ -77,6 +89,12 @@
         },
         {
             "id": "201907190000_201907252359_aa759efe-dfe4-470b-a2f8-8d51440bede2",
+            "meta": {
+                "vsmoke": {
+                    "ws": 18,
+                    "wd": 240
+                }
+            },
             "activity": [
                 {
                     "active_areas": [
