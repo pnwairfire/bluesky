@@ -128,3 +128,6 @@
 ## 4.1.23
  - Fixed bug where tranched hysplit threads where using configuration defaults, ignoring configuration overrides specified by user
  - Fixed adhoc pardump / parinit hysplit test
+
+## 4.1.24
+ - add status log post with dispersion fire location count
