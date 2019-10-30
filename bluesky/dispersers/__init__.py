@@ -120,7 +120,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         r["output"].update({
             "directory": self._run_output_dir,
             "start_time": self._model_start.isoformat(),
-            "num_hours": self._num_hours
+            "num_hours": self._num_hours,
+            "num_fires": len(self._fires)
         })
         if self._working_dir:
             r["output"]["working_dir"] = self._working_dir
