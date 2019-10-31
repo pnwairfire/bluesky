@@ -132,11 +132,13 @@ def compute_num_processes(num_fire_sets, **tranching_config):
 ## Dummy Fires
 ##
 
-DUMMY_TIMEPROFILED_EMISSIONS_HOUR = {
-    s: 0.00001 for s in
-        ("pm2.5", "pm10", "co", "co2", "ch4",
-         "nox","nh3", "so2", "voc", "pm", "nmhc")
-}
+def dummy_timeprofiled_emissions_hour(num_hours):
+    return {
+        s: (0.00001 / num_hours) for s in
+            ("pm2.5", "pm10", "co", "co2", "ch4",
+             "nox","nh3", "so2", "voc", "pm", "nmhc")
+    }
+
 # Note: DUMMY_PLUMERISE_HOUR is slightly different than
 #    MISSING_PLUMERISE_HOUR
 # TODO: should they be the same and thus consolidated?
@@ -163,12 +165,13 @@ def generate_dummy_fire(model_start, num_hours, grid_params):
         area_fractions={}
     )
     hourly_area_fraction = 1.0 / float(num_hours)
+    hourly_timeprofiled_emissions = dummy_timeprofiled_emissions_hour(num_hours)
     for hour in range(num_hours):
         dt = model_start + datetime.timedelta(hours=hour)
         dt = dt.strftime('%Y-%m-%dT%H:%M:%S')
         f['plumerise'][dt] = DUMMY_PLUMERISE_HOUR
         f['area_fractions'][dt] =  hourly_area_fraction
-        f['timeprofiled_emissions'][dt] = DUMMY_TIMEPROFILED_EMISSIONS_HOUR
+        f['timeprofiled_emissions'][dt] = hourly_timeprofiled_emissions
 
     return f
 
