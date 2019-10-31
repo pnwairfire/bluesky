@@ -154,22 +154,24 @@ class PlumeMerger(object):
 
     def merge(self, fires):
         fire_buckets = self._bucket_fires(fires)
-        merged_fires = []:
+        merged_fires = []
         for b in fire_buckets:
             # create new fire out of all fires in the bucket
             pass
 
         return merged_fires
 
-    def _bucket_fires(self):
-        buckets = {}
+    def _bucket_fires(self, fires):
+        buckets = defaultdict(lambda: [])
         for f in fires:
             # we can assume that lat and lng are defined
             if (f.latitude >= self.swLat and f.latitude <= self.neLat
                     and f.longitude >= self.swLng and f.longitude <= self.neLng):
-                # TODO: determine grid cell and put it in that bucket
-                pass
+                latIdx = int((f.latitude - self.swLat) / self.spacing)
+                lngIdx = int((f.longitude - self.swLng) / self.spacing)
+                buckets[(latIdx, lngIdx)].append(f)
+
             # else, fire will be excluded
 
         # we don't need to know the grid cell each bucket belongs to
-        return bucket.values()
+        return list(buckets.values())

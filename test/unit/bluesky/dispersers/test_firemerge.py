@@ -2,7 +2,10 @@ import copy
 import datetime
 import uuid
 
+import pytest
+
 from bluesky.dispersers import firemerge
+from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models.fires import Fire
 
 
@@ -544,19 +547,19 @@ class TestFireMerger(object):
 class TestPlumeMergerValidateConfig(object):
 
     def test_invalid(self):
-        with raises(BlueSkyConfigurationError) as e_info:
+        with pytest.raises(BlueSkyConfigurationError) as e_info:
             firemerge.PlumeMerger({})
 
-        with raises(BlueSkyConfigurationError) as e_info:
+        with pytest.raises(BlueSkyConfigurationError) as e_info:
             firemerge.PlumeMerger({"foo": 'sdf'})
 
-        with raises(BlueSkyConfigurationError) as e_info:
+        with pytest.raises(BlueSkyConfigurationError) as e_info:
             firemerge.PlumeMerger({"grid": "sdf"})
 
-        with raises(BlueSkyConfigurationError) as e_info:
+        with pytest.raises(BlueSkyConfigurationError) as e_info:
             firemerge.PlumeMerger({"grid": {}})
 
-        with raises(BlueSkyConfigurationError) as e_info:
+        with pytest.raises(BlueSkyConfigurationError) as e_info:
             firemerge.PlumeMerger({
                 "grid": {
                     "boundary": {
@@ -584,32 +587,36 @@ class TestPlumeMergerBucketFires(object):
             "grid": {
                 "spacing": 0.5,
                 "boundary": {
-                  "sw": { "lat": 30, "lng": -110 },
-                  "ne": { "lat": 40, "lng": -120 }
+                  "sw": { "lat": 30, "lng": -120 },
+                  "ne": { "lat": 40, "lng": -110 }
                 }
             }
         }
         pm = firemerge.PlumeMerger(config)
         fires = [
-            Fire({'latitude': 32.0, 'longitude': -100}),
-            Fire({'latitude': 36.22, 'longitude': -111.1}),
-            Fire({'latitude': 32.2, 'longitude': -110}),
-            Fire({'latitude': 32.2, 'longitude': -111.2}),
-            Fire({'latitude': 36.1, 'longitude': -111.4}),
-            Fire({'latitude': 36.4, 'longitude': -111.3})
+            Fire({'id': '3', 'latitude': 32.0, 'longitude': -100}), # will be excluded
+            Fire({'id': '2', 'latitude': 36.22, 'longitude': -111.1}),
+            Fire({'id': '3', 'latitude': 32.2, 'longitude': -110}),
+            Fire({'id': '4', 'latitude': 32.2, 'longitude': -111.2}),
+            Fire({'id': '5', 'latitude': 36.1, 'longitude': -111.4}),
+            Fire({'id': '6', 'latitude': 36.4, 'longitude': -111.3})
         ]
-        expected_as_sets = [
-            set([Fire({'latitude': 32.0, 'longitude': -100})]),
-            set([Fire({'latitude': 32.2, 'longitude': -110})]),
-            set([Fire({'latitude': 32.2, 'longitude': -111.2})]),
-            set([
-                Fire({'latitude': 36.1, 'longitude': -111.4}),
-                Fire({'latitude': 36.4, 'longitude': -111.1}),
-                Fire({'latitude': 36.22, 'longitude': -111.3})
-            ])
+        expected = [
+            [
+                Fire({'id': '5', 'latitude': 36.1, 'longitude': -111.4}),
+                Fire({'id': '6', 'latitude': 36.4, 'longitude': -111.3}),
+                Fire({'id': '2', 'latitude': 36.22, 'longitude': -111.1})
+            ],
+            [Fire({'id': '4', 'latitude': 32.2, 'longitude': -111.2})],
+            [Fire({'id': '3', 'latitude': 32.2, 'longitude': -110})]
         ]
-        actual = pm.merge(fires)
-        assert [set(e) for e in actual] == expected_as_sets
+        actual = pm._bucket_fires(fires)
+        # sort to compare
+        for a in actual:
+            a.sort(key=lambda f: f.longitude)
+        actual.sort(key=lambda fl: fl[0].longitude)
+
+        assert actual == expected
 
 
 class TestPlumeMergerMerge(object):
@@ -654,7 +661,7 @@ class TestPlumeMergerMerge(object):
             "residual": 1449,
             "smoldering": 1267,
             "total": 4027
-        }
+        },
         "heat": 1000000.0
     })
 
@@ -699,6 +706,6 @@ class TestPlumeMergerMerge(object):
             "residual": 100,
             "smoldering": 50,
             "total": 400
-        }
+        },
         "heat": 2000000.0
     })
