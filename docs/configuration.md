@@ -412,7 +412,7 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 
 ##### archive
 
-- ***'config' > 'export' > 'tarzip'*** -- *optional* -- list of modules whose output directories should be tar'd and zipped and then deleted; defaults empty list
+- ***'config' > 'archive' > 'tarzip'*** -- *optional* -- list of modules whose output directories should be tar'd and zipped and then deleted; defaults empty list
 
 ##### statuslogging
 
