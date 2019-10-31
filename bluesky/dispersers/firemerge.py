@@ -79,9 +79,8 @@ class FireMerger(object):
             utc_offset=f_merged.utc_offset,
             plumerise=self._merge_hourly_data(
                 f_merged.plumerise, f.plumerise, f['start']),
-            timeprofile=self._merge_hourly_data(
-                f_merged.timeprofile, f.timeprofile, f['start']),
-            emissions=self._sum_data(f_merged.emissions, f.emissions),
+            timeprofiled_area=self._merge_hourly_data(
+                f_merged.timeprofiled_area, f.timeprofiled_area, f['start']),
             timeprofiled_emissions=self._merge_hourly_data(
                 f_merged.timeprofiled_emissions, f.timeprofiled_emissions,
                 f['start']),

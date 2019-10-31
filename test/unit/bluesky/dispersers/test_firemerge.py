@@ -68,16 +68,9 @@ class TestFireMerger(object):
             "2015-08-04T17:00:00": PLUMERISE_HOUR,
             "2015-08-04T18:00:00": EMPTY_PLUMERISE_HOUR
         },
-        "timeprofile": {
-            "2015-08-04T17:00:00": {
-                "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-            },
-            "2015-08-04T18:00:00": {
-                "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-            }
-        },
-        "emissions": {
-            "flaming": {"PM2.5": 5.0}, "residual": {"PM2.5": 10.0, 'CO': 2.0}, "smoldering": {"PM2.5": 20.0}
+        "timeprofiled_area": {
+            "2015-08-04T17:00:00": 12.0,
+            "2015-08-04T18:00:00": 0.0
         },
         "timeprofiled_emissions": {
             "2015-08-04T17:00:00": {"CO": 0.0, "PM2.5": 4.0},  # == 5.0 * 0.2 + 10.0 * 0.1 + 20.0 * 0.1
@@ -99,16 +92,9 @@ class TestFireMerger(object):
             "2015-08-04T18:00:00": PLUMERISE_HOUR,
             "2015-08-04T19:00:00": EMPTY_PLUMERISE_HOUR
         },
-        "timeprofile": {
-            "2015-08-04T18:00:00": {
-                "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-            },
-            "2015-08-04T19:00:00": {
-                "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-            }
-        },
-        "emissions": {
-            "flaming": {"PM2.5": 5.0}, "residual": {"PM2.5": 10.0}, "smoldering": {"PM2.5": 20.0}
+        "timeprofiled_area": {
+            "2015-08-04T18:00:00": 12.0,
+            "2015-08-04T19:00:00": 0.0
         },
         "timeprofiled_emissions": {
             "2015-08-04T18:00:00": {"CO": 0.0, "PM2.5": 4.0},  # == 5.0 * 0.2 + 10.0 * 0.1 + 20.0 * 0.1
@@ -130,16 +116,9 @@ class TestFireMerger(object):
             "2015-08-04T19:00:00": PLUMERISE_HOUR,
             "2015-08-04T20:00:00": EMPTY_PLUMERISE_HOUR
         },
-        "timeprofile": {
-            "2015-08-04T19:00:00": {
-                "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-            },
-            "2015-08-04T20:00:00": {
-                "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-            }
-        },
-        "emissions": {
-            "flaming": {"PM2.5": 10.0, 'CO2': 3.0}, "residual": {"PM2.5": 10.0}, "smoldering": {"PM2.5": 20.0}
+        "timeprofiled_area": {
+            "2015-08-04T19:00:00": 10.0,
+            "2015-08-04T20:00:00": 0.0
         },
         "timeprofiled_emissions": {
             "2015-08-04T19:00:00": {"CO": 0.0, "PM2.5": 5.0},  # == 10.0 * 0.2 + 10.0 * 0.1 + 20.0 * 0.1
@@ -161,16 +140,9 @@ class TestFireMerger(object):
             "2015-08-04T20:00:00": PLUMERISE_HOUR,
             "2015-08-04T21:00:00": EMPTY_PLUMERISE_HOUR
         },
-        "timeprofile": {
-            "2015-08-04T20:00:00": {
-                "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-            },
-            "2015-08-04T21:00:00": {
-                "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-            }
-        },
-        "emissions": {
-            "flaming": {"PM2.5": 5.0}, "residual": {"PM2.5": 10.0}, "smoldering": {"PM2.5": 20.0}
+        "timeprofiled_area": {
+            "2015-08-04T20:00:00": 12.0,
+            "2015-08-04T21:00:00": 0.0
         },
         "timeprofiled_emissions": {
             "2015-08-04T20:00:00": {"CO": 0.0, "PM2.5": 4.0},  # == 5.0 * 0.2 + 10.0 * 0.1 + 20.0 * 0.1
@@ -191,16 +163,9 @@ class TestFireMerger(object):
             "2015-08-04T20:00:00": PLUMERISE_HOUR,
             "2015-08-04T21:00:00": EMPTY_PLUMERISE_HOUR
         },
-        "timeprofile": {
-            "2015-08-04T20:00:00": {
-                "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-            },
-            "2015-08-04T21:00:00": {
-                "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-            }
-        },
-        "emissions": {
-            "flaming": {"PM2.5": 5.0}, "residual": {"PM2.5": 10.0}, "smoldering": {"PM2.5": 20.0}
+        "timeprofiled_area": {
+            "2015-08-04T20:00:00": 12.0,
+            "2015-08-04T21:00:00": 0.0
         },
         "timeprofiled_emissions": {
             "2015-08-04T20:00:00": {"CO": 0.0, "PM2.5": 4.0},  # == 5.0 * 0.2 + 10.0 * 0.1 + 20.0 * 0.1
@@ -221,16 +186,9 @@ class TestFireMerger(object):
             "2015-08-04T20:00:00": PLUMERISE_HOUR,
             "2015-08-04T21:00:00": EMPTY_PLUMERISE_HOUR
         },
-        "timeprofile": {
-            "2015-08-04T20:00:00": {
-                "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-            },
-            "2015-08-04T21:00:00": {
-                "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-            }
-        },
-        "emissions": {
-            "flaming": {"PM2.5": 5.0}, "residual": {"PM2.5": 10.0}, "smoldering": {"PM2.5": 20.0}
+        "timeprofiled_area": {
+            "2015-08-04T20:00:00": 12.0,
+            "2015-08-04T21:00:00": 0.0
         },
         "timeprofiled_emissions": {
             "2015-08-04T20:00:00": {"CO": 0.0, "PM2.5": 4.0},  # == 5.0 * 0.2 + 10.0 * 0.1 + 20.0 * 0.1
@@ -322,24 +280,11 @@ class TestFireMerger(object):
                     "2015-08-04T20:00:00": PLUMERISE_HOUR,
                     "2015-08-04T21:00:00": EMPTY_PLUMERISE_HOUR
                 },
-                "timeprofile": {
-                    "2015-08-04T17:00:00": {
-                        "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-                    },
-                    "2015-08-04T18:00:00": {
-                        "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-                    },
-                    "2015-08-04T20:00:00": {
-                        "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-                    },
-                    "2015-08-04T21:00:00": {
-                        "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-                    }
-                },
-                "emissions": {
-                    "flaming": {"PM2.5": 10.0},
-                    "residual": {"PM2.5": 20.0, 'CO': 2.0},
-                    "smoldering": {"PM2.5": 40.0}
+                "timeprofiled_area": {
+                    "2015-08-04T17:00:00": 12.0,
+                    "2015-08-04T18:00:00": 0.0,
+                    "2015-08-04T20:00:00": 12.0,
+                    "2015-08-04T21:00:00": 0.0
                 },
                 "timeprofiled_emissions": {
                     "2015-08-04T17:00:00": {"CO": 0.0, "PM2.5": 4.0},  # == 5.0 * 0.2 + 10.0 * 0.1 + 20.0 * 0.1
@@ -382,24 +327,11 @@ class TestFireMerger(object):
                     "2015-08-04T19:00:00": PLUMERISE_HOUR,
                     "2015-08-04T20:00:00": EMPTY_PLUMERISE_HOUR
                 },
-                "timeprofile": {
-                    "2015-08-04T17:00:00": {
-                        "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-                    },
-                    "2015-08-04T18:00:00": {
-                        "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-                    },
-                    "2015-08-04T19:00:00": {
-                        "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-                    },
-                    "2015-08-04T20:00:00": {
-                        "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-                    }
-                },
-                "emissions": {
-                    "flaming": {"PM2.5": 15.0, 'CO2': 3.0},
-                    "residual": {"PM2.5": 20.0, 'CO': 2.0},
-                    "smoldering": {"PM2.5": 40.0}
+                "timeprofiled_area": {
+                    "2015-08-04T17:00:00": 12.0,
+                    "2015-08-04T18:00:00": 0.0,
+                    "2015-08-04T19:00:00": 10.0,
+                    "2015-08-04T20:00:00": 0.0
                 },
                 "timeprofiled_emissions": {
                     "2015-08-04T17:00:00": {"CO": 0.0, "PM2.5": 4.0},  # == 5.0 * 0.2 + 10.0 * 0.1 + 20.0 * 0.1
@@ -453,24 +385,11 @@ class TestFireMerger(object):
                     "2015-08-04T19:00:00": PLUMERISE_HOUR,
                     "2015-08-04T20:00:00": EMPTY_PLUMERISE_HOUR
                 },
-                "timeprofile": {
-                    "2015-08-04T17:00:00": {
-                        "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-                    },
-                    "2015-08-04T18:00:00": {
-                        "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-                    },
-                    "2015-08-04T19:00:00": {
-                        "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-                    },
-                    "2015-08-04T20:00:00": {
-                        "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-                    }
-                },
-                "emissions": {
-                    "flaming": {"PM2.5": 15.0, 'CO2': 3.0},
-                    "residual": {"PM2.5": 20.0, 'CO': 2.0},
-                    "smoldering": {"PM2.5": 40.0}
+                "timeprofiled_area": {
+                    "2015-08-04T17:00:00": 12.0,
+                    "2015-08-04T18:00:00": 0.0,
+                    "2015-08-04T19:00:00": 10.0,
+                    "2015-08-04T20:00:00": 0.0
                 },
                 "timeprofiled_emissions": {
                     "2015-08-04T17:00:00": {"CO": 0.0, "PM2.5": 4.0},  # == 5.0 * 0.2 + 10.0 * 0.1 + 20.0 * 0.1
@@ -496,22 +415,11 @@ class TestFireMerger(object):
                     "2015-08-04T20:00:00": PLUMERISE_HOUR,
                     "2015-08-04T21:00:00": EMPTY_PLUMERISE_HOUR
                 },
-                "timeprofile": {
-                    "2015-08-04T18:00:00": {
-                        "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-                    },
-                    "2015-08-04T19:00:00": {
-                        "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-                    },
-                    "2015-08-04T20:00:00": {
-                        "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-                    },
-                    "2015-08-04T21:00:00": {
-                        "area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering": 0.0
-                    }
-                },
-                "emissions": {
-                    "flaming": {"PM2.5": 10.0}, "residual": {"PM2.5": 20.0}, "smoldering": {"PM2.5": 40.0}
+                "timeprofiled_area": {
+                    "2015-08-04T18:00:00": 12.0,
+                    "2015-08-04T19:00:00": 0.0,
+                    "2015-08-04T20:00:00": 12.0,
+                    "2015-08-04T21:00:00": 0.0
                 },
                 "timeprofiled_emissions": {
                     "2015-08-04T18:00:00": {"CO": 0.0, "PM2.5": 4.0},
@@ -645,13 +553,8 @@ class TestPlumeMergerMergeFires(object):
                 "smolder_fraction": 0.05
             }
         },
-        "timeprofile": {
-            "2015-08-04T17:00:00": {
-                "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-            }
-        },
-        "emissions": {
-            "flaming": {"PM2.5": 5.0}, "residual": {"PM2.5": 10.0, 'CO': 2.0}, "smoldering": {"PM2.5": 20.0}
+        "timeprofiled_area": {
+            "2015-08-04T17:00:00": 12.0
         },
         "timeprofiled_emissions": {
             "2015-08-04T17:00:00": {"CO": 0.0, "PM2.5": 10.0}
@@ -689,13 +592,8 @@ class TestPlumeMergerMergeFires(object):
                 "smolder_fraction": 0.05
             }
         },
-        "timeprofile": {
-            "2015-08-04T17:00:00": {
-                "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
-            }
-        },
-        "emissions": {
-            "flaming": {"PM2.5": 5.0}, "residual": {"PM2.5": 10.0}, "smoldering": {"PM2.5": 20.0}
+        "timeprofiled_area": {
+            "2015-08-04T17:00:00": 12.0
         },
         "timeprofiled_emissions": {
             "2015-08-04T17:00:00": {"CO": 0.0, "PM2.5": 4.0}
