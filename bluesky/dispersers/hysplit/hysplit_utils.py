@@ -145,7 +145,7 @@ def dummy_timeprofiled_emissions_hour(num_hours):
 # TODO: make sure these dummy plumerise values don't have unexpected consequences
 DUMMY_PLUMERISE_HOUR = dict(
     heights=[1000 + 100*n for n in range(21)],
-    emission_fractions=[0.5] * 20,
+    emission_fractions=[0.05] * 20,
     smolder_fraction=0.0
 )
 
