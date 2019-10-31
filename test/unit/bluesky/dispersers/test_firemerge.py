@@ -530,8 +530,8 @@ class TestPlumeMergerBucketFires(object):
 class TestPlumeMergerMergeFires(object):
 
     FIRE_1 =  Fire({
-        "id": "SF11C14225236095807750-0",
-        "original_fire_ids": {"SF11C14225236095807750"},
+        "id": "aaa",
+        "original_fire_ids": {"bbb"},
         "meta": {'foo': 'bar'},
         "start": datetime.datetime(2015,8,4,17,0,0),
         "end": datetime.datetime(2015,8,4,18,0,0),
@@ -557,7 +557,7 @@ class TestPlumeMergerMergeFires(object):
             "2015-08-04T17:00:00": 12.0
         },
         "timeprofiled_emissions": {
-            "2015-08-04T17:00:00": {"CO": 0.0, "PM2.5": 10.0}
+            "2015-08-04T17:00:00": {"CO": 22.0, "PM2.5": 10.0}
         },
         "consumption": {
             "flaming": 1311,
@@ -569,12 +569,12 @@ class TestPlumeMergerMergeFires(object):
     })
 
     FIRE_2 = Fire({
-        "id": "SF11C14225236095807750-0",
-        "original_fire_ids": {"SF11C14225236095807750"},
-        "meta": {'foo': 'bar'},
-        "start": datetime.datetime(2015,8,4,18,0,0),
-        "end": datetime.datetime(2015,8,4,20,0,0),
-        "area": 120.0, "latitude": 47.6, "longitude": -121.7, "utc_offset": -7.0,
+        "id": "ccc",
+        "original_fire_ids": {"ddd", "eee"},
+        "meta": {'foo': 'bar', 'bar': 'baz'},
+        "start": datetime.datetime(2015,8,4,17,0,0),
+        "end": datetime.datetime(2015,8,4,19,0,0),
+        "area": 150.0, "latitude": 47.6, "longitude": -121.7, "utc_offset": -7.0,
         "plumerise": {
             "2015-08-04T17:00:00": {
                 "emission_fractions": [
@@ -590,13 +590,28 @@ class TestPlumeMergerMergeFires(object):
                     1210,1270,1329
                 ],
                 "smolder_fraction": 0.05
+            },
+            "2015-08-04T18:00:00": {
+                "emission_fractions": [
+                    0.01,0.05,0.05,0.05,0.05,0.05,
+                    0.09,0.09,0.09,0.05,0.05,0.05,
+                    0.05,0.05,0.05,0.05,0.05,0.05,
+                    0.01,0.01
+                ],
+                "heights": [
+                    90,100,120,150,200,250,
+                    320,350,400,480,550,600,
+                    650,700,750,800,900,973,
+                    1000,1010,1100
+                ],
+                "smolder_fraction": 0.05
             }
         },
         "timeprofiled_area": {
-            "2015-08-04T17:00:00": 12.0
+            "2015-08-04T17:00:00": 20.0
         },
         "timeprofiled_emissions": {
-            "2015-08-04T17:00:00": {"CO": 0.0, "PM2.5": 4.0}
+            "2015-08-04T17:00:00": {"CO": 1.0, "PM2.5": 4.0}
         },
         "consumption": {
             "flaming": 200,
@@ -607,11 +622,35 @@ class TestPlumeMergerMergeFires(object):
         "heat": 2000000.0
     })
 
-    def test_merge_one(self):
-        pass
+    def setup(self):
+        self.merger = firemerge.PlumeMerger({
+            "grid": {
+                "spacing": 0.5,
+                "boundary": {
+                  "sw": { "lat": 30, "lng": -110 },
+                  "ne": { "lat": 40, "lng": -120 }
+                }
+            }
+        })
 
-    def test_merge_two(self):
-        pass
+    def test_merge_one(self):
+        assert FIRE_1 == self.merger._merge_fires([
+            copy.deepcopy(FIRE_1)
+        ])
+
+    def test_merge_two(self, monkeypatch):
+        monkeypatch.setattr(uuid, 'uuid4', lambda: '1234abcd')
+        expected = Fire({
+            "id": "ccc",
+            "original_fire_ids": {"bbb", "ddd", "eee"},
+            "meta": {'foo': 'bar', 'bar': 'baz'},
+            "start": datetime.datetime(2015,8,4,17,0,0),
+            "end": datetime.datetime(2015,8,4,19,0,0),
+        })
+
+        assert expected == self.merger._merge_fires([
+            copy.deepcopy(FIRE_1), copy.deepcopy(FIRE_2)
+        ])
 
     def test_merge_three(self):
         pass
