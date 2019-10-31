@@ -215,7 +215,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         emissions = self._get_emissions(loc)
         timeprofiled_emissions = self._get_timeprofiled_emissions(
             timeprofile, emissions)
-        area_fractions = {dt: e.get('area_fraction') for dt,e in timeprofile.items()}
+        timeprofiled_area = {dt: e.get('area_fraction') * loc['area'] for dt,e in timeprofile.items()}
 
         # consumption = datautils.sum_nested_data(
         #     [fb.get("consumption", {}) for fb in a['fuelbeds']], 'summary', 'total')
@@ -237,7 +237,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             utc_offset=utc_offset,
             plumerise=plumerise,
             timeprofiled_emissions=timeprofiled_emissions,
-            area_fractions=area_fractions,
+            timeprofiled_area=timeprofiled_area,
             consumption=consumption
         )
         if heat:

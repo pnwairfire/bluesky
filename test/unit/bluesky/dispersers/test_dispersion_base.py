@@ -173,8 +173,8 @@ class TestDispersionBaseSetFireData(object):
                 "2015-08-04T17:00:00": PLUMERISE_HOUR,
                 "2015-08-04T18:00:00": EMPTY_PLUMERISE_HOUR
             },
-            "area_fractions": {
-                "2015-08-04T17:00:00": 0.1,
+            "timeprofiled_area": {
+                "2015-08-04T17:00:00": 12.0,
                 "2015-08-04T18:00:00": 0.0
             },
             "timeprofiled_emissions": {
@@ -320,8 +320,8 @@ class TestDispersionBaseSetFireData(object):
                     "2015-08-04T17:00:00": PLUMERISE_HOUR,
                     "2015-08-04T18:00:00": EMPTY_PLUMERISE_HOUR
                 },
-                "area_fractions": {
-                    "2015-08-04T17:00:00": 0.1,
+                "timeprofiled_area": {
+                    "2015-08-04T17:00:00": 12.0,
                     "2015-08-04T18:00:00": 0.0
                 },
                 "timeprofiled_emissions": {
@@ -349,9 +349,9 @@ class TestDispersionBaseSetFireData(object):
                     "2015-08-04T17:00:00": EMPTY_PLUMERISE_HOUR,
                     "2015-08-04T18:00:00": PLUMERISE_HOUR
                 },
-                "area_fractions": {
+                "timeprofiled_area": {
                     "2015-08-04T17:00:00": 0.0,
-                    "2015-08-04T18:00:00": 0.1
+                    "2015-08-04T18:00:00": 12.0
                 },
                 "timeprofiled_emissions": {
                     "2015-08-04T17:00:00": {

@@ -564,16 +564,16 @@ class HYSPLITDispersion(DispersionBase):
             os.path.join(working_dir, 'ROUGLEN.ASC'))
 
     def _get_hour_data(self, dt, fire):
-        if fire.plumerise and fire.timeprofiled_emissions and fire.area_fractions:
+        if fire.plumerise and fire.timeprofiled_emissions and fire.timeprofiled_area:
             local_dt = dt + datetime.timedelta(hours=fire.utc_offset)
             # TODO: will fire.plumerise and fire.timeprofile always
             #    have string value keys
             local_dt = local_dt.strftime('%Y-%m-%dT%H:%M:%S')
             plumerise_hour = fire.plumerise.get(local_dt)
             timeprofiled_emissions_hour = fire.timeprofiled_emissions.get(local_dt)
-            area_fraction = fire.area_fractions.get(local_dt)
-            if plumerise_hour and timeprofiled_emissions_hour and area_fraction:
-                return False, plumerise_hour, timeprofiled_emissions_hour, area_fraction
+            hourly_area = fire.timeprofiled_area.get(local_dt)
+            if plumerise_hour and timeprofiled_emissions_hour and hourly_area:
+                return False, plumerise_hour, timeprofiled_emissions_hour, hourly_area
 
         return (True, hysplit_utils.DUMMY_PLUMERISE_HOUR, dict(), 0.0)
 
@@ -615,7 +615,7 @@ class HYSPLITDispersion(DispersionBase):
                     # If we don't have real data for the given timestep, we apparently need
                     # to stick in dummy records anyway (so we have the correct number of sources).
                     (dummy, plumerise_hour, timeprofiled_emissions_hour,
-                        area_fraction) = self._get_hour_data(dt, fire)
+                        hourly_area) = self._get_hour_data(dt, fire)
                     if dummy:
                         logging.debug("Fire %s has no emissions for hour %s", fire.id, hour)
                         fires_wo_emissions += 1
@@ -626,9 +626,7 @@ class HYSPLITDispersion(DispersionBase):
                     if not dummy:
                         # Extract the fraction of area burned in this timestep, and
                         # convert it from acres to square meters.
-                        # TODO: ????? WHAT TIME PROFILE VALUE TO USE ?????
-                        area = fire.area * area_fraction
-                        area_meters = area * SQUARE_METERS_PER_ACRE
+                        area_meters = hourly_area * SQUARE_METERS_PER_ACRE
 
                         smoldering_fraction = plumerise_hour['smolder_fraction']
 

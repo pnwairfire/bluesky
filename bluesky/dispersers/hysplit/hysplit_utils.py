@@ -162,15 +162,15 @@ def generate_dummy_fire(model_start, num_hours, grid_params):
         utc_offset=0, # since plumerise and timeprofile will have utc keys
         plumerise={},
         timeprofiled_emissions={},
-        area_fractions={}
+        timeprofiled_area={}
     )
-    hourly_area_fraction = 1.0 / float(num_hours)
+    hourly_area = 1.0 / float(num_hours)
     hourly_timeprofiled_emissions = dummy_timeprofiled_emissions_hour(num_hours)
     for hour in range(num_hours):
         dt = model_start + datetime.timedelta(hours=hour)
         dt = dt.strftime('%Y-%m-%dT%H:%M:%S')
         f['plumerise'][dt] = DUMMY_PLUMERISE_HOUR
-        f['area_fractions'][dt] =  hourly_area_fraction
+        f['timeprofiled_area'][dt] =  hourly_area
         f['timeprofiled_emissions'][dt] = hourly_timeprofiled_emissions
 
     return f

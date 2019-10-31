@@ -241,7 +241,7 @@ class TestGenerateDummyFire(object):
             "plumerise": {
                 "2018-11-09T00:00:00": self.EXPECTED_PLUMERISE_HOUR
             },
-            "area_fractions": {
+            "timeprofiled_area": {
                 "2018-11-09T00:00:00": 1.0,
             },
             "timeprofiled_emissions": {
@@ -275,7 +275,7 @@ class TestGenerateDummyFire(object):
                 "2018-11-09T03:00:00": self.EXPECTED_PLUMERISE_HOUR
 
             },
-            "area_fractions": {
+            "timeprofiled_area": {
                 "2018-11-09T00:00:00": 0.25,
                 "2018-11-09T01:00:00": 0.25,
                 "2018-11-09T02:00:00": 0.25,
