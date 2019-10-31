@@ -143,7 +143,7 @@ class Fips(object):
     def _get_fips(self):
         # try API and fallback to Shapefile
         url = "https://geo.fcc.gov/api/census/block/find?latitude={}&longitude={}&format=json".format(self.lat, self.lng)
-        
+
         try:
             r = requests.get(url)
             if r.status_code == 200:
@@ -165,7 +165,7 @@ class Fips(object):
     def _get_shp_data(self):
         # get counties_fips shapefile
         filename = os.path.join(os.path.dirname(__file__), 'fips', 'counties_fips.shp')
-        
+
         # load into geopandas and set CRS
         gdf = gpd.read_file(filename)
         gdf = gdf.to_crs(epsg=4326)
@@ -192,7 +192,3 @@ class Fips(object):
         self._state_name = None
         self._state_fips = data.STATEFP
         self._state_code = None
-
-
-
-    
