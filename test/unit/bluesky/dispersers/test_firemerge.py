@@ -619,9 +619,9 @@ class TestPlumeMergerBucketFires(object):
         assert actual == expected
 
 
-class TestPlumeMergerMerge(object):
+class TestPlumeMergerMergeFires(object):
 
-    fires =  Fire({
+    FIRE_1 =  Fire({
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar'},
@@ -665,8 +665,7 @@ class TestPlumeMergerMerge(object):
         "heat": 1000000.0
     })
 
-    # no conflicting meta, same location, but overlapping time window
-    FIRE_OVERLAPPING_TIME_WINDOWS = Fire({
+    FIRE_2 = Fire({
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar'},
@@ -709,3 +708,17 @@ class TestPlumeMergerMerge(object):
         },
         "heat": 2000000.0
     })
+
+    def test_merge_one(self):
+        pass
+
+    def test_merge_two(self):
+        pass
+
+    def test_merge_three(self):
+        pass
+
+
+class TestPlumeMergerMergeFires(object):
+    # TODO: add test with some fires merged and some not
+    pass

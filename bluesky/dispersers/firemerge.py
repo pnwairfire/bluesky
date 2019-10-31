@@ -157,7 +157,7 @@ class PlumeMerger(object):
         merged_fires = []
         for b in fire_buckets:
             # create new fire out of all fires in the bucket
-            pass
+            merged_fires.append(self._merge_fires(b))
 
         return merged_fires
 
@@ -175,3 +175,14 @@ class PlumeMerger(object):
 
         # we don't need to know the grid cell each bucket belongs to
         return list(buckets.values())
+
+    def _merge_fires(self, fires):
+        if len(fires) == 1:
+            return fires[0]
+
+        # TODO: handle more than one fire
+        #   - merge meta
+        #   - merge emissions
+        #   - merge timeprofile
+        #   - merge plumerise
+        #   - etc...
