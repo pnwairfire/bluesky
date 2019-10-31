@@ -677,7 +677,7 @@ class HYSPLITDispersion(DispersionBase):
                             if self._reduction_factor == 1:
                                 height_meters = (lower_height + upper_height) / 2.0  # original approach
                             else:
-                                 height_meters = upper_height # top-edge approach
+                                height_meters = upper_height # top-edge approach
                             # Total PM2.5 entrained (lofted in the plume)
                             pm25_entrained = pm25_emitted * entrainment_fraction
                             # Inject the proper fraction of the entrained PM2.5 in each quantile gap.
