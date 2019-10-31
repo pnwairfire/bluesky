@@ -164,7 +164,7 @@ class HYSPLITDispersion(DispersionBase):
         self._has_parinit = []
 
     def _required_activity_fields(self):
-        return ('timeprofile', 'plumerise')
+        return ('timeprofile', 'plumerise', 'emissions')
 
     def _run(self, wdir):
         """Runs hysplit
@@ -564,19 +564,18 @@ class HYSPLITDispersion(DispersionBase):
             os.path.join(working_dir, 'ROUGLEN.ASC'))
 
     def _get_hour_data(self, dt, fire):
-        if fire.plumerise and fire.timeprofile:
+        if fire.plumerise and fire.timeprofiled_emissions and fire.area_fractions:
             local_dt = dt + datetime.timedelta(hours=fire.utc_offset)
             # TODO: will fire.plumerise and fire.timeprofile always
             #    have string value keys
             local_dt = local_dt.strftime('%Y-%m-%dT%H:%M:%S')
             plumerise_hour = fire.plumerise.get(local_dt)
-            timeprofile_hour = fire.timeprofile.get(local_dt)
-            if plumerise_hour and timeprofile_hour:
-                return False, plumerise_hour, timeprofile_hour
+            timeprofiled_emissions_hour = fire.timeprofiled_emissions.get(local_dt)
+            area_fraction = fire.area_fractions.get(local_dt)
+            if plumerise_hour and timeprofiled_emissions_hour and area_fraction:
+                return False, plumerise_hour, timeprofiled_emissions_hour, area_fraction
 
-        return (True, hysplit_utils.DUMMY_PLUMERISE_HOUR,
-            hysplit_utils.dummy_timeprofile_hour(self._num_hours))
-
+        return (True, hysplit_utils.DUMMY_PLUMERISE_HOUR, dict(), 0.0)
 
     def _write_emissions(self, fires, emissions_file):
         # A value slightly above ground level at which to inject smoldering
@@ -615,7 +614,8 @@ class HYSPLITDispersion(DispersionBase):
 
                     # If we don't have real data for the given timestep, we apparently need
                     # to stick in dummy records anyway (so we have the correct number of sources).
-                    dummy, plumerise_hour, timeprofile_hour = self._get_hour_data(dt, fire)
+                    (dummy, plumerise_hour, timeprofiled_emissions_hour,
+                        area_fraction) = self._get_hour_data(dt, fire)
                     if dummy:
                         logging.debug("Fire %s has no emissions for hour %s", fire.id, hour)
                         fires_wo_emissions += 1
@@ -627,7 +627,7 @@ class HYSPLITDispersion(DispersionBase):
                         # Extract the fraction of area burned in this timestep, and
                         # convert it from acres to square meters.
                         # TODO: ????? WHAT TIME PROFILE VALUE TO USE ?????
-                        area = fire.area * timeprofile_hour['area_fraction']
+                        area = fire.area * area_fraction
                         area_meters = area * SQUARE_METERS_PER_ACRE
 
                         smoldering_fraction = plumerise_hour['smolder_fraction']
@@ -638,10 +638,7 @@ class HYSPLITDispersion(DispersionBase):
                         # hourly emissions by phase for this hour, and then summing
                         # the three values to get the total emissions for this hour
                         # TODO: use fire.timeprofiled_emissions[local_dt]['PM2.5']
-                        pm25_emitted = sum([
-                            timeprofile_hour[p]*fire.emissions[p].get('PM2.5', 0.0)
-                                for p in PHASES
-                        ])
+                        pm25_emitted = timeprofiled_emissions_hour.get('PM2.5', 0.0)
                         pm25_emitted *= GRAMS_PER_TON
                         # Total PM2.5 smoldering (not lofted in the plume)
                         pm25_injected = pm25_emitted * smoldering_fraction

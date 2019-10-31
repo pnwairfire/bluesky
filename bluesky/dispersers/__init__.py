@@ -39,7 +39,6 @@ BTU_TO_MW = 3414425.94972     # Btu to MW
 # Conversion factor for fire size
 SQUARE_METERS_PER_ACRE = 4046.8726
 PHASES = ['flaming', 'smoldering', 'residual']
-TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
 class SkipLocationError(Exception):
     pass
@@ -216,6 +215,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         emissions = self._get_emissions(loc)
         timeprofiled_emissions = self._get_timeprofiled_emissions(
             timeprofile, emissions)
+        area_fractions = {dt: e.get('area_fraction') for dt,e in timeprofile.items()}
 
         # consumption = datautils.sum_nested_data(
         #     [fb.get("consumption", {}) for fb in a['fuelbeds']], 'summary', 'total')
@@ -236,9 +236,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             longitude=latlng.longitude,
             utc_offset=utc_offset,
             plumerise=plumerise,
-            timeprofile=timeprofile,
-            emissions=emissions,
             timeprofiled_emissions=timeprofiled_emissions,
+            area_fractions=area_fractions,
             consumption=consumption
         )
         if heat:
