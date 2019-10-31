@@ -3,8 +3,12 @@ import datetime
 import uuid
 
 from bluesky.dispersers import firemerge
-from bluesky.models import fires
+from bluesky.models.fires import Fire
 
+
+##
+## PlumeMerge tests
+##
 
 CONSUMPTION = {
     "summary": {
@@ -48,9 +52,9 @@ EMPTY_PLUMERISE_HOUR = {
     "smolder_fraction": 0.0
 }
 
-class TestDispersionBaseMergeFires(object):
+class TestFireMerger(object):
 
-    FIRE_1 = fires.Fire({
+    FIRE_1 = Fire({
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar'},
@@ -81,7 +85,7 @@ class TestDispersionBaseMergeFires(object):
     })
 
     # no conflicting meta, same location, but overlapping time window
-    FIRE_OVERLAPPING_TIME_WINDOWS = fires.Fire({
+    FIRE_OVERLAPPING_TIME_WINDOWS = Fire({
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar'},
@@ -112,7 +116,7 @@ class TestDispersionBaseMergeFires(object):
     })
 
     # contiguous time windows, no conflicting meta, same location
-    FIRE_CONTIGUOUS_TIME_WINDOWS = fires.Fire({
+    FIRE_CONTIGUOUS_TIME_WINDOWS = Fire({
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar', 'bar': 'asdasd'},
@@ -143,7 +147,7 @@ class TestDispersionBaseMergeFires(object):
     })
 
     # non contiguous time windows, no conflicting meta, same location
-    FIRE_NON_CONTIGUOUS_TIME_WINDOWS = fires.Fire({
+    FIRE_NON_CONTIGUOUS_TIME_WINDOWS = Fire({
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'bar', 'bar': 'sdf'},
@@ -173,7 +177,7 @@ class TestDispersionBaseMergeFires(object):
         "heat": 4000000.0
     })
 
-    FIRE_CONFLICTING_META = fires.Fire({
+    FIRE_CONFLICTING_META = Fire({
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {'foo': 'baz'},
@@ -203,7 +207,7 @@ class TestDispersionBaseMergeFires(object):
         "heat": 5000000.0
     })
 
-    FIRE_DIFFERENT_LAT_LNG = fires.Fire({
+    FIRE_DIFFERENT_LAT_LNG = Fire({
         "id": "SF11C14225236095807750-0",
         "original_fire_ids": {"SF11C14225236095807750"},
         "meta": {},
@@ -302,7 +306,7 @@ class TestDispersionBaseMergeFires(object):
         merged_fires = firemerge.FireMerger().merge([self.FIRE_1, self.FIRE_NON_CONTIGUOUS_TIME_WINDOWS])
 
         expected_merged_fires = [
-            fires.Fire({
+            Fire({
                 "id": "1234abcd",
                 "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'sdf'},
@@ -362,7 +366,7 @@ class TestDispersionBaseMergeFires(object):
         merged_fires = firemerge.FireMerger().merge([self.FIRE_1, self.FIRE_CONTIGUOUS_TIME_WINDOWS])
 
         expected_merged_fires = [
-            fires.Fire({
+            Fire({
                 "id": "1234abcd",
                 "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'asdasd'},
@@ -433,7 +437,7 @@ class TestDispersionBaseMergeFires(object):
 
         expected_merged_fires = [
             # FIRE_1 merged with FIRE_CONTIGUOUS_TIME_WINDOWS
-            fires.Fire({
+            Fire({
                 "id": "1234abcd",
                 "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'asdasd'},
@@ -476,7 +480,7 @@ class TestDispersionBaseMergeFires(object):
             }),
             # FIRE_OVERLAPPING_TIME_WINDOWS merged with
             # FIRE_NON_CONTIGUOUS_TIME_WINDOWS
-            fires.Fire({
+            Fire({
                 "id": "1234abcd",
                 "original_fire_ids": {"SF11C14225236095807750"},
                 "meta": {'foo': 'bar', 'bar': 'sdf'},
@@ -531,3 +535,134 @@ class TestDispersionBaseMergeFires(object):
         assert self.FIRE_DIFFERENT_LAT_LNG == original_fire_different_lat_lng
 
         # TODO: repeat, but with fires initially in different order
+
+
+##
+## PlumeMerge tests
+##
+
+class TestPlumeMergerBucketFires(object):
+
+    def test(self):
+        config = {
+            "grid": {
+                "spacing": 0.5,
+                "boundary": {
+                  "sw": { "lat": 30, "lng": -110 },
+                  "ne": { "lat": 40, "lng": -120 }
+                }
+            }
+        }
+        pm = firemerge.PlumeMerger(config)
+        fires = [
+            Fire({'latitude': 32.0, 'longitude': -100}),
+            Fire({'latitude': 36.22, 'longitude': -111.1}),
+            Fire({'latitude': 32.2, 'longitude': -110}),
+            Fire({'latitude': 32.2, 'longitude': -111.2}),
+            Fire({'latitude': 36.1, 'longitude': -111.4}),
+            Fire({'latitude': 36.4, 'longitude': -111.3})
+        ]
+        expected_as_sets = [
+            set([Fire({'latitude': 32.0, 'longitude': -100})]),
+            set([Fire({'latitude': 32.2, 'longitude': -110})]),
+            set([Fire({'latitude': 32.2, 'longitude': -111.2})]),
+            set([
+                Fire({'latitude': 36.1, 'longitude': -111.4}),
+                Fire({'latitude': 36.4, 'longitude': -111.1}),
+                Fire({'latitude': 36.22, 'longitude': -111.3})
+            ])
+        ]
+        actual = pm.merge(fires)
+        assert [set(e) for e in actual] == expected_as_sets
+
+
+class TestPlumeMergerMerge(object):
+
+    fires =  Fire({
+        "id": "SF11C14225236095807750-0",
+        "original_fire_ids": {"SF11C14225236095807750"},
+        "meta": {'foo': 'bar'},
+        "start": datetime.datetime(2015,8,4,17,0,0),
+        "end": datetime.datetime(2015,8,4,18,0,0),
+        "area": 120.0, "latitude": 47.4, "longitude": -121.5, "utc_offset": -7.0,
+        "plumerise": {
+            "2015-08-04T17:00:00": {
+                "emission_fractions": [
+                    0.01,0.05,0.05,0.05,0.05,0.05,
+                    0.09,0.09,0.09,0.05,0.05,0.05,
+                    0.05,0.05,0.05,0.05,0.05,0.05,
+                    0.01,0.01
+                ],
+                "heights": [
+                    100,200,260,319,379,438,
+                    497,557,616,676,735,794,
+                    854,913,973,1032,1091,1151,
+                    1210,1270,1329
+                ],
+                "smolder_fraction": 0.05
+            }
+        },
+        "timeprofile": {
+            "2015-08-04T17:00:00": {
+                "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
+            }
+        },
+        "emissions": {
+            "flaming": {"PM2.5": 5.0}, "residual": {"PM2.5": 10.0, 'CO': 2.0}, "smoldering": {"PM2.5": 20.0}
+        },
+        "timeprofiled_emissions": {
+            "2015-08-04T17:00:00": {"CO": 0.0, "PM2.5": 10.0}
+        },
+        "consumption": {
+            "flaming": 1311,
+            "residual": 1449,
+            "smoldering": 1267,
+            "total": 4027
+        }
+        "heat": 1000000.0
+    })
+
+    # no conflicting meta, same location, but overlapping time window
+    FIRE_OVERLAPPING_TIME_WINDOWS = Fire({
+        "id": "SF11C14225236095807750-0",
+        "original_fire_ids": {"SF11C14225236095807750"},
+        "meta": {'foo': 'bar'},
+        "start": datetime.datetime(2015,8,4,18,0,0),
+        "end": datetime.datetime(2015,8,4,20,0,0),
+        "area": 120.0, "latitude": 47.6, "longitude": -121.7, "utc_offset": -7.0,
+        "plumerise": {
+            "2015-08-04T17:00:00": {
+                "emission_fractions": [
+                    0.01,0.05,0.05,0.05,0.05,0.05,
+                    0.09,0.09,0.09,0.05,0.05,0.05,
+                    0.05,0.05,0.05,0.05,0.05,0.05,
+                    0.01,0.01
+                ],
+                "heights": [
+                    100,200,260,319,379,438,
+                    497,557,616,676,735,794,
+                    854,913,973,1032,1091,1151,
+                    1210,1270,1329
+                ],
+                "smolder_fraction": 0.05
+            }
+        },
+        "timeprofile": {
+            "2015-08-04T17:00:00": {
+                "area_fraction": 0.1, "flaming": 0.2, "residual": 0.1, "smoldering": 0.1
+            }
+        },
+        "emissions": {
+            "flaming": {"PM2.5": 5.0}, "residual": {"PM2.5": 10.0}, "smoldering": {"PM2.5": 20.0}
+        },
+        "timeprofiled_emissions": {
+            "2015-08-04T17:00:00": {"CO": 0.0, "PM2.5": 4.0}
+        },
+        "consumption": {
+            "flaming": 200,
+            "residual": 100,
+            "smoldering": 50,
+            "total": 400
+        }
+        "heat": 2000000.0
+    })

@@ -226,6 +226,19 @@ _DEFAULTS = {
         "output_dir": None,
         "working_dir": None,
         "handle_existing": "fail",
+        "plume_merge": {
+            # As with hysplit grid configuration, below, there are no default
+            # plume merge 'grid' parameters, and the presence/absence
+            # of a grid definition (nonempty vs. empty grid dict) is used in
+            # the logic in the code. So, leave grid fields commented out
+            "grid": {
+                # "spacing": None,
+                # "boundary": {
+                #   "sw": { "lat":None, "lng": None},
+                #   "ne": { "lat":None, "lng": None}
+                # }
+            }
+        },
         "hysplit": {
             "binaries": {},
             "skip_invalid_fires": False,

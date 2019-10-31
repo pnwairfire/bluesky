@@ -118,3 +118,18 @@ class FireMerger(object):
                     summed_data[k] = data1[k] + data2[k]
 
         return summed_data
+
+
+class PlumeMerger(object):
+
+    def __init__(self, config):
+        self.config = config
+
+    def merge(self, fires):
+        if not self.config:
+            return fires
+
+        fire_buckets = self._bucket_fires(fires)
+
+    def _bucket_fires(self):
+        buckets = {}

@@ -109,6 +109,9 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         # TODO: should we pop 'end' from each fire object, since it's
         #   only used in _merge_fires logic?
 
+        self._fires = firemerge.PlumeMerger(
+            Config().get('dispersion', 'plume_merge'))
+
         notes = "Filtered fires merged and processed by dispersion"
         fires_manager.log_status('Good', 'dispersion', 'Continue',
             number_of_locations=len(self._fires), notes=notes)
