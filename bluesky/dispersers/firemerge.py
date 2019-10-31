@@ -1,8 +1,10 @@
 import itertools
 from collections import defaultdict
 
+import afconfig
 from afdatetime import parsing as datetime_parsing
 
+from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models.fires import Fire
 
 class FireMerger(object):
@@ -123,13 +125,51 @@ class FireMerger(object):
 class PlumeMerger(object):
 
     def __init__(self, config):
-        self.config = config
+        self._set_config(config)
+
+    def _set_config(self, config):
+        if config:
+            try:
+                self.spacing = afconfig.get_config_value(
+                    config, 'grid', 'spacing')
+                self.swLat = afconfig.get_config_value(
+                    config, 'grid', 'boundary', 'sw', 'lat')
+                self.swLng = afconfig.get_config_value(
+                    config, 'grid', 'boundary', 'sw', 'lng')
+                self.neLat = afconfig.get_config_value(
+                    config, 'grid', 'boundary', 'ne', 'lat')
+                self.neLng = afconfig.get_config_value(
+                    config, 'grid', 'boundary', 'ne', 'lng')
+                if (self.spacing and self.swLat and self.swLng
+                        and self.neLat and self.neLng):
+                    return
+
+            except Exception as e:
+                pass
+
+        # The config wasn't defined at all, or one of the required fields
+        # wasn't defined, or the config was otherwise invalid
+        raise BlueSkyConfigurationError(
+            "Missing or invalid plume_merge configuration")
 
     def merge(self, fires):
-        if not self.config:
-            return fires
-
         fire_buckets = self._bucket_fires(fires)
+        merged_fires = []:
+        for b in fire_buckets:
+            # create new fire out of all fires in the bucket
+            pass
+
+        return merged_fires
 
     def _bucket_fires(self):
         buckets = {}
+        for f in fires:
+            # we can assume that lat and lng are defined
+            if (f.latitude >= self.swLat and f.latitude <= self.neLat
+                    and f.longitude >= self.swLng and f.longitude <= self.neLng):
+                # TODO: determine grid cell and put it in that bucket
+                pass
+            # else, fire will be excluded
+
+        # we don't need to know the grid cell each bucket belongs to
+        return bucket.values()

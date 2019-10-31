@@ -216,6 +216,12 @@ emissions config
   - ***'config' > 'dispersion' > 'working_dir'*** -- *required* -- directory to contain working output
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
  - ***'config' > 'dispersion' > 'handle_existing'*** - *optional* -- how to handle case where output dir already exists; options: 'replace', 'write_in_place', 'fail'; defaults to 'fail'
+ - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'spacing'*** -- *optional*, but required if other plume_merge grid fields are specified --
+ - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *optional*, but required if other plume_merge grid fields are specified --
+ - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *optional*, but required if other plume_merge grid fields are specified --
+ - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *optional*, but required if other plume_merge grid fields are specified --
+ - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *optional*, but required if other plume_merge grid fields are specified --
+
 
 ###### if running hysplit dispersion:
 

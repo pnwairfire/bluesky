@@ -109,8 +109,11 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         # TODO: should we pop 'end' from each fire object, since it's
         #   only used in _merge_fires logic?
 
-        self._fires = firemerge.PlumeMerger(
-            Config().get('dispersion', 'plume_merge'))
+        pm_config = Config().get('dispersion', 'plume_merge')
+        if pm_config:
+            # TODO: make sure pm_config boundary includes all of disperion
+            #   boundary, and raise BlueSkyConfigurationError if not?
+            self._fires = firemerge.PlumeMerger(pm_config).merge(fires)
 
         notes = "Filtered fires merged and processed by dispersion"
         fires_manager.log_status('Good', 'dispersion', 'Continue',

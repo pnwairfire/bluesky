@@ -541,6 +541,42 @@ class TestFireMerger(object):
 ## PlumeMerge tests
 ##
 
+class TestPlumeMergerValidateConfig(object):
+
+    def test_invalid(self):
+        with raises(BlueSkyConfigurationError) as e_info:
+            firemerge.PlumeMerger({})
+
+        with raises(BlueSkyConfigurationError) as e_info:
+            firemerge.PlumeMerger({"foo": 'sdf'})
+
+        with raises(BlueSkyConfigurationError) as e_info:
+            firemerge.PlumeMerger({"grid": "sdf"})
+
+        with raises(BlueSkyConfigurationError) as e_info:
+            firemerge.PlumeMerger({"grid": {}})
+
+        with raises(BlueSkyConfigurationError) as e_info:
+            firemerge.PlumeMerger({
+                "grid": {
+                    "boundary": {
+                      "sw": { "lat": 30, "lng": -110 },
+                      "ne": { "lat": 40, "lng": -120 }
+                    }
+                }
+            })
+
+    def test_valid_not_empty(self):
+        firemerge.PlumeMerger({
+            "grid": {
+                "spacing": 0.5,
+                "boundary": {
+                  "sw": { "lat": 30, "lng": -110 },
+                  "ne": { "lat": 40, "lng": -120 }
+                }
+            }
+        })
+
 class TestPlumeMergerBucketFires(object):
 
     def test(self):
