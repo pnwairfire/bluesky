@@ -23,7 +23,12 @@ class BaseFireMerger(object):
                 # so that, if 'k' is in both dicts, that values will both be
                 # either numeric or dicts
                 if isinstance(data1[k], dict):
-                    summed_data[k] = self._sum_data(data1[k], data2[k])
+                    # call with BaseFireMerger._sum_data, explicitly
+                    # passing in self, so that child class' implementation
+                    # of _sum_data (if it has one, like PlumeMerger does)
+                    # isn't called
+                    summed_data[k] = BaseFireMerger._sum_data(
+                        self, data1[k], data2[k])
                 else:
                     summed_data[k] = data1[k] + data2[k]
 
@@ -195,7 +200,7 @@ class PlumeMerger(BaseFireMerger):
             # fires will get merged together.  This set of original fire
             # ids isn't currently used other than in log messages, but
             # could be used in tranching
-            original_fire_ids=set.union(*[f.original_fire_ids for f in fires]),
+            original_fire_ids=sorted(list(set.union(*[f.original_fire_ids for f in fires]))),
             meta=self._merge_meta(fires),
             # Note: we need to use f['start'] instead of f.start
             #   because the Fire model has special property 'start' that
@@ -218,8 +223,9 @@ class PlumeMerger(BaseFireMerger):
             timeprofiled_emissions=self._sum_data(fires, 'timeprofiled_emissions'),
             consumption=self._sum_data(fires, 'consumption')
         )
-        if 'heat' in f_merged or 'heat' in f:
-            new_f_merged['heat'] = f_merged.get('heat', 0.0) + f.get('heat', 0.0)
+        heat_values = [f['heat'] for f in fires if f.get('heat') is not None]
+        if heat_values:
+            new_f_merged['heat'] = sum(heat_values)
         return new_f_merged
 
     def _get_centroid(self, fires):
@@ -234,7 +240,7 @@ class PlumeMerger(BaseFireMerger):
         # TODO: how to merge possibly conflicting meta data;
         # TODO: log warning if conflicting meta
         meta = {}
-        for f in meta:
+        for f in fires:
             meta.update(f.meta)
         return meta
 
@@ -248,40 +254,58 @@ class PlumeMerger(BaseFireMerger):
         return data
 
     def _merge_plumerise(self, fires):
+        plumerise = {}
+        for dt in set.union(*[set(f['plumerise'].keys()) for f in fires]):
+            fires_with_dt = [f for f in fires
+                if dt in f.plumerise and dt in f.timeprofiled_emissions]
+            if fires_with_dt:
+                if len(fires_with_dt) == 1:
+                    # Use the plumerise data from the one fire that has
+                    # data for this hour
+                    plumerise[dt] = fires_with_dt[0].plumerise[dt]
+                else:
+                    plumerise[dt] = self._merge_plumerise_hour(fires_with_dt, dt)
+            # else, no fires have plumerise for that hour
+
+        return plumerise
+
+    def _merge_plumerise_hour(self, fires, dt):
         # TODO: make sure all fires have the same number of plume heights
         #   and abort if not
-        num_heights = len(list(fires[0].plumerise.values())[0]['heights'])
-        plumerise = {}
-        import pdb;pdb.set_trace()
-        for dt in set.union(*[set(f['plumerise'].keys()) for f in fires]):
-            (levels, min_height, max_height, weighted_smolder_fraction,
-                total_pm25) = self._aggregate_plumerise_hour(fires, dt)
+        num_heights = len(fires[0].plumerise[dt]['heights'])
 
-            import pdb;pdb.set_trace()
-            smolder_fraction = (weighted_smolder_fraction and
-                (weighted_smolder_fraction / total_pm25))
-            # TODO: handle levels == []   (and min_height=1000000 and max_height = 0)
+        (levels, min_height, max_height, weighted_smolder_fraction,
+            total_pm25) = self._aggregate_plumerise_hour(fires, dt)
 
-            total_height_diff = max_height - min_height
-            bucketed_levels = [[]] * (num_heights - 1)
+        smolder_fraction = (weighted_smolder_fraction and
+            (weighted_smolder_fraction / total_pm25))
 
-            for l in levels:
-                idx = int( (l[0] - min_height) / total_height_diff)
-                bucketed_levels[idx].append(l)
+        # TODO: handle levels == []   (and min_height=1000000 and max_height = 0)
 
-            diff_between_heights = total_height_diff / (num_heights - 1)
-            plumerise[dt] = {
-                "emission_fractions": [],
-                "heights": [
-                    min_height + (diff_between_heights * i) for i in num_heights
-                ],
-                "smolder_fraction": smolder_fraction
-            }
-            for b in bucketed_levels:
-                import pdb;pdb.set_trace()
-                plumerise[dt]['emission_fractions'].append(...)
+        total_height_diff = max_height - min_height
+        height_bucket_height = total_height_diff / (num_heights-1)
+        bucketed_levels = [[] for i in range(num_heights-1)]
+        for l in levels:
+            idx = int( (l[0] - min_height) / height_bucket_height)
+            # the following should only happen if l[0] equals the max
+            # height, and that should only happen if the last two height
+            # values are the same (which I don't think should happen)
+            idx = min(idx, len(bucketed_levels)-1)
+            bucketed_levels[idx].append(l)
 
-            # TODO: Normalize emissions_fractions
+        diff_between_heights = total_height_diff / (num_heights - 1)
+        plumerise_hour = {
+            "emission_fractions": [],
+            "heights": [
+                min_height + (diff_between_heights * i) for i in range(num_heights)
+            ],
+            "smolder_fraction": smolder_fraction
+        }
+        for b in bucketed_levels:
+            fraction = sum([l[1] for l in b]) / total_pm25
+            plumerise_hour['emission_fractions'].append(fraction)
+
+        return plumerise_hour
 
     def _aggregate_plumerise_hour(self, fires, dt):
         levels = []
