@@ -225,7 +225,7 @@ class PlumeMerger(BaseFireMerger):
     def _get_centroid(self, fires):
         points = [{
             'lng': float(f.longitude),
-            'lat':float(p.latitude)
+            'lat':float(f.latitude)
         } for f in fires]
 
         return locationutils.LatLng({'specified_points': points})
