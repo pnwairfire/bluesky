@@ -250,28 +250,71 @@ class PlumeMerger(BaseFireMerger):
     def _merge_plumerise(self, fires):
         # TODO: make sure all fires have the same number of plume heights
         #   and abort if not
-        num_heights = len(fires[0].plumerise.values()[0]['heights'])
+        num_heights = len(list(fires[0].plumerise.values())[0]['heights'])
         plumerise = {}
-        for dt in set.union([list(f['plumerise'].keys()) for f in fires]):
-            levels = []
-            for f in fires:
-                if dt in f.plumerise and dt in f.timeprofiled_emissions:
-                    for i in range(len(f.plumerise[dt]['heights'])):
+        import pdb;pdb.set_trace()
+        for dt in set.union(*[set(f['plumerise'].keys()) for f in fires]):
+            (levels, min_height, max_height, weighted_smolder_fraction,
+                total_pm25) = self._aggregate_plumerise_hour(fires, dt)
 
-                        pm25 = f.timeprofiled_emissions[dt].get('PM2.5')
-                        # weight the fractions based on PM2.5 emissions levels
-                        levels.extend(
-                            (f.plumerise[dt]['heights'][i],
-                                f.plumerise[dt]['emission_fractions'][i] * pm25)
-                        )
+            import pdb;pdb.set_trace()
+            smolder_fraction = (weighted_smolder_fraction and
+                (weighted_smolder_fraction / total_pm25))
+            # TODO: handle levels == []   (and min_height=1000000 and max_height = 0)
 
-            # sort by height
-            levels.sort(key=lambda e: e[0])
-            min_height = levels[0][0]
-            max_height = levels[-1][0]
-            height_diff = max_height - min_height
-            bucketed_levels = [[]] * num_heights
+            total_height_diff = max_height - min_height
+            bucketed_levels = [[]] * (num_heights - 1)
+
             for l in levels:
-                idx = int( () / height_diff)
-            # TODO: combine
-            # TODO: Normalize emissions_factors
+                idx = int( (l[0] - min_height) / total_height_diff)
+                bucketed_levels[idx].append(l)
+
+            diff_between_heights = total_height_diff / (num_heights - 1)
+            plumerise[dt] = {
+                "emission_fractions": [],
+                "heights": [
+                    min_height + (diff_between_heights * i) for i in num_heights
+                ],
+                "smolder_fraction": smolder_fraction
+            }
+            for b in bucketed_levels:
+                import pdb;pdb.set_trace()
+                plumerise[dt]['emission_fractions'].append(...)
+
+            # TODO: Normalize emissions_fractions
+
+    def _aggregate_plumerise_hour(self, fires, dt):
+        levels = []
+        min_height = 1000000 # will never be even close
+        max_height = 0
+        weighted_smolder_fraction = 0
+        total_pm25 = 0
+        for f in fires:
+            if dt in f.plumerise and dt in f.timeprofiled_emissions:
+                min_height = min(min_height, f.plumerise[dt]['heights'][0])
+                max_height = max(max_height, f.plumerise[dt]['heights'][-1])
+                # There are N + 1 heights and N emission fractions, so
+                # we'll asociate each emission fraciton with the mid
+                # point between the two associated heights
+                height_midpoints = self._get_height_midpoints(
+                    f.plumerise[dt]['heights'])
+                pm25 = f.timeprofiled_emissions[dt].get('PM2.5')
+                total_pm25 += pm25
+                weighted_smolder_fraction += f.plumerise[dt]['smolder_fraction'] * pm25
+
+                # weight the fractions based on PM2.5 emissions levels
+                levels.extend(list(zip(
+                    height_midpoints,
+                    [e*pm25 for e in f.plumerise[dt]['emission_fractions']]
+                )))
+
+        # sort by height midpoints
+        levels.sort(key=lambda e: e[0])
+
+        return levels, min_height, max_height, weighted_smolder_fraction, total_pm25
+
+    def _get_height_midpoints(self, heights):
+        return [
+            (heights[i] + heights[i+1]) / 2
+                for i in range(len(heights) - 1)
+        ]
