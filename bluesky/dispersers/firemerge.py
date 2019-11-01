@@ -1,4 +1,5 @@
 import itertools
+import logging
 from collections import defaultdict
 
 import afconfig
@@ -32,6 +33,7 @@ class BaseFireMerger(oject):
 class FireMerger(BaseFireMerger):
 
     def merge(self, fires):
+        logging.debug("Merging fires with same lat,lng")
         fires_by_lat_lng = defaultdict(lambda: [])
         for f in sorted(fires, key=lambda f: f['start']):
             key = (f.latitude, f.longitude)
@@ -157,6 +159,7 @@ class PlumeMerger(BaseFireMerger):
             "Missing or invalid plume_merge configuration")
 
     def merge(self, fires):
+        logging.debug("Merging fires plumes by grid cell")
         fire_buckets = self._bucket_fires(fires)
         merged_fires = []
         for b in fire_buckets:
