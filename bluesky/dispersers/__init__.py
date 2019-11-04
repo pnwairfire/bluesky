@@ -112,7 +112,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         if pm_config:
             # TODO: make sure pm_config boundary includes all of disperion
             #   boundary, and raise BlueSkyConfigurationError if not?
-            self._fires = firemerge.PlumeMerger(pm_config).merge(fires)
+            self._fires = firemerge.PlumeMerger(pm_config).merge(self._fires)
 
         notes = "Filtered fires merged and processed by dispersion"
         fires_manager.log_status('Good', 'dispersion', 'Continue',
