@@ -136,3 +136,6 @@
  - Support replacing '{run_id}' in log file name
  - Add option to merge fires (i.e. modeled plumes) by configured grid cell in despersion module
  - other minor updates
+
+## 4.1.26
+ - Updated bsp-run-info to include count of plumes modeled in dispersion
