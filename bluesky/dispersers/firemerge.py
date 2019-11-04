@@ -1,3 +1,4 @@
+import copy
 import itertools
 import logging
 import uuid
@@ -282,10 +283,18 @@ class PlumeMerger(BaseFireMerger):
         (levels, min_height, max_height, weighted_smolder_fraction,
             total_pm25) = self._aggregate_plumerise_hour(fires, dt)
 
+        # The following handles:
+        #    - levels == [] (and min_height=1000000 and max_height = 0)
+        #    - min_height == max_height == 0  (i.e. all heights were zero)
+        if max_height == 0:
+            # It doesn't matter what fractions we use, so just return
+            # first fire's
+            return copy.deepcopy(fires[0].plumerise[dt])
+
+        # this will never divide by zero; if total_pm25 is zero, so is
+        # weighted_smolder_fraction
         smolder_fraction = (weighted_smolder_fraction and
             (weighted_smolder_fraction / total_pm25))
-
-        # TODO: handle levels == []   (and min_height=1000000 and max_height = 0)
 
         total_height_diff = max_height - min_height
         height_bucket_height = total_height_diff / (num_heights-1)
