@@ -1,5 +1,6 @@
 import itertools
 import logging
+import uuid
 from collections import defaultdict
 
 import afconfig
@@ -182,8 +183,10 @@ class PlumeMerger(BaseFireMerger):
                 latIdx = int((f.latitude - self.swLat) / self.spacing)
                 lngIdx = int((f.longitude - self.swLng) / self.spacing)
                 buckets[(latIdx, lngIdx)].append(f)
+            else:
+                # just put fire in it's own bucket
+                buckets[str(uuid.uuid4())].append(f)
 
-            # else, fire will be excluded
 
         # we don't need to know the grid cell each bucket belongs to
         return list(buckets.values())
@@ -191,6 +194,8 @@ class PlumeMerger(BaseFireMerger):
     def _merge_fires(self, fires):
         if len(fires) == 1:
             return fires[0]
+
+        logging.debug("Merging plumes of %s fires in for hysplit", len(fires))
 
         latLng = self._get_centroid(fires)
 

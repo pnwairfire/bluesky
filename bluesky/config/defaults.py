@@ -233,6 +233,7 @@ _DEFAULTS = {
         "plume_merge": {
             # "grid": {
             #     "spacing": None,
+            #     # the region within which to merge plumes
             #     "boundary": {
             #         "sw": { "lat":None, "lng": None},
             #         "ne": { "lat":None, "lng": None}

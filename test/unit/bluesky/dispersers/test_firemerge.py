@@ -485,8 +485,8 @@ class TestPlumeMerger_ValidateConfig(BaseTestPlumeMerger):
             firemerge.PlumeMerger({
                 "grid": {
                     "boundary": {
-                      "sw": { "lat": 30, "lng": -110 },
-                      "ne": { "lat": 40, "lng": -120 }
+                      "sw": { "lat": 30, "lng": -120 },
+                      "ne": { "lat": 40, "lng": -110 }
                     }
                 }
             })
@@ -496,8 +496,8 @@ class TestPlumeMerger_ValidateConfig(BaseTestPlumeMerger):
             "grid": {
                 "spacing": 0.5,
                 "boundary": {
-                  "sw": { "lat": 30, "lng": -110 },
-                  "ne": { "lat": 40, "lng": -120 }
+                  "sw": { "lat": 30, "lng": -120 },
+                  "ne": { "lat": 40, "lng": -110 }
                 }
             }
         })
@@ -507,7 +507,11 @@ class TestPlumeMerger_HelperMethods(BaseTestPlumeMerger):
 
     def test_bucket_fires(self):
         fires = [
-            Fire({'id': '3', 'latitude': 32.0, 'longitude': -100}), # will be excluded
+            # The following two fires will be in their own buckets, even
+            # though they're within what would be a grid cell, because they're
+            # outside the merging boundary
+            Fire({'id': '1', 'latitude': 32.1, 'longitude': -100.1}),
+            Fire({'id': '1.5', 'latitude': 32.2, 'longitude': -100.2}),
             Fire({'id': '2', 'latitude': 36.22, 'longitude': -111.1}),
             Fire({'id': '3', 'latitude': 32.2, 'longitude': -110}),
             Fire({'id': '4', 'latitude': 32.2, 'longitude': -111.2}),
@@ -521,7 +525,9 @@ class TestPlumeMerger_HelperMethods(BaseTestPlumeMerger):
                 Fire({'id': '2', 'latitude': 36.22, 'longitude': -111.1})
             ],
             [Fire({'id': '4', 'latitude': 32.2, 'longitude': -111.2})],
-            [Fire({'id': '3', 'latitude': 32.2, 'longitude': -110})]
+            [Fire({'id': '3', 'latitude': 32.2, 'longitude': -110})],
+            [Fire({'id': '1.5', 'latitude': 32.2, 'longitude': -100.2})],
+            [Fire({'id': '1', 'latitude': 32.1, 'longitude': -100.1})]
         ]
         actual = self.merger._bucket_fires(fires)
         # sort to compare
