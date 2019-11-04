@@ -30,6 +30,12 @@ def count(fires_manager):
     print("Fire counts")
     print("  Fires: {}".format(fires_manager.num_fires))
     print("  Locations: {}".format(fires_manager.num_locations))
+    try:
+        dispersion_plumes = fires_manager.dispersion['output']['num_fires']
+        print("  Dispersion Plumes Modeled: {}".format(dispersion_plumes))
+    except:
+        # must not have run dispersion
+        pass
 
 def runtime(fires_manager):
     print("Runtime")
