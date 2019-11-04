@@ -131,3 +131,8 @@
 
 ## 4.1.24
  - add status log post with dispersion fire location count
+
+## 4.1.25
+ - Support replacing '{run_id}' in log file name
+ - Add option to merge fires (i.e. modeled plumes) by configured grid cell in despersion module
+ - other minor updates
