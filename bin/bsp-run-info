@@ -26,13 +26,19 @@ def parse_args():
     parser.formatter_class = argparse.RawTextHelpFormatter
     return parser.parse_args()
 
+def underscore_to_cap(k):
+    return ' '.join([e.capitalize() for e in k.split('_')])
+
 def count(fires_manager):
     print("Fire counts")
     print("  Fires: {}".format(fires_manager.num_fires))
     print("  Locations: {}".format(fires_manager.num_locations))
     try:
-        dispersion_plumes = fires_manager.dispersion['output']['num_fires']
-        print("  Dispersion Plumes Modeled: {}".format(dispersion_plumes))
+        dispersion_counts = fires_manager.dispersion.get('counts')
+        if dispersion_counts:
+            print("Dispersion counts")
+            for k, v in dispersion_counts.items():
+                print("  {}: {}".format(underscore_to_cap(k), v))
     except:
         # must not have run dispersion
         pass
