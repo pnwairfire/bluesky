@@ -101,12 +101,15 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         self._working_dir = working_dir and os.path.abspath(working_dir)
         # osutils.create_working_dir will create working dir if necessary
 
+        counts = {'fires': len(fires_manager.fires)}
         self._set_fire_data(fires_manager.fires)
+        counts['locations'] = len(self._fires)
 
         # TODO: only merge fires if hysplit, or make it configurable ???
         self._fires = firemerge.FireMerger().merge(self._fires)
         # TODO: should we pop 'end' from each fire object, since it's
         #   only used in _merge_fires logic?
+        counts['distinct_locations'] = len(self._fires)
 
         pm_config = Config().get('dispersion', 'plume_merge')
         if pm_config:
@@ -114,18 +117,19 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             #   boundary, and raise BlueSkyConfigurationError if not?
             self._fires = firemerge.PlumeMerger(pm_config).merge(self._fires)
 
-        notes = "Filtered fires merged and processed by dispersion"
+        counts['plumes'] = len(self._fires)
+        notes = "Plumes to be modeled by dispersion"
         fires_manager.log_status('Good', 'dispersion', 'Continue',
-            number_of_locations=len(self._fires), notes=notes)
+            number_of_locations=counts['plumes'], notes=notes)
 
         with osutils.create_working_dir(working_dir=self._working_dir) as wdir:
             r = self._run(wdir)
 
+        r["counts"] = counts
         r["output"].update({
             "directory": self._run_output_dir,
             "start_time": self._model_start.isoformat(),
-            "num_hours": self._num_hours,
-            "num_fires": len(self._fires)
+            "num_hours": self._num_hours
         })
         if self._working_dir:
             r["output"]["working_dir"] = self._working_dir
