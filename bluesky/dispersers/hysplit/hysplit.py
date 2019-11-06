@@ -543,7 +543,7 @@ class HYSPLITDispersion(DispersionBase):
             # Archive data files
             for f in message_files:
                 self._archive_file(f, tranche_num=tranche_num)
-            if self.config("MAKE_INIT_FILE"):
+            if self.config("MAKE_INIT_FILE") and self.config('archive_pardump_files'):
                 for f in pardumpFiles:
                     self._archive_file(f, tranche_num=tranche_num)
                     #shutil.copy2(os.path.join(working_dir, f), self._run_output_dir)

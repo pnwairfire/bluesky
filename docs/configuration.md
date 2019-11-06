@@ -236,7 +236,8 @@ emissions config
  - ***'config' > 'dispersion' > 'hysplit' > 'GRID_LENGTH'***
  - ***'config' > 'dispersion' > 'hysplit' > 'CONVERT_HYSPLIT2NETCDF'*** -- *optional* -- default: true
  - ***'config' > 'dispersion' > 'hysplit' > 'output_file_name'*** -- *optional* -- default: 'hysplit_conc.nc'
- - ***'config' > 'dispersion' > 'hysplit' > 'archive_tranche_files'*** -- *optional* -- default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'archive_tranche_files'*** -- *optional* -- copy hysplit input and output files for tranched runs from working dir to output dir; default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'archive_pardump_files'*** -- *optional* -- copy hysplit pardump files to output dir; default: false
 
 
  ####### Config settings adopted from BlueSky Framework
