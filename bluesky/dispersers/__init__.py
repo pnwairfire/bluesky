@@ -320,8 +320,11 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         archived_filename = os.path.basename(filename)
         if suffix:
             filename_parts = archived_filename.split('.')
-            archived_filename = "{}_{}.{}".format(
-                '.'.join(filename_parts[:-1]), suffix, filename_parts[-1])
+            if len(filename_parts) == 1:
+                archived_filename = "{}_{}".format(archived_filename, suffix)
+            else:
+                archived_filename = "{}_{}.{}".format(
+                    '.'.join(filename_parts[:-1]), suffix, filename_parts[-1])
         archived_filename = os.path.join(self._run_output_dir, archived_filename)
 
         if src_dir:
