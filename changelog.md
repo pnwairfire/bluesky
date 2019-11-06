@@ -139,3 +139,12 @@
 
 ## 4.1.26
  - Updated bsp-run-info to include count of plumes modeled in dispersion
+
+## 4.1.27
+ - Modify and add to dispersion module's reporting on fire, location, and plume counts
+ - Update bsp-run-info to list dispersion fire, location, and plume counts
+ - Copy combined hysplit_conc.nc from working dir to output dir for tranched runs; this fixes a bug where only the last processed tranche's output file was being incorporated into KML and dispersion images
+ - Only archive tranched hysplit files if configured to do so and use tranche_num as the archived file suffix
+ - Fixed bug in adding suffix to archived dispersion files lacking file extension
+ - Fixed bug in dispersion file archiving logic where 0 wasn't recognized as a valid, defined suffix
+ - Only archive hysplit pardump files if configured to do so
