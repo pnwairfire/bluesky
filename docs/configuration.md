@@ -236,6 +236,7 @@ emissions config
  - ***'config' > 'dispersion' > 'hysplit' > 'GRID_LENGTH'***
  - ***'config' > 'dispersion' > 'hysplit' > 'CONVERT_HYSPLIT2NETCDF'*** -- *optional* -- default: true
  - ***'config' > 'dispersion' > 'hysplit' > 'output_file_name'*** -- *optional* -- default: 'hysplit_conc.nc'
+ - ***'config' > 'dispersion' > 'hysplit' > 'archive_tranche_files'*** -- *optional* -- default: false
 
 
  ####### Config settings adopted from BlueSky Framework

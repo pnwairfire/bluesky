@@ -402,7 +402,7 @@ class HYSPLITDispersion(DispersionBase):
         # properties in self.run so that they don't have to be passed into
         # each call to _run_process.
         # The only things that change from call to call are working_dir,
-        # fires, and tranch_num
+        # fires, and tranche_num
         self._create_sym_links_for_process(working_dir)
 
         emissions_file = os.path.join(working_dir, "EMISS.CFG")
@@ -516,7 +516,7 @@ class HYSPLITDispersion(DispersionBase):
             if not os.path.exists(output_conc_file):
                 msg = "HYSPLIT failed, check MESSAGE file for details"
                 raise AssertionError(msg)
-            self._archive_file(output_conc_file)
+            self._archive_file(output_conc_file, tranche_num=tranche_num)
 
             if self.config('CONVERT_HYSPLIT2NETCDF'):
                 logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (output_conc_file, output_file))
@@ -532,21 +532,28 @@ class HYSPLITDispersion(DispersionBase):
                 if not os.path.exists(output_file):
                     msg = "Unable to convert HYSPLIT concentration file to NetCDF format"
                     raise AssertionError(msg)
-            self._archive_file(output_file)
+            self._archive_file(output_file, tranche_num=tranche_num)
 
         finally:
             # Archive input files
-            self._archive_file(emissions_file)
-            self._archive_file(control_file)
-            self._archive_file(setup_file)
+            self._archive_file(emissions_file, tranche_num=tranche_num)
+            self._archive_file(control_file, tranche_num=tranche_num)
+            self._archive_file(setup_file, tranche_num=tranche_num)
 
             # Archive data files
             for f in message_files:
-                self._archive_file(f)
+                self._archive_file(f, tranche_num=tranche_num)
             if self.config("MAKE_INIT_FILE"):
                 for f in pardumpFiles:
-                    self._archive_file(f)
+                    self._archive_file(f, tranche_num=tranche_num)
                     #shutil.copy2(os.path.join(working_dir, f), self._run_output_dir)
+
+    def _archive_file(self, filename, tranche_num=None):
+        if tranche_num is None:
+            super()._archive_file(filename)
+        # Only archive tranched files if configured to do so
+        elif self.config('archive_tranche_files'):
+            super()._archive_file(filename, suffix=tranche_num)
 
     def _create_sym_links_for_process(self, working_dir):
         for f in self._met_info['files']:

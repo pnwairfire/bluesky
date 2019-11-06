@@ -19,7 +19,7 @@ from bluesky.config import Config
 
 __all__ = [
     'create_fire_sets', 'create_fire_tranches'
-    ]
+]
 
 
 def config(*keys):

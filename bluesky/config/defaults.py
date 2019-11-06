@@ -303,6 +303,8 @@ _DEFAULTS = {
 
             ## Other
 
+            "archive_tranche_files": False,
+
             "CONVERT_HYSPLIT2NETCDF": True,
             "output_file_name": "hysplit_conc.nc",
 
