@@ -318,7 +318,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
     def _archive_file(self, filename, src_dir=None, suffix=None):
         archived_filename = os.path.basename(filename)
-        if suffix:
+        if suffix is not None:
             filename_parts = archived_filename.split('.')
             if len(filename_parts) == 1:
                 archived_filename = "{}_{}".format(archived_filename, suffix)
