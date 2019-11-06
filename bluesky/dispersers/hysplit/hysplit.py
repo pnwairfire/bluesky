@@ -387,6 +387,7 @@ class HYSPLITDispersion(DispersionBase):
         ncks_args.append("0/%s" % (self._output_file_name))
         ncks_args.append(output_file)
         self._execute(self.BINARIES['NCKS'], *ncks_args, working_dir=working_dir)
+        self._archive_file(output_file)
 
     def _create_sym_link(self, dest, link):
         try:
