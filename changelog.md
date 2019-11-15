@@ -148,3 +148,6 @@
  - Fixed bug in adding suffix to archived dispersion files lacking file extension
  - Fixed bug in dispersion file archiving logic where 0 wasn't recognized as a valid, defined suffix
  - Only archive hysplit pardump files if configured to do so
+
+## 4.1.28
+ - Fixed two FIPS bugs
