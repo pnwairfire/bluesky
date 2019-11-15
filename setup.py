@@ -40,7 +40,8 @@ setup(
         'bluesky': [
             'dispersers/hysplit/bdyfiles/*',
             'dispersers/vsmoke/images/*',
-            'ecoregion/data/*'
+            'ecoregion/data/*',
+            'fips/*'
         ]
     },
     url='https://github.com/pnwairfire/bluesky',

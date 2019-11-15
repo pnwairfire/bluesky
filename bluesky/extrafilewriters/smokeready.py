@@ -241,10 +241,12 @@ class SmokeReadyWriter(object):
     num_of_fires = 0
     skip_no_emiss = 0
     skip_no_plume = 0
+    skip_bad_fips = 0
     total_skipped = 0
 
     for fire_info in fires_info:
       for fire_loc in fire_info.locations:
+        num_of_fires += 1
         if "emissions" not in fire_loc.keys():
           skip_no_emiss += 1
           total_skipped += 1
@@ -262,6 +264,8 @@ class SmokeReadyWriter(object):
           cyid, stid = self._get_state_county_fips(lat, lng)
         except ValueError:
           print("Invalid Lat:%s and/or Invalid Lng:%s" % (lat, lng))
+          skip_bad_fips += 1
+          total_skipped += 1
           continue
 
         scc = self._map_scc(fire_info.type)
@@ -307,8 +311,6 @@ class SmokeReadyWriter(object):
 
           date = start_dt.strftime('%m/%d/%y')  # Date
           
-        
-
           EMISSIONS_MAPPING = [('PM2_5', "pm2.5"),
                               ('PM10', "pm10"),
                               ('CO', "co"),
@@ -505,6 +507,7 @@ class SmokeReadyWriter(object):
     if self._write_ptday_file:
       ptday.close()
     pthour.close()
+    logging.debug("SmokeReady Process Complete.\n#FIRES:{}\n#SKIPPED:{}\n#NO EMISS:{}\n#NO PLUME:{}\n#BAD FIPS:{}".format(num_of_fires,total_skipped,skip_no_emiss,skip_no_plume,skip_bad_fips))
 
   def _get_state_county_fips(self, lat, lng):
     """
@@ -525,8 +528,8 @@ class SmokeReadyWriter(object):
         CMAS FIPS = '54104'
     """
     fips = locationutils.Fips(lat, lng)
-    cyid = fips.county_fips.lstrip(fips.state_fips)
-    stid = fips.state_fips.lstrip('0')
+    cyid = fips.county_fips[2:].lstrip('0')
+    stid = f2.state_fips.lstrip('0')
     return cyid, stid
 
   def _map_scc(self, fire_type):
