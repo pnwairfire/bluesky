@@ -6,6 +6,7 @@ import datetime
 import time
 
 from py.test import raises
+from numpy.testing import assert_approx_equal
 
 from bluesky.config import Config
 from bluesky.dispersers.hysplit import hysplit_utils
@@ -187,34 +188,37 @@ class TestComputeNumProcesses(object):
 ## Dummy Fires
 ##
 
-class TestDummyTimeprofileHour(object):
+class TestDummyTimeprofiledEmissionsHour(object):
 
     def test_one_hour(self, reset_config):
         expected = {
-            "area_fraction": 1.0,
-            'flaming': 1.0,
-            'smoldering': 1.0,
-            'residual': 1.0
+            "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
+            "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
+            "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
+            "pm": 0.00001, "nmhc": 0.00001
         }
-        assert expected == hysplit_utils.dummy_timeprofile_hour(1)
+        assert expected == hysplit_utils.dummy_timeprofiled_emissions_hour(1)
 
     def test_ten_hours(self, reset_config):
         expected = {
-            "area_fraction": 0.1,
-            'flaming': 0.1,
-            'smoldering': 0.1,
-            'residual': 0.1
+            "pm2.5": 0.000001, "pm10": 0.000001, "co": 0.000001,
+            "co2": 0.000001, "ch4": 0.000001, "nox": 0.000001,
+            "nh3": 0.000001, "so2": 0.000001, "voc": 0.000001,
+            "pm": 0.000001, "nmhc": 0.000001
         }
-        assert expected == hysplit_utils.dummy_timeprofile_hour(10)
+        actual = hysplit_utils.dummy_timeprofiled_emissions_hour(10)
+        assert set(expected.keys()) == set(actual.keys())
+        for k in expected:
+            assert_approx_equal(expected[k], actual[k])
 
 class TestGenerateDummyFire(object):
 
     EXPECTED_PLUMERISE_HOUR = {
         'emission_fractions': [
-            0.5,0.5,0.5,0.5,0.5,
-            0.5,0.5,0.5,0.5,0.5,
-            0.5,0.5,0.5,0.5,0.5,
-            0.5,0.5,0.5,0.5,0.5
+            0.05, 0.05, 0.05, 0.05, 0.05,
+            0.05, 0.05, 0.05, 0.05, 0.05,
+            0.05, 0.05, 0.05, 0.05, 0.05,
+            0.05, 0.05, 0.05, 0.05, 0.05
         ],
         'heights': [
             1000,1100,1200,1300,1400,
@@ -237,28 +241,11 @@ class TestGenerateDummyFire(object):
             "plumerise": {
                 "2018-11-09T00:00:00": self.EXPECTED_PLUMERISE_HOUR
             },
-            "timeprofile": {
-                "2018-11-09T00:00:00": {
-                    "area_fraction": 1.0,
-                    'flaming': 1.0,
-                    'smoldering': 1.0,
-                    'residual': 1.0
-                }
+            "timeprofiled_area": {
+                "2018-11-09T00:00:00": 1.0,
             },
-            "emissions": {
-                "flaming": {
-                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
-                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
-                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
-                    "pm": 0.00001, "nmhc": 0.00001
-                },
-                "smoldering": {
-                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
-                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
-                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
-                    "pm": 0.00001, "nmhc": 0.00001
-                },
-                "residual": {
+            "timeprofiled_emissions": {
+                "2018-11-09T00:00:00": {
                     "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
                     "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
                     "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
@@ -288,42 +275,36 @@ class TestGenerateDummyFire(object):
                 "2018-11-09T03:00:00": self.EXPECTED_PLUMERISE_HOUR
 
             },
-            "timeprofile": {
-                "2018-11-09T00:00:00": {
-                    "area_fraction": 0.25, 'flaming': 0.25,
-                    'smoldering': 0.25, 'residual': 0.25
-                },
-                "2018-11-09T01:00:00": {
-                    "area_fraction": 0.25, 'flaming': 0.25,
-                    'smoldering': 0.25, 'residual': 0.25
-                },
-                "2018-11-09T02:00:00": {
-                    "area_fraction": 0.25, 'flaming': 0.25,
-                    'smoldering': 0.25, 'residual': 0.25
-                },
-                "2018-11-09T03:00:00": {
-                    "area_fraction": 0.25, 'flaming': 0.25,
-                    'smoldering': 0.25, 'residual': 0.25
-                }
+            "timeprofiled_area": {
+                "2018-11-09T00:00:00": 0.25,
+                "2018-11-09T01:00:00": 0.25,
+                "2018-11-09T02:00:00": 0.25,
+                "2018-11-09T03:00:00": 0.25
             },
-            "emissions": {
-                "flaming": {
-                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
-                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
-                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
-                    "pm": 0.00001, "nmhc": 0.00001
+            "timeprofiled_emissions": {
+                "2018-11-09T00:00:00":{
+                    "pm2.5": 0.0000025, "pm10": 0.0000025, "co": 0.0000025,
+                    "co2": 0.0000025, "ch4": 0.0000025, "nox": 0.0000025,
+                    "nh3": 0.0000025, "so2": 0.0000025, "voc": 0.0000025,
+                    "pm": 0.0000025, "nmhc": 0.0000025
                 },
-                "smoldering": {
-                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
-                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
-                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
-                    "pm": 0.00001, "nmhc": 0.00001
+                "2018-11-09T01:00:00":{
+                    "pm2.5": 0.0000025, "pm10": 0.0000025, "co": 0.0000025,
+                    "co2": 0.0000025, "ch4": 0.0000025, "nox": 0.0000025,
+                    "nh3": 0.0000025, "so2": 0.0000025, "voc": 0.0000025,
+                    "pm": 0.0000025, "nmhc": 0.0000025
                 },
-                "residual": {
-                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
-                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
-                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
-                    "pm": 0.00001, "nmhc": 0.00001
+                "2018-11-09T02:00:00":{
+                    "pm2.5": 0.0000025, "pm10": 0.0000025, "co": 0.0000025,
+                    "co2": 0.0000025, "ch4": 0.0000025, "nox": 0.0000025,
+                    "nh3": 0.0000025, "so2": 0.0000025, "voc": 0.0000025,
+                    "pm": 0.0000025, "nmhc": 0.0000025
+                },
+                "2018-11-09T03:00:00":{
+                    "pm2.5": 0.0000025, "pm10": 0.0000025, "co": 0.0000025,
+                    "co2": 0.0000025, "ch4": 0.0000025, "nox": 0.0000025,
+                    "nh3": 0.0000025, "so2": 0.0000025, "voc": 0.0000025,
+                    "pm": 0.0000025, "nmhc": 0.0000025
                 }
             }
         }

@@ -216,6 +216,12 @@ emissions config
   - ***'config' > 'dispersion' > 'working_dir'*** -- *required* -- directory to contain working output
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
  - ***'config' > 'dispersion' > 'handle_existing'*** - *optional* -- how to handle case where output dir already exists; options: 'replace', 'write_in_place', 'fail'; defaults to 'fail'
+ - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'spacing'*** -- *optional*, but required if other plume_merge grid fields are specified --
+ - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *optional*, but required if other plume_merge grid fields are specified --
+ - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *optional*, but required if other plume_merge grid fields are specified --
+ - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *optional*, but required if other plume_merge grid fields are specified --
+ - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *optional*, but required if other plume_merge grid fields are specified --
+
 
 ###### if running hysplit dispersion:
 
@@ -230,6 +236,8 @@ emissions config
  - ***'config' > 'dispersion' > 'hysplit' > 'GRID_LENGTH'***
  - ***'config' > 'dispersion' > 'hysplit' > 'CONVERT_HYSPLIT2NETCDF'*** -- *optional* -- default: true
  - ***'config' > 'dispersion' > 'hysplit' > 'output_file_name'*** -- *optional* -- default: 'hysplit_conc.nc'
+ - ***'config' > 'dispersion' > 'hysplit' > 'archive_tranche_files'*** -- *optional* -- copy hysplit input and output files for tranched runs from working dir to output dir; default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'archive_pardump_files'*** -- *optional* -- copy hysplit pardump files to output dir; default: false
 
 
  ####### Config settings adopted from BlueSky Framework
@@ -371,7 +379,7 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
 
 ##### export
 
-- ***'config' > 'export' > 'modes' -- *optional* -- defaults to ['email']
+- ***'config' > 'export' > 'modes'*** -- *optional* -- defaults to ['email']
 - ***'config' > 'export' > 'extra_exports'*** -- *optional* -- array of extra output files to export (ex. 'dispersion' or 'visualization' outputs); defaults to none
 
 ###### if using email:
@@ -403,6 +411,10 @@ defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
  - ***'config' > 'export' > 'upload' > 'scp' > 'user'*** - *optional* if uploading via scp (which is currently the only supported upload mode) -- username to use in scp; defaults to 'bluesky'
  - ***'config' > 'export' > 'upload' > 'scp' > 'port'*** - *optional* if uploading via scp (which is currently the only supported upload mode) -- port to use in scp; defaults to 22
  - ***'config' > 'export' > 'upload' > 'scp' > 'dest_dir'*** - *required* if uploading via scp (which is currently the only supported upload mode) -- destination directory on remote host to contain output directory
+
+##### archive
+
+- ***'config' > 'archive' > 'tarzip'*** -- *optional* -- list of modules whose output directories should be tar'd and zipped and then deleted; defaults empty list
 
 ##### statuslogging
 

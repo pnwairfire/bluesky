@@ -14,12 +14,12 @@ from functools import reduce
 
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models.fires import Fire
-from .. import PHASES, TIMEPROFILE_FIELDS
+from .. import PHASES
 from bluesky.config import Config
 
 __all__ = [
     'create_fire_sets', 'create_fire_tranches'
-    ]
+]
 
 
 def config(*keys):
@@ -132,29 +132,22 @@ def compute_num_processes(num_fire_sets, **tranching_config):
 ## Dummy Fires
 ##
 
-DUMMY_EMISSIONS = (
-    "pm2.5", "pm10", "co", "co2", "ch4", "nox",
-    "nh3", "so2", "voc", "pm", "nmhc"
-)
-DUMMY_EMISSIONS_VALUE = 0.00001
-DUMMY_HOURS = 24
+def dummy_timeprofiled_emissions_hour(num_hours):
+    return {
+        s: (0.00001 / num_hours) for s in
+            ("pm2.5", "pm10", "co", "co2", "ch4",
+             "nox","nh3", "so2", "voc", "pm", "nmhc")
+    }
+
 # Note: DUMMY_PLUMERISE_HOUR is slightly different than
 #    MISSING_PLUMERISE_HOUR
 # TODO: should they be the same and thus consolidated?
 # TODO: make sure these dummy plumerise values don't have unexpected consequences
 DUMMY_PLUMERISE_HOUR = dict(
     heights=[1000 + 100*n for n in range(21)],
-    emission_fractions=[0.5] * 20,
+    emission_fractions=[0.05] * 20,
     smolder_fraction=0.0
 )
-
-# Note: dummy_timeprofile_hour is slightly different than
-#    MISSING_TIMEPROFILE_HOUR
-# TODO: should they be the same and thus consolidated?
-def dummy_timeprofile_hour(num_hours):
-    return {
-        d: 1.0 / float(num_hours) for d in TIMEPROFILE_FIELDS
-    }
 
 def generate_dummy_fire(model_start, num_hours, grid_params):
     """Returns dummy fire formatted like
@@ -168,18 +161,17 @@ def generate_dummy_fire(model_start, num_hours, grid_params):
         # TODO: look up offset from lat, lng, and model_start
         utc_offset=0, # since plumerise and timeprofile will have utc keys
         plumerise={},
-        timeprofile={},
-        emissions={
-            p: {
-                e: DUMMY_EMISSIONS_VALUE for e in DUMMY_EMISSIONS
-            } for p in PHASES
-        }
+        timeprofiled_emissions={},
+        timeprofiled_area={}
     )
+    hourly_area = 1.0 / float(num_hours)
+    hourly_timeprofiled_emissions = dummy_timeprofiled_emissions_hour(num_hours)
     for hour in range(num_hours):
         dt = model_start + datetime.timedelta(hours=hour)
         dt = dt.strftime('%Y-%m-%dT%H:%M:%S')
         f['plumerise'][dt] = DUMMY_PLUMERISE_HOUR
-        f['timeprofile'][dt] = dummy_timeprofile_hour(num_hours)
+        f['timeprofiled_area'][dt] =  hourly_area
+        f['timeprofiled_emissions'][dt] = hourly_timeprofiled_emissions
 
     return f
 

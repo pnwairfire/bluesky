@@ -226,6 +226,20 @@ _DEFAULTS = {
         "output_dir": None,
         "working_dir": None,
         "handle_existing": "fail",
+        # As with hysplit grid configuration, below, there are no default
+        # plume merge parameters, and the presence/absence
+        # of plume_merge config (nonempty vs. empty dict) is used in
+        # the logic in the code. So, leave fields commented out
+        "plume_merge": {
+            # "grid": {
+            #     "spacing": None,
+            #     # the region within which to merge plumes
+            #     "boundary": {
+            #         "sw": { "lat":None, "lng": None},
+            #         "ne": { "lat":None, "lng": None}
+            #     }
+            # }
+        },
         "hysplit": {
             "binaries": {},
             "skip_invalid_fires": False,
@@ -288,6 +302,9 @@ _DEFAULTS = {
 
 
             ## Other
+
+            "archive_tranche_files": False,
+            "archive_pardump_files": False,
 
             "CONVERT_HYSPLIT2NETCDF": True,
             "output_file_name": "hysplit_conc.nc",
@@ -636,6 +653,9 @@ _DEFAULTS = {
             #     "dest_dir": None
             # }
         }
+    },
+    "archive": {
+        'tarzip': []
     }
 }
 

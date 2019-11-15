@@ -275,6 +275,10 @@ def output_version(parser, args):
 def configure_logging(args, fires_manager):
     # are written
     if args.log_file:
+        # replace '{run_id}' before filling in timestamps, since
+        # --run-id may have been specified with a timestamp wildcard
+        if args.run_id:
+            args.log_file = args.log_file.replace('{run_id}', args.run_id)
         args.log_file = datetimeutils.fill_in_datetime_strings(
                 args.log_file, today=fires_manager.today)
     # Note: The second argument to configure_logging_from_args

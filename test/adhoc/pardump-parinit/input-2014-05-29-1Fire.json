@@ -1,25 +1,33 @@
 {
     "fires": [
         {
-            "type": "rx",
-            "activity":  [
+            "activity": [
                 {
-                    "location": {
-                        "area": 5000.4,
-                        "geojson": {
-                            "type": "MultiPoint",
-                            "coordinates": [
-                                [-119.4, 39.6],
-                                [-119.5, 39.4]
-                            ]
-                        },
-                        "utc_offset": "-07:00",
-                        "ecoregion": "western"
-                    },
-                    "start": "2014-05-29T00:00:00",
-                    "end": "2014-05-30T00:00:00"
+                    "active_areas": [
+                        {
+                            "ecoregion": "western",
+                            "utc_offset": "-07:00",
+                            "start": "2014-05-29T00:00:00",
+                            "specified_points": [
+                                {
+                                    "lng": -119.4,
+                                    "area": 2500.2,
+                                    "lat": 39.6
+                                },
+                                {
+                                    "lng": -119.5,
+                                    "area": 2500.2,
+                                    "lat": 39.4
+                                }
+                            ],
+                            "end": "2014-05-30T00:00:00"
+                        }
+                    ]
                 }
-            ]
+            ],
+            "fuel_type": "natural",
+            "id": "15ccdab9",
+            "type": "rx"
         }
     ]
 }

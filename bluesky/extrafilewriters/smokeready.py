@@ -55,7 +55,10 @@ class ColumnSpecificRecord(object):
                 else:
                     data = "%8.6f" % data
             else:
-                data = str(datatype(data))
+                try:
+                  data = str(datatype(data))
+                except:
+                  logging.debug('Error setting data at name %s', name)
             if len(data) > fieldlen:
                 data = data[:fieldlen]
             if datatype is str:

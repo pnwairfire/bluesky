@@ -21,8 +21,8 @@
             "start": "{today}",
             "num_hours": 24,
             "model": "hysplit",
-            "output_dir": "/bluesky/output/dispersion-output/{run_id}/",
-            "working_dir": "/bluesky/output/dispersion-working/{run_id}/",
+            "output_dir": "/bluesky/output/output/{run_id}/",
+            "working_dir": "/bluesky/output/working/{run_id}/",
             "hysplit": {
                 "grid": {
                     "spacing": 0.15,

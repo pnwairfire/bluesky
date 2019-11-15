@@ -7,6 +7,7 @@ import io
 import os
 import shutil
 import sys
+import tarfile
 import time
 
 from pyairfire.io import *
@@ -18,7 +19,8 @@ from bluesky.exceptions import (
 __all__ = [
     "create_dir_or_handle_existing",
     "wait_for_availability",
-    "capture_stdout"
+    "capture_stdout",
+    "create_tarball"
 ]
 
 def create_dir_or_handle_existing(dir_to_create, handle_existing):
@@ -146,3 +148,12 @@ class capture_stdout(object):
     def __exit__(self, e_type, value, tb):
         sys.stdout = sys.__stdout__
 
+
+def create_tarball(output_dir, tarball_pathname=None):
+    tarball_pathname = tarball_pathname or "{}.tar.gz".format(
+        output_dir.rstrip('/'))
+    if os.path.exists(tarball_pathname):
+        os.remove(tarball_pathname)
+    with tarfile.open(tarball_pathname, "w:gz") as tar:
+        tar.add(output_dir, arcname=os.path.basename(output_dir))
+    return tarball_pathname

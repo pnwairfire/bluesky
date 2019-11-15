@@ -38,7 +38,7 @@ def run(fires_manager):
                 processed_kwargs.update(
                     hysplit_visualizer_version=visualizers.dispersion.hysplit.__version__)
             else:
-                NotImplementedError("Visualization of {} dispersion model not "
+                raise NotImplementedError("Visualization of {} dispersion model not "
                     "supported".format(dispersion_model))
 
         else:

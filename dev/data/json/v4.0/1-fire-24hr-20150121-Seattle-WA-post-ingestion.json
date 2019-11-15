@@ -1,6 +1,6 @@
 {
     "run_id": "1-fire-24hr-20150121-WA-{today}",
-    "fires": [
+    "fire_information": [
         {
             "type": "wildfire",
             "id": "klajsdhfaksjdhfk",

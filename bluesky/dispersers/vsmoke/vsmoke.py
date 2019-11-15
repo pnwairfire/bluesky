@@ -99,7 +99,7 @@ class VSMOKEDispersion(DispersionBase):
             timezone = fire.utc_offset
 
             # Get emissions for fire
-            if not fire.emissions or not fire.consumption:
+            if not fire.timeprofiled_emissions or not fire.consumption:
                 continue
 
             logging.debug("%d hour run time for fireID %s",

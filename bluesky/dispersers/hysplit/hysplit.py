@@ -56,6 +56,7 @@ import datetime
 
 from afdatetime.parsing import parse_datetime
 
+from bluesky.config import Config
 from bluesky.models.fires import Fire
 from .. import (
     DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE, PHASES
@@ -163,7 +164,7 @@ class HYSPLITDispersion(DispersionBase):
         self._has_parinit = []
 
     def _required_activity_fields(self):
-        return ('timeprofile', 'plumerise')
+        return ('timeprofile', 'plumerise', 'emissions')
 
     def _run(self, wdir):
         """Runs hysplit
@@ -324,9 +325,10 @@ class HYSPLITDispersion(DispersionBase):
     def _run_parallel(self, working_dir):
         runner = self
         class T(threading.Thread):
-            def  __init__(self, fires, working_dir, tranche_num):
+            def  __init__(self, fires, config, working_dir, tranche_num):
                 super(T, self).__init__()
                 self.fires = fires
+                self.config = config
                 self.working_dir = working_dir
                 if not os.path.exists(working_dir):
                     os.makedirs(working_dir)
@@ -334,6 +336,9 @@ class HYSPLITDispersion(DispersionBase):
                 self.exc = None
 
             def run(self):
+                # We need to set config to what was loaded in the main thread.
+                # Otherwise, we'll just be using defaults
+                Config().set(self.config)
                 try:
                     runner._run_process(self.fires, self.working_dir,
                         self.tranche_num)
@@ -343,11 +348,13 @@ class HYSPLITDispersion(DispersionBase):
         fire_tranches = hysplit_utils.create_fire_tranches(
             self._fire_sets, self._num_processes)
         threads = []
+        main_thread_config = Config().get()
         for nproc in range(len(fire_tranches)):
             fires = fire_tranches[nproc]
             # Note: no need to set _context.basedir; it will be set to workdir
             logging.info("Starting thread to run HYSPLIT on %d fires." % (len(fires)))
-            t = T(fires, os.path.join(working_dir, str(nproc)), nproc)
+            t = T(fires, main_thread_config,
+                os.path.join(working_dir, str(nproc)), nproc)
             t.start()
             threads.append(t)
 
@@ -380,6 +387,7 @@ class HYSPLITDispersion(DispersionBase):
         ncks_args.append("0/%s" % (self._output_file_name))
         ncks_args.append(output_file)
         self._execute(self.BINARIES['NCKS'], *ncks_args, working_dir=working_dir)
+        self._archive_file(output_file)
 
     def _create_sym_link(self, dest, link):
         try:
@@ -394,7 +402,7 @@ class HYSPLITDispersion(DispersionBase):
         # properties in self.run so that they don't have to be passed into
         # each call to _run_process.
         # The only things that change from call to call are working_dir,
-        # fires, and tranch_num
+        # fires, and tranche_num
         self._create_sym_links_for_process(working_dir)
 
         emissions_file = os.path.join(working_dir, "EMISS.CFG")
@@ -508,7 +516,7 @@ class HYSPLITDispersion(DispersionBase):
             if not os.path.exists(output_conc_file):
                 msg = "HYSPLIT failed, check MESSAGE file for details"
                 raise AssertionError(msg)
-            self._archive_file(output_conc_file)
+            self._archive_file(output_conc_file, tranche_num=tranche_num)
 
             if self.config('CONVERT_HYSPLIT2NETCDF'):
                 logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (output_conc_file, output_file))
@@ -524,21 +532,28 @@ class HYSPLITDispersion(DispersionBase):
                 if not os.path.exists(output_file):
                     msg = "Unable to convert HYSPLIT concentration file to NetCDF format"
                     raise AssertionError(msg)
-            self._archive_file(output_file)
+            self._archive_file(output_file, tranche_num=tranche_num)
 
         finally:
             # Archive input files
-            self._archive_file(emissions_file)
-            self._archive_file(control_file)
-            self._archive_file(setup_file)
+            self._archive_file(emissions_file, tranche_num=tranche_num)
+            self._archive_file(control_file, tranche_num=tranche_num)
+            self._archive_file(setup_file, tranche_num=tranche_num)
 
             # Archive data files
             for f in message_files:
-                self._archive_file(f)
-            if self.config("MAKE_INIT_FILE"):
+                self._archive_file(f, tranche_num=tranche_num)
+            if self.config("MAKE_INIT_FILE") and self.config('archive_pardump_files'):
                 for f in pardumpFiles:
-                    self._archive_file(f)
+                    self._archive_file(f, tranche_num=tranche_num)
                     #shutil.copy2(os.path.join(working_dir, f), self._run_output_dir)
+
+    def _archive_file(self, filename, tranche_num=None):
+        if tranche_num is None:
+            super()._archive_file(filename)
+        # Only archive tranched files if configured to do so
+        elif self.config('archive_tranche_files'):
+            super()._archive_file(filename, suffix=tranche_num)
 
     def _create_sym_links_for_process(self, working_dir):
         for f in self._met_info['files']:
@@ -557,19 +572,18 @@ class HYSPLITDispersion(DispersionBase):
             os.path.join(working_dir, 'ROUGLEN.ASC'))
 
     def _get_hour_data(self, dt, fire):
-        if fire.plumerise and fire.timeprofile:
+        if fire.plumerise and fire.timeprofiled_emissions and fire.timeprofiled_area:
             local_dt = dt + datetime.timedelta(hours=fire.utc_offset)
             # TODO: will fire.plumerise and fire.timeprofile always
             #    have string value keys
             local_dt = local_dt.strftime('%Y-%m-%dT%H:%M:%S')
             plumerise_hour = fire.plumerise.get(local_dt)
-            timeprofile_hour = fire.timeprofile.get(local_dt)
-            if plumerise_hour and timeprofile_hour:
-                return False, plumerise_hour, timeprofile_hour
+            timeprofiled_emissions_hour = fire.timeprofiled_emissions.get(local_dt)
+            hourly_area = fire.timeprofiled_area.get(local_dt)
+            if plumerise_hour and timeprofiled_emissions_hour and hourly_area:
+                return False, plumerise_hour, timeprofiled_emissions_hour, hourly_area
 
-        return (True, hysplit_utils.DUMMY_PLUMERISE_HOUR,
-            hysplit_utils.dummy_timeprofile_hour(self._num_hours))
-
+        return (True, hysplit_utils.DUMMY_PLUMERISE_HOUR, dict(), 0.0)
 
     def _write_emissions(self, fires, emissions_file):
         # A value slightly above ground level at which to inject smoldering
@@ -608,7 +622,8 @@ class HYSPLITDispersion(DispersionBase):
 
                     # If we don't have real data for the given timestep, we apparently need
                     # to stick in dummy records anyway (so we have the correct number of sources).
-                    dummy, plumerise_hour, timeprofile_hour = self._get_hour_data(dt, fire)
+                    (dummy, plumerise_hour, timeprofiled_emissions_hour,
+                        hourly_area) = self._get_hour_data(dt, fire)
                     if dummy:
                         logging.debug("Fire %s has no emissions for hour %s", fire.id, hour)
                         fires_wo_emissions += 1
@@ -619,9 +634,7 @@ class HYSPLITDispersion(DispersionBase):
                     if not dummy:
                         # Extract the fraction of area burned in this timestep, and
                         # convert it from acres to square meters.
-                        # TODO: ????? WHAT TIME PROFILE VALUE TO USE ?????
-                        area = fire.area * timeprofile_hour['area_fraction']
-                        area_meters = area * SQUARE_METERS_PER_ACRE
+                        area_meters = hourly_area * SQUARE_METERS_PER_ACRE
 
                         smoldering_fraction = plumerise_hour['smolder_fraction']
 
@@ -631,10 +644,7 @@ class HYSPLITDispersion(DispersionBase):
                         # hourly emissions by phase for this hour, and then summing
                         # the three values to get the total emissions for this hour
                         # TODO: use fire.timeprofiled_emissions[local_dt]['PM2.5']
-                        pm25_emitted = sum([
-                            timeprofile_hour[p]*fire.emissions[p].get('PM2.5', 0.0)
-                                for p in PHASES
-                        ])
+                        pm25_emitted = timeprofiled_emissions_hour.get('PM2.5', 0.0)
                         pm25_emitted *= GRAMS_PER_TON
                         # Total PM2.5 smoldering (not lofted in the plume)
                         pm25_injected = pm25_emitted * smoldering_fraction
@@ -675,7 +685,7 @@ class HYSPLITDispersion(DispersionBase):
                             if self._reduction_factor == 1:
                                 height_meters = (lower_height + upper_height) / 2.0  # original approach
                             else:
-                                 height_meters = upper_height # top-edge approach
+                                height_meters = upper_height # top-edge approach
                             # Total PM2.5 entrained (lofted in the plume)
                             pm25_entrained = pm25_emitted * entrainment_fraction
                             # Inject the proper fraction of the entrained PM2.5 in each quantile gap.

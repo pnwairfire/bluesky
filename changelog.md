@@ -118,3 +118,33 @@
 
 ## 4.1.20
  - Handle comparison of string and datetime objects when merging fires for dispersion
+
+## 4.1.21
+ - Added data error handling in smokeready extrafiles module
+
+## 4.1.22
+ - Added `archive` module, which currently supports creating zipped tarballs of module-specific output directories (dispersion, plumerise, extrafiles, etc.), and then deleting the original directory
+
+## 4.1.23
+ - Fixed bug where tranched hysplit threads where using configuration defaults, ignoring configuration overrides specified by user
+ - Fixed adhoc pardump / parinit hysplit test
+
+## 4.1.24
+ - add status log post with dispersion fire location count
+
+## 4.1.25
+ - Support replacing '{run_id}' in log file name
+ - Add option to merge fires (i.e. modeled plumes) by configured grid cell in despersion module
+ - other minor updates
+
+## 4.1.26
+ - Updated bsp-run-info to include count of plumes modeled in dispersion
+
+## 4.1.27
+ - Modify and add to dispersion module's reporting on fire, location, and plume counts
+ - Update bsp-run-info to list dispersion fire, location, and plume counts
+ - Copy combined hysplit_conc.nc from working dir to output dir for tranched runs; this fixes a bug where only the last processed tranche's output file was being incorporated into KML and dispersion images
+ - Only archive tranched hysplit files if configured to do so and use tranche_num as the archived file suffix
+ - Fixed bug in adding suffix to archived dispersion files lacking file extension
+ - Fixed bug in dispersion file archiving logic where 0 wasn't recognized as a valid, defined suffix
+ - Only archive hysplit pardump files if configured to do so

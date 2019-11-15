@@ -64,6 +64,8 @@ class StatusLogger(object):
                 'domain': self.domain
             }
             fields.update(extra_fields)
+            logging.debug("Aboout to log status: %s %s %s %s",
+                status, step, action, extra_fields)
             self._log_async(**fields)
         else:
             logging.debug("Status logging disabled - not submitting "

@@ -9,11 +9,10 @@ import logging
 import os
 import re
 import shutil
-import tarfile
 import tempfile
 
+from bluesky import io
 from bluesky.config import Config
-from bluesky.io import create_dir_or_handle_existing
 
 # TODO: Support exporting VSMOKE dispersion, which would include KMLs
 #   and not have separate visualization section
@@ -57,7 +56,8 @@ class ExporterBase(object):
             fires_manager.dumps(output_stream=f)
 
         if create_tarball:
-            return self._create_tarball(dest, output_dir)
+            return io.create_tarball(output_dir,
+                tarball_pathname=self._get_tarball_pathname(dest))
 
         return output_dir
 
@@ -89,7 +89,7 @@ class ExporterBase(object):
         if not os.path.exists(dest):
             os.makedirs(dest)
 
-        output_dir = create_dir_or_handle_existing(
+        output_dir = io.create_dir_or_handle_existing(
             os.path.join(dest, self._output_dir_name),
             handle_existing=self._handle_existing)
 
@@ -324,12 +324,8 @@ class ExporterBase(object):
                 matches.append(os.path.join(root, filename))
         return [m.replace(directory, '').lstrip('/') for m in matches]
 
-    def _create_tarball(self, dest, output_dir):
+    def _get_tarball_pathname(self, dest):
         tarball_name = self.config('tarball_name')
-        tarball = (os.path.join(dest, tarball_name) if tarball_name
-            else "{}.tar.gz".format(output_dir))
-        if os.path.exists(tarball):
-            os.remove(tarball)
-        with tarfile.open(tarball, "w:gz") as tar:
-            tar.add(output_dir, arcname=os.path.basename(output_dir))
-        return tarball
+        if tarball_name:
+            os.path.join(dest, tarball_name)
+        # else, returns None

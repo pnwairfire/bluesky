@@ -17,7 +17,6 @@ import os
 import shutil
 import subprocess
 from datetime import timedelta
-from collections import defaultdict
 
 from pyairfire import osutils
 from afdatetime import parsing as datetime_parsing
@@ -26,7 +25,7 @@ from bluesky import datautils, locationutils
 from bluesky.config import Config
 from bluesky.datetimeutils import parse_utc_offset
 from bluesky.models.fires import Fire
-from functools import reduce
+from . import firemerge
 
 
 # Note: HYSPLIT can accept concentrations in any units, but for
@@ -40,7 +39,6 @@ BTU_TO_MW = 3414425.94972     # Btu to MW
 # Conversion factor for fire size
 SQUARE_METERS_PER_ACRE = 4046.8726
 PHASES = ['flaming', 'smoldering', 'residual']
-TIMEPROFILE_FIELDS = PHASES + ['area_fraction']
 
 class SkipLocationError(Exception):
     pass
@@ -73,11 +71,11 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
     def config(self, *keys, **kwargs):
         return Config().get('dispersion', self._model, *keys, **kwargs)
 
-    def run(self, fires, start, num_hours, output_dir, working_dir=None):
+    def run(self, fires_manager, start, num_hours, output_dir, working_dir=None):
         """Runs hysplit
 
         args:
-         - fires - list of fires to run through hysplit
+         - fires_manager - FiresManager object
          - start - model run start hour
          - num_hours - number of hours in model run
          - output_dir - directory to contain output
@@ -103,16 +101,31 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         self._working_dir = working_dir and os.path.abspath(working_dir)
         # osutils.create_working_dir will create working dir if necessary
 
-        self._set_fire_data(fires)
+        counts = {'fires': len(fires_manager.fires)}
+        self._set_fire_data(fires_manager.fires)
+        counts['locations'] = len(self._fires)
 
         # TODO: only merge fires if hysplit, or make it configurable ???
-        self._fires = self._merge_fires(self._fires)
+        self._fires = firemerge.FireMerger().merge(self._fires)
         # TODO: should we pop 'end' from each fire object, since it's
         #   only used in _merge_fires logic?
+        counts['distinct_locations'] = len(self._fires)
+
+        pm_config = Config().get('dispersion', 'plume_merge')
+        if pm_config:
+            # TODO: make sure pm_config boundary includes all of disperion
+            #   boundary, and raise BlueSkyConfigurationError if not?
+            self._fires = firemerge.PlumeMerger(pm_config).merge(self._fires)
+
+        counts['plumes'] = len(self._fires)
+        notes = "Plumes to be modeled by dispersion"
+        fires_manager.log_status('Good', 'dispersion', 'Continue',
+            number_of_locations=counts['plumes'], notes=notes)
 
         with osutils.create_working_dir(working_dir=self._working_dir) as wdir:
             r = self._run(wdir)
 
+        r["counts"] = counts
         r["output"].update({
             "directory": self._run_output_dir,
             "start_time": self._model_start.isoformat(),
@@ -189,120 +202,6 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                     raise
 
 
-    ## Merging Fires
-
-    def _merge_fires(self, fires):
-        fires_by_lat_lng = defaultdict(lambda: [])
-        for f in sorted(fires, key=lambda f: f['start']):
-            key = (f.latitude, f.longitude)
-            merged = False
-
-            # Sort fires_by_lat_lng[key] for unit testing purposes - for
-            # deterministic behavior (since f could potentially merge with
-            # possibly multiple fires in fires_by_lat_lng[key])
-            # TODO: this shouldn't be a significant performance hit, but
-            #   currently unit tests are structured so that the sorting
-            #   doesn't come into play, so we could remove it for now.
-            for i, f_merged in enumerate(sorted(fires_by_lat_lng[key], key=lambda f: f['start'])):
-                if (not self._do_fires_overlap(f, f_merged)
-                        and not self._do_fire_metas_conflict(f, f_merged)):
-                    # replace f_merged with f_merged merged with f
-                    fires_by_lat_lng[key][i] = self._merge_two_fires(f_merged, f)
-                    merged = True
-
-            if not merged:
-                # just add it
-                fires_by_lat_lng[key].append(f)
-
-        # return flattened list
-        return list(itertools.chain.from_iterable(fires_by_lat_lng.values()))
-
-    def _do_fires_overlap(self, f1, f2):
-        return (f1['start'] < f2['end']) and (f2['start'] < f1['end'])
-
-    def _do_fire_metas_conflict(self, f1, f2):
-        for k in set(f1['meta'].keys()).intersection(f2['meta'].keys()):
-            if f1['meta'][k] != f2['meta'][k]:
-                return True
-
-        return False
-
-    def _merge_two_fires(self, f_merged, f):
-        new_f_merged = Fire(
-            # We'll let the new fire be assigned a new id
-            # It's possible, but not likely, that locations from different
-            # fires will get merged together.  This set of original fire
-            # ids isn't currently used other than in log messages, but
-            # could be used in tranching
-            original_fire_ids=f_merged.original_fire_ids.union(f.original_fire_ids),
-            # we know at this point that their meta dicts don't conflict
-            meta=dict(f_merged.meta, **f.meta),
-            # there may be a gap between f_merged['end'] and f['start']
-            # but no subsequent fires will be in that gap, since
-            # fires were sorted by 'start'
-            # Note: we need to use f_merged['start'] instead of f_merged.start
-            #   because the Fire model has special property 'start' that
-            #   returns the first start time of all active_areas in the fire's
-            #   activity, and since we're not using nested activity here,
-            #   f_merged.start returns 'None' rather than the actual value
-            #   set in _add_location
-            start=f_merged['start'],
-            # end will only be used when merging fires
-            # Note: see note about 'start', above
-            end=f['end'],
-            area=f_merged.area + f.area,
-            # f_merged and f have the same lat,lng (o.w. they wouldn't
-            # be merged)
-            latitude=f_merged.latitude,
-            longitude=f_merged.longitude,
-            # the offsets could be different, but only if on DST transition
-            # TODO: Should we worry about this?  If so, we should add same
-            #   utc offset to criteria for deciding to merge or not
-            utc_offset=f_merged.utc_offset,
-            plumerise=self._merge_hourly_data(
-                f_merged.plumerise, f.plumerise, f['start']),
-            timeprofile=self._merge_hourly_data(
-                f_merged.timeprofile, f.timeprofile, f['start']),
-            emissions=self._sum_data(f_merged.emissions, f.emissions),
-            timeprofiled_emissions=self._merge_hourly_data(
-                f_merged.timeprofiled_emissions, f.timeprofiled_emissions,
-                f['start']),
-            consumption=self._sum_data(f_merged.consumption, f.consumption)
-        )
-        if 'heat' in f_merged or 'heat' in f:
-            new_f_merged['heat'] = f_merged.get('heat', 0.0) + f.get('heat', 0.0)
-        return new_f_merged
-
-    def _merge_hourly_data(self, data1, data2, start2):
-        pruned_data2 = {k: v for k, v in data2.items()
-            if self._on_or_after(k, start2)}
-        return dict(data1, **pruned_data2)
-
-    def _on_or_after(self, dt1, dt2):
-        # make sure same type, and convert to datetimes if not
-        if type(dt1) != type(dt2):
-            dt1 = datetime_parsing.parse(dt1)
-            dt2 = datetime_parsing.parse(dt2)
-        return dt1 >= dt2
-
-    def _sum_data(self, data1, data2):
-        summed_data = {}
-        for k in set(data1.keys()).union(data2.keys()):
-            if k not in data1:
-                summed_data[k] = data2[k]
-            elif k not in data2:
-                summed_data[k] = data1[k]
-            else:
-                # we know that data1 and data2 will have the same structure,
-                # so that, if 'k' is in both dicts, that values will both be
-                # either numeric or dicts
-                if isinstance(data1[k], dict):
-                    summed_data[k] = self._sum_data(data1[k], data2[k])
-                else:
-                    summed_data[k] = data1[k] + data2[k]
-
-        return summed_data
-
     ## Creating fires out of locations
 
     def _add_location(self, fire, aa, loc, activity_fields, utc_offset, loc_num):
@@ -320,6 +219,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         emissions = self._get_emissions(loc)
         timeprofiled_emissions = self._get_timeprofiled_emissions(
             timeprofile, emissions)
+        timeprofiled_area = {dt: e.get('area_fraction') * loc['area'] for dt,e in timeprofile.items()}
 
         # consumption = datautils.sum_nested_data(
         #     [fb.get("consumption", {}) for fb in a['fuelbeds']], 'summary', 'total')
@@ -340,9 +240,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             longitude=latlng.longitude,
             utc_offset=utc_offset,
             plumerise=plumerise,
-            timeprofile=timeprofile,
-            emissions=emissions,
             timeprofiled_emissions=timeprofiled_emissions,
+            timeprofiled_area=timeprofiled_area,
             consumption=consumption
         )
         if heat:
@@ -419,10 +318,13 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
     def _archive_file(self, filename, src_dir=None, suffix=None):
         archived_filename = os.path.basename(filename)
-        if suffix:
+        if suffix is not None:
             filename_parts = archived_filename.split('.')
-            archived_filename = "{}_{}.{}".format(
-                '.'.join(filename_parts[:-1]), suffix, filename_parts[-1])
+            if len(filename_parts) == 1:
+                archived_filename = "{}_{}".format(archived_filename, suffix)
+            else:
+                archived_filename = "{}_{}.{}".format(
+                    '.'.join(filename_parts[:-1]), suffix, filename_parts[-1])
         archived_filename = os.path.join(self._run_output_dir, archived_filename)
 
         if src_dir:
