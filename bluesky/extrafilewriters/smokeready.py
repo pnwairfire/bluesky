@@ -532,7 +532,7 @@ class SmokeReadyWriter(object):
     """
     fips = locationutils.Fips(lat, lng)
     cyid = fips.county_fips[2:].lstrip('0')
-    stid = f2.state_fips.lstrip('0')
+    stid = fips.state_fips.lstrip('0')
     return cyid, stid
 
   def _map_scc(self, fire_type):
