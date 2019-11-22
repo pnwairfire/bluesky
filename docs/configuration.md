@@ -216,7 +216,7 @@ emissions config
   - ***'config' > 'dispersion' > 'working_dir'*** -- *required* -- directory to contain working output
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
  - ***'config' > 'dispersion' > 'handle_existing'*** - *optional* -- how to handle case where output dir already exists; options: 'replace', 'write_in_place', 'fail'; defaults to 'fail'
- - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'spacing'*** -- *optional*, but required if other plume_merge grid fields are specified --
+ - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'spacing'*** -- *optional*, but required if other plume_merge grid fields are specified -- grid cell dimensions ***in degrees***
  - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *optional*, but required if other plume_merge grid fields are specified --
  - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *optional*, but required if other plume_merge grid fields are specified --
  - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *optional*, but required if other plume_merge grid fields are specified --
@@ -226,8 +226,8 @@ emissions config
 ###### if running hysplit dispersion:
 
  - ***'config' > 'dispersion' > 'hysplit' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
- - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'spacing'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed --
- - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'domain'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed -- default: 'LatLng' (which means the spacing is in degrees)
+ - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'spacing'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed -- grid cell dimensions ***in km unless 'projection' is 'LatLng' (see below)***
+ - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'projection'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed -- default: 'LatLng' (which means the spacing is in degrees)
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'boundary' > 'sw' > 'lat'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed --
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed --
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed --
@@ -318,8 +318,8 @@ If USER_DEFINED_GRID is set to true, hysplit will expect BlueSky framework's
 user defined grid settings ('CENTER_LATITUDE', 'CENTER_LONGITUDE',
 'WIDTH_LONGITUDE', 'HEIGHT_LATITUDE', 'SPACING_LONGITUDE', and
 'SPACING_LONGITUDE').  Otherwise, it will look in 'config' > 'dispersion' >
-'hysplit' > 'grid' for 'boundary', 'spacing', and 'domain' fields.  If not
-defined, it will look for 'boundary', 'spacing', and 'domain' in the top level
+'hysplit' > 'grid' for 'boundary', 'spacing', and 'projection' fields.  If not
+defined, it will look for 'boundary', 'spacing', and 'projection' in the top level
 'met' object.
 
 ###### if running vsmoke dispersion:
