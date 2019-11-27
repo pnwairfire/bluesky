@@ -10,9 +10,9 @@ from timeprofile.static import (
     InvalidStartEndTimesError,
     InvalidEmissionsDataError
 )
-
+from timeprofile.static import FepsTimeProfiler
 from bluesky.config import Config
-from bluesky.datetimeutils import parse_datetimes
+from bluesky.datetimeutils import parse_datetimes, parse_datetime
 from bluesky.exceptions import BlueSkyConfigurationError
 from functools import reduce
 
@@ -61,9 +61,8 @@ def _run_fire(hourly_fractions, fire):
 
     _validate_fire(fire)
     for a in active_areas:
-        tw = parse_datetimes(a, 'start', 'end')
-        profiler = StaticTimeProfiler(tw['start'], tw['end'],
-            hourly_fractions=hourly_fractions)
+        profiler = _get_profiler(hourly_fractions, fire, a)
+
         # convert timeprofile to dict with dt keys
         a['timeprofile'] = {}
         fields = list(profiler.hourly_fractions.keys())
@@ -71,6 +70,35 @@ def _run_fire(hourly_fractions, fire):
             hr = profiler.start_hour + (i * profiler.ONE_HOUR)
             a['timeprofile'][hr.isoformat()] = {
                 p: profiler.hourly_fractions[p][i] for p in fields }
+
+def _get_profiler(hourly_fractions, fire, active_area):
+    tw = parse_datetimes(active_area, 'start', 'end')
+
+    # Use FepsTimeProfilers for Rx fires and StaticTimeProfiler for WF,
+    # Unless custom hourly_fractions are specified, in which case
+    # Static Time Profiler is used for all fires.
+    # If ignition_start and ignition_end aren't specified for Rx fires,
+    # FepsTimeProfilers will assume 9am-12pm
+    # TODO: add config setting to use FEPS for Rx even if custom
+    #   hourly_fractions are specified (or the converse - i.e. alwys use
+    #   FEPS for rx and add setting to turn on use of hourly_fractions,
+    #   if specified, for Rx)
+    if fire.type == 'rx' and not hourly_fractions:
+        ig_start = active_area.get('ignition_start') and parse_datetime(
+            active_area['ignition_start'], k='ignition_start')
+        ig_end = active_area.get('ignition_end') and parse_datetime(
+            active_area['ignition_end'], k='ignition_end')
+        # TODO: pass in relative humidity, wind speed, and duff moisture
+        #    content, if defined?
+        # TODO: pass in other optional fields (total consumption, etc.)
+        #    when FepsTimeProfilers is updated to support them
+        return FepsTimeProfilers(tw['start'], tw['end'],
+            local_ignition_start_time=ig_start,
+            local_ignition_end_time=ig_end)
+
+    else:
+        return StaticTimeProfiler(tw['start'], tw['end'],
+            hourly_fractions=hourly_fractions)
 
 MISSING_ACTIVITY_AREA_MSG = "Missing activity data required for time profiling"
 INSUFFICIENT_ACTIVITY_INFP_MSG = "Insufficient activity data required for time profiling"
