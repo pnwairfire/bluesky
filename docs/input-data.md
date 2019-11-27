@@ -57,6 +57,9 @@ Other fields
 
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuelbeds'*** -- *required* -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'area'*** -- *required* -- fire's total area
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'ignition_start'*** -- *required* -- fire's total area
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'ignition_end'*** -- *required* -- fire's total area
+
 
 The following can be defined either under 'specified_points' or 'perimeter'
 objects, or directly under the parent 'active_areas' object
@@ -65,7 +68,6 @@ objects, or directly under the parent 'active_areas' object
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'slope'*** -- *optional* -- default: 5
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'windspeed'*** -- *optional* -- default: 6
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'days_since_rain' or 'rain_days'*** -- *optional* -- default: 10;
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'length_of_ignition'*** -- *optional* -- default: 120
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fm_type'*** -- *optional* -- default: "MEAS-Th"
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuel_moisture_10hr_pct' or 'moisture_10hr'*** -- *optional* -- default: 50
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuel_moisture_1000hr_pct' or 'moisture_1khr'*** -- *optional* -- default: 30
@@ -84,7 +86,6 @@ The following can be defined either under 'specified_points' or 'perimeter'
 objects, or directly under the parent 'active_areas' object
 
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'days_since_rain'*** -- *required* -- default: 1
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'length_of_ignition'*** -- *required* -- default: 1
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'slope'*** -- *optional* -- default: 5
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'windspeed'*** -- *optional* -- default: 5
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuel_moisture_10hr_pct'*** -- *optional* -- default: 50

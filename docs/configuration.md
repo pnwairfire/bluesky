@@ -122,7 +122,7 @@ for a fire's activity object. They also define what synonyms to recognize, if an
  - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'days_since_rain' > 'synonyms'*** -- *optional* -- default ['rain_days']
  - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fuel_moisture_10hr_pct' > 'default'*** -- *optional* -- default 50
  - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fuel_moisture_10hr_pct' > 'synonyms'*** -- *optional* -- default ['moisture_10hr']
- - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'length_of_ignition' > 'default'*** -- *optional* -- in minutes; default 120
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'length_of_ignition' > 'default'*** -- *optional* -- in minutes; default 120; used if `ignition_start` and `ignition_end` aren't specified for a fire
  - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fm_type' > 'default'*** -- *optional* -- defailt "MEAS-Th"
  - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_1000hr_pct' > 'default'*** -- *optional* -- default 30
  - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_1000hr_pct' > 'synonyms'*** -- *optional* -- default ['moisture_1khr']

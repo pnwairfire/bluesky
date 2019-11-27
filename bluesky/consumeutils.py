@@ -48,12 +48,23 @@ SETTINGS['all']['output_units'] = {
 def _apply_settings(fc, location, burn_type):
     valid_settings = dict(SETTINGS[burn_type], **SETTINGS['all'])
     for field, d in valid_settings.items():
-        possible_name = [field] + d.get('synonyms', [])
-        defined_fields = [f for f in possible_name if f in location]
-        if defined_fields:
-            # use first of defined fields - it's not likely that
-            # len(defined_fields) > 1
-            setattr(fc, field, location[defined_fields[0]])
+        value = None
+        # If field == 'length_of_ignition', use location.ignition_start
+        #    and location.ignition_end, if both defined, else use
+        #    value from config d['default']
+        if field == 'length_of_ignition':
+            if location.ignition_start and location.ignition_end:
+                value = location.ignition_end - location.ignition_start
+        else:
+            possible_name = [field] + d.get('synonyms', [])
+            defined_fields = [f for f in possible_name if f in location]
+            if defined_fields:
+                # use first of defined fields - it's not likely that
+                # len(defined_fields) > 1
+                value = location[defined_fields[0]]
+
+        if value:
+            setattr(fc, field, value)
         elif 'default' in d:
             setattr(fc, field, d['default'])
         else:

@@ -10,7 +10,6 @@
                             "moisture_1khr": 50,
                             "slope": 5,
                             "shrub_blackened_pct": 50,
-                            "length_of_ignition": 120,
                             "windspeed": 5,
                             "utc_offset": "-09:00",
                             "moisture_litter": 30,
