@@ -7,8 +7,7 @@ from timeprofile import __version__ as timeprofile_version
 from timeprofile.static import (
     StaticTimeProfiler,
     InvalidHourlyFractionsError,
-    InvalidStartEndTimesError,
-    InvalidEmissionsDataError
+    InvalidStartEndTimesError
 )
 from timeprofile.static import FepsTimeProfiler
 from bluesky.config import Config
@@ -41,9 +40,6 @@ def run(fires_manager):
             except InvalidStartEndTimesError as e:
                 raise BlueSkyConfigurationError(
                     "Invalid timeprofile start end times: '{}'".format(str(e)))
-            # except InvalidEmissionsDataError, e:
-            #     TODO: do anything with InvalidEmissionsDataError?
-            #     raise
 
 NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS_MSG = ("Only 24-hour repeatable"
     " time profiles supported for fires with multiple activity windows")
