@@ -70,11 +70,11 @@ def _run_fire(hourly_fractions, fire):
 def _get_profiler(hourly_fractions, fire, active_area):
     tw = parse_datetimes(active_area, 'start', 'end')
 
-    # Use FepsTimeProfilers for Rx fires and StaticTimeProfiler for WF,
+    # Use FepsTimeProfiler for Rx fires and StaticTimeProfiler for WF,
     # Unless custom hourly_fractions are specified, in which case
     # Static Time Profiler is used for all fires.
     # If ignition_start and ignition_end aren't specified for Rx fires,
-    # FepsTimeProfilers will assume 9am-12pm
+    # FepsTimeProfiler will assume 9am-12pm
     # TODO: add config setting to use FEPS for Rx even if custom
     #   hourly_fractions are specified (or the converse - i.e. alwys use
     #   FEPS for rx and add setting to turn on use of hourly_fractions,
@@ -84,11 +84,16 @@ def _get_profiler(hourly_fractions, fire, active_area):
             active_area['ignition_start'], k='ignition_start')
         ig_end = active_area.get('ignition_end') and parse_datetime(
             active_area['ignition_end'], k='ignition_end')
-        # TODO: pass in relative humidity, wind speed, and duff moisture
-        #    content, if defined?
+        # TODO: pass in moisture category, relative humidity, wind speed,
+        #    and duff moisture content, if defined?
         # TODO: pass in other optional fields (total consumption, etc.)
-        #    when FepsTimeProfilers is updated to support them
-        return FepsTimeProfilers(tw['start'], tw['end'],
+        #    when FepsTimeProfiler is updated to support them
+        duff_fuel_load = 10  # TODO: set correctly
+        total_above_ground_consumption = 10000  # TODO: set correctly
+        total_below_ground_consumption = 10000  # TODO: set correctly
+        return FepsTimeProfiler(tw['start'], tw['end'],
+            duff_fuel_load, total_above_ground_consumption,
+            total_below_ground_consumption,
             local_ignition_start_time=ig_start,
             local_ignition_end_time=ig_end)
 
