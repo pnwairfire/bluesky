@@ -9,7 +9,7 @@ from timeprofile.static import (
     InvalidHourlyFractionsError,
     InvalidStartEndTimesError
 )
-from timeprofile.static import FepsTimeProfiler
+from timeprofile.feps import FepsTimeProfiler
 from bluesky.config import Config
 from bluesky.datetimeutils import parse_datetimes, parse_datetime
 from bluesky.exceptions import BlueSkyConfigurationError
