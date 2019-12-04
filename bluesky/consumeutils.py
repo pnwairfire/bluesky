@@ -55,6 +55,9 @@ def _apply_settings(fc, location, burn_type):
         if field == 'length_of_ignition':
             if location.get('ignition_start') and location.get('ignition_end'):
                 value = location.ignition_end - location.ignition_start
+            # for backwards compatibility, support length_of_ignition
+            elif location.get('length_of_ignition'):
+                value = location.length_of_ignition
         else:
             possible_name = [field] + d.get('synonyms', [])
             defined_fields = [f for f in possible_name if f in location]
