@@ -95,10 +95,10 @@ def check_value(expected, actual, *keys_for_error_log):
 
     if type(expected) == dict:
         if set(expected.keys()) != set(actual.keys()):
-            logging.error("Keys don't match: %s vs. %s  ('%s')",
-                ','.join(list(set(expected.keys()))),
-                ','.join(list(set(actual.keys()))),
-                "' > '".join(keys_for_error_log))
+            logging.error("Keys don't match (for '%s'): \n  EXPECTED: %s\n  ACTUAL:   %s",
+                "' > '".join(keys_for_error_log),
+                ','.join(sorted(list(set(expected.keys())))),
+                ','.join(sorted(list(set(actual.keys())))))
             return False
         # check all; don't bail after first difference  (so that
         # we see all differing values in output)
