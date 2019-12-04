@@ -720,7 +720,6 @@
                     },
                     "active_areas": [
                         {
-                            "length_of_ignition": 120,
                             "rain_days": 10,
                             "moisture_10hr": 50,
                             "specified_points": [

@@ -11,7 +11,6 @@
                             "utc_offset": "-09:00",
                             "end": "2014-05-30T01:00:00",
                             "canopy_consumption_pct": 0,
-                            "length_of_ignition": 120,
                             "pile_blackened_pct": 0,
                             "start": "2014-05-29T22:00:00",
                             "windspeed": 5,

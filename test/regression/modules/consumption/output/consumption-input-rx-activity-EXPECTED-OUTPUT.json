@@ -985,7 +985,6 @@
                             ],
                             "ecoregion": "southern",
                             "moisture_duff": 50,
-                            "length_of_ignition": 120,
                             "pile_blackened_pct": 0,
                             "heat": {
                                 "summary": {

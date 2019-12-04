@@ -449,7 +449,6 @@
                     "location": {
                         "slope": 5,
                         "moisture_1khr": 50,
-                        "length_of_ignition": 120,
                         "rain_days": 10,
                         "moisture_duff": 50,
                         "fm_type": "MEAS-Th",
@@ -2086,7 +2085,6 @@
                                     "area": 200
                                 }
                             ],
-                            "length_of_ignition": 120,
                             "heat": {
                                 "summary": {
                                     "flaming": 2173582080.0,

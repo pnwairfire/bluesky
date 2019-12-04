@@ -744,7 +744,6 @@
                             "moisture_litter": 30,
                             "shrub_blackened_pct": 50,
                             "moisture_10hr": 50,
-                            "length_of_ignition": 120,
                             "start": "2015-01-20T17:00:00",
                             "fm_type": "MEAS-Th",
                             "moisture_duff": 50

@@ -64,7 +64,6 @@
                         "moisture_10hr": 50,
                         "longitude": -121.3990506,
                         "canopy_consumption_pct": 0,
-                        "length_of_ignition": 120,
                         "moisture_duff": 50,
                         "area": 200
                     },
@@ -1302,7 +1301,6 @@
                             "rain_days": 10,
                             "moisture_1khr": 50,
                             "moisture_10hr": 50,
-                            "length_of_ignition": 120,
                             "canopy_consumption_pct": 0,
                             "start": "2015-01-20T17:00:00",
                             "emissions": {

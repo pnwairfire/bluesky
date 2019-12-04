@@ -1433,8 +1433,7 @@
                                 }
                             ],
                             "utc_offset": "-09:00",
-                            "end": "2015-01-21T17:00:00",
-                            "length_of_ignition": 120
+                            "end": "2015-01-21T17:00:00"
                         }
                     ],
                     "consumption": {
