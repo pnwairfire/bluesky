@@ -151,3 +151,9 @@
 
 ## 4.1.28
  - Fixed two FIPS bugs
+
+## 4.1.29
+ - replace location `length_of_ignition` field with active area `ignition_start` and `ignition_end` fields, but retain support for `length_of_ignition` in consumeutils for backwards compatibility
+ - Upgrede timeprofile to v1.1.1
+ - Add support for FEPS timeprofile, using it for Rx fires unless custom hourly fractions are specified
+ - regression test updates
