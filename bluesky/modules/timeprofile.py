@@ -9,7 +9,7 @@ from timeprofile.static import (
     InvalidHourlyFractionsError,
     InvalidStartEndTimesError
 )
-from timeprofile.feps import FepsTimeProfiler
+from timeprofile.feps import FepsTimeProfiler, FireType
 from bluesky.config import Config
 from bluesky.datetimeutils import parse_datetimes, parse_datetime
 from bluesky.exceptions import BlueSkyConfigurationError
@@ -84,18 +84,14 @@ def _get_profiler(hourly_fractions, fire, active_area):
             active_area['ignition_start'], k='ignition_start')
         ig_end = active_area.get('ignition_end') and parse_datetime(
             active_area['ignition_end'], k='ignition_end')
-        # TODO: pass in moisture category, relative humidity, wind speed,
-        #    and duff moisture content, if defined?
-        # TODO: pass in other optional fields (total consumption, etc.)
-        #    when FepsTimeProfiler is updated to support them
-        duff_fuel_load = 10  # TODO: set correctly
-        total_above_ground_consumption = 10000  # TODO: set correctly
-        total_below_ground_consumption = 10000  # TODO: set correctly
+        # TODO: pass in duff_fuel_load, total_above_ground_consumption,
+        #    total_below_ground_consumption, moisture_category,
+        #    relative_humidity, wind_speed, and duff_moisture_content,
+        #    if defined?
         return FepsTimeProfiler(tw['start'], tw['end'],
-            duff_fuel_load, total_above_ground_consumption,
-            total_below_ground_consumption,
             local_ignition_start_time=ig_start,
-            local_ignition_end_time=ig_end)
+            local_ignition_end_time=ig_end,
+            fire_type=FireType.RX)
 
     else:
         return StaticTimeProfiler(tw['start'], tw['end'],
