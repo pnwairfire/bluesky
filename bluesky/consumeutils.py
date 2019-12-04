@@ -53,7 +53,7 @@ def _apply_settings(fc, location, burn_type):
         #    and location.ignition_end, if both defined, else use
         #    value from config d['default']
         if field == 'length_of_ignition':
-            if location.ignition_start and location.ignition_end:
+            if location.get('ignition_start') and location.get('ignition_end'):
                 value = location.ignition_end - location.ignition_start
         else:
             possible_name = [field] + d.get('synonyms', [])
