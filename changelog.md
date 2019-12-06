@@ -157,3 +157,6 @@
  - Upgrede timeprofile to v1.1.1
  - Add support for FEPS timeprofile, using it for Rx fires unless custom hourly fractions are specified
  - regression test updates
+
+## 4.1.30
+- Upgrede timeprofile to v1.1.2
