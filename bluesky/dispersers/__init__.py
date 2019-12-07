@@ -333,13 +333,29 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         if os.path.exists(filename):
             shutil.copy(filename, archived_filename)
 
+
+    def _log_execute_output(self, cmd, output, is_stdout=True):
+        output = output.decode('ascii')
+        if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+            logging.debug('Captured {} {}:'.format(cmd,
+                "output" if is_stdout else "error output"))
+            for line in output.split('\n'):
+                logging.debug('{}: {}'.format(cmd, line))
+
+
     def _execute(self, *args, **kwargs):
         # TODO: make sure this is the corrrect way to call
         logging.debug('Executing {}'.format(' '.join(args)))
-        # Use check_output so that output isn't sent to stdout
-        output = subprocess.check_output(args, cwd=kwargs.get('working_dir'))
-        output = output.decode('ascii')
-        if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
-            logging.debug('Captured {} output:'.format(args[0]))
-            for line in output.split('\n'):
-                logging.debug('{}: {}'.format(args[0], line))
+
+        try:
+            # Use check_output so that output isn't sent to stdout
+            output = subprocess.check_output(
+                args, cwd=kwargs.get('working_dir'))
+            self._log_execute_output(args[0], output)
+
+        except subprocess.CalledProcessError as e:
+            # note e.output and e.stdout are aliases
+            self._log_execute_output(args[0], e.output)
+            logging.debug("%s failed with return code %s", e.cmd, e.returncode)
+            self._log_execute_output(args[0], e.stderr, is_stdout=False)
+            raise e
