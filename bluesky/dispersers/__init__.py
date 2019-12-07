@@ -335,12 +335,13 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
 
     def _log_execute_output(self, cmd, output, is_stdout=True):
-        output = output.decode('ascii')
-        if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
-            logging.debug('Captured {} {}:'.format(cmd,
+        if output:
+            log_func = logging.debug if is_stdout else logging.error
+            log_func('Captured {} {}:'.format(cmd,
                 "output" if is_stdout else "error output"))
+            output = output.decode('ascii') if output else ''
             for line in output.split('\n'):
-                logging.debug('{}: {}'.format(cmd, line))
+                log_func('{}: {}'.format(cmd, line))
 
 
     def _execute(self, *args, **kwargs):
