@@ -356,6 +356,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         except subprocess.CalledProcessError as e:
             # note e.output and e.stdout are aliases
             self._log_execute_output(args[0], e.output)
-            logging.debug("%s failed with return code %s", e.cmd, e.returncode)
             self._log_execute_output(args[0], e.stderr, is_stdout=False)
+            # Note: not logging e.cmd and e.returncode, since they'll
+            #   be logged by top level exception handler
             raise e
