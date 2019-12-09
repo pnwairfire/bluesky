@@ -2,8 +2,11 @@
 
 __author__ = "Joel Dubowy"
 
+import logging
 import sys
+import subprocess
 import time
+from collections import defaultdict
 
 from py.test import raises
 
@@ -271,3 +274,93 @@ class TestCaptureStdout(object):
             assert sys.stdout == stdout_buffer
         assert sys.stdout != stdout_buffer
         assert sys.stdout == sys.__stdout__
+
+
+class TestCmdExecutor(object):
+
+    def monkeypatch_logging(self, monkeypatch):
+        self.msgs = defaultdict(lambda: [])
+
+        def get_mock_log_func(level):
+            l = self.msgs[level]
+            def log(*args, **kwargs):
+                l.append((args, kwargs))
+            return log
+
+        monkeypatch.setattr(logging, 'debug', get_mock_log_func(logging.DEBUG))
+        monkeypatch.setattr(logging, 'error', get_mock_log_func(logging.ERROR))
+
+    def test_invalid_args(self):
+        with raises(ValueError) as e_info:
+            io.CmdExecutor().execute(123)
+        assert e_info.value.args[0] == "Invalid args for CmdExecutor.execute: (123,)"
+
+    ## Realtime output logging
+
+    def test_invalid_executable_realtime_logging(self, monkeypatch):
+        self.monkeypatch_logging(monkeypatch)
+        with raises(FileNotFoundError) as e_info:
+            io.CmdExecutor().execute(['sdfsdfsdf', 'sdf'], realtime_logging=True)
+        # TODO: check self.msgs
+        with raises(FileNotFoundError) as e_info:
+            io.CmdExecutor().execute('sdfsdfsdf', 'sdf', realtime_logging=True)
+        # TODO: check self.msgs
+        with raises(FileNotFoundError) as e_info:
+            io.CmdExecutor().execute('sdfsdfsdf sdf', realtime_logging=True)
+        # TODO: check self.msgs
+
+    def test_invalid_command_realtime_logging(self, monkeypatch):
+        self.monkeypatch_logging(monkeypatch)
+        with raises(subprocess.CalledProcessError) as e_info:
+            io.CmdExecutor().execute(['ls', 'fsdkdsfjlkdsfkjlrew'], realtime_logging=True)
+        # TODO: check self.msgs
+        with raises(subprocess.CalledProcessError) as e_info:
+            io.CmdExecutor().execute('ls', 'fsdkdsfjlkdsfkjlrew', realtime_logging=True)
+        # TODO: check self.msgs
+        with raises(subprocess.CalledProcessError) as e_info:
+            io.CmdExecutor().execute('ls fsdkdsfjlkdsfkjlrew', realtime_logging=True)
+        # TODO: check self.msgs
+
+    def test_success_realtime_logging(self, monkeypatch):
+        self.monkeypatch_logging(monkeypatch)
+        io.CmdExecutor().execute(['echo', 'hello'], realtime_logging=True)
+        # TODO: check self.msgs
+        io.CmdExecutor().execute('echo', 'hello', realtime_logging=True)
+        # TODO: check self.msgs
+        io.CmdExecutor().execute('echo hello', realtime_logging=True)
+        # TODO: check self.msgs
+
+    ## Post-execution output logging
+
+    def test_invalid_executable_post_logging(self, monkeypatch):
+        self.monkeypatch_logging(monkeypatch)
+        with raises(FileNotFoundError) as e_info:
+            io.CmdExecutor().execute(['lsdflsdf', 'sdf'], realtime_logging=False)
+        # TODO: check self.msgs
+        with raises(FileNotFoundError) as e_info:
+            io.CmdExecutor().execute('lsdflsdf', 'sdf', realtime_logging=False)
+        # TODO: check self.msgs
+        with raises(FileNotFoundError) as e_info:
+            io.CmdExecutor().execute('lsdflsdf sdf', realtime_logging=False)
+        # TODO: check self.msgs
+
+    def test_invalid_command_post_logging(self, monkeypatch):
+        self.monkeypatch_logging(monkeypatch)
+        with raises(subprocess.CalledProcessError) as e_info:
+            io.CmdExecutor().execute(['ls', 'fsdkdsfjlkdsfkjlrew'], realtime_logging=False)
+        # TODO: check self.msgs
+        with raises(subprocess.CalledProcessError) as e_info:
+            io.CmdExecutor().execute('ls', 'fsdkdsfjlkdsfkjlrew', realtime_logging=False)
+        # TODO: check self.msgs
+        with raises(subprocess.CalledProcessError) as e_info:
+            io.CmdExecutor().execute('ls fsdkdsfjlkdsfkjlrew', realtime_logging=False)
+        # TODO: check self.msgs
+
+    def test_success_post_logging(self, monkeypatch):
+        self.monkeypatch_logging(monkeypatch)
+        io.CmdExecutor().execute(['echo', 'hello'], realtime_logging=False)
+        # TODO: check self.msgs
+        io.CmdExecutor().execute('echo', 'hello', realtime_logging=False)
+        # TODO: check self.msgs
+        io.CmdExecutor().execute('echo hello', realtime_logging=False)
+        # TODO: check self.msgs
