@@ -10,7 +10,10 @@ __all__ = [
     "BlueSkyConfigurationError",
     "BlueSkyModuleError",
     "MissingDependencyError",
-    "BlueSkyDatetimeValueError"
+    "BlueSkyDatetimeValueError",
+    'BlueSkyGeographyValueError',
+    'BlueSkyUnavailableResourceError',
+    'BlueSkySubprocessError'
 ]
 
 class BlueSkyImportError(ImportError):
@@ -33,4 +36,7 @@ class BlueSkyGeographyValueError(ImportError):
     pass
 
 class BlueSkyUnavailableResourceError(ValueError):
+    pass
+
+class BlueSkySubprocessError(RuntimeError):
     pass

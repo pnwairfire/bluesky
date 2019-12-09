@@ -15,7 +15,8 @@ import time
 from pyairfire.io import *
 
 from bluesky.exceptions import (
-    BlueSkyConfigurationError, BlueSkyUnavailableResourceError
+    BlueSkyConfigurationError, BlueSkyUnavailableResourceError,
+    BlueSkySubprocessError
 )
 
 __all__ = [
@@ -177,11 +178,11 @@ class CmdExecutor(object):
             self._log(e.stderr, is_stdout=False)
             # Note: not logging e.cmd and e.returncode, since they'll
             #   be logged by top level exception handler
-            raise e
+            raise BlueSkySubprocessError(e)
 
         except FileNotFoundError as e:
             self._log(e.strerror, is_stdout=False)
-            raise e
+            raise BlueSkySubprocessError(e)
 
     def _set_cmd_args(self, args):
         # Support three ways of being called:
