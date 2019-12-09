@@ -5,6 +5,7 @@ __author__ = "Joel Dubowy"
 import logging
 import io
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -185,16 +186,18 @@ class CmdExecutor(object):
     def _set_cmd_args(self, args):
         # Support either list of command parts or single command string
         if len(args) == 1 and hasattr(args[0], 'split'):
-            self._cmd_args = args[0].split()
+            self._cmd_args = shlex.split(args[0])
             self._cmd_str = args[0]
         else:
             self._cmd_args = args
-            self._cmd_str = ' '.join(args)
+            self._cmd_str = shlex.join(args)
 
         logging.debug('Executing {}'.format(self._cmd_str))
         self._executable = os.path.basename(self._cmd_args[0])
 
     def _execute_with_real_time_logging(self, cwd):
+        # TODO: capture stdout and stderr separately, so that
+        #   different log levels can be used.
         process = subprocess.Popen(self._cmd_args,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, #.PIPE
             shell=False, cwd=cwd, universal_newlines=True)
@@ -215,6 +218,8 @@ class CmdExecutor(object):
 
     def _execute_with_logging_after(self, cwd):
         # Use check_output so that output isn't sent to stdout
+        # TODO: capture stdout and stderr separately, so that
+        #   different log levels can be used.
         output = subprocess.check_output(self._cmd_args,
             stderr=subprocess.STDOUT, cwd=cwd, universal_newlines=True)
         self._log(output)
