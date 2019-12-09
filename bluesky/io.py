@@ -184,13 +184,27 @@ class CmdExecutor(object):
             raise e
 
     def _set_cmd_args(self, args):
-        # Support either list of command parts or single command string
-        if len(args) == 1 and hasattr(args[0], 'split'):
-            self._cmd_args = shlex.split(args[0])
-            self._cmd_str = args[0]
+        # Support three ways of being called:
+        if len(args) == 1:
+            # e.g. CmdExecutor().execute('ls foo')
+            if hasattr(args[0], 'split'):
+                self._cmd_args = shlex.split(args[0])
+                self._cmd_str = args[0]
+
+            # e.g. CmdExecutor().execute(['ls', 'foo'])
+            elif hasattr(args[0], 'append'):
+                self._cmd_args = args[0]
+                self._cmd_str = ' '.join(args[0])
+
+            else:
+                raise ValueError(
+                    "Invalid args for CmdExecutor.execute: {}".format(args))
+
+        # e.g. CmdExecutor().execute('ls', 'foo')
         else:
             self._cmd_args = args
-            self._cmd_str = shlex.join(args)
+            # TODO: use shlex.join after upgrading to python>=3.8
+            self._cmd_str = ' '.join(args)
 
         logging.info('Executing {}'.format(self._cmd_str))
         self._executable = os.path.basename(self._cmd_args[0])
