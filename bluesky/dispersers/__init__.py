@@ -332,32 +332,3 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
         if os.path.exists(filename):
             shutil.copy(filename, archived_filename)
-
-
-    def _log_execute_output(self, cmd, output, is_stdout=True):
-        if output:
-            log_func = logging.debug if is_stdout else logging.error
-            log_func('Captured {} {}:'.format(cmd,
-                "output" if is_stdout else "error output"))
-            output = output.decode('ascii') if output else ''
-            for line in output.split('\n'):
-                log_func('{}: {}'.format(cmd, line))
-
-
-    def _execute(self, *args, **kwargs):
-        # TODO: make sure this is the corrrect way to call
-        logging.debug('Executing {}'.format(' '.join(args)))
-
-        try:
-            # Use check_output so that output isn't sent to stdout
-            output = subprocess.check_output(
-                args, cwd=kwargs.get('working_dir'))
-            self._log_execute_output(args[0], output)
-
-        except subprocess.CalledProcessError as e:
-            # note e.output and e.stdout are aliases
-            self._log_execute_output(args[0], e.output)
-            self._log_execute_output(args[0], e.stderr, is_stdout=False)
-            # Note: not logging e.cmd and e.returncode, since they'll
-            #   be logged by top level exception handler
-            raise e

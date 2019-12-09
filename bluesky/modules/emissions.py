@@ -288,7 +288,8 @@ class Consume(EmissionsBase):
 
         # Consume emissions prints out lines like
         #    Converting units: tons_ac -> tons
-        # which we want to capture and ifnore
+        # which we want to capture and ignore
+        # TODO: should we log??
         with capture_stdout() as stdout_buffer:
             r = e.results()['emissions']
 

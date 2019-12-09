@@ -19,6 +19,7 @@ from datetime import timedelta
 
 from afdatetime import parsing as datetime_parsing
 
+from bluesky import io
 from bluesky.datetimeutils import parse_utc_offset
 
 from .. import (
@@ -110,7 +111,7 @@ class VSMOKEDispersion(DispersionBase):
                 local_dt = self._compute_local_dt(fire, hr)
                 self._write_iso_input(fire, local_dt, in_var)
 
-                self._execute(self.BINARIES['VSMOKEGIS'], working_dir=wdir)
+                io.CmdExecutor().execute(self.BINARIES['VSMOKEGIS'], cwd=wdir)
 
                 # TODO: replace 'hr' with 'local_dt'
                 suffix = "{}_hour{}".format(fire.id, str(hr+1))
@@ -134,7 +135,7 @@ class VSMOKEDispersion(DispersionBase):
             # Write input files
             self._write_input(fire, in_var)
             # Run VSMOKE for fire
-            self._execute(self.BINARIES['VSMOKE'], working_dir=wdir)
+            io.CmdExecutor().execute(self.BINARIES['VSMOKE'], cwd=wdir)
 
             # Rename input and output files and archive
             self._archive_file("VSMOKE.IPT", src_dir=wdir, suffix=fire.id)

@@ -6,6 +6,7 @@ import logging
 import io
 import os
 import shutil
+import subprocess
 import sys
 import tarfile
 import time
@@ -147,6 +148,75 @@ class capture_stdout(object):
 
     def __exit__(self, e_type, value, tb):
         sys.stdout = sys.__stdout__
+
+
+class CmdExecutor(object):
+    """Wraps command execution in order to capture
+    and optionally log stdout and stderr output
+
+    To adhoc test:
+
+        python3 -c 'from bluesky import io; io.CmdExecutor().execute("echo \"hello\"")'
+    """
+
+    def execute(self, *args, cwd=None, realtime_logging=True):
+        self._set_cmd_args(args)
+
+        try:
+            f = (self._execute_with_real_time_logging if realtime_logging
+                else self._execute_with_logging_after)
+            f(cwd)
+
+        except subprocess.CalledProcessError as e:
+            # note e.output and e.stdout are aliases
+            self._log(e.output)
+            self._log(e.stderr, is_stdout=False)
+            # Note: not logging e.cmd and e.returncode, since they'll
+            #   be logged by top level exception handler
+            raise e
+
+        except FileNotFoundError as e:
+            self._log(e.strerror, is_stdout=False)
+            raise e
+
+    def _set_cmd_args(self, args):
+        # Support either list of command parts or single command string
+        if len(args) == 1 and hasattr(args[0], 'split'):
+            self._cmd_args = args[0].split()
+            self._cmd_str = args[0]
+        else:
+            self._cmd_args = args
+            self._cmd_str = ' '.join(args)
+        logging.debug('Executing {}'.format(self._cmd_str))
+
+        self._executable = os.path.basename(self._cmd_args[0])
+
+    def _execute_with_real_time_logging(self, cwd):
+        process = subprocess.Popen(self._cmd_args, shell=False,
+            cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, #STDOUT,
+            universal_newlines=True)
+        while True:
+            line = process.stdout.readline()
+            if line != "":
+                self._log(line)
+            line = process.stderr.readline()
+            if line != "":
+                self._log(line, is_stdout=True)
+
+            if process.poll() is not None:
+                break
+
+    def _execute_with_logging_after(self, cwd):
+        # Use check_output so that output isn't sent to stdout
+        output = subprocess.check_output(self._cmd_args, cwd=cwd,
+            universal_newlines=True)
+        self._log(output)
+
+    def _log(self, output, is_stdout=True):
+        if output:
+            log_func = logging.warn if is_stdout else logging.error
+            for line in output.split('\n'):
+                log_func('{}: {}'.format(self._executable, line))
 
 
 def create_tarball(output_dir, tarball_pathname=None):
