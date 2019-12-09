@@ -4,7 +4,6 @@ __author__ = "Joel Dubowy"
 
 import logging
 import sys
-import subprocess
 import time
 from collections import defaultdict
 
@@ -12,7 +11,8 @@ from py.test import raises
 
 from bluesky import io
 from bluesky.exceptions import (
-    BlueSkyConfigurationError, BlueSkyUnavailableResourceError
+    BlueSkyConfigurationError, BlueSkyUnavailableResourceError,
+    BlueSkySubprocessError
 )
 
 ##
@@ -299,26 +299,36 @@ class TestCmdExecutor(object):
 
     def test_invalid_executable_realtime_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
-        with raises(FileNotFoundError) as e_info:
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute(['sdfsdfsdf', 'sdf'], realtime_logging=True)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
-        with raises(FileNotFoundError) as e_info:
+
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute('sdfsdfsdf', 'sdf', realtime_logging=True)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
-        with raises(FileNotFoundError) as e_info:
+
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute('sdfsdfsdf sdf', realtime_logging=True)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
     def test_invalid_command_realtime_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
-        with raises(subprocess.CalledProcessError) as e_info:
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute(['ls', 'fsdkdsfjlkdsfkjlrew'], realtime_logging=True)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
-        with raises(subprocess.CalledProcessError) as e_info:
+
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute('ls', 'fsdkdsfjlkdsfkjlrew', realtime_logging=True)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
-        with raises(subprocess.CalledProcessError) as e_info:
+
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute('ls fsdkdsfjlkdsfkjlrew', realtime_logging=True)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
     def test_success_realtime_logging(self, monkeypatch):
@@ -334,26 +344,36 @@ class TestCmdExecutor(object):
 
     def test_invalid_executable_post_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
-        with raises(FileNotFoundError) as e_info:
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute(['lsdflsdf', 'sdf'], realtime_logging=False)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
-        with raises(FileNotFoundError) as e_info:
+
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute('lsdflsdf', 'sdf', realtime_logging=False)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
-        with raises(FileNotFoundError) as e_info:
+
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute('lsdflsdf sdf', realtime_logging=False)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
     def test_invalid_command_post_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
-        with raises(subprocess.CalledProcessError) as e_info:
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute(['ls', 'fsdkdsfjlkdsfkjlrew'], realtime_logging=False)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
-        with raises(subprocess.CalledProcessError) as e_info:
+
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute('ls', 'fsdkdsfjlkdsfkjlrew', realtime_logging=False)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
-        with raises(subprocess.CalledProcessError) as e_info:
+
+        with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute('ls fsdkdsfjlkdsfkjlrew', realtime_logging=False)
+        # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
     def test_success_post_logging(self, monkeypatch):
