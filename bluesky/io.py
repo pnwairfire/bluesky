@@ -159,6 +159,9 @@ class CmdExecutor(object):
         python3 -c 'from bluesky import io; io.CmdExecutor().execute("echo \"hello\"")'
     """
 
+    def __init__(self, stdout_log_level=logging.DEBUG):
+        self._stdout_log_level = stdout_log_level
+
     def execute(self, *args, cwd=None, realtime_logging=True):
         self._set_cmd_args(args)
 
@@ -187,36 +190,40 @@ class CmdExecutor(object):
         else:
             self._cmd_args = args
             self._cmd_str = ' '.join(args)
-        logging.debug('Executing {}'.format(self._cmd_str))
 
+        logging.debug('Executing {}'.format(self._cmd_str))
         self._executable = os.path.basename(self._cmd_args[0])
 
     def _execute_with_real_time_logging(self, cwd):
-        process = subprocess.Popen(self._cmd_args, shell=False,
-            cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, #STDOUT,
-            universal_newlines=True)
+        process = subprocess.Popen(self._cmd_args,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, #.PIPE
+            shell=False, cwd=cwd, universal_newlines=True)
+
         while True:
+            # There will be at least one printed line - minimally,
+            # a single newline
             line = process.stdout.readline()
             if line != "":
                 self._log(line)
-            line = process.stderr.readline()
-            if line != "":
-                self._log(line, is_stdout=True)
+            # TODO: figure out how to capture stdout and stderr separately
+            # line = process.stderr.readline()
+            # if line != "":
+            #     self._log(line, is_stdout=False)
 
             if process.poll() is not None:
                 break
 
     def _execute_with_logging_after(self, cwd):
         # Use check_output so that output isn't sent to stdout
-        output = subprocess.check_output(self._cmd_args, cwd=cwd,
-            universal_newlines=True)
+        output = subprocess.check_output(self._cmd_args,
+            stderr=subprocess.STDOUT, cwd=cwd, universal_newlines=True)
         self._log(output)
 
     def _log(self, output, is_stdout=True):
         if output:
-            log_func = logging.warn if is_stdout else logging.error
-            for line in output.split('\n'):
-                log_func('{}: {}'.format(self._executable, line))
+            log_level = self._stdout_log_level if is_stdout else logging.ERROR
+            for line in output.strip().split('\n'):
+                logging.log(log_level, '%s: %s', self._executable, line)
 
 
 def create_tarball(output_dir, tarball_pathname=None):
