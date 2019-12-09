@@ -23,6 +23,7 @@ __all__ = [
     "create_dir_or_handle_existing",
     "wait_for_availability",
     "capture_stdout",
+    "CmdExecutor",
     "create_tarball"
 ]
 
