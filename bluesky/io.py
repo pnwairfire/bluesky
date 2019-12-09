@@ -192,7 +192,7 @@ class CmdExecutor(object):
             self._cmd_args = args
             self._cmd_str = shlex.join(args)
 
-        logging.debug('Executing {}'.format(self._cmd_str))
+        logging.info('Executing {}'.format(self._cmd_str))
         self._executable = os.path.basename(self._cmd_args[0])
 
     def _execute_with_real_time_logging(self, cwd):
