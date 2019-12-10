@@ -179,18 +179,23 @@ class SubprocessExecutor(object):
             self._log(e.stderr, is_stdout=False)
             # Note: not logging e.cmd and e.returncode, since they'll
             #   be logged by top level exception handler
-            raise BlueSkySubprocessError(e)
+            msg = (e.stderr or e.output or str(e))
+            msg = self._get_last_line(msg)
+            raise BlueSkySubprocessError(msg)
 
         except FileNotFoundError as e:
             self._log(e.strerror, is_stdout=False)
-            raise BlueSkySubprocessError(e)
+            raise BlueSkySubprocessError(str(e))
 
         except BlueSkySubprocessError:
             # any stderr will have been logged; just reraise
             raise
 
         except Exception as e:
-            raise BlueSkySubprocessError(e)
+            raise BlueSkySubprocessError(str(e))
+
+    def _get_last_line(self, output):
+        return output.strip().split('\n')[-1] if output else ""
 
     def _set_cmd_args(self, args):
         # Support three ways of being called:
@@ -235,8 +240,10 @@ class SubprocessExecutor(object):
             ret_val = process.poll()
 
         if ret_val > 0:
-            self._log(process.stderr.read(), is_stdout=False)
-            raise BlueSkySubprocessError()
+            serr = process.stderr.read()
+            self._log(serr, is_stdout=False)
+            msg = self._get_last_line(serr)
+            raise BlueSkySubprocessError(msg)
 
     def _execute_with_logging_after(self, cwd):
         # Use check_output so that output isn't sent to stdout
