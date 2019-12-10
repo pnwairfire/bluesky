@@ -23,7 +23,7 @@ __all__ = [
     "create_dir_or_handle_existing",
     "wait_for_availability",
     "capture_stdout",
-    "CmdExecutor",
+    "SubprocessExecutor",
     "create_tarball"
 ]
 
@@ -153,13 +153,13 @@ class capture_stdout(object):
         sys.stdout = sys.__stdout__
 
 
-class CmdExecutor(object):
+class SubprocessExecutor(object):
     """Wraps command execution in order to capture
     and optionally log stdout and stderr output
 
     To adhoc test:
 
-        python3 -c 'from bluesky import io; io.CmdExecutor().execute("echo \"hello\"")'
+        python3 -c 'from bluesky import io; io.SubprocessExecutor().execute("echo \"hello\"")'
     """
 
     def __init__(self, stdout_log_level=logging.DEBUG):
@@ -190,21 +190,21 @@ class CmdExecutor(object):
     def _set_cmd_args(self, args):
         # Support three ways of being called:
         if len(args) == 1:
-            # e.g. CmdExecutor().execute('ls foo')
+            # e.g. SubprocessExecutor().execute('ls foo')
             if hasattr(args[0], 'split'):
                 self._cmd_args = shlex.split(args[0])
                 self._cmd_str = args[0]
 
-            # e.g. CmdExecutor().execute(['ls', 'foo'])
+            # e.g. SubprocessExecutor().execute(['ls', 'foo'])
             elif hasattr(args[0], 'append'):
                 self._cmd_args = args[0]
                 self._cmd_str = ' '.join(args[0])
 
             else:
                 raise ValueError(
-                    "Invalid args for CmdExecutor.execute: {}".format(args))
+                    "Invalid args for SubprocessExecutor.execute: {}".format(args))
 
-        # e.g. CmdExecutor().execute('ls', 'foo')
+        # e.g. SubprocessExecutor().execute('ls', 'foo')
         else:
             self._cmd_args = args
             # TODO: use shlex.join after upgrading to python>=3.8

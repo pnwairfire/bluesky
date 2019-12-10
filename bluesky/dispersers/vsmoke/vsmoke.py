@@ -111,7 +111,7 @@ class VSMOKEDispersion(DispersionBase):
                 local_dt = self._compute_local_dt(fire, hr)
                 self._write_iso_input(fire, local_dt, in_var)
 
-                io.CmdExecutor().execute(self.BINARIES['VSMOKEGIS'], cwd=wdir)
+                io.SubprocessExecutor().execute(self.BINARIES['VSMOKEGIS'], cwd=wdir)
 
                 # TODO: replace 'hr' with 'local_dt'
                 suffix = "{}_hour{}".format(fire.id, str(hr+1))
@@ -135,7 +135,7 @@ class VSMOKEDispersion(DispersionBase):
             # Write input files
             self._write_input(fire, in_var)
             # Run VSMOKE for fire
-            io.CmdExecutor().execute(self.BINARIES['VSMOKE'], cwd=wdir)
+            io.SubprocessExecutor().execute(self.BINARIES['VSMOKE'], cwd=wdir)
 
             # Rename input and output files and archive
             self._archive_file("VSMOKE.IPT", src_dir=wdir, suffix=fire.id)

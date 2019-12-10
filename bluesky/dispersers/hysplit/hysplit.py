@@ -382,12 +382,12 @@ class HYSPLITDispersion(DispersionBase):
         ncea_args = ["-O","-v","PM25","-y","ttl"]
         ncea_args.extend(["%d/%s" % (i, self._output_file_name) for i in  range(self._num_processes)])
         ncea_args.append(output_file)
-        io.CmdExecutor().execute(self.BINARIES['NCEA'], *ncea_args, cwd=working_dir)
+        io.SubprocessExecutor().execute(self.BINARIES['NCEA'], *ncea_args, cwd=working_dir)
 
         ncks_args = ["-A","-v","TFLAG"]
         ncks_args.append("0/%s" % (self._output_file_name))
         ncks_args.append(output_file)
-        io.CmdExecutor().execute(self.BINARIES['NCKS'], *ncks_args, cwd=working_dir)
+        io.SubprocessExecutor().execute(self.BINARIES['NCKS'], *ncks_args, cwd=working_dir)
         self._archive_file(output_file)
 
     def _create_sym_link(self, dest, link):
@@ -510,9 +510,9 @@ class HYSPLITDispersion(DispersionBase):
                     # or even support it.)
                     args.append("--allow-run-as-root")
                 args.extend(["-n", str(NCPUS), self.BINARIES['HYSPLIT_MPI']])
-                io.CmdExecutor().execute(*args, cwd=working_dir)
+                io.SubprocessExecutor().execute(*args, cwd=working_dir)
             else:  # standard serial run
-                io.CmdExecutor().execute(self.BINARIES['HYSPLIT'], cwd=working_dir)
+                io.SubprocessExecutor().execute(self.BINARIES['HYSPLIT'], cwd=working_dir)
 
             if not os.path.exists(output_conc_file):
                 msg = "HYSPLIT failed, check MESSAGE file for details"
@@ -521,7 +521,7 @@ class HYSPLITDispersion(DispersionBase):
 
             if self.config('CONVERT_HYSPLIT2NETCDF'):
                 logging.info("Converting HYSPLIT output to NetCDF format: %s -> %s" % (output_conc_file, output_file))
-                io.CmdExecutor().execute(self.BINARIES['HYSPLIT2NETCDF'],
+                io.SubprocessExecutor().execute(self.BINARIES['HYSPLIT2NETCDF'],
                     "-I" + output_conc_file,
                     "-O" + os.path.basename(output_file),
                     "-X1000000.0",  # Scale factor to convert from grams to micrograms

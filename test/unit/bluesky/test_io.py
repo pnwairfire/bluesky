@@ -276,7 +276,7 @@ class TestCaptureStdout(object):
         assert sys.stdout == sys.__stdout__
 
 
-class TestCmdExecutor(object):
+class TestSubprocessExecutor(object):
 
     def monkeypatch_logging(self, monkeypatch):
         self.msgs = defaultdict(lambda: [])
@@ -292,8 +292,8 @@ class TestCmdExecutor(object):
 
     def test_invalid_args(self):
         with raises(ValueError) as e_info:
-            io.CmdExecutor().execute(123)
-        assert e_info.value.args[0] == "Invalid args for CmdExecutor.execute: (123,)"
+            io.SubprocessExecutor().execute(123)
+        assert e_info.value.args[0] == "Invalid args for SubprocessExecutor.execute: (123,)"
 
     ## Realtime output logging
 
@@ -301,17 +301,17 @@ class TestCmdExecutor(object):
         self.monkeypatch_logging(monkeypatch)
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute(['sdfsdfsdf', 'sdf'], realtime_logging=True)
+            io.SubprocessExecutor().execute(['sdfsdfsdf', 'sdf'], realtime_logging=True)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute('sdfsdfsdf', 'sdf', realtime_logging=True)
+            io.SubprocessExecutor().execute('sdfsdfsdf', 'sdf', realtime_logging=True)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute('sdfsdfsdf sdf', realtime_logging=True)
+            io.SubprocessExecutor().execute('sdfsdfsdf sdf', realtime_logging=True)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
@@ -319,30 +319,30 @@ class TestCmdExecutor(object):
         self.monkeypatch_logging(monkeypatch)
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute(['ls', 'fsdkdsfjlkdsfkjlrew'], realtime_logging=True)
+            io.SubprocessExecutor().execute(['ls', 'fsdkdsfjlkdsfkjlrew'], realtime_logging=True)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute('ls', 'fsdkdsfjlkdsfkjlrew', realtime_logging=True)
+            io.SubprocessExecutor().execute('ls', 'fsdkdsfjlkdsfkjlrew', realtime_logging=True)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute('ls fsdkdsfjlkdsfkjlrew', realtime_logging=True)
+            io.SubprocessExecutor().execute('ls fsdkdsfjlkdsfkjlrew', realtime_logging=True)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
     def test_success_realtime_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
 
-        io.CmdExecutor().execute(['echo', 'hello'], realtime_logging=True)
+        io.SubprocessExecutor().execute(['echo', 'hello'], realtime_logging=True)
         # TODO: check self.msgs
 
-        io.CmdExecutor().execute('echo', 'hello', realtime_logging=True)
+        io.SubprocessExecutor().execute('echo', 'hello', realtime_logging=True)
         # TODO: check self.msgs
 
-        io.CmdExecutor().execute('echo hello', realtime_logging=True)
+        io.SubprocessExecutor().execute('echo hello', realtime_logging=True)
         # TODO: check self.msgs
 
     ## Post-execution output logging
@@ -351,45 +351,45 @@ class TestCmdExecutor(object):
         self.monkeypatch_logging(monkeypatch)
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute(['lsdflsdf', 'sdf'], realtime_logging=False)
+            io.SubprocessExecutor().execute(['lsdflsdf', 'sdf'], realtime_logging=False)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute('lsdflsdf', 'sdf', realtime_logging=False)
+            io.SubprocessExecutor().execute('lsdflsdf', 'sdf', realtime_logging=False)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute('lsdflsdf sdf', realtime_logging=False)
+            io.SubprocessExecutor().execute('lsdflsdf sdf', realtime_logging=False)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
     def test_invalid_command_post_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute(['ls', 'fsdkdsfjlkdsfkjlrew'], realtime_logging=False)
+            io.SubprocessExecutor().execute(['ls', 'fsdkdsfjlkdsfkjlrew'], realtime_logging=False)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute('ls', 'fsdkdsfjlkdsfkjlrew', realtime_logging=False)
+            io.SubprocessExecutor().execute('ls', 'fsdkdsfjlkdsfkjlrew', realtime_logging=False)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.CmdExecutor().execute('ls fsdkdsfjlkdsfkjlrew', realtime_logging=False)
+            io.SubprocessExecutor().execute('ls fsdkdsfjlkdsfkjlrew', realtime_logging=False)
         # TODO: check e_info.value.args[0]
         # TODO: check self.msgs
 
     def test_success_post_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
 
-        io.CmdExecutor().execute(['echo', 'hello'], realtime_logging=False)
+        io.SubprocessExecutor().execute(['echo', 'hello'], realtime_logging=False)
         # TODO: check self.msgs
 
-        io.CmdExecutor().execute('echo', 'hello', realtime_logging=False)
+        io.SubprocessExecutor().execute('echo', 'hello', realtime_logging=False)
         # TODO: check self.msgs
 
-        io.CmdExecutor().execute('echo hello', realtime_logging=False)
+        io.SubprocessExecutor().execute('echo hello', realtime_logging=False)
         # TODO: check self.msgs
