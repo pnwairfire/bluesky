@@ -58,29 +58,24 @@ RUN apt-get update \
         libmpich-dev \
         openmpi-bin
 
-# upgrade distribute
-RUN pip3 install --upgrade \
-        distribute
+# upgrade distribute and pip
+RUN pip3 install --upgrade distribute pip
 
-RUN pip3 install --upgrade pip
-
-# blueskykml, consume, and fiona are relatively static these days; so, install them
-# here in order to avoid reinstalling them and their large dependencies
-# (Pillow==2.8.1, 9.0MB, and matplotlib==1.4.3, 50.4MB, for blueskykml;
-# pandas, etc. for consume; 39.7MB for fiona itself) everytime the the bluesky image is built
-# Note: these RUN commands will need to be updated if fiona,
-#   consume, and or blueskykml are ever updated in setup.py
-# Note: install fiona, then consume, then blueskykml, based on
-#   likelyhood of upgrade
-RUN pip3 install Fiona==1.7.2
-RUN pip3 install \
-    --extra-index https://pypi.airfire.org/simple apps-consume==5.0.2
-RUN pip3 install \
-    --extra-index https://pypi.airfire.org/simple blueskykml==2.4.3
-
-# Install bluesky utils for merging emissions, etc.
-RUN pip3 install \
-    --extra-index https://pypi.airfire.org/simple blueskyutils>=0.4.0
+# blueskykml, consume, and fiona are relatively static these days; so, install
+# them here in order to avoid reinstalling them and their large dependencies
+# each time other dependencies in requirements.txt change.
+# Also install blueskyutils for merging emissions, etc.
+# Notable sub-dependencies:
+#  - blueskykml:  Pillow==2.8.1, 9.0MB, and matplotlib==1.4.3, 50.4MB
+#  - consume:  pandas, etc.
+#  - fiona:  39.7MB for fiona itself
+# Note: this RUN command will need to be updated if fiona,
+#   consume, blueskykml, or blueskyutils are ever updated in setup.py
+RUN pip3 install --extra-index https://pypi.airfire.org/simple \
+    Fiona==1.7.2 \
+    apps-consume==5.0.2 \
+    blueskykml==2.4.3 \
+    blueskyutils>=0.4.0
 
 # Install binary dependencies - for localmet, plumerise,
 # dipersion, and visualization
