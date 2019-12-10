@@ -159,4 +159,10 @@
  - regression test updates
 
 ## 4.1.30
-- Upgrede timeprofile to v1.1.2
+ - Upgrede timeprofile to v1.1.2
+
+## 4.1.31
+ - Create new class bluesky.io.SubprocessExecutor for running sub-processes and capturing their output, both stdout and stderr, with either real-time or post-execution logging of the output
+ - Update dispersion modules (hysplit and vsmoke) as well as export upload module to use bluesky.io.SubprocessExecutor instead of using the subprocess package directly
+ - Install ssh in docker image, since it's needed by export upload <-- this fixes the code that creates the remote directory before scping the export tarball
+ - consolidate RUN commands in Dockerfile
