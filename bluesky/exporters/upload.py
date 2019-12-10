@@ -153,8 +153,6 @@ class UploadExporter(ExporterBase):
         logging.info("Extracting {} on {} in {}".format(tarball,
             remote_server, options['dest_dir']))
 
-        # Note: due to need to quote remote command, I couldn't figure out
-        #  away to avoid using shell=True in check_output call
         cmd = "ssh {} -p {} 'cd {} && tar xzf {}'".format(remote_server,
             port, options['dest_dir'], tarball_filename)
         io.SubprocessExecutor().execute(cmd)
