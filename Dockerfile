@@ -21,59 +21,48 @@ MAINTAINER Joel Dubowy
 
 ## Install Dependencies
 
-# Install base dependencies
+# Install
+#  - base dependencies and utilities
+#  - png and freetype libs for matplotlib, which is needed
+#    by bluesky kml, as well as netcdf and proj libs
+#  - numpy
+#  - gdal, it's python bindings, and it's utilities
+#  - xml libs
+#  - gdal-bin for gdalwarp and gdal_translate
+#  - openpmi and mpich libs (TODO: install libopenmpi1.10
+#    and libmpich12 instead of the dev versions?)
 RUN apt-get update \
     && apt-get install -y \
         g++ \
         gcc \
         make \
         ssh \
+        vim \
         dialog \
         less \
         python3 \
         python3-dev \
-        python3-pip
+        python3-pip \
+        libpng-dev \
+        libfreetype6-dev \
+        libnetcdf-dev \
+        libproj-dev \
+        python3-numpy \
+        libgdal-dev \
+        nco \
+        python3-gdal \
+        libxml2-dev \
+        libxslt1-dev \
+        gdal-bin \
+        libopenmpi-dev \
+        libmpich-dev \
+        openmpi-bin
 
 # upgrade distribute
 RUN pip3 install --upgrade \
         distribute
 
-# install png and freetype libs for matplotlib, which is needed
-# by bluesky kml, as well as netcdf and proj libs
-RUN apt-get install -y \
-        libpng-dev \
-        libfreetype6-dev \
-        libnetcdf-dev \
-        libproj-dev
-
-# Install numpy (which must be installed first); gdal, it's python bindings,
-# and it's utilities; and xml libs
-RUN apt-get install -y \
-        python3-numpy \
-    && apt-get install -y \
-        libgdal-dev \
-        nco \
-    && apt-get install -y \
-        python3-gdal \
-    && apt-get install -y \
-        libxml2-dev \
-        libxslt1-dev \
-    && apt-get install -y \
-        gdal-bin # install gdal-bin for gdalwarp and gdal_translate
-
-# TODO: install libopenmpi1.10 and libmpich12 instead of the dev versions
-RUN apt-get update \
-    && apt-get install -y \
-        libopenmpi-dev \
-        libmpich-dev \
-    && apt-get install -y \
-        openmpi-bin
-
 RUN pip3 install --upgrade pip
-
-# Having vim is handy
-RUN apt-get install -y \
-        vim
 
 # blueskykml, consume, and fiona are relatively static these days; so, install them
 # here in order to avoid reinstalling them and their large dependencies
