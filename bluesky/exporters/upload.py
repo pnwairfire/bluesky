@@ -8,9 +8,9 @@ import logging
 import os
 import re
 import shutil
-import subprocess
 import tempfile
 
+from bluesky import io
 from bluesky.exceptions import BlueSkyConfigurationError
 from . import ExporterBase
 
@@ -113,8 +113,7 @@ class UploadExporter(ExporterBase):
         shutil.copy(tarball, dest_dir)
 
         # TODO: use tarfile module
-        subprocess.check_output(['tar', 'xzf', tarball, '-C',
-            dest_dir], stderr=subprocess.STDOUT)
+        io.SubprocessExecutor().execute(['tar', 'xzf', tarball, '-C', dest_dir])
 
     ##
     ## SCP
@@ -136,12 +135,11 @@ class UploadExporter(ExporterBase):
         #   is captured by piping stderr to stdout in each check_output call
         logging.info("Creating remote destination {}".format(
             options['dest_dir']))
-        subprocess.check_output(['ssh', '-o', 'StrictHostKeyChecking=no',
-            remote_server, '-p', port, 'mkdir', '-p', options['dest_dir']],
-            stderr=subprocess.STDOUT)
+        io.SubprocessExecutor().execute(['ssh', '-o', 'StrictHostKeyChecking=no',
+            remote_server, '-p', port, 'mkdir', '-p', options['dest_dir']])
         logging.info("Uploading {} via scp".format(tarball))
-        subprocess.check_output(['scp', '-o', 'StrictHostKeyChecking=no',
-            '-P', port, tarball, destination], stderr=subprocess.STDOUT)
+        io.SubprocessExecutor().execute(['scp', '-o', 'StrictHostKeyChecking=no',
+            '-P', port, tarball, destination])
 
         return {
             "destination": destination,
@@ -159,7 +157,7 @@ class UploadExporter(ExporterBase):
         #  away to avoid using shell=True in check_output call
         cmd = "ssh {} -p {} 'cd {} && tar xzf {}'".format(remote_server,
             port, options['dest_dir'], tarball_filename)
-        subprocess.check_output([cmd], shell=True, stderr=subprocess.STDOUT)
+        io.SubprocessExecutor().execute(cmd)
 
     def _scp(self, options, tarball):
         # Note: don't catch and exceptions here. Let calling method, 'export',
