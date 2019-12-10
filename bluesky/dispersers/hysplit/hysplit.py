@@ -527,7 +527,7 @@ class HYSPLITDispersion(DispersionBase):
                     "-X1000000.0",  # Scale factor to convert from grams to micrograms
                     "-D1",  # Debug flag
                     "-L-1",  # Lx is x layers. x=-1 for all layers...breaks KML output for multiple layers
-                    working_dir=working_dir
+                    cwd=working_dir
                 )
 
                 if not os.path.exists(output_file):
