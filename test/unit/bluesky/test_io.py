@@ -302,35 +302,35 @@ class TestSubprocessExecutor(object):
 
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute(['sdfsdfsdf', 'sdf'], realtime_logging=True)
-        # TODO: check e_info.value.args[0]
+        assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'sdfsdfsdf'"
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('sdfsdfsdf', 'sdf', realtime_logging=True)
-        # TODO: check e_info.value.args[0]
+        assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'sdfsdfsdf'"
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('sdfsdfsdf sdf', realtime_logging=True)
-        # TODO: check e_info.value.args[0]
+        assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'sdfsdfsdf'"
         # TODO: check self.msgs
 
     def test_invalid_command_realtime_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.SubprocessExecutor().execute(['ls', 'fsdkdsfjlkdsfkjlrew'], realtime_logging=True)
-        # TODO: check e_info.value.args[0]
+            io.SubprocessExecutor().execute(['ls', 'dfjre'], realtime_logging=True)
+        assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.SubprocessExecutor().execute('ls', 'fsdkdsfjlkdsfkjlrew', realtime_logging=True)
-        # TODO: check e_info.value.args[0]
+            io.SubprocessExecutor().execute('ls', 'dfjre', realtime_logging=True)
+        assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.SubprocessExecutor().execute('ls fsdkdsfjlkdsfkjlrew', realtime_logging=True)
-        # TODO: check e_info.value.args[0]
+            io.SubprocessExecutor().execute('ls dfjre', realtime_logging=True)
+        assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
         # TODO: check self.msgs
 
     def test_success_realtime_logging(self, monkeypatch):
@@ -352,34 +352,34 @@ class TestSubprocessExecutor(object):
 
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute(['lsdflsdf', 'sdf'], realtime_logging=False)
-        # TODO: check e_info.value.args[0]
+        assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'lsdflsdf'"
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('lsdflsdf', 'sdf', realtime_logging=False)
-        # TODO: check e_info.value.args[0]
+        assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'lsdflsdf'"
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('lsdflsdf sdf', realtime_logging=False)
-        # TODO: check e_info.value.args[0]
+        assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'lsdflsdf'"
         # TODO: check self.msgs
 
     def test_invalid_command_post_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
         with raises(BlueSkySubprocessError) as e_info:
-            io.SubprocessExecutor().execute(['ls', 'fsdkdsfjlkdsfkjlrew'], realtime_logging=False)
-        # TODO: check e_info.value.args[0]
+            io.SubprocessExecutor().execute(['ls', 'dfjre'], realtime_logging=False)
+        assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.SubprocessExecutor().execute('ls', 'fsdkdsfjlkdsfkjlrew', realtime_logging=False)
-        # TODO: check e_info.value.args[0]
+            io.SubprocessExecutor().execute('ls', 'dfjre', realtime_logging=False)
+        assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
         # TODO: check self.msgs
 
         with raises(BlueSkySubprocessError) as e_info:
-            io.SubprocessExecutor().execute('ls fsdkdsfjlkdsfkjlrew', realtime_logging=False)
-        # TODO: check e_info.value.args[0]
+            io.SubprocessExecutor().execute('ls dfjre', realtime_logging=False)
+        assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
         # TODO: check self.msgs
 
     def test_success_post_logging(self, monkeypatch):
