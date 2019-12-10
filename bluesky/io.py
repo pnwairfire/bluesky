@@ -202,6 +202,9 @@ class SubprocessExecutor(object):
         if len(args) == 1:
             # e.g. SubprocessExecutor().execute('ls foo')
             if hasattr(args[0], 'split'):
+                # shlex.split handles quotes.  e.g.
+                #    >>> shlex.split("ssh foo@bar 'cd /tmp/ && ls -la'")
+                #    ['ssh', 'foo@bar', 'cd /tmp/ && ls -la']
                 self._cmd_args = shlex.split(args[0])
                 self._cmd_str = args[0]
 
