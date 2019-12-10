@@ -27,6 +27,7 @@ RUN apt-get update \
         g++ \
         gcc \
         make \
+        ssh \
         dialog \
         less \
         python3 \
