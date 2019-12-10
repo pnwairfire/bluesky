@@ -185,7 +185,12 @@ class SubprocessExecutor(object):
             self._log(e.strerror, is_stdout=False)
             raise BlueSkySubprocessError(e)
 
-        # TODO: catch BlueSkySubprocessError, log error output, and re-raise
+        except BlueSkySubprocessError:
+            # any stderr will have been logged; just reraise
+            raise
+
+        except Exception as e:
+            raise BlueSkySubprocessError(e)
 
     def _set_cmd_args(self, args):
         # Support three ways of being called:
@@ -214,10 +219,8 @@ class SubprocessExecutor(object):
         self._executable = os.path.basename(self._cmd_args[0])
 
     def _execute_with_real_time_logging(self, cwd):
-        # TODO: capture stdout and stderr separately, so that
-        #   different log levels can be used.
         process = subprocess.Popen(self._cmd_args,
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, #.PIPE
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             shell=False, cwd=cwd, universal_newlines=True)
 
         ret_val = None
@@ -228,14 +231,11 @@ class SubprocessExecutor(object):
             line = process.stdout.readline()
             if line != "":
                 self._log(line)
-            # TODO: figure out how to capture stdout and stderr separately
-            # line = process.stderr.readline()
-            # if line != "":
-            #     self._log(line, is_stdout=False)
 
             ret_val = process.poll()
 
         if ret_val > 0:
+            self._log(process.stderr.read(), is_stdout=False)
             raise BlueSkySubprocessError()
 
     def _execute_with_logging_after(self, cwd):
