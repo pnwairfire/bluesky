@@ -15,7 +15,6 @@ import itertools
 import logging
 import os
 import shutil
-import subprocess
 from datetime import timedelta
 
 from pyairfire import osutils
