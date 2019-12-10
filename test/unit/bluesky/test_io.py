@@ -279,16 +279,12 @@ class TestCaptureStdout(object):
 class TestSubprocessExecutor(object):
 
     def monkeypatch_logging(self, monkeypatch):
-        self.msgs = defaultdict(lambda: [])
+        self.msgs = []
 
-        def get_mock_log_func(level):
-            l = self.msgs[level]
-            def log(*args, **kwargs):
-                l.append((args, kwargs))
-            return log
+        def mock_log(*args, **kwargs):
+            self.msgs.append((args, kwargs))
 
-        monkeypatch.setattr(logging, 'debug', get_mock_log_func(logging.DEBUG))
-        monkeypatch.setattr(logging, 'error', get_mock_log_func(logging.ERROR))
+        monkeypatch.setattr(logging, 'log', mock_log)
 
     def test_invalid_args(self):
         with raises(ValueError) as e_info:
@@ -303,17 +299,25 @@ class TestSubprocessExecutor(object):
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute(['sdfsdfsdf', 'sdf'], realtime_logging=True)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'sdfsdfsdf'"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((logging.ERROR, '%s: %s', 'sdfsdfsdf', "No such file or directory: 'sdfsdfsdf'"), {})
+        ]
 
+        self.msgs = []  # reset
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('sdfsdfsdf', 'sdf', realtime_logging=True)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'sdfsdfsdf'"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((logging.ERROR, '%s: %s', 'sdfsdfsdf', "No such file or directory: 'sdfsdfsdf'"), {})
+        ]
 
+        self.msgs = []  # reset
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('sdfsdfsdf sdf', realtime_logging=True)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'sdfsdfsdf'"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((logging.ERROR, '%s: %s', 'sdfsdfsdf', "No such file or directory: 'sdfsdfsdf'"), {})
+        ]
 
     def test_invalid_command_realtime_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
@@ -321,29 +325,45 @@ class TestSubprocessExecutor(object):
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute(['ls', 'dfjre'], realtime_logging=True)
         assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((logging.ERROR, '%s: %s', 'ls', "ls: cannot access 'dfjre': No such file or directory"), {})
+        ]
 
+        self.msgs = []  # reset
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('ls', 'dfjre', realtime_logging=True)
         assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((logging.ERROR, '%s: %s', 'ls', "ls: cannot access 'dfjre': No such file or directory"), {})
+        ]
 
+        self.msgs = []  # reset
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('ls dfjre', realtime_logging=True)
         assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((logging.ERROR, '%s: %s', 'ls', "ls: cannot access 'dfjre': No such file or directory"), {})
+        ]
 
     def test_success_realtime_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
 
         io.SubprocessExecutor().execute(['echo', 'hello'], realtime_logging=True)
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((10, '%s: %s', 'echo', 'hello'), {})
+        ]
 
+        self.msgs = []  # reset
         io.SubprocessExecutor().execute('echo', 'hello', realtime_logging=True)
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((10, '%s: %s', 'echo', 'hello'), {})
+        ]
 
+        self.msgs = []  # reset
         io.SubprocessExecutor().execute('echo hello', realtime_logging=True)
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((10, '%s: %s', 'echo', 'hello'), {})
+        ]
 
     ## Post-execution output logging
 
@@ -353,43 +373,71 @@ class TestSubprocessExecutor(object):
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute(['lsdflsdf', 'sdf'], realtime_logging=False)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'lsdflsdf'"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((40, '%s: %s', 'lsdflsdf', "No such file or directory: 'lsdflsdf'"), {})
+        ]
 
+        self.msgs = []  # reset
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('lsdflsdf', 'sdf', realtime_logging=False)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'lsdflsdf'"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((40, '%s: %s', 'lsdflsdf', "No such file or directory: 'lsdflsdf'"), {})
+        ]
 
+        self.msgs = []  # reset
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('lsdflsdf sdf', realtime_logging=False)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'lsdflsdf'"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((40, '%s: %s', 'lsdflsdf', "No such file or directory: 'lsdflsdf'"), {})
+        ]
 
     def test_invalid_command_post_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
+
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute(['ls', 'dfjre'], realtime_logging=False)
         assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            # it's DEBUG because the log-after-execution code doesn't (yet)
+            # distinguish between stdout and stderr when the command returns
+            # error (as opposed to trying to run an invalid executable)
+            ((logging.DEBUG, '%s: %s', 'ls', "ls: cannot access 'dfjre': No such file or directory"), {})
+        ]
 
+        self.msgs = []  # reset
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('ls', 'dfjre', realtime_logging=False)
         assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((logging.DEBUG, '%s: %s', 'ls', "ls: cannot access 'dfjre': No such file or directory"), {})
+        ]
 
+        self.msgs = []  # reset
         with raises(BlueSkySubprocessError) as e_info:
             io.SubprocessExecutor().execute('ls dfjre', realtime_logging=False)
         assert e_info.value.args[0] == "ls: cannot access 'dfjre': No such file or directory"
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((logging.DEBUG, '%s: %s', 'ls', "ls: cannot access 'dfjre': No such file or directory"), {})
+        ]
 
     def test_success_post_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
 
         io.SubprocessExecutor().execute(['echo', 'hello'], realtime_logging=False)
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((10, '%s: %s', 'echo', 'hello'), {})
+        ]
 
+        self.msgs = []  # reset
         io.SubprocessExecutor().execute('echo', 'hello', realtime_logging=False)
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((10, '%s: %s', 'echo', 'hello'), {})
+        ]
 
+        self.msgs = []  # reset
         io.SubprocessExecutor().execute('echo hello', realtime_logging=False)
-        # TODO: check self.msgs
+        assert self.msgs == [
+            ((10, '%s: %s', 'echo', 'hello'), {})
+        ]
