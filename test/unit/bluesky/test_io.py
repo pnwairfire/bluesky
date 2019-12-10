@@ -299,6 +299,7 @@ class TestCmdExecutor(object):
 
     def test_invalid_executable_realtime_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
+
         with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute(['sdfsdfsdf', 'sdf'], realtime_logging=True)
         # TODO: check e_info.value.args[0]
@@ -316,6 +317,7 @@ class TestCmdExecutor(object):
 
     def test_invalid_command_realtime_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
+
         with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute(['ls', 'fsdkdsfjlkdsfkjlrew'], realtime_logging=True)
         # TODO: check e_info.value.args[0]
@@ -333,10 +335,13 @@ class TestCmdExecutor(object):
 
     def test_success_realtime_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
+
         io.CmdExecutor().execute(['echo', 'hello'], realtime_logging=True)
         # TODO: check self.msgs
+
         io.CmdExecutor().execute('echo', 'hello', realtime_logging=True)
         # TODO: check self.msgs
+
         io.CmdExecutor().execute('echo hello', realtime_logging=True)
         # TODO: check self.msgs
 
@@ -344,6 +349,7 @@ class TestCmdExecutor(object):
 
     def test_invalid_executable_post_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
+
         with raises(BlueSkySubprocessError) as e_info:
             io.CmdExecutor().execute(['lsdflsdf', 'sdf'], realtime_logging=False)
         # TODO: check e_info.value.args[0]
@@ -378,9 +384,12 @@ class TestCmdExecutor(object):
 
     def test_success_post_logging(self, monkeypatch):
         self.monkeypatch_logging(monkeypatch)
+
         io.CmdExecutor().execute(['echo', 'hello'], realtime_logging=False)
         # TODO: check self.msgs
+
         io.CmdExecutor().execute('echo', 'hello', realtime_logging=False)
         # TODO: check self.msgs
+
         io.CmdExecutor().execute('echo hello', realtime_logging=False)
         # TODO: check self.msgs

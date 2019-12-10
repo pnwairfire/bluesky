@@ -185,6 +185,8 @@ class CmdExecutor(object):
             self._log(e.strerror, is_stdout=False)
             raise BlueSkySubprocessError(e)
 
+        # TODO: catch BlueSkySubprocessError, log error output, and re-raise
+
     def _set_cmd_args(self, args):
         # Support three ways of being called:
         if len(args) == 1:
@@ -218,7 +220,9 @@ class CmdExecutor(object):
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, #.PIPE
             shell=False, cwd=cwd, universal_newlines=True)
 
-        while True:
+        ret_val = None
+
+        while ret_val is None:
             # There will be at least one printed line - minimally,
             # a single newline
             line = process.stdout.readline()
@@ -229,8 +233,10 @@ class CmdExecutor(object):
             # if line != "":
             #     self._log(line, is_stdout=False)
 
-            if process.poll() is not None:
-                break
+            ret_val = process.poll()
+
+        if ret_val > 0:
+            raise BlueSkySubprocessError()
 
     def _execute_with_logging_after(self, cwd):
         # Use check_output so that output isn't sent to stdout
