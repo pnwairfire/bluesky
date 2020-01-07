@@ -398,6 +398,9 @@ class HYSPLITDispersion(DispersionBase):
             pass
 
     def _run_process(self, fires, working_dir, tranche_num=None):
+        hysplit_utils.ensure_tranch_has_dummy_fire(fires, self._model_start,
+            self._num_hours, self._grid_params)
+
         logging.info("Running one HYSPLIT49 Dispersion model process")
         # TODO: set all but fires, working_dir, and tranche_num as instance
         # properties in self.run so that they don't have to be passed into

@@ -232,6 +232,7 @@ class TestGenerateDummyFire(object):
 
     def test_one_hour(self, reset_config):
         expected = {
+            "is_dummy": True,
             "area": 1,
             "type": "wildfire",
             "fuel_type": "natural",
@@ -262,6 +263,7 @@ class TestGenerateDummyFire(object):
 
     def test_four_hours(self, reset_config):
         expected = {
+            "is_dummy": True,
             "area": 1,
             "type": "wildfire",
             "fuel_type": "natural",
