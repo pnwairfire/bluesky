@@ -192,24 +192,12 @@ class TestDummyTimeprofiledEmissionsHour(object):
 
     def test_one_hour(self, reset_config):
         expected = {
-            "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
-            "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
-            "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
-            "pm": 0.00001, "nmhc": 0.00001
+            "pm2.5": 0.0, "pm10": 0.0, "co": 0.0,
+            "co2": 0.0, "ch4": 0.0, "nox": 0.0,
+            "nh3": 0.0, "so2": 0.0, "voc": 0.0,
+            "pm": 0.0, "nmhc": 0.0
         }
-        assert expected == hysplit_utils.dummy_timeprofiled_emissions_hour(1)
-
-    def test_ten_hours(self, reset_config):
-        expected = {
-            "pm2.5": 0.000001, "pm10": 0.000001, "co": 0.000001,
-            "co2": 0.000001, "ch4": 0.000001, "nox": 0.000001,
-            "nh3": 0.000001, "so2": 0.000001, "voc": 0.000001,
-            "pm": 0.000001, "nmhc": 0.000001
-        }
-        actual = hysplit_utils.dummy_timeprofiled_emissions_hour(10)
-        assert set(expected.keys()) == set(actual.keys())
-        for k in expected:
-            assert_approx_equal(expected[k], actual[k])
+        assert expected == hysplit_utils.dummy_timeprofiled_emissions_hour()
 
 class TestGenerateDummyFire(object):
 
@@ -247,10 +235,10 @@ class TestGenerateDummyFire(object):
             },
             "timeprofiled_emissions": {
                 "2018-11-09T00:00:00": {
-                    "pm2.5": 0.00001, "pm10": 0.00001, "co": 0.00001,
-                    "co2": 0.00001, "ch4": 0.00001, "nox": 0.00001,
-                    "nh3": 0.00001, "so2": 0.00001, "voc": 0.00001,
-                    "pm": 0.00001, "nmhc": 0.00001
+                    "pm2.5": 0.0, "pm10": 0.0, "co": 0.0,
+                    "co2": 0.0, "ch4": 0.0, "nox": 0.0,
+                    "nh3": 0.0, "so2": 0.0, "voc": 0.0,
+                    "pm": 0.0, "nmhc": 0.0
                 }
             }
         }
@@ -285,28 +273,28 @@ class TestGenerateDummyFire(object):
             },
             "timeprofiled_emissions": {
                 "2018-11-09T00:00:00":{
-                    "pm2.5": 0.0000025, "pm10": 0.0000025, "co": 0.0000025,
-                    "co2": 0.0000025, "ch4": 0.0000025, "nox": 0.0000025,
-                    "nh3": 0.0000025, "so2": 0.0000025, "voc": 0.0000025,
-                    "pm": 0.0000025, "nmhc": 0.0000025
+                    "pm2.5": 0.0, "pm10": 0.0, "co": 0.0,
+                    "co2": 0.0, "ch4": 0.0, "nox": 0.0,
+                    "nh3": 0.0, "so2": 0.0, "voc": 0.0,
+                    "pm": 0.0, "nmhc": 0.0
                 },
                 "2018-11-09T01:00:00":{
-                    "pm2.5": 0.0000025, "pm10": 0.0000025, "co": 0.0000025,
-                    "co2": 0.0000025, "ch4": 0.0000025, "nox": 0.0000025,
-                    "nh3": 0.0000025, "so2": 0.0000025, "voc": 0.0000025,
-                    "pm": 0.0000025, "nmhc": 0.0000025
+                    "pm2.5": 0.0, "pm10": 0.0, "co": 0.0,
+                    "co2": 0.0, "ch4": 0.0, "nox": 0.0,
+                    "nh3": 0.0, "so2": 0.0, "voc": 0.0,
+                    "pm": 0.0, "nmhc": 0.0
                 },
                 "2018-11-09T02:00:00":{
-                    "pm2.5": 0.0000025, "pm10": 0.0000025, "co": 0.0000025,
-                    "co2": 0.0000025, "ch4": 0.0000025, "nox": 0.0000025,
-                    "nh3": 0.0000025, "so2": 0.0000025, "voc": 0.0000025,
-                    "pm": 0.0000025, "nmhc": 0.0000025
+                    "pm2.5": 0.0, "pm10": 0.0, "co": 0.0,
+                    "co2": 0.0, "ch4": 0.0, "nox": 0.0,
+                    "nh3": 0.0, "so2": 0.0, "voc": 0.0,
+                    "pm": 0.0, "nmhc": 0.0
                 },
                 "2018-11-09T03:00:00":{
-                    "pm2.5": 0.0000025, "pm10": 0.0000025, "co": 0.0000025,
-                    "co2": 0.0000025, "ch4": 0.0000025, "nox": 0.0000025,
-                    "nh3": 0.0000025, "so2": 0.0000025, "voc": 0.0000025,
-                    "pm": 0.0000025, "nmhc": 0.0000025
+                    "pm2.5": 0.0, "pm10": 0.0, "co": 0.0,
+                    "co2": 0.0, "ch4": 0.0, "nox": 0.0,
+                    "nh3": 0.0, "so2": 0.0, "voc": 0.0,
+                    "pm": 0.0, "nmhc": 0.0
                 }
             }
         }

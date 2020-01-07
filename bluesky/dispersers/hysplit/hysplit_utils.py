@@ -132,9 +132,9 @@ def compute_num_processes(num_fire_sets, **tranching_config):
 ## Dummy Fires
 ##
 
-def dummy_timeprofiled_emissions_hour(num_hours):
+def dummy_timeprofiled_emissions_hour():
     return {
-        s: (0.00001 / num_hours) for s in
+        s: 0.0 for s in
             ("pm2.5", "pm10", "co", "co2", "ch4",
              "nox","nh3", "so2", "voc", "pm", "nmhc")
     }
@@ -166,7 +166,7 @@ def generate_dummy_fire(model_start, num_hours, grid_params):
         timeprofiled_area={}
     )
     hourly_area = 1.0 / float(num_hours)
-    hourly_timeprofiled_emissions = dummy_timeprofiled_emissions_hour(num_hours)
+    hourly_timeprofiled_emissions = dummy_timeprofiled_emissions_hour()
     for hour in range(num_hours):
         dt = model_start + datetime.timedelta(hours=hour)
         dt = dt.strftime('%Y-%m-%dT%H:%M:%S')
