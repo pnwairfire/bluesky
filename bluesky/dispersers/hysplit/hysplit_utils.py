@@ -190,8 +190,9 @@ def ensure_tranch_has_dummy_fire(fires, model_start, num_hours, grid_params):
     # met domain. We can skip this step if the tranch was already
     # assigned a dummy fire (i.e. which sould only have happened if
     # there were fewer fires than tranches)
-    if not (len(fires) == 1 and fires[0].get('is_dummy')):
-        logging.debug("Adding debug fire for HYSPLIT process")
+
+    if not any([f.get('is_dummy') for f in fires]):
+        logging.debug("Adding dummy fire for HYSPLIT process")
         f = generate_dummy_fire(model_start, num_hours, grid_params)
         fires.append(f)
     else:
