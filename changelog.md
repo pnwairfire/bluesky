@@ -170,3 +170,6 @@
 ## 4.1.32
  - Ensure that there's a dummy fire for each hysplit process, to guarantee at least one fire within met domain, thus avoiding hysplit failure resulting from all points falling outside of met domain.
  - Assign zero emissions to dummy hysplit fires
+
+## 4.1.33
+ - Bug fix in dispersion code
