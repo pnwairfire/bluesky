@@ -149,7 +149,7 @@ _DEFAULTS = {
     },
     "emissions": {
         # Note that 'efs' is deprecated, and so is not listed here
-        "model": "feps",
+        "model": "prichard-oneill",
         "include_emissions_details": False,
         "species": [],
         "fuel_loadings": {}
