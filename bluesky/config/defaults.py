@@ -312,7 +312,7 @@ _DEFAULTS = {
             "SMOLDER_HEIGHT": 10.0,
 
             # Height in meters of the top of the model domain
-            "TOP_OF_MODEL_DOMAIN": 30000.0,
+            "TOP_OF_MODEL_DOMAIN": 10000.0,
 
             # List of vertical levels for output sampling grid
             "VERTICAL_LEVELS": [100],
