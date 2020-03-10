@@ -212,7 +212,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             raise ValueError(
                 "Missing emissions data required for computing dispersion")
 
-        heat = self._get_heat(fire, loc)
+        heat = self._get_heat(fire, aa, loc)
         plumerise, timeprofile = self._get_plumerise_and_timeprofile(
             loc, utc_offset)
         emissions = self._get_emissions(loc)
@@ -286,7 +286,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         return timeprofiled_emissions
 
 
-    def _get_heat(self, fire, loc):
+    def _get_heat(self, fire, aa, loc):
         # TDOO: handle case where heat is defined by phase, but not total
         #   (just make sure each phase is defined, and set total to sum)
         heat = None
