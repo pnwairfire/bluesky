@@ -200,6 +200,9 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                 else:
                     raise
 
+        if not self._fires:
+            raise ValueError("No fire locations with valid emissions and heat data")
+
 
     ## Creating fires out of locations
 
