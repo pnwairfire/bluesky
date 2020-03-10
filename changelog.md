@@ -173,3 +173,9 @@
 
 ## 4.1.33
  - Bug fix in dispersion code
+
+## 4.1.34
+ - Change default emissions model from 'feps' to 'prichard-oneill'
+ - Decrease default value for TOP_OF_MODEL_DOMAIN from 30000 to 10000
+ - Fix bug in dispersion that was triggered when a fire location had inadequate heat
+ - Raise an exception in dispersion if there are no fire locations with valid emissions and heat data
