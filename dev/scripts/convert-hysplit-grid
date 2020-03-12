@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+
+import argparse
+import json
+import logging
+import sys
+
+try:
+    from bluesky.dispersers.hysplit import hysplit_utils
+except:
+    print("""Run in Docker
+
+    docker run --rm -ti --user bluesky \\
+        -v $PWD:/bluesky/ \\
+        -e PYTHONPATH=/bluesky/ \\
+        -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \\
+        bluesky {} -h
+        """.format(sys.argv[0]))
+    exit(1)
+
+EXAMPLES_STRING = """
+Examples:
+
+    {script} --log-level INFO -i '{{
+        "USER_DEFINED_GRID": true,
+        "CENTER_LATITUDE": 37.25,
+        "CENTER_LONGITUDE": -119.00,
+        "WIDTH_LONGITUDE": 10.00,
+        "HEIGHT_LATITUDE": 9.5,
+        "SPACING_LONGITUDE": 0.02,
+        "SPACING_LATITUDE": 0.02
+    }}'
+
+    {script} --log-level INFO -i '{{
+        "grid": {{
+            "spacing": 1.33,
+            "projection": "LCC",
+            "boundary": {{
+                "sw": {{"lng": -125.0, "lat": 32.0}},
+                "ne": {{"lng": -112.0, "lat": 43.0}}
+            }}
+        }}
+    }}'
+
+ """.format(script=sys.argv[0])
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input', help="input file", required=True)
+    parser.add_argument('--log-level', default="INFO", help="Log level")
+
+    parser.epilog = EXAMPLES_STRING
+    parser.formatter_class = argparse.RawTextHelpFormatter
+
+    args = parser.parse_args()
+
+    logging.basicConfig(level=getattr(logging, args.log_level),
+        format='%(asctime)s %(levelname)s: %(message)s')
+
+    return args
+
+def convert(input_data):
+    if 'grid' in input_data:
+        return hysplit_utils.grid_params_from_grid(input_data['grid'])
+    elif input_data.get('USER_DEFINED_GRID'):
+        half_height_lat = input_data['HEIGHT_LATITUDE'] / 2.0
+        half_width_lng = input_data['WIDTH_LONGITUDE'] / 2.0
+        spacing_lng = (input_data['SPACING_LONGITUDE']
+            * hysplit_utils.km_per_deg_lng(input_data['CENTER_LATITUDE']))
+        spacing_lat = input_data['SPACING_LATITUDE'] * hysplit_utils.KM_PER_DEG_LAT
+        return {
+            "grid": {
+                "spacing": (spacing_lng + spacing_lat) / 2.0,
+                "projection": "LCC",
+                "boundary": {
+                    "sw": {
+                        "lat": input_data['CENTER_LATITUDE'] - half_height_lat,
+                        "lng": input_data['CENTER_LONGITUDE'] - half_width_lng,
+                    },
+                    "ne": {
+                        "lat": input_data['CENTER_LATITUDE'] + half_height_lat,
+                        "lng": input_data['CENTER_LONGITUDE'] + half_width_lng,
+                    }
+                }
+            }
+        }
+
+    else:
+        raise ValueError("Input does not contain 'grid' or 'USER_DEFINED_GRID' data")
+
+def main():
+    args = parse_args()
+    input_data = json.loads(args.input)
+    output_data = convert(input_data)
+    print(json.dumps(output_data, indent=4))
+
+if __name__ == "__main__":
+    main()
