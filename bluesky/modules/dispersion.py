@@ -9,7 +9,6 @@ __author__ = "Joel Dubowy"
 import logging
 
 from bluesky.config import Config
-from bluesky.datetimeutils import parse_datetime
 from bluesky.importutils import import_class
 from bluesky.io import get_working_and_output_dirs
 from bluesky.metutils import filter_met

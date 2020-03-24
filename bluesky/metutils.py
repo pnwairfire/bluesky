@@ -1,6 +1,8 @@
 import copy
 import datetime
 
+from bluesky.datetimeutils import parse_datetime
+
 def filter_met(met, start, num_hours):
     # the passed-in met is a reference to the fires_manager's met, so copy it
     met = copy.deepcopy(met)
