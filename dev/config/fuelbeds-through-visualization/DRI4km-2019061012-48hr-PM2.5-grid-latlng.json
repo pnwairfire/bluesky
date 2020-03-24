@@ -6,6 +6,22 @@
         "findmetdata": {
             "met_root_dir": "/data/Met/CANSAC/4km/ARL/"
         },
+        "trajectories": {
+            "models": "hysplit",
+            "start": "2019-06-10T12:00:00",
+            "num_hours": 24,
+            "output_dir": "/bluesky/output/traj-output/{run_id}/",
+            "working_dir": "/bluesky/output/trajworkingoutput/{run_id}/",
+            "handle_existing": "fail",
+            "hysplit": {
+                "start_hours": [0],
+                "heights": [10, 100, 1000],
+                "vertial_motion": 0,
+                "top_of_model_domain": 10000,
+                "num_simultaneous_met_files": 1,
+                "output_file_name": "tdump"
+            }
+        },
         "dispersion": {
             "start": "2019-06-10T12:00:00",
             "num_hours": 48,
