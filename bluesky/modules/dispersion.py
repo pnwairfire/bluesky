@@ -6,14 +6,13 @@ other executables. See the repo README.md for more information.
 
 __author__ = "Joel Dubowy"
 
-import copy
-import datetime
 import logging
 
 from bluesky.config import Config
 from bluesky.datetimeutils import parse_datetime
 from bluesky.importutils import import_class
 from bluesky.io import get_working_and_output_dirs
+from bluesky.metutils import filter_met
 
 __all__ = [
     'run'
@@ -34,7 +33,7 @@ def run(fires_manager):
             "{}Dispersion".format(model.upper()))
 
         start, num_hours = _get_time(fires_manager)
-        met = _filter_met(fires_manager.met, start, num_hours)
+        met = filter_met(fires_manager.met, start, num_hours)
 
         disperser = klass(met)
         processed_kwargs.update({
@@ -58,32 +57,6 @@ def run(fires_manager):
             **processed_kwargs)
 
     # TODO: add information to fires_manager indicating where to find the hysplit output
-
-def _filter_met(met, start, num_hours):
-    # the passed-in met is a reference to the fires_manager's met, so copy it
-    met = copy.deepcopy(met)
-
-    if not met:
-        # return `met` in case it's a dict and dict is expected downstream
-        return met
-
-    # limit met to only what's needed to cover dispersion window
-    end = start + datetime.timedelta(hours=num_hours)
-
-    # Note: we don't store the parsed first and last hour values
-    # because they aren't used outside of this method, and they'd
-    # just have to be dumped back to string values when bsp exits
-    logging.debug('Determinig met files needed for dispersion')
-    met_files = met.pop('files', [])
-    met["files"] = []
-    for m in met_files:
-        if (parse_datetime(m['first_hour']) <= end
-                and parse_datetime(m['last_hour']) >= start):
-            met["files"].append(m)
-        else:
-            logging.debug('Dropping met file %s - not needed for dispersion',
-                m["file"])
-    return met
 
 
 SECONDS_PER_HOUR = 3600
