@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+docker run --rm -ti --user bluesky \
+    -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
+    -e PYTHONPATH=/bluesky/ \
+    -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+    bluesky ipython
