@@ -1,7 +1,7 @@
 """bluesky.modules.dispersion
 
-If running hysplit dispersion, you'll need to obtain hysplit and various other
-Executables. See the repo README.md for more information.
+If running hysplit dispersion, you'll need to obtain hysplit and various
+other executables. See the repo README.md for more information.
 """
 
 __author__ = "Joel Dubowy"
@@ -10,12 +10,10 @@ import copy
 import datetime
 import logging
 
-from bluesky import datetimeutils
 from bluesky.config import Config
-from bluesky.dispersers.hysplit import hysplit
 from bluesky.datetimeutils import parse_datetime
-from bluesky.io import create_dir_or_handle_existing
 from bluesky.importutils import import_class
+from bluesky.io import create_dir_or_handle_existing
 
 __all__ = [
     'run'
