@@ -219,6 +219,22 @@ _DEFAULTS = {
 
         }
     },
+    "trajectories": {
+        "models": "hysplit",
+        "start": None,
+        "num_hours": 24, # run time
+        "output_dir": None,
+        "working_dir": None,
+        "handle_existing": "fail",
+        "hysplit": {
+            "start_hours": [0],
+            "heights": [10, 100, 1000],
+            "vertial_motion": 0, # 0 = from met file
+            "top_of_model_domain": 10000,  # trajectories end above this
+            "num_simultaneous_met_files": 1,
+            "output_file_name": "tdump"
+        }
+    },
     "dispersion": {
         "model": "hysplit",
         "start": None,
