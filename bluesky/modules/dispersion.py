@@ -8,15 +8,14 @@ __author__ = "Joel Dubowy"
 
 import copy
 import datetime
-import importlib
 import logging
 
 from bluesky import datetimeutils
 from bluesky.config import Config
-from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.dispersers.hysplit import hysplit
 from bluesky.datetimeutils import parse_datetime
 from bluesky.io import create_dir_or_handle_existing
+from bluesky.importutils import import_class
 
 __all__ = [
     'run'
@@ -33,7 +32,8 @@ def run(fires_manager):
     model = Config().get('dispersion', 'model').lower()
     processed_kwargs = {}
     try:
-        module, klass = _get_module_and_class(model)
+        module, klass = import_class("bluesky.dispersers.{}".format(model),
+            "{}Dispersion".format(model.upper()))
 
         start, num_hours = _get_time(fires_manager)
         met = _filter_met(fires_manager.met, start, num_hours)
@@ -87,25 +87,6 @@ def _filter_met(met, start, num_hours):
                 m["file"])
     return met
 
-def _get_module_and_class(model):
-    module_name = "bluesky.dispersers.{}".format(model)
-    logging.debug("Importing %s", module_name)
-    try:
-        module = importlib.import_module(module_name)
-    except ImportError:
-        raise BlueSkyConfigurationError(
-            "Invalid dispersion model: '{}'".format(model))
-
-    klass_name = "{}Dispersion".format(model.upper())
-    logging.debug("Loading class %s", klass_name)
-    try:
-        klass = getattr(module, klass_name)
-    except:
-        # TODO: use more appropriate exception class
-        raise RuntimeError("{} does not define class {}".format(
-            module_name, klass_name))
-
-    return module, klass
 
 SECONDS_PER_HOUR = 3600
 
