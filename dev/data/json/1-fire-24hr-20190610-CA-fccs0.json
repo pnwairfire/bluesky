@@ -1,0 +1,39 @@
+{
+    "fires": [
+        {
+            "id": "SF11C14225236095807750",
+            "event_of": {
+                "name": "Natural Fire in North Tahoe",
+                "id": "sdfkj234kljfd"
+            },
+            "meta": {
+                "vsmoke": {
+                    "ws": 20,
+                    "wd": 230
+                }
+            },
+            "type": "wildfire",
+            "activity": [
+                {
+                    "active_areas": [
+                        {
+                            "start": "2019-06-09T17:00:00",
+                            "end": "2019-06-10T17:00:00",
+                            "utc_offset": "-07:00",
+                            "ecoregion": "western",
+                            "country": "USA",
+                            "state": "CA",
+                            "specified_points": [
+                                {
+                                    "lat": 35.88307,
+                                    "lng": -120.90649,
+                                    "area": 32
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
