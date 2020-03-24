@@ -13,7 +13,7 @@ import logging
 from bluesky.config import Config
 from bluesky.datetimeutils import parse_datetime
 from bluesky.importutils import import_class
-from bluesky.io import create_dir_or_handle_existing
+from bluesky.io import get_working_and_output_dirs
 
 __all__ = [
     'run'
@@ -41,7 +41,7 @@ def run(fires_manager):
             "{}_version".format(model): module.__version__
         })
 
-        output_dir, working_dir = _get_dirs(fires_manager)
+        output_dir, working_dir = get_working_and_output_dirs(module_name)
 
         # further validation of start and num_hours done in 'run'
         dispersion_info = disperser.run(fires_manager, start,
@@ -108,18 +108,3 @@ def _get_time(fires_manager):
 
     logging.debug("Dispersion window: %s for %s hours", start, num_hours)
     return start, num_hours
-
-
-def _get_dirs(fires_manager):
-    handle_existing = Config().get('dispersion', 'handle_existing')
-
-    output_dir = Config().get('dispersion', 'output_dir')
-    if not output_dir:
-        raise ValueError("Specify dispersion output directory")
-    create_dir_or_handle_existing(output_dir, handle_existing)
-
-    working_dir = Config().get('dispersion', 'working_dir')
-    if working_dir:
-        create_dir_or_handle_existing(working_dir, handle_existing)
-
-    return output_dir, working_dir

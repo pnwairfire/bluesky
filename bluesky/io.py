@@ -68,6 +68,22 @@ def create_dir_or_handle_existing(dir_to_create, handle_existing):
 
     return dir_to_create
 
+def get_working_and_output_dirs(module_name):
+    config = Config().get(module_name)
+
+    handle_existing = config.get('handle_existing')
+
+    output_dir = config.get('output_dir')
+    if not output_dir:
+        raise ValueError("Specify {} output directory".format(module_name))
+    create_dir_or_handle_existing(output_dir, handle_existing)
+
+    working_dir = config.get('working_dir')
+    if working_dir:
+        create_dir_or_handle_existing(working_dir, handle_existing)
+
+    return output_dir, working_dir
+
 
 INVALID_WAIT_CONFIG_MSG = ("'strategy', 'time', 'max_attempts' "
     "must all be defined if waiting for a resource")
