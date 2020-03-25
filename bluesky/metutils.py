@@ -22,7 +22,7 @@ def filter_met(met, start, num_hours):
     met_files = met.pop('files', [])
     met["files"] = []
     for m in met_files:
-        if (parse_datetime(m['first_hour']) <= end
+        if (m.get('file') and parse_datetime(m['first_hour']) <= end
                 and parse_datetime(m['last_hour']) >= start):
             met["files"].append(m)
         else:

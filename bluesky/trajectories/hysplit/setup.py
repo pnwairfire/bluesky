@@ -93,6 +93,6 @@ class SetupFileWriter(object):
 
     def write(self, working_dir):
         with open(os.path.join(working_dir, 'SETUP.CFG'), 'w') as f:
-            contents = this.SETUP_FILE_TEMPLATE.format(
-                **this._config["setup_file_params"])
+            contents = self.SETUP_FILE_TEMPLATE.format(
+                **self._config["setup_file_params"])
             f.write(contents)

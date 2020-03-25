@@ -40,12 +40,15 @@ def run(fires_manager):
         start, num_hours = _get_time_window()
         output_dir, working_dir = get_working_and_output_dirs('trajectories')
 
-        traj_gen = klass(Config().get('trajectories', model))
-        traj_info = traj_gen.run(fires_manager, start, num_hours,
+        model_config = Config().get('trajectories', model)
+        traj_gen = klass(model_config, fires_manager, start, num_hours,
             output_dir, working_dir=working_dir)
+        traj_info = traj_gen.run()
         traj_info.update(model=model)
-        # TODO: store trajectories into in summary?
+
+        # TODO: store trajectories info in summary?
         #   > fires_manager.summarize(trajectories=disperser.run(...))
+
         fires_manager.trajectories = traj_info
 
         # TODO: add information about fires to processed_kwargs

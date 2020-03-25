@@ -213,7 +213,7 @@ class SubprocessExecutor(object):
             self._log(e.strerror, is_stdout=False)
             raise BlueSkySubprocessError(str(e))
 
-        except BlueSkySubprocessError:
+        except BlueSkySubprocessError as e:
             # any stderr will have been logged; just reraise
             raise
 
