@@ -1,5 +1,6 @@
 import os
 
+from bluesky import locationutils
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 
@@ -43,10 +44,10 @@ class ControlFileWriter(object):
          gfs_NorthAmericaFine_2016051100_000.traj
     """
 
-    def __init__(config):
+    def __init__(self, config):
         self._config = config
 
-    def write(locations, start, num_hours, working_dir):
+    def write(self, locations, start, num_hours, working_dir):
 
         with open(os.path.join(working_dir, 'CONTROL'), 'w') as f:
             f.write(start.strftime("%Y %m %d %H\n"))
@@ -56,8 +57,10 @@ class ControlFileWriter(object):
             f.write("{}\n".format(num_trajectries))
 
             for loc in locations:
+                latlng = locationutils.LatLng(loc)
                 for h in self._config['heights']:
-                    f.write("{} {} {}\n".format(loc.lat, loc.lng, h))
+                    f.write("{} {} {}\n".format(latlng.latitude,
+                        latlng.longitude, h))
 
             f.write("{}\n".format(num_hours))
             f.write("{}\n".format(self._config['vertical_motion']))

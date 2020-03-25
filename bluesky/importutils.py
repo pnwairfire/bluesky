@@ -1,10 +1,11 @@
 """bluesky.importutils"""
 
 import importlib
+import logging
 
 from bluesky.exceptions import BlueSkyConfigurationError
 
-def import_class(nodule_name, klass_name):
+def import_class(module_name, klass_name):
     logging.debug("Importing %s", module_name)
     try:
         module = importlib.import_module(module_name)

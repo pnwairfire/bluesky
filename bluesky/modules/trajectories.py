@@ -28,18 +28,21 @@ def run(fires_manager):
     model = Config().get('trajectories', 'model').lower()
     processed_kwargs = {}
     try:
-        module, klass = import_class("bluesky.trajectories.{}".format(model),
-            "{}Trajectories".format(model.upper()))
+        # e.g. 'hysplt' -> 'HysplitDispersion', 'foo_bar' -> 'FooBarDispersion'
+        klass_name = ''.join(["{}Trajectories".format(m.capitalize())
+            for m in model.split('_')])
+        module, klass = import_class(
+            "bluesky.trajectories.{}".format(model), klass_name)
 
         processed_kwargs.update({
             "{}_version".format(model): module.__version__
         })
         start, num_hours = _get_time_window()
-        output_dir, working_dir = get_working_and_output_dirs(module_name)
+        output_dir, working_dir = get_working_and_output_dirs('trajectories')
 
-        traj_gen = klass(Config().get('trajectories'), fires_manager, start,
-            num_hours, output_dir, working_dir=working_dir)
-        traj_info = traj_gen.run()
+        traj_gen = klass(Config().get('trajectories', model))
+        traj_info = traj_gen.run(fires_manager, start, num_hours,
+            output_dir, working_dir=working_dir)
         traj_info.update(model=model)
         # TODO: store trajectories into in summary?
         #   > fires_manager.summarize(trajectories=disperser.run(...))
@@ -56,7 +59,7 @@ def run(fires_manager):
 
 def _get_time_window():
     start = Config().get('trajectories', 'start')
-    if not self._config['start']:
+    if not start:
         raise BlueSkyConfigurationError(
             "Missing trajectories 'start' time")
 

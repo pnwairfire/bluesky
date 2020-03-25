@@ -14,6 +14,7 @@ import time
 
 from pyairfire.io import *
 
+from bluesky.config import Config
 from bluesky.exceptions import (
     BlueSkyConfigurationError, BlueSkyUnavailableResourceError,
     BlueSkySubprocessError

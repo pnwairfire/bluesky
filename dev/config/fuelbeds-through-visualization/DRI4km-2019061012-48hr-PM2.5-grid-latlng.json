@@ -11,10 +11,10 @@
             "start": "2019-06-10T12:00:00",
             "num_hours": 24,
             "output_dir": "/bluesky/output/traj-output/{run_id}/",
-            "working_dir": "/bluesky/output/trajworkingoutput/{run_id}/",
-            "handle_existing": "fail",
+            "working_dir": "/bluesky/output/traj-working/{run_id}/",
+            "handle_existing": "replace",
             "hysplit": {
-                "start_hours": [0],
+                "start_hours": [0, 6],
                 "heights": [10, 100, 1000],
                 "vertial_motion": 0,
                 "top_of_model_domain": 10000,

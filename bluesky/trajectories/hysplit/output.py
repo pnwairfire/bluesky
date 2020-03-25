@@ -37,9 +37,10 @@ class OutputLoader(object):
          ....
     """
 
-    def __init__(config):
+    def __init__(self, config):
         self._config = config
 
-    def load(working_dir):
-        with open(os.path.join(working_dir, config['output_file_name']), 'r') as f:
+    def load(self, working_dir):
+        filename = os.path.join(working_dir, self._config['output_file_name'])
+        with open(filename, 'r') as f:
             pass

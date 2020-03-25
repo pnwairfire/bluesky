@@ -1,5 +1,6 @@
 import copy
 import datetime
+import logging
 
 from bluesky.datetimeutils import parse_datetime
 

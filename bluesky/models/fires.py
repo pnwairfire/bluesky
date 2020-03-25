@@ -296,6 +296,11 @@ class FiresManager(object):
         return self._num_fires
 
     @property
+    def locations(self):
+        return list(itertools.chain.from_iterable(
+            [f.locations for f in self.fires]))
+
+    @property
     def num_locations(self):
         return sum([len(f.locations) for f in self.fires])
 

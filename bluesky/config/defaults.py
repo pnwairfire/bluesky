@@ -220,7 +220,7 @@ _DEFAULTS = {
         }
     },
     "trajectories": {
-        "models": "hysplit",
+        "model": "hysplit",
         "start": None,
         "num_hours": 24, # run time
         "output_dir": None,
@@ -229,7 +229,7 @@ _DEFAULTS = {
         "hysplit": {
             "start_hours": [0],
             "heights": [10, 100, 1000],
-            "vertial_motion": 0, # 0 = from met file
+            "vertical_motion": 0, # 0 = from met file
             "top_of_model_domain": 10000,  # trajectories end above this
             "num_simultaneous_met_files": 1,
             "output_file_name": "tdump"
