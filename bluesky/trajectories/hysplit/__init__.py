@@ -6,6 +6,7 @@ import os
 
 from pyairfire import osutils
 
+from bluesky import io
 from bluesky.metutils import filter_met
 from .setup import ControlFileWriter
 from .output import OutputLoader
@@ -31,12 +32,17 @@ class HysplitTrajectories(object):
                 with osutils.create_working_dir(working_dir=working_dir_s) as wdir:
                     ControlFileWriter(self._config).write(fires_manager.locations,
                         start_s, num_hours, wdir)
-                    self._run_hysplit()
+                    self._run_hysplit(wdir)
                     output = OutputLoader(self._config).load(wdir)
                     # TODO: add to aggregated output
-            except:
-                logging.error("Failed to compute trajectories for start_hour %s", s)
+            except Exception as e:
+                logging.error(
+                    "Failed to compute trajectories for start_hour %s: %s", s, e)
                 # TODO: somehow mark failure in aggregated data
+
+        if not output:
+            # TODO: use BlueSkySubprocessError ?
+            raise RuntimeError("Failed all hysplit trajectories runs")
 
         # TODO: write aggregated output to file in output dir
 
@@ -50,5 +56,6 @@ class HysplitTrajectories(object):
         }
         return r
 
-    def _run_hysplit(self):
-        pass
+    def _run_hysplit(self, wdir):
+        io.SubprocessExecutor().execute(
+            self._config['binary'], cwd=wdir)

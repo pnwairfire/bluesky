@@ -83,6 +83,7 @@ COPY bin/feps_plumerise /usr/local/bin/feps_plumerise
 COPY bin/feps_weather /usr/local/bin/feps_weather
 COPY bin/hycm_std /usr/local/bin/hycm_std
 COPY bin/hycs_std /usr/local/bin/hycs_std
+COPY bin/hyts_std /usr/local/bin/hyts_std
 COPY bin/hysplit2netcdf /usr/local/bin/hysplit2netcdf
 COPY bin/profile /usr/local/bin/profile
 COPY bin/vsmkgs /usr/local/bin/vsmkgs

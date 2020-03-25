@@ -227,6 +227,7 @@ _DEFAULTS = {
         "working_dir": None,
         "handle_existing": "fail",
         "hysplit": {
+            "binary": 'hyts_std',
             "start_hours": [0],
             "heights": [10, 100, 1000],
             "vertical_motion": 0, # 0 = from met file
