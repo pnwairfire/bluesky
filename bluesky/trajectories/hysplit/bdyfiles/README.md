@@ -3,6 +3,10 @@ roughness length, and terrain data for Hysplit trajectories.  The current
 file resolution is 360x180 at 1 degree.  The upper left corner starts at
 180W, 90N.
 
+Note that dispersers/hysplit/bdyfiles/ also contains land-use and roughness
+length data, but hysplit trajectories will maintain it's own copies of the
+files.
+
 The structure of these files is defined in the ASCDATA.CFG file, which
 defines the grid system and gives the directory location of the land-
 use, roughness length, and terrain files.

@@ -39,6 +39,7 @@ setup(
         # via `python setup.py install` as well as via pip
         'bluesky': [
             'dispersers/hysplit/bdyfiles/*',
+            'trajectories/hysplit/bdyfiles/*',
             'dispersers/vsmoke/images/*',
             'ecoregion/data/*',
             'fips/*'

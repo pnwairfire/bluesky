@@ -18,7 +18,6 @@
                 "heights": [10, 100, 1000],
                 "vertial_motion": 0,
                 "top_of_model_domain": 10000,
-                "num_simultaneous_met_files": 1,
                 "output_file_name": "tdump"
             }
         },
