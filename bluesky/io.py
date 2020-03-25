@@ -22,6 +22,8 @@ from bluesky.exceptions import (
 
 __all__ = [
     "create_dir_or_handle_existing",
+    "get_working_and_output_dirs",
+    "create_sym_link",
     "wait_for_availability",
     "capture_stdout",
     "SubprocessExecutor",
@@ -84,6 +86,13 @@ def get_working_and_output_dirs(module_name):
         create_dir_or_handle_existing(working_dir, handle_existing)
 
     return output_dir, working_dir
+
+def create_sym_link(dest, link):
+    try:
+        os.symlink(dest, link)
+    except FileExistsError as e:
+        # ignore existing sym link error
+        pass
 
 
 INVALID_WAIT_CONFIG_MSG = ("'strategy', 'time', 'max_attempts' "

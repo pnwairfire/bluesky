@@ -390,13 +390,6 @@ class HYSPLITDispersion(DispersionBase):
         io.SubprocessExecutor().execute(self.BINARIES['NCKS'], *ncks_args, cwd=working_dir)
         self._archive_file(output_file)
 
-    def _create_sym_link(self, dest, link):
-        try:
-            os.symlink(dest, link)
-        except FileExistsError as e:
-            # ignore existing sym link error
-            pass
-
     def _run_process(self, fires, working_dir, tranche_num=None):
         hysplit_utils.ensure_tranch_has_dummy_fire(fires, self._model_start,
             self._num_hours, self._grid_params)
@@ -563,16 +556,16 @@ class HYSPLITDispersion(DispersionBase):
         for f in self._met_info['files']:
             # bluesky.modules.dispersion.run will have weeded out met
             # files that aren't relevant to this dispersion run
-            self._create_sym_link(f,
+            io.create_sym_link(f,
                 os.path.join(working_dir, os.path.basename(f)))
 
         # Create sym links to ancillary data files (note: HYSPLIT49 balks
         # if it can't find ASCDATA.CFG).
-        self._create_sym_link(self.config("ASCDATA_FILE"),
+        io.create_sym_link(self.config("ASCDATA_FILE"),
             os.path.join(working_dir, 'ASCDATA.CFG'))
-        self._create_sym_link(self.config("LANDUSE_FILE"),
+        io.create_sym_link(self.config("LANDUSE_FILE"),
             os.path.join(working_dir, 'LANDUSE.ASC'))
-        self._create_sym_link(self.config("ROUGLEN_FILE"),
+        io.create_sym_link(self.config("ROUGLEN_FILE"),
             os.path.join(working_dir, 'ROUGLEN.ASC'))
 
     def _get_hour_data(self, dt, fire):
