@@ -44,13 +44,12 @@ class ControlFileWriter(object):
          gfs_NorthAmericaFine_2016051100_000.traj
     """
 
-    def __init__(self, config, met_files, locations, num_hours):
+    def __init__(self, config, locations, num_hours):
         self._config = config
-        self._met_files = met_files
         self._locations = locations
         self._num_hours = num_hours
 
-    def write(self, start, working_dir):
+    def write(self, start, met_files, working_dir):
         with open(os.path.join(working_dir, 'CONTROL'), 'w') as f:
             f.write(start.strftime("%Y %m %d %H\n"))
 
@@ -67,12 +66,15 @@ class ControlFileWriter(object):
             f.write("{}\n".format(self._num_hours))
             f.write("{}\n".format(self._config['vertical_motion']))
             f.write("{}\n".format(self._config['top_of_model_domain']))
-            # TODO: should the next line be the following?
-            #   f.write("{}\n".format(self._config['num_simultaneous_met_files']))
-            f.write("{}\n".format(len(self._met_files)))
-            for m in self._met_files:
+            # TODO: should the next line be configurable instead of beting
+            #   set to the number of met files?  e.g.:
+            #     f.write("{}\n".format(self._config['num_simultaneous_met_files']))
+            f.write("{}\n".format(len(met_files)))
+
+            for m in met_files:
                 f.write("./\n")  # met grid directory
                 f.write("{}\n".format(os.path.basename(m)))  # met grid file (ARL format)
+
             f.write("./\n")  # output directoroy
             f.write("{}\n".format(self._config['output_file_name']))
 

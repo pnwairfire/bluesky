@@ -234,7 +234,6 @@ _DEFAULTS = {
             "heights": [10, 100, 1000],
             "vertical_motion": 0, # 0 = from met file
             "top_of_model_domain": 10000,  # trajectories end above this
-            "num_simultaneous_met_files": 1,
             "output_file_name": "tdump",
             "setup_file_params": {
                  "tm_tpot": 1,
