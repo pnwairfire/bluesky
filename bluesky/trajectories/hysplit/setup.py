@@ -70,3 +70,30 @@ class ControlFileWriter(object):
             f.write("oct1618.BIN\n")  # met grid file (ARL format)
             f.write("./\n")  # output directoroy
             f.write("{}\n".format(self._config['output_file_name']))
+
+
+class SetupFileWriter(object):
+
+    SETUP_FILE_TEMPLATE = """ &SETUP
+ tm_tpot = {tm_tpot},
+ tm_tamb = {tm_tamb},
+ tm_rain = {tm_rain},
+ tm_mixd = {tm_mixd},
+ tm_relh = {tm_relh},
+ tm_dswf = {tm_dswf},
+ tm_terr = {tm_terr},
+ kmsl = {kmsl},
+ /
+
+""" # The extra, empty line at the end is intentional
+
+
+    def __init__(self, config):
+        self._config = config
+
+    def write(self, locations, start, num_hours, working_dir):
+
+        with open(os.path.join(working_dir, 'SETUP.CFG'), 'w') as f:
+            contents = this.SETUP_FILE_TEMPLATE.format(
+                **this._config["setup_file_params"])
+            f.write(contents)

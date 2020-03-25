@@ -233,7 +233,17 @@ _DEFAULTS = {
             "vertical_motion": 0, # 0 = from met file
             "top_of_model_domain": 10000,  # trajectories end above this
             "num_simultaneous_met_files": 1,
-            "output_file_name": "tdump"
+            "output_file_name": "tdump",
+            "setup_file_params": {
+                 "tm_tpot": 1,
+                 "tm_tamb": 1,
+                 "tm_rain": 1,
+                 "tm_mixd": 1,
+                 "tm_relh": 1,
+                 "tm_dswf": 1,
+                 "tm_terr": 0,
+                 "kmsl": 0
+            }
         }
     },
     "dispersion": {
