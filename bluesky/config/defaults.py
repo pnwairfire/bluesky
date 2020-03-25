@@ -7,8 +7,10 @@ __all__ = [
 ]
 
 _REPO_ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
-_HYSPLIT_BDYFILES_PATH = os.path.join(_REPO_ROOT_DIR,
+_HYSPLIT_DISP_BDYFILES_PATH = os.path.join(_REPO_ROOT_DIR,
     'dispersers/hysplit/bdyfiles')
+_HYSPLIT_TRAJ_BDYFILES_PATH = os.path.join(_REPO_ROOT_DIR,
+    'trajectories/hysplit/bdyfiles')
 _VSMOKE_IMAGES_PATH = os.path.join(_REPO_ROOT_DIR,
     'dispersers/vsmoke/images')
 
@@ -243,6 +245,12 @@ _DEFAULTS = {
                  "tm_dswf": 1,
                  "tm_terr": 0,
                  "kmsl": 0
+            },
+            "static_files": {
+                "ASCDATA_FILE": os.path.join(_HYSPLIT_TRAJ_BDYFILES_PATH, 'ASCDATA.CFG'),
+                "LANDUSE_FILE": os.path.join(_HYSPLIT_TRAJ_BDYFILES_PATH, 'LANDUSE.ASC'),
+                "ROUGLEN_FILE": os.path.join(_HYSPLIT_TRAJ_BDYFILES_PATH, 'ROUGLEN.ASC'),
+                "TERRAIN_FILE": os.path.join(_HYSPLIT_TRAJ_BDYFILES_PATH, 'TERRAIN.ASC')
             }
         }
     },
@@ -323,9 +331,9 @@ _DEFAULTS = {
 
             # Ancillary data files (note: HYSPLIT4.9 balks if it can't find ASCDATA.CFG)
             #  The code will default to using
-            "ASCDATA_FILE": os.path.join(_HYSPLIT_BDYFILES_PATH, 'ASCDATA.CFG'),
-            "LANDUSE_FILE": os.path.join(_HYSPLIT_BDYFILES_PATH, 'LANDUSE.ASC'),
-            "ROUGLEN_FILE": os.path.join(_HYSPLIT_BDYFILES_PATH, 'ROUGLEN.ASC'),
+            "ASCDATA_FILE": os.path.join(_HYSPLIT_DISP_BDYFILES_PATH, 'ASCDATA.CFG'),
+            "LANDUSE_FILE": os.path.join(_HYSPLIT_DISP_BDYFILES_PATH, 'LANDUSE.ASC'),
+            "ROUGLEN_FILE": os.path.join(_HYSPLIT_DISP_BDYFILES_PATH, 'ROUGLEN.ASC'),
 
 
             ## Other
