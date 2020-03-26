@@ -611,14 +611,14 @@ _DEFAULTS = {
     },
     "visualization": {
         "target": None, # supported for backwards compatibility
-        "targets": ["dispersion"],
+        "targets": [],
         "hysplit": None, # supported for backwards compatibility
-        "dispersion": {
+        "trajectories": {
             "hysplit": {
 
             }
         },
-        "trajectories": {
+        "dispersion": {
             "hysplit": {
                 "websky_version": "1",
                 "fire_locations_csv_filename": 'fire_locations.csv',
