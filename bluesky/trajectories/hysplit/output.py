@@ -94,7 +94,6 @@ class OutputLoader(object):
         self._initialize_locations(start)
         filename = os.path.join(working_dir, self._config['output_file_name'])
         with open(filename, 'r') as f:
-            num_locations = len(self._locations)
             num_heights = len(self._config['heights'])
             for line in f:
                 parts = re.split('\s+', line.strip())
@@ -104,8 +103,8 @@ class OutputLoader(object):
                     h_idx = set_idx % 3
                     # since the location could have traj lines from other
                     # start times, we're indexing from the back of the list
-                    reverse_h_idx = num_heights - h_idx - 1
-                    self._locations[l_idx]['trajectories']['lines'][-reverse_h_idx]['points'].append(
+                    reverse_h_idx = -num_heights + h_idx
+                    self._locations[l_idx]['trajectories']['lines'][reverse_h_idx]['points'].append(
                         [float(parts[9]), float(parts[10]), float(parts[11])]
                     )
 
