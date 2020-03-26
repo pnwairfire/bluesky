@@ -66,7 +66,8 @@ class OutputLoader(object):
         ....
 
 
-    The loaded trajectory data is added to each location, structured as follows:
+    The loaded trajectory data is added to each location, structured as
+    follows, where each point is [lat, lng, height]:
 
     {
         ...
@@ -77,7 +78,7 @@ class OutputLoader(object):
                     "start": "2019-03-20T00:00:00Z",
                     "height": 100,
                     "points": [
-                        (35.0, -120, 100)
+                        [35.0, -120, 100]
                     ]
                 }
             ]
@@ -97,19 +98,22 @@ class OutputLoader(object):
             num_heights = len(self._config['heights'])
             for line in f:
                 parts = re.split('\s+', line.strip())
-                if parts >= 13:
+                if len(parts) >= 13:
                     set_idx = int(parts[0]) - 1
                     l_idx = int(set_idx / num_heights)
                     h_idx = set_idx % 3
-                    self._locations[l_idx]['trajectories']['lines'][h_idx]['line'].append(
-                        float(parts[9]), float(parts[10]), float(parts[11])
+                    # since the location could have traj lines from other
+                    # start times, we're indexing from the back of the list
+                    reverse_h_idx = num_heights - h_idx - 1
+                    self._locations[l_idx]['trajectories']['lines'][-reverse_h_idx]['points'].append(
+                        [float(parts[9]), float(parts[10]), float(parts[11])]
                     )
 
     def _initialize_locations(self, start):
         for loc in self._locations:
             if not 'trajectories' in self._locations:
                 loc['trajectories'] = {
-                    "model": hysplit,
+                    "model": "hysplit",
                     "lines": []
                 }
             for h in self._config['heights']:

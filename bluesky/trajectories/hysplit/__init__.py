@@ -36,23 +36,15 @@ class HysplitTrajectories(object):
     ## Public Interface
 
     def run(self):
-        aggregated = {}
         for start_hour in self._config['start_hours']:
             try:
-                output = self._run_start_hour(start_hour)
-                # TODO: add to aggregated output
+                self._run_start_hour(start_hour)
             except Exception as e:
                 logging.debug(traceback.format_exc())
                 logging.error(
                     "Failed to compute trajectories for start_hour %s: %s",
                     start_hour, e)
                 # TODO: somehow mark failure in aggregated data
-
-        if not aggregated:
-            # TODO: use BlueSkySubprocessError ?
-            raise RuntimeError("Failed all hysplit trajectories runs")
-
-        # TODO: write aggregated output to file in output dir
 
         r = {
             "start": self._start,
