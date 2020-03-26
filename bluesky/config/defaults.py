@@ -225,7 +225,6 @@ _DEFAULTS = {
         "model": "hysplit",
         "start": None,
         "num_hours": 24, # run time
-        "output_dir": None,
         "working_dir": None,
         "handle_existing": "fail",
         "hysplit": {

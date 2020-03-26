@@ -38,7 +38,8 @@ def run(fires_manager):
             "{}_version".format(model): module.__version__
         })
         start, num_hours = _get_time_window()
-        output_dir, working_dir = get_working_and_output_dirs('trajectories')
+        output_dir, working_dir = get_working_and_output_dirs(
+            'trajectories', require_output_dir=False)
 
         model_config = Config().get('trajectories', model)
         traj_gen = klass(model_config, fires_manager, start, num_hours,
