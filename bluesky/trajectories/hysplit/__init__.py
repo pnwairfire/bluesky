@@ -26,9 +26,11 @@ class HysplitTrajectories(object):
         self._output_dir = output_dir
         self._working_dir = working_dir
         self._met = fires_manager.met
+        self._locations = fires_manager.locations
         self._control_file_writer = ControlFileWriter(self._config,
-            fires_manager.locations, self._num_hours)
+            self._locations, self._num_hours)
         self._setup_file_writer = SetupFileWriter(self._config)
+        self._output_loader = OutputLoader(self._config, self._locations)
 
 
     ## Public Interface
@@ -76,7 +78,7 @@ class HysplitTrajectories(object):
             self._sym_link_met_files(wdir, met_files)
             self._sym_link_static_files(wdir)
             self._run_hysplit(wdir)
-            return OutputLoader(self._config).load(wdir)
+            self._output_loader.load(start_s, wdir)
 
     def _get_met_files(self, start):
         met = filter_met(self._met, start, self._num_hours)
