@@ -208,12 +208,43 @@ emissions config
 - ***'config' > 'extrafiles' > 'firescsvs' > 'fire_events_filename'*** -- *optiona* -- default: 'fire_events.csv'
 
 
+##### trajectories
+
+ - ***'config' > 'trajectories' > 'model'*** -- *optional* -- default: "hysplit"
+ - ***'config' > 'trajectories' > 'start'*** -- *required* --
+ - ***'config' > 'trajectories' > 'num_hours'*** -- *optional* -- default: 24
+ - ***'config' > 'trajectories' > 'working_dir'*** -- *optional* -- default is to create a temp dir
+ - ***'config' > 'trajectories' > 'handle_existing'*** -- *optional* -- "fail"
+
+###### if running hysplit dispersion:
+
+ - ***'config' > 'trajectories' > 'hysplit' > 'binary'*** -- *optional* -- default: 'hyts_std'
+ - ***'config' > 'trajectories' > 'hysplit' > 'start_hours'*** -- *optional* -- default: [0]
+ - ***'config' > 'trajectories' > 'hysplit' > 'heights'*** -- *optional* -- default: [10, 100, 1000]
+ - ***'config' > 'trajectories' > 'hysplit' > 'vertical_motion'*** -- *optional* -- default: 0 (0 = from met file)
+ - ***'config' > 'trajectories' > 'hysplit' > 'top_of_model_domain'*** -- *optional* -- default: 10000
+ - ***'config' > 'trajectories' > 'hysplit' > 'output_file_name'*** -- *optional* -- default: "tdump"
+ - ***'config' > 'trajectories' > 'hysplit' > 'setup_file_params'*** -- *optional* -- default: {
+ - ***'config' > 'trajectories' > 'hysplit' > 'setup_file_params' > 'tm_tpot'*** -- *optional* -- default: 1
+ - ***'config' > 'trajectories' > 'hysplit' > 'setup_file_params' > 'tm_tamb'*** -- *optional* -- default: 1
+ - ***'config' > 'trajectories' > 'hysplit' > 'setup_file_params' > 'tm_rain'*** -- *optional* -- default: 1
+ - ***'config' > 'trajectories' > 'hysplit' > 'setup_file_params' > 'tm_mixd'*** -- *optional* -- default: 1
+ - ***'config' > 'trajectories' > 'hysplit' > 'setup_file_params' > 'tm_relh'*** -- *optional* -- default: 1
+ - ***'config' > 'trajectories' > 'hysplit' > 'setup_file_params' > 'tm_dswf'*** -- *optional* -- default: 1
+ - ***'config' > 'trajectories' > 'hysplit' > 'setup_file_params' > 'tm_terr'*** -- *optional* -- default: 0
+ - ***'config' > 'trajectories' > 'hysplit' > 'setup_file_params' > 'kmsl'*** -- *optional* -- default: 0
+ - ***'config' > 'trajectories' > 'hysplit' > 'static_files' > 'ASCDATA_FILE'*** -- optional -- default files included in bluesky package
+ - ***'config' > 'trajectories' > 'hysplit' > 'static_files' > 'LANDUSE_FILE'*** -- optional -- default files included in bluesky package
+ - ***'config' > 'trajectories' > 'hysplit' > 'static_files' > 'ROUGLEN_FILE'*** -- optional -- default files included in bluesky package
+ - ***'config' > 'trajectories' > 'hysplit' > 'static_files' > 'TERRAIN_FILE'*** -- optional -- default files included in bluesky package
+
+
 ##### dispersion
 
  - ***'config' > 'dispersion' > 'start'*** -- *required* (unless it can be determined from fire activity windows) -- modeling start time (ex. "2015-01-21T00:00:00Z"); 'today' is also recognized, in which case start is set to midnight of the current utc date
  - ***'config' > 'dispersion' > 'num_hours'*** -- *required* (unless it can be determined from fire activity windows) -- number of hours in model run
  - ***'config' > 'dispersion' > 'output_dir'*** -- *required* -- directory to contain output
-  - ***'config' > 'dispersion' > 'working_dir'*** -- *required* -- directory to contain working output
+ - ***'config' > 'dispersion' > 'working_dir'*** -- *required* -- directory to contain working output
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
  - ***'config' > 'dispersion' > 'handle_existing'*** - *optional* -- how to handle case where output dir already exists; options: 'replace', 'write_in_place', 'fail'; defaults to 'fail'
  - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'spacing'*** -- *optional*, but required if other plume_merge grid fields are specified -- grid cell dimensions ***in degrees***
@@ -221,7 +252,6 @@ emissions config
  - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'sw' > 'lng'*** -- *optional*, but required if other plume_merge grid fields are specified --
  - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *optional*, but required if other plume_merge grid fields are specified --
  - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *optional*, but required if other plume_merge grid fields are specified --
-
 
 ###### if running hysplit dispersion:
 
