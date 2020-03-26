@@ -1,8 +1,4 @@
-"""Unit tests for bluesky.modules.dispersion
-
-Note:  This file has an extra '_' to avoid a name conflict (with
-test/unit/bluesky/visualizers/test_dispersion.py) which was
-preventing the tests from running.
+"""Unit tests for bluesky.metutils
 """
 
 __author__ = "Joel Dubowy"
@@ -12,7 +8,7 @@ import datetime
 
 #from py.test import raises
 
-from bluesky.modules import dispersion
+from bluesky import metutils
 
 MET = {
     "files": [
@@ -76,16 +72,16 @@ class TestFilterMet(object):
 
     def test_no_filtering_needed(self):
         expected = copy.deepcopy(MET)
-        assert expected == dispersion._filter_met(MET,
+        assert expected == metutils.filter_met(MET,
             datetime.datetime(2016,9,21,0,0,0), 100)
 
     def test_filtering(self):
         expected = copy.deepcopy(MET)
 
         expected["files"].pop(0)
-        assert expected == dispersion._filter_met(MET,
+        assert expected == metutils.filter_met(MET,
             datetime.datetime(2016,9,21,14,0,0), 100)
 
         expected["files"].pop()
-        assert expected == dispersion._filter_met(MET,
+        assert expected == metutils.filter_met(MET,
             datetime.datetime(2016,9,21,14,0,0), 60)
