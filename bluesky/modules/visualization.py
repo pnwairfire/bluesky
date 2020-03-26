@@ -5,8 +5,8 @@ __author__ = "Joel Dubowy"
 import logging
 
 from bluesky.config import Config
-from bluesky import visualizers
 from bluesky.exceptions import BlueSkyConfigurationError
+from bluesky.importutils import import_class
 
 __all__ = [
     'run'
@@ -20,44 +20,56 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-    target = Config().get('visualization', 'target').lower()
-    processed_kwargs = {"target": target}
-    visualization_info = {"target": target}
-    try:
-        # TODO: support VSMOKE as well
-        if target == 'dispersion':
-            dispersion_model = get_dispersion_model(fires_manager)
-            processed_kwargs.update(dispersion_model=dispersion_model)
-            visualization_info.update(dispersion_model=dispersion_model)
-            if dispersion_model == 'hysplit':
-                # TODO: look under 'visualization' > 'dispersion' > 'hysplit',
-                #   but support 'visualization' > 'hysplit' for backwards
-                #   compatibility ?
-                visualizer = visualizers.dispersion.hysplit.HysplitVisualizer(
-                    fires_manager)
-                processed_kwargs.update(
-                    hysplit_visualizer_version=visualizers.dispersion.hysplit.__version__)
-            else:
-                raise NotImplementedError("Visualization of {} dispersion model not "
-                    "supported".format(dispersion_model))
 
-        else:
-            raise BlueSkyConfigurationError(
-                "Invalid visualizaton: '{}'".format(model))
+    targets = get_targets()
 
-        visualization_info.update(visualizer.run())
-        fires_manager.visualization = visualization_info
+    processed_kwargs = {"targets": []}
+    visualization_info = {"targets": []}
+    for target in targets:
+        for obj in (visualization_info, processed_kwargs)
+            obj['targets'].append({"target": target})
+            obj['targets'][-1].update(model=model)
 
-    finally:
-        fires_manager.processed(__name__, __version__, **processed_kwargs)
+        try:
+            model = get_model(fires_manager, target)
+            module, klass = import_class(
+                'bluesky.visualizers.{}.{}'.format(target, model),
+                '{}Visualizer'.format(target.capitalize()))
+            visualizer = klass(fires_manager)
+                processed_kwargs['targets'][-1].update(
+                    version=module.__version__)
 
-    # TODO: add information to fires_manager indicating where to find the hysplit output
+            visualization_info['targets'][-1].update(visualizer.run())
+            # TODO: add information to fires_manager indicating where to
+            #   find the hysplit output if hysplit dispersion
 
-def get_dispersion_model(fires_manager):
-    if fires_manager.dispersion and fires_manager.dispersion.get('model'):
-        return fires_manager.dispersion['model']
-    model = Config().get('dispersion', 'model')
+        finally:
+            fires_manager.visualization = visualization_info
+            fires_manager.processed(__name__, __version__, **processed_kwargs)
+
+def get_targets():
+    targets = Config().get('visualization', 'targets')
+
+    # 'visualization' > 'target' supported for backwards compatibility
+    if Config().get('visualization', 'target'):
+        # this will only be hit if it's an older config specifying
+        # 'visualization' > 'target'
+        targets = [Config().get('visualization', 'target')]
+
+    targets = [t.lower() for t in targets]
+
+
+def get_model(fires_manager, target):
+    if target not in fires_manager and target not in Config().get():
+        raise ValueError("Invalid visualization target: {}".format(target))
+
+    model = fires_manager.get(target) and fires_manager[target].get('model')
+    if model:
+        return fires_manager[target]['model']
+
+    model = Config().get(target, 'model')
     if model:
         return model.lower()
 
-    raise ValueError("Dispersion model must be specified if visualizing dispersion")
+    raise ValueError("{} model must be specified if visualizing {}",
+        target.capitalize(), target)

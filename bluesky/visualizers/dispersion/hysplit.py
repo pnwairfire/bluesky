@@ -37,7 +37,13 @@ def disp_config(*keys):
     return Config().get('dispersion', *keys)
 
 def vis_hysplit_config(*keys):
-    return Config().get('visualization', 'hysplit', *keys)
+    try:
+        # support 'visualization' > 'hysplit' for backwards compatibility,
+        return Config().get('visualization', 'hysplit', *keys)
+    except:
+        # this will be used unless older config specifying
+        # 'visualization' > 'hysplit' is used
+        return Config().get('visualization', 'dispersion', 'hysplit', *keys)
 
 def disp_hysplit_config(*keys):
     return Config().get('dispersion', 'hysplit', *keys)

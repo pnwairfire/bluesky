@@ -610,35 +610,44 @@ _DEFAULTS = {
         }
     },
     "visualization": {
-        "target": "dispersion",
-        "hysplit": {
-            "websky_version": "1",
-            "fire_locations_csv_filename": 'fire_locations.csv',
-            "fire_events_csv_filename": 'fire_events.csv',
-            "smoke_dispersion_kmz_filename": 'smoke_dispersion.kmz',
-            "fire_kmz_filename": 'fire_locations.kmz',
-            "prettykml": False,
-            "output_dir": None,
-            "images_dir": None,
-            "data_dir": "",
-            "create_summary_json": False,
-            "blueskykml_config": {
-                'SmokeDispersionKMLInput': {
-                    # Use google's fire icon instead of BlueSkyKml's built-in icon
-                    # (if an alternative isn't already specified)
-                    # TODO: should we be using google's icon as the default?
-                    'FIRE_EVENT_ICON': "http://maps.google.com/mapfiles/ms/micons/firedept.png"
-                },
-                'DispersionGridOutput': {
-                    # If not set by user, it will be set to
-                    # output_dir/images_dir
-                    'OUTPUT_DIR': None
-                }
-            },
+        "target": None, # supported for backwards compatibility
+        "targets": ["dispersion"],
+        "hysplit": None, # supported for backwards compatibility
+        "dispersion": {
+            "hysplit": {
 
-            # The following default is defined in the blueskykml package,
-            # but we need to define it here so that the code doesn't fail
-            "layers": [0]
+            }
+        },
+        "trajectories": {
+            "hysplit": {
+                "websky_version": "1",
+                "fire_locations_csv_filename": 'fire_locations.csv',
+                "fire_events_csv_filename": 'fire_events.csv',
+                "smoke_dispersion_kmz_filename": 'smoke_dispersion.kmz',
+                "fire_kmz_filename": 'fire_locations.kmz',
+                "prettykml": False,
+                "output_dir": None,
+                "images_dir": None,
+                "data_dir": "",
+                "create_summary_json": False,
+                "blueskykml_config": {
+                    'SmokeDispersionKMLInput': {
+                        # Use google's fire icon instead of BlueSkyKml's built-in icon
+                        # (if an alternative isn't already specified)
+                        # TODO: should we be using google's icon as the default?
+                        'FIRE_EVENT_ICON': "http://maps.google.com/mapfiles/ms/micons/firedept.png"
+                    },
+                    'DispersionGridOutput': {
+                        # If not set by user, it will be set to
+                        # output_dir/images_dir
+                        'OUTPUT_DIR': None
+                    }
+                },
+
+                # The following default is defined in the blueskykml package,
+                # but we need to define it here so that the code doesn't fail
+                "layers": [0]
+            }
         }
     },
     "export": {

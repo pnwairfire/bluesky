@@ -1,0 +1,2 @@
+class HysplitVisualizer(object):
+    pass
