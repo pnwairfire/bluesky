@@ -183,3 +183,6 @@
 ## 4.1.35
  - add trajectories module with support for hysplit model
  - refactor visualization module to support multiple targets and add new 'trajectories' target
+
+## 4.1.36
+ - Modify trajectories output info so that it can be recognized as an extra export
