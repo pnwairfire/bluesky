@@ -122,7 +122,7 @@ class OutputLoader(object):
                 if len(parts) >= 13:
                     set_idx = int(parts[0]) - 1
                     l_idx = int(set_idx / num_heights)
-                    h_idx = set_idx % 3
+                    h_idx = set_idx % num_heights
                     # since the location could have traj lines from other
                     # start times, we're indexing from the back of the list
                     reverse_h_idx = -num_heights + h_idx
