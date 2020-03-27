@@ -39,7 +39,7 @@ def run(fires_manager):
             "{}_version".format(model): module.__version__
         })
 
-        output_dir, working_dir = get_working_and_output_dirs(module_name)
+        output_dir, working_dir = get_working_and_output_dirs('dispersion')
 
         # further validation of start and num_hours done in 'run'
         dispersion_info = disperser.run(fires_manager, start,
