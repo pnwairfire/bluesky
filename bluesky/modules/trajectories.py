@@ -46,10 +46,11 @@ def run(fires_manager):
         traj_info = traj_gen.run()
         traj_info.update(
             model=model,
-            start=start,
-            num_hours=num_hours,
-            output_dir=output_dir,
-            working_dir=working_dir
+            output={
+                'start': start,
+                'num_hours': num_hours,
+                'directory': output_dir
+            }
         )
 
         # TODO: store trajectories info in summary?
