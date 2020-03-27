@@ -225,6 +225,7 @@ _DEFAULTS = {
         "model": "hysplit",
         "start": None,
         "num_hours": 24, # run time
+        "output_dir": None,
         "working_dir": None,
         "handle_existing": "fail",
         "hysplit": {
@@ -234,6 +235,9 @@ _DEFAULTS = {
             "vertical_motion": 0, # 0 = from met file
             "top_of_model_domain": 10000,  # trajectories end above this
             "output_file_name": "tdump",
+            "json_indent": None,
+            "json_file_name": "hysplit-trajectories.json",
+            "geojson_file_name": "hysplit-trajectories.geojson",
             "setup_file_params": {
                  "tm_tpot": 1,
                  "tm_tamb": 1,

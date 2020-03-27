@@ -1,5 +1,9 @@
+import json
 import re
 import os
+
+from bluesky import locationutils
+from bluesky.models.fires import FireEncoder
 
 class OutputLoader(object):
     """Loads data from output file produced by hysplit trajectories
@@ -80,18 +84,42 @@ class OutputLoader(object):
                     "points": [
                         [35.0, -120, 100]
                     ]
+                    ...
                 }
+                ...
             ]
         }
+        ...
     }
     """
 
-    def __init__(self, config, locations):
+    def __init__(self, config, fires_manager):
         self._config = config
-        self._locations = locations
+        self._fires_manager = fires_manager
+        self._locations = fires_manager.locations
 
-    def load(self, start, working_dir):
+    def load(self, start, working_dir, output_dir):
         self._initialize_locations(start)
+        self._load_output_file(start, working_dir)
+        self._write_to_json(output_dir)
+        self._write_to_geojson(output_dir)
+
+    def _initialize_locations(self, start):
+        for loc in self._locations:
+            if not 'trajectories' in self._locations:
+                loc['trajectories'] = {
+                    "model": "hysplit",
+                    "lines": []
+                }
+            for h in self._config['heights']:
+                loc['trajectories']['lines'].append({
+                    "start": start,
+                    "height": h,
+                    "points": []
+                })
+
+
+    def _load_output_file(self, start, working_dir):
         filename = os.path.join(working_dir, self._config['output_file_name'])
         with open(filename, 'r') as f:
             num_heights = len(self._config['heights'])
@@ -108,16 +136,23 @@ class OutputLoader(object):
                         [float(parts[9]), float(parts[10]), float(parts[11])]
                     )
 
-    def _initialize_locations(self, start):
-        for loc in self._locations:
-            if not 'trajectories' in self._locations:
-                loc['trajectories'] = {
-                    "model": "hysplit",
-                    "lines": []
-                }
-            for h in self._config['heights']:
-                loc['trajectories']['lines'].append({
-                    "start": start,
-                    "height": h,
-                    "points": []
+    def _write_to_json(self, output_dir):
+        json_data = {"fires": []}
+        for fire in self._fires_manager.fires:
+            json_data["fires"].append({"id": fire.id, "locations": []})
+            for loc in fire.locations:
+                latlng = locationutils.LatLng(loc)
+                json_data["fires"][-1]["locations"].append({
+                    "lines": loc['trajectories']['lines'],
+                    "lat": latlng.latitude,
+                    "lng": latlng.longitude
                 })
+
+        import pdb;pdb.set_trace()
+        filename = os.path.join(output_dir, self._config['json_file_name'])
+        with open(filename, 'w') as f:
+            f.write(json.dumps(json_data, cls=FireEncoder,
+                indent=self._config['json_indent']))
+
+    def _write_to_geojson(self, output_dir):
+        pass
