@@ -179,3 +179,7 @@
  - Decrease default value for TOP_OF_MODEL_DOMAIN from 30000 to 10000
  - Fix bug in dispersion that was triggered when a fire location had inadequate heat
  - Raise an exception in dispersion if there are no fire locations with valid emissions and heat data
+
+## 4.1.35
+ - add trajectories module with support for hysplit model
+ - refactor visualization module to support multiple targets and add new 'trajectories' target
