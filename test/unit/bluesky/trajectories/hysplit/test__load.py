@@ -2,7 +2,7 @@ import os
 import pytest
 import tempfile
 
-from bluesky.trajectories.hysplit import output
+from bluesky.trajectories.hysplit import load
 
 ONE_LOC_ONE_HEIGHT_TDUMP = """         1     1
         AWRF    19     6    10    12     0
@@ -65,7 +65,7 @@ class TestOutputLoader(object):
             }
             locations = [{}]
 
-            loader = output.OutputLoader(config, locations)
+            loader = load.OutputLoader(config, locations)
             loader.load("2019-06-10T12:00:00Z", os.path.dirname(filename))
 
             expected = [{
@@ -94,7 +94,7 @@ class TestOutputLoader(object):
             }
             locations = [{}, {}]
 
-            loader = output.OutputLoader(config, locations)
+            loader = load.OutputLoader(config, locations)
             loader.load("2019-06-10T12:00:00Z", os.path.dirname(filename))
 
             expected = [
