@@ -17,6 +17,8 @@ class JsonOutputWriter(object):
         self._write_to_json()
         self._write_to_geojson()
 
+    ## Setting & Getting Filenames
+
     @property
     def json_file_name(self):
         return self._json_file_name
@@ -31,6 +33,8 @@ class JsonOutputWriter(object):
         self._geojson_file_name = os.path.join(self._output_dir,
             self._config['geojson_file_name'])
 
+
+    ## JSON file
 
     def _write_to_json(self):
         """Maintains bluesky's fires output structure, but including only
@@ -49,6 +53,9 @@ class JsonOutputWriter(object):
 
         self._write_file(self._json_file_name, json_data)
 
+
+    ## GeoJSON file
+
     def _write_to_geojson(self):
         """Flattens trajectory data into a FeatureCollection of trajectory
         line Features (one Feature per line)
@@ -63,25 +70,47 @@ class JsonOutputWriter(object):
         for fire in self._fires_manager.fires:
             for loc in fire.locations:
                 latlng = locationutils.LatLng(loc)
+                geojson_data['features'].append(
+                    self._get_location_feature(fire, loc, latlng))
                 for line in loc['trajectories']['lines']:
-                    coords = [[p[1], p[0]] for p in line['points']]
-                    heights = [p[2] for p in line['points']]
-                    geojson_data['features'].append({
-                        "type": "Feature",
-                        "geometry": {
-                            "type": "LineString",
-                            "coordinates": coords
-                        },
-                        "properties": {
-                            "fire_id": fire.id,
-                            "location_lat": latlng.latitude,
-                            "location_lng": latlng.longitude,
-                            "start_hour": line['start'],
-                            "heights": heights
-                        }
-                    })
+                    geojson_data['features'].append(
+                        self._get_line_feature(fire, latlng, line))
 
         self._write_file(self._geojson_file_name, geojson_data)
+
+    def _get_location_feature(self, fire, loc, latlng):
+        return {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [latlng.longitude, latlng.latitude]
+            },
+            "properties": {
+                "fire_id": fire.id
+            }
+        }
+
+
+    def _get_line_feature(self, fire, latlng, line):
+        coords = [[p[1], p[0]] for p in line['points']]
+        heights = [p[2] for p in line['points']]
+        return {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": coords
+            },
+            "properties": {
+                "fire_id": fire.id,
+                "location_lat": latlng.latitude,
+                "location_lng": latlng.longitude,
+                "start_hour": line['start'],
+                "heights": heights
+            }
+        }
+
+
+    ## Helpers
 
     def _write_file(self, filename, data):
         with open(filename, 'w') as f:
