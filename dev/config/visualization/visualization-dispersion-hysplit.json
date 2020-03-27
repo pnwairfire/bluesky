@@ -1,12 +1,14 @@
 {
     "config": {
         "visualization": {
-            "target": "dispersion",
-            "hysplit": {
-                "is_aquipt": false,
-                "images_dir": "images/",
-                "data_dir": "data/",
-                "output_dir": "/bluesky/output/output/{run_id}/"
+            "targets": ["dispersion"],
+            "dispersion": {
+                "hysplit": {
+                    "is_aquipt": false,
+                    "images_dir": "images/",
+                    "data_dir": "data/",
+                    "output_dir": "/bluesky/output/output/{run_id}/"
+                }
             }
         }
     }

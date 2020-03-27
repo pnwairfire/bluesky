@@ -3,7 +3,7 @@
 __author__ = "Joel Dubowy"
 
 __all__ = [
-    'HysplitVisualizer'
+    'HysplitDispersionVisualizer'
 ]
 __version__ = "0.1.0"
 
@@ -66,7 +66,7 @@ BlueskyKmlArgs = namedtuple('BlueskyKmlArgs', ARGS)
 ## Visualizer class
 ##
 
-class HysplitVisualizer(object):
+class HysplitDispersionVisualizer(object):
     def __init__(self, fires_manager):
         self._fires_manager = fires_manager
 
@@ -245,15 +245,17 @@ class HysplitVisualizer(object):
         e.g.
 
             "visualization": {
-                "target": "dispersion",
-                "hysplit": {
-                    "output_dir": "/sdf/sdf/",
-                    ...,
-                    "blueskykml_config": {
-                        "SmokeDispersionKMLInput": {
-                            "FIRE_EVENT_ICON"  : "http://maps.google.com/mapfiles/ms/micons/firedept.png"
+                "targets": ["dispersion"],
+                "dispersion": {
+                    "hysplit": {
+                        "output_dir": "/sdf/sdf/",
+                        ...,
+                        "blueskykml_config": {
+                            "SmokeDispersionKMLInput": {
+                                "FIRE_EVENT_ICON"  : "http://maps.google.com/mapfiles/ms/micons/firedept.png"
+                            }
+                            ...
                         }
-                        ...
                     }
                 }
             }

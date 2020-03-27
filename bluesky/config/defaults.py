@@ -614,12 +614,10 @@ _DEFAULTS = {
         }
     },
     "visualization": {
-        "target": None, # supported for backwards compatibility
         "targets": [],
-        "hysplit": None, # supported for backwards compatibility
         "trajectories": {
             "hysplit": {
-
+                "kml_file_name": "hysplit-trajectories.kml"
             }
         },
         "dispersion": {

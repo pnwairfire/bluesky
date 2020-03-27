@@ -20,24 +20,24 @@ def run(fires_manager):
     Args:
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
-
     targets = get_targets()
 
     processed_kwargs = {"targets": []}
     visualization_info = {"targets": []}
     for target in targets:
-        for obj in (visualization_info, processed_kwargs)
+        for obj in (visualization_info, processed_kwargs):
             obj['targets'].append({"target": target})
-            obj['targets'][-1].update(model=model)
 
         try:
             model = get_model(fires_manager, target)
+            for obj in (visualization_info, processed_kwargs):
+                obj['targets'][-1].update({"model": model})
             module, klass = import_class(
                 'bluesky.visualizers.{}.{}'.format(target, model),
-                '{}Visualizer'.format(target.capitalize()))
+                '{}{}Visualizer'.format(model.capitalize(), target.capitalize()))
             visualizer = klass(fires_manager)
-                processed_kwargs['targets'][-1].update(
-                    version=module.__version__)
+            processed_kwargs['targets'][-1].update(
+                version=module.__version__)
 
             visualization_info['targets'][-1].update(visualizer.run())
             # TODO: add information to fires_manager indicating where to
@@ -48,26 +48,28 @@ def run(fires_manager):
             fires_manager.processed(__name__, __version__, **processed_kwargs)
 
 def get_targets():
-    targets = Config().get('visualization', 'targets')
+    vis_config = Config().get('visualization')
+    targets = vis_config['targets']
 
     # 'visualization' > 'target' supported for backwards compatibility
-    if Config().get('visualization', 'target'):
+    if vis_config.get('target'):
         # this will only be hit if it's an older config specifying
         # 'visualization' > 'target'
-        targets = [Config().get('visualization', 'target')]
+        targets = [vis_config['target']]
 
     targets = [t.lower() for t in targets]
+    logging.info("Visualizatin targets '%s'", "', '".join(targets))
 
+    invalid = [t for t in targets if t not in vis_config]
+    if invalid:
+        raise ValueError("Invalid visualization target(s): '{}'".format(
+            "','".join(invalid)))
+
+    return targets
 
 def get_model(fires_manager, target):
-    if target not in fires_manager and target not in Config().get():
-        raise ValueError("Invalid visualization target: {}".format(target))
-
-    model = fires_manager.get(target) and fires_manager[target].get('model')
-    if model:
-        return fires_manager[target]['model']
-
-    model = Config().get(target, 'model')
+    model =  (getattr(fires_manager, target) or {}).get('model')
+    model = model or Config().get(target, 'model')
     if model:
         return model.lower()
 

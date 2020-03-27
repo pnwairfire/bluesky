@@ -22,17 +22,19 @@
             }
         },
         "visualization": {
-            "target": "dispersion",
-            "hysplit": {
-                "images_dir": "images/",
-                "data_dir": "data/",
-                "create_summary_json": true,
-                "blueskykml_config": {
-                    "DispersionGridInput": {
-                        "LAYERS": [0,2]
-                    },
-                    "DispersionImages": {
-                        "DAILY_IMAGES_UTC_OFFSETS": [-7, 0]
+            "targets": ["dispersion"],
+            "dispersion": {
+                "hysplit": {
+                    "images_dir": "images/",
+                    "data_dir": "data/",
+                    "create_summary_json": true,
+                    "blueskykml_config": {
+                        "DispersionGridInput": {
+                            "LAYERS": [0,2]
+                        },
+                        "DispersionImages": {
+                            "DAILY_IMAGES_UTC_OFFSETS": [-7, 0]
+                        }
                     }
                 }
             }

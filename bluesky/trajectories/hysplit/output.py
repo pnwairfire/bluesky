@@ -11,10 +11,26 @@ class JsonOutputWriter(object):
         self._config = config
         self._fires_manager = fires_manager
         self._output_dir = output_dir
+        self._set_file_name()
 
     def write(self):
         self._write_to_json()
         self._write_to_geojson()
+
+    @property
+    def json_file_name(self):
+        return self._json_file_name
+
+    @property
+    def geojson_file_name(self):
+        return self._geojson_file_name
+
+    def _set_file_name(self):
+        self._json_file_name = os.path.join(self._output_dir,
+            self._config['json_file_name'])
+        self._geojson_file_name = os.path.join(self._output_dir,
+            self._config['geojson_file_name'])
+
 
     def _write_to_json(self):
         """Maintains bluesky's fires output structure, but including only
@@ -31,7 +47,7 @@ class JsonOutputWriter(object):
                     "lng": latlng.longitude
                 })
 
-        self._write_file(self._config['json_file_name'], json_data)
+        self._write_file(self._json_file_name, json_data)
 
     def _write_to_geojson(self):
         """Flattens trajectory data into a FeatureCollection of trajectory
@@ -65,10 +81,9 @@ class JsonOutputWriter(object):
                         }
                     })
 
-        self._write_file(self._config['geojson_file_name'], geojson_data)
+        self._write_file(self._geojson_file_name, geojson_data)
 
     def _write_file(self, filename, data):
-        filename = os.path.join(self._output_dir, filename)
         with open(filename, 'w') as f:
             f.write(json.dumps(data, cls=FireEncoder,
                 indent=self._config['json_indent']))

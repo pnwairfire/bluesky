@@ -44,7 +44,13 @@ def run(fires_manager):
         traj_gen = klass(model_config, fires_manager, start, num_hours,
             output_dir, working_dir=working_dir)
         traj_info = traj_gen.run()
-        traj_info.update(model=model)
+        traj_info.update(
+            model=model,
+            start=start,
+            num_hours=num_hours,
+            output_dir=output_dir,
+            working_dir=working_dir
+        )
 
         # TODO: store trajectories info in summary?
         #   > fires_manager.summarize(trajectories=disperser.run(...))

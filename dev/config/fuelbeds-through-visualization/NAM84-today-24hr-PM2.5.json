@@ -42,11 +42,13 @@
             }
         },
         "visualization": {
-            "target": "dispersion",
-            "hysplit": {
-                "images_dir": "images/",
-                "data_dir": "data/",
-                "create_summary_json": true
+            "targets": ["dispersion"],
+            "dispersion": {
+                "hysplit": {
+                    "images_dir": "images/",
+                    "data_dir": "data/",
+                    "create_summary_json": true
+                }
             }
         },
         "export": {

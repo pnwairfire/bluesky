@@ -213,6 +213,7 @@ emissions config
  - ***'config' > 'trajectories' > 'model'*** -- *optional* -- default: "hysplit"
  - ***'config' > 'trajectories' > 'start'*** -- *required* --
  - ***'config' > 'trajectories' > 'num_hours'*** -- *optional* -- default: 24
+ - ***'config' > 'trajectories' > 'output_dir'*** -- *required* -- where output json and geojson files will be written
  - ***'config' > 'trajectories' > 'working_dir'*** -- *optional* -- default is to create a temp dir
  - ***'config' > 'trajectories' > 'handle_existing'*** -- *optional* -- "fail"
 

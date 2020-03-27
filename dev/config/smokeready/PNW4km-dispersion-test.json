@@ -118,32 +118,34 @@
             }
         },
         "visualization": {
-            "target": "dispersion",
-            "hysplit": {
-                "websky_version": "2",
-                "create_summary_json": true,
-                "images_dir": "images/",
-                "data_dir": "data/",
-                "blueskykml_config": {
-                    "DispersionGridInput": {
-                        "LAYERS": [0]
-                    },
-                    "DispersionImages": {
-                        "DAILY_IMAGES_UTC_OFFSETS": [-11,-10,-9,-8,-7,-6,-5,-4, 0],
-                        "REPROJECT_IMAGES": "True"
-                    },
-                    "DispersionGridOutput": {
-                        "HOURLY_COLORS": "GrayColorBar",
-                        "THREE_HOUR_COLORS": "GrayColorBar",
-                        "DAILY_COLORS": "GrayColorBar"
-                    },
-                    "GrayColorBar": {
-                        "DEFINE_RGB": "true",
-                        "DATA_LEVELS": "0 1 12 35 55 150 250 350 500 2000",
-                        "RED": " 0 200 175 150 125 100 75 50 25",
-                        "GREEN": "0 200 175 150 125 100 75 50 25",
-                        "BLUE": "0 200 175 150 125 100 75 50 25",
-                        "IMAGE_OPACITY_FACTOR": "0.7"
+            "targets": ["dispersion"],
+            "dispersion": {
+                "hysplit": {
+                    "websky_version": "2",
+                    "create_summary_json": true,
+                    "images_dir": "images/",
+                    "data_dir": "data/",
+                    "blueskykml_config": {
+                        "DispersionGridInput": {
+                            "LAYERS": [0]
+                        },
+                        "DispersionImages": {
+                            "DAILY_IMAGES_UTC_OFFSETS": [-11,-10,-9,-8,-7,-6,-5,-4, 0],
+                            "REPROJECT_IMAGES": "True"
+                        },
+                        "DispersionGridOutput": {
+                            "HOURLY_COLORS": "GrayColorBar",
+                            "THREE_HOUR_COLORS": "GrayColorBar",
+                            "DAILY_COLORS": "GrayColorBar"
+                        },
+                        "GrayColorBar": {
+                            "DEFINE_RGB": "true",
+                            "DATA_LEVELS": "0 1 12 35 55 150 250 350 500 2000",
+                            "RED": " 0 200 175 150 125 100 75 50 25",
+                            "GREEN": "0 200 175 150 125 100 75 50 25",
+                            "BLUE": "0 200 175 150 125 100 75 50 25",
+                            "IMAGE_OPACITY_FACTOR": "0.7"
+                        }
                     }
                 }
             }
