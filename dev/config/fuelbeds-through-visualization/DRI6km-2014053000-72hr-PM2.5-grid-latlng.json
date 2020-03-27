@@ -59,7 +59,7 @@
         },
         "export": {
             "modes": ["email", "localsave"],
-            "extra_exports": ["dispersion", "visualization"],
+            "extra_exports": ["dispersion", "visualization", "trajectories"],
             "email": {
                 "recipients": ["jdubowy+blueskytest@gmail.com"],
                 "sender": "bsp@airfire.org",
