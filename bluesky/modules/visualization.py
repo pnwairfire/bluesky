@@ -43,9 +43,19 @@ def run(fires_manager):
             # TODO: add information to fires_manager indicating where to
             #   find the hysplit output if hysplit dispersion
 
-        finally:
-            fires_manager.visualization = visualization_info
-            fires_manager.processed(__name__, __version__, **processed_kwargs)
+        except Exception as e:
+            visualization_info['targets'][-1].update(error=str(e))
+
+    # need top level output > directory information for export
+    visualization_info["output"] = {"directories": []}
+    for t in visualization_info["targets"]:
+        if t.get('output',{}).get('directory'):
+            visualization_info["output"]["directories"].append(
+                t['output']['directory'])
+
+    fires_manager.visualization = visualization_info
+    fires_manager.processed(__name__, __version__, **processed_kwargs)
+
 
 def get_targets():
     vis_config = Config().get('visualization')

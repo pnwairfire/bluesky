@@ -106,11 +106,15 @@ class ExporterBase(object):
         r = {}
         dirs_to_copy = {}
         for k in self._extra_exports:
-            d = getattr(fires_manager, k)
-            if d and d.get('output', {}).get('directory'):
-                dirs_to_copy[d['output']['directory']] = dirs_to_copy.get(
-                    d['output']['directory'], [])
-                dirs_to_copy[d['output']['directory']].append(k)
+            module_info = getattr(fires_manager, k)
+            if module_info and module_info.get('output', {}):
+                directories = module_info["output"].get("directories", [])
+                if module_info["output"].get('directory'):
+                    directories.append(module_info["output"]['directory'])
+                for d in directories:
+                    dirs_to_copy[d] = dirs_to_copy.get(d, [])
+                    dirs_to_copy[d].append(k)
+
         for directory, extra_exports in list(dirs_to_copy.items()):
             # TODO: See comment in bluesky.io.create_dir_or_handle_existing
             #   about getting shutil.copytree to work in the case
@@ -133,6 +137,7 @@ class ExporterBase(object):
                 processor = getattr(self, '_process_{}'.format(k), None)
                 if processor:
                     processor(getattr(fires_manager, k), r)
+
         return r
 
 
@@ -188,7 +193,7 @@ class ExporterBase(object):
     SERIES_IMG_MATCHER = re.compile('.*_\d+.png')
     LEGEND_IMG_MATCHER = re.compile('.*colorbar_.*.png')
 
-    def _process_images(self, d):
+    def _process_images(self, directory):
         """Produces new image results json structure
 
         Note: This method uses recursion in order to handle variable
@@ -233,7 +238,7 @@ class ExporterBase(object):
                     color_scheme_dict['other_images'].append(image_name)
 
 
-        for i in self._find_files(d['output']['directory'], self.IMAGE_PATTERN):
+        for i in self._find_files(directory, self.IMAGE_PATTERN):
             _set(i)
 
         return images
@@ -253,8 +258,10 @@ class ExporterBase(object):
 
     JSON_PATTERN = '*.json'
     KMZ_PATTERN = '*.kmz'
+    KML_PATTERN = '*.kml'
     CSV_PATTERN = '*.csv'
     NETCDF_PATTERN = '*.nc'
+    TRAJ_KML_PATTERN = re.compile('.*traj.*kml')
     SMOKE_KMZ_MATCHER = re.compile('.*smoke.*kmz')
     FIRE_KMZ_MATCHER = re.compile('.*fire.*kmz')
     FIRE_LOCATIONS_CSV_MATCHER = re.compile('.*/fire_locations.*')
@@ -262,18 +269,33 @@ class ExporterBase(object):
     FIRE_EMISSIONS_CSV_MATCHER = re.compile('.*/fire_emissions.*')
 
     def _process_visualization(self, d, r):
+        for target_info in d.get('targets', []):
+            directory = target_info.get('output', {}).get('directory')
+            if directory:
+                f = "_process_{}_visualization".format(target_info['target'])
+                target_processor = getattr(self, f, None)
+                if target_processor:
+                    r['visualization'][target_info['target']] = {}
+                    target_processor(directory, r)
+
+    def _process_trajectories_visualization(self, directory, r):
+        kmls = self._find_files(directory, self.KML_PATTERN)
+        r['visualization']['trajectories']['kmls'] = self._pick_out_files(kmls,
+            trajectories=self.TRAJ_KML_PATTERN)
+
+    def _process_dispersion_visualization(self, directory, r):
         # TODO: look in 'd' to see the target of visualization, what files
         #   exist, etc.; it won't necessarily say - so that's why we need
         #   the back-up logic of looking for specific files
-        kmzs = self._find_files(d['output']['directory'], self.KMZ_PATTERN)
-        r['visualization']['kmzs'] = self._pick_out_files(kmzs,
+        kmzs = self._find_files(directory, self.KMZ_PATTERN)
+        r['visualization']['dispersion']['kmzs'] = self._pick_out_files(kmzs,
             smoke=self.SMOKE_KMZ_MATCHER, fire=self.FIRE_KMZ_MATCHER)
 
-        r['visualization']['images'] = self._process_images(d)
-        self._sort_images(r['visualization']['images'])
+        r['visualization']['dispersion']['images'] = self._process_images(directory)
+        self._sort_images(r['visualization']['dispersion']['images'])
 
-        csvs = self._find_files(d['output']['directory'], self.CSV_PATTERN)
-        r['visualization']['csvs'] = self._pick_out_files(csvs,
+        csvs = self._find_files(directory, self.CSV_PATTERN)
+        r['visualization']['dispersion']['csvs'] = self._pick_out_files(csvs,
             fire_locations=self.FIRE_LOCATIONS_CSV_MATCHER,
             fire_events=self.FIRE_EVENTS_CSV_MATCHER,
             fire_emissions=self.FIRE_EMISSIONS_CSV_MATCHER)

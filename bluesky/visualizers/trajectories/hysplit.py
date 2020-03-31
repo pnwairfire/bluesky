@@ -28,18 +28,19 @@ class HysplitTrajectoriesVisualizer(object):
         self._set_output_info()
 
     def _set_output_info(self):
-        self._geojson_file_name = (self._fires_manager.trajectories
-            and self._fires_manager.trajectories.get('geojson_file_name'))
+        if self._fires_manager.trajectories:
+            o = self._fires_manager.trajectories.get('output')
+            if o and o.get('geojson_file_name') and o.get('directory'):
+                self._geojson_file_name = os.path.join(o['directory'],
+                    o['geojson_file_name'])
+                self._kml_file_name = os.path.join(o['directory'],
+                    Config().get('visualization', 'trajectories', 'hysplit',
+                        'kml_file_name')
+                )
+                return
 
         if not self._geojson_file_name:
             raise RuntimeError("No trajectories GeoJSON file to convert to KML")
-
-        self._kml_file_name = os.path.join(
-            os.path.dirname(self._geojson_file_name),
-            Config().get('visualization', 'trajectories', 'hysplit',
-                'kml_file_name')
-        )
-
 
     def run(self):
         args = [
@@ -50,5 +51,8 @@ class HysplitTrajectoriesVisualizer(object):
         io.SubprocessExecutor().execute(*args)
 
         return {
-            'kml_file_name': self._kml_file_name
+            "output": {
+                'kml_file_name': os.path.basename(self._kml_file_name),
+                'directory': os.path.dirname(self._kml_file_name),
+            }
         }

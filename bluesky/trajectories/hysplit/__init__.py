@@ -53,8 +53,13 @@ class HysplitTrajectories(object):
         self._output_writer.write()
 
         r = {
-            "json_file_name": self._output_writer.json_file_name,
-            "geojson_file_name": self._output_writer.geojson_file_name
+            "output": {
+                'start': self._start,
+                'num_hours': self._num_hours,
+                'directory': self._output_dir,
+                "json_file_name": os.path.basename(self._output_writer.json_file_name),
+                "geojson_file_name": os.path.basename(self._output_writer.geojson_file_name)
+            }
             # TODO: include information about failures?
         }
         return r
