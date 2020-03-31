@@ -44,9 +44,10 @@ class JsonOutputWriter(object):
         for fire in self._fires_manager.fires:
             json_data["fires"].append({"id": fire.id, "locations": []})
             for loc in fire.locations:
+                lines = loc.get('trajectories', {}).get('lines', [])
                 latlng = locationutils.LatLng(loc)
                 json_data["fires"][-1]["locations"].append({
-                    "lines": loc['trajectories']['lines'],
+                    "lines": lines,
                     "lat": latlng.latitude,
                     "lng": latlng.longitude
                 })
@@ -72,7 +73,8 @@ class JsonOutputWriter(object):
                 latlng = locationutils.LatLng(loc)
                 geojson_data['features'].append(
                     self._get_location_feature(fire, loc, latlng))
-                for line in loc['trajectories']['lines']:
+                lines = loc.get('trajectories', {}).get('lines', [])
+                for line in lines:
                     geojson_data['features'].append(
                         self._get_line_feature(fire, latlng, line))
 

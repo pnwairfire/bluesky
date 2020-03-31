@@ -48,7 +48,7 @@ class HysplitTrajectories(object):
                 logging.error(
                     "Failed to compute trajectories for start_hour %s: %s",
                     start_hour, e)
-                # TODO: somehow mark failure in aggregated data
+                # TODO: somehow mark failure in output data
 
         self._output_writer.write()
 
