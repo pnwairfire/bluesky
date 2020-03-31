@@ -261,6 +261,8 @@ class ExporterBase(object):
     KML_PATTERN = '*.kml'
     CSV_PATTERN = '*.csv'
     NETCDF_PATTERN = '*.nc'
+    # TODO: compile regexes from file name config settings, since the following
+    #   patterns may be invalid if user specifies custom names
     TRAJ_KML_PATTERN = re.compile('.*traj.*kml')
     SMOKE_KMZ_MATCHER = re.compile('.*smoke.*kmz')
     FIRE_KMZ_MATCHER = re.compile('.*fire.*kmz')
