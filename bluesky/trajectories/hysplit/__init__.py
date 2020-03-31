@@ -40,10 +40,12 @@ class HysplitTrajectories(object):
     ## Public Interface
 
     def run(self):
+        num_failed = 0
         for start_hour in self._config['start_hours']:
             try:
                 self._run_start_hour(start_hour)
             except Exception as e:
+                num_failed += 1
                 logging.debug(traceback.format_exc())
                 logging.error(
                     "Failed to compute trajectories for start_hour %s: %s",
@@ -60,8 +62,16 @@ class HysplitTrajectories(object):
                 "json_file_name": os.path.basename(self._output_writer.json_file_name),
                 "geojson_file_name": os.path.basename(self._output_writer.geojson_file_name)
             }
-            # TODO: include information about failures?
         }
+        if num_failed:
+            num_start_hours = len(self._config['start_hours'])
+            if num_failed == num_start_hours:
+                r["error"] = "{} {} hysplit trajectories run{} failed".format(
+                    "All" if num_failed > 1 else "The", num_failed,
+                    "s" if num_failed > 1 else "")
+            else:
+                r["warning"] = "{} of the {} hysplit trajectories runs failed".format(
+                    num_failed, num_start_hours)
         return r
 
 
