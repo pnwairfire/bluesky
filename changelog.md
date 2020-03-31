@@ -186,3 +186,13 @@
 
 ## 4.1.36
  - Modify trajectories output info so that it can be recognized as an extra export
+
+## 4.2.0
+
+***Note that this release is not backwards compatible with regards to the output data structure, specifically the 'visualization' section of the output. (Since visualization now supports multiple targets, the hysplit dispersion info is now under "visualization" > "dispersion" > "hysplit" instead of "visualization" > "hysplit"). As with v4.1, we decided to keep the major version 4.***
+
+ - update visualization section of configuration doc
+ - modified structure of trajectories output info to nest output dir, file names, etc under 'output' (to support export)
+ - modified visualization output info sections (to support multiple targets)
+ - fix and add error handling in trajectories and visualization modules
+ - Update trajectories module so that run continues even if all trajectories fail, and add warning/error message to trajectories output info if any/all hysplit runs fail
