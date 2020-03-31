@@ -162,7 +162,7 @@ class HysplitDispersionVisualizer(object):
             'blueskykml_version': blueskykml_version,
             "output": {
                 "directory": output_directory,
-                "hysplit_output_file": self._hysplit_output_file,
+                "hysplit_output_file": os.path.basename(self._hysplit_output_file),
                 "smoke_dispersion_kmz_filename": files['smoke_dispersion_kmz']['name'],
                 "fire_kmz_filename": files['fire_kmz']['name'],
                 "fire_locations_csv_filename": files['fire_locations_csv']['name'],
