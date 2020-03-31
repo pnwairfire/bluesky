@@ -111,7 +111,7 @@ class ExporterBase(object):
                 directories = module_info["output"].get("directories", [])
                 if module_info["output"].get('directory'):
                     directories.append(module_info["output"]['directory'])
-                for d in directories:
+                for d in [d.rstrip('/') for d in directories]:
                     dirs_to_copy[d] = dirs_to_copy.get(d, [])
                     dirs_to_copy[d].append(k)
 
