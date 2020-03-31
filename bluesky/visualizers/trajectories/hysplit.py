@@ -39,8 +39,7 @@ class HysplitTrajectoriesVisualizer(object):
                 )
                 return
 
-        if not self._geojson_file_name:
-            raise RuntimeError("No trajectories GeoJSON file to convert to KML")
+        raise RuntimeError("No trajectories GeoJSON file to convert to KML")
 
     def run(self):
         args = [
