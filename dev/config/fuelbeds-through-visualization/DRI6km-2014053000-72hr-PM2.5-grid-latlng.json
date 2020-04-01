@@ -1,10 +1,30 @@
 {
     "config": {
+        "skip_failed_fires": true,
         "emissions": {
             "species": ["PM2.5"]
         },
         "findmetdata": {
             "met_root_dir": "/data/Met/CANSAC/6km/ARL/"
+        },
+        "extrafiles":{
+            "dest_dir": "/bluesky/output/extrafiles/{run_id}/",
+            "sets": ["firescsvs", "emissionscsv", "smokeready"],
+            "firescsvs": {
+                "fire_locations_filename": "fire_locations.csv",
+                "fire_events_filename": "fire_events.csv"
+            },
+            "emissionscsv": {
+                "filename": "fire_emissions.csv"
+            },
+            "smokeready": {
+                "ptinv_filename": "ptinv-{today:%Y%m%d%H}.ida",
+                "ptday_filename": "ptday-{today:%Y%m%d%H}.ems95",
+                "pthour_filename": "pthour-{today:%Y%m%d%H}.ems95",
+                "separate_smolder": true,
+                "write_ptinv_totals": true,
+                "write_ptday_file": true
+            }
         },
         "trajectories": {
             "models": "hysplit",
@@ -59,7 +79,7 @@
         },
         "export": {
             "modes": ["email", "localsave"],
-            "extra_exports": ["dispersion", "visualization", "trajectories"],
+            "extra_exports": ["dispersion", "visualization", "trajectories", "extrafiles"],
             "email": {
                 "recipients": ["jdubowy+blueskytest@gmail.com"],
                 "sender": "bsp@airfire.org",
@@ -68,7 +88,8 @@
                 "smtp_port": 1025
             },
             "localsave": {
-                "dest_dir": "/bluesky/output/exports/"
+                "dest_dir": "/bluesky/output/exports/",
+                "extra_exports_dir_name": "forecast"
             }
         }
     }
