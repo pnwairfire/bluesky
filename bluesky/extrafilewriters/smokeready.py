@@ -242,13 +242,21 @@ class SmokeReadyWriter(object):
     pthour.write("#DESC POINT SOURCE BlueSky Framework Fire Emissions\n")
 
     num_of_fires = 0
+    skip_no_lat_lng = 0
     skip_no_emiss = 0
+    skip_no_lat_lng = 0
     skip_no_plume = 0
     skip_bad_fips = 0
     total_skipped = 0
 
     for fire_info in fires_info:
       for fire_loc in fire_info.locations:
+
+        if any([k not in fire_loc for k in ('lat', 'lng')]):
+          skip_no_lat_lng += 1
+          total_skipped += 1
+          continue
+
         num_of_fires += 1
         if "emissions" not in fire_loc.keys():
           skip_no_emiss += 1
@@ -510,15 +518,21 @@ class SmokeReadyWriter(object):
     if self._write_ptday_file:
       ptday.close()
     pthour.close()
-    logging.debug("SmokeReady Process Complete.\n#FIRES:{}\n#SKIPPED:{}\n#NO EMISS:{}\n#NO PLUME:{}\n#BAD FIPS:{}".format(num_of_fires,total_skipped,skip_no_emiss,skip_no_plume,skip_bad_fips))
+    logging.debug("SmokeReady Process Complete.")
+    logging.debug(" #FIRES: %s", num_of_fires)
+    logging.debug(" #SKIPPED: %s", total_skipped)
+    logging.debug(" #NO LAT/LNG: %s", skip_no_lat_lng)
+    logging.debug(" #NO EMISS: %s", skip_no_emiss)
+    logging.debug(" #NO PLUME: %s", skip_no_plume)
+    logging.debug(" #BAD FIPS: %s", skip_bad_fips)
 
   def _get_state_county_fips(self, lat, lng):
     """
       CMAS has a State/County FIPS code that is 5 digits long.
-      Please refer to the documentation here: 
+      Please refer to the documentation here:
       https://www.cmascenter.org/smoke/documentation/3.7/html/ch02s03s04.html
 
-      Examples: 
+      Examples:
 
       Tuolumne County (CA):
         state_fips = '06'
