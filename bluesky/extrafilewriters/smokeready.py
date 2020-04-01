@@ -24,7 +24,7 @@ from bluesky import locationutils
 class ColumnSpecificRecord(object):
     columndefs = []
     has_newline = True
-    
+
     def __init__(self):
         object.__setattr__(self, "data", dict())
 
@@ -176,7 +176,7 @@ class SmokeReadyWriter(object):
   SmokeReadyWriter is an object class that accepts a destination
   dir argument for file location and several kwargs specific to the
   config of the job.
-  
+
   param: dest_dir
   type: str
 
@@ -284,7 +284,7 @@ class SmokeReadyWriter(object):
         start_hour = start_dt.hour
 
         # if timeprofile key has 0 values, (for flaming/resid/etc), do we
-        # ignore or still right the value. 
+        # ignore or still right the value.
         num_hours = len(fire_loc['timeprofile'].keys())
         num_days = num_hours // 24
         if num_hours % 24 > 0: num_days += 1
@@ -292,14 +292,14 @@ class SmokeReadyWriter(object):
 
         """
         NOTE: In the old BSF runs, timezone was never
-        operational, and defaulted to EST in every output I reviewed. 
+        operational, and defaulted to EST in every output I reviewed.
         Per https://www.cmascenter.org/smoke/documentation/2.7/html/ch02s09s14.html,
         the timezone field is only used if timezone cannot be determined through FIPS code.
         """
         tzonnam = self._set_timezone_name(lat, lng, start_dt)
 
-        
-        # Define fire types, defaults to total. 
+
+        # Define fire types, defaults to total.
         if self._separate_smolder:
             fire_phases = ("flaming", "smoldering")
         else:
@@ -321,7 +321,7 @@ class SmokeReadyWriter(object):
           prid = ''                       # Process ID
 
           date = start_dt.strftime('%m/%d/%y')  # Date
-          
+
           EMISSIONS_MAPPING = [('PM2_5', "pm2.5"),
                               ('PM10', "pm10"),
                               ('CO', "co"),
@@ -373,7 +373,7 @@ class SmokeReadyWriter(object):
                   for day in range(num_days):
                     dt = start_dt + timedelta(days=day)
                     date = dt.strftime('%m/%d/%y')
-                    
+
                     # PTDAYRecord
                     ptday_rec = PTDAYRecord()
                     ptday_rec.STID = stid
@@ -403,7 +403,7 @@ class SmokeReadyWriter(object):
                           smoldering = sum(fuelbed['emissions'][fire_phase][vkey.upper()][start_slice:end_slice])
                           residual = sum(fuelbed['emissions']['residual'][vkey.upper()][start_slice:end_slice])
                           daytot = smoldering + residual
-                        
+
                     else:
                       if isinstance(fuelbed['emissions'][fire_phase][vkey.upper()], tuple):
                           daytot = sum(fuelbed['emissions'][fire_phase][vkey.upper()])
@@ -439,7 +439,7 @@ class SmokeReadyWriter(object):
 
             # collect sorted hour list
             ordered_hours = sorted(fire_loc['plumerise'].keys())
-            
+
             for day in range(num_days):
                 dt = start_dt + timedelta(days=day)
                 date = dt.strftime('%m/%d/%y')  # Date
@@ -492,7 +492,7 @@ class SmokeReadyWriter(object):
                     else:
                       if fire_phase == "flaming":
                         flaming_total = self._phase_emissions_for_species(fire_loc, fire_phase, species_key)
-                        value = (timeprofile_hour[fire_phase] * flaming_total)                      
+                        value = (timeprofile_hour[fire_phase] * flaming_total)
                       elif fire_phase == "smoldering":
                         smoldering_total = self._phase_emissions_for_species(fire_loc, fire_phase, species_key)
                         residual_total = self._phase_emissions_for_species(fire_loc, 'residual', species_key)
@@ -576,11 +576,11 @@ class SmokeReadyWriter(object):
 
   def _set_timezone_name(self, lat, lng, start_dt):
     VALID_TIMEZONES = ['GMT','ADT','AST','EDT','EST','CDT','CST','MDT','MST','PDT','PST','AKDT', 'AKST']
-          
+
     try:
       dst_obj = timezones.DstAccurateTimeZone().find(lat, lng, start_dt)
       tzonnam = dst_obj['abbreviation']
-      
+
       if dst_obj['abbreviation'] == 'UTC':
         tzonnam = 'GMT'
 
@@ -598,7 +598,7 @@ class SmokeReadyWriter(object):
 
   def _phase_emissions_for_species(self, fire_loc, phase, species):
     """
-    To get species specific emission levels at each phase 
+    To get species specific emission levels at each phase
     we need to iterate through the fuelbeds. Requires a valid
     fire location object.
     """
