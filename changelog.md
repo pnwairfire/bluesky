@@ -196,3 +196,6 @@
  - modified visualization output info sections (to support multiple targets)
  - fix and add error handling in trajectories and visualization modules
  - Update trajectories module so that run continues even if all trajectories fail, and add warning/error message to trajectories output info if any/all hysplit runs fail
+
+## 4.2.1
+ - added error handling to smokeready extrafile writer
