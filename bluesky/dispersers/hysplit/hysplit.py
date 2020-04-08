@@ -588,7 +588,7 @@ class HYSPLITDispersion(DispersionBase):
         smolder_height = self.config("SMOLDER_HEIGHT")
 
         # sub-hour emissions?
-        SERI = self.config("SUBHOUR_EMISSION_REDUCTION_INTERVAL",int)
+        SERI = self.config("SUBHOUR_EMISSION_REDUCTION_INTERVAL")
 
         # must be 1 to 12 and result in an integer when 60 is divided by it
         if ( SERI < 1 or SERI > 13 ):
@@ -743,7 +743,7 @@ class HYSPLITDispersion(DispersionBase):
     def _write_control_file(self, fires, control_file, concFile):
 
         # sub-hour emissions?
-        SERI = self.config("SUBHOUR_EMISSION_REDUCTION_INTERVAL",int)
+        SERI = self.config("SUBHOUR_EMISSION_REDUCTION_INTERVAL")
 
         # must be 1 to 12 and result in an integer when 60 is divided by it
         if ( SERI < 1 or SERI > 13 ):
