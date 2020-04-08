@@ -710,7 +710,7 @@ class HYSPLITDispersion(DispersionBase):
                             pm25_injected = pm25_entrained * fraction
 
                         # Write the record to the file
-                        emis.write(record_fmt % (dt_str, min_dut_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
+                        emis.write(record_fmt % (dt_str, min_dur_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
 
                 if fires_wo_emissions > 0:
                     logging.debug("%d of %d fires had no emissions for hour %d", fires_wo_emissions, num_fires, hour)
