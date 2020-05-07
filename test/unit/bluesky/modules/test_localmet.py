@@ -7,7 +7,7 @@ import datetime
 from py.test import raises
 from met.arl import arlprofiler
 
-from bluesky.config import defaults
+from bluesky.config import defaults, Config
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models.fires import FiresManager, Fire
 from bluesky.modules import localmet
@@ -101,6 +101,7 @@ class TestLocalMetRun(object):
         assert e_info.value.args[0] == localmet.NO_MET_ERROR_MSG
 
     def test_fire_no_activity(self, reset_config, monkeypatch):
+        Config().set(False, 'skip_failed_fires')
         monkeypatch_arl_profiler(monkeypatch)
 
         fm = FiresManager()
