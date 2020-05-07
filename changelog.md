@@ -199,3 +199,7 @@
 
 ## 4.2.1
  - added error handling to smokeready extrafile writer
+
+## 4.2.2
+ - Default skip_failed_fires to true
+ - Upgrade eflookup to v3.2.1
