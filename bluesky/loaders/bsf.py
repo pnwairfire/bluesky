@@ -90,6 +90,7 @@ class CsvFileLoader(BaseCsvFileLoader):
     def __init__(self, **config):
         super().__init__(**config)
         self._skip_failures = config.get('skip_failures')
+        self._omit_nulls = config.get('omit_nulls')
 
     def _marshal(self, data):
         self._fires = {}
@@ -124,6 +125,9 @@ class CsvFileLoader(BaseCsvFileLoader):
 
         sp = {loc_attr: f(row.get(csv_key))
             for csv_key, loc_attr, f in LOCATION_FIELDS}
+        if self._omit_nulls:
+            sp = {k: v for k, v in sp.items() if v is not None}
+
         if utc_offset:
             sp['utc_offset'] = utc_offset
         self._fires[fire_id]['specified_points_by_date'][start].append(sp)

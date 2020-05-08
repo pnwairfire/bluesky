@@ -35,6 +35,7 @@ _DEFAULTS = {
         #  'start'
         #  'end'
         #  'skip_failures'
+        #  'omit_nulls'
         #  "wait": None, #{"strategy": None,"time": None,"max_attempts": None}
         #  "saved_copy_file"
         #  "saved_copy_events_file"

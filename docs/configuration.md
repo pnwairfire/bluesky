@@ -61,6 +61,7 @@ configuration json data are case-insensitive.***
  - ***'config' > 'load' > 'sources' > 'start'*** -- used to filter fires based on time
  - ***'config' > 'load' > 'sources' > 'end'*** -- used to filter fires based on time
  - ***'config' > 'load' > 'sources' > 'skip_failures'*** -- skip fires that result in exception during load
+ - ***'config' > 'load' > 'sources' > 'omit_nulls'*** -- don't include fire data keys with null/None values; it is up to each source specific load module to honor (perhaps partially), or not, this setting
 
 ###### if type 'file':
 
