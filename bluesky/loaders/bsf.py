@@ -128,7 +128,12 @@ class CsvFileLoader(BaseCsvFileLoader):
                 if ts in self._timeprofile[event_id][day]:
                     raise ValueError("Multiple timeprofile values for %s %s",
                         row['Fire'], ts)
-                    self._timeprofile[event_id][day][ts] = FractionOfDay
+                self._timeprofile[event_id][day][ts] = {
+                    "area_fraction": row['FractionOfDay'],
+                    "flaming": row['FractionOfDay'],
+                    "residual": row['FractionOfDay'],
+                    "smoldering": row['FractionOfDay']
+                }
 
             # TODO: fill in zeros for hours not specified ???
 
@@ -183,7 +188,7 @@ class CsvFileLoader(BaseCsvFileLoader):
                         }
                     ]
                 })
-                if event_id and start in self._timeprofile[event_id]:
+                if event_id and (start in self._timeprofile[event_id]):
                     fire['activity'][-1]["active_areas"][0]["timeprofile"] = self._timeprofile[event_id][start]
 
 
