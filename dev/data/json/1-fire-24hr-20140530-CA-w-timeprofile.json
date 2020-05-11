@@ -1,0 +1,65 @@
+{
+    "fires": [
+        {
+            "id": "SF11C14225236095807750",
+            "event_of": {
+                "name": "Natural Fire in North Tahoe",
+                "id": "sdfkj234kljfd"
+            },
+            "meta": {
+                "vsmoke": {
+                    "ws": 20,
+                    "wd": 230
+                }
+            },
+            "type": "wildfire",
+            "activity": [
+                {
+                    "active_areas": [
+                        {
+                            "start": "2014-05-29T17:00:00",
+                            "end": "2014-05-30T17:00:00",
+                            "utc_offset": "-07:00",
+                            "ecoregion": "western",
+                            "country": "USA",
+                            "state": "CA",
+                            "specified_points": [
+                                {
+                                    "lng": -119.7615805,
+                                    "lat": 37.909644,
+                                    "area": 10000
+                                }
+                            ],
+                            "timeprofile": {
+                                "2014-05-29T17:00:00": {"area_fraction": 0.1, "flaming": 0.1, "residual": 0.1, "smoldering": 0.1},
+                                "2014-05-29T18:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-29T19:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-29T20:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-29T21:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-29T22:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-29T23:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T00:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T01:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T02:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T03:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T04:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T05:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T06:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T07:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T08:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T09:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T10:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T11:00:00": {"area_fraction": 0.02, "flaming": 0.02, "residual": 0.02, "smoldering": 0.02},
+                                "2014-05-30T12:00:00": {"area_fraction": 0.09, "flaming": 0.09, "residual": 0.09, "smoldering": 0.09},
+                                "2014-05-30T13:00:00": {"area_fraction": 0.1, "flaming": 0.1, "residual": 0.1, "smoldering": 0.1},
+                                "2014-05-30T14:00:00": {"area_fraction": 0.15, "flaming": 0.15, "residual": 0.15, "smoldering": 0.15},
+                                "2014-05-30T15:00:00": {"area_fraction": 0.1, "flaming": 0.1, "residual": 0.1, "smoldering": 0.1},
+                                "2014-05-30T16:00:00": {"area_fraction": 0.1, "flaming": 0.1, "residual": 0.1, "smoldering": 0.1}
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
