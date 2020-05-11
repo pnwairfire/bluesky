@@ -41,9 +41,8 @@ class TestBsfLoader(object):
                 for aa in a.get('active_areas', []):
                     aa['start'] = parse_datetime(aa['start'])
                     aa['end'] = parse_datetime(aa['end'])
-                    if 'timeprofile' in aa:
-                        aa['timeprofile'] = {parse_datetime(k): v
-                            for k, v in aa['timeprofile'].items()}
+                    # Note: timeprofile keys are expected to be strings
+
         return expected
 
     def _call_marshal(self, start=None, end=None):

@@ -124,7 +124,9 @@ class CsvFileLoader(BaseCsvFileLoader):
             for row in data:
                 event_id = row['Fire']
                 day = datetime.datetime.strptime(row['LocalDay'], '%Y-%m-%d')
-                ts = datetime.datetime.strptime(row['LocalHour'], '%Y-%m-%d %H:%M')
+                # ts needs to be string value
+                ts = datetime.datetime.strptime(row['LocalHour'],
+                    '%Y-%m-%d %H:%M').isoformat()
                 if ts in self._timeprofile[event_id][day]:
                     raise ValueError("Multiple timeprofile values for %s %s",
                         row['Fire'], ts)
@@ -136,6 +138,7 @@ class CsvFileLoader(BaseCsvFileLoader):
                 }
 
             # TODO: fill in zeros for hours not specified ???
+            # TODO: make sure fractions for each event/day add up to 1.0
 
     def _process_row(self, row):
         fire_id = row.get("id") or str(uuid.uuid4())
