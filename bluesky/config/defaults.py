@@ -35,10 +35,12 @@ _DEFAULTS = {
         #  'start'
         #  'end'
         #  'skip_failures'
-        #  'omit_nulls'
         #  "wait": None, #{"strategy": None,"time": None,"max_attempts": None}
         #  "saved_copy_file"
         #  "saved_copy_events_file"
+        # BSF
+        #  "omit_nulls"
+        #  "timeprofile_file"
         # File Sourcees
         #  'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
         #  'events_file'*** -- *optional* for each file type source-- file containing fire events data; e.g. '/path/to/fire_events.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)

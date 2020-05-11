@@ -16,6 +16,8 @@ import traceback
 import uuid
 from collections import defaultdict
 
+from pyairfire.io import CSV2JSON
+
 from bluesky.models.fires import Fire
 from . import BaseCsvFileLoader
 from bluesky.datetimeutils import parse_datetime, parse_utc_offset
@@ -91,8 +93,12 @@ class CsvFileLoader(BaseCsvFileLoader):
         super().__init__(**config)
         self._skip_failures = config.get('skip_failures')
         self._omit_nulls = config.get('omit_nulls')
+        self._timeprofile_file = config.get('timeprofile_file')
+
 
     def _marshal(self, data):
+        self._load_timeprofile_file()
+
         self._fires = {}
 
         for row in data:
@@ -109,6 +115,22 @@ class CsvFileLoader(BaseCsvFileLoader):
         self._post_process_activity()
 
         return list(self._fires.values())
+
+    def _load_timeprofile_file(self):
+        self._timeprofile = defaultdict(lambda: defaultdict(lambda: {}))
+        if self._timeprofile_file:
+            csv_loader = CSV2JSON(input_file=self._timeprofile_file)
+            data = csv_loader._load()
+            for row in data:
+                event_id = row['Fire']
+                day = datetime.datetime.strptime(row['LocalDay'], '%Y-%m-%d')
+                ts = datetime.datetime.strptime(row['LocalHour'], '%Y-%m-%d %H:%M')
+                if ts in self._timeprofile[event_id][day]:
+                    raise ValueError("Multiple timeprofile values for %s %s",
+                        row['Fire'], ts)
+                    self._timeprofile[event_id][day][ts] = FractionOfDay
+
+            # TODO: fill in zeros for hours not specified ???
 
     def _process_row(self, row):
         fire_id = row.get("id") or str(uuid.uuid4())
@@ -147,6 +169,7 @@ class CsvFileLoader(BaseCsvFileLoader):
 
     def _post_process_activity(self):
         for fire in self._fires.values():
+            event_id = fire.get("event_of", {}).get("id")
             fire["activity"] = []
             sorted_items = sorted(fire.pop("specified_points_by_date").items(),
                 key=lambda a: a[0])
@@ -160,6 +183,9 @@ class CsvFileLoader(BaseCsvFileLoader):
                         }
                     ]
                 })
+                if event_id and start in self._timeprofile[event_id]:
+                    fire['activity'][-1]["timeprofile"] = self._timeprofile[event_id][start]
+
 
     # Note: Although 'timezone' (a numberical value) is defined alongsite
     #   date_time (which may include utc_offset), utc_offset, if defined, reflects
