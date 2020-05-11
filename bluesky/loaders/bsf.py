@@ -184,7 +184,7 @@ class CsvFileLoader(BaseCsvFileLoader):
                     ]
                 })
                 if event_id and start in self._timeprofile[event_id]:
-                    fire['activity'][-1]["timeprofile"] = self._timeprofile[event_id][start]
+                    fire['activity'][-1]["active_areas"][0]["timeprofile"] = self._timeprofile[event_id][start]
 
 
     # Note: Although 'timezone' (a numberical value) is defined alongsite
