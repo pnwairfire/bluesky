@@ -202,12 +202,12 @@ class CsvFileLoader(BaseCsvFileLoader):
     #   -5.0 and utc_offset (embedded in the 'date_time' field) '-04:00'
 
     ## 'date_time'
-    OLD_DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?Z$')
-    DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?([+-]\d{2}\:\d{2})$')
-    DATE_TIME_FMT = "%Y%m%d%H%M"
-    DATE_TIME_ISOFORMAT_MATCHER = re.compile(
-        '^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})([+-]\d{2}\:\d{2})$')
-    DATE_TIME_ISOFORMAT_FMT = "%Y-%m-%dT%H:%M:%S.%f"
+    DATE_TIME_MATCHERS = (
+        (re.compile('^(\d{12})(\d{2})?([+-]\d{2}\:\d{2})$'), "%Y%m%d%H%M"),
+        (re.compile('^(\d{12})(\d{2})?Z$'), "%Y%m%d%H%M"),
+        (re.compile('^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})([+-]\d{2}\:\d{2})$'),
+            "%Y-%m-%dT%H:%M:%S.%f")
+    )
 
     def _parse_date_time(self, date_time):
         """Parses 'date_time' field, found in BSF fire data
@@ -232,24 +232,13 @@ class CsvFileLoader(BaseCsvFileLoader):
         utc_offset = None
         if date_time:
             try:
-                m = self.DATE_TIME_MATCHER.match(date_time)
-                if m:
-                    start = datetime.datetime.strptime(
-                        m.group(1), self.DATE_TIME_FMT)
-                    utc_offset = parse_utc_offset(m.group(3))
-                else:
-                    m = self.OLD_DATE_TIME_MATCHER.match(date_time)
+                for matcher, fmt in self.DATE_TIME_MATCHERS:
+                    m = matcher.match(date_time)
                     if m:
-                        start = datetime.datetime.strptime(
-                            m.group(1), self.DATE_TIME_FMT)
-                        # Note: we don't know utc offset; don't set
-                    else:
-                        m = self.DATE_TIME_ISOFORMAT_MATCHER.match(date_time)
-                        if m:
-                            start = datetime.datetime.strptime(
-                                m.group(1), self.DATE_TIME_ISOFORMAT_FMT)
-                            utc_offset = parse_utc_offset(m.group(2))
-
+                        start = datetime.datetime.strptime(m.group(1), fmt)
+                        if len(m.groups()) > 1:
+                            utc_offset = parse_utc_offset(m.groups()[-1])
+                        break
 
             except Exception as e:
                 logging.warn("Failed to parse 'date_time' value %s",
