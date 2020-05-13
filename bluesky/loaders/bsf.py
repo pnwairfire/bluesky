@@ -205,6 +205,9 @@ class CsvFileLoader(BaseCsvFileLoader):
     OLD_DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?Z$')
     DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?([+-]\d{2}\:\d{2})$')
     DATE_TIME_FMT = "%Y%m%d%H%M"
+    DATE_TIME_ISOFORMAT_MATCHER = re.compile(
+        '^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})([+-]\d{2}\:\d{2})$')
+    DATE_TIME_ISOFORMAT_FMT = "%Y-%m-%dT%H:%M:%S.%f"
 
     def _parse_date_time(self, date_time):
         """Parses 'date_time' field, found in BSF fire data
@@ -218,6 +221,10 @@ class CsvFileLoader(BaseCsvFileLoader):
         Newer (and current) SF2 fire data formats date_time like so:
 
             '201508040000-04:00'
+
+        Another newer format:
+
+            2020-05-13T00:00:00.000-07:00
 
         With true utc offset embedded in the string.
         """
@@ -236,6 +243,13 @@ class CsvFileLoader(BaseCsvFileLoader):
                         start = datetime.datetime.strptime(
                             m.group(1), self.DATE_TIME_FMT)
                         # Note: we don't know utc offset; don't set
+                    else:
+                        m = self.DATE_TIME_ISOFORMAT_MATCHER.match(date_time)
+                        if m:
+                            start = datetime.datetime.strptime(
+                                m.group(1), self.DATE_TIME_ISOFORMAT_FMT)
+                            utc_offset = parse_utc_offset(m.group(2))
+
 
             except Exception as e:
                 logging.warn("Failed to parse 'date_time' value %s",
