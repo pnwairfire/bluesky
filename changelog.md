@@ -206,3 +206,6 @@
 
 ## 4.2.3
  - Update bsf load module to optionally load separate timeprofile file
+
+## 4.2.4
+ - Update bsf loader to support isoformatted date_time values
