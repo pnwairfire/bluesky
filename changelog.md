@@ -199,3 +199,13 @@
 
 ## 4.2.1
  - added error handling to smokeready extrafile writer
+
+## 4.2.2
+ - Default skip_failed_fires to true
+ - Upgrade eflookup to v3.2.1
+
+## 4.2.3
+ - Update bsf load module to optionally load separate timeprofile file
+
+## 4.2.4
+ - Update bsf loader to support isoformatted date_time values

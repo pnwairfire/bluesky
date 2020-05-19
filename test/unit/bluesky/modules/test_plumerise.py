@@ -211,6 +211,7 @@ class TestPlumeRiseRunFeps(object):
 
     def setup(self):
         Config().set('feps', 'plumerise', 'model')
+        Config().set(False, 'skip_failed_fires')
         self.fm = FiresManager()
 
     def test_fire_no_activity(self, reset_config, monkeypatch):
@@ -306,6 +307,7 @@ class TestPlumeRiseRunSev(object):
 
     def setup(self):
         Config().set('sev', 'plumerise', 'model')
+        Config().set(False, 'skip_failed_fires')
         self.fm = FiresManager()
 
     def test_fire_no_activity(self, reset_config, monkeypatch):

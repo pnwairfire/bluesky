@@ -57,8 +57,15 @@ configuration json data are case-insensitive.***
  - ***'config' > 'load' > 'sources' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
  - ***'config' > 'load' > 'sources' > 'wait' > 'max_attempts'*** -- *required* if 'wait' section is defined  -- max number of attempts
  - ***'config' > 'load' > 'sources' > 'saved_copy_file'*** -- *optional* - save copy of loaded fire data to file
+ - ***'config' > 'load' > 'sources' > 'saved_copy_events_file'*** -- *optional* - save copy of loaded fire events data to file
  - ***'config' > 'load' > 'sources' > 'start'*** -- used to filter fires based on time
  - ***'config' > 'load' > 'sources' > 'end'*** -- used to filter fires based on time
+ - ***'config' > 'load' > 'sources' > 'skip_failures'*** -- skip fires that result in exception during load
+
+###### if source 'bsf'
+
+ - ***'config' > 'load' > 'sources' > 'omit_nulls'*** -- don't include fire data keys with null/None values
+ - ***'config' > 'load' > 'sources' > 'timeprofile_file'*** -- *optional*
 
 ###### if type 'file':
 

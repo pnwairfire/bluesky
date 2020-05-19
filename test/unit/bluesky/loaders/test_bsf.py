@@ -21,30 +21,41 @@ data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 class TestBsfLoader(object):
 
-    INPUT_FILENAME = os.path.join(data_dir, 'bsf-input.csv')
-    LOADED_FILENAME = os.path.join(data_dir, 'bsf-loaded.json')
-
-
     def setup(self):
+        self._expected_output = {
+            False: self._load_expected_output(
+                os.path.join(data_dir, 'bsf-loaded.json')),
+            True: self._load_expected_output(
+                os.path.join(data_dir, 'bsf-loaded-w-timeprofile.json'))
+        }
+
+    def _load_expected_output(self, filename):
         # with open(FSV2_INPUT_FILENAME) as f:
         #     self._input = json.loads(f.read())
-        with open(self.LOADED_FILENAME) as f:
-            self._expected_output = json.loads(f.read())
-            self._expected_output.sort(key=lambda f: f['id'])
+        with open(filename) as f:
+            expected = json.loads(f.read())
+            expected.sort(key=lambda f: f['id'])
         # convert timestamps to datetime objects
-        for f in self._expected_output:
+        for f in expected:
             for a in f.get('activity', []):
                 for aa in a.get('active_areas', []):
                     aa['start'] = parse_datetime(aa['start'])
                     aa['end'] = parse_datetime(aa['end'])
+                    # Note: timeprofile keys are expected to be strings
+
+        return expected
 
     def _call_marshal(self, start=None, end=None):
-        loader = bsf.CsvFileLoader(
-            file=self.INPUT_FILENAME,
-            start=start, end=end)
-        actual = loader.load()
-        actual.sort(key=lambda f: f['id'])
-        assert actual == self._expected_output
+        for include_timeprofile in (False, True):
+            options = dict(file=os.path.join(data_dir, 'bsf-input.csv'),
+                start=start, end=end)
+            if include_timeprofile:
+                options['timeprofile_file'] = os.path.join(data_dir,
+                    'bsf-input-timeprofile.csv')
+            loader = bsf.CsvFileLoader(**options)
+            actual = loader.load()
+            actual.sort(key=lambda f: f['id'])
+            assert actual == self._expected_output[include_timeprofile]
 
     ## With 'start' option
 
@@ -60,13 +71,15 @@ class TestBsfLoader(object):
         self._call_marshal(start="2019-05-28T14:00:00Z")
 
     def test_marshal_w_start_mid_second_activity_window(self):
-        self._expected_output[0]['activity'].pop(0)
-        self._expected_output[1]['activity'].pop(0)
+        for b in (True, False):
+            self._expected_output[b][0]['activity'].pop(0)
+            self._expected_output[b][1]['activity'].pop(0)
         self._call_marshal(start=datetime.datetime(2019,5,29,14,0,0))
         self._call_marshal(start="2019-05-29T14:00:00Z")
 
     def test_marshal_w_start_after_all_activity(self):
-        self._expected_output = []
+        for b in (True, False):
+            self._expected_output[b] = []
         self._call_marshal(start=datetime.datetime(2019,5,31,14,0,0))
         self._call_marshal(start="2019-05-31T14:00:00Z")
 
@@ -81,13 +94,15 @@ class TestBsfLoader(object):
         self._call_marshal(end="2019-05-29T14:00:00Z")
 
     def test_marshal_w_end_mid_first_activity_window(self):
-        self._expected_output[0]['activity'].pop()
-        self._expected_output[1]['activity'].pop()
+        for b in (True, False):
+            self._expected_output[b][0]['activity'].pop()
+            self._expected_output[b][1]['activity'].pop()
         self._call_marshal(end=datetime.datetime(2019,5,28,14,0,0))
         self._call_marshal(end="2019-05-28T14:00:00Z")
 
     def test_marshal_w_end_before_all_activity(self):
-        self._expected_output = []
+        for b in (True, False):
+            self._expected_output[b] = []
         self._call_marshal(end=datetime.datetime(2019,5,27,14,0,0))
         self._call_marshal(end="2019-05-27T14:00:00Z")
 
@@ -106,8 +121,9 @@ class TestBsfLoader(object):
             end="2019-05-29T14:00:00Z")
 
     def test_marshal_w_start_and_end_inside_first_activity_windows(self):
-        self._expected_output[0]['activity'].pop(1)
-        self._expected_output[1]['activity'].pop(1)
+        for b in (True, False):
+            self._expected_output[b][0]['activity'].pop(1)
+            self._expected_output[b][1]['activity'].pop(1)
         self._call_marshal(start=datetime.datetime(2019,5,28,10,0,0),
             end=datetime.datetime(2019,5,28,17,0,0))
         self._call_marshal(start="2019-05-28T20:00:00Z",
@@ -115,7 +131,8 @@ class TestBsfLoader(object):
 
     def test_marshal_w_start_and_end_exclude_all_activity_windows(self):
         # exclude all activity windows
-        self._expected_output = []
+        for b in (True, False):
+            self._expected_output[b] = []
         self._call_marshal(start=datetime.datetime(2019,5,20,14,0,0),
             end=datetime.datetime(2019,5,27,1,0,0))
         self._call_marshal(start="2019-05-20T14:00:00",
