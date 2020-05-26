@@ -81,11 +81,13 @@ LOCATION_FIELDS = [
 ]
 # ignored fields: fips, scc, fuel_1hr, fuel_10hr, fuel_100hr, fuel_1khr,
 #   fuel_10khr, fuel_gt10khr, shrub, grass, rot, duff, litter,
-#   consumption_flaming, consumption_smoldering,
-#   consumption_residual, consumption_duff
 #   heat, pm25, pm10, co, co2, ch4, nox, nh3, so2, voc, VEG,
 #   canopy, fccs_number, owner, sf_event_guid, sf_server,
 #   sf_stream_name, timezone
+#
+#   consumption_flaming, consumption_smoldering,
+#   consumption_residual, consumption_duff
+#   are handled below
 
 class CsvFileLoader(BaseCsvFileLoader):
 
@@ -173,6 +175,28 @@ class CsvFileLoader(BaseCsvFileLoader):
         if row.get("type"):
             self._fires[fire_id]["type"] = row["type"].lower()
 
+        # Add consumption data if present. 
+        # This was implemented for the Canadian version of the SmartFire system.
+        # It is important to note that this consumption marshalling was done with only the Canadian format
+        # in mind. If consumption is added to the input of the US system, further changes maybe required.
+        if row.get("consumption_flaming") is not None and row.get("consumption_smoldering") is not None \
+            and row.get("consumption_residual") is not None and row.get("consumption_duff") is not None:
+
+            total_cons = get_optional_float(row.get("consumption_flaming")) + \
+            get_optional_float(row.get("consumption_smoldering")) + \
+            get_optional_float(row.get("consumption_residual")) + \
+            get_optional_float(row.get("consumption_duff"))
+
+            consumption = {"summary": {"flaming": get_optional_float(row.get("consumption_flaming")),
+            "residual": get_optional_float(row.get("consumption_residual")),
+            "smoldering": get_optional_float(row.get("consumption_smoldering")),
+            "duff": get_optional_float(row.get("consumption_duff")),
+            "total": total_cons
+            }}
+
+            self._fires[fire_id]["consumption"] = consumption
+
+
         # TODO: other marshaling
 
     def _post_process_activity(self):
@@ -193,6 +217,11 @@ class CsvFileLoader(BaseCsvFileLoader):
                 })
                 if event_id and (start in self._timeprofile[event_id]):
                     fire['activity'][-1]["active_areas"][0]["timeprofile"] = self._timeprofile[event_id][start]
+            # Again this is for the Canadian addition. Assumes one location per fire.
+            if fire["consumption"] is not None:
+                fire["activity"][-1]["active_areas"][0]["consumption"] = fire["consumption"]
+                fire["activity"][-1]["consumption"] = fire["consumption"]
+                fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["consumption"] = fire["consumption"]
 
 
     # Note: Although 'timezone' (a numberical value) is defined alongsite
