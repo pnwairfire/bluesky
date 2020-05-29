@@ -259,6 +259,7 @@ class CsvFileLoader(BaseCsvFileLoader):
         """
         start = None
         utc_offset = None
+
         if date_time:
             try:
                 for matcher, fmt in self.DATE_TIME_MATCHERS:
