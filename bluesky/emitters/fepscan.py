@@ -17,10 +17,6 @@
 #
 #******************************************************************************
 
-_bluesky_version_ = "3.5.1"
-
-#from bluesky.config import Config
-
 import os
 import subprocess
 import logging
@@ -145,18 +141,22 @@ class FEPSCanEmissions(object):
         flaming = {}
         residual = {}
         smoldering = {}
+        total = {}
         emissions = {"flaming": flaming,
                     "residual": residual,
-                    "smoldering": smoldering}
+                    "smoldering": smoldering,
+                    "total": total}
 
         def loadArrays(v, x):
             if x not in v["flaming"]:
                 v["flaming"][x] = [0]
                 v["smoldering"][x] = [0]
                 v["residual"][x] = [0]
+                v["total"][x] = [0]
             v["flaming"][x][0] = float(row["flame_" + x]) + v["flaming"][x][0]
             v["smoldering"][x][0] = float(row["smold_" + x]) + v["smoldering"][x][0]
             v["residual"][x][0] = float(row["resid_" + x]) + v["residual"][x][0]
+            v["total"][x][0] = float(row[x]) + v["total"][x][0]
             return v
 
         for row in csv.DictReader(open(filename, 'r'), skipinitialspace=True):
