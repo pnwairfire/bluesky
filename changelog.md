@@ -209,3 +209,6 @@
 
 ## 4.2.4
  - Update bsf loader to support isoformatted date_time values
+
+## 4.2.5
+ - Update BSF loader to store utc_offset in the active area object rather than the specified point
