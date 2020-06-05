@@ -5,7 +5,7 @@ afconfig==1.1.2
 afdatetime==1.1.2
 afscripting==1.1.5
 geoutils==1.0.3
-eflookup==3.2.1
+eflookup==3.2.2
 emitcalc==2.0.2
 fccsmap==2.1.0
 timeprofile==1.1.2
