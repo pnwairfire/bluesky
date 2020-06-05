@@ -216,3 +216,6 @@
 ## 4.2.6
  - Upgrade emitcalc to 2.0.2
  - Be specific about python package dependency versions
+
+## 4.2.7
+ - Upgrade eflookup to v3.2.2
