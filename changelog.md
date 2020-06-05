@@ -212,3 +212,7 @@
 
 ## 4.2.5
  - Update BSF loader to store utc_offset in the active area object rather than the specified point
+
+## 4.2.6
+ - Upgrade emitcalc to 2.0.2
+ - Be specific about python package dependency versions
