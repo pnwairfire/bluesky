@@ -102,6 +102,7 @@ class CsvFileLoader(BaseCsvFileLoader):
         self._load_timeprofile_file()
 
         self._fires = {}
+        self._consumption_values = {}
 
         for row in data:
             try:
@@ -187,14 +188,14 @@ class CsvFileLoader(BaseCsvFileLoader):
             get_optional_float(row.get("consumption_residual")) + \
             get_optional_float(row.get("consumption_duff"))
 
-            consumption = {"summary": {"flaming": get_optional_float(row.get("consumption_flaming")),
-            "residual": get_optional_float(row.get("consumption_residual")),
-            "smoldering": get_optional_float(row.get("consumption_smoldering")),
-            "duff": get_optional_float(row.get("consumption_duff")),
-            "total": total_cons
-            }}
+            consumption = {"flaming": [get_optional_float(row.get("consumption_flaming"))],
+            "residual": [get_optional_float(row.get("consumption_residual"))],
+            "smoldering": [get_optional_float(row.get("consumption_smoldering"))],
+            "duff": [get_optional_float(row.get("consumption_duff"))],
+            "total": [total_cons]
+            }
 
-            self._fires[fire_id]["consumption"] = consumption
+            self._consumption_values[fire_id] = consumption
 
 
         # TODO: other marshaling
@@ -218,10 +219,12 @@ class CsvFileLoader(BaseCsvFileLoader):
                 if event_id and (start in self._timeprofile[event_id]):
                     fire['activity'][-1]["active_areas"][0]["timeprofile"] = self._timeprofile[event_id][start]
             # Again this is for the Canadian addition. Assumes one location per fire.
-            if fire["consumption"] is not None:
-                fire["activity"][-1]["active_areas"][0]["consumption"] = fire["consumption"]
-                fire["activity"][-1]["consumption"] = fire["consumption"]
-                fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["consumption"] = fire["consumption"]
+            # TODO: Add check to see if fuelbed initialized.
+            if fire["id"] in self._consumption_values:
+                # fire["activity"][-1]["active_areas"][0]["consumption"] = fire["consumption"]
+                # fire["activity"][-1]["consumption"] = fire["consumption"]
+                fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["fuelbeds"] = [{}]
+                fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["fuelbeds"][0]["consumption"] = self._consumption_values[fire["id"]]
 
 
     # Note: Although 'timezone' (a numberical value) is defined alongsite

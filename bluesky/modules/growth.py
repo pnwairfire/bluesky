@@ -13,6 +13,7 @@ import os
 import shutil
 
 from bluesky import io
+from bluesky import datautils
 from bluesky.config import Config
 from bluesky.persisters.persistence import Persistence
 
@@ -25,5 +26,7 @@ def run(fires_manager):
 
     pers = Persistence()
     pers.run(fires_manager)
+
+    datautils.summarize_all_levels(fires_manager, 'consumption')
 
     fires_manager.processed(__name__, __version__)

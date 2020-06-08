@@ -44,9 +44,15 @@ class FEPSCanEmissions(object):
     def loadHeat(self, plume_dir):
         plumeFile = os.path.join(plume_dir, "plume.txt")
 
-        heat = {"total": [0]}
+        heat = {"flaming": [0],
+                "residual": [0],
+                "smoldering": [0],
+                "total": [0]}
+
+        #TODO: Investigate if this is the right kind of heat
         for row in csv.DictReader(open(plumeFile, 'r'), skipinitialspace=True):
             heat["total"][0] = heat["total"][0] + float(row["heat"])
+            heat["smoldering"][0] = heat["smoldering"][0] + float(row["heat"])
 
         return heat
 
@@ -159,6 +165,7 @@ class FEPSCanEmissions(object):
             v["total"][x][0] = float(row[x]) + v["total"][x][0]
             return v
 
+        
         for row in csv.DictReader(open(filename, 'r'), skipinitialspace=True):
             emissions = loadArrays(emissions,"PM25")
             emissions = loadArrays(emissions,"PM10")
@@ -171,3 +178,34 @@ class FEPSCanEmissions(object):
             emissions = loadArrays(emissions,"VOC")
 
         return emissions
+
+    def readEmissionsTEMP(self, filename):
+        flaming = {}
+        residual = {}
+        smoldering = {}
+        total = {}
+        emissions = {"flaming": flaming,
+                    "residual": residual,
+                    "smoldering": smoldering,
+                    "total": total}
+
+        phases = {"Flame": "flaming",
+                "Smold": "smoldering",
+                "Resid": "residual",
+                "Total": "total"}
+        
+        def loadArrays(v, p, x):
+            v[phases[p]][x] = [float(row[x])]
+            return v
+
+        for row in csv.DictReader(open(filename, 'r'), skipinitialspace=True):
+            p = row["Phase"]
+            emissions = loadArrays(emissions,p,"PM25")
+            emissions = loadArrays(emissions,p,"PM10")
+            emissions = loadArrays(emissions,p,"CO")
+            emissions = loadArrays(emissions,p,"CO2")
+            emissions = loadArrays(emissions,p,"CH4")
+            emissions = loadArrays(emissions,p,"NOx")
+            emissions = loadArrays(emissions,p,"NH3")
+            emissions = loadArrays(emissions,p,"SO2")
+            emissions = loadArrays(emissions,p,"VOC")

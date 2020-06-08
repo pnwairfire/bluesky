@@ -41,18 +41,20 @@ class Persistence(object):
 
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
-                aa = fire.active_areas
+                aa = fire["activity"]
                 if len(aa) != 1:
+                    raise ValueError("Each fire must have only 1 activity object when running persistence")
+                if len(aa[0]["active_areas"]) != 1:
                     raise ValueError("Each fire must have only 1 active area when running persistence")
-                start = aa[0]["start"] + timedelta(days=1)
-                end = aa[0]["end"] + timedelta(days=1)
+                start = aa[0]["active_areas"][0]["start"] + timedelta(days=1)
+                end = aa[0]["active_areas"][0]["end"] + timedelta(days=1)
 
                 while start <= last_hour:
                     n_created += 1
                     new_aa = copy.deepcopy(aa[0])
-                    new_aa["start"] = start
-                    new_aa["end"] = end
-                    fire["activity"][0]["active_areas"].append(new_aa)
+                    new_aa["active_areas"][0]["start"] = start
+                    new_aa["active_areas"][0]["end"] = end
+                    fire["activity"].append(new_aa)
                     start += timedelta(days=1)
                     end += timedelta(days=1)
 

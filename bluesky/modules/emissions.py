@@ -80,6 +80,9 @@ def run(fires_manager):
                             _fix_keys(fb['emissions_details'])
 
     datautils.summarize_all_levels(fires_manager, 'emissions')
+    # Heat is loaded in at this point in the Canadian version of the framework
+    if klass_name == "FepsCan":
+        datautils.summarize_all_levels(fires_manager, 'heat')
     if include_emissions_details:
         datautils.summarize_over_all_fires(fires_manager, 'emissions_details')
 
@@ -169,10 +172,13 @@ class FepsCan(EmissionsBase):
                 if "timeprofile" not in loc:
                     raise ValueError(
                         "Missing timeprofile data required for computing Canadian emissions")
-                if 'fuelbeds' in loc:
+                if 'fuelbeds' not in loc:
                     raise ValueError(
-                        "Fuelbeds key should not be present in Canadian data before emissions")
-                loc["fuelbeds"] = [{}]
+                        "Fuelbeds should be made in growth module before computing Canadian emissions")
+                if len(loc["fuelbeds"]) != 1:
+                    raise ValueError(
+                        "Each fuelbed array should only have one entry when running Canadian emissions")
+                # loc["fuelbeds"] = [{}]
                 loc["fuelbeds"][0]["emissions"] = self.emitter.run(loc,working_dir,plume_dir)
                 loc["fuelbeds"][0]["heat"] = self.emitter.loadHeat(plume_dir)
                 
