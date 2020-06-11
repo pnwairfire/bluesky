@@ -219,3 +219,7 @@
 
 ## 4.2.7
  - Upgrade eflookup to v3.2.2
+
+## 4.2.8
+ - Update hysplit trajectories to gracefully handle no fires, and log and record warning
+ - Update dispersion to not abort if there no fires
