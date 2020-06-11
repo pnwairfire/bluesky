@@ -54,3 +54,9 @@ See [pytest](http://pytest.org/latest/getting-started.html#getstarted) for more 
 For testing export emails, you can use something like the
 [mailtrip](https://pypi.org/project/mailtrap/) package, which has
 an smtp server that you cah use to catch and thus test export emails.
+
+
+## Publishing new version
+
+    ./dev/scripts/bump-version
+    git push && git push --tags
