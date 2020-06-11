@@ -140,6 +140,7 @@ def check(expected, actual):
     actual.pop('runtime')
     # TODO: cherry pick other fields to check
     if len(expected['fires']) != len(actual['fires']):
+        logging.error("Different number of fires")
         return False
 
     for i in range(len(expected['fires'])):
