@@ -200,9 +200,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
                 else:
                     raise
 
-        if not self._fires:
-            raise ValueError("No fire locations with valid emissions and heat data")
-
+        # Note: even if self._fires is emtpy, we don't want to abort (like
+        # we used to do), since we want output even if it's blank
 
     ## Creating fires out of locations
 
