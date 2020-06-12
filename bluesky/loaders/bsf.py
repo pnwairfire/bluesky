@@ -149,7 +149,10 @@ class CsvFileLoader(BaseCsvFileLoader):
             self._fires[fire_id] = Fire({
                 "id": fire_id,
                 "event_of": {},
-                "specified_points_by_date": defaultdict(lambda: [])
+                # Though unlikely, it's possible that the points in
+                # a single fire span multiple time zones
+                "specified_points_by_date_n_offset": defaultdict(
+                    lambda: defaultdict(lambda: []))
             })
 
         start, utc_offset = self._parse_date_time(row["date_time"])
@@ -161,9 +164,7 @@ class CsvFileLoader(BaseCsvFileLoader):
         if self._omit_nulls:
             sp = {k: v for k, v in sp.items() if v is not None}
 
-        if utc_offset:
-            sp['utc_offset'] = utc_offset
-        self._fires[fire_id]['specified_points_by_date'][start].append(sp)
+        self._fires[fire_id]['specified_points_by_date_n_offset'][start][utc_offset].append(sp)
 
         # event and type could have been set when the Fire object was
         # instantiated, but checking amd setting here allow the fields to
@@ -204,20 +205,22 @@ class CsvFileLoader(BaseCsvFileLoader):
         for fire in self._fires.values():
             event_id = fire.get("event_of", {}).get("id")
             fire["activity"] = []
-            sorted_items = sorted(fire.pop("specified_points_by_date").items(),
+            sorted_items = sorted(fire.pop("specified_points_by_date_n_offset").items(),
                 key=lambda a: a[0])
-            for start, specified_points in sorted_items:
-                fire['activity'].append({
-                    "active_areas": [
-                        {
-                            "start": start,
-                            "end": start + ONE_DAY,
-                            "specified_points": specified_points
-                        }
-                    ]
-                })
-                if event_id and (start in self._timeprofile[event_id]):
-                    fire['activity'][-1]["active_areas"][0]["timeprofile"] = self._timeprofile[event_id][start]
+            for start, points_by_utc_offset in sorted_items:
+                for utc_offset, specified_points in points_by_utc_offset.items():
+                    fire['activity'].append({
+                        "active_areas": [
+                            {
+                                "start": start,
+                                "end": start + ONE_DAY,
+                                "utc_offset": utc_offset,
+                                "specified_points": specified_points
+                            }
+                        ]
+                    })
+                    if event_id and (start in self._timeprofile[event_id]):
+                        fire['activity'][-1]["active_areas"][0]["timeprofile"] = self._timeprofile[event_id][start]
             # Again this is for the Canadian addition. Assumes one location per fire.
             # TODO: Add check to see if fuelbed initialized.
             if fire["id"] in self._consumption_values:
