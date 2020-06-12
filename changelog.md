@@ -223,3 +223,7 @@
 ## 4.2.8
  - Update hysplit trajectories to gracefully handle no fires, and log and record warning
  - Update dispersion to not abort if there no fires
+
+## 4.2.9
+ - Add script for creating new version of bluesky
+ - Bug fixes in writing of fire_events.csv
