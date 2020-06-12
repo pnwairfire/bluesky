@@ -347,7 +347,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 "id": "SF11C14225236095807750",
                 "event_of": {
                     "id": "bigeventid"
-                    # porposely missing 'name'
+                    # purposely missing 'name'
                 },
                 "type": "wildfire",
                 "activity": [
@@ -635,7 +635,373 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'total_nmhc': None,
                 'total_nox': None,
                 'total_pm10': None,
-                'total_pm2.5': 64.725875042004375,
+                'total_pm2.5': None, # because pm2.5 wasn't defined for one location
+                'total_so2': None,
+                'total_voc': None
+            }
+        }
+        assert events_fields == expected_events_fields
+
+    def test_two_fires_one_event_two_days(self):
+        fires = [
+            Fire({
+                "fuel_type": "natural",
+                "id": "SF11C14225236095807750",
+                "event_of": {
+                    "id": "bigeventid"
+                    # purposely missing 'name'
+                },
+                "type": "wildfire",
+                # two days defined as two active areas in the same
+                # actividy object
+                "activity": [
+                    {
+                        "active_areas": [
+                            {
+                                "start": "2015-08-04T18:00:00",
+                                "end": "2015-08-05T18:00:00",
+                                "utc_offset": "-06:00",
+                                "specified_points": [
+                                    {
+                                        "lat": 35.0,
+                                        "lng": -96.2,
+                                        "area": 99,
+                                        "fuelbeds": [
+                                            {
+                                                "emissions": {
+                                                    "total": {
+                                                        "PM2.5": [10]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "start": "2015-08-05T18:00:00",
+                                "end": "2015-08-06T18:00:00",
+                                "utc_offset": "-06:00",
+                                "specified_points": [
+                                    {
+                                        "lat": 35.0,
+                                        "lng": -96.2,
+                                        "area": 99,
+                                        "fuelbeds": [
+                                            {
+                                                "emissions": {
+                                                    "total": {
+                                                        "PM2.5": [20]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                        ]
+                    }
+                ]
+            }),
+            Fire({
+                "fuel_type": "natural",
+                "id": "SF11C14225236095807750",
+                "event_of": {
+                    "id": "bigeventid",
+                    "name": "foo-event"
+                },
+                "type": "wildfire",
+                # two days defined as two activity objects, each with
+                # one active area
+                "activity": [
+                    {
+                        "active_areas": [
+                            {
+                                "start": "2015-08-04T18:00:00",
+                                "end": "2015-08-05T18:00:00",
+                                "utc_offset": "-06:00",
+                                "specified_points": [
+                                    {
+                                        "lat": 35.5,
+                                        "lng": -96.0,
+                                        "area": 200,
+                                        "fuelbeds": [
+                                            {
+                                                "emissions": {
+                                                    "total": {
+                                                        "PM2.5": [30]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "active_areas": [
+                            {
+                                "start": "2015-08-05T18:00:00",
+                                "end": "2015-08-06T18:00:00",
+                                "utc_offset": "-06:00",
+                                "specified_points": [
+                                    {
+                                        "lat": 35.5,
+                                        "lng": -96.0,
+                                        "area": 200,
+                                        "fuelbeds": [
+                                            {
+                                                "emissions": {
+                                                    "total": {
+                                                        "PM2.5": [40]
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                        ]
+                    }
+                ]
+            })
+        ]
+
+
+        writer = firescsvs.FiresCsvsWriter('/foo')
+        fires_fields, events_fields = writer._collect_csv_fields(fires)
+
+        expected_fires_fields = [
+            {
+                "area": 99,
+                "canopy_consumption_pct": '',
+                'ch4': '',
+                'co': '',
+                'co2': '',
+                'consumption_flaming': '',
+                'consumption_residual': '',
+                'consumption_smoldering': '',
+                'consumption_total': '',
+                'country': '',
+                'county': '',
+                'date_time': '20150804',
+                'elevation': '',
+                'event_id': 'bigeventid',
+                'event_name': '',
+                'fccs_number': '',
+                'heat': '',
+                'id': 'SF11C14225236095807750',
+                "latitude": 35.0,
+                "longitude": -96.2,
+                'max_humid': '',
+                'max_temp': '',
+                'max_temp_hour': '',
+                'max_wind': '',
+                'max_wind_aloft': '',
+                'min_humid': '',
+                'min_temp': '',
+                'min_temp_hour': '',
+                'min_wind': '',
+                'min_wind_aloft': '',
+                'moisture_100hr': '',
+                'moisture_10hr': '',
+                'moisture_1hr': '',
+                'moisture_1khr': '',
+                'moisture_duff': '',
+                'moisture_live': '',
+                'nh3': '',
+                'nox': '',
+                'pm10': '',
+                'pm2.5': 10.0,
+                'rain_days': '',
+                'slope': '',
+                'snow_month': '',
+                'so2': '',
+                'state': '',
+                'sunrise_hour': '',
+                'sunset_hour': '',
+                'type': 'WF',
+                "utc_offset": "-06:00",
+                'voc': ''
+            },
+            {
+                "area": 99,
+                "canopy_consumption_pct": '',
+                'ch4': '',
+                'co': '',
+                'co2': '',
+                'consumption_flaming': '',
+                'consumption_residual': '',
+                'consumption_smoldering': '',
+                'consumption_total': '',
+                'country': '',
+                'county': '',
+                'date_time': '20150805',
+                'elevation': '',
+                'event_id': 'bigeventid',
+                'event_name': '',
+                'fccs_number': '',
+                'heat': '',
+                'id': 'SF11C14225236095807750',
+                "latitude": 35.0,
+                "longitude": -96.2,
+                'max_humid': '',
+                'max_temp': '',
+                'max_temp_hour': '',
+                'max_wind': '',
+                'max_wind_aloft': '',
+                'min_humid': '',
+                'min_temp': '',
+                'min_temp_hour': '',
+                'min_wind': '',
+                'min_wind_aloft': '',
+                'moisture_100hr': '',
+                'moisture_10hr': '',
+                'moisture_1hr': '',
+                'moisture_1khr': '',
+                'moisture_duff': '',
+                'moisture_live': '',
+                'nh3': '',
+                'nox': '',
+                'pm10': '',
+                'pm2.5': 20.0,
+                'rain_days': '',
+                'slope': '',
+                'snow_month': '',
+                'so2': '',
+                'state': '',
+                'sunrise_hour': '',
+                'sunset_hour': '',
+                'type': 'WF',
+                "utc_offset": "-06:00",
+                'voc': ''
+            },
+            {
+                "area": 200,
+                "canopy_consumption_pct": '',
+                'ch4': '',
+                'co': '',
+                'co2': '',
+                'consumption_flaming': '',
+                'consumption_residual': '',
+                'consumption_smoldering': '',
+                'consumption_total': '',
+                'country': '',
+                'county': '',
+                'date_time': '20150804',
+                'elevation': '',
+                'event_id': 'bigeventid',
+                'event_name': 'foo-event',
+                'fccs_number': '',
+                'heat': '',
+                'id': 'SF11C14225236095807750',
+                "latitude": 35.5,
+                "longitude": -96.0,
+                'max_humid': '',
+                'max_temp': '',
+                'max_temp_hour': '',
+                'max_wind': '',
+                'max_wind_aloft': '',
+                'min_humid': '',
+                'min_temp': '',
+                'min_temp_hour': '',
+                'min_wind': '',
+                'min_wind_aloft': '',
+                'moisture_100hr': '',
+                'moisture_10hr': '',
+                'moisture_1hr': '',
+                'moisture_1khr': '',
+                'moisture_duff': '',
+                'moisture_live': '',
+                'nh3': '',
+                'nox': '',
+                'pm10': '',
+                'pm2.5': 30.0,
+                'rain_days': '',
+                'slope': '',
+                'snow_month': '',
+                'so2': '',
+                'state': '',
+                'sunrise_hour': '',
+                'sunset_hour': '',
+                'type': 'WF',
+                "utc_offset": "-06:00",
+                'voc': ''
+            },
+            {
+                "area": 200,
+                "canopy_consumption_pct": '',
+                'ch4': '',
+                'co': '',
+                'co2': '',
+                'consumption_flaming': '',
+                'consumption_residual': '',
+                'consumption_smoldering': '',
+                'consumption_total': '',
+                'country': '',
+                'county': '',
+                'date_time': '20150805',
+                'elevation': '',
+                'event_id': 'bigeventid',
+                'event_name': 'foo-event',
+                'fccs_number': '',
+                'heat': '',
+                'id': 'SF11C14225236095807750',
+                "latitude": 35.5,
+                "longitude": -96.0,
+                'max_humid': '',
+                'max_temp': '',
+                'max_temp_hour': '',
+                'max_wind': '',
+                'max_wind_aloft': '',
+                'min_humid': '',
+                'min_temp': '',
+                'min_temp_hour': '',
+                'min_wind': '',
+                'min_wind_aloft': '',
+                'moisture_100hr': '',
+                'moisture_10hr': '',
+                'moisture_1hr': '',
+                'moisture_1khr': '',
+                'moisture_duff': '',
+                'moisture_live': '',
+                'nh3': '',
+                'nox': '',
+                'pm10': '',
+                'pm2.5': 40.0,
+                'rain_days': '',
+                'slope': '',
+                'snow_month': '',
+                'so2': '',
+                'state': '',
+                'sunrise_hour': '',
+                'sunset_hour': '',
+                'type': 'WF',
+                "utc_offset": "-06:00",
+                'voc': ''
+            }
+        ]
+
+        assert len(fires_fields) == len(expected_fires_fields)
+        for i in range(len(fires_fields)):
+            assert fires_fields[i].keys() == expected_fires_fields[i].keys()
+            for k in fires_fields[i]:
+                assert fires_fields[i][k] == expected_fires_fields[i][k], "{} differs".format(k)
+
+        expected_events_fields = {
+            'bigeventid': {
+                'name':'foo-event',
+                'total_area': 598,
+                'total_ch4': None,
+                'total_co': None,
+                'total_co2': None,
+                'total_heat': None,
+                'total_nh3': None,
+                'total_nmhc': None,
+                'total_nox': None,
+                'total_pm10': None,
+                'total_pm2.5': 100, # because pm2.5 wasn't defined for one location
                 'total_so2': None,
                 'total_voc': None
             }
