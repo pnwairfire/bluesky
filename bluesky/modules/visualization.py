@@ -3,6 +3,7 @@
 __author__ = "Joel Dubowy"
 
 import logging
+import traceback
 
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
@@ -44,6 +45,8 @@ def run(fires_manager):
             #   find the hysplit output if hysplit dispersion
 
         except Exception as e:
+            logging.error(e)
+            logging.debug(traceback.format_exc())
             visualization_info['targets'][-1].update(error=str(e))
 
     # need top level output > directory information for export

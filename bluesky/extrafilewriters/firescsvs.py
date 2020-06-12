@@ -187,38 +187,43 @@ FIRE_LOCATIONS_CSV_FIELDS = (
 ## Functions for extracting fire *event* information to write to csv files
 ##
 
-def _assign_event_name(event, fire, new_fire):
-    name = fire.get('event_of', {}).get('name')
+def _assign_event_name(event, fire_loc):
+    name = fire_loc.get('event_name')
     if name:
         if event.get('name') and name != event['name']:
             logging.warning("Fire {} event name conflict: '{}' != '{}'".format(
-                fire.id, name, event['name']))
+                fire_loc['id'], name, event['name']))
         return name
 
-def _update_event_area(event, fire, new_fire):
-    if any([not loc.get('area') for loc in fire.locations]):
-        raise ValueError("Fire {} lacks area".format(fire.get('id')))
-    return event.get('total_area', 0.0) + sum([loc['area'] for loc in fire.locations])
+def _update_event_area(event, fire_loc):
+    if fire_loc['area'] is None:
+        raise ValueError("Fire {} location lacks area".format(fire_loc['id']))
+    return event.get('total_area', 0.0) + fire_loc['area']
 
-def _update_total_heat(event, fire, new_fire):
+def _update_total_heat(event, fire_loc):
     if 'total_heat' in event and event['total_heat'] is None:
         # previous fire didn't have heat defined; abort so
         # that we don't end up with misleading partial heat
         return
-    logging.debug("total fire heat: %s", new_fire.get('heat'))
-    if new_fire.get('heat'):
-        return event.get('total_heat', 0.0) + new_fire['heat']
+    logging.debug("total fire heat: %s", fire_loc.get('heat'))
+    if fire_loc.get('heat'):
+        return event.get('total_heat', 0.0) + fire_loc['heat']
 
 def _update_total_emissions_species(species):
     key = 'total_{}'.format(species)
-    def f(event, fire, new_fire):
+    def f(event, fire_loc):
         if key in event and event[key] is None:
             # previous fire didn't have this emissions value defined; abort so
             # that we don't end up with misleading partial total
             return
 
-        if new_fire.get(species):
-            return event.get(key, 0.0) + new_fire[species]
+        if not fire_loc.get(species):
+            # this fire doesn't have this emissions value defined; abort,
+            # throwing away whatever is recorded in event[key], so
+            # that we don't end up with misleading partial total
+            return
+
+        return event.get(key, 0.0) + fire_loc[species]
     return f
 
 # Fire events csv columns from BSF:
@@ -273,16 +278,19 @@ class FiresCsvsWriter(object):
     def _collect_csv_fields(self, fires):
         # As we iterate through fires, collecting necessary fields, collect
         # events information as well
+
         fires_fields = []
-        events_fields = {}
         for fire in fires:
             for loc in fire.locations:
                 fires_fields.append({k: l(fire, loc) or '' for k, l in FIRE_LOCATIONS_CSV_FIELDS})
-            event_id = fire.get('event_of', {}).get('id')
-            if event_id:
-                events_fields[event_id] = events_fields.get(event_id, {})
+
+        events_fields = {}
+        for ff in fires_fields:
+            e_id = ff.get('event_id')
+            if e_id:
+                events_fields[e_id] = events_fields.get(e_id, {})
                 for k, l in FIRE_EVENTS_CSV_FIELDS:
-                    events_fields[event_id][k] = l(events_fields[event_id], fire, fires_fields[-1])
+                    events_fields[e_id][k] = l(events_fields[e_id], ff)
 
         logging.debug("events: %s", events_fields)
         return fires_fields, events_fields

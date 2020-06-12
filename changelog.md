@@ -209,3 +209,21 @@
 
 ## 4.2.4
  - Update bsf loader to support isoformatted date_time values
+
+## 4.2.5
+ - Update BSF loader to store utc_offset in the active area object rather than the specified point
+
+## 4.2.6
+ - Upgrade emitcalc to 2.0.2
+ - Be specific about python package dependency versions
+
+## 4.2.7
+ - Upgrade eflookup to v3.2.2
+
+## 4.2.8
+ - Update hysplit trajectories to gracefully handle no fires, and log and record warning
+ - Update dispersion to not abort if there no fires
+
+## 4.2.9
+ - Add script for creating new version of bluesky
+ - Bug fixes in writing of fire_events.csv

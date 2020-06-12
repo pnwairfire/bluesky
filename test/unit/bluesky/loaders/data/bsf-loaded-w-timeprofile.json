@@ -12,6 +12,7 @@
                 "active_areas": [{
                     "start": "2019-05-28T00:00:00",
                     "end": "2019-05-29T00:00:00",
+                    "utc_offset": -6.0,
                     "specified_points": [{
                         "area": 101.999999747,
                         "country": "Unknown",
@@ -45,8 +46,7 @@
                         "snow_month": 5.0,
                         "state": "Unknown",
                         "sunrise_hour": 5.0,
-                        "sunset_hour": 21.0,
-                        "utc_offset": -6.0
+                        "sunset_hour": 21.0
                     }],
                     "timeprofile": {
                         "2019-05-28T00:00:00": {"area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering":  0.0},
@@ -80,6 +80,7 @@
                 "active_areas": [{
                     "start": "2019-05-29T00:00:00",
                     "end": "2019-05-30T00:00:00",
+                    "utc_offset": -6.0,
                     "specified_points": [{
                         "area": 101.999999747,
                         "country": "Unknown",
@@ -113,8 +114,7 @@
                         "snow_month": 5.0,
                         "state": "Unknown",
                         "sunrise_hour": 5.0,
-                        "sunset_hour": 21.0,
-                        "utc_offset": -6.0
+                        "sunset_hour": 21.0
                     }]
                 }]
             }
@@ -132,6 +132,7 @@
                 "active_areas": [{
                     "start": "2019-05-28T00:00:00",
                     "end": "2019-05-29T00:00:00",
+                    "utc_offset": -4.0,
                     "specified_points": [{
                         "area": 67.999999831,
                         "country": "USA",
@@ -165,8 +166,7 @@
                         "snow_month": 5.0,
                         "state": "FL",
                         "sunrise_hour": 6.0,
-                        "sunset_hour": 19.0,
-                        "utc_offset": -4.0
+                        "sunset_hour": 19.0
                     }],
                     "timeprofile": {
                         "2019-05-28T00:00:00": {"area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering":  0.0},
@@ -200,6 +200,7 @@
                 "active_areas": [{
                     "start": "2019-05-29T00:00:00",
                     "end": "2019-05-30T00:00:00",
+                    "utc_offset": -4.0,
                     "specified_points": [{
                         "area": 67.999999831,
                         "country": "USA",
@@ -233,8 +234,7 @@
                         "snow_month": 5.0,
                         "state": "FL",
                         "sunrise_hour": 6.0,
-                        "sunset_hour": 19.0,
-                        "utc_offset": -4.0
+                        "sunset_hour": 19.0
                     }],
                     "timeprofile": {
                         "2019-05-29T00:00:00": {"area_fraction": 0.0, "flaming": 0.0, "residual": 0.0, "smoldering":  0.0},

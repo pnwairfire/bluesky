@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+lasttag=`git describe --abbrev=0 --tags`
+nexttag=`echo "${lasttag%.*}.$((${lasttag##*.}+1))"`
+nexttag_no_v=`echo $nexttag | sed -e 's/v//'`
+lasttag_no_v=`echo $lasttag | sed -e 's/v//'`
+nexttag_comma_delim=`echo $nexttag_no_v| sed -e 's/\./,/g'`
+lasttag_comma_delim=`echo $lasttag_no_v| sed -e 's/\./,/g'`
+
+echo Latest tag: $lasttag
+echo Next tag: $nexttag
+
+echo "Updating $nexttag_comma_delim -> $lasttag_comma_delim  in bluesky/__init__.py"
+sed -i.bak -e 's/'$lasttag_comma_delim'/'$nexttag_comma_delim'/' bluesky/__init__.py
+
+echo "Updating $nexttag_np_v -> $lasttag_no_v in docs/installation.md"
+sed -i.bak -e 's/'$lasttag_no_v'/'$nexttag_no_v'/' docs/installation.md
+
+find . -name *.bak -exec rm  {} \;
+
+emacs changelog.md
+
+git add changelog.md docs/installation.md bluesky/__init__.py
+
+git commit -m "Bump version to $nexttag"
+git tag $nexttag
+
+echo "Review the last commit
+
+  git show
+
+And then push
+
+  git push && git push --tags
+"
