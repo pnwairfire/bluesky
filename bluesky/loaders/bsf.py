@@ -221,8 +221,6 @@ class CsvFileLoader(BaseCsvFileLoader):
             # Again this is for the Canadian addition. Assumes one location per fire.
             # TODO: Add check to see if fuelbed initialized.
             if fire["id"] in self._consumption_values:
-                # fire["activity"][-1]["active_areas"][0]["consumption"] = fire["consumption"]
-                # fire["activity"][-1]["consumption"] = fire["consumption"]
                 fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["fuelbeds"] = [{}]
                 fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["fuelbeds"][0]["consumption"] = self._consumption_values[fire["id"]]
 

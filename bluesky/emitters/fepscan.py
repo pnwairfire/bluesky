@@ -52,16 +52,16 @@ class FEPSCanEmissions(object):
         #TODO: Investigate if this is the right kind of heat
         for row in csv.DictReader(open(plumeFile, 'r'), skipinitialspace=True):
             heat["total"][0] = heat["total"][0] + float(row["heat"])
-            heat["smoldering"][0] = heat["smoldering"][0] + float(row["heat"])
+            heat["residual"][0] = heat["residual"][0] + float(row["heat"])
 
         return heat
 
     def run(self, fireLoc, working_dir, plume_dir):
 
-        profileFile = os.path.join(plume_dir, "profile.txt")
+        # profileFile = os.path.join(plume_dir, "profile.txt")
         consumptionFile = os.path.join(plume_dir, "cons.txt")
         totalEmissionsFile = os.path.join(working_dir, "total_emissions.txt")
-        emissionsFile = os.path.join(working_dir, "emissions.txt")
+        # emissionsFile = os.path.join(working_dir, "emissions.txt")
 
         emissionsArgs = [self.config("FEPS_EMISSIONS_BINARY"),
                         "-c", consumptionFile,
@@ -71,29 +71,22 @@ class FEPSCanEmissions(object):
         #TODO: Log output?
         subprocess.check_output(emissionsArgs)
 
-        if not len(fireLoc["timeprofile"]):
-            logging.info("WARNING: Skipping a fire because it has an invalid time profile. See FEPSCan")
-            emissions = None
-        else:
-            outputArgs = [self.config("FEPS_OUTPUT_BINARY"),
-                            "-e", totalEmissionsFile,
-                            "-p", profileFile,
-                            "-o", emissionsFile]
+        # if not len(fireLoc["timeprofile"]):
+        #     logging.info("WARNING: Skipping a fire because it has an invalid time profile. See FEPSCan")
+        #     emissions = None
+        # else:
+        #     outputArgs = [self.config("FEPS_OUTPUT_BINARY"),
+        #                     "-e", totalEmissionsFile,
+        #                     "-p", profileFile,
+        #                     "-o", emissionsFile]
             
-            #TODO: Log output?
-            subprocess.check_output(outputArgs)
+        #    #TODO: Log output?
+        #    subprocess.check_output(outputArgs)
 
-            emissions = self.readEmissions(emissionsFile)
+        emissions = self.readEmissions(totalEmissionsFile)
 
-            # heat = []
-            # for row in csv.DictReader(open(plumeFile, 'r'), skipinitialspace=True):
-            #    heat.append(float(row["heat"]))
 
-            # emissions["heat"] = heat
-
-        # OK, these are our output emissions
         return emissions
-        # fireLoc["emissions"] = emissions
 
         # TODO: TOBIAS: Determine if this following block useful!!!
 
@@ -143,7 +136,7 @@ class FEPSCanEmissions(object):
 
         #     context.pop_dir()
 
-    def readEmissions(self, filename):
+    def readEmissionsTEMP(self, filename):
         flaming = {}
         residual = {}
         smoldering = {}
@@ -179,7 +172,7 @@ class FEPSCanEmissions(object):
 
         return emissions
 
-    def readEmissionsTEMP(self, filename):
+    def readEmissions(self, filename):
         flaming = {}
         residual = {}
         smoldering = {}
@@ -209,3 +202,5 @@ class FEPSCanEmissions(object):
             emissions = loadArrays(emissions,p,"NH3")
             emissions = loadArrays(emissions,p,"SO2")
             emissions = loadArrays(emissions,p,"VOC")
+    
+        return emissions

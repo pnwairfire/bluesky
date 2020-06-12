@@ -174,11 +174,10 @@ class FepsCan(EmissionsBase):
                         "Missing timeprofile data required for computing Canadian emissions")
                 if 'fuelbeds' not in loc:
                     raise ValueError(
-                        "Fuelbeds should be made in growth module before computing Canadian emissions")
+                        "Fuelbeds should be made in bsf load module before computing Canadian emissions")
                 if len(loc["fuelbeds"]) != 1:
                     raise ValueError(
                         "Each fuelbed array should only have one entry when running Canadian emissions")
-                # loc["fuelbeds"] = [{}]
                 loc["fuelbeds"][0]["emissions"] = self.emitter.run(loc,working_dir,plume_dir)
                 loc["fuelbeds"][0]["heat"] = self.emitter.loadHeat(plume_dir)
                 
