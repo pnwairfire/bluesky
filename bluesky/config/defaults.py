@@ -157,7 +157,12 @@ _DEFAULTS = {
         "model": "prichard-oneill",
         "include_emissions_details": False,
         "species": [],
-        "fuel_loadings": {}
+        "fuel_loadings": {},
+        "feps-can": {
+                "working_dir": None,
+                "FEPS_EMISSIONS_BINARY": "feps_emissions",
+                "FEPS_OUTPUT_BINARY": "feps_output"
+            }
     },
     "findmetdata": {
         "met_root_dir": None,
