@@ -1,21 +1,4 @@
-#******************************************************************************
-#
-#  BlueSky Framework - Controls the estimation of emissions, incorporation of
-#                      meteorology, and the use of dispersion models to
-#                      forecast smoke impacts from fires.
-#  Copyright (C) 2003-2006  USDA Forest Service - Pacific Northwest Wildland
-#                           Fire Sciences Laboratory
-#  BlueSky Framework - Version 3.5.1
-#  Copyright (C) 2007-2009  USDA Forest Service - Pacific Northwest Wildland Fire
-#                      Sciences Laboratory and Sonoma Technology, Inc.
-#                      All rights reserved.
-#
-# See LICENSE.TXT for the Software License Agreement governing the use of the
-# BlueSky Framework - Version 3.5.1.
-#
-# Contributors to the BlueSky Framework are identified in ACKNOWLEDGEMENTS.TXT
-#
-#******************************************************************************
+__author__      = "Tobias Schmidt"
 
 import os
 import subprocess
@@ -23,7 +6,6 @@ import logging
 import csv
 
 from datetime import timedelta, time, datetime, timezone
-# import dateutil.tz as tz
 from math import acos, asin, cos, sin, tan, exp, log, pow, sqrt, pi
 from math import degrees as deg, radians as rad
 
@@ -32,7 +14,11 @@ FEPS_WEATHER_BINARY = "feps_weather_binary"
 FEPS_TIMEPROFILE_BINARY = "feps_timeprofile_binary"
 
 class FEPSCanTimeProfiler(object):
-    """ FEPS Time Profile Module """
+    """ FEPS Time Profile Module 
+
+    FEPSTimeProfile was copied from BlueSky Framework, and subsequently modified
+    TODO: acknowledge original authors (STI?)
+    """
 
     # Setup the array that defines percentage of acres burned per hour for a
     # wildfire.  The array goes from midnight (hr 0) to 11 pm local time, in
@@ -55,31 +41,18 @@ class FEPSCanTimeProfiler(object):
 
     # NOTE FOR TOBIAS: FOR NOW fireLoc MEANS active_area
     def _run(self, fireLoc, working_dir):
-        # working_dir = self.config("working_dir")
-        
+        logging.debug("Running WFRT version of FEPS Time Profile model")
 
-        #self.log.info("Running FEPS Time Profile model")
-
-        # for fireLoc in fire["activity"]:
-        #     if len(fireLoc["active_areas"]) != 1:
-        #         raise ValueError("There should be exactly one active_area per activity object before running Canadian timeprofiling")
-        #     fireLoc = fireLoc["active_areas"][0]
         if fireLoc["consumption"] is None:
             raise ValueError("Missing consumption data for Canadian timeprofiling")
         if len(fireLoc["specified_points"]) != 1:
             raise ValueError("There should be exactly one specified_point per activity object before running Canadian timeprofiling")
-
-        # context.push_dir(fireLoc.uniqueid())
 
         diurnalFile = self._get_diurnal_file(fireLoc, fireLoc["specified_points"][0],working_dir)
 
         consumptionFile = os.path.join(working_dir, "cons.txt")
         growthFile = os.path.join(working_dir, "growth.txt")
         profileFile = os.path.join(working_dir, "profile.txt")
-
-        # context.archive_file(consumptionFile)
-        # context.archive_file(growthFile)
-        # context.archive_file(profileFile)
 
         self.writeConsumption(fireLoc, fireLoc["specified_points"][0], consumptionFile)
         self.writeGrowth(fireLoc, growthFile)
@@ -107,19 +80,6 @@ class FEPSCanTimeProfiler(object):
         self.start_hour = fireLoc["start"]
         self.ONE_HOUR = timedelta(hours=1)
 
-        # Adjust the start time to midnight local time
-        # fire_dt = fireLoc["date_time"]
-        # start_of_fire_day = BSDateTime(fire_dt.year, fire_dt.month, fire_dt.day,
-        #                                0, 0, 0, 0,
-        #                                tzinfo=fire_dt.tzinfo)
-        # fireLoc["date_time"] = start_of_fire_day
-
-        # fireLoc["time_profile"] = time_profile
-
-        # context.pop_dir()
-
-        #self.set_output("fires", fireInfo)
-
     def writeConsumption(self, fireLoc, fire_location_info, filename):
         f = open(filename, 'w')
         f.write("cons_flm=%f\n" % fireLoc["consumption"]["summary"]["flaming"])
@@ -133,43 +93,22 @@ class FEPSCanTimeProfiler(object):
         f = open(filename, 'w')
         f.write("day, hour, size\n")
         cumul_size = 0
-        # if fireLoc["type"] in ("wildfire", "WF", "WFU", "Unknown"):
         # Write area measurements using WRAP curve
+        # NOTE: We are assuming that all fires are of the type WF.
+        # This is based off of the standard being said by CWFIS and smartfire.
+        # See the orginal framework's version of this method to see how it used to be done.
         for h, size_fract in enumerate(self.WRAP_TIME_PROFILE):
             day = h // 24
             hour = h % 24
             size = fireLoc["specified_points"][0]["area"] * size_fract
             cumul_size += size
             f.write("%d, %d, %f\n" %(day, hour, cumul_size))
-        # else:
-        #     # Write area measurements (single curve, since we only have one area)
-        #     start_size = 0
-        #     end_size = fireLoc["area"]
-            
-        #     new_start_hour = fireLoc["date_time"].hour
-            
-        #     if new_start_hour == 0 or new_start_hour > 17:
-        #         start_hour = 9
-        #         end_hour = 18
-        #     else:
-        #         start_hour = new_start_hour
-        #         end_hour = 18
-            
-        #     f.write("0, %d, %f\n" % (start_hour, start_size))
-        #     f.write("0, %d, %f\n" % (end_hour, end_size))
         f.close()
 
     def readProfile(self, start_hour, profileFile):
-        #time_profile = construct_type("TimeProfileData")
         time_profile = {}
         for k in ["area_fraction", "flaming", "residual", "smoldering"]:
              time_profile[k] = []
-        # for row in csv.DictReader(open(profileFile, 'r'), skipinitialspace=True):
-        #     time = start_hour + timedelta(hours=int(row["hour"]))
-        #     time_profile[time]["area_fraction"] = float(row["area_fract"])
-        #     time_profile[time]["flaming"] = float(row["flame"])
-        #     time_profile[time]["residual"] = float(row["residual"])
-        #     time_profile[time]["smoldering"] = float(row["smolder"])
         i = 0
         for row in csv.DictReader(open(profileFile, 'r'), skipinitialspace=True):
             if i > 23:

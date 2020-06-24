@@ -105,11 +105,6 @@ def _get_profiler(hourly_fractions, fire, active_area):
                     "feps-timeprofile-{}".format(fire.id))
                 if not os.path.exists(working_dir):
                     os.makedirs(working_dir)
-                # wfrtConfig['working_dir'] = working_dir
-                # return working_dir
-            # print(wfrtConfig.get("working_dir"))
-            # if fire.id == "SF11C2168671415844830":
-            #     print("SF11C2168671415844830")
             return wfrtfeps.FEPSCanTimeProfiler(active_area,working_dir,wfrtConfig)
         else:
             return StaticTimeProfiler(tw['start'], tw['end'],

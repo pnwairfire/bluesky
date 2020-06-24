@@ -1,21 +1,4 @@
-#******************************************************************************
-#
-#  BlueSky Framework - Controls the estimation of emissions, incorporation of 
-#                      meteorology, and the use of dispersion models to 
-#                      forecast smoke impacts from fires.
-#  Copyright (C) 2003-2006  USDA Forest Service - Pacific Northwest Wildland 
-#                           Fire Sciences Laboratory
-#  BlueSky Framework - Version 3.5.1    
-#  Copyright (C) 2007-2009  USDA Forest Service - Pacific Northwest Wildland Fire 
-#                      Sciences Laboratory and Sonoma Technology, Inc.
-#                      All rights reserved.
-#
-# See LICENSE.TXT for the Software License Agreement governing the use of the
-# BlueSky Framework - Version 3.5.1.
-#
-# Contributors to the BlueSky Framework are identified in ACKNOWLEDGEMENTS.TXT
-#
-#******************************************************************************
+__author__ = "Tobias Schmidt"
 
 from datetime import timedelta
 import logging
@@ -24,9 +7,11 @@ import copy
 from bluesky.config import Config
 
 class Persistence(object):
-    _version_ = '2.0.0'
-    # def __init__(self, fire_failure_handler):
-    #     self.fire_failure_handler = fire_failure_handler
+    """ BSF's Persistence Model 
+
+    Persistence was copied from BlueSky Framework, and subsequently modified
+    TODO: acknowledge original authors (STI?)
+    """
 
     def run(self, fires_manager):
         n_created = self._fill_missing_fires(fires_manager)
@@ -36,20 +21,21 @@ class Persistence(object):
     def _fill_missing_fires(self, fires_manager):
         """Fill-in (persist) that do not extend to the end of the emissions period"""
         n_created = 0
-        first_hour, num_hours = self._get_time(fires_manager)
-        last_hour = first_hour + timedelta(hours=num_hours)
+        # first_hour, num_hours = self._get_time(fires_manager)
+        # last_hour = first_hour + timedelta(hours=num_hours)
+        last_hour = Config().get('filter','time','end')
         fire_events = {}
 
         # This is to ensure we are not double counting any fires.
         # Future fires that already exist (have an event_id) will
         # not have past data persisted overtop of the existing data
-        for fire in fires_manager.fires:
-            event = fire["event_of"]["id"]
-            start = fire["activity"][0]["active_areas"][0]["start"]
-            if event not in fire_events:
-                fire_events[event] = [start]
-            else:
-                fire_events[event].append(start)
+        # for fire in fires_manager.fires:
+        #     event = fire["event_of"]["id"]
+        #     start = fire["activity"][0]["active_areas"][0]["start"]
+        #     if event not in fire_events:
+        #         fire_events[event] = [start]
+        #     else:
+        #         fire_events[event].append(start)
 
 
 
@@ -65,8 +51,8 @@ class Persistence(object):
                 end = aa[0]["active_areas"][0]["end"] + timedelta(days=1)
 
                 while start <= last_hour:
-                    if start in fire_events[event]:
-                        break
+                    # if start in fire_events[event]:
+                    #     break
                     n_created += 1
                     new_aa = copy.deepcopy(aa[0])
                     new_aa["active_areas"][0]["start"] = start
@@ -75,7 +61,7 @@ class Persistence(object):
                     start += timedelta(days=1)
                     end += timedelta(days=1)
 
-        self._remove_unused_fires(fires_manager,first_hour,last_hour)
+        # self._remove_unused_fires(fires_manager,first_hour,last_hour)
         return n_created
     
     # Clear out the fires in the fires_manager that will never
@@ -90,7 +76,8 @@ class Persistence(object):
                 i = 0
                 for a in fire["activity"]:
                     start = a["active_areas"][0]["start"]
-                    if start < first_hour or start > last_hour:
+                    end = a["active_areas"][0]["end"]
+                    if end <= first_hour or start >= last_hour:
                         activity_for_deletion.append(i)
                     i = i + 1
                 if len(activity_for_deletion) == len(fire["activity"]):
