@@ -41,7 +41,6 @@ class FEPSCanTimeProfiler(object):
 
     # NOTE FOR TOBIAS: FOR NOW fireLoc MEANS active_area
     def _run(self, fireLoc, working_dir):
-        logging.debug("Running WFRT version of FEPS Time Profile model")
 
         if fireLoc["consumption"] is None:
             raise ValueError("Missing consumption data for Canadian timeprofiling")
