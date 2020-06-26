@@ -16,7 +16,7 @@ from bluesky.datetimeutils import parse_datetimes, parse_datetime
 from bluesky.exceptions import BlueSkyConfigurationError
 from functools import reduce
 
-from bluesky.timeprofilers import wfrtfeps
+from bluesky.timeprofilers import ubcbsffeps
 
 __all__ = [
     'run'
@@ -98,14 +98,14 @@ def _get_profiler(hourly_fractions, fire, active_area):
 
     else:
         model_name = Config().get("timeprofile", "model").lower()
-        if model_name == "feps-can":
+        if model_name == "ubc-bsf-feps":
             wfrtConfig = Config().get("timeprofile", model_name)
             if wfrtConfig.get('working_dir'):
                 working_dir = os.path.join(wfrtConfig['working_dir'],
                     "feps-timeprofile-{}".format(fire.id))
                 if not os.path.exists(working_dir):
                     os.makedirs(working_dir)
-            return wfrtfeps.FEPSCanTimeProfiler(active_area,working_dir,wfrtConfig)
+            return ubcbsffeps.UbcBsfFEPSTimeProfiler(active_area,working_dir,wfrtConfig)
         else:
             return StaticTimeProfiler(tw['start'], tw['end'],
                 hourly_fractions=hourly_fractions)

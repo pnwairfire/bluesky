@@ -21,9 +21,9 @@ class Persistence(object):
     def _fill_missing_fires(self, fires_manager):
         """Fill-in (persist) that do not extend to the end of the emissions period"""
         n_created = 0
-        # first_hour, num_hours = self._get_time(fires_manager)
-        # last_hour = first_hour + timedelta(hours=num_hours)
-        last_hour = Config().get('filter','time','end')
+        first_hour, num_hours = self._get_time(fires_manager)
+        last_hour = first_hour + timedelta(hours=num_hours)
+        # last_hour = Config().get('filter','time','end')
         fire_events = {}
 
         # This is to ensure we are not double counting any fires.

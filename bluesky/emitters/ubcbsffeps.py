@@ -7,7 +7,7 @@ import csv
 
 
 
-class FEPSCanEmissions(object):
+class UbcBsfFEPSEmissions(object):
     """ FEPS Emissions Module used in Canadian system
 
     FEPSEmissions was copied from BlueSky Framework, and subsequently modified

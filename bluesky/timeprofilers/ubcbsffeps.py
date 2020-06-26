@@ -13,7 +13,7 @@ from math import degrees as deg, radians as rad
 FEPS_WEATHER_BINARY = "feps_weather_binary"
 FEPS_TIMEPROFILE_BINARY = "feps_timeprofile_binary"
 
-class FEPSCanTimeProfiler(object):
+class UbcBsfFEPSTimeProfiler(object):
     """ FEPS Time Profile Module 
 
     FEPSTimeProfile was copied from BlueSky Framework, and subsequently modified

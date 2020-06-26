@@ -21,7 +21,7 @@ from bluesky import datautils, datetimeutils
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.io import capture_stdout
-from bluesky.emitters.fepscan import FEPSCanEmissions
+from bluesky.emitters.ubcbsffeps import UbcBsfFEPSEmissions
 
 from bluesky.consumeutils import (
     _apply_settings, FuelLoadingsManager, FuelConsumptionForEmissions,
@@ -119,14 +119,14 @@ class EmissionsBase(object, metaclass=abc.ABCMeta):
 ## FEPS for Canadian Smartfire
 ##
 
-class FepsCan(EmissionsBase):
+class UbcBsfFeps(EmissionsBase):
     # TODO: Add "Included Emissions Details" functionality
 
     def __init__(self, fire_failure_handler):
-        super(FepsCan, self).__init__(fire_failure_handler)
+        super(UbcBsfFeps, self).__init__(fire_failure_handler)
         model = Config().get('emissions', 'model').lower()
         config = Config().get('emissions', model)
-        self.emitter = FEPSCanEmissions(**config)
+        self.emitter = UbcBsfFEPSEmissions(**config)
 
     def run(self, fires):
         logging.info("Running emissions module FEPSCan EFs")
