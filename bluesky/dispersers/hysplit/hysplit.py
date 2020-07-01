@@ -181,15 +181,13 @@ class HYSPLITDispersion(DispersionBase):
         self._set_grid_params()
         self._set_reduction_factor()
         self._compute_tranches()
-        hysplit_utils.fill_in_dummy_fires(self._fire_sets, self._fires,
-            self._num_processes, self._model_start, self._num_hours,
-            self._grid_params)
 
         if 1 < self._num_processes:
                 # hysplit_utils.create_fire_tranches will log number of processes
                 # and number of fires each
                 self._run_parallel(wdir)
         else:
+            hysplit_utils.ensure_tranch_has_dummy_fire(self._fires)
             self._run_process(self._fires, wdir)
 
         # Note: DispersionBase.run will add directory, start_time,
@@ -346,8 +344,9 @@ class HYSPLITDispersion(DispersionBase):
                 except Exception as e:
                     self.exc = e
 
-        fire_tranches = hysplit_utils.create_fire_tranches(
-            self._fire_sets, self._num_processes)
+        fire_tranches = hysplit_utils.create_fire_tranches(self._fire_sets,
+            self._num_processes, self._model_start, self._num_hours,
+            self._grid_params)
         threads = []
         main_thread_config = Config().get()
         for nproc in range(len(fire_tranches)):
