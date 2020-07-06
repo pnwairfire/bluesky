@@ -10,8 +10,8 @@ from math import acos, asin, cos, sin, tan, exp, log, pow, sqrt, pi
 from math import degrees as deg, radians as rad
 
 # required executables
-FEPS_WEATHER_BINARY = "feps_weather_binary"
-FEPS_TIMEPROFILE_BINARY = "feps_timeprofile_binary"
+FEPS_WEATHER_BINARY = "feps_weather"
+FEPS_TIMEPROFILE_BINARY = "feps_timeprofile"
 
 class UbcBsfFEPSTimeProfiler(object):
     """ FEPS Time Profile Module 
@@ -65,7 +65,7 @@ class UbcBsfFEPSTimeProfiler(object):
         else:
             normSwitch = "-d"
 
-        timeProfileArgs = [self.config(FEPS_TIMEPROFILE_BINARY),
+        timeProfileArgs = [FEPS_TIMEPROFILE_BINARY,
                         "-c", consumptionFile,
                         "-w", diurnalFile,
                         "-g", growthFile,
@@ -142,7 +142,7 @@ class UbcBsfFEPSTimeProfiler(object):
         f.close()
 
         weather_args = [
-            self.config(FEPS_WEATHER_BINARY),
+            FEPS_WEATHER_BINARY,
             "-w", weather_file,
             "-o", diurnal_file
         ]

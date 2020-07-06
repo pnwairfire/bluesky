@@ -5,7 +5,8 @@ import subprocess
 import logging
 import csv
 
-
+# required executables
+FEPS_EMISSIONS_BINARY = 'feps_emissions'
 
 class UbcBsfFEPSEmissions(object):
     """ FEPS Emissions Module used in Canadian system
@@ -13,10 +14,6 @@ class UbcBsfFEPSEmissions(object):
     FEPSEmissions was copied from BlueSky Framework, and subsequently modified
     TODO: acknowledge original authors (STI?)
     """
-
-    # required executables
-    FEPS_EMISSIONS_BINARY = 'feps_emissions'
-    FEPS_OUTPUT_BINARY = 'feps_output'
 
     def __init__(self, **config):
         self._config = config
@@ -29,7 +26,7 @@ class UbcBsfFEPSEmissions(object):
         self._write_consumption(fireLoc['consumption']['summary'],fireLoc,consumptionFile)
         totalEmissionsFile = os.path.join(working_dir, "total_emissions.txt")
 
-        emissionsArgs = [self.config("FEPS_EMISSIONS_BINARY"),
+        emissionsArgs = [FEPS_EMISSIONS_BINARY,
                         "-c", consumptionFile,
                         "-a", str(fireLoc["area"]),
                         "-o", totalEmissionsFile]

@@ -154,9 +154,6 @@ class UbcBsfFeps(EmissionsBase):
                 if "consumption" not in loc:
                     raise ValueError(
                         "Missing consumption data required for computing Canadian emissions")
-                if "timeprofile" not in loc:
-                    raise ValueError(
-                        "Missing timeprofile data required for computing Canadian emissions")
                 if 'fuelbeds' not in loc:
                     raise ValueError(
                         "Fuelbeds should be made in bsf load module before computing Canadian emissions")
