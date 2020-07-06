@@ -9,6 +9,7 @@ SF11C77574457421602580,SF11E4146026,27.188,-81.113,RX,67.999999831,201905280000-
 
 __author__ = "Joel Dubowy"
 
+import copy
 import datetime
 import logging
 import re
@@ -19,7 +20,7 @@ from collections import defaultdict
 from pyairfire.io import CSV2JSON
 
 from bluesky.models.fires import Fire
-from . import BaseCsvFileLoader
+from . import BaseCsvFileLoader, skip_failures
 from bluesky.datetimeutils import parse_datetime, parse_utc_offset
 
 __all__ = [
@@ -93,7 +94,6 @@ class CsvFileLoader(BaseCsvFileLoader):
 
     def __init__(self, **config):
         super().__init__(**config)
-        self._skip_failures = config.get('skip_failures')
         self._omit_nulls = config.get('omit_nulls')
         self._timeprofile_file = config.get('timeprofile_file')
 
@@ -101,23 +101,38 @@ class CsvFileLoader(BaseCsvFileLoader):
     def _marshal(self, data):
         self._load_timeprofile_file()
 
-        self._fires = {}
+        fires = {}
         self._consumption_values = {}
 
         for row in data:
-            try:
-                self._process_row(row)
+            with skip_failures(self._skip_failures):
+                fire = self._process_row(row)
+                if fire["id"] not in fires:
+                    fires[fire["id"]] = fire
+                else:
+                    # wait to the end to set so that, failure and if
+                    # skip_failures == true, the fires[fire["id"]] will be
+                    # left as it is
+                    fires[fire["id"]] = self._merge(fires[fire["id"]], fire)
 
-            except Exception as e:
-                if not self._skip_failures:
-                    logging.debug(traceback.format_exc())
-                    raise ValueError(str(e))
-                # else, just log str(e) (which is detailed enough)
-                logging.warning(str(e))
+        processed_fires = []
+        for fire in fires.values():
+            with skip_failures(self._skip_failures):
+                self._post_process_activity(fire)
+                processed_fires.append(fire)
 
-        self._post_process_activity()
+        return processed_fires
 
-        return list(self._fires.values())
+    def _merge(self, fire1, fire2):
+        merged_fire = copy.deepcopy(fire1)
+        merged_fire['specified_points_by_date_n_offset'].update(
+            fire2['specified_points_by_date_n_offset'])
+        merged_fire['event_of'].update(fire2['event_of'])
+        if 'type' in fire2:
+            # TODO: if defined, make sure fire1's type doesn't differ
+            merged_fire['type'] = fire2['type']
+
+        return merged_fire
 
     def _load_timeprofile_file(self):
         self._timeprofile = defaultdict(lambda: defaultdict(lambda: {}))
@@ -144,16 +159,14 @@ class CsvFileLoader(BaseCsvFileLoader):
             # TODO: make sure fractions for each event/day add up to 1.0
 
     def _process_row(self, row):
-        fire_id = row.get("id") or str(uuid.uuid4())
-        if fire_id not in self._fires:
-            self._fires[fire_id] = Fire({
-                "id": fire_id,
-                "event_of": {},
-                # Though unlikely, it's possible that the points in
-                # a single fire span multiple time zones
-                "specified_points_by_date_n_offset": defaultdict(
-                    lambda: defaultdict(lambda: []))
-            })
+        fire = Fire({
+            "id": row.get("id") or str(uuid.uuid4()),
+            "event_of": {},
+            # Though unlikely, it's possible that the points in
+            # a single fire span multiple time zones
+            "specified_points_by_date_n_offset": defaultdict(
+                lambda: defaultdict(lambda: []))
+        })
 
         start, utc_offset = self._parse_date_time(row["date_time"])
         if not start:
@@ -164,18 +177,18 @@ class CsvFileLoader(BaseCsvFileLoader):
         if self._omit_nulls:
             sp = {k: v for k, v in sp.items() if v is not None}
 
-        self._fires[fire_id]['specified_points_by_date_n_offset'][start][utc_offset].append(sp)
+        fire['specified_points_by_date_n_offset'][start][utc_offset].append(sp)
 
         # event and type could have been set when the Fire object was
         # instantiated, but checking amd setting here allow the fields to
         # be set even if only subsequent rows for the fire have them defined
         if row.get("event_id"):
-            self._fires[fire_id]["event_of"]["id"] = row["event_id"]
+            fire["event_of"]["id"] = row["event_id"]
         if row.get("event_url"):
-            self._fires[fire_id]["event_of"]["url"] = row["event_url"]
+            fire["event_of"]["url"] = row["event_url"]
 
         if row.get("type"):
-            self._fires[fire_id]["type"] = row["type"].lower()
+            fire["type"] = row["type"].lower()
 
         # Add consumption data if present. 
         # This was implemented for the Canadian version of the SmartFire system.
@@ -201,31 +214,30 @@ class CsvFileLoader(BaseCsvFileLoader):
 
         # TODO: other marshaling
 
-    def _post_process_activity(self):
-        for fire in self._fires.values():
-            event_id = fire.get("event_of", {}).get("id")
-            fire["activity"] = []
-            sorted_items = sorted(fire.pop("specified_points_by_date_n_offset").items(),
-                key=lambda a: a[0])
-            for start, points_by_utc_offset in sorted_items:
-                for utc_offset, specified_points in points_by_utc_offset.items():
-                    fire['activity'].append({
-                        "active_areas": [
-                            {
-                                "start": start,
-                                "end": start + ONE_DAY,
-                                "utc_offset": utc_offset,
-                                "specified_points": specified_points
-                            }
-                        ]
-                    })
-                    if event_id and (start in self._timeprofile[event_id]):
-                        fire['activity'][-1]["active_areas"][0]["timeprofile"] = self._timeprofile[event_id][start]
-            # Again this is for the Canadian addition. Assumes one location per fire.
-            # TODO: Add check to see if fuelbed initialized.
-            if fire["id"] in self._consumption_values:
-                fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["fuelbeds"] = [{}]
-                fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["fuelbeds"][0]["consumption"] = self._consumption_values[fire["id"]]
+    def _post_process_activity(self, fire):
+        event_id = fire.get("event_of", {}).get("id")
+        fire["activity"] = []
+        sorted_items = sorted(fire.pop("specified_points_by_date_n_offset").items(),
+            key=lambda a: a[0])
+        for start, points_by_utc_offset in sorted_items:
+            for utc_offset, specified_points in points_by_utc_offset.items():
+                fire['activity'].append({
+                    "active_areas": [
+                        {
+                            "start": start,
+                            "end": start + ONE_DAY,
+                            "utc_offset": utc_offset,
+                            "specified_points": specified_points
+                        }
+                    ]
+                })
+                if event_id and (start in self._timeprofile[event_id]):
+                    fire['activity'][-1]["active_areas"][0]["timeprofile"] = self._timeprofile[event_id][start]
+        # Again this is for the Canadian addition. Assumes one location per fire.
+        # TODO: Add check to see if fuelbed initialized.
+        if fire["id"] in self._consumption_values:
+            fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["fuelbeds"] = [{}]
+            fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["fuelbeds"][0]["consumption"] = self._consumption_values[fire["id"]]
 
 
     # Note: Although 'timezone' (a numberical value) is defined alongsite

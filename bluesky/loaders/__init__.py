@@ -23,6 +23,7 @@ import logging
 import os
 import urllib
 import shutil
+import traceback
 
 from pyairfire.io import CSV2JSON
 
@@ -40,6 +41,24 @@ __all__ = [
     'BaseFileLoader'
 ]
 
+class skip_failures(object):
+
+    def __init__(self, enabled):
+        self._enabled = enabled
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, e_type, value, tb):
+        if e_type:
+            if self._enabled:
+                logging.warning("Failed to load fire: %s", str(value))
+                return True
+
+            logging.debug(traceback.format_exc())
+
+
+
 class BaseLoader(object):
 
     def __init__(self, **config):
@@ -55,17 +74,21 @@ class BaseLoader(object):
 
         self._saved_copy_filename = (self._config.get('saved_copy_file')
             or self._config.get('saved_data_file'))
+        self._skip_failures = self._config.get('skip_failures')
 
     def load(self):
         data = self._load()
         self._save_copy(data)
 
-        fires = self._marshal(data)
-        # cast each fire to Fire object, in case child class
-        #   did override _marshal but didn't return Fire objects?
-        # TODO: support config setting 'skip_failures'
-        fires = [Fire(f) for f in fires]
-        fires = self._prune(fires)
+        fires = []
+        for fire in self._marshal(data):
+            with skip_failures(self._skip_failures):
+                # cast each fire to Fire object, in case child class
+                #   did override _marshal but didn't return Fire objects?
+                fire = Fire(fire)
+                self._prune_activity(fire)
+                if fire['activity']:
+                    fires.append(fire)
 
         return fires
 
@@ -78,18 +101,13 @@ class BaseLoader(object):
 
     ## Pruning
 
-    def _prune(self, fires):
+    def _prune_activity(self, fire):
         """Filters out activity windows that are outside of time range.
         """
-        for fire in fires:
-            # TODO: support config setting 'skip_failures'
-            for a in fire['activity']:
-                a['active_areas'] = [aa for aa in a.active_areas
-                    if self._within_time_range(aa)]
-            fire['activity'] = [a for a in fire['activity'] if a.active_areas]
-        fires = [f for f in fires if f['activity']]
-
-        return fires
+        for a in fire['activity']:
+            a['active_areas'] = [aa for aa in a.active_areas
+                if self._within_time_range(aa)]
+        fire['activity'] = [a for a in fire['activity'] if a.active_areas]
 
     def _within_time_range(self, active_area):
         """
