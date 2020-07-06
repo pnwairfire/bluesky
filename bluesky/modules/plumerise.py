@@ -9,6 +9,7 @@ import copy
 import datetime
 import logging
 import os
+import csv
 
 from plumerise import sev, feps, __version__ as plumerise_version
 from pyairfire import sun
@@ -35,6 +36,12 @@ def run(fires_manager):
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             compute_func(fire)
+
+    # Make sure to distribute the heat if it was loaded here.
+    model = Config().get('plumerise', 'model').lower()
+    config = Config().get('plumerise', model)
+    if config.get("load_heat"):
+        datautils.summarize_all_levels(fires_manager, 'heat')
 
     # TODO: spread out emissions over plume and set in activity or fuelbed
     #   objects ??? (be consistent with profiled emissions, setting in
@@ -95,6 +102,21 @@ class ComputeFunction(object):
                 if not os.path.exists(working_dir):
                     os.makedirs(working_dir)
                 return working_dir
+        
+        def _loadHeat(plume_dir):
+            plumeFile = os.path.join(plume_dir, "plume.txt")
+
+            heat = {"flaming": [0],
+                    "residual": [0],
+                    "smoldering": [0],
+                    "total": [0]}
+
+            #TODO: Investigate if this is the right kind of heat
+            for row in csv.DictReader(open(plumeFile, 'r'), skipinitialspace=True):
+                heat["total"][0] = heat["total"][0] + float(row["heat"])
+                heat["residual"][0] = heat["residual"][0] + float(row["heat"])
+
+            return heat
 
         def _f(fire):
             # TODO: create and change to working directory here (per fire),
@@ -129,12 +151,24 @@ class ComputeFunction(object):
                         # just set them both, even if one is already set
                         loc["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
                         loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
+                    
+                    if config.get("consumption_in_tons_per_acre"):
+                        consumption = loc['consumption']['summary'] * loc["area"]
+                    else:
+                        consumption = loc['consumption']['summary']
 
                     plumerise_data = pr.compute(aa['timeprofile'],
-                        loc['consumption']['summary'], loc,
+                        consumption, loc,
                         working_dir=_get_working_dir(fire))
                     loc['plumerise'] = plumerise_data['hours']
+
+                    if config.get("load_heat"):
+                        if 'fuelbeds' not in loc:
+                            raise ValueError(
+                                "Fuelbeds should exist before loading heat in plumerise")
+                        loc["fuelbeds"][0]["heat"] = _loadHeat(_get_working_dir(fire))
                     # TODO: do anything with plumerise_data['heat'] ?
+                    # SEE: Canadian additon to this system above
 
         return _f
 
