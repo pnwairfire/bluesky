@@ -163,10 +163,6 @@ class CsvFileLoader(BaseCsvFileLoader):
             for csv_key, loc_attr, f in LOCATION_FIELDS}
         if self._omit_nulls:
             sp = {k: v for k, v in sp.items() if v is not None}
-        
-        # Handle case where area is 0.
-        if sp["area"] == 0:
-            raise ValueError("Fire location has 0 area")
 
         self._fires[fire_id]['specified_points_by_date_n_offset'][start][utc_offset].append(sp)
 
