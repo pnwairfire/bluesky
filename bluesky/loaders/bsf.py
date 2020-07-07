@@ -209,10 +209,11 @@ class CsvFileLoader(BaseCsvFileLoader):
             "total": [total_cons]
             }
 
-            self._consumption_values[fire_id] = consumption
-
+            self._consumption_values[fire["id"]] = consumption
 
         # TODO: other marshaling
+
+        return fire
 
     def _post_process_activity(self, fire):
         event_id = fire.get("event_of", {}).get("id")
