@@ -152,7 +152,7 @@ class ComputeFunction(object):
                         loc["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
                         loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
                     
-                    consumption = loc['consumption']['summary']
+                    consumption = copy.deepcopy(loc['consumption']['summary'])
 
                     if config.get("consumption_in_tons_per_acre"):
                         c = consumption.items()
