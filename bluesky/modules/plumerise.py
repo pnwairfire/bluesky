@@ -152,10 +152,12 @@ class ComputeFunction(object):
                         loc["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
                         loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
                     
+                    consumption = loc['consumption']['summary']
+
                     if config.get("consumption_in_tons_per_acre"):
-                        consumption = loc['consumption']['summary'] * loc["area"]
-                    else:
-                        consumption = loc['consumption']['summary']
+                        c = consumption.items()
+                        for key,value in c:
+                            consumption[key] = value * loc["area"]
 
                     plumerise_data = pr.compute(aa['timeprofile'],
                         consumption, loc,
