@@ -80,9 +80,6 @@ def run(fires_manager):
                             _fix_keys(fb['emissions_details'])
 
     datautils.summarize_all_levels(fires_manager, 'emissions')
-    # Heat is loaded in at this point in the Canadian version of the framework
-    if klass_name == "FepsCan":
-        datautils.summarize_all_levels(fires_manager, 'heat')
     if include_emissions_details:
         datautils.summarize_over_all_fires(fires_manager, 'emissions_details')
 
@@ -129,22 +126,11 @@ class UbcBsfFeps(EmissionsBase):
         self.emitter = UbcBsfFEPSEmissions(**config)
 
     def run(self, fires):
-        logging.info("Running emissions module FEPSCan EFs")
+        logging.info("Running emissions module UbcBsfFeps EFs")
 
         for fire in fires:
             with self.fire_failure_handler(fire):
                 self._run_on_fire(fire)
-    
-    def _get_plume_dir(self, fire):
-        model = Config().get('plumerise', 'model').lower()
-        config = Config().get('plumerise', model)
-        if config.get('working_dir'):
-            plume_dir = os.path.join(config['working_dir'],
-                "feps-plumerise-{}".format(fire.id))
-            if not os.path.exists(plume_dir):
-                raise ValueError(
-                    "Missing plumerise data required for computing Canadian emissions")
-            return plume_dir
     
     def _get_working_dir(self, fire):
         model = Config().get('emissions', 'model').lower()
@@ -159,7 +145,6 @@ class UbcBsfFeps(EmissionsBase):
     #CONVERSION_FACTOR = 0.0005 # 1.0 ton / 2000.0 lbs
 
     def _run_on_fire(self, fire):
-        plume_dir = self._get_plume_dir(fire)
         working_dir = self._get_working_dir(fire)
         if 'activity' not in fire:
             raise ValueError(
@@ -169,17 +154,13 @@ class UbcBsfFeps(EmissionsBase):
                 if "consumption" not in loc:
                     raise ValueError(
                         "Missing consumption data required for computing Canadian emissions")
-                if "timeprofile" not in loc:
-                    raise ValueError(
-                        "Missing timeprofile data required for computing Canadian emissions")
                 if 'fuelbeds' not in loc:
                     raise ValueError(
                         "Fuelbeds should be made in bsf load module before computing Canadian emissions")
                 if len(loc["fuelbeds"]) != 1:
                     raise ValueError(
                         "Each fuelbed array should only have one entry when running Canadian emissions")
-                loc["fuelbeds"][0]["emissions"] = self.emitter.run(loc,working_dir,plume_dir)
-                loc["fuelbeds"][0]["heat"] = self.emitter.loadHeat(plume_dir)
+                loc["fuelbeds"][0]["emissions"] = self.emitter.run(loc,working_dir)
                 
 
 ##

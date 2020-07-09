@@ -5,7 +5,8 @@ import subprocess
 import logging
 import csv
 
-
+# required executables
+FEPS_EMISSIONS_BINARY = 'feps_emissions'
 
 class UbcBsfFEPSEmissions(object):
     """ FEPS Emissions Module used in Canadian system
@@ -14,36 +15,18 @@ class UbcBsfFEPSEmissions(object):
     TODO: acknowledge original authors (STI?)
     """
 
-    # required executables
-    FEPS_EMISSIONS_BINARY = 'feps_emissions'
-    FEPS_OUTPUT_BINARY = 'feps_output'
-
     def __init__(self, **config):
         self._config = config
 
     def config(self, key):
         return self._config.get(key.lower, getattr(self, key))
-    
-    def loadHeat(self, plume_dir):
-        plumeFile = os.path.join(plume_dir, "plume.txt")
 
-        heat = {"flaming": [0],
-                "residual": [0],
-                "smoldering": [0],
-                "total": [0]}
-
-        #TODO: Investigate if this is the right kind of heat
-        for row in csv.DictReader(open(plumeFile, 'r'), skipinitialspace=True):
-            heat["total"][0] = heat["total"][0] + float(row["heat"])
-            heat["residual"][0] = heat["residual"][0] + float(row["heat"])
-
-        return heat
-
-    def run(self, fireLoc, working_dir, plume_dir):
-        consumptionFile = os.path.join(plume_dir, "cons.txt")
+    def run(self, fireLoc, working_dir):
+        consumptionFile = os.path.join(working_dir, "cons.txt")
+        self._write_consumption(fireLoc['consumption']['summary'],fireLoc,consumptionFile)
         totalEmissionsFile = os.path.join(working_dir, "total_emissions.txt")
 
-        emissionsArgs = [self.config("FEPS_EMISSIONS_BINARY"),
+        emissionsArgs = [FEPS_EMISSIONS_BINARY,
                         "-c", consumptionFile,
                         "-a", str(fireLoc["area"]),
                         "-o", totalEmissionsFile]
@@ -53,8 +36,18 @@ class UbcBsfFEPSEmissions(object):
 
         emissions = self.readEmissions(totalEmissionsFile)
 
-
         return emissions
+    
+    # NOTE: Assumes that consumption is in the UBC team's units of tons/acre
+    def _write_consumption(self, consumption, fire_location_info, filename):
+        f = open(filename, 'w')
+        f.write("cons_flm=%f\n" % (consumption["flaming"]))
+        f.write("cons_sts=%f\n" % (consumption["smoldering"]))
+        f.write("cons_lts=%f\n" % (consumption["residual"]))
+        # TODO: what to do if duff consumption isn't defined? is 0.0 appropriate?
+        f.write("cons_duff=%f\n" % (consumption.get("duff", 0.0)))
+        f.write("moist_duff=%f\n" % fire_location_info['moisture_duff'])
+        f.close()
 
     def readEmissions(self, filename):
         flaming = {}

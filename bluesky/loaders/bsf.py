@@ -96,6 +96,7 @@ class CsvFileLoader(BaseCsvFileLoader):
         super().__init__(**config)
         self._omit_nulls = config.get('omit_nulls')
         self._timeprofile_file = config.get('timeprofile_file')
+        self._load_consumption = config.get('load_consumption')
 
 
     def _marshal(self, data):
@@ -190,29 +191,39 @@ class CsvFileLoader(BaseCsvFileLoader):
         if row.get("type"):
             fire["type"] = row["type"].lower()
 
-        # Add consumption data if present. 
+        # Add consumption data if present and flag active. 
         # This was implemented for the Canadian version of the SmartFire system.
         # It is important to note that this consumption marshalling was done with only the Canadian format
         # in mind. If consumption is added to the input of the US system, further changes maybe required.
-        if row.get("consumption_flaming") is not None and row.get("consumption_smoldering") is not None \
-            and row.get("consumption_residual") is not None and row.get("consumption_duff") is not None:
+        if self._load_consumption:
+            flaming = 0
+            smold = 0
+            resid = 0
+            duff = 0
 
-            total_cons = get_optional_float(row.get("consumption_flaming")) + \
-            get_optional_float(row.get("consumption_smoldering")) + \
-            get_optional_float(row.get("consumption_residual")) + \
-            get_optional_float(row.get("consumption_duff"))
+            if row.get("consumption_flaming") is not None:
+                flaming = get_optional_float(row.get("consumption_flaming"))
+            if row.get("consumption_smoldering") is not None:
+                smold = get_optional_float(row.get("consumption_smoldering"))
+            if row.get("consumption_residual") is not None:
+                resid = get_optional_float(row.get("consumption_residual"))
+            if row.get("consumption_duff") is not None:
+                duff = get_optional_float(row.get("consumption_duff"))
 
-            consumption = {"flaming": [get_optional_float(row.get("consumption_flaming"))],
-            "residual": [get_optional_float(row.get("consumption_residual"))],
-            "smoldering": [get_optional_float(row.get("consumption_smoldering"))],
-            "duff": [get_optional_float(row.get("consumption_duff"))],
+            total_cons = flaming + smold + resid + duff
+
+            consumption = {"flaming": [flaming],
+            "residual": [resid],
+            "smoldering": [smold],
+            "duff": [duff],
             "total": [total_cons]
             }
 
-            self._consumption_values[fire_id] = consumption
-
+            self._consumption_values[fire["id"]] = consumption
 
         # TODO: other marshaling
+
+        return fire
 
     def _post_process_activity(self, fire):
         event_id = fire.get("event_of", {}).get("id")
