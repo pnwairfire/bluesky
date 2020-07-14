@@ -26,6 +26,9 @@ __version__ = "0.1.0"
 
 NO_MET_ERROR_MSG = "Specify met files to use in localmet"
 NO_ACTIVITY_ERROR_MSG = "Missing activity location data required for localmet"
+FAILED_TO_COMPILE_INPUT_ERROR_MSG = "Failed to compile input to run localmet profiler"
+NO_START_OR_END_ERROR_MSG = "Couldn't determine start and/or end time for localmet profiling"
+PROFILER_RUN_ERROR_MSG = "Failure in localmet profiling"
 
 def run(fires_manager):
     """Runs plumerise module
@@ -77,12 +80,10 @@ def run(fires_manager):
                     profiler_locations.append(p_loc)
 
     if len(locations) != len(profiler_locations):
-        raise RuntimeError(
-            "Failed to compile input to run localmet profiler")
+        raise RuntimeError(FAILED_TO_COMPILE_INPUT_ERROR_MSG)
 
     if not start_utc or not end_utc:
-        raise RuntimeError(
-            "Couldn't determine start and/or end time for localmet profiling")
+        raise RuntimeError(NO_START_OR_END_ERROR_MSG)
 
     arl_profiler = arlprofiler.ArlProfiler(fires_manager.met.get('files'),
         time_step=Config().get('localmet', 'time_step'))
@@ -93,7 +94,7 @@ def run(fires_manager):
         start_utc, end_utc, profiler_locations)
 
     if len(localmet) != len(locations):
-        raise RuntimeError("Failure in localmet profiling")
+        raise RuntimeError(PROFILER_RUN_ERROR_MSG)
 
     for i in range(len(localmet)):
         locations[i]['localmet'] = localmet[i]
