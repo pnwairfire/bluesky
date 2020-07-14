@@ -5,7 +5,7 @@ __author__ = "Joel Dubowy"
 import datetime
 
 from py.test import raises
-from met.arl import arlprofiler
+from met.arl import arlbulkprofiler
 
 from bluesky.config import defaults, Config
 from bluesky.exceptions import BlueSkyConfigurationError
@@ -74,7 +74,7 @@ _ARLP_ARGS = None
 _ARLP_KWARGS = None
 _ARLP_PROFILE_CALL_ARGS = None
 
-class MockArlProfiler(object):
+class MockArlBulkProfiler(object):
     def __init__(self, *args, **kwargs):
         global _ARLP_ARGS, _ARLP_KWARGS, _ARLP_PROFILE_CALL_ARGS
         _ARLP_ARGS = args
@@ -85,7 +85,7 @@ class MockArlProfiler(object):
         _ARLP_PROFILE_CALL_ARGS.append(args)
 
 def monkeypatch_arl_profiler(monkeypatch):
-    monkeypatch.setattr(arlprofiler, 'ArlProfiler', MockArlProfiler)
+    monkeypatch.setattr(arlbulkprofiler, 'ArlBulkProfiler', MockArlBulkProfiler)
 
 class TestLocalMetRun(object):
 
