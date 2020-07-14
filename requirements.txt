@@ -9,7 +9,7 @@ eflookup==3.2.2
 emitcalc==2.0.2
 fccsmap==2.1.0
 timeprofile==1.1.2
-met==1.2.5
+met==2.0.0
 plumerise==2.0.2
 blueskykml==2.4.3
 apps-consume==5.0.2
