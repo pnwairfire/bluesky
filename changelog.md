@@ -227,3 +227,7 @@
 ## 4.2.9
  - Add script for creating new version of bluesky
  - Bug fixes in writing of fire_events.csv
+
+## 4.2.10
+ - Update base loader and BSF loader to honor `skip_failures`
+ - Upgrade `met` package to `v2.0.0` and switch to using bulk localmet profiler
