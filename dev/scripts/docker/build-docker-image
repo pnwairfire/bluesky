@@ -78,6 +78,10 @@ def upload(tag_version):
         _call(['docker', 'login'])
         _call(['docker', 'push', 'pnwairfire/bluesky:latest'])
         _call(['docker', 'push', 'pnwairfire/bluesky:' + tag_version])
+    sys.stdout.write('Logout of hub.docker.com?: [Y/n]: ')
+    r = input().strip()
+    if not (r and r.lower() in ('n', 'no')):
+        _call(['docker', 'login'])
 
 if __name__ == "__main__":
     args = parse_args()
