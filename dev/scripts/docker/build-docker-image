@@ -75,6 +75,7 @@ def upload(tag_version):
     r = input().strip()
     if r and r.lower() in ('y', 'yes'):
         sys.stdout.write("Pushing to docker hub.\n")
+        _call(['docker', 'login'])
         _call(['docker', 'push', 'pnwairfire/bluesky:latest'])
         _call(['docker', 'push', 'pnwairfire/bluesky:' + tag_version])
 
