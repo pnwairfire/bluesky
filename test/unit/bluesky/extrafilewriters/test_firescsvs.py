@@ -100,7 +100,8 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                                 {
                                     "lat": 35.0,
                                     "lng": -96.2,
-                                    "area": 99
+                                    "area": 99,
+                                    "source": "GOES-16"
                                 }
                             ]
                         },
@@ -173,6 +174,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
 
         expected_fires_fields = [
             {
+                "source": "GOES-16",
                 "area": 99,
                 "canopy_consumption_pct": '',
                 'ch4': '',
@@ -225,6 +227,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'voc': ''
             },
             {
+                "source": "",
                 "area": 102,
                 "canopy_consumption_pct": 23.3,
                 'ch4': '',
@@ -277,6 +280,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'voc': ''
             },
             {
+                'source': "",
                 'area': 120.0,
                 "canopy_consumption_pct": 23.3,
                 'ch4': '',
@@ -460,6 +464,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
 
         expected_fires_fields = [
             {
+                "source": "",
                 "area": 99,
                 "canopy_consumption_pct": '',
                 'ch4': '',
@@ -512,6 +517,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'voc': ''
             },
             {
+                "source": "",
                 "area": 102,
                 "canopy_consumption_pct": 23.3,
                 'ch4': '',
@@ -564,6 +570,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'voc': ''
             },
             {
+                'source': "",
                 'area': 120.0,
                 "canopy_consumption_pct": 23.3,
                 'ch4': '',
@@ -774,6 +781,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
 
         expected_fires_fields = [
             {
+                "source": "",
                 "area": 99,
                 "canopy_consumption_pct": '',
                 'ch4': '',
@@ -826,6 +834,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'voc': ''
             },
             {
+                "source": "",
                 "area": 99,
                 "canopy_consumption_pct": '',
                 'ch4': '',
@@ -878,6 +887,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'voc': ''
             },
             {
+                "source": "",
                 "area": 200,
                 "canopy_consumption_pct": '',
                 'ch4': '',
@@ -930,6 +940,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'voc': ''
             },
             {
+                "source": "",
                 "area": 200,
                 "canopy_consumption_pct": '',
                 'ch4': '',
