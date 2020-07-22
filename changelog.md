@@ -231,3 +231,6 @@
 ## 4.2.10
  - Update base loader and BSF loader to honor `skip_failures`
  - Upgrade `met` package to `v2.0.0` and switch to using bulk localmet profiler
+
+ ## 4.2.11
+ - Include source in fire_locations.csv
