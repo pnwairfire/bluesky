@@ -239,3 +239,6 @@
  - Add fuelbed_fractions to fire_locations.csv
  - Update fuelbeds module to support forcing use of AK FCCS fuelbed map
  - Dev script updates
+
+## 4.2.13
+ - Update fires csv writer to not fail on integer fccs_id values
