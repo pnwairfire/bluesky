@@ -234,3 +234,8 @@
 
  ## 4.2.11
  - Include source in fire_locations.csv
+
+## 4.2.12
+ - Add fuelbed_fractions to fire_locations.csv
+ - Update fuelbeds module to support forcing use of AK FCCS fuelbed map
+ - Dev script updates
