@@ -52,7 +52,7 @@ def _get_fuelbed_fractions(fire, loc):
             key=lambda fb: fb.get('pct', 0.0), reverse=True)
         fuelbed_fractions = ''
         for fb in fuelbeds:
-            fuelbed_fractions += fb["fccs_id"] + ' ' + str(round(fb['pct']/100,2)) + '; '
+            fuelbed_fractions += str(fb["fccs_id"]) + ' ' + str(round(fb['pct']/100,2)) + '; '
         return fuelbed_fractions.rstrip("; ")
 
 def _get_heat(fire, loc):
