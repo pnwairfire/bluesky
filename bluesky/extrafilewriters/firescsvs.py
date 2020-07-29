@@ -44,6 +44,17 @@ def _pick_representative_fuelbed(fire, loc):
             key=lambda fb: fb.get('pct', 0.0), reverse=True)
         return fuelbeds[0]['fccs_id']
 
+def _get_fuelbed_fractions(fire, loc):
+    fuelbeds = [f for f in loc.get('fuelbeds', [])
+        if hasattr(f.get('pct', 0.0), 'real') and f.get('fccs_id')]
+    if fuelbeds:
+        fuelbeds = sorted(fuelbeds,
+            key=lambda fb: fb.get('pct', 0.0), reverse=True)
+        fuelbed_fractions = ''
+        for fb in fuelbeds:
+            fuelbed_fractions += fb["fccs_id"] + ' ' + str(round(fb['pct']/100,2)) + '; '
+        return fuelbed_fractions.rstrip("; ")
+
 def _get_heat(fire, loc):
     if loc.get('fuelbeds'):
         heat = [fb.get('heat', {}).get('total') for fb in loc['fuelbeds']]
@@ -127,6 +138,7 @@ FIRE_LOCATIONS_CSV_FIELDS = (
         ('date_time', lambda f, loc: datetime_parsing.parse(loc['start']).strftime(BLUESKYKML_DATE_FORMAT)),
         ('event_name', lambda f, loc: f.get('event_of', {}).get('name')),
         ('fccs_number', _pick_representative_fuelbed),
+        ('fuelbed_fractions', _get_fuelbed_fractions),
 
         # TDOO: add 'VEG'? (Note: sf2 has 'veg' field, but
         #   it seems to be a fuelbed discription which is probably for

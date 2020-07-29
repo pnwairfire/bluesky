@@ -191,6 +191,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'event_id': '',
                 'event_name': '',
                 'fccs_number': '',
+                'fuelbed_fractions': '',
                 'heat': '',
                 'id': 'SF11C14225236095807750',
                 "latitude": 35.0,
@@ -244,6 +245,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'event_id': '',
                 'event_name': '',
                 'fccs_number': '',
+                'fuelbed_fractions': '',
                 'heat': '',
                 'id': 'SF11C14225236095807750',
                 "latitude": 30.0,
@@ -297,6 +299,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'event_id': '',
                 'event_name': '',
                 'fccs_number': '9',
+                'fuelbed_fractions': '9 1.0',
                 'heat': 64442794218.7609,
                 'id': 'SF11C14225236095807750',
                 'latitude': 47.41,
@@ -448,6 +451,74 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                                         ],
                                         "lat": 47.41,
                                         "lng": -121.41
+                                    },
+                                    {
+                                        "area": 120.0,
+                                        "rain_days": 8,
+                                        "slope": 20.0,
+                                        "snow_month": 5,
+                                        "sunrise_hour": 4,
+                                        "sunset_hour": 19,
+                                        "consumption": {
+                                            "summary": {
+                                                "flaming": 1311.2071801109494,
+                                                "residual": 1449.3962581338644,
+                                                "smoldering": 1267.0712004277434,
+                                                "total": 4027.6746386725567
+                                            }
+                                        },
+                                        "fuelbeds": [
+                                            {
+                                                "emissions": {
+                                                    "flaming": {
+                                                        "PM2.5": [9.545588271207714]
+                                                    },
+                                                    "residual": {
+                                                        "PM2.5": [24.10635856528243]
+                                                    },
+                                                    "smoldering": {
+                                                        "PM2.5": [21.073928205514225]
+                                                    },
+                                                    "total": {
+                                                        "PM2.5": [54.725875042004375]
+                                                    }
+                                                },
+                                                "fccs_id": "9",
+                                                "heat": {
+                                                    "flaming": [20979314881.77519],
+                                                    "residual": [23190340130.141827],
+                                                    "smoldering": [20273139206.843895],
+                                                    "total": [64442794218.7609]
+                                                },
+                                                "pct": 40.0
+                                            },
+                                            {
+                                                "emissions": {
+                                                    "flaming": {
+                                                        "PM2.5": [0]
+                                                    },
+                                                    "residual": {
+                                                        "PM2.5": [0]
+                                                    },
+                                                    "smoldering": {
+                                                        "PM2.5": [0]
+                                                    },
+                                                    "total": {
+                                                        "PM2.5": [10]
+                                                    }
+                                                },
+                                                "fccs_id": "52",
+                                                "heat": {
+                                                    "flaming": [0],
+                                                    "residual": [0],
+                                                    "smoldering": [0],
+                                                    "total": [0]
+                                                },
+                                                "pct": 60.0
+                                            }
+                                        ],
+                                        "lat": 47.41,
+                                        "lng": -121.41
                                     }
                                 ],
                                 "state": "WA"
@@ -481,6 +552,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'event_id': 'bigeventid',
                 'event_name': '',
                 'fccs_number': '',
+                'fuelbed_fractions': '',
                 'heat': '',
                 'id': 'SF11C14225236095807750',
                 "latitude": 35.0,
@@ -534,6 +606,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'event_id': 'bigeventid',
                 'event_name': 'big event name',
                 'fccs_number': '',
+                'fuelbed_fractions': '',
                 'heat': '',
                 'id': 'SF11C14225236095807750-B',
                 "latitude": 30.0,
@@ -587,6 +660,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'event_id': 'bigeventid',
                 'event_name': 'big event name',
                 'fccs_number': '9',
+                'fuelbed_fractions': '9 1.0',
                 'heat': 64442794218.7609,
                 'id': 'SF11C14225236095807750-B',
                 'latitude': 47.41,
@@ -621,6 +695,60 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'type': 'WF',
                 'utc_offset': '-07:00',
                 'voc': ''
+            },
+            {
+                'source': "",
+                'area': 120.0,
+                "canopy_consumption_pct": 23.3,
+                'ch4': '',
+                'co': '',
+                'co2': '',
+                'consumption_flaming': 1311.2071801109494,
+                'consumption_residual': 1449.3962581338644,
+                'consumption_smoldering': 1267.0712004277434,
+                'consumption_total': 4027.6746386725567,
+                'country': '',
+                'county': '',
+                'date_time': '20150804',
+                'elevation': '',
+                'event_id': 'bigeventid',
+                'event_name': 'big event name',
+                'fccs_number': '52',
+                'fuelbed_fractions': '52 0.6; 9 0.4',
+                'heat': 64442794218.7609,
+                'id': 'SF11C14225236095807750-B',
+                'latitude': 47.41,
+                'longitude': -121.41,
+                'max_humid': '',
+                'max_temp': '',
+                'max_temp_hour': '',
+                'max_wind': '',
+                'max_wind_aloft': '',
+                'min_humid': '',
+                'min_temp': '',
+                'min_temp_hour': '',
+                'min_wind': 34,
+                'min_wind_aloft': '',
+                'moisture_100hr': '',
+                'moisture_10hr': '',
+                'moisture_1hr': '',
+                'moisture_1khr': '',
+                'moisture_duff': '',
+                'moisture_live': '',
+                'nh3': '',
+                'nox': '',
+                'pm10': '',
+                'pm2.5': 64.725875042004375,
+                'rain_days': 8.0,
+                'slope': 20.0,
+                'snow_month': 5.0,
+                'so2': '',
+                'state': 'WA',
+                'sunrise_hour': 4.0,
+                'sunset_hour': 19.0,
+                'type': 'WF',
+                'utc_offset': '-07:00',
+                'voc': ''
             }
         ]
 
@@ -633,7 +761,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
         expected_events_fields = {
             'bigeventid': {
                 'name':'big event name',
-                'total_area': 321.0,
+                'total_area': 441.0,
                 'total_ch4': None,
                 'total_co': None,
                 'total_co2': None,
@@ -798,6 +926,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'event_id': 'bigeventid',
                 'event_name': '',
                 'fccs_number': '',
+                'fuelbed_fractions': '',
                 'heat': '',
                 'id': 'SF11C14225236095807750',
                 "latitude": 35.0,
@@ -851,6 +980,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'event_id': 'bigeventid',
                 'event_name': '',
                 'fccs_number': '',
+                'fuelbed_fractions': '',
                 'heat': '',
                 'id': 'SF11C14225236095807750',
                 "latitude": 35.0,
@@ -904,6 +1034,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'event_id': 'bigeventid',
                 'event_name': 'foo-event',
                 'fccs_number': '',
+                'fuelbed_fractions': '',
                 'heat': '',
                 'id': 'SF11C14225236095807750',
                 "latitude": 35.5,
@@ -957,6 +1088,7 @@ class TestFiresCsvsWriterCollectCsvFields(object):
                 'event_id': 'bigeventid',
                 'event_name': 'foo-event',
                 'fccs_number': '',
+                'fuelbed_fractions': '',
                 'heat': '',
                 'id': 'SF11C14225236095807750',
                 "latitude": 35.5,
