@@ -114,7 +114,7 @@ class ComputeFunction(object):
             #TODO: Investigate if this is the right kind of heat
             for row in csv.DictReader(open(plumeFile, 'r'), skipinitialspace=True):
                 heat["total"][0] = heat["total"][0] + float(row["heat"])
-                heat["residual"][0] = heat["residual"][0] + float(row["heat"])
+                heat["flaming"][0] = heat["flaming"][0] + float(row["heat"])
 
             return heat
 
