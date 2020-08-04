@@ -1,2 +1,0 @@
-"""bluesky.persisters
-"""
