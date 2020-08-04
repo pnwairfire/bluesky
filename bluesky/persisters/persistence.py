@@ -21,14 +21,12 @@ class Persistence(object):
     def _fill_missing_fires(self, fires_manager):
         """Fill-in (persist) that do not extend to the end of the emissions period"""
         n_created = 0
-        first_hour, num_hours = self._get_time(fires_manager)
-        last_hour = first_hour + timedelta(hours=num_hours)
-        # last_hour = Config().get('filter','time','end')
-        fire_events = {}
+        last_hour = Config().get('growth', 'forecast_end')
 
         # This is to ensure we are not double counting any fires.
         # Future fires that already exist (have an event_id) will
         # not have past data persisted overtop of the existing data
+        # fire_events = {}
         # for fire in fires_manager.fires:
         #     event = fire["event_of"]["id"]
         #     start = fire["activity"][0]["active_areas"][0]["start"]
@@ -37,12 +35,10 @@ class Persistence(object):
         #     else:
         #         fire_events[event].append(start)
 
-
-
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
                 aa = fire["activity"]
-                event = fire["event_of"]["id"]
+                # event = fire["event_of"]["id"]
                 if len(aa) != 1:
                     raise ValueError("Each fire must have only 1 activity object when running persistence")
                 if len(aa[0]["active_areas"]) != 1:
@@ -88,25 +84,3 @@ class Persistence(object):
         
         for fire in fires_for_deletion:
             fires_manager.remove_fire(fire)
-
-    def _get_time(self, fires_manager):
-        SECONDS_PER_HOUR = 3600
-        start = Config().get('dispersion', 'start')
-        num_hours = Config().get('dispersion', 'num_hours')
-
-        if not start or num_hours is None:
-            s = fires_manager.earliest_start # needed for 'start' and 'num_hours'
-            if not s:
-                raise ValueError("Unable to determine dispersion 'start'")
-            if not start:
-                start = s
-
-            if not num_hours and start == s:
-                e = fires_manager.latest_end # needed only for num_hours
-                if e and e > s:
-                    num_hours = int((e - s).total_seconds() / SECONDS_PER_HOUR)
-            if not num_hours:
-                raise ValueError("Unable to determine dispersion 'num_hours'")
-
-        logging.debug("Dispersion window: %s for %s hours", start, num_hours)
-        return start, num_hours

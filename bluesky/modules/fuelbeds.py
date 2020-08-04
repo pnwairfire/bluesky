@@ -39,7 +39,7 @@ def run(fires_manager):
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             for aa in fire.active_areas:
-                lookup = FCCS_LOOKUPS[aa.get('state')]
+                lookup = FCCS_LOOKUPS['AK'] if Config().get('fuelbeds', 'use_alaska') else FCCS_LOOKUPS[aa.get('state')]
 
                 # Note that aa.locations validates that each location object
                 # has either lat+lng+area or polygon

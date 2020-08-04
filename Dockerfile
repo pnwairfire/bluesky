@@ -86,6 +86,7 @@ COPY bin/hycs_std /usr/local/bin/hycs_std
 COPY bin/hyts_std /usr/local/bin/hyts_std
 COPY bin/hysplit2netcdf /usr/local/bin/hysplit2netcdf
 COPY bin/profile /usr/local/bin/profile
+COPY bin/bulk_profiler_csv /usr/local/bin/bulk_profiler_csv
 COPY bin/vsmkgs /usr/local/bin/vsmkgs
 COPY bin/vsmoke /usr/local/bin/vsmoke
 

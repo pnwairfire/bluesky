@@ -90,8 +90,10 @@ _DEFAULTS = {
         "truncation_percentage_threshold": 90.0,
         "truncation_count_threshold": 5,
         # Allow summed fuel percentages to be between 99.5% and 100.5%
-        "total_pct_threshold": 0.5
-
+        "total_pct_threshold": 0.5,
+        # Force use of AK fuelbed lookup; useful if all fires
+        # are known to be in AK, but none define 'state'
+        "use_alaska": False
     },
     "consumption": {
         "fuel_loadings": {},
@@ -158,10 +160,8 @@ _DEFAULTS = {
         "include_emissions_details": False,
         "species": [],
         "fuel_loadings": {},
-        "feps-can": {
-                "working_dir": None,
-                "FEPS_EMISSIONS_BINARY": "feps_emissions",
-                "FEPS_OUTPUT_BINARY": "feps_output"
+        "ubc-bsf-feps": {
+                "working_dir": None
             }
     },
     "findmetdata": {
@@ -190,13 +190,21 @@ _DEFAULTS = {
         "time_step": 1
     },
     "timeprofile": {
-        "hourly_fractions": None
+        "hourly_fractions": None,
+        "model": "default",
+        "ubc-bsf-feps": {
+            "INTERPOLATION_TYPE": 1,
+            "NORMALIZE": True,
+            "working_dir": None
+        }
     },
 
     "plumerise": {
         "model": "feps",
         "feps": {
-            "working_dir": None
+            "working_dir": None,
+            "consumption_in_tons_per_acre": False,
+            "load_heat": False
             # The following defaults are defined in the plumerise
             # package, so we won't set them here
             # "feps_weather_binary": "feps_weather",

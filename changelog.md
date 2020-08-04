@@ -227,3 +227,18 @@
 ## 4.2.9
  - Add script for creating new version of bluesky
  - Bug fixes in writing of fire_events.csv
+
+## 4.2.10
+ - Update base loader and BSF loader to honor `skip_failures`
+ - Upgrade `met` package to `v2.0.0` and switch to using bulk localmet profiler
+
+ ## 4.2.11
+ - Include source in fire_locations.csv
+
+## 4.2.12
+ - Add fuelbed_fractions to fire_locations.csv
+ - Update fuelbeds module to support forcing use of AK FCCS fuelbed map
+ - Dev script updates
+
+## 4.2.13
+ - Update fires csv writer to not fail on integer fccs_id values
