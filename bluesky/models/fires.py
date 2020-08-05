@@ -211,12 +211,13 @@ class FiresManager(object):
 
     def __init__(self):
         self._meta = {}
-        self._initialize_today()
         # configuration no longer initialized here
         self.modules = []
         self.fires = [] # this intitializes self._fires and self._num_fires
         self._num_fires = 0
-        self._initialize_run_id()
+        # call setters for today and run_id, to trigger setting in Config()
+        self.today = datetimeutils.today_utc()
+        self.run_id = str(uuid.uuid4())
 
     ##
     ## Importing
@@ -317,52 +318,25 @@ class FiresManager(object):
 
     ## today
 
-    def _initialize_today(self):
-        self._manually_set_today = False
-        self._processed_today = True
-        self._today = datetimeutils.today_utc()
-        Config().set_today(self._today)
-
     @property
     def today(self):
-        if not self._processed_today:
-            self._today = datetimeutils.fill_in_datetime_strings(self._today)
-            self._today = datetimeutils.to_datetime(self._today)
-            self._processed_today = True
-
         return self._today
 
     @today.setter
     def today(self, today):
-        self._processed_today = False
+        today = datetimeutils.fill_in_datetime_strings(today)
+        today = datetimeutils.to_datetime(today)
         self._today = today
-
-        # HACK (sort of): we need to call self.today to trigger replacement
-        #   of wildcards and then converstion to datetime object (that's a
-        #   hack), but we need to access it anyway to set in Config
-        Config().set_today(self.today)
-
-        self._manually_set_today = True
+        Config().set_today(self._today)
 
     ## run_id
-
-    def _initialize_run_id(self):
-        self._manually_set_run_id = False
-        # default to guid, but manual set will still be allowed
-        self._run_id = str(uuid.uuid4())
-        Config().set_run_id(self._run_id)
 
     @property
     def run_id(self):
         return self._run_id
 
-    RUN_ID_IS_IMMUTABLE_MSG = "Run id is immutible"
     @run_id.setter
     def run_id(self, run_id):
-        if self._manually_set_run_id:
-            raise TypeError(self.RUN_ID_IS_IMMUTABLE_MSG)
-
-        self._manually_set_run_id = True
         logging.debug('filling in run_id wildcards')
         self._run_id = datetimeutils.fill_in_datetime_strings(
             run_id, today=self.today)
@@ -668,12 +642,6 @@ class FiresManager(object):
             self.run_id = run_id
 
         self._meta = input_dict
-
-
-        # HACK: access 'today' to trigger replacement of wildcards or
-        # setting of defaults
-        # self._processed_today = False
-        # self.today
 
     def loads(self, input_stream=None, input_file=None, subsequent_input=False):
         """Loads json-formatted fire data, creating list of Fire objects and
