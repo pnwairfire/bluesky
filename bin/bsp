@@ -43,10 +43,10 @@ OPTIONAL_ARGS = [
     {
         'short': '-i',
         'long': '--input-file',
-        'dest': 'input_file',
-        'help': 'input file comtaining JSON formatted fire data',
-        'action': "store",
-        'default': None
+        'dest': 'input_files',
+        'help': 'input file(s) comtaining JSON formatted fire data',
+        'action': "append",
+        'default': []
     },
     {
         'short': '-n',
@@ -248,16 +248,16 @@ def validate_args(args):
     # from file, 3) --no-input.  There's extra logic here to return error
     # messages specific to each bad combination
     is_po = is_piped_input()
-    if is_po and args.no_input and args.input_file:
+    if is_po and args.no_input and args.input_files:
         exit_with_msg("Specify '-n'/'--no-input' or "
             "'-i'/'--input-file', or pipe input - not all three.")
-    elif args.no_input and args.input_file:
+    elif args.no_input and args.input_files:
         exit_with_msg("Options '-n'/'--no-input' and "
             "'-i'/'--input-file' can't be specified simultaneously")
     elif args.no_input and is_po:
         exit_with_msg("Option '-n'/'--no-input' can't be "
             "specified if there's piped input")
-    elif args.input_file and is_po:
+    elif args.input_files and is_po:
         exit_with_msg("Option '-i'/'--input-file' can't be "
             "specified if there's piped input")
 
@@ -329,14 +329,15 @@ def setup(args):
     logging.summary("BlueSky v%s", __version__)
     # Log input file and output file in SUMMARY messages, and skip
     # them in scripting_args.output_args (which uses INFO level messages)
-    logging.summary("Input File: %s", args.input_file)
+    logging.summary("Input File(s): %s", ', '.join(args.input_files))
     logging.summary("Output File: %s", args.output_file)
     scripting_args.output_args(args, skip=['input_file', 'output_file'])
     #afscripting.utils.log_config(args.config_options)
 
     # Note: Calling code handles exception
     if not args.no_input:
-        fires_manager.loads(input_file=args.input_file)
+        for i, f in enumerate(args.input_files):
+            fires_manager.loads(input_file=f, subsequent_input=(i>0))
 
     set_modules(args, fires_manager)
 

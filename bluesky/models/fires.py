@@ -647,16 +647,17 @@ class FiresManager(object):
 
     ## Loading data
 
-    def load(self, input_dict):
+    def load(self, input_dict, subsequent_input=False):
         if not hasattr(input_dict, 'keys'):
             raise ValueError("Invalid fire data")
 
         # wipe out existing list of modules, if any
         self.modules = input_dict.pop('modules', [])
 
-        # wipe out existing fires, if any
-        self.fires = (input_dict.pop('fires', [])
+        # wipe out existing fires, if any, if subsequent_input==False
+        new_fires = (input_dict.pop('fires', [])
             or input_dict.pop('fire_information', []))
+        self.fires = self.fires + new_fires if subsequent_input else new_fires
 
         # pop config, but don't set until after today has been set
         if 'config' in input_dict:
@@ -682,7 +683,7 @@ class FiresManager(object):
         # self._processed_today = False
         # self.today
 
-    def loads(self, input_stream=None, input_file=None):
+    def loads(self, input_stream=None, input_file=None, subsequent_input=False):
         """Loads json-formatted fire data, creating list of Fire objects and
         storing other fields in self.meta.
         """
@@ -691,7 +692,7 @@ class FiresManager(object):
         if not input_stream:
             input_stream = self._stream(input_file, 'r')
         data = json.loads(''.join([d for d in input_stream]))
-        return self.load(data)
+        return self.load(data, subsequent_input=subsequent_input)
 
     ## Dumping data
 
