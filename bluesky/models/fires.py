@@ -355,7 +355,7 @@ class FiresManager(object):
     ## run_id
 
     def _initialize_run_id(self):
-        self._maually_set_run_id = False
+        self._manually_set_run_id = False
         # default to guid, but manual set will still be allowed
         self._run_id = str(uuid.uuid4())
         Config().set_run_id(self._run_id)
@@ -367,10 +367,10 @@ class FiresManager(object):
     RUN_ID_IS_IMMUTABLE_MSG = "Run id is immutible"
     @run_id.setter
     def run_id(self, run_id):
-        if self._maually_set_run_id:
+        if self._manually_set_run_id:
             raise TypeError(self.RUN_ID_IS_IMMUTABLE_MSG)
 
-        self._maually_set_run_id = True
+        self._manually_set_run_id = True
         logging.debug('filling in run_id wildcards')
         self._run_id = datetimeutils.fill_in_datetime_strings(
             run_id, today=self.today)
