@@ -394,7 +394,7 @@ class TestPlumeRiseRunSev(object):
         plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
         assert _PR_COMPUTE_CALL_ARGS == []
 
     def test_one_fire(self, reset_config, monkeypatch):
@@ -404,7 +404,7 @@ class TestPlumeRiseRunSev(object):
         plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
         loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
         loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
         assert _PR_COMPUTE_CALL_ARGS == [
