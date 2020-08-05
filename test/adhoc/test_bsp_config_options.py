@@ -157,7 +157,7 @@ logging.basicConfig(level=logging.INFO)
 logging.info("actual:   {}".format(actual))
 logging.info("expected: {}".format(EXPECTED))
 today = actual.pop('today')
-assert today == datetime.datetime.utcnow().strftime('%Y-%m-%d') #T00:00:00')
+assert today == datetime.datetime.utcnow().strftime('%Y-%m-%dT00:00:00')
 #assert actual == EXPECTED
 assert set(actual.keys()) == set(['run_config', 'fires', 'run_id', 'counts', 'bluesky_version'])
 assert actual['fires'] == EXPECTED['fires']
