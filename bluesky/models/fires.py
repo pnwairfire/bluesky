@@ -332,23 +332,15 @@ class FiresManager(object):
 
         return self._today
 
-    TODAY_IS_IMMUTABLE_MSG = "'today' is immutible"
     @today.setter
     def today(self, today):
-        previous_today = self.today
         self._processed_today = False
         self._today = today
+
         # HACK (sort of): we need to call self.today to trigger replacement
         #   of wildcards and then converstion to datetime object (that's a
         #   hack), but we need to access it anyway to set in Config
-        new_today = self.today
-
-        # now that today is sure to be a datetime object, make sure that,
-        # if previously manually set, the two values are the same
-        if self._manually_set_today and previous_today != new_today:
-            raise TypeError(self.TODAY_IS_IMMUTABLE_MSG)
-
-        Config().set_today(new_today)
+        Config().set_today(self.today)
 
         self._manually_set_today = True
 

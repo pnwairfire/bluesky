@@ -870,22 +870,37 @@ class TestFiresManagerSettingToday(object):
         fires_manager.today = datetime.date(2017,10,1)
         assert fires_manager.today == datetime.datetime(2017,10,1)
 
-    def test_is_immutable(self, reset_config):
+    def test_is_mutable(self, reset_config):
         fires_manager = fires.FiresManager()
-        fires_manager.today = datetime.datetime(2017,10,1)
 
-        # ok to set to same val
+        # set to something other than UTC today (which is default)
         fires_manager.today = datetime.datetime(2017,10,1)
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+        # set to same date (as datetime, date, and string objects)
+
+        fires_manager.today = datetime.datetime(2017,10,1)
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
         fires_manager.today = datetime.date(2017,10,1)
-        fires_manager.today = "2017-10-01"
+        assert fires_manager.today == datetime.datetime(2017,10,1)
 
-        # not ok to change
-        with raises(TypeError) as e_info:
-            fires_manager.today = datetime.datetime(2017,10,2)
-        assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
-        with raises(TypeError) as e_info:
-            fires_manager.today = datetime.date(2017,10,3)
-        assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
-        with raises(TypeError) as e_info:
-            fires_manager.today = "2017-10-04"
-        assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
+        fires_manager.today = "2017-10-01T00:00:00"
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+        fires_manager.today = "2017-10-01"
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+        # set to different dates (as datetime, date, and string objects)
+
+        fires_manager.today = datetime.datetime(2017,10,2)
+        assert fires_manager.today == datetime.datetime(2017,10,2)
+
+        fires_manager.today = datetime.date(2017,10,3)
+        assert fires_manager.today == datetime.datetime(2017,10,3)
+
+        fires_manager.today = "2017-10-04T00:00:00"
+        assert fires_manager.today == datetime.datetime(2017,10,4)
+
+        fires_manager.today = "2017-10-05"
+        assert fires_manager.today == datetime.datetime(2017,10,5)
