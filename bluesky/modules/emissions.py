@@ -7,6 +7,7 @@ import copy
 import itertools
 import logging
 import sys
+import os
 
 from emitcalc import __version__ as emitcalc_version
 from emitcalc.calculator import EmissionsCalculator
@@ -20,6 +21,7 @@ from bluesky import datautils, datetimeutils
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.io import capture_stdout
+from bluesky.emitters.ubcbsffeps import UbcBsfFEPSEmissions
 
 from bluesky.consumeutils import (
     _apply_settings, FuelLoadingsManager, FuelConsumptionForEmissions,
@@ -110,6 +112,56 @@ class EmissionsBase(object, metaclass=abc.ABCMeta):
     def run(self, fires):
         pass
 
+##
+## FEPS for Canadian Smartfire
+##
+
+class UbcBsfFeps(EmissionsBase):
+    # TODO: Add "Included Emissions Details" functionality
+
+    def __init__(self, fire_failure_handler):
+        super(UbcBsfFeps, self).__init__(fire_failure_handler)
+        model = Config().get('emissions', 'model').lower()
+        config = Config().get('emissions', model)
+        self.emitter = UbcBsfFEPSEmissions(**config)
+
+    def run(self, fires):
+        logging.info("Running emissions module UbcBsfFeps EFs")
+
+        for fire in fires:
+            with self.fire_failure_handler(fire):
+                self._run_on_fire(fire)
+    
+    def _get_working_dir(self, fire):
+        model = Config().get('emissions', 'model').lower()
+        config = Config().get('emissions', model)
+        if config.get('working_dir'):
+            working_dir = os.path.join(config['working_dir'],
+                "feps-emissions-{}".format(fire.id))
+            if not os.path.exists(working_dir):
+                os.makedirs(working_dir)
+            return working_dir
+
+    #CONVERSION_FACTOR = 0.0005 # 1.0 ton / 2000.0 lbs
+
+    def _run_on_fire(self, fire):
+        working_dir = self._get_working_dir(fire)
+        if 'activity' not in fire:
+            raise ValueError(
+                "Missing activity data required for computing Canadian emissions")
+        for aa in fire.active_areas:
+            for loc in aa.locations:
+                if "consumption" not in loc:
+                    raise ValueError(
+                        "Missing consumption data required for computing Canadian emissions")
+                if 'fuelbeds' not in loc:
+                    raise ValueError(
+                        "Fuelbeds should be made in bsf load module before computing Canadian emissions")
+                if len(loc["fuelbeds"]) != 1:
+                    raise ValueError(
+                        "Each fuelbed array should only have one entry when running Canadian emissions")
+                loc["fuelbeds"][0]["emissions"] = self.emitter.run(loc,working_dir)
+                
 
 ##
 ## FEPS

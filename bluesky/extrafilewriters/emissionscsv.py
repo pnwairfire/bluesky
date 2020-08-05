@@ -96,7 +96,7 @@ class EmissionsCsvWriter(object):
             "fire_id": fire.get('id', ''),
             "hour": str(i),
             "ignition_date_time": '', # TODO: fill in
-            "date_time": ts + utc_offset,
+            "date_time": ts + str(utc_offset),
             "area_fract": tp['area_fraction'],
             "flame_profile": tp['flaming'],
             "smolder_profile": tp['smoldering'],

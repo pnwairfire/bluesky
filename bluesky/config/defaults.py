@@ -159,7 +159,10 @@ _DEFAULTS = {
         "model": "prichard-oneill",
         "include_emissions_details": False,
         "species": [],
-        "fuel_loadings": {}
+        "fuel_loadings": {},
+        "ubc-bsf-feps": {
+                "working_dir": None
+            }
     },
     "findmetdata": {
         "met_root_dir": None,
@@ -187,13 +190,21 @@ _DEFAULTS = {
         "time_step": 1
     },
     "timeprofile": {
-        "hourly_fractions": None
+        "hourly_fractions": None,
+        "model": "default",
+        "ubc-bsf-feps": {
+            "INTERPOLATION_TYPE": 1,
+            "NORMALIZE": True,
+            "working_dir": None
+        }
     },
 
     "plumerise": {
         "model": "feps",
         "feps": {
-            "working_dir": None
+            "working_dir": None,
+            "consumption_in_tons_per_acre": False,
+            "load_heat": False
             # The following defaults are defined in the plumerise
             # package, so we won't set them here
             # "feps_weather_binary": "feps_weather",
