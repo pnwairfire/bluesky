@@ -641,7 +641,7 @@ class FiresManager(object):
         if run_id:
             self.run_id = run_id
 
-        self._meta = input_dict
+        self._meta.update(input_dict)
 
     def loads(self, input_stream=None, input_file=None, append_fires=False):
         """Loads json-formatted fire data, creating list of Fire objects and
