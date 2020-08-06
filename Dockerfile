@@ -79,7 +79,9 @@ RUN pip3 install --extra-index https://pypi.airfire.org/simple \
 
 # Install binary dependencies - for localmet, plumerise,
 # dipersion, and visualization
+COPY bin/feps_emissions /usr/local/bin/feps_emissions
 COPY bin/feps_plumerise /usr/local/bin/feps_plumerise
+COPY bin/feps_timeprofile /usr/local/bin/feps_timeprofile
 COPY bin/feps_weather /usr/local/bin/feps_weather
 COPY bin/hycm_std /usr/local/bin/hycm_std
 COPY bin/hycs_std /usr/local/bin/hycs_std
