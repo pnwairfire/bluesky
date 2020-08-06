@@ -193,8 +193,8 @@ _DEFAULTS = {
         "hourly_fractions": None,
         "model": "default",
         "ubc-bsf-feps": {
-            "INTERPOLATION_TYPE": 1,
-            "NORMALIZE": True,
+            "interpolation_type": 1,
+            "normalize": True,
             "working_dir": None
         }
     },
