@@ -319,6 +319,8 @@ def set_config(args, fires_manager):
 
 def setup(args):
     fires_manager = models.fires.FiresManager()
+    # Set today first of two times. Setting here is so that config data
+    # timestamp wildcards are filled in
     if args.today:
         fires_manager.today = args.today
 
@@ -341,14 +343,15 @@ def setup(args):
 
     set_modules(args, fires_manager)
 
-    # run_id must be specified after the call to loads (as opposed to when
-    # instantiatiing fires_manager) - otherwise, loads will delete it
-    # (since loads wipes fires_manager and then populates it from scratch).
-    # If run_id is defined in both the input file and in args.run_id, an
-    # exception will be raised, since run_id can only be set once (with the
-    # exception of being able to be reset in or after a call to loads).
+    # If either run_id or today is defined in both the input file and in
+    # args, what's in args will overwrite what's in the input file,
+    # set args.today a second time, in case first setting was overwriten
+    # by one of the input files
+    if args.today:
+        fires_manager.today = args.today
     if args.run_id:
         fires_manager.run_id = args.run_id
+
     return fires_manager
 
 ##
