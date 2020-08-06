@@ -102,7 +102,7 @@ class ComputeFunction(object):
                 if not os.path.exists(working_dir):
                     os.makedirs(working_dir)
                 return working_dir
-        
+
         def _loadHeat(plume_dir):
             plumeFile = os.path.join(plume_dir, "plume.txt")
 
@@ -151,7 +151,7 @@ class ComputeFunction(object):
                         # just set them both, even if one is already set
                         loc["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
                         loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
-                    
+
                     consumption = copy.deepcopy(loc['consumption']['summary'])
 
                     if config.get("consumption_in_tons_per_acre"):

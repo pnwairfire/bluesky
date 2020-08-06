@@ -37,7 +37,7 @@ class UbcBsfFEPSEmissions(object):
         emissions = self.readEmissions(totalEmissionsFile)
 
         return emissions
-    
+
     # NOTE: Assumes that consumption is in the UBC team's units of tons/acre
     def _write_consumption(self, consumption, fire_location_info, filename):
         f = open(filename, 'w')
@@ -63,7 +63,7 @@ class UbcBsfFEPSEmissions(object):
                 "Smold": "smoldering",
                 "Resid": "residual",
                 "Total": "total"}
-        
+
         def loadArrays(v, p, x):
             v[phases[p]][x] = [float(row[x])]
             return v
@@ -79,5 +79,5 @@ class UbcBsfFEPSEmissions(object):
             emissions = loadArrays(emissions,p,"NH3")
             emissions = loadArrays(emissions,p,"SO2")
             emissions = loadArrays(emissions,p,"VOC")
-    
+
         return emissions

@@ -16,7 +16,7 @@ FEPS_WEATHER_BINARY = "feps_weather"
 FEPS_TIMEPROFILE_BINARY = "feps_timeprofile"
 
 class UbcBsfFEPSTimeProfiler(object):
-    """ FEPS Time Profile Module 
+    """ FEPS Time Profile Module
 
     FEPSTimeProfile was copied from BlueSky Framework, and subsequently modified
     TODO: acknowledge original authors (STI?)
@@ -118,7 +118,7 @@ class UbcBsfFEPSTimeProfiler(object):
             i = i + 1
 
         return time_profile
-    
+
     # The next 2 methods were copied from AirFire with some modifications
     def _get_diurnal_file(self, active_area, fire_location_info, working_dir):
         self._fill_fire_location_info(active_area, fire_location_info)

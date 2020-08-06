@@ -131,7 +131,7 @@ class UbcBsfFeps(EmissionsBase):
         for fire in fires:
             with self.fire_failure_handler(fire):
                 self._run_on_fire(fire)
-    
+
     def _get_working_dir(self, fire):
         model = Config().get('emissions', 'model').lower()
         config = Config().get('emissions', model)
@@ -161,7 +161,7 @@ class UbcBsfFeps(EmissionsBase):
                     raise ValueError(
                         "Each fuelbed array should only have one entry when running Canadian emissions")
                 loc["fuelbeds"][0]["emissions"] = self.emitter.run(loc,working_dir)
-                
+
 
 ##
 ## FEPS

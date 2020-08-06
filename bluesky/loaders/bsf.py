@@ -191,7 +191,7 @@ class CsvFileLoader(BaseCsvFileLoader):
         if row.get("type"):
             fire["type"] = row["type"].lower()
 
-        # Add consumption data if present and flag active. 
+        # Add consumption data if present and flag active.
         # This was implemented for the Canadian version of the SmartFire system.
         # It is important to note that this consumption marshalling was done with only the Canadian format
         # in mind. If consumption is added to the input of the US system, further changes maybe required.
