@@ -38,9 +38,7 @@ def run(fires_manager):
             compute_func(fire)
 
     # Make sure to distribute the heat if it was loaded here.
-    model = Config().get('plumerise', 'model').lower()
-    config = Config().get('plumerise', model)
-    if config.get("load_heat"):
+    if compute_func.config.get("load_heat"):
         datautils.summarize_all_levels(fires_manager, 'heat')
 
     # TODO: spread out emissions over plume and set in activity or fuelbed
@@ -70,13 +68,13 @@ class ComputeFunction(object):
             raise BlueSkyConfigurationError(
                 INVALID_PLUMERISE_MODEL_MSG.format(model))
 
-        config = Config().get('plumerise', model)
-        self._compute_func = generator(config)
+        self.config = Config().get('plumerise', model)
+        self._compute_func = generator(self.config)
 
-        if config.get('working_dir'):
+        if self.config.get('working_dir'):
             fires_manager.plumerise = {
                 'output': {
-                    'directory': config['working_dir']
+                    'directory': self.config['working_dir']
                 }
             }
 
