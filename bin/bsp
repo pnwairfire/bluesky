@@ -336,8 +336,8 @@ def setup(args):
 
     # Note: Calling code handles exception
     if not args.no_input:
-        for i, f in enumerate(args.input_files):
-            fires_manager.loads(input_file=f, subsequent_input=(i>0))
+        for f in args.input_files:
+            fires_manager.loads(input_file=f, append_fires=True)
 
     set_modules(args, fires_manager)
 
