@@ -724,6 +724,33 @@ class TestFiresManager(object):
         }
         assert expected_meta == fires_manager.meta
 
+    @freezegun.freeze_time("2016-04-20")
+    def test_load_multiple_streams(self, monkeypatch, reset_config):
+        input_1 = io.StringIO('{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
+            '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}],'
+            '"foo": {"bar": "baz"}}')
+        input_2 = io.StringIO('{"das": 1, "fires":[{"id":"c","bar":1223,"baz":1,"bee":"12"}]}')
+
+        monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
+
+        fires_manager = fires.FiresManager()
+        fires_manager.loads(input_stream=input_1, append_fires=True)
+        fires_manager.loads(input_stream=input_2, append_fires=True)
+        expected_fires = [
+            fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
+            fires.Fire({'id':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'}),
+            fires.Fire({"id":"c", "bar":1223,"baz":1,"bee":"12"})
+        ]
+        assert fires_manager.num_fires == 3
+        assert expected_fires == fires_manager.fires
+        assert fires_manager.today == freezegun.api.FakeDatetime(2016,4,20)
+        expected_meta = {
+            "foo": {"bar": "baz"},
+            "das": 1
+        }
+        assert expected_meta == fires_manager.meta
+
+
     ## Dumping
 
     def test_dump_no_fire_no_meta(self, monkeypatch, reset_config):
