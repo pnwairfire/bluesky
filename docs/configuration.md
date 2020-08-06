@@ -154,6 +154,10 @@ for a fire's activity object. They also define what synonyms to recognize, if an
 'config' > 'consumption' > 'fuel_loadings' if it doesn't find them in the
 emissions config
 
+###### If running ubc-bsf-feps emissions:
+
+- ***'config' > 'emissions' > 'ubc-bsf-feps' > working_dir*** -- *optional* --
+
 ##### findmetdata
 
  - ***'config' > 'findmetdata' > 'met_root_dir'*** -- *required* --
@@ -176,11 +180,24 @@ emissions config
 ##### timeprofile
 
  - ***'config' > 'timeprofile' > 'hourly_fractions'*** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the activity window)
+ - ***'config' > 'timeprofile' > 'model'*** -- *optional* -- default: "default"; only used if you want to use the 'ubc-bsf-feps' model
 
+###### If running ubc-bsf-feps model:
+
+ - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'interpolation_type'*** -- *optional* -- default: 1
+ - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'normalize'*** -- *optional* -- default: True
+ - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'working_dir'*** -- *optional* -- default: None
 
 ##### plumerise
 
  - ***'config' > 'plumerise' > 'model'*** -- *optional* -- plumerise model; defaults to "feps"
+
+###### If running feps model:
+
+ - ***'config' > 'plumerise' > 'feps' > 'working_dir'*** -- *optional* -- default: None
+ - ***'config' > 'plumerise' > 'feps' > 'consumption_in_tons_per_acre'*** -- *optional* -- default: False
+ - ***'config' > 'plumerise' > 'feps' > 'load_heat'*** -- *optional* -- default: False
+
 
 ###### if feps:
 
