@@ -161,8 +161,8 @@ _DEFAULTS = {
         "species": [],
         "fuel_loadings": {},
         "ubc-bsf-feps": {
-                "working_dir": None
-            }
+            "working_dir": None
+        }
     },
     "findmetdata": {
         "met_root_dir": None,

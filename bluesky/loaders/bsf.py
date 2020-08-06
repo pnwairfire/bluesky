@@ -212,11 +212,12 @@ class CsvFileLoader(BaseCsvFileLoader):
 
             total_cons = flaming + smold + resid + duff
 
-            consumption = {"flaming": [flaming],
-            "residual": [resid],
-            "smoldering": [smold],
-            "duff": [duff],
-            "total": [total_cons]
+            consumption = {
+                "flaming": [flaming],
+                "residual": [resid],
+                "smoldering": [smold],
+                "duff": [duff],
+                "total": [total_cons]
             }
 
             self._consumption_values[fire["id"]] = consumption
