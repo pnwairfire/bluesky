@@ -46,7 +46,7 @@ class UbcBsfFEPSEmissions(object):
         f.write("cons_lts=%f\n" % (consumption["residual"]))
         # TODO: what to do if duff consumption isn't defined? is 0.0 appropriate?
         f.write("cons_duff=%f\n" % (consumption.get("duff", 0.0)))
-        f.write("moist_duff=%f\n" % fire_location_info['moisture_duff'])
+        f.write("moist_duff=%f\n" % fire_location_info.get('moisture_duff', 40.0))
         f.close()
 
     def readEmissions(self, filename):
