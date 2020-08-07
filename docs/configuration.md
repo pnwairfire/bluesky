@@ -157,7 +157,7 @@ emissions config
 
 ###### If running ubc-bsf-feps emissions:
 
-- ***'config' > 'emissions' > 'ubc-bsf-feps' > working_dir*** -- *optional* --
+- ***'config' > 'emissions' > 'ubc-bsf-feps' > 'working_dir'*** -- *optional* --
 
 ##### findmetdata
 
