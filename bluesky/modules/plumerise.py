@@ -151,16 +151,9 @@ class ComputeFunction(object):
                         loc["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
                         loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
 
-                    consumption = copy.deepcopy(loc['consumption']['summary'])
-
-                    if config.get("consumption_in_tons_per_acre"):
-                        c = consumption.items()
-                        for key,value in c:
-                            consumption[key] = value * loc["area"]
-
                     fire_working_dir = _get_fire_working_dir(fire, working_dir)
                     plumerise_data = pr.compute(aa['timeprofile'],
-                        consumption, loc,
+                        loc['consumption']['summary'], loc,
                         working_dir=fire_working_dir)
                     loc['plumerise'] = plumerise_data['hours']
 

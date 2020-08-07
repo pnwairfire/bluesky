@@ -29,7 +29,6 @@
         "plumerise": {
             "model": "feps",
             "feps": {
-                "consumption_in_tons_per_acre": true,
                 "load_heat": true
             }
         }

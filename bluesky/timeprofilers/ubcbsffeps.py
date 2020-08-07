@@ -80,11 +80,11 @@ class UbcBsfFEPSTimeProfiler(object):
 
     def writeConsumption(self, active_area, fire_location_info, filename):
         f = open(filename, 'w')
-        f.write("cons_flm=%f\n" % active_area["consumption"]["summary"]["flaming"])
-        f.write("cons_sts=%f\n" % active_area["consumption"]["summary"]["smoldering"])
-        f.write("cons_lts=%f\n" % active_area["consumption"]["summary"]["residual"])
-        f.write("cons_duff=%f\n" % active_area["consumption"]["summary"]["duff"])
-        f.write("moist_duff=%f\n" % fire_location_info["moisture_duff"])
+        f.write("cons_flm={}\n".format(active_area["consumption"]["summary"]["flaming"] / fire_location_info['area']))
+        f.write("cons_sts={}\n".format(active_area["consumption"]["summary"]["smoldering"] / fire_location_info['area']))
+        f.write("cons_lts={}\n".format(active_area["consumption"]["summary"]["residual"] / fire_location_info['area']))
+        f.write("cons_duff={}\n".format(active_area["consumption"]["summary"]["duff"] / fire_location_info['area']))
+        f.write("moist_duff={}\n".format(fire_location_info["moisture_duff"]))
         f.close()
 
     def writeGrowth(self, active_area, filename):

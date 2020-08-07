@@ -212,12 +212,14 @@ class CsvFileLoader(BaseCsvFileLoader):
 
             total_cons = flaming + smold + resid + duff
 
+
+            area = sp.get('area') or 1
             consumption = {
-                "flaming": [flaming],
-                "residual": [resid],
-                "smoldering": [smold],
-                "duff": [duff],
-                "total": [total_cons]
+                "flaming": [area * flaming],
+                "residual": [area * resid],
+                "smoldering": [area * smold],
+                "duff": [area * duff],
+                "total": [area * total_cons]
             }
 
             self._consumption_values[fire["id"]] = consumption

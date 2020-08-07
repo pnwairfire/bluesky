@@ -196,7 +196,6 @@ emissions config
 ###### If running feps model:
 
  - ***'config' > 'plumerise' > 'feps' > 'working_dir'*** -- *optional* -- default: None
- - ***'config' > 'plumerise' > 'feps' > 'consumption_in_tons_per_acre'*** -- *optional* -- default: False
  - ***'config' > 'plumerise' > 'feps' > 'load_heat'*** -- *optional* -- default: False
 
 

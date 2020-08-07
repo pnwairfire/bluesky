@@ -41,11 +41,11 @@ class UbcBsfFEPSEmissions(object):
     # NOTE: Assumes that consumption is in the UBC team's units of tons/acre
     def _write_consumption(self, consumption, fire_location_info, filename):
         f = open(filename, 'w')
-        f.write("cons_flm=%f\n" % (consumption["flaming"]))
-        f.write("cons_sts=%f\n" % (consumption["smoldering"]))
-        f.write("cons_lts=%f\n" % (consumption["residual"]))
+        f.write("cons_flm=%f\n" % (consumption["flaming"] / fire_location_info['area']))
+        f.write("cons_sts=%f\n" % (consumption["smoldering"] / fire_location_info['area']))
+        f.write("cons_lts=%f\n" % (consumption["residual"] / fire_location_info['area']))
         # TODO: what to do if duff consumption isn't defined? is 0.0 appropriate?
-        f.write("cons_duff=%f\n" % (consumption.get("duff", 0.0)))
+        f.write("cons_duff=%f\n" % (consumption.get("duff", 0.0) / fire_location_info['area']))
         f.write("moist_duff=%f\n" % fire_location_info.get('moisture_duff', 40.0))
         f.close()
 

@@ -204,7 +204,6 @@ _DEFAULTS = {
         "model": "feps",
         "feps": {
             "working_dir": None,
-            "consumption_in_tons_per_acre": False,
             "load_heat": False
             # The following defaults are defined in the plumerise
             # package, so we won't set them here
