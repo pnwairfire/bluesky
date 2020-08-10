@@ -10,6 +10,7 @@ import logging
 
 from bluesky.config import Config
 from bluesky.datetimeutils import parse_datetime
+from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.importutils import import_class
 from bluesky.io import get_working_and_output_dirs
 

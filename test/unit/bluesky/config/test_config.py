@@ -97,7 +97,7 @@ class TestGetAndSet(object):
     def test_getting_defaults(self, reset_config):
         # getting defaults
         assert Config().get() == DEFAULTS
-        assert Config().get('skip_failed_fires') == False
+        assert Config().get('skip_failed_fires') == True
         assert Config().get('fuelbeds', 'fccs_version') == '2'
         # last key can be upper or lower
         assert Config().get('fuelbeds', 'FCCS_VERSION') == '2'
@@ -358,7 +358,7 @@ class TestThreadSafety(object):
                 try:
                     # getting defaults
                     assert Config().get() == DEFAULTS
-                    assert Config().get('skip_failed_fires') == False
+                    assert Config().get('skip_failed_fires') == True
                     Config().set(self.i, 'skip_failed_fires')
                     assert Config().get('skip_failed_fires') == self.i
                 except Exception as e:

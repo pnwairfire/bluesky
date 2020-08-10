@@ -759,6 +759,7 @@ class TestFiresManager(object):
             "foo": {"bar": "baz"},
             "counts": {
                 "fires": 2,
+                "failed_fires": 0,
                 "locations": 0
             },
             "bluesky_version": __version__

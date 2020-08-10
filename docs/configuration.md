@@ -57,8 +57,15 @@ configuration json data are case-insensitive.***
  - ***'config' > 'load' > 'sources' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
  - ***'config' > 'load' > 'sources' > 'wait' > 'max_attempts'*** -- *required* if 'wait' section is defined  -- max number of attempts
  - ***'config' > 'load' > 'sources' > 'saved_copy_file'*** -- *optional* - save copy of loaded fire data to file
+ - ***'config' > 'load' > 'sources' > 'saved_copy_events_file'*** -- *optional* - save copy of loaded fire events data to file
  - ***'config' > 'load' > 'sources' > 'start'*** -- used to filter fires based on time
  - ***'config' > 'load' > 'sources' > 'end'*** -- used to filter fires based on time
+ - ***'config' > 'load' > 'sources' > 'skip_failures'*** -- skip fires that result in exception during load
+
+###### if source 'bsf'
+
+ - ***'config' > 'load' > 'sources' > 'omit_nulls'*** -- don't include fire data keys with null/None values
+ - ***'config' > 'load' > 'sources' > 'timeprofile_file'*** -- *optional*
 
 ###### if type 'file':
 
@@ -95,17 +102,18 @@ configuration json data are case-insensitive.***
 
 ##### fuelbeds
 
-- ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- default ['0', '900']
-- ***'config' > 'fuelbeds' > 'truncation_percentage_threshold'*** -- *optional* -- use first N largest fuelbeds making up this percentage for a location; default 90.0
-- ***'config' > 'fuelbeds' > 'truncation_count_threshold'*** -- *optional* -- use only up to this many fuelbeds for a location; default 5
 - ***'config' > 'fuelbeds' > 'fccs_version'*** -- *optional* -- '1' or '2'
+- ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
+- ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- fuelbeds to ignore; default ['0', '900']
+- ***'config' > 'fuelbeds' > 'no_sampling'*** -- *optional* -- don't sample surrounding area for Point and MultiPoint geometries
 - ***'config' > 'fuelbeds' > 'fccs_fuelload_file'*** -- *optional* -- NetCDF
   file containing FCCS lookup map
 - ***'config' > 'fuelbeds' > 'fccs_fuelload_param'*** -- *optional* -- name of variable in NetCDF file
 - ***'config' > 'fuelbeds' > 'fccs_fuelload_grid_resolution'*** -- *optional* -- length of grid cells in km
-- ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- fuelbeds to ignore
-- ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
-- ***'config' > 'fuelbeds' > 'no_sampling'*** -- *optional* -- don't sample surrounding area for Point and MultiPoint geometries
+- ***'config' > 'fuelbeds' > 'truncation_percentage_threshold'*** -- *optional* -- use first N largest fuelbeds making up this percentage for a location; default 90.0
+- ***'config' > 'fuelbeds' > 'truncation_count_threshold'*** -- *optional* -- use only up to this many fuelbeds for a location; default 5
+- ***'config' > 'fuelbeds' > 'total_pct_threshold'*** -- *optional* -- Allow summed fuel percentages to be this much off of 100%; default is 0.5% (i.e. between 99.5% and 100.5%)
+- ***'config' > 'fuelbeds' > 'use_alaska'*** -- *optional* -- force use of AK fuelbed lookup; useful if all fires are known to be in AK, but none define 'state'
 
 ##### consumption
 

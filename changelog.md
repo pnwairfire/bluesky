@@ -199,3 +199,46 @@
 
 ## 4.2.1
  - added error handling to smokeready extrafile writer
+
+## 4.2.2
+ - Default skip_failed_fires to true
+ - Upgrade eflookup to v3.2.1
+
+## 4.2.3
+ - Update bsf load module to optionally load separate timeprofile file
+
+## 4.2.4
+ - Update bsf loader to support isoformatted date_time values
+
+## 4.2.5
+ - Update BSF loader to store utc_offset in the active area object rather than the specified point
+
+## 4.2.6
+ - Upgrade emitcalc to 2.0.2
+ - Be specific about python package dependency versions
+
+## 4.2.7
+ - Upgrade eflookup to v3.2.2
+
+## 4.2.8
+ - Update hysplit trajectories to gracefully handle no fires, and log and record warning
+ - Update dispersion to not abort if there no fires
+
+## 4.2.9
+ - Add script for creating new version of bluesky
+ - Bug fixes in writing of fire_events.csv
+
+## 4.2.10
+ - Update base loader and BSF loader to honor `skip_failures`
+ - Upgrade `met` package to `v2.0.0` and switch to using bulk localmet profiler
+
+ ## 4.2.11
+ - Include source in fire_locations.csv
+
+## 4.2.12
+ - Add fuelbed_fractions to fire_locations.csv
+ - Update fuelbeds module to support forcing use of AK FCCS fuelbed map
+ - Dev script updates
+
+## 4.2.13
+ - Update fires csv writer to not fail on integer fccs_id values

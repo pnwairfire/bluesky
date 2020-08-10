@@ -9,6 +9,7 @@ SF11C77574457421602580,SF11E4146026,27.188,-81.113,RX,67.999999831,201905280000-
 
 __author__ = "Joel Dubowy"
 
+import copy
 import datetime
 import logging
 import re
@@ -16,8 +17,10 @@ import traceback
 import uuid
 from collections import defaultdict
 
+from pyairfire.io import CSV2JSON
+
 from bluesky.models.fires import Fire
-from . import BaseCsvFileLoader
+from . import BaseCsvFileLoader, skip_failures
 from bluesky.datetimeutils import parse_datetime, parse_utc_offset
 
 __all__ = [
@@ -89,34 +92,77 @@ class CsvFileLoader(BaseCsvFileLoader):
 
     def __init__(self, **config):
         super().__init__(**config)
-        self._skip_failures = config.get('skip_failures')
+        self._omit_nulls = config.get('omit_nulls')
+        self._timeprofile_file = config.get('timeprofile_file')
+
 
     def _marshal(self, data):
-        self._fires = {}
+        self._load_timeprofile_file()
 
+        fires = {}
         for row in data:
-            try:
-                self._process_row(row)
+            with skip_failures(self._skip_failures):
+                fire = self._process_row(row)
+                if fire["id"] not in fires:
+                    fires[fire["id"]] = fire
+                else:
+                    # wait to the end to set so that, failure and if
+                    # skip_failures == true, the fires[fire["id"]] will be
+                    # left as it is
+                    fires[fire["id"]] = self._merge(fires[fire["id"]], fire)
 
-            except Exception as e:
-                if not self._skip_failures:
-                    logging.debug(traceback.format_exc())
-                    raise ValueError(str(e))
-                # else, just log str(e) (which is detailed enough)
-                logging.warning(str(e))
+        processed_fires = []
+        for fire in fires.values():
+            with skip_failures(self._skip_failures):
+                self._post_process_activity(fire)
+                processed_fires.append(fire)
 
-        self._post_process_activity()
+        return processed_fires
 
-        return list(self._fires.values())
+    def _merge(self, fire1, fire2):
+        merged_fire = copy.deepcopy(fire1)
+        merged_fire['specified_points_by_date_n_offset'].update(
+            fire2['specified_points_by_date_n_offset'])
+        merged_fire['event_of'].update(fire2['event_of'])
+        if 'type' in fire2:
+            # TODO: if defined, make sure fire1's type doesn't differ
+            merged_fire['type'] = fire2['type']
+
+        return merged_fire
+
+    def _load_timeprofile_file(self):
+        self._timeprofile = defaultdict(lambda: defaultdict(lambda: {}))
+        if self._timeprofile_file:
+            csv_loader = CSV2JSON(input_file=self._timeprofile_file)
+            data = csv_loader._load()
+            for row in data:
+                event_id = row['Fire']
+                day = datetime.datetime.strptime(row['LocalDay'], '%Y-%m-%d')
+                # ts needs to be string value
+                ts = datetime.datetime.strptime(row['LocalHour'],
+                    '%Y-%m-%d %H:%M').isoformat()
+                if ts in self._timeprofile[event_id][day]:
+                    raise ValueError("Multiple timeprofile values for %s %s",
+                        row['Fire'], ts)
+                self._timeprofile[event_id][day][ts] = {
+                    "area_fraction": row['FractionOfDay'],
+                    "flaming": row['FractionOfDay'],
+                    "residual": row['FractionOfDay'],
+                    "smoldering": row['FractionOfDay']
+                }
+
+            # TODO: fill in zeros for hours not specified ???
+            # TODO: make sure fractions for each event/day add up to 1.0
 
     def _process_row(self, row):
-        fire_id = row.get("id") or str(uuid.uuid4())
-        if fire_id not in self._fires:
-            self._fires[fire_id] = Fire({
-                "id": fire_id,
-                "event_of": {},
-                "specified_points_by_date": defaultdict(lambda: [])
-            })
+        fire = Fire({
+            "id": row.get("id") or str(uuid.uuid4()),
+            "event_of": {},
+            # Though unlikely, it's possible that the points in
+            # a single fire span multiple time zones
+            "specified_points_by_date_n_offset": defaultdict(
+                lambda: defaultdict(lambda: []))
+        })
 
         start, utc_offset = self._parse_date_time(row["date_time"])
         if not start:
@@ -124,38 +170,46 @@ class CsvFileLoader(BaseCsvFileLoader):
 
         sp = {loc_attr: f(row.get(csv_key))
             for csv_key, loc_attr, f in LOCATION_FIELDS}
-        if utc_offset:
-            sp['utc_offset'] = utc_offset
-        self._fires[fire_id]['specified_points_by_date'][start].append(sp)
+        if self._omit_nulls:
+            sp = {k: v for k, v in sp.items() if v is not None}
+
+        fire['specified_points_by_date_n_offset'][start][utc_offset].append(sp)
 
         # event and type could have been set when the Fire object was
         # instantiated, but checking amd setting here allow the fields to
         # be set even if only subsequent rows for the fire have them defined
         if row.get("event_id"):
-            self._fires[fire_id]["event_of"]["id"] = row["event_id"]
+            fire["event_of"]["id"] = row["event_id"]
         if row.get("event_url"):
-            self._fires[fire_id]["event_of"]["url"] = row["event_url"]
+            fire["event_of"]["url"] = row["event_url"]
 
         if row.get("type"):
-            self._fires[fire_id]["type"] = row["type"].lower()
+            fire["type"] = row["type"].lower()
 
         # TODO: other marshaling
 
-    def _post_process_activity(self):
-        for fire in self._fires.values():
-            fire["activity"] = []
-            sorted_items = sorted(fire.pop("specified_points_by_date").items(),
-                key=lambda a: a[0])
-            for start, specified_points in sorted_items:
+        return fire
+
+    def _post_process_activity(self, fire):
+        event_id = fire.get("event_of", {}).get("id")
+        fire["activity"] = []
+        sorted_items = sorted(fire.pop("specified_points_by_date_n_offset").items(),
+            key=lambda a: a[0])
+        for start, points_by_utc_offset in sorted_items:
+            for utc_offset, specified_points in points_by_utc_offset.items():
                 fire['activity'].append({
                     "active_areas": [
                         {
                             "start": start,
                             "end": start + ONE_DAY,
+                            "utc_offset": utc_offset,
                             "specified_points": specified_points
                         }
                     ]
                 })
+                if event_id and (start in self._timeprofile[event_id]):
+                    fire['activity'][-1]["active_areas"][0]["timeprofile"] = self._timeprofile[event_id][start]
+
 
     # Note: Although 'timezone' (a numberical value) is defined alongsite
     #   date_time (which may include utc_offset), utc_offset, if defined, reflects
@@ -164,9 +218,12 @@ class CsvFileLoader(BaseCsvFileLoader):
     #   -5.0 and utc_offset (embedded in the 'date_time' field) '-04:00'
 
     ## 'date_time'
-    OLD_DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?Z$')
-    DATE_TIME_MATCHER = re.compile('^(\d{12})(\d{2})?([+-]\d{2}\:\d{2})$')
-    DATE_TIME_FMT = "%Y%m%d%H%M"
+    DATE_TIME_MATCHERS = (
+        (re.compile('^(\d{12})(\d{2})?([+-]\d{2}\:\d{2})$'), "%Y%m%d%H%M"),
+        (re.compile('^(\d{12})(\d{2})?Z$'), "%Y%m%d%H%M"),
+        (re.compile('^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})([+-]\d{2}\:\d{2})$'),
+            "%Y-%m-%dT%H:%M:%S.%f")
+    )
 
     def _parse_date_time(self, date_time):
         """Parses 'date_time' field, found in BSF fire data
@@ -181,23 +238,23 @@ class CsvFileLoader(BaseCsvFileLoader):
 
             '201508040000-04:00'
 
+        Another newer format:
+
+            2020-05-13T00:00:00.000-07:00
+
         With true utc offset embedded in the string.
         """
         start = None
         utc_offset = None
         if date_time:
             try:
-                m = self.DATE_TIME_MATCHER.match(date_time)
-                if m:
-                    start = datetime.datetime.strptime(
-                        m.group(1), self.DATE_TIME_FMT)
-                    utc_offset = parse_utc_offset(m.group(3))
-                else:
-                    m = self.OLD_DATE_TIME_MATCHER.match(date_time)
+                for matcher, fmt in self.DATE_TIME_MATCHERS:
+                    m = matcher.match(date_time)
                     if m:
-                        start = datetime.datetime.strptime(
-                            m.group(1), self.DATE_TIME_FMT)
-                        # Note: we don't know utc offset; don't set
+                        start = datetime.datetime.strptime(m.group(1), fmt)
+                        if len(m.groups()) > 1:
+                            utc_offset = parse_utc_offset(m.groups()[-1])
+                        break
 
             except Exception as e:
                 logging.warn("Failed to parse 'date_time' value %s",

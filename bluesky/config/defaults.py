@@ -15,7 +15,7 @@ _VSMOKE_IMAGES_PATH = os.path.join(_REPO_ROOT_DIR,
     'dispersers/vsmoke/images')
 
 _DEFAULTS = {
-    "skip_failed_fires": False,
+    "skip_failed_fires": True,
     "skip_failed_sources": False,
     "statuslogging": {
         "enabled": False,
@@ -38,6 +38,9 @@ _DEFAULTS = {
         #  "wait": None, #{"strategy": None,"time": None,"max_attempts": None}
         #  "saved_copy_file"
         #  "saved_copy_events_file"
+        # BSF
+        #  "omit_nulls"
+        #  "timeprofile_file"
         # File Sourcees
         #  'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
         #  'events_file'*** -- *optional* for each file type source-- file containing fire events data; e.g. '/path/to/fire_events.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
@@ -87,8 +90,10 @@ _DEFAULTS = {
         "truncation_percentage_threshold": 90.0,
         "truncation_count_threshold": 5,
         # Allow summed fuel percentages to be between 99.5% and 100.5%
-        "total_pct_threshold": 0.5
-
+        "total_pct_threshold": 0.5,
+        # Force use of AK fuelbed lookup; useful if all fires
+        # are known to be in AK, but none define 'state'
+        "use_alaska": False
     },
     "consumption": {
         "fuel_loadings": {},

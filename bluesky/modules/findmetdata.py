@@ -135,6 +135,16 @@ def _infer_time_windows_from_fires(fires_manager):
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
                 for aa in fire.active_areas:
+                    # TODO: Because of the following:
+                    #   a) start, end, & utc_offset are allowed to be set
+                    #      per specified point or perimeter rather than per
+                    #      active area, and
+                    #   b) accessing [perim|sp].[start|end|utc_offset] will fallback
+                    #      on aa's values if not defined in the sp,perim,
+                    #  then maybe we should iterate through the aa's locations (sp,perim)
+                    #  and execute the following logic on each location. We'd need to
+                    #  make sure that time window merging and other downstream logic
+                    #  aren't broken or negatively affected.
                     utc_offset = parse_utc_offset(aa.get('utc_offset'))
                     offset = datetime.timedelta(hours=utc_offset)
                     tw = parse_datetimes(aa, 'start', 'end')

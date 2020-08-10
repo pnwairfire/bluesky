@@ -1,0 +1,16 @@
+{
+    "config":{
+        "load": {
+            "sources": [
+                {
+                    "name": "bsf",
+                    "format": "CSV",
+                    "type": "file",
+                    "file": "/bluesky/dev/data/other-sources/bsf/fire_locations_20181108_Camp.csv",
+                    "timeprofile_file": "/bluesky/dev/data/other-sources/bsf/timeprofile_20181108_Camp.csv",
+                    "omit_nulls": true
+                }
+            ]
+        }
+    }
+}

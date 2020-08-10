@@ -140,6 +140,7 @@ def check(expected, actual):
     actual.pop('runtime')
     # TODO: cherry pick other fields to check
     if len(expected['fires']) != len(actual['fires']):
+        logging.error("Different number of fires")
         return False
 
     for i in range(len(expected['fires'])):
@@ -161,6 +162,11 @@ def run_input(module, input_file):
 
     logging.debug('Running bsp on %s', input_file)
     try:
+        if 'skip_failed_fires' not in config:
+            # regression test output data was generated when
+            # skip_failed_fires defaulted to false
+            config['skip_failed_fires'] = False
+
         Config().set(config)
         fires_manager = models.fires.FiresManager()
         fires_manager.loads(input_file=input_file)
