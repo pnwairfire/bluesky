@@ -8,6 +8,7 @@ Example calls:
  > bsp < fires-before.json > fires-after.json
 """
 
+import datetime
 import fcntl
 import json
 import logging
@@ -272,15 +273,17 @@ def output_version(parser, args):
 ## Setting up FiresManager
 ##
 
-def configure_logging(args, fires_manager):
+def configure_logging(args):
     # are written
     if args.log_file:
         # replace '{run_id}' before filling in timestamps, since
         # --run-id may have been specified with a timestamp wildcard
         if args.run_id:
             args.log_file = args.log_file.replace('{run_id}', args.run_id)
+        today = (datetime.datetime.strptime(args.today, "%Y-%m-%d")
+            if args.today else datetimeutils.today_utc())
         args.log_file = datetimeutils.fill_in_datetime_strings(
-                args.log_file, today=fires_manager.today)
+                args.log_file, today=today)
     # Note: The second argument to configure_logging_from_args
     #  is not used. It must be left over from a previous version
     #  of the function. So just pass in None.
@@ -324,8 +327,6 @@ def setup(args):
     if args.today:
         fires_manager.today = args.today
 
-    # configure logging as soon as possible, before any log messages
-    configure_logging(args, fires_manager)
     set_config(args, fires_manager)
 
     logging.summary("BlueSky v%s", __version__)
@@ -365,6 +366,8 @@ def exit_with_traceback(e):
 
 def main():
     args = parse_args()
+    # configure logging as soon as possible, before any log messages
+    configure_logging(args)
 
     try:
         fires_manager = setup(args)
