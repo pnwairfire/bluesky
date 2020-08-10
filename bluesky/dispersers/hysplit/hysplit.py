@@ -187,7 +187,6 @@ class HYSPLITDispersion(DispersionBase):
                 # and number of fires each
                 self._run_parallel(wdir)
         else:
-            hysplit_utils.ensure_tranch_has_dummy_fire(self._fires)
             self._run_process(self._fires, wdir)
 
         # Note: DispersionBase.run will add directory, start_time,
