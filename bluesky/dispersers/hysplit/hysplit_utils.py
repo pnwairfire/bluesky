@@ -52,8 +52,6 @@ def create_fire_tranches(fire_sets, num_processes, model_start, num_hours,
     location, etc.; to keep the number of fires in each tranche as close
     as possible to to # fires / # tranches).
     """
-    # for s in fire_sets:
-    #     ensure_tranch_has_dummy_fire(s)
     fill_in_dummy_fires(fire_sets, num_processes, model_start, num_hours,
         grid_params)
     n_sets = len(fire_sets)
@@ -182,10 +180,14 @@ def generate_dummy_fire(model_start, num_hours, grid_params):
     return f
 
 # TODO: replace fill_in_dummy_fires and ensure_tranch_has_dummy_fire
-#   with a single method that
+#   with a single method that adds a dummy fire to existing fire sets
+#   and fills in dummy fire sets to reach num_processes
 
 def fill_in_dummy_fires(fire_sets, num_processes, model_start,
         num_hours, grid_params):
+    """Creates extra trahcnes, each with a dummy fire within the
+    dispersion grid, so that len(fires_sets) == num_processes
+    """
     if len(fire_sets) < num_processes:
         for i in range(num_processes - len(fire_sets)):
             f = generate_dummy_fire(
@@ -194,8 +196,8 @@ def fill_in_dummy_fires(fire_sets, num_processes, model_start,
 
 def ensure_tranch_has_dummy_fire(fires, model_start, num_hours, grid_params):
     # Adds a dummy fire to ensure that there's at least one fire within
-    # met domain. We can skip this step if the tranch was already
-    # assigned a dummy fire (i.e. which sould only have happened if
+    # the dispersion domain. We can skip this step if the tranch was already
+    # assigned a dummy fire (i.e. which would only have happened if
     # there were fewer fires than tranches)
 
     if not any([f.get('is_dummy') for f in fires]):
