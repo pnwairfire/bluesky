@@ -45,7 +45,7 @@ OPTIONAL_ARGS = [
         'short': '-i',
         'long': '--input-file',
         'dest': 'input_files',
-        'help': 'input file(s) comtaining JSON formatted fire data',
+        'help': 'input file(s) containing JSON formatted fire data',
         'action': "append",
         'default': []
     },
@@ -152,6 +152,16 @@ EPILOG_STR = """\
 Available Modules:
 
     {}
+
+Input files:
+
+    If multiple input files are specified, e.g.
+
+      $ bsp -i input1.json -i input2.json
+
+    fire data from the files will be concatenated, but any other data
+    specified by more than one of the input files will be overwritten by
+    the subsequent file(s).
 
 Configuration:
 
