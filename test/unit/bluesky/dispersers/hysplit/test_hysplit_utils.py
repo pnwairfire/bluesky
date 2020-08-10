@@ -56,8 +56,16 @@ class TestCreateFireSets(object):
 
 
 class TestCreateFireTranches(object):
+    GRID_PARAMS = e = {
+        "center_latitude": 45.0,
+        "center_longitude": -118.0,
+        "height_latitude": 0.9009009009009009,
+        "width_longitude": 1.2704038469036067,
+        "spacing_longitude": 0.0762242308142164,
+        "spacing_latitude": 0.05405405405405406
+    }
 
-    def test(self, reset_config):
+    def test_five_tranches_four_fires(self, reset_config):
         fire_sets = [
             [MockFireLocationData(1), MockFireLocationData(1)],
             [MockFireLocationData(3), MockFireLocationData(3)],
@@ -65,19 +73,46 @@ class TestCreateFireTranches(object):
             [MockFireLocationData(22), MockFireLocationData(22)]
         ]
 
-        # 4 fires locations, 5 proceses  <-- should assume only 4 processes
+        expected_tranches = [
+            [fire_sets[0][0], fire_sets[0][1]],
+            [fire_sets[1][0], fire_sets[1][1]],
+            [fire_sets[2][0], fire_sets[2][1]],
+            [fire_sets[3][0], fire_sets[3][1]],
+
+        ]
+        fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 5,
+            datetime.datetime(2018, 11, 9, 0, 0, 0), 24, self.GRID_PARAMS)
+        assert expected_tranches == fire_tranches[0:4]
+        assert len(fire_tranches) == 5
+        assert len(fire_tranches[4]) == 1 # dummy fire
+
+    def test_four_tranches_four_fires(self, reset_config):
+        fire_sets = [
+            [MockFireLocationData(1), MockFireLocationData(1)],
+            [MockFireLocationData(3), MockFireLocationData(3)],
+            [MockFireLocationData(7), MockFireLocationData(7)],
+            [MockFireLocationData(22), MockFireLocationData(22)]
+        ]
+
+        # 4 fires locations, 4 proceses  <-- should assume only 4 processes
         expected_tranches = [
             [fire_sets[0][0], fire_sets[0][1]],
             [fire_sets[1][0], fire_sets[1][1]],
             [fire_sets[2][0], fire_sets[2][1]],
             [fire_sets[3][0], fire_sets[3][1]]
         ]
-        fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 5)
+        # 4 fires locations, 4 proceses
+        fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 4,
+            datetime.datetime(2018, 11, 9, 0, 0, 0), 24, self.GRID_PARAMS)
         assert expected_tranches == fire_tranches
 
-        # 4 fires locations, 4 proceses  <-- same expected set as when called with num_processes = 5
-        fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 4)
-        assert expected_tranches == fire_tranches
+    def test_three_tranches_four_fires(self, reset_config):
+        fire_sets = [
+            [MockFireLocationData(1), MockFireLocationData(1)],
+            [MockFireLocationData(3), MockFireLocationData(3)],
+            [MockFireLocationData(7), MockFireLocationData(7)],
+            [MockFireLocationData(22), MockFireLocationData(22)]
+        ]
 
         # 4 fires locations, 3 proceses
         expected_tranches = [
@@ -86,9 +121,17 @@ class TestCreateFireTranches(object):
             [fire_sets[2][0], fire_sets[2][1]],
             [fire_sets[3][0], fire_sets[3][1]]
         ]
-        fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 3)
+        fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 3,
+            datetime.datetime(2018, 11, 9, 0, 0, 0), 24, self.GRID_PARAMS)
         assert expected_tranches == fire_tranches
 
+    def test_two_tranches_four_fires(self, reset_config):
+        fire_sets = [
+            [MockFireLocationData(1), MockFireLocationData(1)],
+            [MockFireLocationData(3), MockFireLocationData(3)],
+            [MockFireLocationData(7), MockFireLocationData(7)],
+            [MockFireLocationData(22), MockFireLocationData(22)]
+        ]
         # 4 fires locations, 2 proceses
         expected_tranches = [
             [fire_sets[0][0], fire_sets[0][1],
@@ -96,9 +139,17 @@ class TestCreateFireTranches(object):
             [fire_sets[2][0], fire_sets[2][1],
              fire_sets[3][0], fire_sets[3][1]]
         ]
-        fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 2)
+        fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 2,
+            datetime.datetime(2018, 11, 9, 0, 0, 0), 24, self.GRID_PARAMS)
         assert expected_tranches == fire_tranches
 
+    def test_one_tranches_four_fires(self, reset_config):
+        fire_sets = [
+            [MockFireLocationData(1), MockFireLocationData(1)],
+            [MockFireLocationData(3), MockFireLocationData(3)],
+            [MockFireLocationData(7), MockFireLocationData(7)],
+            [MockFireLocationData(22), MockFireLocationData(22)]
+        ]
         # 4 fires locations, 1 proceses
         expected_tranches = [
             [fire_sets[0][0], fire_sets[0][1],
@@ -106,7 +157,8 @@ class TestCreateFireTranches(object):
              fire_sets[2][0], fire_sets[2][1],
              fire_sets[3][0], fire_sets[3][1]]
         ]
-        fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 1)
+        fire_tranches = hysplit_utils.create_fire_tranches(fire_sets, 1,
+            datetime.datetime(2018, 11, 9, 0, 0, 0), 24, self.GRID_PARAMS)
         assert expected_tranches == fire_tranches
 
 
@@ -323,7 +375,7 @@ class TestFillInDummyFires(object):
         self.original_fire_sets = copy.deepcopy(self.fire_sets)
 
     def test_one_proc_no_dummy_fires_needed(self, reset_config):
-        hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 1,
+        hysplit_utils.fill_in_dummy_fires(self.fire_sets, 1,
             datetime.datetime(2018,11,9), 4,
             {"center_latitude": 40, "center_longitude": -110})
         assert self.original_fires == self.fires
@@ -338,7 +390,7 @@ class TestFillInDummyFires(object):
         self.original_fire_sets = copy.deepcopy(self.fire_sets)
 
     def test_two_procs_no_dummy_fires_needed(self, reset_config):
-        hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 2,
+        hysplit_utils.fill_in_dummy_fires(self.fire_sets, 2,
             datetime.datetime(2018,11,9), 4,
             {"center_latitude": 40, "center_longitude": -110})
         assert self.original_fires == self.fires
@@ -353,28 +405,25 @@ class TestFillInDummyFires(object):
         self.original_fire_sets = copy.deepcopy(self.fire_sets)
 
     def test_three_procs_one_dummy_fire_needed(self, reset_config):
-        hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 3,
+        hysplit_utils.fill_in_dummy_fires(self.fire_sets, 3,
             datetime.datetime(2018,11,9), 4,
             {"center_latitude": 40, "center_longitude": -110})
-        assert len(self.fires) == 4
+        assert len(self.fires) == 3
         assert self.fires[0:3] == self.original_fires
         assert len(self.fire_sets) == 3
         assert self.fire_sets[0:2] == self.original_fire_sets
         assert len(self.fire_sets[2]) == 1
-        assert self.fire_sets[2][0] == self.fires[3]
 
     def test_four_procs_two_dummy_fires_needed(self, reset_config):
-        hysplit_utils.fill_in_dummy_fires(self.fire_sets, self.fires, 4,
+        hysplit_utils.fill_in_dummy_fires(self.fire_sets, 4,
             datetime.datetime(2018,11,9), 4,
             {"center_latitude": 40, "center_longitude": -110})
-        assert len(self.fires) == 5
+        assert len(self.fires) == 3
         assert self.fires[0:3] == self.original_fires
         assert len(self.fire_sets) == 4
         assert self.fire_sets[0:2] == self.original_fire_sets
         assert len(self.fire_sets[2]) == 1
-        assert self.fire_sets[2][0] == self.fires[3]
         assert len(self.fire_sets[3]) == 1
-        assert self.fire_sets[3][0] == self.fires[4]
 
 ##
 ## Dispersion Grid
