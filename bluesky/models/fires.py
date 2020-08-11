@@ -5,6 +5,7 @@ __author__ = "Joel Dubowy"
 import datetime
 import importlib
 import itertools
+import io
 import json
 import logging
 import sys
@@ -12,6 +13,7 @@ import traceback
 import uuid
 from collections import OrderedDict
 
+import requests
 from pyairfire import process
 
 from bluesky import datautils, datetimeutils, __version__
@@ -267,7 +269,13 @@ class FiresManager(object):
             file_name = datetimeutils.fill_in_datetime_strings(
                 file_name, today=self.today)
             file_name = file_name.replace('{run_id}', self.run_id)
-            return open(file_name, flag)
+            if  file_name.startswith('http'):
+                logging.debug("Loading input over http: %s", file_name)
+                r = requests.get(file_name)
+                return io.StringIO(r.text)
+            else:
+                logging.debug("Loading local file: %s", file_name)
+                return open(file_name, flag)
         else:
             if flag == 'r':
                 return sys.stdin
