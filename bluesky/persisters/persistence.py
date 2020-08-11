@@ -45,8 +45,9 @@ class Persistence(object):
                     raise ValueError("Each fire must have only 1 active area when running persistence")
                 start = aa[0]["active_areas"][0]["start"] + timedelta(days=1)
                 end = aa[0]["active_areas"][0]["end"] + timedelta(days=1)
+                start_utc = start - timedelta(hours=int(aa[0]["active_areas"][0]["utc_offset"]))
 
-                while start <= last_hour:
+                while start_utc < last_hour:
                     # if start in fire_events[event]:
                     #     break
                     n_created += 1
@@ -56,6 +57,7 @@ class Persistence(object):
                     fire["activity"].append(new_aa)
                     start += timedelta(days=1)
                     end += timedelta(days=1)
+                    start_utc += timedelta(days=1)
 
         # self._remove_unused_fires(fires_manager,first_hour,last_hour)
         return n_created
