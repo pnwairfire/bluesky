@@ -242,3 +242,13 @@
 
 ## 4.2.13
  - Update fires csv writer to not fail on integer fccs_id values
+
+## 4.2.14
+ - Added support for subhourly emissions in hysplit dispersion
+ - Added support for loading and running Canadian fire data through plumerise
+ - Refactored use of hysplit dummy fires so that
+   1. the number of tranches equals NPROCESSES and
+   2. every tranche has a dummy fire (to ensure that there is at least one fire within the dispersion domain for each hysplit process)
+ - Added support for loading multiple input files
+ - Added support for loading input files over http
+ - Upgrade met package to v2.0.1
