@@ -2,10 +2,12 @@
 
 __author__ = "Joel Dubowy"
 
+import json
 import logging
 import os
 import subprocess
 import sys
+import tempfile
 import traceback
 
 import afscripting
@@ -14,7 +16,10 @@ REQUIRED_ARGS = [
     {
         'short': '-i',
         'long': '--input-file',
-        'help': "json input file"
+        'dest': 'input_files',
+        'help': 'input file(s) containing JSON formatted fire data',
+        'action': "append",
+        'default': []
     },
     {
         'short': '-r',
@@ -32,11 +37,6 @@ REQUIRED_ARGS = [
 ]
 
 OPTIONAL_ARGS = [
-    {
-        'short': '-c',
-        'long': '--config-file',
-        'help': "json input file"
-    },
     {
         'short': '-p',
         'long': '--pretty-format',
@@ -84,16 +84,34 @@ if __name__ == "__main__":
     # TODO: if repo root is in args.input_file, replace it with ''
 
     try:
-        input_file = os.path.abspath(args.input_file)
+        input_files = [os.path.abspath(i) for i in args.input_files]
+        config_file = None
+        if args.config_file_options or args.config_options:
+            config = {"config": {}}
+            if args.config_file_options:
+                config["config"].update(args.config_file_options)
+            if args.config_options:
+                config["config"].update(args.config_options)
+            f = tempfile.NamedTemporaryFile(delete=False)
+            f.write(json.dumps(config).encode())
+            f.close()
+            config_file = f.name
 
         cmd_args = [
-            'cat', input_file,'|',
             'docker', 'run', '--rm', '-i',
             '-v', '{}:/bluesky-repo/'.format(args.repo_root),
             '-w', '/bluesky-repo/',
             '-e', 'PYTHONPATH=/bluesky-repo/',
             '-e', 'PATH=/bluesky-repo/bin/:$PATH'
         ]
+        for i in input_files:
+            cmd_args.extend([
+                '-v', '{f}:{f}'.format(f=i),
+            ])
+        if config_file:
+            cmd_args.extend([
+                '-v', '{f}:{f}'.format(f=config_file),
+            ])
 
         for d in args.mount_dirs:
             dirs = d.split(':')
@@ -105,11 +123,16 @@ if __name__ == "__main__":
         cmd_args.extend([
             'bluesky',
             './bin/bsp',
-            '--log-level', args.log_level
+            '--log-level', logging.getLevelName(args.log_level)
         ])
-
-        if args.config_file:
-            cmd_args.extend(['-c', args.config_file])
+        for i in input_files:
+            cmd_args.extend([
+                '-i', '{f}'.format(f=i),
+            ])
+        if config_file:
+            cmd_args.extend([
+                '--config-file', '{f}'.format(f=config_file),
+            ])
 
         cmd_args.extend(args.modules)
         if args.pretty_format:

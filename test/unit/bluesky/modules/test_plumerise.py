@@ -3,9 +3,13 @@
 __author__ = "Joel Dubowy"
 
 import datetime
+import os
+import tempfile
+import uuid
 
 from py.test import raises
 from plumerise import sev, feps
+from pyairfire import osutils
 
 from bluesky.config import Config, defaults
 from bluesky.exceptions import BlueSkyConfigurationError
@@ -195,6 +199,15 @@ def monkeypatch_plumerise_class(monkeypatch):
     monkeypatch.setattr(sev, 'SEVPlumeRise', MockPlumeRise)
     monkeypatch.setattr(feps, 'FEPSPlumeRise', MockPlumeRise)
 
+TEMPFILE_DIRS = []
+def monkeypatch_tempfile_mkdtemp(monkeypatch):
+    def _mkdtemp():
+        t = '/tmp/bluesky-plumerise-unittest-' + str(uuid.uuid4())
+        os.makedirs(t)
+        TEMPFILE_DIRS.append(t)
+        return t
+    monkeypatch.setattr(tempfile, 'mkdtemp', _mkdtemp)
+
 # TODO: mock pyairfire.sun.Sun
 
 class TestPlumeRiseRun(object):
@@ -259,6 +272,7 @@ class TestPlumeRiseRunFeps(object):
 
     def test_fire_missing_localmet(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
+        monkeypatch_tempfile_mkdtemp(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_LOCALMET]})
         plumerise.run(self.fm)
@@ -270,7 +284,7 @@ class TestPlumeRiseRunFeps(object):
             ({"foo": 1},{"smoldering": 123}, loc1)
         ]
         assert _PR_COMPUTE_CALL_KWARGS == [
-            {'working_dir': None}
+            {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ FIRE_MISSING_LOCALMET.id)}
         ]
 
     def test_no_fires(self, reset_config, monkeypatch):
@@ -285,6 +299,7 @@ class TestPlumeRiseRunFeps(object):
 
     def test_one_fire(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
+        monkeypatch_tempfile_mkdtemp(monkeypatch)
 
         self.fm.load({"fires": [FIRE]})
         plumerise.run(self.fm)
@@ -298,8 +313,8 @@ class TestPlumeRiseRunFeps(object):
             ({"bar": 2}, {"flaming": 434}, loc2)
         ]
         assert _PR_COMPUTE_CALL_KWARGS == [
-            {'working_dir': None},
-            {'working_dir': None}
+            {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ FIRE.id)},
+            {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ FIRE.id)}
         ]
         # TOOD: assert plumerise return value
 
@@ -394,7 +409,7 @@ class TestPlumeRiseRunSev(object):
         plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
         assert _PR_COMPUTE_CALL_ARGS == []
 
     def test_one_fire(self, reset_config, monkeypatch):
@@ -404,7 +419,7 @@ class TestPlumeRiseRunSev(object):
         plumerise.run(self.fm)
 
         assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
+        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
         loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
         loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
         assert _PR_COMPUTE_CALL_ARGS == [

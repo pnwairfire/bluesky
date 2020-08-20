@@ -16,7 +16,7 @@ FEPS_WEATHER_BINARY = "feps_weather"
 FEPS_TIMEPROFILE_BINARY = "feps_timeprofile"
 
 class UbcBsfFEPSTimeProfiler(object):
-    """ FEPS Time Profile Module 
+    """ FEPS Time Profile Module
 
     FEPSTimeProfile was copied from BlueSky Framework, and subsequently modified
     TODO: acknowledge original authors (STI?)
@@ -52,7 +52,7 @@ class UbcBsfFEPSTimeProfiler(object):
         growthFile = os.path.join(working_dir, "growth.txt")
         profileFile = os.path.join(working_dir, "profile.txt")
 
-        self.writeConsumption(active_area, active_area["specified_points"][0], consumptionFile)
+        self.writeConsumption(active_area, consumptionFile)
         self.writeGrowth(active_area, growthFile)
 
         # What interpolation mode are we using?
@@ -78,13 +78,21 @@ class UbcBsfFEPSTimeProfiler(object):
         self.start_hour = active_area["start"]
         self.ONE_HOUR = timedelta(hours=1)
 
-    def writeConsumption(self, active_area, fire_location_info, filename):
+    def writeConsumption(self, active_area, filename):
+        cons = active_area["consumption"]["summary"]
+
+        # compute total area and average moisture_duff over all specified points
+        area = sum([l['area'] for l in active_area['specified_points']])
+        mduff = sum([
+            l['moisture_duff'] for l in active_area['specified_points']
+        ]) / len(active_area['specified_points'])
+
         f = open(filename, 'w')
-        f.write("cons_flm=%f\n" % active_area["consumption"]["summary"]["flaming"])
-        f.write("cons_sts=%f\n" % active_area["consumption"]["summary"]["smoldering"])
-        f.write("cons_lts=%f\n" % active_area["consumption"]["summary"]["residual"])
-        f.write("cons_duff=%f\n" % active_area["consumption"]["summary"]["duff"])
-        f.write("moist_duff=%f\n" % fire_location_info["moisture_duff"])
+        f.write("cons_flm={}\n".format(cons["flaming"] / area))
+        f.write("cons_sts={}\n".format(cons["smoldering"] / area))
+        f.write("cons_lts={}\n".format(cons["residual"] / area))
+        f.write("cons_duff={}\n".format(cons["duff"] / area))
+        f.write("moist_duff={}\n".format(mduff))
         f.close()
 
     def writeGrowth(self, active_area, filename):
@@ -118,7 +126,7 @@ class UbcBsfFEPSTimeProfiler(object):
             i = i + 1
 
         return time_profile
-    
+
     # The next 2 methods were copied from AirFire with some modifications
     def _get_diurnal_file(self, active_area, fire_location_info, working_dir):
         self._fill_fire_location_info(active_area, fire_location_info)

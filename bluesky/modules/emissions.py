@@ -9,13 +9,13 @@ import logging
 import sys
 import os
 
+import consume
 from emitcalc import __version__ as emitcalc_version
 from emitcalc.calculator import EmissionsCalculator
 from eflookup import __version__ as eflookup_version
 from eflookup.fccs2ef.lookup import Fccs2Ef
 from eflookup.fepsef import FepsEFLookup
-
-import consume
+from pyairfire import osutils
 
 from bluesky import datautils, datetimeutils
 from bluesky.config import Config
@@ -131,37 +131,36 @@ class UbcBsfFeps(EmissionsBase):
         for fire in fires:
             with self.fire_failure_handler(fire):
                 self._run_on_fire(fire)
-    
-    def _get_working_dir(self, fire):
-        model = Config().get('emissions', 'model').lower()
-        config = Config().get('emissions', model)
-        if config.get('working_dir'):
-            working_dir = os.path.join(config['working_dir'],
-                "feps-emissions-{}".format(fire.id))
-            if not os.path.exists(working_dir):
-                os.makedirs(working_dir)
-            return working_dir
+
+    def _get_fire_working_dir(self, fire, working_dir):
+        fire_working_dir = os.path.join(working_dir,
+            "feps-emissions-{}".format(fire.id))
+        if not os.path.exists(fire_working_dir):
+            os.makedirs(fire_working_dir)
+        return fire_working_dir
 
     #CONVERSION_FACTOR = 0.0005 # 1.0 ton / 2000.0 lbs
 
     def _run_on_fire(self, fire):
-        working_dir = self._get_working_dir(fire)
-        if 'activity' not in fire:
-            raise ValueError(
-                "Missing activity data required for computing Canadian emissions")
-        for aa in fire.active_areas:
-            for loc in aa.locations:
-                if "consumption" not in loc:
-                    raise ValueError(
-                        "Missing consumption data required for computing Canadian emissions")
-                if 'fuelbeds' not in loc:
-                    raise ValueError(
-                        "Fuelbeds should be made in bsf load module before computing Canadian emissions")
-                if len(loc["fuelbeds"]) != 1:
-                    raise ValueError(
-                        "Each fuelbed array should only have one entry when running Canadian emissions")
-                loc["fuelbeds"][0]["emissions"] = self.emitter.run(loc,working_dir)
-                
+        working_dir = Config().get('emissions', 'ubc-bsf-feps', 'working_dir')
+        with osutils.create_working_dir(working_dir=working_dir) as wdir:
+            fire_working_dir = self._get_fire_working_dir(fire, wdir)
+            if 'activity' not in fire:
+                raise ValueError(
+                    "Missing activity data required for computing Canadian emissions")
+            for aa in fire.active_areas:
+                for loc in aa.locations:
+                    if "consumption" not in loc:
+                        raise ValueError(
+                            "Missing consumption data required for computing Canadian emissions")
+                    if 'fuelbeds' not in loc:
+                        raise ValueError(
+                            "Fuelbeds should be made in bsf load module before computing Canadian emissions")
+                    if len(loc["fuelbeds"]) != 1:
+                        raise ValueError(
+                            "Each fuelbed array should only have one entry when running Canadian emissions")
+                    loc["fuelbeds"][0]["emissions"] = self.emitter.run(loc, fire_working_dir)
+
 
 ##
 ## FEPS

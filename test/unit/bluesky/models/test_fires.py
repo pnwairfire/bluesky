@@ -470,7 +470,7 @@ class TestFiresManager(object):
         assert fires_manager.num_fires == 2
         assert set(['1','2']) == set(list(fires_manager._fires.keys()))
         assert {'1': [fire_objects[0]],'2': [fire_objects[1]]} == fires_manager._fires
-        assert fires_manager.today == freezegun.api.FakeDate(2016, 4, 20)
+        assert fires_manager.today == freezegun.api.FakeDatetime(2016, 4, 20)
         expected_meta = {
             'a':1, 'b':{'c':2}, 'd': 123
         }
@@ -479,9 +479,9 @@ class TestFiresManager(object):
     ## Properties
 
     @freezegun.freeze_time("2016-04-20")
-    def test_today_is_processed_for_wildcards(self, monkeypatch, reset_config):
+    def test_toy_is_processed_for_wildcards(self, monkeypatch, reset_config):
         fm = fires.FiresManager()
-        assert fm.today == datetime.date(2016,4,20)
+        assert fm.today == datetime.datetime(2016,4,20)
 
         # test setting fm.today by load
 
@@ -523,7 +523,7 @@ class TestFiresManager(object):
 
         # TODO: any other possibilities ??
 
-    def test_run_id_is_immutable(self, monkeypatch, reset_config):
+    def test_run_id_is_mutable(self, monkeypatch, reset_config):
         monkeypatch.setattr(uuid, 'uuid4', lambda: "sdf123")
 
         fm = fires.FiresManager()
@@ -545,17 +545,15 @@ class TestFiresManager(object):
         assert fm.run_id == "sdf123"
         fm.load({'run_id': "ggbgbg"})
         assert fm.run_id == "ggbgbg"
-        with raises(TypeError) as e_info:
-            fm.run_id = "sdfsdfsdf"
-        assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+        fm.run_id = "sdfsdfsdf"
+        assert fm.run_id == "sdfsdfsdf"
 
         fm = fires.FiresManager()
         assert fm.run_id == "sdf123"
         fm.run_id = "eee"
         assert fm.run_id == "eee"
-        with raises(TypeError) as e_info:
-            fm.run_id = "sdfsdfsdf"
-        assert e_info.value.args[0] == fires.FiresManager.RUN_ID_IS_IMMUTABLE_MSG
+        fm.run_id = "sdfsdfsdf"
+        assert fm.run_id == "sdfsdfsdf"
 
         # when you load, fm starts from scratch
         fm = fires.FiresManager()
@@ -659,7 +657,7 @@ class TestFiresManager(object):
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{}'))
         fires_manager.loads()
         assert fires_manager.num_fires == 0
-        assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
+        assert fires_manager.today == freezegun.api.FakeDatetime(2016,4,20)
         assert [] == fires_manager.fires
         assert expected_meta == fires_manager.meta
 
@@ -678,7 +676,7 @@ class TestFiresManager(object):
         fires_manager.loads()
         assert fires_manager.num_fires == 0
         assert [] == fires_manager.fires
-        assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
+        assert fires_manager.today == freezegun.api.FakeDatetime(2016,4,20)
         expected_meta = {
             "foo": {"bar": "baz"}
         }
@@ -698,7 +696,7 @@ class TestFiresManager(object):
         ]
         assert fires_manager.num_fires == 1
         assert expected_fires == fires_manager.fires
-        assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
+        assert fires_manager.today == freezegun.api.FakeDatetime(2016,4,20)
         expected_meta = {
             "foo": {"bar": "baz"}
         }
@@ -720,11 +718,38 @@ class TestFiresManager(object):
         ]
         assert fires_manager.num_fires == 2
         assert expected_fires == fires_manager.fires
-        assert fires_manager.today == freezegun.api.FakeDate(2016,4,20)
+        assert fires_manager.today == freezegun.api.FakeDatetime(2016,4,20)
         expected_meta = {
             "foo": {"bar": "baz"},
         }
         assert expected_meta == fires_manager.meta
+
+    @freezegun.freeze_time("2016-04-20")
+    def test_load_multiple_streams(self, monkeypatch, reset_config):
+        input_1 = io.StringIO('{"fires":[{"id":"a","bar":123,"baz":12.32,"bee":"12.12"},'
+            '{"id":"b","bar":2, "baz": 1.1, "bee":"24.34"}],'
+            '"foo": {"bar": "baz"}}')
+        input_2 = io.StringIO('{"das": 1, "fires":[{"id":"c","bar":1223,"baz":1,"bee":"12"}]}')
+
+        monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
+
+        fires_manager = fires.FiresManager()
+        fires_manager.loads(input_stream=input_1, append_fires=True)
+        fires_manager.loads(input_stream=input_2, append_fires=True)
+        expected_fires = [
+            fires.Fire({'id':'a', 'bar':123, 'baz':12.32, 'bee': "12.12"}),
+            fires.Fire({'id':'b', 'bar':2, 'baz': 1.1, 'bee': '24.34'}),
+            fires.Fire({"id":"c", "bar":1223,"baz":1,"bee":"12"})
+        ]
+        assert fires_manager.num_fires == 3
+        assert expected_fires == fires_manager.fires
+        assert fires_manager.today == freezegun.api.FakeDatetime(2016,4,20)
+        expected_meta = {
+            "foo": {"bar": "baz"},
+            "das": 1
+        }
+        assert expected_meta == fires_manager.meta
+
 
     ## Dumping
 
@@ -753,7 +778,7 @@ class TestFiresManager(object):
         fires_manager.dumps()
         expected = {
             "run_id": "abcd1234",
-            "today": "2016-04-20",
+            "today": "2016-04-20T00:00:00",
             "run_config": DEFAULTS,
             "fires": fire_objects,
             "foo": {"bar": "baz"},
@@ -870,22 +895,37 @@ class TestFiresManagerSettingToday(object):
         fires_manager.today = datetime.date(2017,10,1)
         assert fires_manager.today == datetime.datetime(2017,10,1)
 
-    def test_is_immutable(self, reset_config):
+    def test_is_mutable(self, reset_config):
         fires_manager = fires.FiresManager()
-        fires_manager.today = datetime.datetime(2017,10,1)
 
-        # ok to set to same val
+        # set to something other than UTC today (which is default)
         fires_manager.today = datetime.datetime(2017,10,1)
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+        # set to same date (as datetime, date, and string objects)
+
+        fires_manager.today = datetime.datetime(2017,10,1)
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
         fires_manager.today = datetime.date(2017,10,1)
-        fires_manager.today = "2017-10-01"
+        assert fires_manager.today == datetime.datetime(2017,10,1)
 
-        # not ok to change
-        with raises(TypeError) as e_info:
-            fires_manager.today = datetime.datetime(2017,10,2)
-        assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
-        with raises(TypeError) as e_info:
-            fires_manager.today = datetime.date(2017,10,3)
-        assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
-        with raises(TypeError) as e_info:
-            fires_manager.today = "2017-10-04"
-        assert e_info.value.args[0] == fires.FiresManager.TODAY_IS_IMMUTABLE_MSG
+        fires_manager.today = "2017-10-01T00:00:00"
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+        fires_manager.today = "2017-10-01"
+        assert fires_manager.today == datetime.datetime(2017,10,1)
+
+        # set to different dates (as datetime, date, and string objects)
+
+        fires_manager.today = datetime.datetime(2017,10,2)
+        assert fires_manager.today == datetime.datetime(2017,10,2)
+
+        fires_manager.today = datetime.date(2017,10,3)
+        assert fires_manager.today == datetime.datetime(2017,10,3)
+
+        fires_manager.today = "2017-10-04T00:00:00"
+        assert fires_manager.today == datetime.datetime(2017,10,4)
+
+        fires_manager.today = "2017-10-05"
+        assert fires_manager.today == datetime.datetime(2017,10,5)

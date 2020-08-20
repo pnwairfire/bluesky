@@ -191,7 +191,7 @@ class CsvFileLoader(BaseCsvFileLoader):
         if row.get("type"):
             fire["type"] = row["type"].lower()
 
-        # Add consumption data if present and flag active. 
+        # Add consumption data if present and flag active.
         # This was implemented for the Canadian version of the SmartFire system.
         # It is important to note that this consumption marshalling was done with only the Canadian format
         # in mind. If consumption is added to the input of the US system, further changes maybe required.
@@ -212,11 +212,14 @@ class CsvFileLoader(BaseCsvFileLoader):
 
             total_cons = flaming + smold + resid + duff
 
-            consumption = {"flaming": [flaming],
-            "residual": [resid],
-            "smoldering": [smold],
-            "duff": [duff],
-            "total": [total_cons]
+
+            area = sp.get('area') or 1
+            consumption = {
+                "flaming": [area * flaming],
+                "residual": [area * resid],
+                "smoldering": [area * smold],
+                "duff": [area * duff],
+                "total": [area * total_cons]
             }
 
             self._consumption_values[fire["id"]] = consumption

@@ -43,7 +43,8 @@ def create_fire_sets(fires):
     """
     return  [[f] for f in fires]
 
-def create_fire_tranches(fire_sets, num_processes):
+def create_fire_tranches(fire_sets, num_processes, model_start, num_hours,
+        grid_params):
     """Creates tranches of FireLocationData, each tranche to be processed by its
     own HYSPLIT process.
 
@@ -51,8 +52,10 @@ def create_fire_tranches(fire_sets, num_processes):
     location, etc.; to keep the number of fires in each tranche as close
     as possible to to # fires / # tranches).
     """
+    fill_in_dummy_fires(fire_sets, num_processes, model_start, num_hours,
+        grid_params)
     n_sets = len(fire_sets)
-    num_processes = min(n_sets, num_processes)  # just to be sure
+    #num_processes = min(n_sets, num_processes)  # just to be sure
     min_n_fire_sets_per_process = n_sets // num_processes
     extra_fire_cutoff = n_sets % num_processes
 
@@ -176,19 +179,25 @@ def generate_dummy_fire(model_start, num_hours, grid_params):
 
     return f
 
-def fill_in_dummy_fires(fire_sets, fires, num_processes, model_start,
+# TODO: replace fill_in_dummy_fires and ensure_tranch_has_dummy_fire
+#   with a single method that adds a dummy fire to existing fire sets
+#   and fills in dummy fire sets to reach num_processes
+
+def fill_in_dummy_fires(fire_sets, num_processes, model_start,
         num_hours, grid_params):
+    """Creates extra trahcnes, each with a dummy fire within the
+    dispersion grid, so that len(fires_sets) == num_processes
+    """
     if len(fire_sets) < num_processes:
         for i in range(num_processes - len(fire_sets)):
             f = generate_dummy_fire(
                 model_start, num_hours, grid_params)
-            fires.append(f)
             fire_sets.append([f])
 
 def ensure_tranch_has_dummy_fire(fires, model_start, num_hours, grid_params):
     # Adds a dummy fire to ensure that there's at least one fire within
-    # met domain. We can skip this step if the tranch was already
-    # assigned a dummy fire (i.e. which sould only have happened if
+    # the dispersion domain. We can skip this step if the tranch was already
+    # assigned a dummy fire (i.e. which would only have happened if
     # there were fewer fires than tranches)
 
     if not any([f.get('is_dummy') for f in fires]):

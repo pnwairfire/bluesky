@@ -66,6 +66,7 @@ configuration json data are case-insensitive.***
 
  - ***'config' > 'load' > 'sources' > 'omit_nulls'*** -- don't include fire data keys with null/None values
  - ***'config' > 'load' > 'sources' > 'timeprofile_file'*** -- *optional*
+ - ***'config' > 'load' > 'sources' > 'load_consumption'*** -- *optional*
 
 ###### if type 'file':
 
@@ -154,6 +155,10 @@ for a fire's activity object. They also define what synonyms to recognize, if an
 'config' > 'consumption' > 'fuel_loadings' if it doesn't find them in the
 emissions config
 
+###### If running ubc-bsf-feps emissions:
+
+- ***'config' > 'emissions' > 'ubc-bsf-feps' > 'working_dir'*** -- *optional* --
+
 ##### findmetdata
 
  - ***'config' > 'findmetdata' > 'met_root_dir'*** -- *required* --
@@ -176,11 +181,23 @@ emissions config
 ##### timeprofile
 
  - ***'config' > 'timeprofile' > 'hourly_fractions'*** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the activity window)
+ - ***'config' > 'timeprofile' > 'model'*** -- *optional* -- default: "default"; only used if you want to use the 'ubc-bsf-feps' model
 
+###### If running ubc-bsf-feps model:
+
+ - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'interpolation_type'*** -- *optional* -- default: 1
+ - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'normalize'*** -- *optional* -- default: True
+ - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'working_dir'*** -- *optional* -- default: None
 
 ##### plumerise
 
  - ***'config' > 'plumerise' > 'model'*** -- *optional* -- plumerise model; defaults to "feps"
+
+###### If running feps model:
+
+ - ***'config' > 'plumerise' > 'feps' > 'working_dir'*** -- *optional* -- default: None
+ - ***'config' > 'plumerise' > 'feps' > 'load_heat'*** -- *optional* -- default: False
+
 
 ###### if feps:
 
@@ -345,6 +362,7 @@ PARTICLE_SHAPE = 1.0
  - ***'config' > 'dispersion' > 'hysplit' > 'TRATIO'*** -- *optional* -- default: 0.75
  - ***'config' > 'dispersion' > 'hysplit' > 'USER_DEFINED_GRID'*** -- *required* to be set to true if grid is not defined in met data or in 'grid' settings, and it's not being computed -- default: False
  - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_EMISLEVELS_REDUCTION_FACTOR'*** -- *optional* -- default: 1
+ - ***'config' > 'dispersion' > 'hysplit' > 'SUBHOUR_EMISSIONS_REDUCTION_INTERVAL'*** -- *optional* -- Factor for subhour emissions interval - e.g. 1 (hourly - default), 2 (30 min), etc.; default: 1
  - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_LEVELS'*** -- *optional* -- default: [100]
  - ***'config' > 'dispersion' > 'hysplit' > 'VERTICAL_METHOD'*** -- *optional* -- default: "DATA"
  - ***'config' > 'dispersion' > 'hysplit' > 'WET_DEP_ACTUAL_HENRY'*** -- *optional* -- default: 0.0

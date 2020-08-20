@@ -41,6 +41,7 @@ _DEFAULTS = {
         # BSF
         #  "omit_nulls"
         #  "timeprofile_file"
+        #  "load_consumption"
         # File Sourcees
         #  'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
         #  'events_file'*** -- *optional* for each file type source-- file containing fire events data; e.g. '/path/to/fire_events.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
@@ -161,8 +162,8 @@ _DEFAULTS = {
         "species": [],
         "fuel_loadings": {},
         "ubc-bsf-feps": {
-                "working_dir": None
-            }
+            "working_dir": None
+        }
     },
     "findmetdata": {
         "met_root_dir": None,
@@ -193,8 +194,8 @@ _DEFAULTS = {
         "hourly_fractions": None,
         "model": "default",
         "ubc-bsf-feps": {
-            "INTERPOLATION_TYPE": 1,
-            "NORMALIZE": True,
+            "interpolation_type": 1,
+            "normalize": True,
             "working_dir": None
         }
     },
@@ -203,7 +204,6 @@ _DEFAULTS = {
         "model": "feps",
         "feps": {
             "working_dir": None,
-            "consumption_in_tons_per_acre": False,
             "load_heat": False
             # The following defaults are defined in the plumerise
             # package, so we won't set them here
@@ -372,6 +372,13 @@ _DEFAULTS = {
 
             # Factor for reducing the number of vertical emission levels
             "VERTICAL_EMISLEVELS_REDUCTION_FACTOR": 1,
+
+            # Factor for subhour emissions interval
+            # sub-hour emission interval. should be an integer value of
+            # 1 (hourly - default), 2 (30 min), 3 (20 min), 4 (15 min),
+            #                       5 (12 min), 6 (10 min), 10 (6 min)
+            #                    or 12 (5 min).
+            "SUBHOUR_EMISSIONS_REDUCTION_INTERVAL": 1,
 
             # Method of vertical motion calculation in HYSPLIT
             # Choices: DATA, ISOB, ISEN, DENS, SIGMA, DIVERG, ETA

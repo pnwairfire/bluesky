@@ -12,7 +12,7 @@ import os
 import csv
 
 from plumerise import sev, feps, __version__ as plumerise_version
-from pyairfire import sun
+from pyairfire import sun, osutils
 
 from bluesky import datautils, datetimeutils, locationutils
 from bluesky.config import Config
@@ -33,14 +33,14 @@ def run(fires_manager):
     """
     compute_func = ComputeFunction(fires_manager)
 
-    for fire in fires_manager.fires:
-        with fires_manager.fire_failure_handler(fire):
-            compute_func(fire)
+    with osutils.create_working_dir(
+            working_dir=compute_func.config.get('working_dir')) as working_dir:
+        for fire in fires_manager.fires:
+            with fires_manager.fire_failure_handler(fire):
+                compute_func(fire, working_dir=working_dir)
 
     # Make sure to distribute the heat if it was loaded here.
-    model = Config().get('plumerise', 'model').lower()
-    config = Config().get('plumerise', model)
-    if config.get("load_heat"):
+    if compute_func.config.get("load_heat"):
         datautils.summarize_all_levels(fires_manager, 'heat')
 
     # TODO: spread out emissions over plume and set in activity or fuelbed
@@ -70,17 +70,17 @@ class ComputeFunction(object):
             raise BlueSkyConfigurationError(
                 INVALID_PLUMERISE_MODEL_MSG.format(model))
 
-        config = Config().get('plumerise', model)
-        self._compute_func = generator(config)
+        self.config = Config().get('plumerise', model)
+        self._compute_func = generator(self.config)
 
-        if config.get('working_dir'):
+        if self.config.get('working_dir'):
             fires_manager.plumerise = {
                 'output': {
-                    'directory': config['working_dir']
+                    'directory': self.config['working_dir']
                 }
             }
 
-    def __call__(self, fire):
+    def __call__(self, fire, working_dir=None):
         if 'activity' not in fire:
             raise ValueError(NO_ACTIVITY_ERROR_MSG)
 
@@ -88,21 +88,20 @@ class ComputeFunction(object):
         # exception if any are missing area
         fire.locations
 
-        self._compute_func(fire)
+        self._compute_func(fire, working_dir)
 
     ## compute function generators
 
     def _feps(self, config):
         pr = feps.FEPSPlumeRise(**config)
 
-        def _get_working_dir(fire):
-            if config.get('working_dir'):
-                working_dir = os.path.join(config['working_dir'],
-                    "feps-plumerise-{}".format(fire.id))
-                if not os.path.exists(working_dir):
-                    os.makedirs(working_dir)
-                return working_dir
-        
+        def _get_fire_working_dir(fire, working_dir):
+            fire_working_dir = os.path.join(working_dir,
+                "feps-plumerise-{}".format(fire.id))
+            if not os.path.exists(fire_working_dir):
+                os.makedirs(fire_working_dir)
+            return fire_working_dir
+
         def _loadHeat(plume_dir):
             plumeFile = os.path.join(plume_dir, "plume.txt")
 
@@ -118,7 +117,7 @@ class ComputeFunction(object):
 
             return heat
 
-        def _f(fire):
+        def _f(fire, working_dir):
             # TODO: create and change to working directory here (per fire),
             #   above (one working dir per all fires), or below (per activity
             #   window)...or just let plumerise create temp workingdir (as
@@ -151,24 +150,18 @@ class ComputeFunction(object):
                         # just set them both, even if one is already set
                         loc["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
                         loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
-                    
-                    consumption = copy.deepcopy(loc['consumption']['summary'])
 
-                    if config.get("consumption_in_tons_per_acre"):
-                        c = consumption.items()
-                        for key,value in c:
-                            consumption[key] = value * loc["area"]
-
+                    fire_working_dir = _get_fire_working_dir(fire, working_dir)
                     plumerise_data = pr.compute(aa['timeprofile'],
-                        consumption, loc,
-                        working_dir=_get_working_dir(fire))
+                        loc['consumption']['summary'], loc,
+                        working_dir=fire_working_dir)
                     loc['plumerise'] = plumerise_data['hours']
 
                     if config.get("load_heat"):
                         if 'fuelbeds' not in loc:
                             raise ValueError(
                                 "Fuelbeds should exist before loading heat in plumerise")
-                        loc["fuelbeds"][0]["heat"] = _loadHeat(_get_working_dir(fire))
+                        loc["fuelbeds"][0]["heat"] = _loadHeat(fire_working_dir)
                     # TODO: do anything with plumerise_data['heat'] ?
                     # SEE: Canadian additon to this system above
 
@@ -177,7 +170,7 @@ class ComputeFunction(object):
     def _sev(self, config):
         pr = sev.SEVPlumeRise(**config)
 
-        def _f(fire):
+        def _f(fire, working_dir):
             fire_frp = fire.get('meta', {}).get('frp')
             for aa in fire.active_areas:
                 for loc in aa.locations:

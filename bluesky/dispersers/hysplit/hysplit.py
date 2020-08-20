@@ -181,9 +181,6 @@ class HYSPLITDispersion(DispersionBase):
         self._set_grid_params()
         self._set_reduction_factor()
         self._compute_tranches()
-        hysplit_utils.fill_in_dummy_fires(self._fire_sets, self._fires,
-            self._num_processes, self._model_start, self._num_hours,
-            self._grid_params)
 
         if 1 < self._num_processes:
                 # hysplit_utils.create_fire_tranches will log number of processes
@@ -346,8 +343,9 @@ class HYSPLITDispersion(DispersionBase):
                 except Exception as e:
                     self.exc = e
 
-        fire_tranches = hysplit_utils.create_fire_tranches(
-            self._fire_sets, self._num_processes)
+        fire_tranches = hysplit_utils.create_fire_tranches(self._fire_sets,
+            self._num_processes, self._model_start, self._num_hours,
+            self._grid_params)
         threads = []
         main_thread_config = Config().get()
         for nproc in range(len(fire_tranches)):
@@ -587,6 +585,17 @@ class HYSPLITDispersion(DispersionBase):
         # emissions into the model.
         smolder_height = self.config("SMOLDER_HEIGHT")
 
+        # sub-hour emissions?
+        SERI = self.config("SUBHOUR_EMISSIONS_REDUCTION_INTERVAL")
+
+        # must be 1 to 12 and result in an integer when 60 is divided by it
+        if ( SERI < 1 or SERI > 13 ):
+            SERI = 1
+            temp = 60%SERI
+            if temp > 0:
+                SERI = 1
+        minutes_per_interval = int(60/SERI)
+
         with open(emissions_file, "w") as emis:
             # HYSPLIT skips past the first two records, so these are for comment purposes only
             emis.write("emissions group header: YYYY MM DD HH QINC NUMBER\n")
@@ -600,7 +609,7 @@ class HYSPLITDispersion(DispersionBase):
                 num_fires = len(fires)
                 #num_heights = 21 # 20 quantile gaps, plus ground level
                 num_heights = self.num_output_quantiles + 1
-                num_sources = num_fires * num_heights
+                num_sources = num_fires * num_heights * SERI
 
                 # TODO: What is this and what does it do?
                 # A reasonable guess would be that it means a time increment of 1 hour
@@ -613,6 +622,15 @@ class HYSPLITDispersion(DispersionBase):
 
                 # Loop through the fire locations
                 for fire in fires:
+
+                  # loop over sub-hour interval (default hourly)
+                  icount = 0
+                  for interval in range(SERI):
+                    min_dur_str = "{:0>2}".format(icount*minutes_per_interval) + " 00"+"{:0>2}".format(minutes_per_interval)
+                    if (SERI == 1):
+                        min_dur_str = "00 0100"
+                    icount += 1
+
                     # Get some properties from the fire location
                     lat = fire.latitude
                     lon = fire.longitude
@@ -658,8 +676,8 @@ class HYSPLITDispersion(DispersionBase):
                     height_meters = smolder_height
 
                     # Write the smoldering record to the file
-                    record_fmt = "%s 00 0100 %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
-                    emis.write(record_fmt % (dt_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
+                    record_fmt = "%s %s %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
+                    emis.write(record_fmt % (dt_str, min_dur_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
 
                     for level in range(0, len(plumerise_hour['heights']) - 1, self._reduction_factor):
                         height_meters = 0.0
@@ -690,7 +708,7 @@ class HYSPLITDispersion(DispersionBase):
                             pm25_injected = pm25_entrained * fraction
 
                         # Write the record to the file
-                        emis.write(record_fmt % (dt_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
+                        emis.write(record_fmt % (dt_str, min_dur_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
 
                 if fires_wo_emissions > 0:
                     logging.debug("%d of %d fires had no emissions for hour %d", fires_wo_emissions, num_fires, hour)
@@ -721,9 +739,20 @@ class HYSPLITDispersion(DispersionBase):
             met_info=self._met_info, fires=self._fires)
 
     def _write_control_file(self, fires, control_file, concFile):
+
+        # sub-hour emissions?
+        SERI = self.config("SUBHOUR_EMISSIONS_REDUCTION_INTERVAL")
+
+        # must be 1 to 12 and result in an integer when 60 is divided by it
+        if ( SERI < 1 or SERI > 13 ):
+            SERI = 1
+            temp = 60%SERI
+            if temp > 0:
+                SERI = 1
+
         num_fires = len(fires)
         num_heights = self.num_output_quantiles + 1  # number of quantiles used, plus ground level
-        num_sources = num_fires * num_heights
+        num_sources = num_fires * num_heights * SERI
 
         # An arbitrary height value.  Used for the default source height
         # in the CONTROL file.  This can be anything we want, because
@@ -820,6 +849,7 @@ class HYSPLITDispersion(DispersionBase):
             # Source locations
             for fire in fires:
                 for height in range(num_heights):
+                  for intervals in range(SERI):
                     f.write("%9.3f %9.3f %9.3f\n" % (fire.latitude, fire.longitude, sourceHeight))
 
             # Total run time (hours)

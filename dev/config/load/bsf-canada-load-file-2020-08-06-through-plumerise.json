@@ -1,0 +1,36 @@
+{
+    "config":{
+        "load": {
+            "sources": [
+                {
+                    "name": "bsf",
+                    "format": "CSV",
+                    "type": "file",
+                    "file": "/bluesky/dev/data/other-sources/bsf-canada/cwfis-hotspots-groundreports-fire-events20200806-19-locations.csv",
+                    "omit_nulls": true,
+                    "load_consumption": true
+                }
+            ]
+        },
+        "emissions": {
+            "model": "ubc-bsf-feps",
+            "ubc-bsf-feps": {
+                "working_dir": null
+            }
+        },
+        "timeprofile": {
+            "model": "ubc-bsf-feps",
+            "ubc-bsf-feps": {
+                "interpolation_type": 1,
+                "normalize": true,
+                "working_dir": null
+            }
+        },
+        "plumerise": {
+            "model": "feps",
+            "feps": {
+                "load_heat": true
+            }
+        }
+    }
+}
