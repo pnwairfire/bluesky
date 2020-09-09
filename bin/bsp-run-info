@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
 import argparse
+import datetime
 import json
 import sys
 import os
+from collections import defaultdict
+
+from afdatetime.parsing import parse_datetime, parse_utc_offset
 
 try:
     from bluesky import models
@@ -43,8 +47,50 @@ def count(fires_manager):
         # must not have run dispersion
         pass
 
+DEFAULT_HOUR_FRACTION = 1/24
+ONE_HOUR = datetime.timedelta(hours=1)
+def area(fires_manager):
+    # note: we
+    area_by_day = defaultdict(lambda: 0)
+    aa_failed = 0
+    for f in fires_manager.fires:
+        for aa in f.active_areas:
+            try:
+                utc_offset = datetime.timedelta(hours=parse_utc_offset(aa['utc_offset']))
+                start = parse_datetime(aa["start"])
+                end = parse_datetime(aa["end"])
+                if start > end:
+                    # invalid time window
+                    aa_failed += 1
+                    continue
+
+                hr = start
+                while hr <= end:
+                    hr_str = hr.strftime('%Y-%m-%dT%H:%M:%S')
+                    area_fraction = aa.get('timeprofile', {}).get(
+                        hr_str, {}).get(hr_str, DEFAULT_HOUR_FRACTION)
+                    aa_area = sum([l['area'] for l in aa.locations])
+                    area_by_day[(hr - utc_offset).date()] += aa_area * area_fraction
+                    hr += ONE_HOUR
+
+            except Exception as e:
+                aa_failed += 1
+                pass
+
+    print("Area by day (UTC)")
+    for k in area_by_day:
+        print("  {}: {:,}".format(k, int(area_by_day[k])))
+
+    if aa_failed:
+        print("  (failed to tally area for {} active areas".format(aa_failed))
+
+
 def runtime(fires_manager):
     print("Runtime")
+    if not fires_manager.runtime:
+        print("  (NA)")
+        return
+
     print("  Total: {}".format(fires_manager.runtime.get('total', '?')))
     print("  Modules")
     for m in fires_manager.runtime.get('modules'):
@@ -56,6 +102,7 @@ def main():
     fires_manager.loads(input_file=args.input)
 
     count(fires_manager)
+    area(fires_manager)
     runtime(fires_manager)
 
 if __name__ == "__main__":
