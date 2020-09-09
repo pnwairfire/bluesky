@@ -83,7 +83,7 @@ def area(fires_manager):
                 pass
 
     print("Area by day (UTC)")
-    for k in area_by_day:
+    for k in sorted(list(area_by_day.keys())):
         print("  {}: {:,}".format(k, int(area_by_day[k])))
 
     if aa_failed:
