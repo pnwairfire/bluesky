@@ -47,7 +47,6 @@ def count(fires_manager):
         # must not have run dispersion
         pass
 
-DEFAULT_HOUR_FRACTION = 1/24
 ONE_HOUR = datetime.timedelta(hours=1)
 def area(fires_manager):
     # note: we
@@ -64,13 +63,20 @@ def area(fires_manager):
                     aa_failed += 1
                     continue
 
+                aa_area = sum([l['area'] for l in aa.locations])
+
+                default_area_fraction = 3600 / (end-start).total_seconds()
+
                 hr = start
-                while hr <= end:
+                while hr < end:
                     hr_str = hr.strftime('%Y-%m-%dT%H:%M:%S')
                     area_fraction = aa.get('timeprofile', {}).get(
-                        hr_str, {}).get(hr_str, DEFAULT_HOUR_FRACTION)
-                    aa_area = sum([l['area'] for l in aa.locations])
-                    area_by_day[(hr - utc_offset).date()] += aa_area * area_fraction
+                        hr_str, {}).get(hr_str, default_area_fraction)
+                    hourly_area = aa_area * area_fraction
+                    utc_date = (hr - utc_offset).date()
+                    print("{} - {} - {} - {}".format(hr, hr_str, utc_date, hourly_area))
+
+                    area_by_day[utc_date] += hourly_area
                     hr += ONE_HOUR
 
             except Exception as e:
