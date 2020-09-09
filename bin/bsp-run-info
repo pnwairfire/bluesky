@@ -74,7 +74,6 @@ def area(fires_manager):
                         hr_str, {}).get(hr_str, default_area_fraction)
                     hourly_area = aa_area * area_fraction
                     utc_date = (hr - utc_offset).date()
-                    print("{} - {} - {} - {}".format(hr, hr_str, utc_date, hourly_area))
 
                     area_by_day[utc_date] += hourly_area
                     hr += ONE_HOUR
