@@ -252,3 +252,8 @@
  - Added support for loading multiple input files
  - Added support for loading input files over http
  - Upgrade met package to v2.0.1
+
+## 4.2.15
+ - Update bsp-run-info to report on total area by UTC date
+ - Upgrade plumerise to v2.0.3
+ - Add growth module with persistence model
