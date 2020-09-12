@@ -165,6 +165,14 @@ _DEFAULTS = {
             "working_dir": None
         }
     },
+    "growth": {
+        "model": "persistence",
+        "persistence": {
+            "date_to_persist": None, # will default to 'today'
+            "days_to_persist": 1,
+            "truncate": False
+        }
+    },
     "findmetdata": {
         "met_root_dir": None,
         # We need to default time_window empty, since it will be used
