@@ -143,7 +143,10 @@ class UbcBsfFeps(EmissionsBase):
 
     def _run_on_fire(self, fire):
         working_dir = Config().get('emissions', 'ubc-bsf-feps', 'working_dir')
-        with osutils.create_working_dir(working_dir=working_dir) as wdir:
+        delete_if_no_error = Config().get('emissions', 'ubc-bsf-feps',
+            'delete_working_dir_if_no_error')
+        with osutils.create_working_dir(working_dir=working_dir,
+                delete_if_no_error=delete_if_no_error) as wdir:
             fire_working_dir = self._get_fire_working_dir(fire, wdir)
             if 'activity' not in fire:
                 raise ValueError(

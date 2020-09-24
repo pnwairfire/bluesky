@@ -90,7 +90,11 @@ class HysplitTrajectories(object):
         start_s = self._start + datetime.timedelta(hours=start_hour)
         working_dir_s = self._working_dir and os.path.join(
             self._working_dir, str(start_hour))
-        with osutils.create_working_dir(working_dir=working_dir_s) as wdir:
+
+        delete_if_no_error = Config().get(
+            'trajectories', 'delete_working_dir_if_no_error')
+        with osutils.create_working_dir(working_dir=working_dir_s,
+                delete_if_no_error=delete_if_no_error) as wdir:
             met_files = self._get_met_files(start_s)
             self._control_file_writer.write(start_s, met_files, wdir)
             self._setup_file_writer.write(wdir)

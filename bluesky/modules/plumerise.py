@@ -33,8 +33,10 @@ def run(fires_manager):
     """
     compute_func = ComputeFunction(fires_manager)
 
-    with osutils.create_working_dir(
-            working_dir=compute_func.config.get('working_dir')) as working_dir:
+    working_dir = compute_func.config.get('working_dir')
+    delete_if_no_error = compute_func.config.get('delete_working_dir_if_no_error')
+    with osutils.create_working_dir(working_dir=working_dir,
+            delete_if_no_error=delete_if_no_error) as working_dir:
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
                 compute_func(fire, working_dir=working_dir)

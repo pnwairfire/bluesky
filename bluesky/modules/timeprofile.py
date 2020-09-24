@@ -103,7 +103,11 @@ def _get_profiler(hourly_fractions, fire, active_area):
         model_name = Config().get("timeprofile", "model").lower()
         if model_name == "ubc-bsf-feps":
             wfrtConfig = Config().get('timeprofile', 'ubc-bsf-feps')
-            with osutils.create_working_dir(working_dir=wfrtConfig.get('working_dir')) as wdir:
+            working_dir = wfrtConfig.get('working_dir')
+            delete_if_no_error = wfrtConfig.get(
+                'delete_working_dir_if_no_error')
+            with osutils.create_working_dir(working_dir=working_dir,
+                    delete_if_no_error=delete_if_no_error) as wdir:
                 fire_working_dir = os.path.join(wdir, "feps-timeprofile-{}".format(fire.id))
                 if not os.path.exists(fire_working_dir):
                     os.makedirs(fire_working_dir)

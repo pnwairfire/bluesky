@@ -121,7 +121,10 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         fires_manager.log_status('Good', 'dispersion', 'Continue',
             number_of_locations=counts['plumes'], notes=notes)
 
-        with osutils.create_working_dir(working_dir=self._working_dir) as wdir:
+        delete_if_no_error = Config().get(
+            'dispersion', 'delete_working_dir_if_no_error')
+        with osutils.create_working_dir(working_dir=self._working_dir,
+                delete_if_no_error=delete_if_no_error) as wdir:
             r = self._run(wdir)
 
         r["counts"] = counts
