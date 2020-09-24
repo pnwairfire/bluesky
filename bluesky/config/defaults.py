@@ -107,6 +107,13 @@ _DEFAULTS = {
         # Allow summed fuel percentages to be between 99.5% and 100.5%
         "total_pct_threshold": 0.5
     },
+    "fuelmoisture":{
+        "model": "wims",
+        "wims": {
+            "url": "https://www.wfas.net/archive/www.fs.fed.us/land/wfas/archive/%Y/%m/%d/fdr_obs.dat",
+            "data_dir": None # defaults to tmp folder
+        }
+    },
     "consumption": {
         "fuel_loadings": {},
         "consume_settings": {
