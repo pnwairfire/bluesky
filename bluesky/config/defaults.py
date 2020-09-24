@@ -96,6 +96,13 @@ _DEFAULTS = {
         # are known to be in AK, but none define 'state'
         "use_alaska": False
     },
+    "fuelmoisture":{
+        "model": "wims",
+        "wims": {
+            "url": "https://www.wfas.net/archive/www.fs.fed.us/land/wfas/archive/%Y/%m/%d/fdr_obs.dat",
+            "data_dir": None # defaults to tmp folder
+        }
+    },
     "consumption": {
         "fuel_loadings": {},
         "default_ecoregion": None,
