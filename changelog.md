@@ -261,3 +261,6 @@
 ## 4.2.16
  - Upgrade pyairfire to v3.0.5
  - Add option in emissions, plumerise, timeprofile, trajectories, and dispersion modules to delete working dirs if no error is encountered
+
+## 4.2.17
+ - fix bug (missing import) in trajectories module
