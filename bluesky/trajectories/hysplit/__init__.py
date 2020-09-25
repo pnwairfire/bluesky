@@ -8,6 +8,7 @@ import traceback
 from pyairfire import osutils
 
 from bluesky import io
+from bluesky.config import Config
 from bluesky.metutils import filter_met
 from .setup import ControlFileWriter, SetupFileWriter
 from .load import OutputLoader
