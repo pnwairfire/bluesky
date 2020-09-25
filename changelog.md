@@ -257,3 +257,7 @@
  - Update bsp-run-info to report on total area by UTC date
  - Upgrade plumerise to v2.0.3
  - Add growth module with persistence model
+
+## 4.2.16
+ - Upgrade pyairfire to v3.0.5
+ - Add option in emissions, plumerise, timeprofile, trajectories, and dispersion modules to delete working dirs if no error is encountered
