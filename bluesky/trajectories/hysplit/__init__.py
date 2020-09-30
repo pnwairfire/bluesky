@@ -58,7 +58,10 @@ class HysplitTrajectories(object):
             num_failed = 0
             for start_hour in self._config['start_hours']:
                 try:
+                    logging.debug("Computing trajectories for start_hour %s",
+                        start_hour)
                     self._run_start_hour(start_hour)
+
                 except Exception as e:
                     num_failed += 1
                     logging.debug(traceback.format_exc())

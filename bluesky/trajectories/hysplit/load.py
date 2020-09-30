@@ -100,7 +100,7 @@ class OutputLoader(object):
 
     def _initialize_locations(self, start):
         for loc in self._locations:
-            if not 'trajectories' in self._locations:
+            if 'trajectories' not in loc:
                 loc['trajectories'] = {
                     "model": "hysplit",
                     "lines": []
