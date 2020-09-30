@@ -1,0 +1,50 @@
+{
+    "config": {
+        "emissions": {
+            "species": ["PM2.5"]
+        },
+        "findmetdata": {
+            "met_root_dir": "/data/Met/CANSAC/6km/ARL/"
+        },
+        "trajectories": {
+            "models": "hysplit",
+            "start": "2014-05-30T00:00:00",
+            "num_hours": 24,
+            "output_dir": "/bluesky/output/traj-output/{run_id}/",
+            "working_dir": "/bluesky/output/traj-working/{run_id}/",
+            "handle_existing": "replace",
+            "hysplit": {
+                "start_hours": [0, 12, 24],
+                "heights": [10,100,500,1000,5000],
+                "vertial_motion": 0,
+                "top_of_model_domain": 10000,
+                "output_file_name": "tdump",
+                "json_indent": 4
+            }
+        },
+        "visualization": {
+            "targets": ["trajectories"],
+            "dispersion": {
+                "hysplit": {
+                    "images_dir": "images/",
+                    "data_dir": "data/",
+                    "create_summary_json": true
+                }
+            }
+        },
+        "export": {
+            "modes": ["email", "localsave"],
+            "extra_exports": ["dispersion", "visualization"],
+            "email": {
+                "recipients": ["jdubowy+blueskytest@gmail.com"],
+                "sender": "bsp@airfire.org",
+                "subject": "BSP output",
+                "smtp_server": "127.0.0.1",
+                "smtp_port": 1025
+            },
+            "localsave": {
+                "dest_dir": "/bluesky/output/exports/"
+            }
+        }
+    }
+}
