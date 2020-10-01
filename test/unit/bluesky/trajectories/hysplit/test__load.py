@@ -65,8 +65,8 @@ class TestOutputLoader(object):
             }
             locations = [{}]
 
-            loader = load.OutputLoader(config, locations)
-            loader.load("2019-06-10T12:00:00Z", os.path.dirname(filename))
+            loader = load.OutputLoader(config)
+            loader.load("2019-06-10T12:00:00Z", os.path.dirname(filename), locations)
 
             expected = [{
                 "trajectories":{
@@ -94,8 +94,8 @@ class TestOutputLoader(object):
             }
             locations = [{}, {}]
 
-            loader = load.OutputLoader(config, locations)
-            loader.load("2019-06-10T12:00:00Z", os.path.dirname(filename))
+            loader = load.OutputLoader(config)
+            loader.load("2019-06-10T12:00:00Z", os.path.dirname(filename), locations)
 
             expected = [
                 {
