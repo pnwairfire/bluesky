@@ -44,20 +44,20 @@ class ControlFileWriter(object):
          gfs_NorthAmericaFine_2016051100_000.traj
     """
 
-    def __init__(self, config, locations, num_hours):
+    def __init__(self, config, num_hours):
         self._config = config
-        self._locations = locations
         self._num_hours = num_hours
 
-    def write(self, start, met_files, working_dir):
+    def write(self, start, met_files, working_dir, locations):
+
         with open(os.path.join(working_dir, 'CONTROL'), 'w') as f:
             f.write(start.strftime("%Y %m %d %H\n"))
 
             # TODO: is this correct?
-            num_trajectries = len(self._locations) * len(self._config['heights'])
+            num_trajectries = len(locations) * len(self._config['heights'])
             f.write("{}\n".format(num_trajectries))
 
-            for loc in self._locations:
+            for loc in locations:
                 latlng = locationutils.LatLng(loc)
                 for h in self._config['heights']:
                     f.write("{} {} {}\n".format(latlng.latitude,

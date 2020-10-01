@@ -5,6 +5,7 @@ import logging
 import os
 import traceback
 
+from afdatetime.parsing import parse_datetime, parse_utc_offset
 from pyairfire import osutils
 
 from bluesky import io
@@ -30,10 +31,9 @@ class HysplitTrajectories(object):
         self._met = fires_manager.met
         self._locations = fires_manager.locations
         self._control_file_writer = ControlFileWriter(self._config,
-            self._locations, self._num_hours)
+            self._num_hours)
         self._setup_file_writer = SetupFileWriter(self._config)
-        self._output_loader = OutputLoader(self._config,
-            fires_manager.locations)
+        self._output_loader = OutputLoader(self._config)
         self._output_writer = JsonOutputWriter(self._config, fires_manager,
             self._output_dir)
 
@@ -95,17 +95,29 @@ class HysplitTrajectories(object):
         working_dir_s = self._working_dir and os.path.join(
             self._working_dir, str(start_hour))
 
+        locations = self._filter_locations(start_s)
+        if not locations:
+            logging.warn("No activity at start hour %s. Skipping hysplit", start_s)
+            return
+
         delete_if_no_error = Config().get(
             'trajectories', 'delete_working_dir_if_no_error')
         with osutils.create_working_dir(working_dir=working_dir_s,
                 delete_if_no_error=delete_if_no_error) as wdir:
             met_files = self._get_met_files(start_s)
-            self._control_file_writer.write(start_s, met_files, wdir)
+            self._control_file_writer.write(start_s, met_files, wdir, locations)
             self._setup_file_writer.write(wdir)
             self._sym_link_met_files(wdir, met_files)
             self._sym_link_static_files(wdir)
             self._run_hysplit(wdir)
-            self._output_loader.load(start_s, wdir)
+            self._output_loader.load(start_s, wdir, locations)
+
+    def _filter_locations(self, start_s):
+        locations = [l for l in self._locations
+            if parse_datetime(l._active_area['start']) <= start_s
+            and parse_datetime(l._active_area['end']) > start_s]
+
+        return locations
 
     def _get_met_files(self, start):
         met = filter_met(self._met, start, self._num_hours)

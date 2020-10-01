@@ -90,16 +90,15 @@ class OutputLoader(object):
     }
     """
 
-    def __init__(self, config, locations):
+    def __init__(self, config):
         self._config = config
-        self._locations = locations
 
-    def load(self, start, working_dir):
-        self._initialize_locations(start)
-        self._load_output_file(start, working_dir)
+    def load(self, start, working_dir, locations):
+        self._initialize_locations(start, locations)
+        self._load_output_file(start, working_dir, locations)
 
-    def _initialize_locations(self, start):
-        for loc in self._locations:
+    def _initialize_locations(self, start, locations):
+        for loc in locations:
             if 'trajectories' not in loc:
                 loc['trajectories'] = {
                     "model": "hysplit",
@@ -113,7 +112,7 @@ class OutputLoader(object):
                 })
 
 
-    def _load_output_file(self, start, working_dir):
+    def _load_output_file(self, start, working_dir, locations):
         filename = os.path.join(working_dir, self._config['output_file_name'])
         with open(filename, 'r') as f:
             num_heights = len(self._config['heights'])
@@ -126,6 +125,6 @@ class OutputLoader(object):
                     # since the location could have traj lines from other
                     # start times, we're indexing from the back of the list
                     reverse_h_idx = -num_heights + h_idx
-                    self._locations[l_idx]['trajectories']['lines'][reverse_h_idx]['points'].append(
+                    locations[l_idx]['trajectories']['lines'][reverse_h_idx]['points'].append(
                         [float(parts[9]), float(parts[10]), float(parts[11])]
                     )
