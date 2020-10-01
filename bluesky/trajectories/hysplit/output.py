@@ -1,5 +1,6 @@
 import json
 import os
+from collections import defaultdict
 
 from bluesky import locationutils
 from bluesky.models.fires import FireEncoder
@@ -14,6 +15,7 @@ class JsonOutputWriter(object):
         self._set_file_name()
 
     def write(self):
+        self._aggregate_locations()
         self._write_to_json()
         self._write_to_geojson()
 
@@ -26,6 +28,19 @@ class JsonOutputWriter(object):
     @property
     def geojson_file_name(self):
         return self._geojson_file_name
+
+    def _aggregate_locations(self):
+        locations_by_lat_lng = defaultdict(lambda: {"lines": []})
+        for fire in self._fires_manager.fires:
+            for loc in fire.locations:
+                latlng = locationutils.LatLng(loc)
+                new_loc = locations_by_lat_lng[(latlng.latitude, latlng.longitude)]
+                # The following line only has to be done if not
+                # new_loc.get('fire'), but doesn't hurt to do again
+                new_loc.update(fire=fire, latlng=latlng)
+                new_loc['lines'].extend(loc.get('trajectories', {}).get('lines', []))
+        self._distinct_locations = list(locations_by_lat_lng.values())
+
 
     def _set_file_name(self):
         self._json_file_name = os.path.join(self._output_dir,
@@ -40,18 +55,21 @@ class JsonOutputWriter(object):
         """Maintains bluesky's fires output structure, but including only
         trajectory data.
         """
-        json_data = {"fires": []}
-        for fire in self._fires_manager.fires:
-            json_data["fires"].append({"id": fire.id, "locations": []})
-            for loc in fire.locations:
-                lines = loc.get('trajectories', {}).get('lines', [])
-                latlng = locationutils.LatLng(loc)
-                json_data["fires"][-1]["locations"].append({
-                    "lines": lines,
-                    "lat": latlng.latitude,
-                    "lng": latlng.longitude
-                })
+        fires = defaultdict(lambda: {"locations": []})
+        for loc in self._distinct_locations:
+            fire = fires[loc['fire'].id]
+            # The following line only has to be done if not
+            # fire.get('id'), but doesn't hurt to do again
+            fire["id"] = loc['fire'].id
+            fire["locations"].append({
+                "lines": loc['lines'],
+                "lat": loc['latlng'].latitude,
+                "lng": loc['latlng'].longitude
+            })
 
+        json_data = {
+            "fires": list(fires.values())
+        }
         self._write_file(self._json_file_name, json_data)
 
 
@@ -68,19 +86,16 @@ class JsonOutputWriter(object):
             "type": "FeatureCollection",
             "features": []
         }
-        for fire in self._fires_manager.fires:
-            for loc in fire.locations:
-                latlng = locationutils.LatLng(loc)
+        for loc in self._distinct_locations:
+            geojson_data['features'].append(
+                self._get_location_feature(loc['fire'], loc['latlng']))
+            for line in loc['lines']:
                 geojson_data['features'].append(
-                    self._get_location_feature(fire, loc, latlng))
-                lines = loc.get('trajectories', {}).get('lines', [])
-                for line in lines:
-                    geojson_data['features'].append(
-                        self._get_line_feature(fire, latlng, line))
+                    self._get_line_feature(loc['fire'], loc['latlng'], line))
 
         self._write_file(self._geojson_file_name, geojson_data)
 
-    def _get_location_feature(self, fire, loc, latlng):
+    def _get_location_feature(self, fire, latlng):
         return {
             "type": "Feature",
             "geometry": {
