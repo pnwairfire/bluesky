@@ -264,3 +264,6 @@
 
 ## 4.2.17
  - fix bug (missing import) in trajectories module
+
+## 4.2.18
+ -  Fix bug in hysplit trajectories where only traj lines from last start hour were being saved
