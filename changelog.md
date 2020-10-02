@@ -263,7 +263,10 @@
  - Add option in emissions, plumerise, timeprofile, trajectories, and dispersion modules to delete working dirs if no error is encountered
 
 ## 4.2.17
- - fix bug (missing import) in trajectories module
+ - Fix bug (missing import) in trajectories module
 
 ## 4.2.18
- -  Fix bug in hysplit trajectories where only traj lines from last start hour were being saved
+ - Fix bug in hysplit trajectories where only traj lines from last start hour were being saved
+
+## 4.2.19
+ - Fix issue in hysplit trajectories causing duplicate trajectories
