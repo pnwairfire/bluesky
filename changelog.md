@@ -270,3 +270,7 @@
 
 ## 4.2.19
  - Fix issue in hysplit trajectories causing duplicate trajectories
+
+## 4.2.20
+ - Upgrade met package to v2.0.2
+ - Upgrade afconfig package to v1.1.3
