@@ -94,12 +94,13 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
 
     # Note: if we end up running fc on all fuelbeds at once, use lists
     # for the rest
-    # Note: consume expects area, but disregards it when computing
-    #  consumption values - it produces tons per unit area (acre?), not
-    #  total tons; so, to avoid confution, just set it to 1 and
-    #  then correct the consumption values by multiplying by area, below
+    # Note: consumption output is always returned in tons per acre
+    #  (see comment, below) and is linearly related to area, so the
+    #  consumption values are the same regardless of what we set
+    #  fuelbed_area_acres to.  Released heat output, on the other hand,
+    #  is not linearly related to area, so we need to set area
     area = (fb['pct'] / 100.0) * location['area']
-    fc.fuelbed_area_acres = [1] # see see note,above
+    fc.fuelbed_area_acres = [area]
     fc.fuelbed_ecoregion = [location['ecoregion']]
 
     _apply_settings(fc, location, burn_type)
@@ -111,11 +112,12 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
         fb['consumption'].pop('debug', None)
         fb['heat'] = _results['heat release']
 
-        # multiply each consumption and heat value by area if
-        # output_inits is 'tons_ac',
-        # TODO: multiple by area even if user sets output_units to 'tons',
-        #   because consume doesn't seem to be multiplying by area for us
-        #   even when 'tons' is specified
+        # Multiply each consumption value by area if output_inits is 'tons_ac'
+        # Note: regardless of what fc.output_units is set to, it gets
+        #  reset to 'tons_ac' in the call to fc.results, and the output values
+        #  are the same (presumably always in tons_ac)
+        # Also multiply heat by area, though we're currently not sure if the
+        # units are in fact BTU per acre
         if fc.output_units == 'tons_ac':
             datautils.multiply_nested_data(fb["consumption"], area)
             datautils.multiply_nested_data(fb["heat"], area)
