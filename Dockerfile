@@ -91,6 +91,7 @@ COPY bin/profile /usr/local/bin/profile
 COPY bin/bulk_profiler_csv /usr/local/bin/bulk_profiler_csv
 COPY bin/vsmkgs /usr/local/bin/vsmkgs
 COPY bin/vsmoke /usr/local/bin/vsmoke
+COPY bin/makepolygons /usr/local/bin/makepolygons
 
 # Install python dependencies
 RUN mkdir /tmp/bluesky/
