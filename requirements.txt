@@ -11,7 +11,7 @@ fccsmap==2.1.0
 timeprofile==1.1.2
 met==2.0.2
 plumerise==2.0.3
-blueskykml==2.4.3
+blueskykml==3.0.0
 apps-consume==5.0.2
 Fiona==1.7.2
 shapely==1.5.7

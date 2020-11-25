@@ -74,7 +74,7 @@ RUN pip3 install --upgrade distribute pip
 RUN pip3 install --extra-index https://pypi.airfire.org/simple \
     Fiona==1.7.2 \
     apps-consume==5.0.2 \
-    blueskykml==2.4.3 \
+    blueskykml==3.0.0 \
     blueskyutils>=0.4.0
 
 # Install binary dependencies - for localmet, plumerise,
