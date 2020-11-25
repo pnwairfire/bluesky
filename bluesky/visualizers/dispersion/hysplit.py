@@ -216,7 +216,7 @@ class HysplitDispersionVisualizer(object):
 
             contents = {
                 "websky_version": vis_hysplit_config("websky_version"),
-                "output_version": "2.0.0",
+                "output_version": "2.0.1",
                 # TODO: populate with real values
                 "dispersion_period": {
                     "from": d_from and d_from.strftime("%Y%m%d %HZ"),
