@@ -274,3 +274,8 @@
 ## 4.2.20
  - Upgrade met package to v2.0.2
  - Upgrade afconfig package to v1.1.3
+
+## 4.2.21
+ - Upgrade blueskykml to v3.0.0
+ - Add `makepolygons` to repo and docker image
+ - Bump hysplit visualization output_version to 2.0.1
