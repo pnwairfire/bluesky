@@ -191,7 +191,7 @@ class ExporterBase(object):
 
     IMAGE_PATTERN = '*.png'
     SERIES_IMG_MATCHER = re.compile('.*_\d+.png')
-    LEGEND_IMG_MATCHER = re.compile('.*colorbar_.*.png')
+    LEGEND_IMG_MATCHER = re.compile('.*colorbar.*\.png')
 
     def _process_images(self, directory):
         """Produces new image results json structure
