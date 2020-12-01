@@ -279,3 +279,6 @@
  - Upgrade blueskykml to v3.0.0
  - Add `makepolygons` to repo and docker image
  - Bump hysplit visualization output_version to 2.0.1
+
+## 4.2.22
+ - Updated regex used for matching blueskykml legend image file names (which changed in v3.0.0)
