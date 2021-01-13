@@ -282,3 +282,7 @@
 
 ## 4.2.22
  - Updated regex used for matching blueskykml legend image file names (which changed in v3.0.0)
+
+## 4.2.23
+ - modify error handling logic in hysplit trajectories visualization module
+ - Support export to AWS S3
