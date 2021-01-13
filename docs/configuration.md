@@ -1,4 +1,4 @@
-## Configuring BlueSky Runs
+# Configuring BlueSky Runs
 
 Config settings can be specified in separate config file(s) as well
 as via command line options.  Config files are loaded in the
@@ -32,7 +32,7 @@ The command line options are specifying configuration are:
 Use `bsp`'s `-h` option to get more more information about each
 config related option.
 
-### 'config' Fields
+## 'config' Fields
 
 The 'config' object has sub-objects specific to the modules to be run, as
 well as top level fields that apply to multiple modules. As with
@@ -42,12 +42,12 @@ the fire data, each module has its own set of required and optional fields.
 visualization > hysplit > blueskykml, all keys in the
 configuration json data are case-insensitive.***
 
-##### Top Level Fields
+### Top Level Fields
 
  - ***'config' > 'skip_failed_fires'*** -- *optional* -- exclude failed fire rather than abort entire run; default false; applies to various modules
  - ***'config' > 'skip_failed_sources'*** -- *optional* -- exclude failed sources rather than abort entire run; default false;  *Note: this may alternatively be defined under 'load'*
 
-##### load
+### load
 
  - ***'config' > 'load' > 'sources'*** -- *optional* -- array of sources to load fire data from; if not defined or if empty array, nothing is loaded
  - ***'config' > 'load' > 'sources' > 'name'*** -- *required* for each source-- e.g. 'firespider'
@@ -62,18 +62,18 @@ configuration json data are case-insensitive.***
  - ***'config' > 'load' > 'sources' > 'end'*** -- used to filter fires based on time
  - ***'config' > 'load' > 'sources' > 'skip_failures'*** -- skip fires that result in exception during load
 
-###### if source 'bsf'
+#### if source 'bsf'
 
  - ***'config' > 'load' > 'sources' > 'omit_nulls'*** -- don't include fire data keys with null/None values
  - ***'config' > 'load' > 'sources' > 'timeprofile_file'*** -- *optional*
  - ***'config' > 'load' > 'sources' > 'load_consumption'*** -- *optional*
 
-###### if type 'file':
+#### if type 'file':
 
  - ***'config' > 'load' > 'sources' > 'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
  - ***'config' > 'load' > 'sources' > 'events_file'*** -- *optional* for each file type source-- file containing fire events data; e.g. '/path/to/fire_events.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
 
-###### if type 'API':
+#### if type 'API':
 
  - ***'config' > 'load' > 'sources' > 'endpoint'*** --
  - ***'config' > 'load' > 'sources' > 'key'*** --
@@ -83,11 +83,11 @@ configuration json data are case-insensitive.***
  - ***'config' > 'load' > 'sources' > 'request_timeout'*** --
  - ***'config' > 'load' > 'sources' > 'query'*** --
 
-##### merge
+### merge
 
  - ***'config' > 'merge' > 'skip_failures'*** -- *optional* -- if fires fail to merge, keep separate and move on; default: false
 
-##### filter
+### filter
 
  - ***'config' > 'filter' > 'skip_failures'*** -- *optional* -- if fires filter fails, move on; default: false
  - ***'config' > 'filter' > 'country' > 'whitelist'*** -- *required* if 'country' section is defined and 'blacklist' array isn't -- whitelist of countries to include
@@ -101,7 +101,7 @@ configuration json data are case-insensitive.***
   - ***'config' > 'filter' > 'time' > 'start'*** -- *required* if 'time' section is defined and 'end' isn't specified -- 'start' and 'end' may be specified together; note that the specified time is assumed to be UTC unless it ends with 'L', in which case it is compared against the activity 'end' times unadjusted for utc offset
   - ***'config' > 'filter' > 'time' > 'end'*** --  *required* if 'time' section is defined and 'start' isn't specified -- 'start' and 'end' may be specified together; note that the specified time is assumed to be UTC unless it ends with 'L', in which case it is compared against the activity 'start' times unadjusted for utc offset
 
-##### fuelbeds
+### fuelbeds
 
 - ***'config' > 'fuelbeds' > 'fccs_version'*** -- *optional* -- '1' or '2'
 - ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
@@ -116,7 +116,7 @@ configuration json data are case-insensitive.***
 - ***'config' > 'fuelbeds' > 'total_pct_threshold'*** -- *optional* -- Allow summed fuel percentages to be this much off of 100%; default is 0.5% (i.e. between 99.5% and 100.5%)
 - ***'config' > 'fuelbeds' > 'use_alaska'*** -- *optional* -- force use of AK fuelbed lookup; useful if all fires are known to be in AK, but none define 'state'
 
-##### consumption
+### consumption
 
  - ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
  - ***'config' > 'consumption' > 'default_ecoregion'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
@@ -143,23 +143,23 @@ for a fire's activity object. They also define what synonyms to recognize, if an
  - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'shrub_blackened_pct' > 'default'*** -- *optional* -- default 50
  - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'pile_blackened_pct' > 'default'*** -- *optional* -- default 0
 
-##### emissions
+### emissions
 
  - ***'config' > 'emissions' > 'model'*** -- *optional* -- emissions model; 'prichard-oneill' (which replaced 'urbanski'), 'feps', or 'consume'; default 'feps'
  - ***'config' > 'emissions' > 'species'*** -- *optional* -- whitelist of species to compute emissions levels for
  - ***'config' > 'emissions' > 'include_emissions_details'*** -- *optional* -- whether or not to include emissions levels by fuel category; default: false
 
-###### If running consume emissions:
+#### If running consume emissions:
 
 - ***'config' > 'emissions' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings, used for piles; Note that the code looks in
 'config' > 'consumption' > 'fuel_loadings' if it doesn't find them in the
 emissions config
 
-###### If running ubc-bsf-feps emissions:
+#### If running ubc-bsf-feps emissions:
 
 - ***'config' > 'emissions' > 'ubc-bsf-feps' > 'working_dir'*** -- *optional* --
 
-##### findmetdata
+### findmetdata
 
  - ***'config' > 'findmetdata' > 'met_root_dir'*** -- *required* --
  - ***'config' > 'findmetdata' > 'time_window' > 'first_hour'*** -- *required* if fire activity data isn't defined --
@@ -169,44 +169,44 @@ emissions config
  - ***'config' > 'findmetdata' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
  - ***'config' > 'findmetdata' > 'wait' > 'max_attempts'*** -- *required* if 'wait' section is defined  -- max number of attempts
 
-###### if arl:
+#### if arl:
  - ***'config' > 'findmetdata' > 'arl' > 'index_filename_pattern'*** -- *optional* -- defaults to 'arl12hrindex.csv'
  - ***'config' > 'findmetdata' > 'arl' > 'max_days_out'*** -- *optional* -- defaults to 4
  - ***'config' > 'findmetdata' > 'arl' > 'accepted_forecasts'*** -- *optional*  -- initialization times of forecasts to accept met data from (e.g. `["20190725", "2019072600", "2019072700"]` or `["2019-07-27T00:00:00"]`; note that 00Z is assumed if hours are not specified)
 
-##### localmet
+### localmet
 
 - ***'config' > 'localmet' > 'time_step'*** -- *optional* -- hour per arl file time step; defaults to 1
 
-##### timeprofile
+### timeprofile
 
  - ***'config' > 'timeprofile' > 'hourly_fractions'*** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the activity window)
  - ***'config' > 'timeprofile' > 'model'*** -- *optional* -- default: "default"; only used if you want to use the 'ubc-bsf-feps' model
 
-###### If running ubc-bsf-feps model:
+#### If running ubc-bsf-feps model:
 
  - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'interpolation_type'*** -- *optional* -- default: 1
  - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'normalize'*** -- *optional* -- default: True
  - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'working_dir'*** -- *optional* -- default: None
 
-##### plumerise
+### plumerise
 
  - ***'config' > 'plumerise' > 'model'*** -- *optional* -- plumerise model; defaults to "feps"
 
-###### If running feps model:
+#### If running feps model:
 
  - ***'config' > 'plumerise' > 'feps' > 'working_dir'*** -- *optional* -- default: None
  - ***'config' > 'plumerise' > 'feps' > 'load_heat'*** -- *optional* -- default: False
 
 
-###### if feps:
+#### if feps:
 
  - ***'config' > 'plumerise' > 'feps' > 'feps_weather_binary'*** -- *optional* -- defaults to "feps_weather"
  - ***'config' > 'plumerise' > 'feps' > 'feps_plumerise_binary'*** -- *optional* -- defaults to "feps_plumerise"
  - ***'config' > 'plumerise' > 'feps' > 'plume_top_behavior'*** -- *optional* -- how to model plume top; options: 'Briggs', 'FEPS', 'auto'; defaults to 'auto'
  - ***'config' > 'plumerise' > 'feps' > 'working_dir'*** -- *optional* -- where to write intermediate files; defaults to writing to tmp dir
 
-###### if sev:
+#### if sev:
 
  - ***'config' > 'plumerise' > 'sev' > 'alpha'*** -- *optional* -- default: 0.24
  - ***'config' > 'plumerise' > 'sev' > 'beta'*** -- *optional* -- default: 170
@@ -218,22 +218,22 @@ emissions config
  - ***'config' > 'plumerise' > 'sev' > 'plume_bottom_over_top'*** -- *optional* -- default: 0.5
 
 
-##### extrafiles
+### extrafiles
 
 - ***'config' > 'extrafiles' > 'dest_dir'*** -- *required* -- where to write extra files
 - ***'config' > 'extrafiles' > 'sets'*** -- *optional* (though nothing happens if not defined) -- array of file sets to write
 
-###### if writing emissionscsv:
+#### if writing emissionscsv:
 
 - ***'config' > 'extrafiles' > 'emissionscsv' > 'filename'*** -- *required* --
 
-###### if writing firescsvs:
+#### if writing firescsvs:
 
 - ***'config' > 'extrafiles' > 'firescsvs' > 'fire_locations_filename'*** -- *optional* -- default: 'fire_locations.csv'
 - ***'config' > 'extrafiles' > 'firescsvs' > 'fire_events_filename'*** -- *optiona* -- default: 'fire_events.csv'
 
 
-##### trajectories
+### trajectories
 
  - ***'config' > 'trajectories' > 'model'*** -- *optional* -- default: "hysplit"
  - ***'config' > 'trajectories' > 'start'*** -- *required* --
@@ -242,7 +242,7 @@ emissions config
  - ***'config' > 'trajectories' > 'working_dir'*** -- *optional* -- default is to create a temp dir
  - ***'config' > 'trajectories' > 'handle_existing'*** -- *optional* -- "fail"
 
-###### if running hysplit dispersion:
+#### if running hysplit dispersion:
 
  - ***'config' > 'trajectories' > 'hysplit' > 'binary'*** -- *optional* -- default: 'hyts_std'
  - ***'config' > 'trajectories' > 'hysplit' > 'start_hours'*** -- *optional* -- default: [0]
@@ -265,7 +265,7 @@ emissions config
  - ***'config' > 'trajectories' > 'hysplit' > 'static_files' > 'TERRAIN_FILE'*** -- optional -- default files included in bluesky package
 
 
-##### dispersion
+### dispersion
 
  - ***'config' > 'dispersion' > 'start'*** -- *required* (unless it can be determined from fire activity windows) -- modeling start time (ex. "2015-01-21T00:00:00Z"); 'today' is also recognized, in which case start is set to midnight of the current utc date
  - ***'config' > 'dispersion' > 'num_hours'*** -- *required* (unless it can be determined from fire activity windows) -- number of hours in model run
@@ -279,7 +279,7 @@ emissions config
  - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'ne' > 'lat'*** -- *optional*, but required if other plume_merge grid fields are specified --
  - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'boundary' > 'ne' > 'lng'*** -- *optional*, but required if other plume_merge grid fields are specified --
 
-###### if running hysplit dispersion:
+#### if running hysplit dispersion:
 
  - ***'config' > 'dispersion' > 'hysplit' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'spacing'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed -- grid cell dimensions ***in km unless 'projection' is 'LatLng' (see below)***
@@ -379,7 +379,7 @@ user defined grid settings ('CENTER_LATITUDE', 'CENTER_LONGITUDE',
 defined, it will look for 'boundary', 'spacing', and 'projection' in the top level
 'met' object.
 
-###### if running vsmoke dispersion:
+#### if running vsmoke dispersion:
 
  - ***'config' > 'dispersion' > 'vsmoke' > 'TEMP_FIRE' -- temperature of fire (F), default: 59.0
  - ***'config' > 'dispersion' > 'vsmoke' > 'PRES'*** -- *optional* -- Atmospheric pressure at surface (mb); default: 1013.25
@@ -415,11 +415,11 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
  - ***'config' > 'dispersion' > 'vsmoke' > 'XNTVL'*** -- *optional* -- Downward distance interval (km) - 0 results in default 31 distances; default: 0.05
  - ***'config' > 'dispersion' > 'vsmoke' > 'TOL'*** -- *optional* -- Tolerance for isopleths; detault: 0.1
 
-##### visualization
+### visualization
 
  - ***'config' > 'visualization' > 'targets'*** -- *optional* -- defaults to dispersion
 
-###### if visualizing hysplit dispersion:
+#### if visualizing hysplit dispersion:
 
  - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'smoke_dispersion_kmz_filename'*** -- *optional* -- defaults to 'smoke_dispersion.kmz'
  - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'fire_kmz_filename'*** -- *optional* -- defaults to 'smoke_dispersion.kmz'
@@ -434,16 +434,16 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
 
  - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'blueskykml_config'*** -- *optional* -- contains configuration to pass directly into blueskykml; expected to be nested with top level section keys and second level option keys; see https://github.com/pnwairfire/blueskykml/ for configuration options
 
-###### if visualizing hysplit trajectories:
+#### if visualizing hysplit trajectories:
 
  - ***'config' > 'visualization' > 'trajectories' > 'hysplit' > 'kml_file_name'*** -- *optional* -- defaults to 'hysplit-trajectories.kml'
 
-##### export
+### export
 
 - ***'config' > 'export' > 'modes'*** -- *optional* -- defaults to []
 - ***'config' > 'export' > 'extra_exports'*** -- *optional* -- array of extra output files to export (ex. 'dispersion' or 'visualization' outputs); defaults to none
 
-###### if using email:
+#### if using email:
 
 - ***'config' > 'export' > 'email' > 'recipients'*** -- *required* --
 - ***'config' > 'export' > 'email' > 'sender'*** -- *optional* -- defaults to 'bsp@airfire.org'
@@ -454,18 +454,18 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
 - ***'config' > 'export' > 'email' > 'username'*** -- *optional* --
 - ***'config' > 'export' > 'email' > 'password'*** -- *optional* --
 
-###### if saving locally, uploading, or publishing to AWS S3:
+#### if saving locally, uploading, or publishing to AWS S3:
 
  - ***'config' > 'export' > ['localsave'|'upload'] > 'output_dir_name'*** -- *optional* -- defaults to run_id, which is generated if not defined
  - ***'config' > 'export' > ['localsave'|'upload'] > 'extra_exports_dir_name'*** -- *optional* -- generated from extra_exports mode name(s) if not defined
  - ***'config' > 'export' > ['localsave'|'upload'] > 'json_output_filename'*** -- *optional* -- defaults to 'output.json'
 
-###### if saving locally:
+#### if saving locally:
 
  - ***'config' > 'export' > 'localsave' > 'dest_dir'*** - *required* -- destination directory to contain output directory
  - ***'config' > 'export' > 'localsave' > 'handle_existing'*** - *optional* -- how to handle case where output dir already exists; options: 'replace', 'write_in_place', 'fail'; defaults to 'fail'
 
-###### if uploading:
+#### if uploading:
 
  - ***'config' > 'export' > 'upload' > 'tarball_name'*** - *optional* -- defaults to '<output_dir>.tar.gz'
  - ***'config' > 'export' > 'upload' > 'scp' > 'host'*** - *required* if uploading via scp (which is currently the only supported upload mode) -- hostname of server to scp to
@@ -473,13 +473,13 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
  - ***'config' > 'export' > 'upload' > 'scp' > 'port'*** - *optional* if uploading via scp (which is currently the only supported upload mode) -- port to use in scp; defaults to 22
  - ***'config' > 'export' > 'upload' > 'scp' > 'dest_dir'*** - *required* if uploading via scp (which is currently the only supported upload mode) -- destination directory on remote host to contain output directory
 
-###### if publishing to AWS S3
+#### if publishing to AWS S3
 
  - ***'config' > 'export' > 's3' > 'bucket'*** - *required* if publishing to s3 -- destination AWS S3 bucket
  - ***'config' > 'export' > 's3' > 'key_prefix'*** - *optional* -- key prefix to use if uploading to AWS S3
  - ***'config' > 'export' > 'upload' > 'tarball_name'*** - *optional* -- defaults to '<output_dir>.tar.gz'
 
-***Note on AWS credentials:***
+##### Note on AWS credentials
 
 AWS credentials and configuration are not specified in the bluesky
 configuration. Instead, they are specified in files under  `~/.aws/`.
@@ -504,11 +504,11 @@ If using docker, mount them in the container with something like the following
 -v $HOME/.aws/:/home/bluesky/.aws/
 ```
 
-##### archive
+### archive
 
 - ***'config' > 'archive' > 'tarzip'*** -- *optional* -- list of modules whose output directories should be tar'd and zipped and then deleted; defaults empty list
 
-##### statuslogging
+### statuslogging
 
 Bluesky supports posting statuses to statuslogging web service.  The
 source code for this service is not yet available, so ignore this section
