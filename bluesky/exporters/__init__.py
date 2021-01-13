@@ -10,6 +10,7 @@ import os
 import re
 import shutil
 import tempfile
+from io import StringIO
 
 from bluesky import io
 from bluesky.config import Config
@@ -32,6 +33,11 @@ class ExporterBase(object):
     def export(self, fires_manager):
         raise NotImplementedError("Bluesky's {} exporter needs to "
             "implement method 'export'".format(self.__class__.__name__))
+
+    def _get_output_dump(self, fires_manager):
+        d = StringIO()
+        fires_manager.dumps(output_stream=d)
+        return d.getvalue()
 
     def _bundle(self, fires_manager, dest, create_tarball=False):
         output_dir = self._create_output_dir(fires_manager, dest)
