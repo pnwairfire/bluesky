@@ -479,6 +479,31 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
  - ***'config' > 'export' > 's3' > 'key_prefix'*** - *optional* -- key prefix to use if uploading to AWS S3
  - ***'config' > 'export' > 'upload' > 'tarball_name'*** - *optional* -- defaults to '<output_dir>.tar.gz'
 
+***Note on AWS credentials:***
+
+AWS credentials and configuration are not specified in the bluesky
+configuration. Instead, they are specified in files under  `~/.aws/`.
+This includes `~/.aws/credentials`, which looks like this:
+
+```
+[default]
+aws_access_key_id = ABC123
+aws_secret_access_key = XYZ987
+```
+
+and `~/.aws/config`, which minimally looks like this:
+
+```
+[default]
+region=us-west-2
+```
+
+If using docker, mount them in the container with something like the following
+
+```
+-v $HOME/.aws/:/home/bluesky/.aws/
+```
+
 ##### archive
 
 - ***'config' > 'archive' > 'tarzip'*** -- *optional* -- list of modules whose output directories should be tar'd and zipped and then deleted; defaults empty list
