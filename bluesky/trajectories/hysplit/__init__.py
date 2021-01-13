@@ -50,7 +50,7 @@ class HysplitTrajectories(object):
         }
 
         if (not self._locations):
-            msg = "Did not run HYSPLIT trajectores - no fire locations"
+            msg = "Did not run HYSPLIT trajectories - no fire locations"
             logging.warn(msg)
             r['warning'] = msg
 

@@ -8,6 +8,7 @@ __all__ = [
 __version__ = "0.1.0"
 
 
+import logging
 import os
 
 from bluesky import io
@@ -28,6 +29,7 @@ class HysplitTrajectoriesVisualizer(object):
         self._set_output_info()
 
     def _set_output_info(self):
+        self._kml_file_name = None
         if self._fires_manager.trajectories:
             o = self._fires_manager.trajectories.get('output')
             if o and o.get('geojson_file_name') and o.get('directory'):
@@ -37,21 +39,26 @@ class HysplitTrajectoriesVisualizer(object):
                     Config().get('visualization', 'trajectories', 'hysplit',
                         'kml_file_name')
                 )
-                return
 
-        raise RuntimeError("No trajectories GeoJSON file to convert to KML")
+            else:
+                logging.warning("No trajectories GeoJSON file to convert to KML")
+
+        else:
+            raise RuntimeError("Hysplit trajectories doesn't appear to have been run")
 
     def run(self):
-        args = [
-            'ogr2ogr', '-f', 'kml',
-            self._kml_file_name,
-            self._geojson_file_name
-        ]
-        io.SubprocessExecutor().execute(*args)
+        r = {"output": {}}
+        if self._kml_file_name:
+            args = [
+                'ogr2ogr', '-f', 'kml',
+                self._kml_file_name,
+                self._geojson_file_name
+            ]
+            io.SubprocessExecutor().execute(*args)
 
-        return {
-            "output": {
+            r["output"] = {
                 'kml_file_name': os.path.basename(self._kml_file_name),
                 'directory': os.path.dirname(self._kml_file_name),
             }
-        }
+
+        return r
