@@ -733,6 +733,15 @@ _DEFAULTS = {
             #     "port": 22,
             #     "dest_dir": None
             # }
+        },
+        "s3": {
+            "handle_existing": "replace", # Not actually used
+            "output_dir_name": None,
+            "extra_exports_dir_name": None,
+            "json_output_filename": "output.json",
+            "tarball_name": None,
+            "bucket": None,
+            "key_prefix": None
         }
     },
     "archive": {

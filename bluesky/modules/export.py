@@ -10,12 +10,13 @@ __version__ = "0.2.0"
 
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
-from bluesky.exporters import email, upload, localsave
+from bluesky.exporters import email, upload, localsave, s3
 
 EXPORTERS = {
     'email': email.EmailExporter,
     'upload': upload.UploadExporter,
-    'localsave': localsave.LocalSaveExporter
+    'localsave': localsave.LocalSaveExporter,
+    's3': s3.S3Exporter
 }
 
 def run(fires_manager):

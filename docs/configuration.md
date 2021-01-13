@@ -440,7 +440,7 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
 
 ##### export
 
-- ***'config' > 'export' > 'modes'*** -- *optional* -- defaults to ['email']
+- ***'config' > 'export' > 'modes'*** -- *optional* -- defaults to []
 - ***'config' > 'export' > 'extra_exports'*** -- *optional* -- array of extra output files to export (ex. 'dispersion' or 'visualization' outputs); defaults to none
 
 ###### if using email:
@@ -454,7 +454,7 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
 - ***'config' > 'export' > 'email' > 'username'*** -- *optional* --
 - ***'config' > 'export' > 'email' > 'password'*** -- *optional* --
 
-###### if saving locally or uploading:
+###### if saving locally, uploading, or publishing to AWS S3:
 
  - ***'config' > 'export' > ['localsave'|'upload'] > 'output_dir_name'*** -- *optional* -- defaults to run_id, which is generated if not defined
  - ***'config' > 'export' > ['localsave'|'upload'] > 'extra_exports_dir_name'*** -- *optional* -- generated from extra_exports mode name(s) if not defined
@@ -472,6 +472,12 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
  - ***'config' > 'export' > 'upload' > 'scp' > 'user'*** - *optional* if uploading via scp (which is currently the only supported upload mode) -- username to use in scp; defaults to 'bluesky'
  - ***'config' > 'export' > 'upload' > 'scp' > 'port'*** - *optional* if uploading via scp (which is currently the only supported upload mode) -- port to use in scp; defaults to 22
  - ***'config' > 'export' > 'upload' > 'scp' > 'dest_dir'*** - *required* if uploading via scp (which is currently the only supported upload mode) -- destination directory on remote host to contain output directory
+
+###### if publishing to AWS S3
+
+ - ***'config' > 'export' > 's3' > 'bucket'*** - *required* if publishing to s3 -- destination AWS S3 bucket
+ - ***'config' > 'export' > 's3' > 'key_prefix'*** - *optional* -- key prefix to use if uploading to AWS S3
+ - ***'config' > 'export' > 'upload' > 'tarball_name'*** - *optional* -- defaults to '<output_dir>.tar.gz'
 
 ##### archive
 

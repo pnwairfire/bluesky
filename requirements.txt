@@ -20,3 +20,4 @@ requests==2.22.0
 dash==1.1.1
 dash-daq==0.1.0
 dash-bootstrap-components==0.7.0
+boto3==1.16.52

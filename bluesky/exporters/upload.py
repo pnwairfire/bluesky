@@ -1,4 +1,4 @@
-"""bluesky.exporters.uploader"""
+"""bluesky.exporters.upload"""
 
 __author__ = "Joel Dubowy"
 
