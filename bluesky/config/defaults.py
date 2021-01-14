@@ -741,7 +741,8 @@ _DEFAULTS = {
             "json_output_filename": "output.json",
             "tarball_name": None,
             "bucket": None,
-            "key_prefix": None
+            "key_prefix": None,
+            "default_region_name": "us-west-2"
         }
     },
     "archive": {

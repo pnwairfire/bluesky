@@ -89,7 +89,11 @@ class S3Exporter(ExporterBase):
             shutil.rmtree(temp_dir)
 
     def _get_s3_url(self, key):
-        region = "" # TODO: get region from s3 client
+        try:
+            region = self._s3_client._client_config.region_name
+        except:
+            region = self.config("default_region_name")
+
         return "https://{bucket}.s3-{region}.amazonaws.com/{key}".format(
             bucket=self.config('bucket'), region=region,
             key=key.lstrip('/'))
