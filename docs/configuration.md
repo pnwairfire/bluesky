@@ -478,7 +478,8 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
  - ***'config' > 'export' > 's3' > 'bucket'*** - *required* if publishing to s3 -- destination AWS S3 bucket
  - ***'config' > 'export' > 's3' > 'key_prefix'*** - *optional* -- key prefix to use if uploading to AWS S3
  - ***'config' > 'export' > 's3' > 'tarball_name'*** - *optional* -- defaults to '<output_dir>.tar.gz'
- - ***'config' > 'export' > 's3' > 'default_region_name'*** - *optional* -- used if there is a failure to get region name from boto3 s3 client; (region name is only used for recording s3 object url in output data)
+ - ***'config' > 'export' > 's3' > 'include_tarball'*** - *optional* -- defaults to true; if false, tarball isn't uploaded to S3
+ - ***'config' > 'export' > 's3' > 'default_region_name'*** - *optional* -- used if there is a failure to get region name from boto3 S3 client; (region name is only used for recording s3 object url in output data)
 
 ##### Note on AWS credentials
 

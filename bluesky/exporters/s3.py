@@ -69,6 +69,10 @@ class S3Exporter(ExporterBase):
             logging.debug(traceback.format_exc())
 
     def _upload_tarball(self, fires_manager, key_prefix):
+        if not self.config('include_tarball'):
+            logging.debug("Skipping upload of tarball to S3")
+            return
+
         temp_dir = tempfile.mkdtemp()
         try:
             tarball_file_name = self._bundle(fires_manager, temp_dir,

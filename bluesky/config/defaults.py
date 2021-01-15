@@ -740,6 +740,7 @@ _DEFAULTS = {
             "extra_exports_dir_name": None,
             "json_output_filename": "output.json",
             "tarball_name": None,
+            "include_tarball": True,
             "bucket": None,
             "key_prefix": None,
             "default_region_name": "us-west-2"
