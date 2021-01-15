@@ -237,8 +237,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
             # original_fire_ids is a set instead of scalar
             original_fire_ids=set([fire.id]),
             meta=fire.get('meta', {}),
-            start=aa['start'],
-            end=aa['end'],
+            start=datetime_parsing.parse(aa['start']),
+            end=datetime_parsing.parse(aa['end']),
             area=loc['area'],
             latitude=latlng.latitude,
             longitude=latlng.longitude,
