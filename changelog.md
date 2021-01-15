@@ -286,3 +286,8 @@
 ## 4.2.23
  - modify error handling logic in hysplit trajectories visualization module
  - Support export to AWS S3
+
+## 4.2.24
+ - minor updates to AWS s3 export module
+ - updates affecting wildcard replacement in config settings and input file names
+ - added parsing of fire location start and end times in dispersion module, in case they're not already loaded into datetime objects
