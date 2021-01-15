@@ -283,17 +283,25 @@ def output_version(parser, args):
 ## Setting up FiresManager
 ##
 
-def configure_logging(args):
-    # are written
-    if args.log_file:
+def replace_wildcards(args, val):
+    if val:
         # replace '{run_id}' before filling in timestamps, since
         # --run-id may have been specified with a timestamp wildcard
         if args.run_id:
-            args.log_file = args.log_file.replace('{run_id}', args.run_id)
-        today = (datetime.datetime.strptime(args.today, "%Y-%m-%d")
-            if args.today else datetimeutils.today_utc())
-        args.log_file = datetimeutils.fill_in_datetime_strings(
-                args.log_file, today=today)
+            val = val.replace('{run_id}', args.run_id)
+
+        today = args.today
+        if not today:
+            today = datetimeutils.today_utc()
+        elif hasattr(today, 'lower'):
+            today = datetime.datetime.strptime(today, "%Y-%m-%d")
+
+        val =  datetimeutils.fill_in_datetime_strings(val, today=today)
+
+    return val
+
+def configure_logging(args):
+    args.log_file = replace_wildcards(args, args.log_file)
     # Note: The second argument to configure_logging_from_args
     #  is not used. It must be left over from a previous version
     #  of the function. So just pass in None.
