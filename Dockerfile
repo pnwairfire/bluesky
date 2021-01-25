@@ -15,7 +15,7 @@
 #  docker run --rm -i bluesky bsp ...
 
 
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 MAINTAINER Joel Dubowy
 
 
@@ -32,7 +32,7 @@ MAINTAINER Joel Dubowy
 #  - openpmi and mpich libs (TODO: install libopenmpi1.10
 #    and libmpich12 instead of the dev versions?)
 RUN apt-get update \
-    && apt-get install -y \
+    && TZ=America/Los_Angeles DEBIAN_FRONTEND=noninteractive apt-get install -y\
         g++ \
         gcc \
         make \
