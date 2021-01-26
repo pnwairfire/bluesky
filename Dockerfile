@@ -59,7 +59,7 @@ RUN apt-get update \
         openmpi-bin
 
 # upgrade distribute and pip
-RUN pip3 install --upgrade distribute pip
+# RUN pip3 install --upgrade distribute pip
 
 # blueskykml, consume, and fiona are relatively static these days; so, install
 # them here in order to avoid reinstalling them and their large dependencies
