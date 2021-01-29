@@ -78,7 +78,7 @@ RUN pip3 install matplotlib==3.3.4 \
     && pip3 install --index-url https://pypi.airfire.org/simple \
         apps-consume==5.1.0 \
         blueskykml==4.0.0 \
-        blueskyutils
+        blueskyutils==1.0.0
 
 # Install binary dependencies - for localmet, plumerise,
 # dipersion, and visualization
