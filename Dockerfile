@@ -66,7 +66,7 @@ RUN apt-get update \
 # each time other dependencies in requirements.txt change.
 # Also install blueskyutils for merging emissions, etc.
 # Notable sub-dependencies:
-#  - blueskykml:  Pillow==2.8.1, 9.0MB, and matplotlib==1.4.3, 50.4MB
+#  - blueskykml:  Pillow==8.1.0, ~9.0MB, and matplotlib==3.3.4, ~50.4MB
 #  - consume:  pandas, etc.
 #  - fiona:  39.7MB for fiona itself
 # Note: this RUN command will need to be updated if fiona,
@@ -77,7 +77,7 @@ RUN pip3 install matplotlib==3.3.4 \
     && pip3 install Fiona==1.8.18 \
     && pip3 install --index-url https://pypi.airfire.org/simple \
         apps-consume==5.0.2 \
-        blueskykml==3.0.0 \
+        blueskykml==4.0.0 \
         blueskyutils
 
 # Install binary dependencies - for localmet, plumerise,

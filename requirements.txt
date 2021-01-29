@@ -1,22 +1,23 @@
 --extra-index https://pypi.airfire.org/simple/
 -f https://pypi.airfire.org/simple/
-pyairfire==3.0.5
+pyairfire==4.0.0
 afconfig==1.1.3
-afdatetime==1.1.2
-afscripting==1.1.5
+afdatetime==2.0.0
+afscripting==2.0.0
 geoutils==1.0.3
-eflookup==3.2.2
-emitcalc==2.0.2
-fccsmap==2.1.0
-timeprofile==1.1.2
-met==2.0.2
+eflookup==4.0.0
+emitcalc==3.0.0
+fccsmap==3.0.0
+timeprofile==1.1.3
+met==3.0.0
 plumerise==2.0.3
-blueskykml==3.0.0
+blueskykml==4.0.0
 apps-consume==5.0.2
-Fiona==1.7.2
-shapely==1.5.7
-geopandas==0.5.0
-requests==2.22.0
+Fiona==1.8.18
+shapely==1.7.1
+geopandas==0.8.2
+requests==2.25.1
+# TODO: upgrade dash* packages, if necessary
 dash==1.1.1
 dash-daq==0.1.0
 dash-bootstrap-components==0.7.0
