@@ -71,11 +71,14 @@ RUN apt-get update \
 #  - fiona:  39.7MB for fiona itself
 # Note: this RUN command will need to be updated if fiona,
 #   consume, blueskykml, or blueskyutils are ever updated in setup.py
-RUN pip3 install --extra-index https://pypi.airfire.org/simple \
-    Fiona==1.7.2 \
-    apps-consume==5.0.2 \
-    blueskykml==3.0.0 \
-    blueskyutils>=0.4.0
+# Another Note: matplotlib must be explicitly installed to make
+#   sure the correct version is installed
+RUN pip3 install matplotlib==3.3.4 \
+    && pip3 install Fiona==1.8.18 \
+    && pip3 install --index-url https://pypi.airfire.org/simple \
+        apps-consume==5.0.2 \
+        blueskykml==3.0.0 \
+        blueskyutils
 
 # Install binary dependencies - for localmet, plumerise,
 # dipersion, and visualization
