@@ -300,7 +300,7 @@ class TestSubprocessExecutor(object):
             io.SubprocessExecutor().execute(['sdfsdfsdf', 'sdf'], realtime_logging=True)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'sdfsdfsdf'"
         assert self.msgs == [
-            ((logging.ERROR, '%s: %s', 'sdfsdfsdf', "No such file or directory: 'sdfsdfsdf'"), {})
+            ((logging.ERROR, '%s: %s', 'sdfsdfsdf', "No such file or directory"), {})
         ]
 
         self.msgs = []  # reset
@@ -308,7 +308,7 @@ class TestSubprocessExecutor(object):
             io.SubprocessExecutor().execute('sdfsdfsdf', 'sdf', realtime_logging=True)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'sdfsdfsdf'"
         assert self.msgs == [
-            ((logging.ERROR, '%s: %s', 'sdfsdfsdf', "No such file or directory: 'sdfsdfsdf'"), {})
+            ((logging.ERROR, '%s: %s', 'sdfsdfsdf', "No such file or directory"), {})
         ]
 
         self.msgs = []  # reset
@@ -316,7 +316,7 @@ class TestSubprocessExecutor(object):
             io.SubprocessExecutor().execute('sdfsdfsdf sdf', realtime_logging=True)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'sdfsdfsdf'"
         assert self.msgs == [
-            ((logging.ERROR, '%s: %s', 'sdfsdfsdf', "No such file or directory: 'sdfsdfsdf'"), {})
+            ((logging.ERROR, '%s: %s', 'sdfsdfsdf', "No such file or directory"), {})
         ]
 
     def test_invalid_command_realtime_logging(self, monkeypatch):
@@ -374,7 +374,7 @@ class TestSubprocessExecutor(object):
             io.SubprocessExecutor().execute(['lsdflsdf', 'sdf'], realtime_logging=False)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'lsdflsdf'"
         assert self.msgs == [
-            ((40, '%s: %s', 'lsdflsdf', "No such file or directory: 'lsdflsdf'"), {})
+            ((40, '%s: %s', 'lsdflsdf', "No such file or directory"), {})
         ]
 
         self.msgs = []  # reset
@@ -382,7 +382,7 @@ class TestSubprocessExecutor(object):
             io.SubprocessExecutor().execute('lsdflsdf', 'sdf', realtime_logging=False)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'lsdflsdf'"
         assert self.msgs == [
-            ((40, '%s: %s', 'lsdflsdf', "No such file or directory: 'lsdflsdf'"), {})
+            ((40, '%s: %s', 'lsdflsdf', "No such file or directory"), {})
         ]
 
         self.msgs = []  # reset
@@ -390,7 +390,7 @@ class TestSubprocessExecutor(object):
             io.SubprocessExecutor().execute('lsdflsdf sdf', realtime_logging=False)
         assert e_info.value.args[0] == "[Errno 2] No such file or directory: 'lsdflsdf'"
         assert self.msgs == [
-            ((40, '%s: %s', 'lsdflsdf', "No such file or directory: 'lsdflsdf'"), {})
+            ((40, '%s: %s', 'lsdflsdf', "No such file or directory"), {})
         ]
 
     def test_invalid_command_post_logging(self, monkeypatch):
