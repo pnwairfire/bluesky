@@ -194,11 +194,10 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
     def _get_fuel_loadings_from_fccsdb_obj(self, fccs_id, fccsdb_obj):
         # iterate through the rows in the fccsdb_obj.loadings_data_
         # pandas.DataFrame until you find row with fuel loadings for fccs_id
-        for i in range(len(fccsdb_obj.loadings_data_)):
-            row = fccsdb_obj.loadings_data_.irow(i)
+        for i, row in fccsdb_obj.loadings_data_.iterrows():
             if row[0] == str(fccs_id):
                 d = dict(row)
-                for k in d:
+                for k in list(d.keys()):
                     if k in self.FUEL_LOADINGS_KEY_MAPPINGS:
                         d[self.FUEL_LOADINGS_KEY_MAPPINGS[k]] = d.pop(k)
                 d.pop('fccs_id', None)
