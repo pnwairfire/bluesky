@@ -85,7 +85,7 @@ def run(fires_manager):
 
 
 def _fix_keys(emissions):
-    for k in emissions:
+    for k in list(emissions.keys()):
         # in case someone spcifies custom EF's with 'PM25'
         if k == 'PM25':
             emissions['PM2.5'] = emissions.pop('PM25')
