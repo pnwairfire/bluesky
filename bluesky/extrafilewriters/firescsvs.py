@@ -151,7 +151,7 @@ FIRE_LOCATIONS_CSV_FIELDS = (
     ]
     # emissions
     + [
-        (s.lower(), _get_emissions_species('PM2.5' if s is 'pm25' else s))
+        (s.lower(), _get_emissions_species('PM2.5' if s == 'pm25' else s))
             for s in BLUESKYKML_SPECIES_LIST if s
     ]
     # consumption
