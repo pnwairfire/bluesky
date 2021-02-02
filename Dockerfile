@@ -80,6 +80,16 @@ RUN pip3 install matplotlib==3.3.4 \
         blueskykml==4.0.0 \
         blueskyutils==1.0.0
 
+# Install python dependencies
+RUN mkdir /tmp/bluesky/
+WORKDIR /tmp/bluesky/
+COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
+RUN pip3 install -r requirements-test.txt
+COPY requirements-dev.txt /tmp/bluesky/requirements-dev.txt
+RUN pip3 install -r requirements-dev.txt
+COPY requirements.txt /tmp/bluesky/requirements.txt
+RUN pip3 install --no-binary gdal -r requirements.txt
+
 # Install binary dependencies - for localmet, plumerise,
 # dipersion, and visualization
 COPY bin/feps_emissions /usr/local/bin/feps_emissions
@@ -95,16 +105,6 @@ COPY bin/bulk_profiler_csv /usr/local/bin/bulk_profiler_csv
 COPY bin/vsmkgs /usr/local/bin/vsmkgs
 COPY bin/vsmoke /usr/local/bin/vsmoke
 COPY bin/makepolygons /usr/local/bin/makepolygons
-
-# Install python dependencies
-RUN mkdir /tmp/bluesky/
-WORKDIR /tmp/bluesky/
-COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
-RUN pip3 install -r requirements-test.txt
-COPY requirements-dev.txt /tmp/bluesky/requirements-dev.txt
-RUN pip3 install -r requirements-dev.txt
-COPY requirements.txt /tmp/bluesky/requirements.txt
-RUN pip3 install --no-binary gdal -r requirements.txt
 
 # Install bluesky package
 COPY bluesky/ /tmp/bluesky/bluesky/
