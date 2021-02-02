@@ -197,6 +197,11 @@ def run_input(module, input_file):
     # dumps and loads actual to convert datetimest, etc.
     actual = json.loads(json.dumps(fires_manager.dump(),
         cls=models.fires.FireEncoder))
+    # Use the following to generate new output, to compare to or replace
+    # the old, when emissions models change
+    # with open(output_file.replace('.json', '-NEW.json'), 'w') as f:
+    #     f.write(json.dumps(actual, indent=4))
+
     success = check(expected, actual)
     logging.info('PASSED - %s', input_file) if success else logging.error('FAILED - %s', input_file)
     return success
