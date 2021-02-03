@@ -182,16 +182,22 @@ is set with the `--log-level` flag.  The log output looks like the following:
 
 the bluesky package includes these other executables:
 
- - feps_plumerise - computes FEPS plumrise
- - feps_weather -
- - hycm_std - MPI hysplit
- - hycs_std - hysplit
- - hysplit2netcdf - converts hysplit concentration output to netcdf
- - profile - extracts local met information
- - vsmkgs -
- - vsmoke -
+  - bsp-output-visualizer
+  - bsp-run-info - extracts information about a bluesky run from it's output
+  - bulk_profiler_csv - extracts local met information from multiple locations at once
+  - feps_emissions -
+  - feps_plumerise - computes FEPS plumrise
+  - feps_timeprofile
+  - feps_weather
+  - hycm_std - MPI hysplit
+  - hycs_std - hysplit
+  - hysplit2netcdf - converts hysplit concentration output to netcdf
+  - hytm_std - MPI hysplit trajectories
+  - hyts_std - hysplit trajectories
+  - makepolygons
+  - profile - extracts local met information
+  - vsmkgs
+  - vsmoke
 
-
-`feps_plumerise`, and `feps_weather` all support the  ```-h``` option to get
-usage information.
+All `feps_*` binaries support the  ```-h``` option to get usage information.
 
