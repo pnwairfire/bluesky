@@ -291,3 +291,6 @@
  - minor updates to AWS s3 export module
  - updates affecting wildcard replacement in config settings and input file names
  - added parsing of fire location start and end times in dispersion module, in case they're not already loaded into datetime objects
+
+## 4.3.0
+ - docker image and bundled binaries built off of ubuntu 20.04 with python 3.8.5; includes code updates and many dependency package upgrades
