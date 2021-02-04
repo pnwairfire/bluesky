@@ -13,4 +13,5 @@ profile.txt
 /input/
 /working/
 dev-private/
+.private/
 /export/
