@@ -13,6 +13,7 @@ import csv
 
 from plumerise import sev, feps, __version__ as plumerise_version
 from pyairfire import sun, osutils
+import numpy
 
 from bluesky import datautils, datetimeutils, locationutils
 from bluesky.config import Config
@@ -154,8 +155,18 @@ class ComputeFunction(object):
                         loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
 
                     fire_working_dir = _get_fire_working_dir(fire, working_dir)
+
+                    met_info = FepsMetParams(loc.get('localmet')).dict
+
+                    # Note that we'll be passing in a dict set with the location
+                    # information (plue met), not the location dict itself.
+                    # so, loc will not be modified by the call to compute
+                    # (It used to be augmented with default values for
+                    # the met related inputs, which are now set from localmet data
+                    # if avbailable)
+                    loc_info = dict(loc, **met_info)
                     plumerise_data = pr.compute(aa['timeprofile'],
-                        loc['consumption']['summary'], loc,
+                        loc['consumption']['summary'], loc_info,
                         working_dir=fire_working_dir)
                     loc['plumerise'] = plumerise_data['hours']
 
@@ -187,3 +198,85 @@ class ComputeFunction(object):
                     loc['plumerise'] = plumerise_data['hours']
 
         return _f
+
+
+class FepsMetParams(object):
+
+    def __init__(self, localmet):
+        self._localmet = localmet
+        self._data = {}
+
+        if self._localmet:
+            try:
+                self._set_max_min_wind()
+                self._set_max_min_wind_aloft()
+                self._set_max_min_humidity()
+                self._set_max_min_temp()
+                self._set_max_min_temp_hour()
+                self._set_sunrise_hour()
+                self._set_sunset_hour()
+
+                # TODO: somehow compute 'moisture_duff' from localmet?
+
+            except Exception as e:
+                logging.warning("Failed to set locamet data for plumerise: %s", e)
+                raise
+
+    @property
+    def dict(self):
+        return self._data
+
+    def _set_max_min_wind(self):
+        self._data.update(self._compute_min_max('WSPD', 'wind'))
+
+    def _set_max_min_wind_aloft(self):
+        try:
+            l2norm_vals = []
+            for hr_vals in self._localmet.values():
+                if hr_vals.get('U10M') is not None and hr_vals.get('V10M') is not None:
+                    l2norm_vals.append(
+                        numpy.linalg.norm([hr_vals['U10M'], hr_vals['V10M']])
+                    )
+            if l2norm_vals:
+                self._data.update({
+                    'min_wind_aloft': min(l2norm_vals),
+                    'max_wind_aloft': max(l2norm_vals),
+                })
+        except Exception as e:
+            logging.warning("Failed to set locamet data for plumerise: %s", e)
+
+    def _set_max_min_humidity(self):
+        self._data.update(self._compute_min_max('RELH', 'humid'))
+
+    def _set_max_min_temp(self):
+        self._data.update(self._compute_min_max('TEMP', 'temp'))
+
+    def _set_max_min_temp_hour(self):
+        # TODO: set integer indices of hours with max and min temps?
+        pass
+
+    def _set_sunrise_hour(self):
+        self._set_any_val('sunrise_hour')
+
+    def _set_sunset_hour(self):
+        self._set_any_val('sunset_hour')
+
+    def _compute_min_max(self, met_field, key_suffix):
+        try:
+            all_vals = [val for hr in self._localmet.values() for val in hr.get(met_field, [])]
+            all_vals = [val for val in all_vals if val is not None]
+
+            if all_vals:
+                return {
+                    'max_' + key_suffix: max(all_vals),
+                    'min_' + key_suffix: min(all_vals)
+                }
+        except Exception as e:
+            logging.warning("Failed to compute min/max of %s: %s", met_field, e)
+
+        return {}
+
+    def _set_any_val(self, met_field, plumerise_field=None):
+        for hr_vals in self._localmet.values():
+            if hr_vals.get(met_field) is not None:
+                self._data[plumerise_field or met_field] = hr_vals[met_field]
