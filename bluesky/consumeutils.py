@@ -66,6 +66,10 @@ def _apply_settings(fc, location, burn_type):
                 # len(defined_fields) > 1
                 value = location[defined_fields[0]]
 
+            # get from localmet data, if available
+            if value is None and location.get('localmet'):
+                value = ConsumeSettingFromLocalmet(field, location['localmet']).value
+
         if value:
             setattr(fc, field, value)
         elif 'default' in d:
@@ -73,6 +77,25 @@ def _apply_settings(fc, location, burn_type):
         else:
             raise BlueSkyConfigurationError("Specify {} for {} burns".format(
                 field, burn_type))
+
+class ConsumeSettingFromLocalmet(object):
+
+    def __init__(self, field, localmet):
+        self._localmet = localmet
+        self._value = None
+        if field == 'windspeed':
+            self._value = self._compute_windspeed(localmet)
+        # TODO: set any other fields from localmet?
+
+    @property
+    def value(self):
+        return self._value
+
+    def _compute_windspeed(self, localmet):
+        """Returns mean of all WSPD array values across all hours
+        """
+        all_windspeed_values = [w for hr in localmet.values() for w in hr['WSPD']]
+        return sum(all_windspeed_values) / len(all_windspeed_values)
 
 class FuelLoadingsManager(object):
 
