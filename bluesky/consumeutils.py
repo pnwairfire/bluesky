@@ -68,7 +68,10 @@ def _apply_settings(fc, location, burn_type):
 
             # get from localmet data, if available
             if value is None and location.get('localmet'):
-                value = ConsumeSettingFromLocalmet(field, location['localmet']).value
+                try:
+                    value = ConsumeSettingFromLocalmet(field, location['localmet']).value
+                except:
+                    pass
 
         if value:
             setattr(fc, field, value)
@@ -94,7 +97,8 @@ class ConsumeSettingFromLocalmet(object):
     def _compute_windspeed(self, localmet):
         """Returns mean of all WSPD array values across all hours
         """
-        all_windspeed_values = [w for hr in localmet.values() for w in hr['WSPD']]
+        all_windspeed_values = [w for hr in localmet.values() for w in hr.get('WSPD', [])]
+        all_windspeed_values = [val for val in all_windspeed_values if val is not None]
         return sum(all_windspeed_values) / len(all_windspeed_values)
 
 class FuelLoadingsManager(object):
