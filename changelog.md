@@ -294,3 +294,8 @@
 
 ## 4.3.0
  - docker image and bundled binaries built off of ubuntu 20.04 with python 3.8.5; includes code updates and many dependency package upgrades
+
+## 4.3.1
+ - Use localmet data, if available, for setting windspeed for CONSUME
+ - Set localmet data, if available, for FEPS plumerise
+ - Use `mpi-default-bin` and `mpi-default-dev` instead of `libopenmpi-dev` and `openmpi-bin`
