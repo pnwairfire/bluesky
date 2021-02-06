@@ -227,9 +227,6 @@ class FepsMetParams(object):
         return self._data
 
     def _set_max_min_wind(self):
-        self._data.update(self._compute_min_max('WSPD', 'wind'))
-
-    def _set_max_min_wind_aloft(self):
         try:
             l2norm_vals = []
             for hr_vals in self._localmet.values():
@@ -244,6 +241,9 @@ class FepsMetParams(object):
                 })
         except Exception as e:
             logging.warning("Failed to set locamet data for plumerise: %s", e)
+
+    def _set_max_min_wind_aloft(self):
+        self._data.update(self._compute_min_max('WSPD', 'wind'))
 
     def _set_max_min_humidity(self):
         self._data.update(self._compute_min_max('RELH', 'humid'))
