@@ -299,3 +299,6 @@
  - Use localmet data, if available, for setting windspeed for CONSUME
  - Set localmet data, if available, for FEPS plumerise
  - Use `mpi-default-bin` and `mpi-default-dev` instead of `libopenmpi-dev` and `openmpi-bin`
+
+## 4.3.2
+ - Remove `libmpich-dev` and replace hysplit binaries with newly built ones
