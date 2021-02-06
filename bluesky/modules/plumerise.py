@@ -165,6 +165,7 @@ class ComputeFunction(object):
                     # the met related inputs, which are now set from localmet data
                     # if avbailable)
                     loc_info = dict(loc, **met_info)
+
                     plumerise_data = pr.compute(aa['timeprofile'],
                         loc['consumption']['summary'], loc_info,
                         working_dir=fire_working_dir)

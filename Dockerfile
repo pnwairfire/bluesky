@@ -54,9 +54,10 @@ RUN apt-get update \
         libxml2-dev \
         libxslt1-dev \
         gdal-bin \
-        libopenmpi-dev \
         libmpich-dev \
-        openmpi-bin
+        mpi-default-bin \
+        mpi-default-dev
+
 
 # upgrade distribute and pip
 # RUN pip3 install --upgrade distribute pip
