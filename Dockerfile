@@ -54,7 +54,6 @@ RUN apt-get update \
         libxml2-dev \
         libxslt1-dev \
         gdal-bin \
-        libmpich-dev \
         mpi-default-bin \
         mpi-default-dev
 
