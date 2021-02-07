@@ -35,7 +35,7 @@ class Grower(GrowerBase):
     def grow(self, fires_manager):
 
         self._date_to_persist = (to_date(self.config('date_to_persist'))
-            or fires_manager.today().date())
+            or fires_manager.today.date())
 
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
