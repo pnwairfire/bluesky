@@ -54,8 +54,9 @@ RUN apt-get update \
         libxml2-dev \
         libxslt1-dev \
         gdal-bin \
-        mpi-default-bin \
-        mpi-default-dev
+        mpich \
+        libmpich-dev \
+        libmpich
 
 
 # upgrade distribute and pip
