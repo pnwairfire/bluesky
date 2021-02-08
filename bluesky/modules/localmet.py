@@ -40,6 +40,9 @@ def run(fires_manager):
     if not fires_manager.met:
         raise ValueError(NO_MET_ERROR_MSG)
 
+    if not fires_manager.fires:
+        logging.warning("No fires to run localmet")
+        return
 
     start_utc = None
     end_utc = None
