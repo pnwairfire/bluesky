@@ -302,3 +302,7 @@
 
 ## 4.3.2
  - Remove `libmpich-dev` and replace hysplit binaries with newly built ones
+
+## 4.3.3
+ - Use `mpich`, `libmpich-dev`, `libmpich12` insead of `mpi-default-bin` and `mpi-default-dev`, and replace mpi hysplit binaries with newly built ones
+ - fix bug in persistence growth module when defaulting 'date_to_persist' to run's 'today' variable
