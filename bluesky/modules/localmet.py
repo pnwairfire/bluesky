@@ -44,62 +44,95 @@ def run(fires_manager):
         logging.warning("No fires to run localmet")
         return
 
-    start_utc = None
-    end_utc = None
 
-    # keep array of references to locations passed into arlprofiler,
-    # to update with local met data after bulk profiler is called
-    locations = []
-    # actual array of locations to pass into arlprofiler
-    profiler_locations = []
-    for fire in fires_manager.fires:
-        with fires_manager.fire_failure_handler(fire):
-            # Make sure fire has at least some locations, but
-            # iterate first through activice areas and then through
-            # locations in order to get utc_offset and time windows
-            if not fire.locations:
-                raise ValueError(NO_ACTIVITY_ERROR_MSG)
-
-            for aa in fire.active_areas:
-                # parse_utc_offset makes sure utc offset is defined and valid
-                utc_offset = parse_utc_offset(aa.get('utc_offset'))
-                tw = parse_datetimes(aa, 'start', 'end')
-
-                # subtract utc_offset, since we want to get back to utc
-                loc_start_utc = tw['start'] - datetime.timedelta(hours=utc_offset)
-                start_utc = min(start_utc, loc_start_utc) if start_utc else loc_start_utc
-
-                loc_end_utc = tw['end'] - datetime.timedelta(hours=utc_offset)
-                end_utc = min(end_utc, loc_end_utc) if end_utc else loc_end_utc
-
-                for loc in aa.locations:
-                    latlng = LatLng(loc)
-                    p_loc = {
-                        'latitude': latlng.latitude,
-                        'longitude': latlng.longitude
-                    }
-
-                    locations.append(loc)
-                    profiler_locations.append(p_loc)
-
-    if len(locations) != len(profiler_locations):
-        raise RuntimeError(FAILED_TO_COMPILE_INPUT_ERROR_MSG)
-
-    if not start_utc or not end_utc:
-        raise RuntimeError(NO_START_OR_END_ERROR_MSG)
-
-    arl_profiler = arlprofiler.ArlProfiler(fires_manager.met.get('files'),
-        time_step=Config().get('localmet', 'time_step'))
-    logging.debug("Extracting localmet data for %d locations",
-        len(profiler_locations))
-
-    localmet = arl_profiler.profile(
-        start_utc, end_utc, profiler_locations)
-
-    if len(localmet) != len(locations):
-        raise RuntimeError(PROFILER_RUN_ERROR_MSG)
-
-    for i in range(len(localmet)):
-        locations[i]['localmet'] = localmet[i]
+    LocalmetRunner(fires_manager).run()
 
     # fires_manager.summarize(...)
+
+
+class LocalmetRunner(object):
+
+    def __init__(self, fires_manager):
+        self._fires_manager = fires_manager
+        self._start_utc = None
+        self._end_utc = None
+
+        # keep array of references to locations passed into arlprofiler,
+        # to update with local met data after bulk profiler is called
+        self._locations = []
+
+        # actual array of locations to pass into arlprofiler
+        self._profiler_locations = []
+
+        self._compile()
+        self._validate()
+
+    @property
+    def start_utc(self):
+        return self._start_utc
+
+    @property
+    def end_utc(self):
+        return self._end_utc
+
+    @property
+    def locations(self):
+        return self._locations
+
+    @property
+    def profiler_locations(self):
+        return self._profiler_locations
+
+    def run(self):
+        arl_profiler = arlprofiler.ArlProfiler(
+            self._fires_manager.met.get('files'),
+            time_step=Config().get('localmet', 'time_step'))
+        logging.debug("Extracting localmet data for %d locations",
+            len(self._profiler_locations))
+
+        localmet = arl_profiler.profile(
+            self._start_utc, self._end_utc, self._profiler_locations)
+
+        if len(localmet) != len(self._locations):
+            raise RuntimeError(PROFILER_RUN_ERROR_MSG)
+
+        for i in range(len(localmet)):
+            self._locations[i]['localmet'] = localmet[i]
+
+    def _compile(self):
+        for fire in self._fires_manager.fires:
+            with self._fires_manager.fire_failure_handler(fire):
+                # Make sure fire has at least some locations, but
+                # iterate first through activice areas and then through
+                # locations in order to get utc_offset and time windows
+                if not fire.locations:
+                    raise ValueError(NO_ACTIVITY_ERROR_MSG)
+
+                for aa in fire.active_areas:
+                    # parse_utc_offset makes sure utc offset is defined and valid
+                    utc_offset = parse_utc_offset(aa.get('utc_offset'))
+                    tw = parse_datetimes(aa, 'start', 'end')
+
+                    # subtract utc_offset, since we want to get back to utc
+                    loc_start_utc = tw['start'] - datetime.timedelta(hours=utc_offset)
+                    self._start_utc = min(self._start_utc, loc_start_utc) if self._start_utc else loc_start_utc
+
+                    loc_end_utc = tw['end'] - datetime.timedelta(hours=utc_offset)
+                    self._end_utc = min(self._end_utc, loc_end_utc) if self._end_utc else loc_end_utc
+
+                    for loc in aa.locations:
+                        latlng = LatLng(loc)
+                        p_loc = {
+                            'latitude': latlng.latitude,
+                            'longitude': latlng.longitude
+                        }
+
+                        self._locations.append(loc)
+                        self._profiler_locations.append(p_loc)
+
+    def _validate(self):
+        if len(self._locations) != len(self._profiler_locations):
+            raise RuntimeError(FAILED_TO_COMPILE_INPUT_ERROR_MSG)
+
+        if not self._start_utc or not self._end_utc:
+            raise RuntimeError(NO_START_OR_END_ERROR_MSG)
