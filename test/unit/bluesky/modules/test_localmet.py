@@ -122,9 +122,8 @@ class TestLocalMetRun(object):
         fm.load({
             "fires": []
         })
-        with raises(RuntimeError) as e_info:
-            localmet.run(fm)
-        assert e_info.value.args[0] == localmet.NO_START_OR_END_ERROR_MSG
+        localmet.run(fm)
+        # Nothing to check. just make sure no error
 
     def test_one_fire(self, reset_config, monkeypatch):
         monkeypatch_arl_profiler(monkeypatch)
