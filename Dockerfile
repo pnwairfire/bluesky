@@ -56,7 +56,7 @@ RUN apt-get update \
         gdal-bin \
         mpich \
         libmpich-dev \
-        libmpich
+        libmpich12
 
 
 # upgrade distribute and pip
