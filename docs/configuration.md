@@ -124,7 +124,7 @@ configuration json data are case-insensitive.***
 
  - ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
  - ***'config' > 'consumption' > 'default_ecoregion'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
- - ***'config' > 'consumption' > 'ecoregion_lookup_implemenation'*** -- *optional* -- default 'ogr'
+ - ***'config' > 'consumption' > 'ecoregion_lookup_implementation'*** -- *optional* -- default 'ogr'
 
 The following consume_settings fields define what defaults to use when the field isn't defined
 for a fire's activity object. They also define what synonyms to recognize, if any, for each field

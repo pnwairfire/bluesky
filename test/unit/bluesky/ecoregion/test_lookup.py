@@ -9,7 +9,7 @@ from bluesky.exceptions import (
     BlueSkyConfigurationError
 )
 
-class TestInvalidImplemenation(object):
+class TestInvalidimplementation(object):
     def test(self):
         with raises(BlueSkyConfigurationError) as e_info:
             EcoregionLookup(implementation='sdfsd')
