@@ -30,6 +30,7 @@ class EcoregionRunner(object):
     def __init__(self, fires_manager):
         self._fires_manager = fires_manager
         self._ecoregion_lookup = None
+        self._skip_failures = Config().get('ecoregion', 'skip_failures')
 
     @property
     def ecoregion_lookup(self):
@@ -56,5 +57,7 @@ class EcoregionRunner(object):
                                     "{}, {}".format(latlng.latitude, latlng.longitude))
 
                         except Exception as e:
-                            logging.warn(f"Failed to look up ecoregion for loc {loc}")
-                            # TODO: raise exception unless configured not to fail
+                            msg = f"Failed to look up ecoregion for loc {loc}"
+                            logging.warn(msg)
+                            if not self._skip_failures:
+                                raise RuntimeError(msg)

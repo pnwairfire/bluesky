@@ -71,7 +71,8 @@ _DEFAULTS = {
         #     "ne": { "lat":None, "lng": None}}}
     },
     "ecoregion": {
-        "lookup_implementation": "ogr"
+        "lookup_implementation": "ogr",
+        "skip_failures": True
     },
     "fuelbeds": {
         # The following defaults are defined in the fccsmap package,
