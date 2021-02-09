@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+
+import argparse
+import sys
+
+
+try:
+    from bluesky.locationutils import LatLng
+    from bluesky.ecoregion.lookup import EcoregionLookup
+except:
+    import os
+    root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
+    sys.path.insert(0, root_dir)
+    from bluesky.locationutils import LatLng
+    from bluesky.ecoregion.lookup import EcoregionLookup
+
+
+EXAMPLES_STRING = """
+Examples:
+
+    {script} --lat 45.5 --lng -118.2
+
+ """.format(script=sys.argv[0])
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--lat', help="latitude", type=float, required=True)
+    parser.add_argument('--lng', help="longitude", type=float, required=True)
+    parser.add_argument('--implementation', default='ogr',
+        help="look up implementation; default 'ogr'")
+
+    parser.epilog = EXAMPLES_STRING
+    parser.formatter_class = argparse.RawTextHelpFormatter
+    return parser.parse_args()
+
+if __name__ == '__main__':
+    args = parse_args()
+
+    ecoregion_lookup = EcoregionLookup(args.implementation)
+    print(f"Ecoregion: {ecoregion_lookup.lookup(args.lat, args.lng)}")
