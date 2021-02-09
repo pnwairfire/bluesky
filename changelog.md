@@ -306,3 +306,7 @@
 ## 4.3.3
  - Use `mpich`, `libmpich-dev`, `libmpich12` insead of `mpi-default-bin` and `mpi-default-dev`, and replace mpi hysplit binaries with newly built ones
  - fix bug in persistence growth module when defaulting 'date_to_persist' to run's 'today' variable
+
+## 4.3.4
+ - Refactor localmet module to not fail when there are no fires
+ - Add new 'ecoregion' module and script 'ecoregion-lookup'
