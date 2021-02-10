@@ -158,6 +158,9 @@ class ComputeFunction(object):
 
                     met_info = FepsMetParams(loc.get('localmet')).dict
 
+                    # TOOD: set "moisture_duff" from fuel moisture module
+                    #   output, once it's implemented
+
                     # Note that we'll be passing in a dict set with the location
                     # information (plue met), not the location dict itself.
                     # so, loc will not be modified by the call to compute
@@ -217,7 +220,9 @@ class FepsMetParams(object):
                 self._set_sunrise_hour()
                 self._set_sunset_hour()
 
-                # TODO: somehow compute 'moisture_duff' from localmet?
+                # TODO: set "snow_month" if it's available in met data?
+                # TODO: set "rain_days" if it's available in met data?
+                # TODO: somehow compute 'moisture_duff' from localmet
 
             except Exception as e:
                 logging.warning("Failed to set locamet data for plumerise: %s", e)
