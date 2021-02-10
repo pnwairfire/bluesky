@@ -27,6 +27,7 @@ FIRE = Fire({
                         {
                             "lat": 45,
                             "lng": -119,
+                            "ecoregion": "foobar", # shouldn't get replaced by 'western'
                             "area": 123
                         },
                         {
@@ -41,6 +42,22 @@ FIRE = Fire({
                     "start": "2015-01-21T17:00:00", # SAME TIME WINDOW
                     "end": "2015-01-22T17:00:00",
                     "utc_offset": "-07:00",
+                    "perimeter": {
+                        "polygon": [
+                            [-121.45, 47.43],
+                            [-121.39, 47.43],
+                            [-121.39, 47.40],
+                            [-121.45, 47.40],
+                            [-121.45, 47.43]
+                        ]
+                    }
+                },
+                {
+                    "pct": 10,
+                    "start": "2015-01-21T17:00:00", # SAME TIME WINDOW
+                    "end": "2015-01-22T17:00:00",
+                    "utc_offset": "-07:00",
+                    "ecoregion": "barbaz", # should prevent ecoregion lookup for perimiter
                     "perimeter": {
                         "polygon": [
                             [-121.45, 47.43],
@@ -83,9 +100,10 @@ class TestEcoRegionRun(object):
         ecoregion.run(fm)
         assert len(fm.fires) == 1
         assert fm.failed_fires == None
-        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'western'
+        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'foobar'
         assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]['ecoregion'] == 'western'
         assert fm.fires[0]['activity'][0]['active_areas'][1]['perimeter']['ecoregion'] == 'western'
+        assert fm.fires[0]['activity'][0]['active_areas'][2]['perimeter']['ecoregion'] == 'barbaz'
 
     def test_one_fire_with_activity_with_ignored_default(self, reset_config):
         Config().set('boreal', 'ecoregion', 'default')
@@ -96,9 +114,10 @@ class TestEcoRegionRun(object):
         ecoregion.run(fm)
         assert len(fm.fires) == 1
         assert fm.failed_fires == None
-        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'western'
+        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'foobar'
         assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]['ecoregion'] == 'western'
         assert fm.fires[0]['activity'][0]['active_areas'][1]['perimeter']['ecoregion'] == 'western'
+        assert fm.fires[0]['activity'][0]['active_areas'][2]['perimeter']['ecoregion'] == 'barbaz'
 
     def test_one_fire_invalid_lat_no_raise(self, reset_config):
         fm = FiresManager()
@@ -109,9 +128,10 @@ class TestEcoRegionRun(object):
         ecoregion.run(fm)
         assert len(fm.fires) == 1
         assert fm.failed_fires == None
-        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'western'
+        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'foobar'
         assert 'ecoregion' not in fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]
         assert fm.fires[0]['activity'][0]['active_areas'][1]['perimeter']['ecoregion'] == 'western'
+        assert fm.fires[0]['activity'][0]['active_areas'][2]['perimeter']['ecoregion'] == 'barbaz'
 
     def test_one_fire_invalid_lat_exception_not_skipped_but_caught(self, reset_config):
         Config().set(True, 'skip_failed_fires')
@@ -125,9 +145,10 @@ class TestEcoRegionRun(object):
         ecoregion.run(fm)
         assert len(fm.fires) == 0
         assert len(fm.failed_fires) == 1
-        assert fm.failed_fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'western'
+        assert fm.failed_fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'foobar'
         assert 'ecoregion' not in fm.failed_fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]
         assert 'ecoregion' not in fm.failed_fires[0]['activity'][0]['active_areas'][1]['perimeter']
+        assert fm.failed_fires[0]['activity'][0]['active_areas'][2]['perimeter']['ecoregion'] == 'barbaz'
 
     def test_one_fire_invalid_lat_exception_not_skipped_and_not_caught(self, reset_config):
         Config().set(False, 'skip_failed_fires')
@@ -155,6 +176,7 @@ class TestEcoRegionRun(object):
         ecoregion.run(fm)
         assert len(fm.fires) == 1
         assert fm.failed_fires == None
-        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'western'
+        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'foobar'
         assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]['ecoregion'] == 'boreal'
         assert fm.fires[0]['activity'][0]['active_areas'][1]['perimeter']['ecoregion'] == 'western'
+        assert fm.fires[0]['activity'][0]['active_areas'][2]['perimeter']['ecoregion'] == 'barbaz'
