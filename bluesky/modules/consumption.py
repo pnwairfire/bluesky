@@ -138,7 +138,8 @@ VALIDATION_ERROR_MSGS = {
     'NO_ACTIVITY': "Fire missing activity data required for computing consumption",
     'NO_LOCATIONS': "Active area missing location data required for computing consumption",
     'NO_FUELBEDS': "Active area location missing fuelbeds data required for computing consumption",
-    'AREA_UNDEFINED': "Fire activity location data must define area for computing consumption"
+    'AREA_UNDEFINED': "Fire activity location data must define area for computing consumption",
+    'ECOREGION_REQUIED': 'Fire activity location data must define ecoregion for computing consumption'
 }
 
 def _validate_input(fires_manager):
@@ -162,40 +163,9 @@ def _validate_input(fires_manager):
                     if not loc.get('area'):
                         raise ValueError(VALIDATION_ERROR_MSGS["AREA_UNDEFINED"])
 
-
                     if not loc.get('ecoregion'):
-                        # import EcoregionLookup here so that, if fires do have
-                        # ecoregion defined, consumption can be run without mapscript
-                        # and other dependencies installed
-                        try:
-                            latlng = LatLng(loc)
-                            if not ecoregion_lookup:
-                                from bluesky.ecoregion.lookup import EcoregionLookup
-                                implementation = Config().get('consumption',
-                                    'ecoregion_lookup_implementation')
-                                ecoregion_lookup = EcoregionLookup(implementation)
-                            loc['ecoregion'] = ecoregion_lookup.lookup(
-                                latlng.latitude, latlng.longitude)
-                            if not loc['ecoregion']:
-                                logging.warning("Failed to look up ecoregion for "
-                                    "{}, {}".format(latlng.latitude, latlng.longitude))
-                                _use_default_ecoregion(fires_manager, loc)
-
-                        except exceptions.MissingDependencyError as e:
-                            _use_default_ecoregion(fires_manager, loc, e)
+                        raise ValueError(VALIDATION_ERROR_MSGS["ECOREGION_REQUIED"])
 
                     for fb in loc['fuelbeds'] :
                         if not fb.get('fccs_id') or not fb.get('pct'):
                             raise ValueError("Each fuelbed must define 'fccs_id' and 'pct'")
-
-def _use_default_ecoregion(fires_manager, loc, exc=None):
-    default_ecoregion = Config().get('consumption', 'default_ecoregion')
-    if default_ecoregion:
-        logging.debug('Using default ecoregion %s', default_ecoregion)
-        loc['location']['ecoregion'] = default_ecoregion
-    else:
-        logging.debug('No default ecoregion')
-        if exc:
-            raise exc
-        else:
-            raise ValueError("No default ecoregion specified.")

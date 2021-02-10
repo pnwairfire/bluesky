@@ -125,11 +125,11 @@ configuration json data are case-insensitive.***
 ### consumption
 
  - ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
- - ***'config' > 'consumption' > 'default_ecoregion'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
- - ***'config' > 'consumption' > 'ecoregion_lookup_implementation'*** -- *optional* -- default 'ogr'
 
-The following consume_settings fields define what defaults to use when the field isn't defined
-for a fire's activity object. They also define what synonyms to recognize, if any, for each field
+The following consume_settings fields define what defaults to use when the
+field isn't defined in a fire's activity object (or in its localmet data, if
+it's a met related field).
+They also define what synonyms to recognize, if any, for each field.
 
  - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'slope' > 'default'*** -- *optional* -- percent, from 1 to 100; default 5
  - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'windspeed' > 'default'*** -- *optional* -- default 6; valid values: 0 to 35
