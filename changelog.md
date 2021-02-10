@@ -310,3 +310,7 @@
 ## 4.3.4
  - Refactor localmet module to not fail when there are no fires
  - Add new 'ecoregion' module and script 'ecoregion-lookup'
+
+## 4.3.5
+ - Update ecoregion module to support default, used when look-up fails
+ - Remove ecoregion look-up from consumption module
