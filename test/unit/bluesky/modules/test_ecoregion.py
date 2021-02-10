@@ -9,6 +9,7 @@ from py.test import raises
 from bluesky.config import Config
 from bluesky.models.fires import FiresManager, Fire
 from bluesky.modules import ecoregion
+from bluesky.exceptions import BlueSkyGeographyValueError
 
 FIRE_NO_ACTIVITY = Fire({
     "id": "SF11C14225236095807750"
@@ -86,6 +87,19 @@ class TestEcoRegionRun(object):
         assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]['ecoregion'] == 'western'
         assert fm.fires[0]['activity'][0]['active_areas'][1]['perimeter']['ecoregion'] == 'western'
 
+    def test_one_fire_with_activity_with_ignored_default(self, reset_config):
+        Config().set('boreal', 'ecoregion', 'default')
+        fm = FiresManager()
+        fm.load({
+            "fires": [copy.deepcopy(FIRE)]
+        })
+        ecoregion.run(fm)
+        assert len(fm.fires) == 1
+        assert fm.failed_fires == None
+        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'western'
+        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]['ecoregion'] == 'western'
+        assert fm.fires[0]['activity'][0]['active_areas'][1]['perimeter']['ecoregion'] == 'western'
+
     def test_one_fire_invalid_lat_no_raise(self, reset_config):
         fm = FiresManager()
         fm.load({
@@ -99,7 +113,7 @@ class TestEcoRegionRun(object):
         assert 'ecoregion' not in fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]
         assert fm.fires[0]['activity'][0]['active_areas'][1]['perimeter']['ecoregion'] == 'western'
 
-    def test_one_fire_invalid_lat_exception_raised_and_caught(self, reset_config):
+    def test_one_fire_invalid_lat_exception_not_skipped_but_caught(self, reset_config):
         Config().set(True, 'skip_failed_fires')
         Config().set(False, 'ecoregion', 'skip_failures')
 
@@ -115,7 +129,7 @@ class TestEcoRegionRun(object):
         assert 'ecoregion' not in fm.failed_fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]
         assert 'ecoregion' not in fm.failed_fires[0]['activity'][0]['active_areas'][1]['perimeter']
 
-    def test_one_fire_invalid_lat_exception_raised_and_not_caught(self, reset_config):
+    def test_one_fire_invalid_lat_exception_not_skipped_and_not_caught(self, reset_config):
         Config().set(False, 'skip_failed_fires')
         Config().set(False, 'ecoregion', 'skip_failures')
 
@@ -124,6 +138,23 @@ class TestEcoRegionRun(object):
             "fires": [copy.deepcopy(FIRE)]
         })
         fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]['lng'] = -200.0
-        with raises(RuntimeError) as e_info:
+        with raises(BlueSkyGeographyValueError) as e_info:
             ecoregion.run(fm)
-        assert e_info.value.args[0].startswith('Failed to look up ecoregion for loc')
+        assert e_info.value.args[0].startswith('Invalid lat,lng:')
+
+    def test_one_fire_invalid_lat_exception_with_default(self, reset_config):
+        Config().set(False, 'skip_failed_fires')
+        Config().set(False, 'ecoregion', 'skip_failures')
+        Config().set('boreal', 'ecoregion', 'default')
+
+        fm = FiresManager()
+        fm.load({
+            "fires": [copy.deepcopy(FIRE)]
+        })
+        fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]['lng'] = -200.0
+        ecoregion.run(fm)
+        assert len(fm.fires) == 1
+        assert fm.failed_fires == None
+        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['ecoregion'] == 'western'
+        assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][1]['ecoregion'] == 'boreal'
+        assert fm.fires[0]['activity'][0]['active_areas'][1]['perimeter']['ecoregion'] == 'western'

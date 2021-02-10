@@ -72,7 +72,8 @@ _DEFAULTS = {
     },
     "ecoregion": {
         "lookup_implementation": "ogr",
-        "skip_failures": True
+        "skip_failures": True,
+        "default": None
     },
     "fuelbeds": {
         # The following defaults are defined in the fccsmap package,

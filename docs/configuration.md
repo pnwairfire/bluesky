@@ -120,6 +120,7 @@ configuration json data are case-insensitive.***
 
  - ***'config' > 'ecoregion' > 'lookup_implementation'*** -- *optional* -- default 'ogr'
  - ***'config' > 'ecoregion' > 'skip_failures'*** -- *optional* -- default true; if true (default) continue on to next location in fire; else, raise exception
+ - ***'config' > 'ecoregion' > 'default'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
 
 ### consumption
 

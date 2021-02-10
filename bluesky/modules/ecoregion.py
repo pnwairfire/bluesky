@@ -47,17 +47,29 @@ class EcoregionRunner(object):
             with self._fires_manager.fire_failure_handler(fire):
                 for loc in fire.locations:
                     if not loc.get('ecoregion'):
+                        exc = None
                         try:
                             latlng = LatLng(loc)
                             loc['ecoregion'] = self.ecoregion_lookup.lookup(
                                 latlng.latitude, latlng.longitude)
 
-                            if not loc['ecoregion']:
-                                logging.warning("Failed to look up ecoregion for "
-                                    "{}, {}".format(latlng.latitude, latlng.longitude))
-
                         except Exception as e:
-                            msg = f"Failed to look up ecoregion for loc {loc}"
-                            logging.warn(msg)
-                            if not self._skip_failures:
-                                raise RuntimeError(msg)
+                            exc = e
+
+                        if not loc.get('ecoregion'):
+                            logging.warning("Failed to look up ecoregion for "
+                                "{}, {}".format(latlng.latitude, latlng.longitude))
+                            self._use_default(loc, exc=exc)
+
+    def _use_default(self, loc, exc=None):
+        default_ecoregion = Config().get('ecoregion', 'default')
+
+        if default_ecoregion:
+            logging.debug('Using default ecoregion %s', default_ecoregion)
+            loc['ecoregion'] = default_ecoregion
+
+        else:
+            logging.debug(exc or 'No default ecoregion')
+            if not self._skip_failures:
+                raise (exc or RuntimeError(
+                    "Failed to look up recoregion, and no default defined"))
