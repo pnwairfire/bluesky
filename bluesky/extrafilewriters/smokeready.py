@@ -250,8 +250,8 @@ class SmokeReadyWriter(object):
     total_skipped = 0
 
     for fire_info in fires_info:
-      for fire_loc in fire_info.locations:
-       with fires_manager.fire_failure_handler(fire_info):
+      with fires_manager.fire_failure_handler(fire_info):
+       for fire_loc in fire_info.locations:
         if any([k not in fire_loc for k in ('lat', 'lng')]):
           skip_no_lat_lng += 1
           total_skipped += 1
