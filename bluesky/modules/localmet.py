@@ -56,6 +56,7 @@ class LocalmetRunner(object):
         self._fires_manager = fires_manager
         self._start_utc = None
         self._end_utc = None
+        self._skip_failures = Config().get('localmet', 'skip_failures')
 
         # keep array of references to locations passed into arlprofiler,
         # to update with local met data after bulk profiler is called
@@ -90,10 +91,17 @@ class LocalmetRunner(object):
         logging.debug("Extracting localmet data for %d locations",
             len(self._profiler_locations))
 
-        localmet = arl_profiler.profile(
-            self._start_utc, self._end_utc, self._profiler_locations)
+        try:
+            localmet = arl_profiler.profile(
+                self._start_utc, self._end_utc, self._profiler_locations)
+        except:
+            if self._skip_failures:
+                return
+            raise
 
         if len(localmet) != len(self._locations):
+            if self._skip_failures:
+                return
             raise RuntimeError(PROFILER_RUN_ERROR_MSG)
 
         for i in range(len(localmet)):
