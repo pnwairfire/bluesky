@@ -201,7 +201,8 @@ _DEFAULTS = {
         # The following default is defined in the met package,
         # but we need to define it here so that the code doesn't fail
         "time_step": 1,
-        "skip_failures": True
+        "skip_failures": True,
+        "working_dir": None
     },
     "timeprofile": {
         "hourly_fractions": None,

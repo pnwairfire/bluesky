@@ -87,7 +87,8 @@ class LocalmetRunner(object):
     def run(self):
         arl_profiler = arlprofiler.ArlProfiler(
             self._fires_manager.met.get('files'),
-            time_step=Config().get('localmet', 'time_step'))
+            time_step=Config().get('localmet', 'time_step'),
+            working_dir=Config().get('localmet', 'working_dir'))
         logging.debug("Extracting localmet data for %d locations",
             len(self._profiler_locations))
 

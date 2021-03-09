@@ -184,6 +184,7 @@ emissions config
 
  - ***'config' > 'localmet' > 'time_step'*** -- *optional* -- hour per arl file time step; defaults to 1
  - ***'config' > 'localmet' > 'skip_failures'*** -- *optional* -- default `true`; if true (default) ignore and move on to next module; else, raise exception
+ - ***'config' > 'localmet' > 'working_dir'*** -- *optional* -- default is to create a temp dir; directory to contain profile executable's input and output files
 
 ### timeprofile
 
