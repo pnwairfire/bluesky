@@ -136,7 +136,10 @@ class TestLocalMetRun(object):
         localmet.run(fm)
 
         assert _ARLP_ARGS == (MET_INFO['files'], )
-        assert _ARLP_KWARGS == {'time_step': defaults._DEFAULTS['localmet']['time_step']}
+        assert _ARLP_KWARGS == {
+            'time_step': defaults._DEFAULTS['localmet']['time_step'],
+            'working_dir': defaults._DEFAULTS['localmet']['working_dir']
+        }
         assert _ARLP_PROFILE_CALL_ARGS == [
             (
                 datetime.datetime(2015, 1, 21, 0, 0),
