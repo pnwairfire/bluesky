@@ -314,3 +314,9 @@
 ## 4.3.5
  - Update ecoregion module to support default, used when look-up fails
  - Remove ecoregion look-up from consumption module
+
+## 4.3.6
+ - Added the following localmet config options:
+   - `localmet` > `skip_failures` to ignore failure and move onto next module
+   - `localmet` > `working_dir` to specify where to write profile executable's input and output files (require `met` package upgrade to `v3.0.1`)
+   - `localmet` > `delete_working_dir_if_no_error` to delete working dir if no error
