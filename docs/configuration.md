@@ -164,6 +164,7 @@ emissions config
 #### If running ubc-bsf-feps emissions:
 
 - ***'config' > 'emissions' > 'ubc-bsf-feps' > 'working_dir'*** -- *optional* --
+- ***'config' > 'emissions' > 'ubc-bsf-feps' > 'delete_working_dir_if_no_error'*** -- *optional* -- default true
 
 ### findmetdata
 
@@ -185,6 +186,7 @@ emissions config
  - ***'config' > 'localmet' > 'time_step'*** -- *optional* -- hour per arl file time step; defaults to 1
  - ***'config' > 'localmet' > 'skip_failures'*** -- *optional* -- default `true`; if true (default) ignore and move on to next module; else, raise exception
  - ***'config' > 'localmet' > 'working_dir'*** -- *optional* -- default is to create a temp dir; directory to contain profile executable's input and output files
+ - ***'config' > 'localmet' > 'delete_working_dir_if_no_error'*** -- *optional* -- default true
 
 ### timeprofile
 
@@ -196,6 +198,8 @@ emissions config
  - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'interpolation_type'*** -- *optional* -- default: 1
  - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'normalize'*** -- *optional* -- default: True
  - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'working_dir'*** -- *optional* -- default: None
+ - ***'config' > 'timeprofile' > 'ubc-bsf-feps' > 'delete_working_dir_if_no_error'*** -- *optional* -- default true
+
 
 ### plumerise
 
@@ -204,6 +208,7 @@ emissions config
 #### If running feps model:
 
  - ***'config' > 'plumerise' > 'feps' > 'working_dir'*** -- *optional* -- default: None
+ - ***'config' > 'plumerise' > 'feps' > 'delete_working_dir_if_no_error'*** -- *optional* -- default: True
  - ***'config' > 'plumerise' > 'feps' > 'load_heat'*** -- *optional* -- default: False
 
 
@@ -213,6 +218,7 @@ emissions config
  - ***'config' > 'plumerise' > 'feps' > 'feps_plumerise_binary'*** -- *optional* -- defaults to "feps_plumerise"
  - ***'config' > 'plumerise' > 'feps' > 'plume_top_behavior'*** -- *optional* -- how to model plume top; options: 'Briggs', 'FEPS', 'auto'; defaults to 'auto'
  - ***'config' > 'plumerise' > 'feps' > 'working_dir'*** -- *optional* -- where to write intermediate files; defaults to writing to tmp dir
+ - ***'config' > 'plumerise' > 'feps' > 'delete_working_dir_if_no_error'*** -- *optional* -- default true
 
 #### if sev:
 
@@ -248,6 +254,7 @@ emissions config
  - ***'config' > 'trajectories' > 'num_hours'*** -- *optional* -- default: 24
  - ***'config' > 'trajectories' > 'output_dir'*** -- *required* -- where output json and geojson files will be written
  - ***'config' > 'trajectories' > 'working_dir'*** -- *optional* -- default is to create a temp dir
+ - ***'config' > 'trajectories' > 'delete_working_dir_if_no_error'*** -- *optional* -- default true
  - ***'config' > 'trajectories' > 'handle_existing'*** -- *optional* -- "fail"
 
 #### if running hysplit dispersion:
@@ -279,6 +286,7 @@ emissions config
  - ***'config' > 'dispersion' > 'num_hours'*** -- *required* (unless it can be determined from fire activity windows) -- number of hours in model run
  - ***'config' > 'dispersion' > 'output_dir'*** -- *required* -- directory to contain output
  - ***'config' > 'dispersion' > 'working_dir'*** -- *required* -- directory to contain working output
+ - ***'config' > 'dispersion' > 'delete_working_dir_if_no_error'*** -- *optional* -- default true
  - ***'config' > 'dispersion' > 'model'*** -- *optional* -- dispersion model; defaults to "hysplit"
  - ***'config' > 'dispersion' > 'handle_existing'*** - *optional* -- how to handle case where output dir already exists; options: 'replace', 'write_in_place', 'fail'; defaults to 'fail'
  - ***'config' > 'dispersion' > 'plume_merge' > 'grid' > 'spacing'*** -- *optional*, but required if other plume_merge grid fields are specified -- grid cell dimensions ***in degrees***

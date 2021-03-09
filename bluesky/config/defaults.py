@@ -202,7 +202,8 @@ _DEFAULTS = {
         # but we need to define it here so that the code doesn't fail
         "time_step": 1,
         "skip_failures": True,
-        "working_dir": None
+        "working_dir": None,
+        "delete_working_dir_if_no_error": True
     },
     "timeprofile": {
         "hourly_fractions": None,

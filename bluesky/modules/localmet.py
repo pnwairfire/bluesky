@@ -11,6 +11,7 @@ __author__ = "Joel Dubowy"
 import datetime
 import logging
 import os
+import shutil
 
 from met.arl import arlprofiler
 
@@ -85,10 +86,11 @@ class LocalmetRunner(object):
         return self._profiler_locations
 
     def run(self):
+        working_dir = Config().get('localmet', 'working_dir')
         arl_profiler = arlprofiler.ArlProfiler(
             self._fires_manager.met.get('files'),
             time_step=Config().get('localmet', 'time_step'),
-            working_dir=Config().get('localmet', 'working_dir'))
+            working_dir=working_dir)
         logging.debug("Extracting localmet data for %d locations",
             len(self._profiler_locations))
 
@@ -107,6 +109,15 @@ class LocalmetRunner(object):
 
         for i in range(len(localmet)):
             self._locations[i]['localmet'] = localmet[i]
+
+        if (working_dir and Config().get('localmet', 'delete_working_dir_if_no_error')):
+            try:
+                logging.debug('Deleting localmet working dir %s', working_dir)
+                shutil.rmtree(working_dir)
+
+            except Exception as e:
+                logging.warn('Failed to delete localmet working dir %s', working_dir)
+
 
     def _compile(self):
         for fire in self._fires_manager.fires:
