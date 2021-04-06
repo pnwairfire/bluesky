@@ -217,7 +217,12 @@ class SmokeReadyWriter(object):
     self._write_ptday_file = write_ptday_file
 
     # Pull the file year out of the dynamically set timestamp
-    self.file_year = int(pthour.split('-')[1][:4])
+    try:
+      self.file_year = int(pthour.split('-')[1][:4])
+    except Exception as e:
+      logging.debug('Error parsing PT filenames')
+      logging.debug(e)
+      raise BlueSkyConfigurationError("Improperly formatted PT Filename: use YYYYMMDDHH filename format.")
 
   # main write function to be called
   def write(self, fires_manager):
@@ -274,7 +279,8 @@ class SmokeReadyWriter(object):
         try:
           cyid, stid = self._get_state_county_fips(lat, lng)
         except ValueError:
-          print("Invalid Lat:%s and/or Invalid Lng:%s" % (lat, lng))
+          invalid = "Invalid Lat:%s and/or Invalid Lng:%s when pulling FIPs Code" % (lat, lng)
+          logging.debug(invalid)
           skip_bad_fips += 1
           total_skipped += 1
           continue
@@ -526,27 +532,22 @@ class SmokeReadyWriter(object):
     logging.debug(" #NO PLUME: %s", skip_no_plume)
     logging.debug(" #BAD FIPS: %s", skip_bad_fips)
 
-  def _get_state_county_fips(self, lat, lng):
+  def _get_state_county_fips(self, lat, lng, default_code=True):
     """
-      CMAS has a State/County FIPS code that is 5 digits long.
+      CMAS has a State/County FIPS code that is 5 digits long. Country Code is appened to make the 6-digit SMOKE code.
       Please refer to the documentation here:
       https://www.cmascenter.org/smoke/documentation/3.7/html/ch02s03s04.html
 
-      Examples:
-
-      Tuolumne County (CA):
-        state_fips = '06'
-        county_fips = '06109'
-        CMAS FIPS = '6109'
-
-      Wetzel County (WV)
-        state_fips = '54'
-        county_fips = '54103'
-        CMAS FIPS = '54104'
+      Per 04/06/2021 -- we've determined FIPS lookup to be nonessential for our purposes
+      so this function will return a defualt value.
     """
-    fips = locationutils.Fips(lat, lng)
-    cyid = fips.county_fips[2:].lstrip('0')
-    stid = fips.state_fips.lstrip('0')
+    if default_code:
+      cyid = '221'
+      stid = '13'
+    else:
+      fips = locationutils.Fips(lat, lng)
+      cyid = fips.county_fips[2:].lstrip('0')
+      stid = fips.state_fips.lstrip('0')
     return cyid, stid
 
   def _map_scc(self, fire_type):
