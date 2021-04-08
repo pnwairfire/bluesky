@@ -139,7 +139,7 @@ VALIDATION_ERROR_MSGS = {
     'NO_LOCATIONS': "Active area missing location data required for computing consumption",
     'NO_FUELBEDS': "Active area location missing fuelbeds data required for computing consumption",
     'AREA_UNDEFINED': "Fire activity location data must define area for computing consumption",
-    'ECOREGION_REQUIED': 'Fire activity location data must define ecoregion for computing consumption'
+    'ECOREGION_REQUIED': 'Fire activity location data must define ecoregion for computing consumption. Run the ecoregion module first.'
 }
 
 def _validate_input(fires_manager):
