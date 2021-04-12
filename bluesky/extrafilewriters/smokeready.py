@@ -216,6 +216,12 @@ class SmokeReadyWriter(object):
       Config().get('extrafiles', 'smokeready', 'write_ptday_file'))
     self._write_ptday_file = write_ptday_file
 
+    try:
+      use_fips = (kwargs.get('use_fips') or Config().get('extrafiles', 'smokeready', 'use_fips'))
+      self._use_fips = use_fips.lower() == 'true'
+    except:
+      self._use_fips = False
+
     # Pull the file year out of the dynamically set timestamp
     try:
       self.file_year = int(pthour.split('-')[1][:4])
@@ -277,7 +283,7 @@ class SmokeReadyWriter(object):
 
         # try to get CYID/STID, but skip record if lat/lng invalid
         try:
-          cyid, stid = self._get_state_county_fips(lat, lng)
+          cyid, stid = self._get_state_county_fips(lat=lat, lng=lng, use_fips=self._use_fips)
         except ValueError:
           invalid = "Invalid Lat:%s and/or Invalid Lng:%s when pulling FIPs Code" % (lat, lng)
           logging.debug(invalid)
@@ -532,7 +538,7 @@ class SmokeReadyWriter(object):
     logging.debug(" #NO PLUME: %s", skip_no_plume)
     logging.debug(" #BAD FIPS: %s", skip_bad_fips)
 
-  def _get_state_county_fips(self, lat, lng, default_code=True):
+  def _get_state_county_fips(self, lat, lng, use_fips=False):
     """
       CMAS has a State/County FIPS code that is 5 digits long. Country Code is appened to make the 6-digit SMOKE code.
       Please refer to the documentation here:
@@ -541,10 +547,12 @@ class SmokeReadyWriter(object):
       Per 04/06/2021 -- we've determined FIPS lookup to be nonessential for our purposes
       so this function will return a defualt value.
     """
-    if default_code:
+    if not use_fips:
+      logging.debug("Using a default FIPS code")
       cyid = '221'
       stid = '13'
     else:
+      logging.debug("Looking up FIPS code for each fire location")
       fips = locationutils.Fips(lat, lng)
       cyid = fips.county_fips[2:].lstrip('0')
       stid = fips.state_fips.lstrip('0')
