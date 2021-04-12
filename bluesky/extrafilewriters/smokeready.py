@@ -218,7 +218,7 @@ class SmokeReadyWriter(object):
 
     try:
       use_fips = (kwargs.get('use_fips') or Config().get('extrafiles', 'smokeready', 'use_fips'))
-      self._use_fips = use_fips.lower() == 'true'
+      self._use_fips = use_fips
     except:
       self._use_fips = False
 
