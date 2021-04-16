@@ -38,7 +38,7 @@ or from file.  Likewise, you can output to stdout or to file.
 
 Example of reading from and writing to file:
 
-    $ bsp -i /path/to/input/fires/json/file.json -o /path/to/output/modified/fires/json/file.json fuelbeds consumption
+    $ bsp -i /path/to/input/fires/json/file.json -o /path/to/output/modified/fires/json/file.json fuelbeds ecoregion consumption
 
 Example of piping in and redirecting output to file
 
@@ -46,7 +46,7 @@ Example of piping in and redirecting output to file
 
 Example of redirecting input from and outputing to file:
 
-    $ bsp fuelbeds consumption emissions < /path/to/input/fires/json/file.json > /path/to/output/modified/fires/json/file.json
+    $ bsp fuelbeds ecoregion consumption emissions < /path/to/input/fires/json/file.json > /path/to/output/modified/fires/json/file.json
 
 Example of redirecting input from file and outputing to stdout
 
@@ -96,7 +96,7 @@ yielding the following augmented output:
 Though there would be no reason to do so in this situation, you could re-run
 the fuelbeds module in the second pass throgh ```bsp```, like so:
 
-    bsp -i fires.json fuelbeds | bsp fuelbeds consumption
+    bsp -i fires.json fuelbeds | bsp fuelbeds ecoregion consumption
 
 The second pass through the fuelbeds module would reinitialize the fuelbeds
 array created by the first pass through the module. After running through
@@ -108,7 +108,7 @@ the beginning of the pipeline.
 Here's an example that runs through comsumption, captures the output, then
 runs the output back through consumption and on through emissions:
 
-    bsp -i fires.json fuelbeds consumption -o fires-c.json
+    bsp -i fires.json fuelbeds ecoregion consumption -o fires-c.json
     cat fires-c.json | bsp consumption emissions > fires-e.json
 
 ```fires-c.json``` would contain the output listed above.  ```fires-e.json```
