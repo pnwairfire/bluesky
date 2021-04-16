@@ -253,7 +253,19 @@ _DEFAULTS = {
             "fire_locations_filename": "fire_locations.csv",
             "fire_events_filename": "fire_events.csv"
 
-        }
+        },
+        "smokeready": {
+            # - PT filenames require datestamps
+            # - FIPS does not appear to matter for the CMAQ runs,
+            #   so we default to not performing a lookup.
+            "ptinv_filename": "ptinv-{today:%Y%m%d%H}.ida",
+            "ptday_filename": "ptday-{today:%Y%m%d%H}.ems95",
+            "pthour_filename": "pthour-{today:%Y%m%d%H}.ems95",
+            "separate_smolder": True,
+            "write_ptinv_totals": True,
+            "write_ptday_file": True,
+            "use_fips": False
+        },
     },
     "trajectories": {
         "model": "hysplit",
