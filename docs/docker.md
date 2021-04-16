@@ -42,7 +42,7 @@ use something like the following:
             }
         ]
     }' | docker run --rm -i bluesky \
-        bsp fuelbeds consumption emissions --indent 4 | less
+        bsp fuelbeds ecoregion consumption emissions --indent 4 | less
 
 To run bluesky with file input, you'll need to use the '-v' option to
 mount host machine directories in your container.  For example, suppose
@@ -53,7 +53,7 @@ could run something like the following:
         -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         bluesky bsp \
         -i /bluesky/dev/data/json/2-fires-24hr-20140530-CA.json \
-        fuelbeds consumption emissions
+        fuelbeds ecoregion consumption emissions
 
 ### Using image for development
 
@@ -79,7 +79,7 @@ Another example, running through emissions:
         bsp --log-level=DEBUG --indent 4 \
         -i ./dev/data/json/2-fires-24hr-20140530-CA.json \
         -o ./output/{run_id}.json \
-        fuelbeds consumption emissions
+        fuelbeds ecoregion consumption emissions
 
 
 Another example, running through vsmoke dispersion:
@@ -95,7 +95,7 @@ Another example, running through vsmoke dispersion:
         -i ./dev/data/json/1-fire-72hr-20140530-CA.json \
         -o ./output/{run_id}.json \
         -c ./dev/config/dispersion/dispersion-vsmoke-72hr.json \
-        fuelbeds consumption emissions timeprofile dispersion
+        fuelbeds ecoregion consumption emissions timeprofile dispersion
 
 
 Two more examples, running `bsp` from the repo through HYSPLIT dispersion
@@ -113,7 +113,7 @@ and KML visualization:
         -i ./dev/data/json/1-fire-24hr-20190610-CA.json \
         -o ./output/{run_id}.json \
         -c ./dev/config/fuelbeds-through-visualization/DRI4km-2019061012-48hr-PM2.5-grid-latlng.json \
-        fuelbeds consumption emissions \
+        fuelbeds ecoregion consumption emissions \
         timeprofile findmetdata localmet plumerise \
         dispersion visualization
 
@@ -129,7 +129,7 @@ and KML visualization:
         -i dev/data/json/2-fires-24hr-2019-07-26-WA.json \
         -o ./output/{run_id}.json \
         -c ./dev/config/fuelbeds-through-visualization/PNW4km-2019072600-24hr-PM2.5.json \
-        fuelbeds consumption emissions \
+        fuelbeds ecoregion consumption emissions \
         timeprofile findmetdata localmet plumerise \
         dispersion visualization
 
@@ -173,7 +173,7 @@ the code as you normally would in development. E.g.:
     ./bin/bsp --log-level=DEBUG \
         -i ./dev/data/json/2-fires-24hr-20140530-CA.json \
         -c ./dev/config/fuelbeds-through-visualization/DRI6km-2014053000-24hr-PM2.5-compute-grid-km.json \
-        fuelbeds consumption emissions timeprofile \
+        fuelbeds ecoregion consumption emissions timeprofile \
         findmetdata localmet plumerise dispersion \
         visualization export --indent 4 > out.json
 

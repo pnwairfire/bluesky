@@ -45,10 +45,10 @@ docker run --rm -ti \
     --run-id smokeready-run \
     -i ./tmp/smokeready-run/output.json \
     -c ./tmp/smokeready-run/config.json \
-    filter fuelbeds consumption emissions timeprofile plumerise extrafiles
+    filter fuelbeds ecoregion consumption emissions timeprofile plumerise extrafiles
     ```
 
 ### Dispersion test 09-2019
 ```
-docker run -it --rm      -v $HOME/airfire/bluesky/:/bluesky/     -v $HOME/airfire/Met/PNW/4km/ARL/:/data/Met/PNW/4km/ARL/     -e PYTHONPATH=/bluesky/     -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin     -w /bluesky/ bluesky bsp --log-level=DEBUG --today 2019-07-28 --run-id PNW4km-dispersion-test{today}00Z -i ./dev/data/json/1-fire-24hr-20190728-OR.json -c ./dev/config/smokeready/PNW4km-dispersion-test.json -o ./output/{run_id}.json  filter fuelbeds consumption emissions timeprofile findmetdata plumerise dispersion extrafiles
+docker run -it --rm      -v $HOME/airfire/bluesky/:/bluesky/     -v $HOME/airfire/Met/PNW/4km/ARL/:/data/Met/PNW/4km/ARL/     -e PYTHONPATH=/bluesky/     -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin     -w /bluesky/ bluesky bsp --log-level=DEBUG --today 2019-07-28 --run-id PNW4km-dispersion-test{today}00Z -i ./dev/data/json/1-fire-24hr-20190728-OR.json -c ./dev/config/smokeready/PNW4km-dispersion-test.json -o ./output/{run_id}.json  filter fuelbeds ecoregion consumption emissions timeprofile findmetdata plumerise dispersion extrafiles
 ```

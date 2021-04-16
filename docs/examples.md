@@ -170,7 +170,7 @@ would give you:
 
 Piping that through consumption
 
-    cat ./tmp/fires.json | bsp fuelbeds consumption
+    cat ./tmp/fires.json | bsp fuelbeds ecoregion consumption
     # or
     cat ./tmp/fires.json | bsp fuelbeds |bsp consumption
 
@@ -534,7 +534,7 @@ would give you give you the
 
 Finally, piping that through emissions
 
-    cat ./tmp/fires.json fuelbeds consumption emissions
+    cat ./tmp/fires.json fuelbeds ecoregion consumption emissions
     # or
     cat ./tmp/fires.json | bsp fuelbeds |bsp consumption | bsp emissions
 
