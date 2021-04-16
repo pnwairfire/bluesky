@@ -108,7 +108,8 @@ _DEFAULTS = {
         "total_pct_threshold": 0.5
     },
     "fuelmoisture":{
-        "model": "wims",
+        # multiple models
+        "models": ["wims"],
         "wims": {
             "url": "https://www.wfas.net/archive/www.fs.fed.us/land/wfas/archive/%Y/%m/%d/fdr_obs.dat",
             "data_dir": None # defaults to tmp folder

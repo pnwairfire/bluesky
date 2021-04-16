@@ -126,6 +126,10 @@ The following settings apply to filtering on any field (other than 'area') in th
  - ***'config' > 'ecoregion' > 'skip_failures'*** -- *optional* -- default true; if true (default) continue on to next location in fire; else, raise exception
  - ***'config' > 'ecoregion' > 'default'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
 
+### fuelmoisture
+
+ - ***'config' > 'fuelmoisture' > 'models'*** -- *optional* -- models to run; default  ["wims"]custom, fuelbed-specific fuel loadings
+
 ### consumption
 
  - ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
