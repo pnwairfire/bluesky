@@ -324,6 +324,11 @@
 ## 4.3.7
  - skip FIPS lookup in smokeready
 
-## 4.4.8
+## 4.3.8
  - config setting controlling use of default FIPS code in smokeready module
  - new hysplit binaries
+
+## 4.3.9
+ - new hysplit binaries
+ - fix bsp config options adhoc test
+ - upgrade consume to v5.1.1
