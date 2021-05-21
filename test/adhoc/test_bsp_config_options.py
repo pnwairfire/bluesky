@@ -17,6 +17,7 @@ import tempfile
 
 from py.test import raises
 
+from bluesky import datetimeutils
 from bluesky.config import DEFAULTS
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
@@ -115,6 +116,21 @@ EXPECTED = {
     "fires": []
 }
 
+# smoke ready config defaults have datetime wildcards; call fill-in code
+# on all of EXPECTED, in case future config params also have wildcards
+def replace_config_wildcards(val):
+    if isinstance(val, dict):
+        for k in val:
+            val[k] = replace_config_wildcards(val[k])
+    elif isinstance(val, list):
+        val = [replace_config_wildcards(v) for v in val]
+    elif hasattr(val, 'lower'):  # i.e. it's a string
+        if val:
+            # first, fill in any datetime control codes or wildcards
+            val = datetimeutils.fill_in_datetime_strings(val)
+    return val
+EXPECTED['run_config'] = replace_config_wildcards(EXPECTED['run_config'])
+
 input_file = tempfile.NamedTemporaryFile(mode='w+t')
 input_file.write(json.dumps(INPUT))
 input_file.flush()
@@ -163,6 +179,8 @@ assert set(actual.keys()) == set(['run_config', 'fires', 'run_id', 'counts', 'bl
 assert actual['fires'] == EXPECTED['fires']
 assert set(actual['run_config'].keys()) == set(EXPECTED['run_config'].keys())
 for k in actual['run_config'].keys():
+    if actual['run_config'][k] != EXPECTED['run_config'][k]:
+        import pdb;pdb.set_trace()
     logging.info('Checking output config key %s', k)
     assert actual['run_config'][k] == EXPECTED['run_config'][k]
 
