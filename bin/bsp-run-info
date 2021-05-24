@@ -55,7 +55,7 @@ def area(fires_manager):
     for f in fires_manager.fires:
         for aa in f.active_areas:
             try:
-                utc_offset = datetime.timedelta(hours=parse_utc_offset(aa['utc_offset']))
+                utc_offset = datetime.timedelta(hours=parse_utc_offset(aa.get('utc_offset', 0)))
                 start = parse_datetime(aa["start"])
                 end = parse_datetime(aa["end"])
                 if start > end:
@@ -63,7 +63,7 @@ def area(fires_manager):
                     aa_failed += 1
                     continue
 
-                aa_area = sum([l['area'] for l in aa.locations])
+                aa_area = sum([l.get('area', 0) for l in aa.locations])
 
                 default_area_fraction = 3600 / (end-start).total_seconds()
 
@@ -99,7 +99,7 @@ def runtime(fires_manager):
     print("  Total: {}".format(fires_manager.runtime.get('total', '?')))
     print("  Modules")
     for m in fires_manager.runtime.get('modules'):
-        print("    {}: {}".format(m['module_name'], m['total']))
+        print("    {}: {}".format(m.get('module_name', '?'), m.get('total', '?')))
 
 def main():
     args = parse_args()
