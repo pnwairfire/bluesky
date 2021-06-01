@@ -518,8 +518,8 @@ class SmokeReadyWriter(object):
                           value = emissions_summary[species_key]
                       daytot += value
                     setattr(pthour_rec, 'HRVAL' + str(hour+1), value)
-                  except IndexError:
-                          self.log.debug("IndexError on hour %d for fire" % (h))
+                  except IndexError as e:
+                          logging.debug("IndexError on hour %d for fire" % (h))
                           setattr(pthour_rec, 'HRVAL' + str(hour+1), 0.0)
 
                 if var not in ('PTOP', 'PBOT', 'LAY1F'):
