@@ -332,3 +332,9 @@
  - new hysplit binaries
  - fix bsp config options adhoc test
  - upgrade consume to v5.1.1
+
+## 4.3.10
+ - Make bsp-run-info more fault tolerant
+ - Fix bug in smokeready module
+ - Add documentation
+ - Add HYSPLIT v5.1 binaries
