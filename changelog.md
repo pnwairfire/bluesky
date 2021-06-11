@@ -338,3 +338,6 @@
  - Fix bug in smokeready module
  - Add documentation
  - Add HYSPLIT v5.1 binaries
+
+## 4.3.11
+ - Copy HYSPLIT v5.1 to docker image
