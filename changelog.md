@@ -341,3 +341,7 @@
 
 ## 4.3.11
  - Copy HYSPLIT v5.1 to docker image
+
+## 4.3.12
+ - More robust fuelbed lookup, automatically handling both AK and lower 48 states
+ - Minor tweak to plume merge configuration validation
