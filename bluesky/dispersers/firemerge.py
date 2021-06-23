@@ -153,8 +153,10 @@ class PlumeMerger(BaseFireMerger):
                     config, 'grid', 'boundary', 'ne', 'lat')
                 self.neLng = afconfig.get_config_value(
                     config, 'grid', 'boundary', 'ne', 'lng')
-                if (self.spacing and self.swLat and self.swLng
-                        and self.neLat and self.neLng):
+                if (self.spacing and self.swLat is not None
+                        and self.swLng is not None
+                        and self.neLat is not None
+                        and self.neLng is not None):
                     return
 
             except Exception as e:
