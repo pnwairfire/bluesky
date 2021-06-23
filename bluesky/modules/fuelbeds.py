@@ -18,11 +18,10 @@ __all__ = [
 
 __version__ = "0.1.0"
 
-# TODO: set is_alaska based on lat & lng instead from 'state'
-FCCS_LOOKUPS = defaultdict(
-    lambda: FccsLookUp(is_alaska=False, **Config().get('fuelbeds')),
-    AK=FccsLookUp(is_alaska=True, **Config().get('fuelbeds'))
-)
+FCCS_LOOKUPS = [
+    FccsLookUp(is_alaska=False, **Config().get('fuelbeds')), # Lower 48
+    FccsLookUp(is_alaska=True, **Config().get('fuelbeds')) # AK
+]
 
 def run(fires_manager):
     """Runs emissions module
@@ -39,12 +38,19 @@ def run(fires_manager):
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             for aa in fire.active_areas:
-                lookup = FCCS_LOOKUPS['AK'] if Config().get('fuelbeds', 'use_alaska') else FCCS_LOOKUPS[aa.get('state')]
-
                 # Note that aa.locations validates that each location object
                 # has either lat+lng+area or polygon
                 for loc in aa.locations:
-                    Estimator(lookup).estimate(loc)
+                    # try each lookup object until one succeeds
+                    for lookup in FCCS_LOOKUPS:
+                        try:
+                            Estimator(lookup).estimate(loc)
+                            break
+                        except Exception as e:
+                            pass
+
+                    if not loc.get('fuelbeds'):
+                        raise RuntimeError('Failed to lookup fuelbed information')
 
     # TODO: Add fuel loadings data to each fuelbed object (????)
     #  If we do so here, use bluesky.modules.consumption.FuelLoadingsManager

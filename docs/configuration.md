@@ -114,7 +114,6 @@ configuration json data are case-insensitive.***
 - ***'config' > 'fuelbeds' > 'truncation_percentage_threshold'*** -- *optional* -- use first N largest fuelbeds making up this percentage for a location; default 90.0
 - ***'config' > 'fuelbeds' > 'truncation_count_threshold'*** -- *optional* -- use only up to this many fuelbeds for a location; default 5
 - ***'config' > 'fuelbeds' > 'total_pct_threshold'*** -- *optional* -- Allow summed fuel percentages to be this much off of 100%; default is 0.5% (i.e. between 99.5% and 100.5%)
-- ***'config' > 'fuelbeds' > 'use_alaska'*** -- *optional* -- force use of AK fuelbed lookup; useful if all fires are known to be in AK, but none define 'state'
 
 ### ecoregion
 
