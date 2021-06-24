@@ -345,3 +345,6 @@
 ## 4.3.12
  - More robust fuelbed lookup, automatically handling both AK and lower 48 states
  - Minor tweak to plume merge configuration validation
+
+## 4.3.13
+ - Upgrade pyairfire to v4.0.1
