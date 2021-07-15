@@ -62,6 +62,14 @@ MISSING_TIMEPROFILE_ERROR_MSG = "Missing timeprofile data required for computing
 MISSING_START_TIME_ERROR_MSG = "Missing fire activity start time required by FEPS plumerise"
 MISSING_LOCALMET_ERROR_MSG = "Missing localmet data required for computing SEV plumerise"
 
+
+def _get_fire_working_dir(fire, model, working_dir):
+    fire_working_dir = os.path.join(working_dir,
+        "{}-plumerise-{}".format(model, fire.id))
+    if not os.path.exists(fire_working_dir):
+        os.makedirs(fire_working_dir)
+    return fire_working_dir
+
 class ComputeFunction(object):
     def __init__(self, fires_manager):
         model = Config().get('plumerise', 'model').lower()
@@ -100,12 +108,6 @@ class ComputeFunction(object):
     def _feps(self, config):
         pr = feps.FEPSPlumeRise(**config)
 
-        def _get_fire_working_dir(fire, working_dir):
-            fire_working_dir = os.path.join(working_dir,
-                "feps-plumerise-{}".format(fire.id))
-            if not os.path.exists(fire_working_dir):
-                os.makedirs(fire_working_dir)
-            return fire_working_dir
 
         def _loadHeat(plume_dir):
             plumeFile = os.path.join(plume_dir, "plume.txt")
@@ -156,7 +158,7 @@ class ComputeFunction(object):
                         loc["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
                         loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
 
-                    fire_working_dir = _get_fire_working_dir(fire, working_dir)
+                    fire_working_dir = _get_fire_working_dir(fire, 'feps', working_dir)
 
                     met_info = FepsMetParams(loc.get('localmet')).dict
 
