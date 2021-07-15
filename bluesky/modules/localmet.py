@@ -97,7 +97,8 @@ class LocalmetRunner(object):
         try:
             localmet = arl_profiler.profile(
                 self._start_utc, self._end_utc, self._profiler_locations)
-        except:
+        except Exception as e:
+            logging.error(f"Faild to extract localmet info: {e}")
             if self._skip_failures:
                 return
             raise
