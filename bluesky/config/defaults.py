@@ -215,9 +215,9 @@ _DEFAULTS = {
 
     "plumerise": {
         "model": "feps",
+        "working_dir": None,
+        "delete_working_dir_if_no_error": True,
         "feps": {
-            "working_dir": None,
-            "delete_working_dir_if_no_error": True,
             "load_heat": False
             # The following defaults are defined in the plumerise
             # package, so we won't set them here
@@ -226,8 +226,6 @@ _DEFAULTS = {
             # "plume_top_behavior": "auto",
         },
         "sev": {
-            "working_dir": None,
-            "delete_working_dir_if_no_error": True
             # The following defaults are defined in the plumerise
             # package, so we won't set them here
             # "alpha": 0.24

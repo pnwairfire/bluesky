@@ -34,8 +34,9 @@ def run(fires_manager):
     """
     compute_func = ComputeFunction(fires_manager)
 
-    working_dir = compute_func.config.get('working_dir')
-    delete_if_no_error = compute_func.config.get('delete_working_dir_if_no_error')
+    working_dir = Config().get('plumerise', 'working_dir')
+    delete_if_no_error = Config().get('plumerise', 'delete_working_dir_if_no_error')
+
     with osutils.create_working_dir(working_dir=working_dir,
             delete_if_no_error=delete_if_no_error) as working_dir:
         for fire in fires_manager.fires:
@@ -73,13 +74,14 @@ class ComputeFunction(object):
             raise BlueSkyConfigurationError(
                 INVALID_PLUMERISE_MODEL_MSG.format(model))
 
+        # config is accessed by client code
         self.config = Config().get('plumerise', model)
         self._compute_func = generator(self.config)
 
-        if self.config.get('working_dir'):
+        if Config().get('plumerise', 'working_dir'):
             fires_manager.plumerise = {
                 'output': {
-                    'directory': self.config['working_dir']
+                    'directory': Config().get('plumerise', 'working_dir')
                 }
             }
 
