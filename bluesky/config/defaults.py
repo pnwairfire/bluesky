@@ -214,9 +214,11 @@ _DEFAULTS = {
     },
 
     "plumerise": {
+        # Options: 'feps', 'sev', 'sev-feps'
         "model": "feps",
         "working_dir": None,
         "delete_working_dir_if_no_error": True,
+        # Note: feps and sev specific configs are usd by 'sev-feps' model
         "feps": {
             "load_heat": False
             # The following defaults are defined in the plumerise

@@ -5,6 +5,7 @@ Requires time profiled emissions and localmet data.
 
 __author__ = "Joel Dubowy"
 
+import abc
 import copy
 import datetime
 import logging
@@ -41,7 +42,9 @@ def run(fires_manager):
             delete_if_no_error=delete_if_no_error) as working_dir:
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
-                compute_func(fire, working_dir=working_dir)
+                for aa in fire.active_areas:
+                    for loc in aa.locations:
+                        compute_func(fire, aa, loc, working_dir=working_dir)
 
     # Make sure to distribute the heat if it was loaded here.
     if compute_func.config.get("load_heat"):
@@ -77,14 +80,15 @@ class ComputeFunction(object):
             plumerise_version=plumerise_version, model=model)
 
         logging.debug('Generating %s plumerise compution function', model)
-        generator = getattr(self, '_{}'.format(model), None)
+        generator = globals().get('{}Compute'.format(model.replace('-', '').upper()), None)
         if not generator:
             raise BlueSkyConfigurationError(
                 INVALID_PLUMERISE_MODEL_MSG.format(model))
 
         # config is accessed by client code
         self.config = Config().get('plumerise', model)
-        self._compute_func = generator(self.config)
+
+        self._compute_func = generator()
 
         if Config().get('plumerise', 'working_dir'):
             fires_manager.plumerise = {
@@ -93,7 +97,7 @@ class ComputeFunction(object):
                 }
             }
 
-    def __call__(self, fire, working_dir=None):
+    def __call__(self, fire, aa, loc, working_dir=None):
         if 'activity' not in fire:
             raise ValueError(NO_ACTIVITY_ERROR_MSG)
 
@@ -101,14 +105,24 @@ class ComputeFunction(object):
         # exception if any are missing area
         fire.locations
 
-        self._compute_func(fire, working_dir)
+        self._compute_func(fire, aa, loc, working_dir)
 
     ## compute function generators
 
-    def _feps(self, config):
-        pr = feps.FEPSPlumeRise(**config)
 
+class PlumeComputeBase(object):
 
+    def __init__(self):
+        self._feps_config = Config().get('plumerise', 'feps')
+        self._feps_pr = feps.FEPSPlumeRise(**self._feps_config)
+        self._sev_config = Config().get('plumerise', 'sev')
+        self._sev_pr = sev.SEVPlumeRise(**self._sev_config)
+
+    @abc.abstractmethod
+    def __call__(self, fire, aa, loc, working_dir):
+        pass
+
+    def _feps(self, fire, aa, loc, working_dir):
         def _loadHeat(plume_dir):
             plumeFile = os.path.join(plume_dir, "plume.txt")
 
@@ -124,88 +138,98 @@ class ComputeFunction(object):
 
             return heat
 
-        def _f(fire, working_dir):
-            # TODO: create and change to working directory here (per fire),
-            #   above (one working dir per all fires), or below (per activity
-            #   window)...or just let plumerise create temp workingdir (as
-            #   it's currently doing?
-            for aa in fire.active_areas:
-                start = aa.get('start')
-                if not start:
-                    raise ValueError(MISSING_START_TIME_ERROR_MSG)
-                start = datetimeutils.parse_datetime(aa.get('start'), 'start')
+        # TODO: create and change to working directory here (per fire),
+        #   above (one working dir per all fires), or below (per activity
+        #   window)...or just let plumerise create temp workingdir (as
+        #   it's currently doing?
+        start = aa.get('start')
+        if not start:
+            raise ValueError(MISSING_START_TIME_ERROR_MSG)
+        start = datetimeutils.parse_datetime(aa.get('start'), 'start')
 
-                if not aa.get('timeprofile'):
-                    raise ValueError(MISSING_TIMEPROFILE_ERROR_MSG)
+        if not aa.get('timeprofile'):
+            raise ValueError(MISSING_TIMEPROFILE_ERROR_MSG)
 
-                for loc in aa.locations:
-                    if not loc.get('consumption', {}).get('summary'):
-                        raise ValueError(MISSING_CONSUMPTION_ERROR_MSG)
+        if not loc.get('consumption', {}).get('summary'):
+            raise ValueError(MISSING_CONSUMPTION_ERROR_MSG)
 
-                    # Fill in missing sunrise / sunset
-                    if any([loc.get(k) is None for k in
-                            ('sunrise_hour', 'sunset_hour')]):
+        # Fill in missing sunrise / sunset
+        if any([loc.get(k) is None for k in
+                ('sunrise_hour', 'sunset_hour')]):
 
-                        # default: UTC
-                        utc_offset = datetimeutils.parse_utc_offset(
-                            loc.get('utc_offset', 0.0))
+            # default: UTC
+            utc_offset = datetimeutils.parse_utc_offset(
+                loc.get('utc_offset', 0.0))
 
-                        # Use NOAA-standard sunrise/sunset calculations
-                        latlng = locationutils.LatLng(loc)
-                        s = sun.Sun(lat=latlng.latitude, lng=latlng.longitude)
-                        d = start.date()
-                        # just set them both, even if one is already set
-                        loc["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
-                        loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
+            # Use NOAA-standard sunrise/sunset calculations
+            latlng = locationutils.LatLng(loc)
+            s = sun.Sun(lat=latlng.latitude, lng=latlng.longitude)
+            d = start.date()
+            # just set them both, even if one is already set
+            loc["sunrise_hour"] = s.sunrise_hr(d, utc_offset)
+            loc["sunset_hour"] = s.sunset_hr(d, utc_offset)
 
-                    fire_working_dir = _get_fire_working_dir(fire, 'feps', working_dir)
+        fire_working_dir = _get_fire_working_dir(fire, 'feps', working_dir)
 
-                    met_info = FepsMetParams(loc.get('localmet')).dict
+        met_info = FepsMetParams(loc.get('localmet')).dict
 
-                    # TOOD: set "moisture_duff" from fuel moisture module
-                    #   output, once it's implemented
+        # TOOD: set "moisture_duff" from fuel moisture module
+        #   output, once it's implemented
 
-                    # Note that we'll be passing in a dict set with the location
-                    # information (plue met), not the location dict itself.
-                    # so, loc will not be modified by the call to compute
-                    # (It used to be augmented with default values for
-                    # the met related inputs, which are now set from localmet data
-                    # if avbailable)
-                    loc_info = dict(loc, **met_info)
+        # Note that we'll be passing in a dict set with the location
+        # information (plue met), not the location dict itself.
+        # so, loc will not be modified by the call to compute
+        # (It used to be augmented with default values for
+        # the met related inputs, which are now set from localmet data
+        # if avbailable)
+        loc_info = dict(loc, **met_info)
 
-                    plumerise_data = pr.compute(aa['timeprofile'],
-                        loc['consumption']['summary'], loc_info,
-                        working_dir=fire_working_dir)
-                    loc['plumerise'] = plumerise_data['hours']
+        plumerise_data = self._feps_pr.compute(aa['timeprofile'],
+            loc['consumption']['summary'], loc_info,
+            working_dir=fire_working_dir)
+        loc['plumerise'] = plumerise_data['hours']
 
-                    if config.get("load_heat"):
-                        if 'fuelbeds' not in loc:
-                            raise ValueError(
-                                "Fuelbeds should exist before loading heat in plumerise")
-                        loc["fuelbeds"][0]["heat"] = _loadHeat(fire_working_dir)
-                    # TODO: do anything with plumerise_data['heat'] ?
-                    # SEE: Canadian additon to this system above
+        if self._feps_config.get("load_heat"):
+            if 'fuelbeds' not in loc:
+                raise ValueError(
+                    "Fuelbeds should exist before loading heat in plumerise")
+            loc["fuelbeds"][0]["heat"] = _loadHeat(fire_working_dir)
+        # TODO: do anything with plumerise_data['heat'] ?
+        # SEE: Canadian additon to this system above
 
-        return _f
+    def _sev(self, fire, aa, loc, working_dir):
+        fire_frp = fire.get('meta', {}).get('frp')
 
-    def _sev(self, config):
-        pr = sev.SEVPlumeRise(**config)
+        if not loc.get('localmet'):
+            raise ValueError(MISSING_LOCALMET_ERROR_MSG)
+        # TODO: if fire_frp is defined but activity's frp isn't,
+        #   do we need to multiple by activity's
+        #   percentage of the fire's total area?
+        loc_frp = loc.get('frp', fire_frp)
+        plumerise_data = self._sev_pr.compute(loc['localmet'],
+            loc['area'], frp=loc_frp)
+        loc['plumerise'] = plumerise_data['hours']
 
-        def _f(fire, working_dir):
-            fire_frp = fire.get('meta', {}).get('frp')
-            for aa in fire.active_areas:
-                for loc in aa.locations:
-                    if not loc.get('localmet'):
-                        raise ValueError(MISSING_LOCALMET_ERROR_MSG)
-                    # TODO: if fire_frp is defined but activity's frp isn't,
-                    #   do we need to multiple by activity's
-                    #   percentage of the fire's total area?
-                    loc_frp = loc.get('frp', fire_frp)
-                    plumerise_data = pr.compute(loc['localmet'],
-                        loc['area'], frp=loc_frp)
-                    loc['plumerise'] = plumerise_data['hours']
 
-        return _f
+class FEPSCompute(PlumeComputeBase):
+
+    def __call__(self, fire, aa, loc, working_dir):
+        return self._feps(fire, aa, loc, working_dir)
+
+
+class SEVCompute(PlumeComputeBase):
+
+    def __call__(self, fire, aa, loc, working_dir):
+        return self._sev(fire, aa, loc, working_dir)
+
+class SEVFEPSCompute(PlumeComputeBase):
+
+    def __call__(self, fire, aa, loc, working_dir):
+        if ((loc.get('frp', fire_frp) or fire.get('meta', {}).get('frp'))
+                and loc.get('localmet')):
+            return self._sev(fire, aa, loc, working_dir)
+        else:
+            return self._feps(fire, aa, loc, working_dir)
 
 
 class FepsMetParams(object):
