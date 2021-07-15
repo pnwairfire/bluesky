@@ -29,7 +29,7 @@ NO_MET_ERROR_MSG = "Specify met files to use in localmet"
 NO_ACTIVITY_ERROR_MSG = "Missing activity location data required for localmet"
 FAILED_TO_COMPILE_INPUT_ERROR_MSG = "Failed to compile input to run localmet profiler"
 NO_START_OR_END_ERROR_MSG = "Couldn't determine start and/or end time for localmet profiling"
-PROFILER_RUN_ERROR_MSG = "Failure in localmet profiling"
+PROFILER_RUN_ERROR_MSG = "Failure in localmet profiling - bulk profiler output inconsistent with input"
 
 def run(fires_manager):
     """Runs plumerise module
@@ -98,12 +98,13 @@ class LocalmetRunner(object):
             localmet = arl_profiler.profile(
                 self._start_utc, self._end_utc, self._profiler_locations)
         except Exception as e:
-            logging.error(f"Faild to extract localmet info: {e}")
+            logging.error(f"Failed to extract localmet info: {e}")
             if self._skip_failures:
                 return
             raise
 
         if len(localmet) != len(self._locations):
+            logging.error(PROFILER_RUN_ERROR_MSG)
             if self._skip_failures:
                 return
             raise RuntimeError(PROFILER_RUN_ERROR_MSG)
