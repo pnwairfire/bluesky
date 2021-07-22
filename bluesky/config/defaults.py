@@ -238,7 +238,8 @@ _DEFAULTS = {
             # "ref_n": 2.5e-4
             # "gravity": 9.8
             # "plume_bottom_over_top": 0.5
-        }
+        },
+        "sev-feps": {} # no config specific to sev-feps
     },
     "extrafiles": {
         "sets": [],
