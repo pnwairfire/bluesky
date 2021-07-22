@@ -42,6 +42,9 @@ def run(fires_manager):
             delete_if_no_error=delete_if_no_error) as working_dir:
         for fire in fires_manager.fires:
             with fires_manager.fire_failure_handler(fire):
+                if 'activity' not in fire:
+                    raise ValueError(NO_ACTIVITY_ERROR_MSG)
+
                 for aa in fire.active_areas:
                     for loc in aa.locations:
                         compute_func(fire, aa, loc, working_dir=working_dir)
@@ -98,9 +101,6 @@ class ComputeFunction(object):
             }
 
     def __call__(self, fire, aa, loc, working_dir=None):
-        if 'activity' not in fire:
-            raise ValueError(NO_ACTIVITY_ERROR_MSG)
-
         # just calling fire.locations will trigger missing area
         # exception if any are missing area
         fire.locations
