@@ -2,6 +2,7 @@
 
 __author__ = "Joel Dubowy"
 
+import copy
 import datetime
 import os
 import tempfile
@@ -53,10 +54,10 @@ FIRE_MISSING_CONSUMPTION = Fire({
                     "specified_points": [{
                         "lat": 45,
                         "lng": -119,
-                        "area": 123
+                        "area": 123,
+                        "localmet": {"2015-01-20T17:00:00": {"baz": 444}}
                     }],
-                    "timeprofile": {"2015-01-20T17:00:00": {"foo": 1}},
-                    "localmet": {"2015-01-20T17:00:00": {"baz": 444}}
+                    "timeprofile": {"2015-01-20T17:00:00": {"foo": 1}}
                 }
             ]
         }
@@ -76,9 +77,10 @@ FIRE_MISSING_TIMEPROFILE = Fire({
                         "lat": 45,
                         "lng": -119,
                         "area": 123,
+                        "localmet": {"2015-01-20T17:00:00": {"baz": 444}},
                         "consumption": {"summary":{"smoldering": 123}}
                     }],
-                    "localmet": {"2015-01-20T17:00:00": {"baz": 444}}
+
                 }
             ]
         }
@@ -97,10 +99,11 @@ FIRE_MISSING_START_TIME = Fire({
                         "lat": 45,
                         "lng": -119,
                         "area": 123,
+                        "localmet": {"2015-01-20T17:00:00": {"baz": 444}},
                         "consumption": {"summary":{"smoldering": 123}}
                     }],
-                    "timeprofile": {"2015-01-20T17:00:00": {"foo": 1}},
-                    "localmet": {"2015-01-20T17:00:00": {"baz": 444}}
+                    "timeprofile": {"2015-01-20T17:00:00": {"foo": 1}}
+
                 }
             ]
         }
@@ -144,10 +147,10 @@ FIRE = Fire({
                         "lat": 45,
                         "lng": -119,
                         "area": 123,
+                        "localmet": {"2015-01-20T17:00:00": {"baz": 444}},
                         "consumption": {"summary":{"smoldering": 123}}
                     }],
-                    "timeprofile": {"2015-01-20T17:00:00": {"foo": 1}},
-                    "localmet": {"2015-01-20T17:00:00": {"baz": 444}}
+                    "timeprofile": {"2015-01-20T17:00:00": {"foo": 1}}
                 },
                 {
                     "pct": 40,
@@ -164,10 +167,11 @@ FIRE = Fire({
                             [-121.45, 47.40],
                             [-121.45, 47.43]
                         ],
+                        "localmet": {"2015-01-20T17:00:00": {"bazoo": 555}},
                         "consumption": {"summary":{"flaming": 434}}
                     },
-                    "timeprofile": {"2015-01-20T17:00:00": {"bar": 2}},
-                    "localmet": {"2015-01-20T17:00:00": {"bazoo": 555}}
+                    "timeprofile": {"2015-01-20T17:00:00": {"bar": 2}}
+
                 }
             ]
         }
@@ -512,10 +516,166 @@ class TestPlumeRiseRunSev(object):
         # TOOD: assert plumerise return value
 
 
+class TestPlumeRiseRunSevFeps(object):
+
+    def setup(self):
+        Config().set('sev-feps', 'plumerise', 'model')
+        Config().set(False, 'skip_failed_fires')
+        self.fm = FiresManager()
+
+    def test_fire_no_activity(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_NO_ACTIVITY]})
+        with raises(ValueError) as e_info:
+            plumerise.run(self.fm)
+        assert e_info.value.args[0] == plumerise.NO_ACTIVITY_ERROR_MSG
+
+    def test_fire_missing_location_area(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": [FIRE_MISSING_LOCATION_AREA]})
+        with raises(ValueError) as e_info:
+            plumerise.run(self.fm)
+        assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
+
+    # def test_fire_missing_location_consumption(self, reset_config, monkeypatch):
+    # def test_fire_missing_timeprofile(self, reset_config, monkeypatch):
+    # def test_fire_missing_start_time(self, reset_config, monkeypatch):
+    # # TODO: test with invalid start time
+    # def test_fire_missing_localmet(self, reset_config, monkeypatch):
+
+    def test_no_fires(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+
+        self.fm.load({"fires": []})
+        plumerise.run(self.fm)
+
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
+        assert _PR_COMPUTE_CALL_KWARGS == {
+            'feps': [],
+            'sev':[]
+        }
+
+    def test_one_fire_feps(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+        monkeypatch_tempfile_mkdtemp(monkeypatch)
+
+        fire = copy.deepcopy(FIRE)
+
+        self.fm.load({"fires": [fire]})
+        plumerise.run(self.fm)
+
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
+        loc1 = fire['activity'][0]['active_areas'][0]['specified_points'][0]
+        loc2 = fire['activity'][0]['active_areas'][1]['perimeter']
+        loc1_plumerise = loc1.pop('plumerise')
+        loc2_plumerise = loc2.pop('plumerise')
+        assert 'feps' == loc1.pop('plumerise-model')
+        assert 'feps' == loc2.pop('plumerise-model')
+        assert _PR_COMPUTE_CALL_ARGS == {
+            'feps': [
+                ({"2015-01-20T17:00:00":{"foo": 1}},{"smoldering": 123}, loc1),
+                ({"2015-01-20T17:00:00":{"bar": 2}}, {"flaming": 434}, loc2)
+            ],
+            'sev':[]
+        }
+        assert _PR_COMPUTE_CALL_KWARGS == {
+            'feps': [
+                {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ fire.id)},
+                {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ fire.id)}
+            ],
+            'sev':[]
+        }
+        # TOOD: assert plumerise return value
+
+    def test_one_fire_sev(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+        monkeypatch_tempfile_mkdtemp(monkeypatch)
+
+        fire = copy.deepcopy(FIRE)
+        fire['activity'][0]['active_areas'][0]['specified_points'][0]['frp'] = 123123
+        fire['activity'][0]['active_areas'][1]['perimeter']['frp'] = 43443
+        self.fm.load({"fires": [fire]})
+        plumerise.run(self.fm)
+
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
+        loc1 = fire['activity'][0]['active_areas'][0]['specified_points'][0]
+        loc2 = fire['activity'][0]['active_areas'][1]['perimeter']
+        loc1_plumerise = loc1.pop('plumerise')
+        loc2_plumerise = loc2.pop('plumerise')
+        assert 'sev' == loc1.pop('plumerise-model')
+        assert 'sev' == loc2.pop('plumerise-model')
+        assert _PR_COMPUTE_CALL_ARGS == {
+            'feps': [],
+            'sev':[
+                ({"2015-01-20T17:00:00":{"baz": 444}}, 123),
+                ({"2015-01-20T17:00:00":{"bazoo": 555}}, 3232)
+            ]
+        }
+        assert _PR_COMPUTE_CALL_KWARGS == {
+            'feps': [],
+            'sev':[
+                {'frp': 123123},
+                {'frp': 43443}
+            ]
+        }
+        # TOOD: assert plumerise return value
+
+    def test_one_fire_one_feps_one_sev(self, reset_config, monkeypatch):
+        monkeypatch_plumerise_class(monkeypatch)
+        monkeypatch_tempfile_mkdtemp(monkeypatch)
+
+        fire = copy.deepcopy(FIRE)
+        fire['activity'][0]['active_areas'][0]['specified_points'][0]['frp'] = None
+        fire['activity'][0]['active_areas'][1]['perimeter']['frp'] = 43443
+        self.fm.load({"fires": [fire]})
+        plumerise.run(self.fm)
+
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
+        loc1 = fire['activity'][0]['active_areas'][0]['specified_points'][0]
+        loc2 = fire['activity'][0]['active_areas'][1]['perimeter']
+        loc1_plumerise = loc1.pop('plumerise')
+        loc2_plumerise = loc2.pop('plumerise')
+        assert 'feps' == loc1.pop('plumerise-model')
+        assert 'sev' == loc2.pop('plumerise-model')
+        assert _PR_COMPUTE_CALL_ARGS == {
+            'feps': [
+                ({"2015-01-20T17:00:00":{"foo": 1}},{"smoldering": 123}, loc1)
+            ],
+            'sev':[
+                ({"2015-01-20T17:00:00":{"bazoo": 555}}, 3232)
+            ]
+        }
+        assert _PR_COMPUTE_CALL_KWARGS == {
+            'feps': [
+                {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ fire.id)},
+            ],
+            'sev':[
+                {'frp': 43443}
+            ]
+        }
+        # TOOD: assert plumerise retur
+
+
 
 class TestFepsMetParams(object):
-
-
 
     def test_full_localmet(self):
         localmet = {
