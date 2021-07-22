@@ -175,29 +175,35 @@ FIRE = Fire({
 })
 
 
+_PR_ARGS = {}
+_PR_KWARGS = {}
+_PR_COMPUTE_CALL_ARGS = {}
+_PR_COMPUTE_CALL_KWARGS = {}
 
-_PR_ARGS = None
-_PR_KWARGS = None
-_PR_COMPUTE_CALL_ARGS = None
-_PR_COMPUTE_CALL_KWARGS = None
+def get_plumerise_class(model):
 
-class MockPlumeRise(object):
+    class MockPlumeRise(object):
 
-    def __init__(self, *args, **kwargs):
-        global _PR_ARGS, _PR_KWARGS, _PR_COMPUTE_CALL_ARGS, _PR_COMPUTE_CALL_KWARGS
-        _PR_ARGS = args
-        _PR_KWARGS = kwargs
-        _PR_COMPUTE_CALL_ARGS = []
-        _PR_COMPUTE_CALL_KWARGS = []
+        def __init__(self, *args, **kwargs):
+            global _PR_ARGS, _PR_KWARGS, _PR_COMPUTE_CALL_ARGS, _PR_COMPUTE_CALL_KWARGS
+            _PR_ARGS[model] = args
+            _PR_KWARGS[model] = kwargs
+            _PR_COMPUTE_CALL_ARGS[model] = []
+            _PR_COMPUTE_CALL_KWARGS[model] = []
 
-    def compute(self, *args, **kwargs):
-        _PR_COMPUTE_CALL_ARGS.append(args)
-        _PR_COMPUTE_CALL_KWARGS.append(kwargs)
-        return {"hours": "compute return value"}
+        def compute(self, *args, **kwargs):
+            _PR_COMPUTE_CALL_ARGS[model].append(args)
+            _PR_COMPUTE_CALL_KWARGS[model].append(kwargs)
+            return {"hours": "compute return value"}
+
+    return MockPlumeRise
+
+MockPlumeRiseSEV = get_plumerise_class('sev')
+MockPlumeRiseFEPS = get_plumerise_class('feps')
 
 def monkeypatch_plumerise_class(monkeypatch):
-    monkeypatch.setattr(sev, 'SEVPlumeRise', MockPlumeRise)
-    monkeypatch.setattr(feps, 'FEPSPlumeRise', MockPlumeRise)
+    monkeypatch.setattr(sev, 'SEVPlumeRise', MockPlumeRiseSEV)
+    monkeypatch.setattr(feps, 'FEPSPlumeRise', MockPlumeRiseFEPS)
 
 TEMPFILE_DIRS = []
 def monkeypatch_tempfile_mkdtemp(monkeypatch):
@@ -278,16 +284,25 @@ class TestPlumeRiseRunFeps(object):
 
         plumerise.run(self.fm)
 
-        assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
         loc1 = FIRE_MISSING_LOCALMET['activity'][0]['active_areas'][0]['specified_points'][0]
         loc1.pop('plumerise')
-        assert _PR_COMPUTE_CALL_ARGS == [
-            ({"2015-01-20T17:00:00":{"foo": 1}},{"smoldering": 123}, loc1)
-        ]
-        assert _PR_COMPUTE_CALL_KWARGS == [
-            {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ FIRE_MISSING_LOCALMET.id)}
-        ]
+        assert _PR_COMPUTE_CALL_ARGS == {
+            'feps': [
+                ({"2015-01-20T17:00:00":{"foo": 1}},{"smoldering": 123}, loc1)
+            ],
+            'sev': []
+        }
+        assert _PR_COMPUTE_CALL_KWARGS == {
+            'feps': [
+                {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ FIRE_MISSING_LOCALMET.id)}
+            ],
+            'sev':[]
+        }
 
     def test_no_fires(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
@@ -295,9 +310,15 @@ class TestPlumeRiseRunFeps(object):
         self.fm.load({"fires": []})
         plumerise.run(self.fm)
 
-        assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
-        assert _PR_COMPUTE_CALL_ARGS == []
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
+        assert _PR_COMPUTE_CALL_KWARGS == {
+            'feps': [],
+            'sev':[]
+        }
 
     def test_one_fire(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
@@ -306,20 +327,29 @@ class TestPlumeRiseRunFeps(object):
         self.fm.load({"fires": [FIRE]})
         plumerise.run(self.fm)
 
-        assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['feps']
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
         loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
         loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
         loc1.pop('plumerise')
         loc2.pop('plumerise')
-        assert _PR_COMPUTE_CALL_ARGS == [
-            ({"2015-01-20T17:00:00":{"foo": 1}},{"smoldering": 123}, loc1),
-            ({"2015-01-20T17:00:00":{"bar": 2}}, {"flaming": 434}, loc2)
-        ]
-        assert _PR_COMPUTE_CALL_KWARGS == [
-            {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ FIRE.id)},
-            {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ FIRE.id)}
-        ]
+        assert _PR_COMPUTE_CALL_ARGS == {
+            'feps': [
+                ({"2015-01-20T17:00:00":{"foo": 1}},{"smoldering": 123}, loc1),
+                ({"2015-01-20T17:00:00":{"bar": 2}}, {"flaming": 434}, loc2)
+            ],
+            'sev':[]
+        }
+        assert _PR_COMPUTE_CALL_KWARGS == {
+            'feps': [
+                {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ FIRE.id)},
+                {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ FIRE.id)}
+            ],
+            'sev':[]
+        }
         # TOOD: assert plumerise return value
 
 class TestPlumeRiseRunSev(object):
@@ -351,15 +381,24 @@ class TestPlumeRiseRunSev(object):
         self.fm.load({"fires": [FIRE_MISSING_CONSUMPTION]})
         plumerise.run(self.fm)
 
-        assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
 
-        assert _PR_COMPUTE_CALL_ARGS == [
-            ({"2015-01-20T17:00:00":{"baz": 444}},123)
-        ]
-        assert _PR_COMPUTE_CALL_KWARGS == [
-            {'frp': None}
-        ]
+        assert _PR_COMPUTE_CALL_ARGS == {
+            'sev': [
+                ({"2015-01-20T17:00:00":{"baz": 444}},123)
+            ],
+            'feps':[]
+        }
+        assert _PR_COMPUTE_CALL_KWARGS == {
+            'sev': [
+                {'frp': None}
+            ],
+            'feps': []
+        }
 
 
     def test_fire_missing_timeprofile(self, reset_config, monkeypatch):
@@ -368,15 +407,24 @@ class TestPlumeRiseRunSev(object):
         self.fm.load({"fires": [FIRE_MISSING_TIMEPROFILE]})
         plumerise.run(self.fm)
 
-        assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
 
-        assert _PR_COMPUTE_CALL_ARGS == [
-            ({"2015-01-20T17:00:00":{"baz": 444}},123)
-        ]
-        assert _PR_COMPUTE_CALL_KWARGS == [
-            {'frp': None}
-        ]
+        assert _PR_COMPUTE_CALL_ARGS == {
+            'sev': [
+                ({"2015-01-20T17:00:00":{"baz": 444}},123)
+            ],
+            'feps':[]
+        }
+        assert _PR_COMPUTE_CALL_KWARGS == {
+            'sev': [
+                {'frp': None}
+            ],
+            'feps': []
+        }
 
 
     def test_fire_missing_start_time(self, reset_config, monkeypatch):
@@ -385,15 +433,24 @@ class TestPlumeRiseRunSev(object):
         self.fm.load({"fires": [FIRE_MISSING_START_TIME]})
         plumerise.run(self.fm)
 
-        assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
 
-        assert _PR_COMPUTE_CALL_ARGS == [
-            ({"2015-01-20T17:00:00":{"baz": 444}}, 123)
-        ]
-        assert _PR_COMPUTE_CALL_KWARGS == [
-            {'frp': None}
-        ]
+        assert _PR_COMPUTE_CALL_ARGS == {
+            'sev': [
+                ({"2015-01-20T17:00:00":{"baz": 444}}, 123)
+            ],
+            'feps':[]
+        }
+        assert _PR_COMPUTE_CALL_KWARGS == {
+            'sev': [
+                {'frp': None}
+            ],
+            'feps': []
+        }
 
     # TODO: test with invalid start time
 
@@ -412,9 +469,15 @@ class TestPlumeRiseRunSev(object):
         self.fm.load({"fires": []})
         plumerise.run(self.fm)
 
-        assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
-        assert _PR_COMPUTE_CALL_ARGS == []
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
+        assert _PR_COMPUTE_CALL_ARGS == {
+            'sev': [],
+            'feps':[]
+        }
 
     def test_one_fire(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
@@ -422,18 +485,27 @@ class TestPlumeRiseRunSev(object):
         self.fm.load({"fires": [FIRE]})
         plumerise.run(self.fm)
 
-        assert _PR_ARGS == ()
-        assert _PR_KWARGS == defaults._DEFAULTS['plumerise']['sev']
+        assert _PR_ARGS == {'feps': (), 'sev': ()}
+        assert _PR_KWARGS == {
+            'feps': defaults._DEFAULTS['plumerise']['feps'],
+            'sev': defaults._DEFAULTS['plumerise']['sev']
+        }
         loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
         loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
-        assert _PR_COMPUTE_CALL_ARGS == [
-            ({"2015-01-20T17:00:00":{"baz": 444}}, 123),
-            ({"2015-01-20T17:00:00":{"bazoo": 555}}, 3232)
-        ]
-        assert _PR_COMPUTE_CALL_KWARGS == [
-            {'frp': None},
-            {'frp': None}
-        ]
+        assert _PR_COMPUTE_CALL_ARGS == {
+            'sev': [
+                ({"2015-01-20T17:00:00":{"baz": 444}}, 123),
+                ({"2015-01-20T17:00:00":{"bazoo": 555}}, 3232)
+            ],
+            'feps':[]
+        }
+        assert _PR_COMPUTE_CALL_KWARGS == {
+            'sev': [
+                {'frp': None},
+                {'frp': None}
+            ],
+            'feps': []
+        }
         # TOOD: assert plumerise return value
 
 
