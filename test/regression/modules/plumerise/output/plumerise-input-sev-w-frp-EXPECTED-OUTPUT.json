@@ -318,6 +318,7 @@
                             "specified_points": [
                                 {
                                     "area": 200.0,
+                                    "plumerise-model": "sev",
                                     "plumerise": {
                                         "2014-05-30T00:00:00": {
                                             "emission_fractions": [

@@ -440,6 +440,7 @@
                             },
                             "specified_points": [
                                 {
+                                    "plumerise-model": "sev",
                                     "plumerise": {
                                         "2015-08-05T05:00:00": {
                                             "smolder_fraction": 0.0,

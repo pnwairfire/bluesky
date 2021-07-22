@@ -290,7 +290,8 @@ class TestPlumeRiseRunFeps(object):
             'sev': defaults._DEFAULTS['plumerise']['sev']
         }
         loc1 = FIRE_MISSING_LOCALMET['activity'][0]['active_areas'][0]['specified_points'][0]
-        loc1.pop('plumerise')
+        loc1_plumerise = loc1.pop('plumerise')
+        assert 'feps' == loc1.pop('plumerise-model')
         assert _PR_COMPUTE_CALL_ARGS == {
             'feps': [
                 ({"2015-01-20T17:00:00":{"foo": 1}},{"smoldering": 123}, loc1)
@@ -334,8 +335,10 @@ class TestPlumeRiseRunFeps(object):
         }
         loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
         loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
-        loc1.pop('plumerise')
-        loc2.pop('plumerise')
+        loc1_plumerise = loc1.pop('plumerise')
+        loc2_plumerise = loc2.pop('plumerise')
+        assert 'feps' == loc1.pop('plumerise-model')
+        assert 'feps' == loc2.pop('plumerise-model')
         assert _PR_COMPUTE_CALL_ARGS == {
             'feps': [
                 ({"2015-01-20T17:00:00":{"foo": 1}},{"smoldering": 123}, loc1),

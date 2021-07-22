@@ -188,6 +188,7 @@ class PlumeComputeBase(object):
             loc['consumption']['summary'], loc_info,
             working_dir=fire_working_dir)
         loc['plumerise'] = plumerise_data['hours']
+        loc['plumerise-model'] = 'feps'
 
         if self._feps_config.get("load_heat"):
             if 'fuelbeds' not in loc:
@@ -209,6 +210,7 @@ class PlumeComputeBase(object):
         plumerise_data = self._sev_pr.compute(loc['localmet'],
             loc['area'], frp=loc_frp)
         loc['plumerise'] = plumerise_data['hours']
+        loc['plumerise-model'] = 'sev'
 
 
 class FEPSCompute(PlumeComputeBase):
