@@ -225,7 +225,7 @@ class SEVCompute(PlumeComputeBase):
 class SEVFEPSCompute(PlumeComputeBase):
 
     def __call__(self, fire, aa, loc, working_dir):
-        if ((loc.get('frp', fire_frp) or fire.get('meta', {}).get('frp'))
+        if ((loc.get('frp') or fire.get('meta', {}).get('frp'))
                 and loc.get('localmet')):
             return self._sev(fire, aa, loc, working_dir)
         else:
