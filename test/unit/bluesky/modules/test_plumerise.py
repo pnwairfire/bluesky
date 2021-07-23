@@ -329,7 +329,8 @@ class TestPlumeRiseRunFeps(object):
         monkeypatch_plumerise_class(monkeypatch)
         monkeypatch_tempfile_mkdtemp(monkeypatch)
 
-        self.fm.load({"fires": [FIRE]})
+        fire = copy.deepcopy(FIRE)
+        self.fm.load({"fires": [fire]})
         plumerise.run(self.fm)
 
         assert _PR_ARGS == {'feps': (), 'sev': ()}
@@ -337,8 +338,8 @@ class TestPlumeRiseRunFeps(object):
             'feps': defaults._DEFAULTS['plumerise']['feps'],
             'sev': defaults._DEFAULTS['plumerise']['sev']
         }
-        loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
-        loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
+        loc1 = fire['activity'][0]['active_areas'][0]['specified_points'][0]
+        loc2 = fire['activity'][0]['active_areas'][1]['perimeter']
         loc1_plumerise = loc1.pop('plumerise')
         loc2_plumerise = loc2.pop('plumerise')
         assert 'feps' == loc1.pop('plumerise-model')
@@ -352,8 +353,8 @@ class TestPlumeRiseRunFeps(object):
         }
         assert _PR_COMPUTE_CALL_KWARGS == {
             'feps': [
-                {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ FIRE.id)},
-                {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ FIRE.id)}
+                {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ fire.id)},
+                {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ fire.id)}
             ],
             'sev':[]
         }
@@ -489,7 +490,8 @@ class TestPlumeRiseRunSev(object):
     def test_one_fire(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
 
-        self.fm.load({"fires": [FIRE]})
+        fire = copy.deepcopy(FIRE)
+        self.fm.load({"fires": [fire]})
         plumerise.run(self.fm)
 
         assert _PR_ARGS == {'feps': (), 'sev': ()}
@@ -497,8 +499,8 @@ class TestPlumeRiseRunSev(object):
             'feps': defaults._DEFAULTS['plumerise']['feps'],
             'sev': defaults._DEFAULTS['plumerise']['sev']
         }
-        loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
-        loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
+        loc1 = fire['activity'][0]['active_areas'][0]['specified_points'][0]
+        loc2 = fire['activity'][0]['active_areas'][1]['perimeter']
         loc1_plumerise = loc1.pop('plumerise')
         loc2_plumerise = loc2.pop('plumerise')
         assert 'sev' == loc1.pop('plumerise-model')
@@ -570,7 +572,6 @@ class TestPlumeRiseRunSevFeps(object):
         monkeypatch_tempfile_mkdtemp(monkeypatch)
 
         fire = copy.deepcopy(FIRE)
-
         self.fm.load({"fires": [fire]})
         plumerise.run(self.fm)
 
