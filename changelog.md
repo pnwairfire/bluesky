@@ -348,3 +348,6 @@
 
 ## 4.3.13
  - Upgrade pyairfire to v4.0.1
+
+## 4.3.14
+ - new 'sev-feps' plumerise model, which contains logic to use SEV for each location, if possible, but fall back on FEPS
