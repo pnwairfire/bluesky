@@ -499,6 +499,10 @@ class TestPlumeRiseRunSev(object):
         }
         loc1 = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
         loc2 = FIRE['activity'][0]['active_areas'][1]['perimeter']
+        loc1_plumerise = loc1.pop('plumerise')
+        loc2_plumerise = loc2.pop('plumerise')
+        assert 'sev' == loc1.pop('plumerise-model')
+        assert 'sev' == loc2.pop('plumerise-model')
         assert _PR_COMPUTE_CALL_ARGS == {
             'sev': [
                 ({"2015-01-20T17:00:00":{"baz": 444}}, 123),
