@@ -65,6 +65,12 @@ OPTIONAL_ARGS = [
         'default': None
     },
     {
+        'long': '--compress',
+        'help': 'Compress output (gzip)',
+        'action': "store_true",
+        'default': False
+    },
+    {
         'long': '--indent',
         'help': 'Format output json with newlines and given indent',
         'type': int
@@ -402,7 +408,8 @@ def main():
     except Exception as e:
         exit_with_traceback(e)
 
-    fires_manager.dumps(output_file=args.output_file, indent=args.indent)
+    fires_manager.dumps(output_file=args.output_file, indent=args.indent,
+        compress=args.compress)
     logging.summary("Run complete")
 
 if __name__ == "__main__":

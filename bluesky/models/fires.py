@@ -11,6 +11,7 @@ import logging
 import sys
 import traceback
 import uuid
+import gzip
 from collections import OrderedDict
 
 import requests
@@ -680,11 +681,23 @@ class FiresManager(object):
             run_id=self.run_id, counts=self.counts, bluesky_version=__version__,
             run_config=Config().get())
 
-    def dumps(self, output_stream=None, output_file=None, indent=None):
+    def dumps(self, output_stream=None, output_file=None, indent=None,
+            compress=False):
         if output_stream and output_file:
             raise RuntimeError("Don't specify both output_stream and output_file")
+
+        # TODO: support writing compressed output to stdout
+        if compress and not output_file:
+            raise RuntimeError("gzip compression only supported when writing to output file")
+
+        # TODO: ensure that output file name ends with .gz if compressing?
+        #   if output_file and comrpess and not output_file.endswith('.gz'):
+        #       output_file += '.gz'
         if not output_stream:
-            output_stream = self._stream(output_file, 'w')
+            flag = 'wb' if compress else 'w'
+            output_stream = self._stream(output_file, flag)
         fire_json = json.dumps(self.dump(), sort_keys=True, cls=FireEncoder,
             indent=indent)
+        if compress:
+            fire_json = gzip.compress(fire_json.encode())
         output_stream.write(fire_json)
