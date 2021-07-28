@@ -690,9 +690,10 @@ class FiresManager(object):
         if compress and not output_file:
             raise RuntimeError("gzip compression only supported when writing to output file")
 
-        # TODO: ensure that output file name ends with .gz if compressing?
-        #   if output_file and comrpess and not output_file.endswith('.gz'):
-        #       output_file += '.gz'
+        # ensure that output file name ends with .gz if compressing?
+        if output_file and compress and not output_file.endswith('.gz'):
+            output_file += '.gz'
+
         if not output_stream:
             flag = 'wb' if compress else 'w'
             output_stream = self._stream(output_file, flag)
