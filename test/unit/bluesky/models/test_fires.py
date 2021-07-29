@@ -15,7 +15,7 @@ from py.test import raises
 from numpy.testing import assert_approx_equal
 
 from bluesky import __version__
-from bluesky.config import Config, DEFAULTS
+from bluesky.config import Config
 from bluesky.models import fires, activity
 
 
@@ -778,7 +778,7 @@ class TestFiresManager(object):
         expected = {
             "run_id": "abcd1234",
             "today": "2016-04-20T00:00:00",
-            "run_config": DEFAULTS,
+            "run_config": Config().get(),
             "fires": fire_objects,
             "foo": {"bar": "baz"},
             "counts": {
