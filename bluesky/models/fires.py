@@ -659,25 +659,20 @@ class FiresManager(object):
         if input_stream and input_file:
             raise RuntimeError("Don't specify both input_stream and input_file")
 
-        def _(i_stream, try_decompress):
-            try:
-                if not i_stream:
-                    i_stream = self._stream(input_file, 'rb')
-                i_stream = b''.join([d for d in i_stream])
-                if try_decompress:
-                    i_stream = gzip.decompress(i_stream)
-                    logging.info("Decompressed input")
-                else:
-                    logging.debug(f"Input not compressed")
-                    # will try loading raw data
+        if not input_stream:
+            input_stream = self._stream(input_file, 'rb')
+        input_stream = b''.join([
+            d.encode() if hasattr(d, 'encode') else d for d in input_stream])
 
-            except Exception as e:
-                logging.debug(f"Input not compressed: {e}")
+        try:
+            input_stream = gzip.decompress(input_stream)
+            logging.info("Decompressed input")
+        except:
+            logging.info("input not gzip'd")
 
-            return i_stream.decode()
+        input_stream = input_stream.decode()
 
-        data = _(input_stream, True) or _(input_stream, False)
-        data = json.loads(data)
+        data = json.loads(input_stream)
         return self.load(data, append_fires=append_fires)
 
     ## Dumping data
