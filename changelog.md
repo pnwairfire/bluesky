@@ -351,3 +351,9 @@
 
 ## 4.3.14
  - new 'sev-feps' plumerise model, which contains logic to use SEV for each location, if possible, but fall back on FEPS
+
+## 4.3.15
+ - support compressed (gzip'd) input and output data
+   - inputing from local file, stdin, and remote file over http
+   - outputing to local file and stdout
+   - exporting to AWS S3
