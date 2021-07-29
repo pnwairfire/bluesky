@@ -619,9 +619,9 @@ class TestFiresManager(object):
     ## Loading
 
     def _stream(test_self, data=''):
-        def _stream(self, file_name, flag):
-            if flag == 'r':
-                return io.StringIO(data)
+        def _stream(self, file_name, flag, compress=False):
+            if flag.startswith('r'):
+                return io.BytesIO(data.encode())
             else:
                 test_self._output = io.StringIO()
                 return test_self._output
@@ -651,8 +651,7 @@ class TestFiresManager(object):
         monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
 
         fires_manager = fires.FiresManager()
-        expected_meta = {
-        }
+        expected_meta = {}
 
         monkeypatch.setattr(fires.FiresManager, '_stream', self._stream('{}'))
         fires_manager.loads()
