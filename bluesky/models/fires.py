@@ -273,7 +273,7 @@ class FiresManager(object):
             if  file_name.startswith('http'):
                 logging.debug("Loading input over http: %s", file_name)
                 r = requests.get(file_name)
-                return io.StringIO(r.text)
+                return r.iter_lines()
             else:
                 logging.debug("Loading local file: %s", file_name)
                 return open(file_name, flag)
