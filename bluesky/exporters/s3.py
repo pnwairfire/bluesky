@@ -29,7 +29,13 @@ class S3Exporter(ExporterBase):
     def __init__(self, extra_exports):
         super(S3Exporter, self).__init__(extra_exports)
         if not self.config('bucket'):
-            raise BlueSkyConfigurationError("Specify at least ")
+            raise BlueSkyConfigurationError("Specify at least bucket")
+        if (not self.config('compress')
+                and self.config('json_output_filename').endswith('.gz')
+                # i.e. not the default
+                and self.config('json_output_filename') != 'output.json.gz'):
+            raise BlueSkyConfigurationError(
+                "Don't specify '.gz' extension if not compressing output")
 
         self._s3_client = boto3.client('s3')
 
@@ -56,7 +62,17 @@ class S3Exporter(ExporterBase):
     def _upload_output(self, fires_manager, key_prefix):
         try:
             key = os.path.join(key_prefix, self.config('json_output_filename'))
-            content = self._get_output_dump(fires_manager)
+            if self.config('compress') and not key.endswith('.gz'):
+                key += '.gz'
+            elif not self.config('compress') and key.endswith('.gz'):
+                # This will only happen if json_output_filename was left as
+                # the default, since there's a check in __init___ to ensure
+                # that, if not compressing, any user-specified json file name
+                # doesn't end in .gz
+                key = key.rstrip('.gz')
+
+            content = self._get_output_dump(fires_manager,
+                compress=self.config('compress'))
             self._s3_client.put_object(Body=content,
                 Bucket=self.config('bucket'), Key=key)
             return {
