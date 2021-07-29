@@ -265,7 +265,7 @@ class FiresManager(object):
 
     # TODO: Remove this method and use bluesky.io.Stream in code below instead
     # (would have a fair amoubnt of unit test updates)
-    def _stream(self, file_name, flag): #, do_strip_newlines):
+    def _stream(self, file_name, flag, compress=False): #, do_strip_newlines):
         if file_name:
             file_name = datetimeutils.fill_in_datetime_strings(
                 file_name, today=self.today)
@@ -281,7 +281,7 @@ class FiresManager(object):
             if flag.startswith('r'):
                 return sys.stdin
             else:
-                return sys.stdout
+                return sys.stdout.buffer if compress else sys.stdout
 
     ##
     ## Fire Related Properties
@@ -698,19 +698,16 @@ class FiresManager(object):
         if output_stream and output_file:
             raise RuntimeError("Don't specify both output_stream and output_file")
 
-        # TODO: support writing compressed output to stdout
-        if compress and not output_file:
-            raise RuntimeError("gzip compression only supported when writing to output file")
-
         # ensure that output file name ends with .gz if compressing?
         if output_file and compress and not output_file.endswith('.gz'):
             output_file += '.gz'
 
         if not output_stream:
             flag = 'wb' if compress else 'w'
-            output_stream = self._stream(output_file, flag)
+            output_stream = self._stream(output_file, flag, compress=compress)
         fire_json = json.dumps(self.dump(), sort_keys=True, cls=FireEncoder,
             indent=indent)
         if compress:
             fire_json = gzip.compress(fire_json.encode())
+
         output_stream.write(fire_json)
