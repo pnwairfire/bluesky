@@ -357,3 +357,6 @@
    - inputing from local file, stdin, and remote file over http
    - outputing to local file and stdout
    - exporting to AWS S3
+
+## 4.3.16
+ - Improve loading of remote compressed files
