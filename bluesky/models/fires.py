@@ -10,6 +10,7 @@ import json
 import logging
 import sys
 import traceback
+import urllib
 import uuid
 import gzip
 from collections import OrderedDict
@@ -272,8 +273,7 @@ class FiresManager(object):
             file_name = file_name.replace('{run_id}', self.run_id)
             if  file_name.startswith('http'):
                 logging.debug("Loading input over http: %s", file_name)
-                r = requests.get(file_name)
-                return r.iter_lines()
+                return io.BytesIO(urllib.request.urlopen(file_name).read())
             else:
                 logging.debug("Loading local file: %s", file_name)
                 return open(file_name, flag)
@@ -667,7 +667,8 @@ class FiresManager(object):
         try:
             input_stream = gzip.decompress(input_stream)
             logging.info("Decompressed input")
-        except:
+        except Exception as e:
+            logging.debug("Failed to gzip.decompress: %s", e)
             logging.info("input not gzip'd")
 
         input_stream = input_stream.decode()
