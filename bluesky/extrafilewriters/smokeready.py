@@ -282,6 +282,8 @@ class SmokeReadyWriter(object):
 
         lat, lng = fire_loc['lat'], fire_loc['lng']
 
+        emissions = self._get_location_emissions(fire_loc)
+
         # try to get CYID/STID, but skip record if lat/lng invalid
         try:
           cyid, stid = self._get_state_county_fips(lat=lat, lng=lng, use_fips=self._use_fips)
@@ -362,13 +364,12 @@ class SmokeReadyWriter(object):
           if self._write_ptinv_totals:
             logging.debug('Writing SmokeReady PTINV File to %s', self._ptinv_pathname)
             for var, vkey in EMISSIONS_MAPPING:
-              for fuelbed in fire_loc['fuelbeds']:
-                if vkey.upper() in fuelbed['emissions'][fire_phase]:
-                  if fuelbed['emissions'][fire_phase][vkey.upper()] is None:
+                if vkey.upper() in emissions[fire_phase]:
+                  if emissions[fire_phase][vkey.upper()] is None:
                     continue
                   prec = PTINVPollutantRecord()
-                  prec.ANN = fuelbed['emissions'][fire_phase][vkey.upper()][0]
-                  prec.AVD = fuelbed['emissions'][fire_phase][vkey.upper()][0]
+                  prec.ANN = emissions[fire_phase][vkey.upper()]
+                  prec.AVD = emissions[fire_phase][vkey.upper()]
                   ptinv_rec_str += str(prec)
 
           ptinv.write(ptinv_rec_str + "\n")
@@ -379,9 +380,8 @@ class SmokeReadyWriter(object):
           if self._write_ptday_file:
             logging.debug('Writing SmokeReady PTHOUR File to %s', self._ptday_pathname)
             for var, vkey in EMISSIONS_MAPPING:
-              for fuelbed in fire_loc['fuelbeds']:
-                if vkey.upper() in fuelbed['emissions'][fire_phase]:
-                  if fuelbed['emissions'][fire_phase][vkey.upper()] is None:
+                if vkey.upper() in emissions[fire_phase]:
+                  if emissions[fire_phase][vkey.upper()] is None:
                     continue
                   for day in range(num_days):
                     dt = start_dt + timedelta(days=day)
@@ -399,29 +399,10 @@ class SmokeReadyWriter(object):
                     ptday_rec.DATE = date
                     ptday_rec.TZONNAM = tzonnam
 
-                    start_slice = max((24 * day) - start_hour, 0)
-                    end_slice = min((24 * (day + 1)) - start_hour, len(fuelbed['emissions'][fire_phase][vkey.upper()]))
-
-                    if fire_phase == "flaming":
-                      if isinstance(fuelbed['emissions'][fire_phase][vkey.upper()], tuple):
-                          daytot = fuelbed['emissions'][fire_phase][vkey.upper()][0]
-                      else:
-                          daytot = sum(tup for tup in fuelbed['emissions'][fire_phase][vkey.upper()][start_slice:end_slice])
-                    elif fire_phase == "smoldering":
-                      if isinstance(fuelbed['emissions'][fire_phase][vkey.upper()], tuple):
-                          daytot = fuelbed['emissions'][fire_phase][vkey.upper()][1] + fuelbed['emissions'][fire_phase][vkey.upper()][2]
-                      else:
-                          # comment for Yufei
-                          # why are we including residual here?
-                          smoldering = sum(fuelbed['emissions'][fire_phase][vkey.upper()][start_slice:end_slice])
-                          residual = sum(fuelbed['emissions']['residual'][vkey.upper()][start_slice:end_slice])
-                          daytot = smoldering + residual
-
+                    if fire_phase == "smoldering":
+                      daytot = emissions[fire_phase][vkey.upper()] + emissions['residual'][vkey.upper()]
                     else:
-                      if isinstance(fuelbed['emissions'][fire_phase][vkey.upper()], tuple):
-                          daytot = sum(fuelbed['emissions'][fire_phase][vkey.upper()])
-                      else:
-                          daytot = sum(sum(fuelbed['emissions'][fire_phase][vkey.upper()][start_slice:end_slice]))
+                      daytot = emissions[fire_phase][vkey.upper()]
 
                     ptday_rec.DAYTOT = daytot                # Daily total
                     ptday_rec.SCC = scc                      # Source Classification Code
@@ -448,7 +429,7 @@ class SmokeReadyWriter(object):
             if var in ('PTOP', 'PBOT', 'LAY1F'):
               if fire_loc['plumerise'] is None: continue
             else:
-              if species_key not in fuelbed['emissions']['total'].keys(): continue
+              if species_key not in emissions['total'].keys(): continue
 
             # collect sorted hour list
             ordered_hours = sorted(fire_loc['plumerise'].keys())
@@ -504,11 +485,11 @@ class SmokeReadyWriter(object):
                           value == None
                     else:
                       if fire_phase == "flaming":
-                        flaming_total = self._phase_emissions_for_species(fire_loc, fire_phase, species_key)
+                        flaming_total = emissions[fire_phase][species_key]
                         value = (timeprofile_hour[fire_phase] * flaming_total)
                       elif fire_phase == "smoldering":
-                        smoldering_total = self._phase_emissions_for_species(fire_loc, fire_phase, species_key)
-                        residual_total = self._phase_emissions_for_species(fire_loc, 'residual', species_key)
+                        smoldering_total = emissions[fire_phase][species_key]
+                        residual_total = emissions['residual'][species_key]
                         smoldering_value = (timeprofile_hour[fire_phase] * smoldering_total)
                         residual_value = (timeprofile_hour['residual'] * residual_total)
                         # smoke wants smoldering + residual
@@ -538,6 +519,22 @@ class SmokeReadyWriter(object):
     logging.debug(" #NO EMISS: %s", skip_no_emiss)
     logging.debug(" #NO PLUME: %s", skip_no_plume)
     logging.debug(" #BAD FIPS: %s", skip_bad_fips)
+
+
+  def _get_location_emissions(self, fire_loc):
+    """Emissions are recored per phase at the fuelbed level, but only
+    totals are specified at the location level.  We need them per phase
+    at the location level
+    """
+    emissions = {}
+    for fuelbed in fire_loc['fuelbeds']:
+      for phase in fuelbed['emissions']:
+        emissions[phase] = emissions.get(phase) or {}
+        for species in fuelbed['emissions'][phase]:
+          emissions[phase][species] = emissions[phase].get(species) or 0.0
+          emissions[phase][species] += fuelbed['emissions'][phase][species][0]
+    return emissions
+
 
   def _get_state_county_fips(self, lat, lng, use_fips=False):
     """
@@ -605,18 +602,3 @@ class SmokeReadyWriter(object):
       # Default to 'EST' if all else fails
       tzonnam = 'EST'
       return tzonnam
-
-  def _phase_emissions_for_species(self, fire_loc, phase, species):
-    """
-    To get species specific emission levels at each phase
-    we need to iterate through the fuelbeds. Requires a valid
-    fire location object.
-    """
-    total = 0.0
-    for fuelbed in fire_loc['fuelbeds']:
-      if species in fuelbed['emissions'][phase].keys():
-        total += sum(fuelbed['emissions'][phase][species])
-    return total
-
-
-
