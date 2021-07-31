@@ -534,8 +534,9 @@ class SmokeReadyWriter(object):
       for phase in fuelbed['emissions']:
         emissions[phase] = emissions.get(phase) or {}
         for species in fuelbed['emissions'][phase]:
-          emissions[phase][species] = emissions[phase].get(species) or 0.0
-          emissions[phase][species] += fuelbed['emissions'][phase][species][0]
+          species_upper = species.upper()
+          emissions[phase][species_upper] = emissions[phase].get(species_upper) or 0.0
+          emissions[phase][species_upper] += fuelbed['emissions'][phase][species][0]
     return emissions
 
 
