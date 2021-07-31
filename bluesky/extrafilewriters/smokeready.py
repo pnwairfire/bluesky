@@ -368,8 +368,11 @@ class SmokeReadyWriter(object):
                   if emissions[fire_phase][vkey.upper()] is None:
                     continue
                   prec = PTINVPollutantRecord()
-                  prec.ANN = emissions[fire_phase][vkey.upper()]
-                  prec.AVD = emissions[fire_phase][vkey.upper()]
+                  val = emissions[fire_phase][vkey.upper()]
+                  if fire_phase == 'smoldering':
+                    val += emissions['residual'][vkey.upper()]
+                  prec.ANN = val
+                  prec.AVD = val
                   ptinv_rec_str += str(prec)
 
           ptinv.write(ptinv_rec_str + "\n")
