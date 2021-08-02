@@ -10,7 +10,7 @@ import json
 import logging
 import sys
 import traceback
-import urllib
+import urllib.request
 import uuid
 import gzip
 from collections import OrderedDict
