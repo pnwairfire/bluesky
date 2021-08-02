@@ -179,8 +179,8 @@ assert set(actual.keys()) == set(['run_config', 'fires', 'run_id', 'counts', 'bl
 assert actual['fires'] == EXPECTED['fires']
 assert set(actual['run_config'].keys()) == set(EXPECTED['run_config'].keys())
 for k in actual['run_config'].keys():
-    if actual['run_config'][k] != EXPECTED['run_config'][k]:
-        import pdb;pdb.set_trace()
+    # if actual['run_config'][k] != EXPECTED['run_config'][k]:
+    #     import pdb;pdb.set_trace()
     logging.info('Checking output config key %s', k)
     assert actual['run_config'][k] == EXPECTED['run_config'][k]
 
