@@ -172,9 +172,11 @@ class BaseFileLoader(BaseLoader, metaclass=abc.ABCMeta):
         if not self._filename:
             raise BlueSkyConfigurationError(
                 "Fires file to load not specified")
-        if not os.path.isfile(self._filename):
+        if (not self._filename.startswith('http')
+                and not os.path.isfile(self._filename)):
             raise BlueSkyUnavailableResourceError("Fires file to "
                 "load {} does not exist".format(self._filename))
+        # TODO: if http, do HEAD request to check if 404
 
     def _save_copy(self, data):
         # initially try to just copy file; if fail, then use super
