@@ -1,6 +1,6 @@
 --extra-index https://pypi.airfire.org/simple/
 -f https://pypi.airfire.org/simple/
-pyairfire==4.0.1
+pyairfire==4.0.2
 afconfig==1.1.3
 afdatetime==2.0.0
 afscripting==2.0.0
