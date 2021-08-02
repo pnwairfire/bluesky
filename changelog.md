@@ -360,3 +360,9 @@
 
 ## 4.3.16
  - Improve loading of remote compressed files
+
+## 4.3.17
+ - Upgrade blueskykml to v4.0.1
+ - Upgrade pyairfire to v4.0.2
+ - Update BSF CSV file loader to support loading remote files via http
+ - Updates to filtering based on inclusion/exclusion lists
