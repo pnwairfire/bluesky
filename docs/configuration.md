@@ -90,8 +90,6 @@ configuration json data are case-insensitive.***
 ### filter
 
  - ***'config' > 'filter' > 'skip_failures'*** -- *optional* -- if fires filter fails, move on; default: false
- - ***'config' > 'filter' > 'country' > 'include'*** -- *required* if 'country' section is defined and 'exclude' array isn't -- list of countries to include
- - ***'config' > 'filter' > 'country' > 'exclude'*** -- *required* if 'country' section is defined and 'include' array isn't -- list of countries to exclude
  - ***'config' > 'filter' > 'area' > 'min'*** -- *required* if 'area' section is defined and 'max' subfield isn't -- min area threshold
  - ***'config' > 'filter' > 'area' > 'max'*** -- *required* if 'area' section is defined and 'min' subfield isn't -- max area threshold
  - ***'config' > 'filter' > 'location' > 'boundary' > 'sw' > 'lat'*** -- *required* if 'location' section is defined --
@@ -100,6 +98,13 @@ configuration json data are case-insensitive.***
  - ***'config' > 'filter' > 'location' > 'boundary' > 'ne' > 'lng'*** -- *required* if 'location' section is defined --
   - ***'config' > 'filter' > 'time' > 'start'*** -- *required* if 'time' section is defined and 'end' isn't specified -- 'start' and 'end' may be specified together; note that the specified time is assumed to be UTC unless it ends with 'L', in which case it is compared against the activity 'end' times unadjusted for utc offset
   - ***'config' > 'filter' > 'time' > 'end'*** --  *required* if 'time' section is defined and 'start' isn't specified -- 'start' and 'end' may be specified together; note that the specified time is assumed to be UTC unless it ends with 'L', in which case it is compared against the activity 'start' times unadjusted for utc offset
+
+The following settings apply to filtering on any field (other than 'area') in the active_area or location ('specified_points' or 'perimeter') objects:
+
+ - ***'config' > 'filter' > 'ANY_FIELD' > 'include'*** -- *required* if 'exclude' array isn't defined -- list of values to include
+ - ***'config' > 'filter' > 'ANY_FIELD' > 'exclude'*** -- *required* if 'include' array isn't defined -- list of values to exclude
+ - ***'config' > 'filter' > 'ANY_FIELD' > 'scope'*** -- *optional* -- options: 'active_area', 'location'; default: 'active_area'; where to look for field in bluesky data structure
+ - ***'config' > 'filter' > 'ANY_FIELD' > 'tolerance'*** -- *optional* -- options: 'any', 'all'; default: 'any'; whether to look for any matches or all
 
 ### fuelbeds
 

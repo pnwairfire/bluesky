@@ -64,11 +64,20 @@ _DEFAULTS = {
         # in the defaults, since each one's presence/absence determines whether
         # or not the filter is run.  There are no default values anywa
         # for the filter-specific options
-        #   "country": {"include": None, "exclude": None},
         #   "area": {"min": None, "max": None}
-        #   "location": {"boundary": {
-        #     "sw": { "lat":None, "lng": None},
-        #     "ne": { "lat":None, "lng": None}}}
+        #   "time": {"start": None, "end": None}
+        #   "location": {
+        #     "boundary": {
+        #       "sw": { "lat":None, "lng": None},
+        #       "ne": { "lat":None, "lng": None}
+        #     }
+        #   }
+        #   "<any other field>": {  # e.g. "country"
+        #     "include": None,
+        #     "exclude": None,
+        #     "scope": "active_area"  # options: "active_area", "location"
+        #     "tolerance": "any"  # options: "any", "all"
+        #   },
     },
     "ecoregion": {
         "lookup_implementation": "ogr",

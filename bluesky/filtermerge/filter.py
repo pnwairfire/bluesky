@@ -155,9 +155,25 @@ class FireActivityFilter(FiresActionBase):
     ## Unterlying filter methods
     ##
 
+    INVALID_SCOPE = "Invalid filter scope: %s"
+    INVALID_TOLERANCE = "Invalid filter tolerance: %s"
     SPECIFY_INCLUSION_OR_EXCLUSION_LIST_MSG = "Specify 'include' or 'exclude' - not both"
     SPECIFY_FILTER_FIELD_MSG = "Specify field to filter on"
     def _get_filter(self, **kwargs):
+        # when scope is 'locations', this is all or None. e.g. if
+        # filtering to include fires in USA, if only one out of 5 locations
+        # is in the USA, all will be kept.  If, on the other hand, we
+        # filtering to exclude any fires in the USA, if only 1 out of 5
+        # locations is in USA, all will be excluded anyway
+        scope = kwargs.get('scope') or "active_area"
+        if scope not in ("active_area", "location"):
+            raise self.FilterError(self.INVALID_SCOPE, scope)
+
+        tolerance = kwargs.get('tolerance') or "any"
+        if tolerance not in ("any", "all"):
+            raise self.FilterError(self.INVALID_TOLERANCE, tolerance)
+        tolerance_func = all if tolerance == "all" else any
+
         inclusion_list = kwargs.get('include')
         exclusion_list = kwargs.get('exclude')
         if (not inclusion_list and not exclusion_list) or (inclusion_list and exclusion_list):
@@ -168,11 +184,12 @@ class FireActivityFilter(FiresActionBase):
             raise self.FilterError(self.SPECIFY_FILTER_FIELD_MSG)
 
         def _filter(fire, active_area):
-            v = active_area.get(filter_field)
+            vals = set([active_area.get(filter_field)] if scope == 'active_area'
+                else [l.get(filter_field) for l in active_area.locations])
             if inclusion_list:
-                return not v or v not in inclusion_list
+                return tolerance_func([not v or v not in inclusion_list for v in vals])
             else:
-                return v and v in exclusion_list
+                return tolerance_func([v and v in exclusion_list for v in vals])
 
         return _filter
 
