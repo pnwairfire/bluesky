@@ -87,34 +87,34 @@ class TestFiresManagerFilterFiresByCountry(object):
         assert self.fm.num_fires == 14
         assert self.init_fires == sorted(self.fm.fires, key=lambda e: int(e.id))
 
-    def test_neither_whitelist_or_blacklist_is_specified(self, reset_config):
+    def test_neither_inclusion_nor_exclusion_list_is_specified(self, reset_config):
         Config().set({'foo': 'bar'}, 'filter', 'country')
         Config().set(False, 'filter', 'skip_failures')
         with raises(fires.FireActivityFilter.FilterError) as e_info:
             self.fm.filter_fires()
         assert self.fm.num_fires == 14
-        assert e_info.value.args[0] == fires.FireActivityFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
+        assert e_info.value.args[0] == fires.FireActivityFilter.SPECIFY_INCLUSION_OR_EXCLUSION_LIST_MSG
         Config().set(True, 'filter', 'skip_failures')
         self.fm.filter_fires()
         assert self.fm.num_fires == 14
         assert self.init_fires == sorted(self.fm.fires, key=lambda e: int(e.id))
 
-    def test_both_whitelist_or_blacklist_are_specified(self, reset_config):
+    def test_both_inclusion_and_exclusion_list_are_specified(self, reset_config):
         Config().set(False, 'filter', 'skip_failures')
-        Config().set(["ZZ"], 'filter', 'country', 'blacklist')
-        Config().set(["YY"], 'filter', 'country', 'whitelist')
+        Config().set(["ZZ"], 'filter', 'country', 'exclude')
+        Config().set(["YY"], 'filter', 'country', 'include')
         with raises(fires.FireActivityFilter.FilterError) as e_info:
             self.fm.filter_fires()
         assert self.fm.num_fires == 14
-        assert e_info.value.args[0] == fires.FireActivityFilter.SPECIFY_WHITELIST_OR_BLACKLIST_MSG
+        assert e_info.value.args[0] == fires.FireActivityFilter.SPECIFY_INCLUSION_OR_EXCLUSION_LIST_MSG
         Config().set(True, 'filter', 'skip_failures')
         self.fm.filter_fires()
         assert self.fm.num_fires == 14
         assert self.init_fires == sorted(self.fm.fires, key=lambda e: int(e.id))
 
         Config().set(False, 'filter', 'skip_failures')
-        Config().set(["ZZ"], 'filter', 'country', 'blacklist')
-        Config().set(None, 'filter', 'country', 'whitelist')
+        Config().set(["ZZ"], 'filter', 'country', 'exclude')
+        Config().set(None, 'filter', 'country', 'include')
         self.fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
@@ -142,8 +142,8 @@ class TestFiresManagerFilterFiresByCountry(object):
         assert expected == sorted(self.fm.fires, key=lambda e: int(e.id))
 
         Config().set(["USA", "CA", "UK", "BZ"],
-            'filter', 'country', 'whitelist')
-        Config().set(None, 'filter', 'country', 'blacklist')
+            'filter', 'country', 'include')
+        Config().set(None, 'filter', 'country', 'exclude')
         self.fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
@@ -166,8 +166,8 @@ class TestFiresManagerFilterFiresByCountry(object):
         assert self.fm.num_fires == 8
         assert expected == sorted(self.fm.fires, key=lambda e: int(e.id))
 
-        Config().set(["USA"], 'filter', 'country', 'blacklist')
-        Config().set(None, 'filter', 'country', 'whitelist')
+        Config().set(["USA"], 'filter', 'country', 'exclude')
+        Config().set(None, 'filter', 'country', 'include')
         self.fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
@@ -186,8 +186,8 @@ class TestFiresManagerFilterFiresByCountry(object):
         assert self.fm.num_fires == 6
         assert expected == sorted(self.fm.fires, key=lambda e: int(e.id))
 
-        Config().set(["USA", "CA", "UK"], 'filter', 'country', 'whitelist')
-        Config().set(None, 'filter', 'country', 'blacklist')
+        Config().set(["USA", "CA", "UK"], 'filter', 'country', 'include')
+        Config().set(None, 'filter', 'country', 'exclude')
         self.fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
@@ -204,8 +204,8 @@ class TestFiresManagerFilterFiresByCountry(object):
         assert self.fm.num_fires == 5
         assert expected == sorted(self.fm.fires, key=lambda e: int(e.id))
 
-        Config().set(["USA", "CA"], 'filter', 'country', 'blacklist')
-        Config().set(None, 'filter', 'country', 'whitelist')
+        Config().set(["USA", "CA"], 'filter', 'country', 'exclude')
+        Config().set(None, 'filter', 'country', 'include')
         self.fm.filter_fires()
         expected = [
             fires.Fire({'id': '04', 'name': 'n4', 'bar1':'a1', 'baz':'baz1',
@@ -218,8 +218,8 @@ class TestFiresManagerFilterFiresByCountry(object):
         assert self.fm.num_fires == 3
         assert expected == self.fm.fires
 
-        Config().set(["UK", "CA"], 'filter', 'country', 'blacklist')
-        Config().set(None, 'filter', 'country', 'whitelist')
+        Config().set(["UK", "CA"], 'filter', 'country', 'exclude')
+        Config().set(None, 'filter', 'country', 'include')
         self.fm.filter_fires()
         assert self.fm.num_fires == 0
         assert [] == self.fm.fires

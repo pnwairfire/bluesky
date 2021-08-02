@@ -70,7 +70,7 @@ class TestLocation(object):
         assert loc.get("d") == 321
         assert loc.get("d", "foo") == 321
 
-        # "fuelbeds" and "emissions" are blacklisted from looking in parent
+        # "fuelbeds" and "emissions" are excluded from looking in parent
         # active area object, so key error if only in active area
         assert "fuelbeds" in loc
         assert loc["fuelbeds"] == 123

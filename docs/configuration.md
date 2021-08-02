@@ -90,8 +90,8 @@ configuration json data are case-insensitive.***
 ### filter
 
  - ***'config' > 'filter' > 'skip_failures'*** -- *optional* -- if fires filter fails, move on; default: false
- - ***'config' > 'filter' > 'country' > 'whitelist'*** -- *required* if 'country' section is defined and 'blacklist' array isn't -- whitelist of countries to include
- - ***'config' > 'filter' > 'country' > 'blacklist'*** -- *required* if 'country' section is defined and 'whiteilst' array isn't -- blacklist of countries to exclude
+ - ***'config' > 'filter' > 'country' > 'include'*** -- *required* if 'country' section is defined and 'exclude' array isn't -- list of countries to include
+ - ***'config' > 'filter' > 'country' > 'exclude'*** -- *required* if 'country' section is defined and 'include' array isn't -- list of countries to exclude
  - ***'config' > 'filter' > 'area' > 'min'*** -- *required* if 'area' section is defined and 'max' subfield isn't -- min area threshold
  - ***'config' > 'filter' > 'area' > 'max'*** -- *required* if 'area' section is defined and 'min' subfield isn't -- max area threshold
  - ***'config' > 'filter' > 'location' > 'boundary' > 'sw' > 'lat'*** -- *required* if 'location' section is defined --
@@ -151,7 +151,7 @@ They also define what synonyms to recognize, if any, for each field.
 ### emissions
 
  - ***'config' > 'emissions' > 'model'*** -- *optional* -- emissions model; 'prichard-oneill' (which replaced 'urbanski'), 'feps', or 'consume'; default 'feps'
- - ***'config' > 'emissions' > 'species'*** -- *optional* -- whitelist of species to compute emissions levels for
+ - ***'config' > 'emissions' > 'species'*** -- *optional* -- list of species to compute emissions levels for
  - ***'config' > 'emissions' > 'include_emissions_details'*** -- *optional* -- whether or not to include emissions levels by fuel category; default: false
 
 #### If running consume emissions:

@@ -23,8 +23,8 @@ class Location(dict):
 
         self._active_area = self.pop('active_area', None)
 
-    # TODO: should we use whitelist of fields instead of blacklist,
-    #   to be safer?
+    # TODO: should we use inclusion list of fields
+    #   instead of exclusion list, to be safer?
     LOCATION_ONLY_FIELDS = [
         # This lists fields that may be defined in either or both the
         # location object or it's parent active area object, and could be

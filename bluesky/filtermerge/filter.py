@@ -155,13 +155,13 @@ class FireActivityFilter(FiresActionBase):
     ## Unterlying filter methods
     ##
 
-    SPECIFY_WHITELIST_OR_BLACKLIST_MSG = "Specify whitelist or blacklist - not both"
+    SPECIFY_INCLUSION_OR_EXCLUSION_LIST_MSG = "Specify 'include' or 'exclude' - not both"
     SPECIFY_FILTER_FIELD_MSG = "Specify field to filter on"
     def _get_filter(self, **kwargs):
-        whitelist = kwargs.get('whitelist')
-        blacklist = kwargs.get('blacklist')
-        if (not whitelist and not blacklist) or (whitelist and blacklist):
-            raise self.FilterError(self.SPECIFY_WHITELIST_OR_BLACKLIST_MSG)
+        inclusion_list = kwargs.get('include')
+        exclusion_list = kwargs.get('exclude')
+        if (not inclusion_list and not exclusion_list) or (inclusion_list and exclusion_list):
+            raise self.FilterError(self.SPECIFY_INCLUSION_OR_EXCLUSION_LIST_MSG)
         filter_field = kwargs.get('filter_field')
         if not filter_field:
             # This will never happen if called internally
@@ -169,10 +169,10 @@ class FireActivityFilter(FiresActionBase):
 
         def _filter(fire, active_area):
             v = active_area.get(filter_field)
-            if whitelist:
-                return not v or v not in whitelist
+            if inclusion_list:
+                return not v or v not in inclusion_list
             else:
-                return v and v in blacklist
+                return v and v in exclusion_list
 
         return _filter
 

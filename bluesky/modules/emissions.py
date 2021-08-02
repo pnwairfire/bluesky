@@ -42,7 +42,7 @@ def run(fires_manager):
 
     Config options:
      - emissions > model -- emissions model to use
-     - emissions > species -- whitelist of species to compute emissions for
+     - emissions > species -- inclusion list of species to compute emissions for
      - emissions > include_emissions_details -- whether or not to include
         emissions per fuel category per phase, as opposed to just per phase
      - emissions > fuel_loadings --

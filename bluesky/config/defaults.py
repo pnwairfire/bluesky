@@ -64,7 +64,7 @@ _DEFAULTS = {
         # in the defaults, since each one's presence/absence determines whether
         # or not the filter is run.  There are no default values anywa
         # for the filter-specific options
-        #   "country": {"whitelist": None, "blacklist": None},
+        #   "country": {"include": None, "exclude": None},
         #   "area": {"min": None, "max": None}
         #   "location": {"boundary": {
         #     "sw": { "lat":None, "lng": None},
