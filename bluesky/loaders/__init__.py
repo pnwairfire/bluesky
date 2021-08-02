@@ -225,7 +225,7 @@ class BaseApiLoader(BaseLoader):
         self._endpoint = config.get('endpoint')
         if not self._endpoint:
             raise BlueSkyConfigurationError(
-                "Json API not specified")
+                "API endpoint not specified")
 
         self._key = config.get('key')
         self._secret = config.get('secret')
