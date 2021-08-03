@@ -366,3 +366,7 @@
  - Upgrade pyairfire to v4.0.2
  - Update BSF CSV file loader to support loading remote files via http
  - Updates to filtering based on inclusion/exclusion lists
+
+## 4.3.18
+ - Update persistence growth module to mark persisted activity
+ - Fix issues in smokeready extrafiles module
