@@ -95,6 +95,7 @@ class Grower(GrowerBase):
             activity = copy.deepcopy(date_to_persist_activity)
             t_diff = (i + 1) * self.ONE_DAY
             for a in activity:
+                a['persisted'] = True
                 for aa in a['active_areas']:
                     aa['start'] = parse_dt(aa['start']) + t_diff
                     aa['end'] = parse_dt(aa['end']) + t_diff
