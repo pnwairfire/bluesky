@@ -268,6 +268,8 @@ def parse_args():
 
     return args
 
+VALID_INPUT_FILE_FAILURE_TOLERANCE_VALUES = ('none', 'partial', 'complete')
+
 def validate_args(args):
     # Only one of three input scenarios allowed at a time - 1) piped, 2) read
     # from file, 3) --no-input.  There's extra logic here to return error
@@ -285,6 +287,11 @@ def validate_args(args):
     elif args.input_files and is_po:
         exit_with_msg("Option '-i'/'--input-file' can't be "
             "specified if there's piped input")
+    elif (args.input_file_failure_tolerance
+            not in VALID_INPUT_FILE_FAILURE_TOLERANCE_VALUES):
+        exit_with_msg(f"Invalid value for '--input-file-failure-tolerance': "
+            f"'{args.input_file_failure_tolerance}'. Valid values: "
+            f"{', '.join(VALID_INPUT_FILE_FAILURE_TOLERANCE_VALUES)}")
 
     # TODO: validate other args values as necessary
 
