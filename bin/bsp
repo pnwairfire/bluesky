@@ -318,8 +318,9 @@ def set_modules(args, fires_manager):
     # args, but not in both places
     if args.module:
         if fires_manager.modules:
-            raise RuntimeError("Modules to be run can't be specified both"
-            " on the command line and in the input json")
+            raise exceptions.BlueSkyInputError(
+                "Modules to be run can't be specified both"
+                " on the command line and in the input json")
         fires_manager.modules = args.module
 
 
