@@ -57,10 +57,12 @@ OPTIONAL_ARGS = [
         'default': False
     },
     {
-        'long': '--skip-failed-input-files',
-        'help': 'Ignore any input files that are missing, invalid, etc.',
-        'action': "store_true",
-        'default': False
+        'long': '--input-file-failure-tolerance',
+        'help': ("Level of tolerance for input file failures - 'none', 'partial', 'complete'; default 'partial'\n"
+            " - 'none': abort execution if any input files fail to load\n"
+            " - 'partial': abort execution only if all input files fail to load\n"
+            " - 'complete': Never abort execution on input failures"),
+        'default': 'partial'
     },
     {
         'short': '-o',
@@ -372,7 +374,7 @@ def setup(args):
 
     # Note: Calling code handles exception
     if not args.no_input:
-
+        tolerance = args.input_file_failure_tolerance.lower()
         at_least_one = False
         for f in args.input_files:
             try:
@@ -381,12 +383,12 @@ def setup(args):
             except Exception as e:
                 msg = f'failed to load {f}: {e}'
                 logging.error(msg)
-                if args.skip_failed_input_files:
-                    fires_manager.record_error(msg)
-                else:
+                if tolerance == 'none':
                     raise
+                else:
+                    fires_manager.record_error(msg)
 
-        if not at_least_one:
+        if not at_least_one and tolerance == 'partial':
             # This will only get hit is --skip-failed-input-files was used
             raise exceptions.BlueSkyInputError("No valid input files were loaded")
 
