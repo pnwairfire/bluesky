@@ -377,6 +377,10 @@ class FiresManager(object):
     def meta(self):
         return self._meta
 
+    def record_error(self, msg):
+        self.meta['errors'] = self._meta.get('errors') or []
+        self.meta['errors'].append(msg)
+
     ##
     ## Configuration
     ##
