@@ -57,7 +57,7 @@ OPTIONAL_ARGS = [
         'default': False
     },
     {
-        'long': '--skip-failed-input-file',
+        'long': '--skip-failed-input-files',
         'help': 'Ignore any input files that are missing, invalid, etc.',
         'action': "store_true",
         'default': False
@@ -381,7 +381,7 @@ def setup(args):
             except Exception as e:
                 msg = f'failed to load {f}: {e}'
                 logging.error(msg)
-                if args.skip_failed_input_file:
+                if args.skip_failed_input_files:
                     fires_manager.record_error(msg)
                 else:
                     raise
