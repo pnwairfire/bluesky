@@ -680,7 +680,7 @@ class FiresManager(object):
         try:
             data = json.loads(input_stream)
         except json.decoder.JSONDecodeError as e:
-            raise BlueSkyInputError("Invalid json: %s", str(e))
+            raise BlueSkyInputError(f"Invalid json: {str(e)}")
 
         return self.load(data, append_fires=append_fires)
 
