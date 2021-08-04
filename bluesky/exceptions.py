@@ -6,6 +6,7 @@ Defines exception classes to let calling code handle errors differently
 __author__ = "Joel Dubowy"
 
 __all__ = [
+    "BlueSkyInputError",
     "BlueSkyImportError",
     "BlueSkyConfigurationError",
     "BlueSkyModuleError",
@@ -15,6 +16,9 @@ __all__ = [
     'BlueSkyUnavailableResourceError',
     'BlueSkySubprocessError'
 ]
+
+class BlueSkyInputError(RuntimeError):
+    pass
 
 class BlueSkyImportError(ImportError):
     pass

@@ -21,7 +21,7 @@ from pyairfire import process
 from bluesky import datautils, datetimeutils, __version__
 from bluesky.config import Config
 from bluesky.exceptions import (
-    BlueSkyImportError, BlueSkyModuleError
+    BlueSkyImportError, BlueSkyModuleError, BlueSkyInputError
 )
 from bluesky.filtermerge.filter import FireActivityFilter
 from bluesky.filtermerge.merge import FiresMerger
@@ -677,7 +677,11 @@ class FiresManager(object):
 
         input_stream = input_stream.decode()
 
-        data = json.loads(input_stream)
+        try:
+            data = json.loads(input_stream)
+        except json.decoder.JSONDecodeError as e:
+            raise BlueSkyInputError("Invalid json: %s", str(e))
+
         return self.load(data, append_fires=append_fires)
 
     ## Dumping data
