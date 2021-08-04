@@ -57,6 +57,12 @@ OPTIONAL_ARGS = [
         'default': False
     },
     {
+        'long': '--skip-failed-input-file',
+        'help': 'Ignore any input files that are missing, invalid, etc.',
+        'action': "store_true",
+        'default': False
+    },
+    {
         'short': '-o',
         'long': '--output-file',
         'dest': 'output_file',
@@ -366,8 +372,23 @@ def setup(args):
 
     # Note: Calling code handles exception
     if not args.no_input:
+
+        at_least_one = False
         for f in args.input_files:
-            fires_manager.loads(input_file=f, append_fires=True)
+            try:
+                fires_manager.loads(input_file=f, append_fires=True)
+                at_least_one = True
+            except Exception as e:
+                msg = f'failed to load {f}: {e}'
+                logging.error(msg)
+                if args.skip_failed_input_file:
+                    fires_manager.record_error(msg)
+                else:
+                    raise
+
+        if not at_least_one:
+            # This will only get hit is --skip-failed-input-files was used
+            raise exceptions.BlueSkyInputError("No valid input files were loaded")
 
     set_modules(args, fires_manager)
 
