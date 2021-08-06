@@ -374,3 +374,6 @@
 ## 4.3.19
  - Support adding top level 'errors' key to bluesky output
  - Add option `--input-file-failure-tolerance` to allow skipping of some or all input file load failures; default now is to exit execution only if all input files fail to load
+
+## 4.3.20
+ - Update localmet bulk profiler
