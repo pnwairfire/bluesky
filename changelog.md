@@ -377,3 +377,6 @@
 
 ## 4.3.20
  - Update localmet bulk profiler
+
+## 4.3.21
+ - Upgrade blueskykml to v4.0.2
