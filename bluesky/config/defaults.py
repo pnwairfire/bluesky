@@ -684,7 +684,7 @@ _DEFAULTS = {
         },
         "dispersion": {
             "hysplit": {
-                "websky_version": "1",
+                "websky_version": "2",
                 "fire_locations_csv_filename": 'fire_locations.csv',
                 "fire_events_csv_filename": 'fire_events.csv',
                 "smoke_dispersion_kmz_filename": 'smoke_dispersion.kmz',
