@@ -257,31 +257,48 @@ class SubprocessExecutor(object):
         process = subprocess.Popen(self._cmd_args,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             shell=False, cwd=cwd, universal_newlines=True)
-
         ret_val = None
 
         while ret_val is None:
-            # There will be at least one printed line - minimally,
-            # a single newline
-            line = process.stdout.readline()
-            if line != "":
-                self._log(line)
+            # Unicode output isn't handled by process.stdout.readline(), so
+            # we need to catch exceptions
+            # TODO: configure `process` to communicate with 'utf-8' encoding
+            try:
+                # There will be at least one printed line - minimally,
+                # a single newline
+                line = process.stdout.readline()
+                if line != "":
+                    self._log(line)
+            except Exception as e:
+                self._log(f"***Failed to read and log line(s) from STDOUT: {e}***")
 
             ret_val = process.poll()
 
         if ret_val > 0:
-            serr = process.stderr.read()
-            self._log(serr, is_stdout=False)
-            msg = self._get_last_line(serr)
+            # See comment above regarding catching unicode related exceptions
+            try:
+                serr = process.stderr.read()
+                self._log(serr, is_stdout=False)
+                msg = self._get_last_line(serr)
+            except:
+                msg = f"Failure running '{' '.join(self._cmd_args)}'. Return code {ret_val}"
+
             raise BlueSkySubprocessError(msg)
 
     def _execute_with_logging_after(self, cwd):
         # Use check_output so that output isn't sent to stdout
         # TODO: capture stdout and stderr separately, so that
         #   different log levels can be used.
-        output = subprocess.check_output(self._cmd_args,
-            stderr=subprocess.STDOUT, cwd=cwd, universal_newlines=True)
-        self._log(output)
+        # See comment above regarding catching unicode related exceptions
+        try:
+            output = subprocess.check_output(self._cmd_args,
+                stderr=subprocess.STDOUT, cwd=cwd, universal_newlines=True)
+            self._log(output)
+        except Exception as e:
+            self._log(f"***Failed to read and log output from : {' '.join(self._cmd_args)}***")
+            self._log(f"***(Note: this does not indicate process failure)***")
+
+
 
     def _log(self, output, is_stdout=True):
         if output:
