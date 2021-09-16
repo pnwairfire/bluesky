@@ -269,7 +269,7 @@ class SubprocessExecutor(object):
                 line = process.stdout.readline()
                 if line != "":
                     self._log(line)
-            except Exception as e:
+            except UnicodeDecodeError as e:
                 self._log(f"***Failed to read and log line(s) from STDOUT: {e}***")
 
             ret_val = process.poll()
@@ -294,7 +294,8 @@ class SubprocessExecutor(object):
             output = subprocess.check_output(self._cmd_args,
                 stderr=subprocess.STDOUT, cwd=cwd, universal_newlines=True)
             self._log(output)
-        except Exception as e:
+
+        except UnicodeDecodeError as e:
             self._log(f"***Failed to read and log output from : {' '.join(self._cmd_args)}***")
             self._log(f"***(Note: this does not indicate process failure)***")
 
