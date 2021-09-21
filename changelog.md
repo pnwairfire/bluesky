@@ -383,3 +383,8 @@
 
 ## 4.3.22
  - Upgrade blueskykml to v4.0.3
+
+## 4.3.23
+ - Change default `websky_version` from 1 to 2
+ - Update `SubprocessExecutor` to handle unicode errors when reading and logging subprocess output
+ - Include runtime info in final status log
