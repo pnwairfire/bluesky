@@ -547,7 +547,7 @@ class FiresManager(object):
             # If there was a failure
             raise BlueSkyModuleError
 
-        self.log_status('Good', 'Main', 'Finish')
+        self.log_status('Good', 'Main', 'Finish', runtime=self.runtime)
 
     ## Filtering Fires
 
