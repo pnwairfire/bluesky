@@ -388,3 +388,6 @@
  - Change default `websky_version` from 1 to 2
  - Update `SubprocessExecutor` to handle unicode errors when reading and logging subprocess output
  - Include runtime info in final status log
+
+## 4.3.24
+ - microsecond resolution in status log timestamps
