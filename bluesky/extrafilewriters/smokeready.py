@@ -21,6 +21,7 @@ import numpy as np
 from bluesky.config import Config
 from bluesky import locationutils
 from bluesky.exceptions import BlueSkyConfigurationError
+from hashlib import blake2b
 
 class ColumnSpecificRecord(object):
     columndefs = []
@@ -579,11 +580,15 @@ class SmokeReadyWriter(object):
       raise ValueError("Fire Type must be a string")
 
   # This is how the PTINV file links back to the ptday/pthour emissions files
+  # to create a "unique" id, the larger cat'd string w/fsid,lat,lon,hours is
+  # converted to hash. hopefully, that doesn't result in too many collisions
+  # but it has to be better than relying on the first 15 chars of the below
   def _generate_fcid(self, fire_info, num_hours, lat, lng):
     # Returns the fire_info id, lat/lng, and num of hours burning
     lat_str = str(lat).replace('.', '')
     lng_str = str(lng).replace('.', '')
-    return fire_info.id + lat_str + lng_str + str(num_hours)
+    fcid_str = fire_info.id + lat_str + lng_str + str(num_hours)
+    return blake2b(fcid_str.encode(),digest_size=7).hexdigest()
 
   def _set_timezone_name(self, lat, lng, start_dt):
     VALID_TIMEZONES = ['GMT','ADT','AST','EDT','EST','CDT','CST','MDT','MST','PDT','PST','AKDT', 'AKST']
