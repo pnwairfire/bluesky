@@ -391,3 +391,6 @@
 
 ## 4.3.24
  - microsecond resolution in status log timestamps
+
+## 4.3.25
+ - Ensure that smokeready ids are no greater than 15 characters
