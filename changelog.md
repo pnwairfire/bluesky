@@ -394,3 +394,6 @@
 
 ## 4.3.25
  - Ensure that smokeready ids are no greater than 15 characters
+
+## 4.3.26
+ - Upgrade met package to v3.0.2
