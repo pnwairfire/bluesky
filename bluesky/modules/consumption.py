@@ -170,7 +170,8 @@ def _validate_input(fires_manager):
                     for fb in loc['fuelbeds'] :
                         # make sure that FCCS id is defined and that pct is defined and non-zero
                         # Note: FCCS id is expected to be a string, but integer values are
-                        #    accepted, so check `fb.get('fccs_id') is None` instead of
-                        #    `not fb.get('fccs_id')` to allow for FCCS #0 (bare ground / light fuels)
-                        if fb.get('fccs_id') is None or not fb.get('pct'):
+                        #    accepted, so check `fb.get('fccs_id') in (None, "")` instead of
+                        #    `not fb.get('fccs_id')` to allow for integer zero value for
+                        #    FCCS #0 (bare ground / light fuels)
+                        if fb.get('fccs_id') in (None, "") or not fb.get('pct'):
                             raise ValueError(VALIDATION_ERROR_MSGS['FCCS_ID_AND_PCT_REQUIRED'])
