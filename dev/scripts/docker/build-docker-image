@@ -40,7 +40,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--version',
         help="Tagged version to build. User prompted if not specified.")
-    # TODO: add option to upload to docker hub, to avoid prompt ?
+    parser.add_argument('-u', '--upload', action="store_true",
+        help="Skip prompt to upload to docker hub and automatically upload")
     # TODO: add back option to override image name to use instead of 'bluesky' ?
     #    (This option was removed because I never used it)
     parser.epilog = EXAMPLES_STR
@@ -85,10 +86,13 @@ def tag(tag_version):
     _call(['docker', 'tag', f'bluesky:{tag_version}', 'pnwairfire/bluesky:' + tag_version])
     return tag_version
 
-def upload(tag_version):
-    sys.stdout.write('Upload to hub.docker.com?: [y/N]: ')
-    r = input().strip()
-    if r and r.lower() in ('y', 'yes'):
+def upload(args, tag_version):
+    def _prompt():
+        sys.stdout.write('Upload to hub.docker.com?: [y/N]: ')
+        r = input().strip()
+        return r and r.lower() in ('y', 'yes')
+
+    if args.upload or _prompt():
         sys.stdout.write("Pushing to docker hub.\n")
         _call(['docker', 'login'])
         _call(['docker', 'push', 'pnwairfire/bluesky:latest'])
@@ -128,4 +132,4 @@ if __name__ == "__main__":
     with tag_checkout_handler(tag_version):
         build(tag_version)
         tag(tag_version)
-        upload(tag_version)
+        upload(args, tag_version)
