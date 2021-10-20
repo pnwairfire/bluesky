@@ -48,7 +48,7 @@ def parse_args():
     parser.formatter_class = argparse.RawTextHelpFormatter
     return parser.parse_args()
 
-def _call(cmd_args, capture_output=True):
+def _call(cmd_args, capture_output=False):
     sys.stdout.write("Calling '{}'\n".format(' '.join(cmd_args)))
     # 'capture_output' isn't supported by subprocess in py3.5, so, specify stdin and stdout directly
     #r = subprocess.run(cmd_args, capture_output=capture_output, universal_newlines=True)
@@ -98,7 +98,7 @@ def upload(args, tag_version):
         sys.stdout.write("Pushing to docker hub.\n")
         # we want prompt to go to stdout, so that user knows to
         # enter usernameand password.
-        _call(['docker', 'login'], capture_output=False)
+        _call(['docker', 'login'])
         _call(['docker', 'push', 'pnwairfire/bluesky:latest'])
         _call(['docker', 'push', 'pnwairfire/bluesky:' + tag_version])
         _call(['docker', 'logout'])
@@ -112,13 +112,13 @@ class tag_checkout_handler(object):
 
     def __init__(self, tag_version):
         # `git symbolic-ref HEAD` works in 2.17 but not 2.7
-        # self._original_branch = _call(['git', 'symbolic-ref', 'HEAD']).stdout
-        self._original_branch = _call(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).stdout
+        # self._original_branch = _call(['git', 'symbolic-ref', 'HEAD'], capture_output=True).stdout
+        self._original_branch = _call(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture_output=True).stdout
         if not self._original_branch or self._original_branch == 'HEAD':
             exit_with_msg("In a detached state. Check out a branch.")
 
         self._original_branch = self._original_branch.replace('refs/heads/', '').strip()
-        self._needs_stash = not not _call(['git', 'status', '--porcelain', '-uno']).stdout
+        self._needs_stash = not not _call(['git', 'status', '--porcelain', '-uno'], capture_output=True).stdout
         self._tag_version = tag_version
 
     def __enter__(self):
