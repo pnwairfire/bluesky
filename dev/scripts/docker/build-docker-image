@@ -63,7 +63,7 @@ def _call(cmd_args):
 def get_tag(args):
     if args.version:
         if not re.compile('^v\d+\.\d+\.\d+$').match(args.version):
-            exit_with_msg(f"Invalid tag version: {args.version}\n")
+            exit_with_msg("Invalid tag version: {}\n".format(args.version))
         tag_version = args.version
 
     else:
