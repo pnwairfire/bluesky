@@ -111,8 +111,10 @@ class tag_checkout_handler(object):
     """
 
     def __init__(self, tag_version):
-        self._original_branch = _call(['git', 'symbolic-ref', 'HEAD']).stdout
-        if not self._original_branch:
+        # `git symbolic-ref HEAD` works in 2.17 but not 2.7
+        # self._original_branch = _call(['git', 'symbolic-ref', 'HEAD']).stdout
+        self._original_branch = _call(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).stdout
+        if not self._original_branch or self._original_branch == 'HEAD':
             exit_with_msg("In a detached state. Check out a branch.")
 
         self._original_branch = self._original_branch.replace('refs/heads/', '').strip()
