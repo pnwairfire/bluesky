@@ -41,7 +41,6 @@ def parse_args():
     parser.add_argument('-v', '--version',
         help="Tagged version to build. User prompted if not specified.")
     # TODO: add option to upload to docker hub, to avoid prompt ?
-    # TODO: add option to logout of docker hub, to avoid prompt ?
     # TODO: add back option to override image name to use instead of 'bluesky' ?
     #    (This option was removed because I never used it)
     parser.epilog = EXAMPLES_STR
@@ -94,11 +93,7 @@ def upload(tag_version):
         _call(['docker', 'login'])
         _call(['docker', 'push', 'pnwairfire/bluesky:latest'])
         _call(['docker', 'push', 'pnwairfire/bluesky:' + tag_version])
-
-        sys.stdout.write('Logout of hub.docker.com?: [Y/n]: ')
-        r = input().strip()
-        if not (r and r.lower() in ('n', 'no')):
-            _call(['docker', 'logout'])
+        _call(['docker', 'logout'])
 
 class tag_checkout_handler(object):
     """Context handler that
