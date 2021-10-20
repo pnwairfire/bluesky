@@ -15,3 +15,4 @@ profile.txt
 dev-private/
 .private/
 /export/
+fabfile.py
