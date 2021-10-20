@@ -48,10 +48,9 @@ def parse_args():
     parser.formatter_class = argparse.RawTextHelpFormatter
     return parser.parse_args()
 
-def _call(cmd_args):
+def _call(cmd_args, capture_output=True):
     sys.stdout.write("Calling '{}'\n".format(' '.join(cmd_args)))
-    r = subprocess.run(cmd_args, stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE, universal_newlines=True)
+    r = subprocess.run(cmd_args, capture_output=capture_output, universal_newlines=True)
 
     if r.returncode:
         msg = "Command '{}' returned error code {}. STDERR: {}".format(
@@ -94,7 +93,9 @@ def upload(args, tag_version):
 
     if args.upload or _prompt():
         sys.stdout.write("Pushing to docker hub.\n")
-        _call(['docker', 'login'])
+        # we want prompt to go to stdout, so that user knows to
+        # enter usernameand password.
+        _call(['docker', 'login'], capture_output=False)
         _call(['docker', 'push', 'pnwairfire/bluesky:latest'])
         _call(['docker', 'push', 'pnwairfire/bluesky:' + tag_version])
         _call(['docker', 'logout'])
