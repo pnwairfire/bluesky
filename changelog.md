@@ -397,3 +397,7 @@
 
 ## 4.3.26
  - Upgrade met package to v3.0.2
+
+## 4.3.27
+ - Update fccs id data check to accept integer value FCCS #0
+ - dev script updates
