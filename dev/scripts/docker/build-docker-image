@@ -79,11 +79,11 @@ def get_tag(args):
 
 def build(tag_version):
     dockerfile_pathname = os.path.join(REPO_ROOT_DIR, 'Dockerfile')
-    _call(['docker','build', '-t', f'bluesky:{tag_version}', REPO_ROOT_DIR])
+    _call(['docker','build', '-t', 'bluesky:{}'.format(tag_version), REPO_ROOT_DIR])
 
 def tag(tag_version):
-    _call(['docker', 'tag', f'bluesky:{tag_version}', 'pnwairfire/bluesky:latest'])
-    _call(['docker', 'tag', f'bluesky:{tag_version}', 'pnwairfire/bluesky:' + tag_version])
+    _call(['docker', 'tag', 'bluesky:{}'.format(tag_version), 'pnwairfire/bluesky:latest'])
+    _call(['docker', 'tag', 'bluesky:{}'.format(tag_version), 'pnwairfire/bluesky:' + tag_version])
     return tag_version
 
 def upload(args, tag_version):
