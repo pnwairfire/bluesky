@@ -139,7 +139,8 @@ VALIDATION_ERROR_MSGS = {
     'NO_LOCATIONS': "Active area missing location data required for computing consumption",
     'NO_FUELBEDS': "Active area location missing fuelbeds data required for computing consumption",
     'AREA_UNDEFINED': "Fire activity location data must define area for computing consumption",
-    'ECOREGION_REQUIED': 'Fire activity location data must define ecoregion for computing consumption. Run the ecoregion module first.'
+    'ECOREGION_REQUIED': 'Fire activity location data must define ecoregion for computing consumption. Run the ecoregion module first.',
+    'FCCS_ID_AND_PCT_REQUIRED': "Each fuelbed must define 'fccs_id' and 'pct'"
 }
 
 def _validate_input(fires_manager):
@@ -167,5 +168,9 @@ def _validate_input(fires_manager):
                         raise ValueError(VALIDATION_ERROR_MSGS["ECOREGION_REQUIED"])
 
                     for fb in loc['fuelbeds'] :
-                        if not fb.get('fccs_id') or not fb.get('pct'):
-                            raise ValueError("Each fuelbed must define 'fccs_id' and 'pct'")
+                        # make sure that FCCS id is defined and that pct is defined and non-zero
+                        # Note: FCCS id is expected to be a string, but integer values are
+                        #    accepted, so check `fb.get('fccs_id') is None` instead of
+                        #    `not fb.get('fccs_id')` to allow for FCCS #0 (bare ground / light fuels)
+                        if fb.get('fccs_id') is None or not fb.get('pct'):
+                            raise ValueError(VALIDATION_ERROR_MSGS['FCCS_ID_AND_PCT_REQUIRED'])
