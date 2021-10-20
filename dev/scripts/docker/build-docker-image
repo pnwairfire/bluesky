@@ -112,7 +112,7 @@ class tag_checkout_handler(object):
             exit_with_msg("In a detached state. Check out a branch.")
 
         self._original_branch = self._original_branch.replace('refs/heads/', '').strip()
-        self._needs_stash = not not _call(['git', 'status', '--porcelain=v1', '-uno']).stdout
+        self._needs_stash = not not _call(['git', 'status', '--porcelain', '-uno']).stdout
         self._tag_version = tag_version
 
     def __enter__(self):
