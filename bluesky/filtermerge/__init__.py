@@ -31,6 +31,7 @@ class FiresActionBase(object, metaclass=abc.ABCMeta):
     def __exit__(self, exc_type, exc_value, traceback):
         logging.info("Number of fires after running %s: %s", self.ACTION,
             self._fires_manager.num_fires)
+
     ##
     ## Abstract methods
     ##

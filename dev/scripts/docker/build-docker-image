@@ -38,36 +38,52 @@ def exit_with_msg(msg, exit_code=1):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    # TODO: add option to specify version, to avoid prompt ?
+    parser.add_argument('-v', '--version',
+        help="Tagged version to build. User prompted if not specified.")
     # TODO: add option to upload to docker hub, to avoid prompt ?
+    # TODO: add option to logout of docker hub, to avoid prompt ?
     # TODO: add back option to override image name to use instead of 'bluesky' ?
     #    (This option was removed because I never used it)
     parser.epilog = EXAMPLES_STR
     parser.formatter_class = argparse.RawTextHelpFormatter
     return parser.parse_args()
 
-
 def _call(cmd_args):
     sys.stdout.write("Calling '{}'\n".format(' '.join(cmd_args)))
-    r = subprocess.call(cmd_args)
-    if r:
-        msg = "Command '{}' returned error code {}".format(' '.join(cmd_args), r)
+    r = subprocess.run(cmd_args, stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE, universal_newlines=True)
+
+    if r.returncode:
+        msg = "Command '{}' returned error code {}. STDERR: {}".format(
+            ' '.join(cmd_args), r.returncode, r.stderr)
         exit_with_msg(msg, exit_code=r)
 
-def build():
-    dockerfile_pathname = os.path.join(REPO_ROOT_DIR, 'Dockerfile')
-    _call(['docker','build', '-t', 'bluesky', REPO_ROOT_DIR])
+    return r
 
-def tag():
-    tag_version = None
-    while not tag_version or not re.compile('^v\d+\.\d+\.\d+$').match(tag_version):
-        if tag_version:
-            sys.stdout.write("Enter a tag version of the form 'v{}' or press"
-                " enter to use the default\n".format(__version__))
-        sys.stdout.write('Tag version [v{}]: '.format(__version__))
-        tag_version = input().strip() or 'v' + __version__
-    _call(['docker', 'tag', 'bluesky', 'pnwairfire/bluesky:latest'])
-    _call(['docker', 'tag', 'bluesky', 'pnwairfire/bluesky:' + tag_version])
+def get_tag(args):
+    if args.version:
+        if not re.compile('^v\d+\.\d+\.\d+$').match(args.version):
+            exit_with_msg(f"Invalid tag version: {args.version}\n")
+        tag_version = args.version
+
+    else:
+        tag_version = None
+        while not tag_version or not re.compile('^v\d+\.\d+\.\d+$').match(tag_version):
+            if tag_version:
+                sys.stdout.write("Enter a tag version of the form 'v{}' or press"
+                    " enter to use the default\n".format(__version__))
+            sys.stdout.write('Tag version [v{}]: '.format(__version__))
+            tag_version = input().strip() or 'v' + __version__
+
+    return tag_version
+
+def build(tag_version):
+    dockerfile_pathname = os.path.join(REPO_ROOT_DIR, 'Dockerfile')
+    _call(['docker','build', '-t', f'bluesky:{tag_version}', REPO_ROOT_DIR])
+
+def tag(tag_version):
+    _call(['docker', 'tag', f'bluesky:{tag_version}', 'pnwairfire/bluesky:latest'])
+    _call(['docker', 'tag', f'bluesky:{tag_version}', 'pnwairfire/bluesky:' + tag_version])
     return tag_version
 
 def upload(tag_version):
@@ -84,8 +100,37 @@ def upload(tag_version):
         if not (r and r.lower() in ('n', 'no')):
             _call(['docker', 'logout'])
 
+class tag_checkout_handler(object):
+    """Context handler that
+        1. records currently checked out commit
+        2. checks out specified tag version on enter
+        3. checks out originally checked out commit on exit
+    """
+
+    def __init__(self, tag_version):
+        self._original_branch = _call(['git', 'symbolic-ref', 'HEAD']).stdout
+        if not self._original_branch:
+            exit_with_msg("In a detached state. Check out a branch.")
+
+        self._original_branch = self._original_branch.replace('refs/heads/', '').strip()
+        self._needs_stash = not not _call(['git', 'status', '--porcelain=v1', '-uno']).stdout
+        self._tag_version = tag_version
+
+    def __enter__(self):
+        if self._needs_stash:
+            _call(['git', 'stash'])
+        _call(['git', 'checkout', self._tag_version])
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        _call(['git', 'checkout', self._original_branch])
+        if self._needs_stash:
+            _call(['git', 'stash', 'pop'])
+
+
 if __name__ == "__main__":
     args = parse_args()
-    build()
-    tag_version = tag()
-    upload(tag_version)
+    tag_version = get_tag(args)
+    with tag_checkout_handler(tag_version):
+        build(tag_version)
+        tag(tag_version)
+        upload(tag_version)
