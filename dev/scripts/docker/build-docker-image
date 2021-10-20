@@ -50,7 +50,10 @@ def parse_args():
 
 def _call(cmd_args, capture_output=True):
     sys.stdout.write("Calling '{}'\n".format(' '.join(cmd_args)))
-    r = subprocess.run(cmd_args, capture_output=capture_output, universal_newlines=True)
+    # 'capture_output' isn't supported by subprocess in py3.5, so, specify stdin and stdout directly
+    #r = subprocess.run(cmd_args, capture_output=capture_output, universal_newlines=True)
+    kwargs = dict(stdout=subprocess.PIPE, stderr=subprocess.PIPE) if capture_output else dict()
+    r = subprocess.run(cmd_args, universal_newlines=True, **kwargs)
 
     if r.returncode:
         msg = "Command '{}' returned error code {}. STDERR: {}".format(
