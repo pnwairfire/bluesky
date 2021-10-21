@@ -88,7 +88,7 @@ class ConsumeSettingFromLocalmet(object):
         self._value = None
         if field == 'windspeed':
             self._value = self._compute_windspeed(localmet)
-        # TODO: set any other fields from localmet?
+        # There are no other localmet fields used by consume
 
     @property
     def value(self):
