@@ -49,7 +49,6 @@ def run(fires_manager):
 
     skip_failures = Config().get('fuelmoisture', 'skip_failures')
 
-
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             for aa in fire.active_areas:

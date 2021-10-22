@@ -96,6 +96,23 @@ class TestFire(object):
             f['fuel_type'] = 'bar'
         assert e_info.value.args[0] == fires.Fire.INVALID_FUEL_TYPE_MSG.format('bar')
 
+    def test_is_wildfire(self, reset_config):
+        f = fires.Fire({})
+        assert f.is_wildfire == (fires.Fire.DEFAULT_TYPE == 'wildfire')
+
+        f = fires.Fire({"type": 'wf'})
+        assert f.is_wildfire
+
+        f = fires.Fire({"type": 'wildfire'})
+        assert f.is_wildfire
+
+        f = fires.Fire({"type": 'rx'})
+        assert not f.is_wildfire
+
+        f = fires.Fire({"type": 'unknown'})
+        assert not f.is_wildfire
+
+
     def test_accessing_attributes(self, reset_config):
         f = fires.Fire({'a': 123, 'b': 'sdf'})
         assert 123 == f['a']

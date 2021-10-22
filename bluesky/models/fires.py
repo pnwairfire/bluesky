@@ -168,6 +168,7 @@ class Fire(dict):
             raise ValueError(self.INVALID_TYPE_MSG.format(val))
         return self.VALID_TYPES[val]
 
+    @property
     def is_wildfire(self):
         return self.type == 'wildfire'
 
