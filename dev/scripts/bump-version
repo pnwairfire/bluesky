@@ -18,7 +18,7 @@ sed -i.bak -e 's/'$lasttag_no_v'/'$nexttag_no_v'/' docs/installation.md
 
 find . -name *.bak -exec rm  {} \;
 
-subl -n changelog.md
+emacs changelog.md
 
 git add changelog.md docs/installation.md bluesky/__init__.py
 
