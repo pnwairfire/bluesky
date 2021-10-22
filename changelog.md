@@ -401,3 +401,8 @@
 ## 4.3.27
  - Update fccs id data check to accept integer value FCCS #0
  - dev script updates
+
+## 4.3.28
+ - Add 'fuelmoisture' module, currently supporting NFDRS model for computing 1-hr and 1-hr values, as well as defaults based on fire type
+ - Update CONSUME to use fuel moisture data, if available
+ - Dev script updates
