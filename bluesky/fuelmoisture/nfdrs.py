@@ -1,4 +1,91 @@
-# Fuel moisture function set
+"""bluesky.fuelmoisture.nfdrs
+
+fm_1_10 written by asbova17
+"""
+
+__version__ = '0.1.0'
+
+__all__ = [
+    'NfdrsFuelMoisture'
+]
+
+
+class NfdrsFuelMoisture(object):
+
+    def _set_first_value(self, met, met_key, key, fm_1_10_args,
+            process_func=lambda a: a):
+        vals = met.get(met_key)
+        if vals:
+            fm_1_10_args[key] = process_func(vals[0])
+        # else, don't set it, so that `fm_1_10`s kward defualt is used
+
+    def _convert_tcld_to_sow(self, tcld):
+        """Convert's cloud cover to SOW
+
+        0 - Clear, less than 1/10 cloud cover
+        1 - Scattered clouds, 1/10 - 5/10 cloud cover
+        2 - Broken clouds, 6/10 - 9/10 cloud cover
+        3 - Overcast, 10/10 cloud cover
+        """
+        # tcld is a percentage in the met data
+        if tcld <= 10:
+            return 0
+        elif tcld <= 50:
+            return 1
+        elif tcld <= 90:
+            return 2
+        else:
+            return 3
+
+    def _set_rain(self, met, fm_1_10_args):
+            # For rain/precip, we want 24-hr total up to current time.  Take the
+            # largest of the TPP<N>fields and multiply it to get 24-hr total
+            # Potential fields, in order of preference
+            #  - TPPD - 24 hour total
+            #  - TPPT - 12 hour total
+            #  - TPP6 - 6 hour total (multiple by 4 to get 24hr)
+            #  - TPP3 - 3 hour total
+            #  - TPP1 - 1 hr total
+            #  - TPPA/TPPS - total over forecat window
+            # Additionally, the value is in meters, and so needs to be
+            # converted to mm
+            self._set_first_value(met, 'TPPD', 'rain', fm_1_10_args,
+                process_func=lambda a: a / 1000)
+            if fm_1_10_args.get('rain') is None:
+                self._set_first_value(met, 'TPPT', 'rain', fm_1_10_args,
+                    process_func=lambda a: (a * 2) / 1000)
+            if fm_1_10_args.get('rain') is None:
+                self._set_first_value(met, 'TPP6', 'rain', fm_1_10_args,
+                    process_func=lambda a: (a * 4) / 1000)
+            if fm_1_10_args.get('rain') is None:
+                self._set_first_value(met, 'TPP3', 'rain', fm_1_10_args,
+                    process_func=lambda a: (a * 8) / 1000)
+            if fm_1_10_args.get('rain') is None:
+                self._set_first_value(met, 'TPP1', 'rain', fm_1_10_args,
+                    process_func=lambda a: (a * 24) / 1000)
+            # TODO: use TPPA/TPPS, but we need to make sure we have the
+            #   correct total number of hours it represents
+
+    def set_fuel_moisture(self, aa, location):
+        """Extracts the closest WIMS data. Assigns default fuel moisture
+         values if no WIMS data is found
+        """
+        for hr, met in location.get('localmet', {}).items():
+            fm_1_10_args = {}
+            # The profiler code says that TEMP is in Kelvin, but
+            # the data appear to be in Celsius
+            self._set_first_value(met, 'TEMP', 'temp', fm_1_10_args)
+            self._set_first_value(met, 'RELH', 'rh', fm_1_10_args)
+            # cloud cover is 'TCLD', we need it to compute 'sow', but
+            self._set_first_value(met, 'TCLD', 'sow', fm_1_10_args,
+                process_func=self._convert_tcld_to_sow)
+            self._set_rain(met, fm_1_10_args)
+
+            fm_1hr, fm_10hr = fm_1_10(**fm_1_10_args)
+            location['fuelmoisture']['1hr'] = fm_1hr
+            location['fuelmoisture']['10hr'] = fm_10hr
+
+
 
 def fm_1_10(temp=20, rh=30, rain=0, sow=0, units='SI'):
 
