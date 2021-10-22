@@ -109,7 +109,10 @@ _DEFAULTS = {
     },
     "fuelmoisture":{
         # multiple models
-        "models": ["wims"],
+        "models": ["nfdrs"],
+        "use_defaults": False,
+        "skip_failures": True,
+        "nfdrs": {},
         "wims": {
             "url": "https://www.wfas.net/archive/www.fs.fed.us/land/wfas/archive/%Y/%m/%d/fdr_obs.dat",
             "data_dir": None # defaults to tmp folder

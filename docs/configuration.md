@@ -128,7 +128,17 @@ The following settings apply to filtering on any field (other than 'area') in th
 
 ### fuelmoisture
 
- - ***'config' > 'fuelmoisture' > 'models'*** -- *optional* -- models to run; default  ["wims"]custom, fuelbed-specific fuel loadings
+ - ***'config' > 'fuelmoisture' > 'models'*** -- *optional* -- fuel moisture models to run; default ["nfdrs"]
+ - ***'config' > 'fuelmoisture' > 'use_defaults'*** -- *optional* -- after running fuel moisture models, set any remaining undefined fields to defaults, based on fire type (wildfire vs rx); otherwise, the fields are left undefined and other modules dependent on fuel moisture will use their own defaults
+ - ***'config' > 'fuelmoisture' > 'skip_failures'*** -- *optional* -- default `true`; if true (default) ignore and move on to next model or location; else, raise exception (which either aborts run or moves fire to `failed_fires`, depending on how top level `skip_failed_fires` is set)
+#### if running NFDRS
+
+***(There aren't currently any config parameters for the NFDRS model)***
+
+#### if running WIMS
+
+ - ***'config' > 'fuelmoisture' > 'wims' > 'url' *** -- *optional* -- source of wims data to download; default: https://www.wfas.net/archive/www.fs.fed.us/land/wfas/archive/%Y/%m/%d/fdr_obs.dat  ***(Note that this source stopped publishing new data in May 2019)***
+ - ***'config' > 'fuelmoisture' > 'wims' > 'data_dir' *** -- *optional* -- where to write downloaded data; defaults to tmp directory
 
 ### consumption
 
