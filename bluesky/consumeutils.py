@@ -73,6 +73,13 @@ def _apply_settings(fc, location, burn_type):
                 except:
                     pass
 
+            # get from fuelmoisture data, if available
+            if value is None and location.get('fuelmoisture'):
+                try:
+                    value = ConsumeSettingFromFuelMoisture(field, location['fuelmoisture']).value
+                except:
+                    pass
+
         if value:
             setattr(fc, field, value)
         elif 'default' in d:
@@ -81,25 +88,63 @@ def _apply_settings(fc, location, burn_type):
             raise BlueSkyConfigurationError("Specify {} for {} burns".format(
                 field, burn_type))
 
-class ConsumeSettingFromLocalmet(object):
 
-    def __init__(self, field, localmet):
-        self._localmet = localmet
+class ConsumeSettingFromOtherData(object):
+
+    def __init__(self, field, data):
+        self._data = data
         self._value = None
-        if field == 'windspeed':
-            self._value = self._compute_windspeed(localmet)
-        # There are no other localmet fields used by consume
+        f = getattr(self, f"_get_{field}", None)
+        if f:
+            self._value = f()
 
     @property
     def value(self):
         return self._value
 
-    def _compute_windspeed(self, localmet):
+    def _get_mean(self, key):
+        """Returns mean of all values of specifid key across all hours.
+
+        Note that hourly value may be scalar or a list.
+        """
+        all_values = []
+        for hr in self._data.values():
+            val = hr.get(key)
+            if hasattr(val, 'append'):
+                all_values.extend(val)
+            else:
+                all_values.append(val)
+
+        all_values = [val for val in all_values if val is not None]
+        return sum(all_values) / len(all_values)
+
+
+class ConsumeSettingFromLocalmet(ConsumeSettingFromOtherData):
+
+    def __init__(self, field, data):
+        super().__init__(field, data)
+
+    def _get_windspeed(self):
         """Returns mean of all WSPD array values across all hours
         """
-        all_windspeed_values = [w for hr in localmet.values() for w in hr.get('WSPD', [])]
-        all_windspeed_values = [val for val in all_windspeed_values if val is not None]
-        return sum(all_windspeed_values) / len(all_windspeed_values)
+        return self._get_mean('WSPD')
+
+class ConsumeSettingFromFuelMoisture(ConsumeSettingFromOtherData):
+
+    # TODO set 'fm_type' from FM data?
+
+    def _get_fuel_moisture_10hr_pct(self):
+        return self._get_mean('10_hr')
+
+    def _get_fuel_moisture_1000hr_pct(self):
+        return self._get_mean('1000_hr')
+
+    def _get_fuel_moisture_duff_pct(self):
+        return self._get_mean('duff')
+
+    def _get_fuel_moisture_litter_pct(self):
+        return self._get_mean('live')
+
 
 class FuelLoadingsManager(object):
 
