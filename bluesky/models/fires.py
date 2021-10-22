@@ -168,6 +168,9 @@ class Fire(dict):
             raise ValueError(self.INVALID_TYPE_MSG.format(val))
         return self.VALID_TYPES[val]
 
+    def is_wildfire(self):
+        return self.type == 'wildfire'
+
     VALID_FUEL_TYPES = ('natural', 'activity', 'piles')
     INVALID_FUEL_TYPE_MSG = "Invalid fire 'fuel_type': {}"
 
