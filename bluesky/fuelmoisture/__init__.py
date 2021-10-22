@@ -1,3 +1,7 @@
+import datetime
+
+from afdatetime.parsing import parse_datetime
+
 # Default FM profiles from BSF
 MOISTURE_PROFILES = {
     "very_dry": {
@@ -34,13 +38,20 @@ def get_defaults(fire, loc):
     else:
         return MOISTURE_PROFILES['moist']
 
-def fill_in_defaults(fire, loc):
+ONE_HOUR = datetime.timedelta(hours=1)
+
+def fill_in_defaults(fire, aa, loc):
     defaults = get_defaults(fire, loc)
+    loc['fuelmoisture'] = loc.get('fuelmoisture', {})
 
-    if not loc.get('fuelmoisture'):
-        loc['fuelmoisture'] = defaults
+    hr = parse_datetime(aa['start'])
+    while hr < parse_datetime(aa['end']):
+        hr_str = hr.strftime('%Y-%m-%dT%H:%M:%S')
+        if not loc['fuelmoisture'].get(hr_str):
+            loc['fuelmoisture'][hr_str] = defaults
 
-    else:
-        for k, v in defaults.items():
-            if loc['fuelmoisture'].get(k) is None:
-                loc['fuelmoisture'][k] = v
+        else:
+            for k, v in defaults.items():
+                if loc['fuelmoisture'][hr_str].get(k) is None:
+                    loc['fuelmoisture'][hr_str][k] = v
+        hr += ONE_HOUR

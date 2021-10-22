@@ -82,8 +82,9 @@ class NfdrsFuelMoisture(object):
             self._set_rain(met, fm_1_10_args)
 
             fm_1hr, fm_10hr = fm_1_10(**fm_1_10_args)
-            location['fuelmoisture']['1_hr'] = fm_1hr
-            location['fuelmoisture']['10_hr'] = fm_10hr
+            location['fuelmoisture'][hr] = location['fuelmoisture'].get(hr, {})
+            location['fuelmoisture'][hr]['1_hr'] = fm_1hr
+            location['fuelmoisture'][hr]['10_hr'] = fm_10hr
 
 
 

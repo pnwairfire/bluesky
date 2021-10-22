@@ -71,4 +71,4 @@ def run(fires_manager):
                             raise
 
                     if use_defaults:
-                        fill_in_defaults(fire, loc)
+                        fill_in_defaults(fire, aa, loc)
