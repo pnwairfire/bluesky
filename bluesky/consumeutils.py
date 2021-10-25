@@ -80,7 +80,7 @@ def _apply_settings(fc, location, burn_type):
                 except:
                     pass
 
-        if value:
+        if value is not None:
             setattr(fc, field, value)
         elif 'default' in d:
             setattr(fc, field, d['default'])
