@@ -409,3 +409,7 @@
 
 ## 4.3.29
  - Fix bug in applying consume settings
+
+## 4.3.30
+ - Upgrade blueskykml to v4.0.4
+ - More flexibility in the format of `date_time` when writing/reading `date_time` to/from csv files
