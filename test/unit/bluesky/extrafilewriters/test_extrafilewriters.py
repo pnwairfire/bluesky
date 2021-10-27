@@ -17,7 +17,7 @@ class TestFormatDateTime(object):
         Config().set("%Y%m%d%H%M%z", 'extrafiles', 'firescsvs',
             'date_time_format')
         s = format_date_time("2015-08-04T18:00:00", "-06:00", 'firescsvs')
-        assert s == '201508041800-0600'
+        assert s == '201508041800-0600' # %z results in no colon
 
     def test_custom_date_time_missing_offset(self, reset_config):
         Config().set("%Y%m%d%H%M%z", 'extrafiles', 'firescsvs',
@@ -25,9 +25,15 @@ class TestFormatDateTime(object):
         s = format_date_time("2015-08-04T18:00:00", None, 'firescsvs')
         assert s == '201508041800'
 
+    def test_custom_date_time_with_utc_offset_wildcard_missing_offset(self, reset_config):
+        Config().set("%Y%m%d%H%M{utc_offset}", 'extrafiles', 'firescsvs',
+            'date_time_format')
+        s = format_date_time("2015-08-04T18:00:00", None, 'firescsvs')
+        assert s == '201508041800'
+
     def test_bsf_date_time(self, reset_config):
-        Config().set("%Y%m%d0000%z", 'extrafiles', 'firescsvs',
+        Config().set("%Y%m%d0000{utc_offset}", 'extrafiles', 'firescsvs',
             'date_time_format')
         s = format_date_time("2015-08-04T18:00:00", "-06:00", 'firescsvs')
-        assert s == '201508040000-0600'
+        assert s == '201508040000-06:00' # '{utc_offset}' results in whatever was in utc_offset field'
 

@@ -266,7 +266,9 @@ _DEFAULTS = {
         "dest_dir": None,
         "emissionscsv": {
             "filename": None,
-            "date_time_format": "%Y-%m-%dT%H:%M:%S%z"
+            # '{utc_offset}' results in whatever utc_offset was set to in
+            # the input data (which might or might not have a colon)
+            "date_time_format": "%Y-%m-%dT%H:%M:%S{utc_offset}"
         },
         "firescsvs": {
             "fire_locations_filename": "fire_locations.csv",

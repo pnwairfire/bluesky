@@ -234,7 +234,7 @@ class TestEmissionsCsvWriterWriteFire(object):
 
         expected_rows = [
             [
-                'SF11C14225236095807750', '0', '', '2015-08-04T17:00:00-0700',
+                'SF11C14225236095807750', '0', '', '2015-08-04T17:00:00-07:00',
                 # time profiles - area fract, flaming, smoldering, residual
                 0.1, 0.2, 0.1, 0.1,
                 4.5, '', '', '', '', '', '', '', '', # emissions - emitted (i.e. total)
@@ -247,7 +247,7 @@ class TestEmissionsCsvWriterWriteFire(object):
                 120, 130, 140, 150, 160, 170, 180, 190, 200, 210
             ],
             [
-                'SF11C14225236095807750', '1', '', '2015-08-04T18:00:00-0700',
+                'SF11C14225236095807750', '1', '', '2015-08-04T18:00:00-07:00',
                 # time profiles - area fract, flaming, smoldering, residual
                 0.3, 0.1, 0.4, 0.2,
                 7.0, '', '', '', '', '', '', '', '', # emissions - emitted (i.e. total)
@@ -260,7 +260,7 @@ class TestEmissionsCsvWriterWriteFire(object):
                 '', '', '', '', '', '', '', '', '', ''
             ],
             [
-                'SF11C14225236095807750', '0', '', '2015-08-05T17:00:00-0700',
+                'SF11C14225236095807750', '0', '', '2015-08-05T17:00:00-07:00',
                 # time profiles - area fract, flaming, smoldering, residual
                  0.3, 0.1, 0.4, 0.2,
                  70.0, '', '', '', '', '', '', '', '', # emissions - emitted (i.e. total)
@@ -277,12 +277,12 @@ class TestEmissionsCsvWriterWriteFire(object):
         assert self.writer.emissions_writer.rows == expected_rows
 
     def test_one_fire_two_points_one_with_emissions_custom_datetime_format(self, reset_config):
-        Config().set("%Y%m%d0000%z", 'extrafiles', 'emissionscsv', 'date_time_format')
+        Config().set("%Y%m%d0000{utc_offset}", 'extrafiles', 'emissionscsv', 'date_time_format')
         self.writer._write_fire(FIRE)
 
         expected_rows = [
             [
-                'SF11C14225236095807750', '0', '', '201508040000-0700',
+                'SF11C14225236095807750', '0', '', '201508040000-07:00',
                 # time profiles - area fract, flaming, smoldering, residual
                 0.1, 0.2, 0.1, 0.1,
                 4.5, '', '', '', '', '', '', '', '', # emissions - emitted (i.e. total)
@@ -295,7 +295,7 @@ class TestEmissionsCsvWriterWriteFire(object):
                 120, 130, 140, 150, 160, 170, 180, 190, 200, 210
             ],
             [
-                'SF11C14225236095807750', '1', '', '201508040000-0700',
+                'SF11C14225236095807750', '1', '', '201508040000-07:00',
                 # time profiles - area fract, flaming, smoldering, residual
                 0.3, 0.1, 0.4, 0.2,
                 7.0, '', '', '', '', '', '', '', '', # emissions - emitted (i.e. total)
@@ -308,7 +308,7 @@ class TestEmissionsCsvWriterWriteFire(object):
                 '', '', '', '', '', '', '', '', '', ''
             ],
             [
-                'SF11C14225236095807750', '0', '', '201508050000-0700',
+                'SF11C14225236095807750', '0', '', '201508050000-07:00',
                 # time profiles - area fract, flaming, smoldering, residual
                  0.3, 0.1, 0.4, 0.2,
                  70.0, '', '', '', '', '', '', '', '', # emissions - emitted (i.e. total)
