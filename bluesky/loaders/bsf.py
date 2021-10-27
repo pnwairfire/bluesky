@@ -262,9 +262,9 @@ class CsvFileLoader(BaseCsvFileLoader):
 
     ## 'date_time'
     DATE_TIME_MATCHERS = (
-        (re.compile('^(\d{12})(\d{2})?([+-]\d{2}\:\d{2})$'), "%Y%m%d%H%M"),
+        (re.compile('^(\d{12})(\d{2})?([+-]\d{2}\:?\d{2})$'), "%Y%m%d%H%M"),
         (re.compile('^(\d{12})(\d{2})?Z$'), "%Y%m%d%H%M"),
-        (re.compile('^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})([+-]\d{2}\:\d{2})$'),
+        (re.compile('^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3})([+-]\d{2}\:?\d{2})$'),
             "%Y-%m-%dT%H:%M:%S.%f")
     )
 
