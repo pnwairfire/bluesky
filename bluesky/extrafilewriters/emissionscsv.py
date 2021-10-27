@@ -10,8 +10,12 @@ Writes fire emissions csv file in the form:
 """
 
 import csv
+import datetime
 import logging
 import os
+
+import dateutil.tz
+from afdatetime import parsing as datetime_parsing
 
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
@@ -96,7 +100,7 @@ class EmissionsCsvWriter(object):
             "fire_id": fire.get('id', ''),
             "hour": str(i),
             "ignition_date_time": '', # TODO: fill in
-            "date_time": ts + str(utc_offset),
+            "date_time": self._format_date_time(loc, ts),
             "area_fract": tp['area_fraction'],
             "flame_profile": tp['flaming'],
             "smolder_profile": tp['smoldering'],
@@ -131,3 +135,13 @@ class EmissionsCsvWriter(object):
 
         self.emissions_writer.writerow(
             [row.get(k, '') for k in self.HEADERS])
+
+    def _format_date_time(sefl, loc, ts):
+        fmt = Config().get('extrafiles', 'emissionscsv', 'date_time_format')
+        #ts + str(utc_offset)
+        d = datetime_parsing.parse(ts)
+        if loc.get('utc_offset'):
+            utc_offset = datetime_parsing.parse_utc_offset(loc.get('utc_offset'))
+            d = datetime.datetime(d.year, d.month, d.day, d.hour, d.minute,
+                d.second, tzinfo=dateutil.tz.tzoffset(None, utc_offset*3600))
+        return d.strftime(fmt)

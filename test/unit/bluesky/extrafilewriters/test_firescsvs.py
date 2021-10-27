@@ -2,8 +2,11 @@
 
 __author__ = "Joel Dubowy"
 
+import copy
+
 from py.test import raises
 
+from bluesky.config import Config
 from bluesky.models.fires import Fire
 from bluesky.extrafilewriters import firescsvs
 
@@ -80,6 +83,61 @@ class TestFiresCsvsPickRepresentativeFuelbed(object):
             ]
         }
         assert "46" == firescsvs._pick_representative_fuelbed({}, g)
+
+
+class TestFiresCsvsFormatDatetime(object):
+
+    FIRE = Fire({
+        "activity": [
+            {
+                "active_areas": [
+                    {
+                        "start": "2015-08-04T18:00:00",
+                        "end": "2015-08-05T18:00:00",
+                        "utc_offset": "-06:00",
+                        "specified_points": [
+                            {
+                                "lat": 35.0,
+                                "lng": -96.2,
+                                "area": 99
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    })
+    LOC = FIRE['activity'][0]['active_areas'][0]['specified_points'][0]
+    FIRE_NO_OFFSET = copy.deepcopy(FIRE)
+    FIRE_NO_OFFSET['activity'][0]['active_areas'][0].pop('utc_offset')
+    LOC_NO_OFFSET = FIRE_NO_OFFSET['activity'][0]['active_areas'][0]['specified_points'][0]
+
+    def teardown(self):
+        # TODO: figure out why this is required, even with
+        #    'reset_config' in each test method's signature
+        Config().reset()
+
+    def test_default_date_time(self):
+        s = firescsvs._format_date_time(self.FIRE, self.LOC)
+        assert s == '20150804'
+
+    def test_custom_date_time(self, reset_config):
+        Config().set("%Y%m%d%H%M%z", 'extrafiles', 'firescsvs',
+            'date_time_format')
+        s = firescsvs._format_date_time(self.FIRE, self.LOC)
+        assert s == '201508041800-0600'
+
+    def test_custom_date_time_missing_offset(self, reset_config):
+        Config().set("%Y%m%d%H%M%z", 'extrafiles', 'firescsvs',
+            'date_time_format')
+        s = firescsvs._format_date_time(self.FIRE_NO_OFFSET, self.LOC_NO_OFFSET)
+        assert s == '201508041800'
+
+    def test_bsf_date_time(self, reset_config):
+        Config().set("%Y%m%d0000%z", 'extrafiles', 'firescsvs',
+            'date_time_format')
+        s = firescsvs._format_date_time(self.FIRE, self.LOC)
+        assert s == '201508040000-0600'
 
 
 class TestFiresCsvsWriterCollectCsvFields(object):

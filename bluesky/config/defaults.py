@@ -265,12 +265,13 @@ _DEFAULTS = {
         "sets": [],
         "dest_dir": None,
         "emissionscsv": {
-            "filename": None
+            "filename": None,
+            "date_time_format": "%Y-%m-%dT%H:%M:%S%z"
         },
         "firescsvs": {
             "fire_locations_filename": "fire_locations.csv",
-            "fire_events_filename": "fire_events.csv"
-
+            "fire_events_filename": "fire_events.csv",
+            "date_time_format": "%Y%m%d"
         },
         "smokeready": {
             # - PT filenames require datestamps
