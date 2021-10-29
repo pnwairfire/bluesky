@@ -414,5 +414,8 @@
  - Upgrade blueskykml to v4.0.4
  - More flexibility in the format of `date_time` when writing/reading `date_time` to/from csv files
 
-## 4.3.30
- - Minor tweak to configurability of formatting `date_time` when writing `date_time` to csv files (support '{utc_offset}' wildcard)
+## 4.3.31
+ - Minor tweak to configurability of formatting `date_time` when writing csv files (support '{utc_offset}' wildcard)
+
+## 4.3.32
+ - Fix bug in formatting `date_time` when writing csv files
