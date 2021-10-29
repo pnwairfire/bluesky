@@ -31,9 +31,16 @@ class TestFormatDateTime(object):
         s = format_date_time("2015-08-04T18:00:00", None, 'firescsvs')
         assert s == '201508041800'
 
-    def test_bsf_date_time(self, reset_config):
+    def test_custom_date_time_with_utc_offset_wildcard_w_offset(self, reset_config):
+        # this is bsf's custom format
         Config().set("%Y%m%d0000{utc_offset}", 'extrafiles', 'firescsvs',
             'date_time_format')
         s = format_date_time("2015-08-04T18:00:00", "-06:00", 'firescsvs')
         assert s == '201508040000-06:00' # '{utc_offset}' results in whatever was in utc_offset field'
+
+    def test_custom_date_time_with_utc_offset_wildcard_w_integer_offset(self, reset_config):
+        Config().set("%Y%m%d0000{utc_offset}", 'extrafiles', 'firescsvs',
+            'date_time_format')
+        s = format_date_time("2015-08-04T18:00:00", -6, 'firescsvs')
+        assert s == '201508040000-0600' # '{utc_offset}' results in whatever was in utc_offset field'
 
