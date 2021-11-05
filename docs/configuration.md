@@ -184,6 +184,16 @@ emissions config
 - ***'config' > 'emissions' > 'ubc-bsf-feps' > 'working_dir'*** -- *optional* --
 - ***'config' > 'emissions' > 'ubc-bsf-feps' > 'delete_working_dir_if_no_error'*** -- *optional* -- default true
 
+### growth
+
+ - ***'config' > 'growth' > 'model'*** -- *optional* -- growth model; currently, only 'persistence' is supported; default: 'persistence'
+
+#### If running persistence:
+
+ - ***'config' > 'growth' > 'persistence' > 'date_to_persist'*** -- *optional* -- default: whatever 'today' is set to
+ - ***'config' > 'growth' > 'persistence' > 'days_to_persist'*** -- *optional* -- default: 1
+ - ***'config' > 'growth' > 'persistence' > 'truncate'*** -- *optional* -- If there is activity after the date to persist, and if 'truncate' is set to true, all activity after the date to persist is deleted and replaced with persisted activity, otherwise it is left in place and the persistence module moves on to the next active area; default: false
+
 ### findmetdata
 
  - ***'config' > 'findmetdata' > 'met_root_dir'*** -- *required* --
