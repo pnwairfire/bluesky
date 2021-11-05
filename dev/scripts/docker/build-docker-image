@@ -88,6 +88,17 @@ def tag(tag_version):
     _call(['docker', 'tag', 'bluesky:{}'.format(tag_version), 'pnwairfire/bluesky:' + tag_version])
     return tag_version
 
+
+class docker_login_handler(object):
+    """Context handler that logs into docker on enter, and logs out on exit
+    """
+
+    def __enter__(self):
+        _call(['docker', 'login'])
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        _call(['docker', 'logout'])
+
 def upload(args, tag_version):
     def _prompt():
         sys.stdout.write('Upload to hub.docker.com?: [y/N]: ')
@@ -98,10 +109,10 @@ def upload(args, tag_version):
         sys.stdout.write("Pushing to docker hub.\n")
         # we want prompt to go to stdout, so that user knows to
         # enter usernameand password.
-        _call(['docker', 'login'])
-        _call(['docker', 'push', 'pnwairfire/bluesky:latest'])
-        _call(['docker', 'push', 'pnwairfire/bluesky:' + tag_version])
-        _call(['docker', 'logout'])
+        with docker_login_handler():
+            _call(['docker', 'push', 'pnwairfire/bluesky:latest'])
+            _call(['docker', 'push', 'pnwairfire/bluesky:' + tag_version])
+
 
 class tag_checkout_handler(object):
     """Context handler that
