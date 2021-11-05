@@ -190,7 +190,7 @@ emissions config
 
 #### If running persistence:
 
- - ***'config' > 'growth' > 'persistence' > 'date_to_persist'*** -- *optional* -- default: whatever 'today' is set to
+ - ***'config' > 'growth' > 'persistence' > 'date_to_persist'*** -- *optional* -- default: whatever 'today' is set to; note that active area dates, which are local, are compared to this date as is
  - ***'config' > 'growth' > 'persistence' > 'days_to_persist'*** -- *optional* -- default: 1
  - ***'config' > 'growth' > 'persistence' > 'truncate'*** -- *optional* -- If there is activity after the date to persist, and if 'truncate' is set to true, all activity after the date to persist is deleted and replaced with persisted activity, otherwise it is left in place and the persistence module moves on to the next active area; default: false
 
