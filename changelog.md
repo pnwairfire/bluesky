@@ -419,3 +419,7 @@
 
 ## 4.3.32
  - Fix bug in formatting `date_time` when writing csv files
+
+## 4.3.33
+ - Upgrade emitcalc to v3.0.1 and support option to include emissions factors in output data
+ - Dev script updates
