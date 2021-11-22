@@ -6,7 +6,7 @@ afdatetime==2.0.0
 afscripting==2.0.0
 geoutils==1.0.3
 eflookup==4.0.0
-emitcalc==3.0.0
+emitcalc==3.0.1
 fccsmap==3.0.0
 timeprofile==1.1.3
 met==3.0.2
