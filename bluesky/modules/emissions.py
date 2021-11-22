@@ -106,6 +106,8 @@ class EmissionsBase(object, metaclass=abc.ABCMeta):
         self.fire_failure_handler = fire_failure_handler
         self.include_emissions_details = Config().get(
             'emissions', 'include_emissions_details')
+        self.include_emissions_factors = Config().get(
+            'emissions', 'include_emissions_factors')
         self.species = Config().get('emissions', 'species')
 
     @abc.abstractmethod
@@ -200,7 +202,8 @@ class Feps(EmissionsBase):
                     if 'consumption' not in fb:
                         raise ValueError(
                             "Missing consumption data required for computing emissions")
-                    _calculate(self.calculator, fb, self.include_emissions_details)
+                    _calculate(self.calculator, fb, self.include_emissions_details,
+                        self.include_emissions_factors)
                     # TODO: Figure out if we should indeed convert from lbs to tons;
                     #   if so, uncomment the following
                     # Note: According to BSF, FEPS emissions are in lbs/ton consumed.  Since
@@ -253,7 +256,8 @@ class PrichardOneill(EmissionsBase):
                             "Missing FCCS Id required for computing emissions")
                     fccs2ef = Fccs2Ef(fb["fccs_id"], is_rx=(fire["type"]=="rx"))
                     calculator = EmissionsCalculator(fccs2ef, species=self.species)
-                    _calculate(calculator, fb, self.include_emissions_details)
+                    _calculate(calculator, fb, self.include_emissions_details,
+                        self.include_emissions_factors)
                     # Convert from lbs to tons
                     # TODO: Update EFs to be tons/ton in a) eflookup package,
                     #   b) just after instantiating look-up objects, above,
@@ -387,8 +391,11 @@ class Consume(EmissionsBase):
 ## Helpers
 ##
 
-def _calculate(calculator, fb, include_emissions_details):
+def _calculate(calculator, fb, include_emissions_details,
+        include_emissions_factors):
     emissions_details = calculator.calculate(fb["consumption"])
     fb['emissions'] = copy.deepcopy(emissions_details['summary']['total'])
     if include_emissions_details:
         fb['emissions_details'] = emissions_details
+    if include_emissions_factors:
+        fb['emissions_factors'] = calculator.emissions_factors
