@@ -13,7 +13,7 @@ import consume
 from emitcalc import __version__ as emitcalc_version
 from emitcalc.calculator import EmissionsCalculator
 from eflookup import __version__ as eflookup_version
-from eflookup.fccs2ef.lookup import Fccs2Ef
+from eflookup.fccs2ef.lookup import Fccs2SeraEf
 from eflookup.fepsef import FepsEFLookup
 from pyairfire import osutils
 
@@ -31,7 +31,7 @@ from bluesky.consumeutils import (
 __all__ = [
     'run'
 ]
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def run(fires_manager):
@@ -254,8 +254,8 @@ class PrichardOneill(EmissionsBase):
                     if 'fccs_id' not in fb:
                         raise ValueError(
                             "Missing FCCS Id required for computing emissions")
-                    fccs2ef = Fccs2Ef(fb["fccs_id"], is_rx=(fire["type"]=="rx"))
-                    calculator = EmissionsCalculator(fccs2ef, species=self.species)
+                    lookup = Fccs2SeraEf(fb["fccs_id"], is_rx=(fire["type"]=="rx"))
+                    calculator = EmissionsCalculator(lookup, species=self.species)
                     _calculate(calculator, fb, self.include_emissions_details,
                         self.include_emissions_factors)
                     # Convert from lbs to tons
