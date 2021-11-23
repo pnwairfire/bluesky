@@ -116,20 +116,20 @@ FIRES = [
                                         "fccs_id": "52",
                                         "pct": 100.0,
                                         "consumption": {
-                                            "foo": {
-                                                "bar": {
+                                            "canopy": {
+                                                "midstory": {
                                                     "smoldering": [0.0],
                                                     "residual": [200.4],
                                                     "flaming": [0.0]
                                                 },
-                                                "baz": {
+                                                "overstory": {
                                                     "smoldering": [900.5],
                                                     "residual": [800.0],
                                                     "flaming": [100.2]
                                                 }
                                             },
-                                            "boo": {
-                                                "blem": {
+                                            "ground fuels": {
+                                                "duff upper": {
                                                     "smoldering": [0.0],
                                                     "residual": [0.0],
                                                     "flaming": [200]
@@ -309,14 +309,14 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
 
     EXPECTED_FIRE1_EMISSIONS = {
         'flaming': {
-            'CH4': [1.4589720000000002],
-            'CO': [31.521],
-            'CO2': [479.7196],
-            'NH3': [0.45930600000000005],
-            'NOx': [0.6184120000000001],
-            'PM10': [6.223926520000001],
-            'PM2.5': [5.274514],
-            'SO2': [0.318212]
+            'CH4': [1.930682],
+            'CO': [59.412994],
+            'CO2': [440.824584],
+            'NH3': [0.617166],
+            'NOx': [0.283298],
+            'PM10': [10.408206520000002],
+            'PM2.5': [8.4127],
+            'SO2': [0.48727]
         },
         'residual': {
             'CH4': [0.0],
@@ -329,26 +329,26 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
             'SO2': [0.0]
         },
         'smoldering': {
-            'CH4': [4.37643],
-            'CO': [94.5525],
-            'CO2': [1438.999],
-            'NH3': [1.3777650000000001],
-            'NOx': [1.85503],
+            'CH4': [6.834795000000001],
+            'CO': [126.34015000000001],
+            'CO2': [1422.2497000000003],
+            'NH3': [1.56687],
+            'NOx': [0.9725400000000001],
             'PM10': [18.6697063],
-            'PM2.5': [15.821785],
-            'SO2': [0.9545300000000001]
+            'PM2.5': [18.055025],
+            'SO2': [1.557865]
         },
-        'total': {
-            'CH4': [5.835402],
-            'CO': [126.0735],
-            'CO2': [1918.7186000000002],
-            'NH3': [1.8370710000000001],
-            'NOx': [2.473442],
-            'PM10': [24.893632820000004],
-            'PM2.5': [21.096299],
-            'SO2': [1.2727420000000003]
+        'total': {'CH4': [8.765476999999999],
+            'CO': [185.753144],
+            'CO2': [1863.0742840000003],
+            'NH3': [2.1840360000000003],
+            'NOx': [1.2558380000000002],
+            'PM10': [29.077912820000005],
+            'PM2.5': [26.467725],
+            'SO2': [2.045135]
         }
     }
+
 
     SPECIES = ['CH4','CO','CO2','NH3','NOx','PM10','PM2.5','SO2','VOC']
 
@@ -384,8 +384,7 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
 class TestConsumeEmissions(BaseEmissionsTest):
 
     EXPECTED_FIRE1_EMISSIONS = {
-        'flaming': {
-            'CH4': array([0.64459607]),
+        'flaming': {'CH4': array([0.64459607]),
             'CO': array([15.11681762]),
             'CO2': array([314.34360837]),
             'NH3': array([0.15689582]),
@@ -399,8 +398,7 @@ class TestConsumeEmissions(BaseEmissionsTest):
             'PM2.5': array([2.55191994]),
             'SO2': array([0.25519199])
         },
-        'residual': {
-            'CH4': array([0.63597235]),
+        'residual': {'CH4': array([0.63597235]),
             'CO': array([11.75585251]),
             'CO2': array([132.33922632]),
             'NH3': array([0.14579603]),
@@ -412,10 +410,9 @@ class TestConsumeEmissions(BaseEmissionsTest):
             'PM': array([0.]),
             'PM10': array([1.86648667]),
             'PM2.5': array([1.68000601]),
-            'SO2': array([0.14495812])}
-        ,
-        'smoldering': {
-            'CH4': array([1.14446127]),
+            'SO2': array([0.14495812])
+        },
+        'smoldering': {'CH4': array([1.14446127]),
             'CO': array([21.15519317]),
             'CO2': array([238.15047817]),
             'NH3': array([0.26236662]),
@@ -429,8 +426,7 @@ class TestConsumeEmissions(BaseEmissionsTest):
             'PM2.5': array([3.02324749]),
             'SO2': array([0.26085876])
         },
-        'total': {
-            'CH4': array([2.42502969]),
+        'total': {'CH4': array([2.42502969]),
             'CO': array([48.0278633]),
             'CO2': array([684.83331286]),
             'NH3': array([0.56505847]),
@@ -442,7 +438,7 @@ class TestConsumeEmissions(BaseEmissionsTest):
             'PM': array([0.]),
             'PM10': array([8.06049769]),
             'PM2.5': array([7.25517344]),
-            'SO2': array([0.66100888])
+           'SO2': array([0.66100888])
         }
     }
 
@@ -510,7 +506,6 @@ class TestConsumeEmissions(BaseEmissionsTest):
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
-
         assert 'emissions_details' in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
             self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
