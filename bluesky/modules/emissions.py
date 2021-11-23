@@ -13,7 +13,7 @@ import consume
 from emitcalc import __version__ as emitcalc_version
 from emitcalc.calculator import EmissionsCalculator
 from eflookup import __version__ as eflookup_version
-from eflookup.fccs2ef.lookup import Fccs2SeraEf
+from eflookup.fccs2ef.lookup import Fccs2Ef, Fccs2SeraEf
 from eflookup.fepsef import FepsEFLookup
 from pyairfire import osutils
 
@@ -186,6 +186,7 @@ class Feps(EmissionsBase):
         if 'activity' not in fire:
             raise ValueError(
                 "Missing activity data required for computing emissions")
+
         for aa in fire.active_areas:
             for loc in aa.locations:
                 if 'fuelbeds' not in loc:
@@ -209,7 +210,6 @@ class Feps(EmissionsBase):
 ##
 ## Prichard / O'Neill
 ##
-
 
 class PrichardOneill(EmissionsBase):
 
@@ -239,7 +239,7 @@ class PrichardOneill(EmissionsBase):
                     if 'fccs_id' not in fb:
                         raise ValueError(
                             "Missing FCCS Id required for computing emissions")
-                    lookup = Fccs2SeraEf(fb["fccs_id"], is_rx=(fire["type"]=="rx"))
+                    lookup = self._get_lookup_object(fire, fb)
                     calculator = EmissionsCalculator(lookup, species=self.species)
                     _calculate(calculator, fb, self.include_emissions_details,
                         self.include_emissions_factors)
@@ -250,6 +250,20 @@ class PrichardOneill(EmissionsBase):
                     datautils.multiply_nested_data(fb['emissions'], self.CONVERSION_FACTOR)
                     if self.include_emissions_details:
                         datautils.multiply_nested_data(fb['emissions_details'], self.CONVERSION_FACTOR)
+
+    def _get_lookup_object(self, fire, fuelbed):
+        return Fccs2SeraEf(fuelbed["fccs_id"], is_rx=(fire["type"]=="rx"))
+
+
+##
+## Urbanski
+##
+
+class Urbanski(PrichardOneill):
+
+    def _get_lookup_object(self, fire, fuelbed):
+        return Fccs2Ef(fuelbed["fccs_id"], is_rx=(fire["type"]=="rx"))
+
 
 ##
 ## CONSUME
