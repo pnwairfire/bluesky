@@ -83,7 +83,6 @@ def run(fires_manager):
     if include_emissions_details:
         datautils.summarize_over_all_fires(fires_manager, 'emissions_details')
 
-
 def _fix_keys(emissions):
     for k in list(emissions.keys()):
         # in case someone spcifies custom EF's with 'PM25'
@@ -110,10 +109,18 @@ class EmissionsBase(object, metaclass=abc.ABCMeta):
             'emissions', 'include_emissions_factors')
         self.species = Config().get('emissions', 'species')
 
-    @abc.abstractmethod
     def run(self, fires):
-        pass
+        logging.info("Running emissions module %s EFs",
+            self.__class__.__name__)
 
+        for fire in fires:
+            with self.fire_failure_handler(fire):
+                self._run_on_fire(fire)
+
+
+    @abc.abstractmethod
+    def _run_on_fire(self, fire):
+        pass
 ##
 ## FEPS for Canadian Smartfire
 ##
@@ -126,13 +133,6 @@ class UbcBsfFeps(EmissionsBase):
         model = Config().get('emissions', 'model').lower()
         config = Config().get('emissions', model)
         self.emitter = UbcBsfFEPSEmissions(**config)
-
-    def run(self, fires):
-        logging.info("Running emissions module UbcBsfFeps EFs")
-
-        for fire in fires:
-            with self.fire_failure_handler(fire):
-                self._run_on_fire(fire)
 
     def _get_fire_working_dir(self, fire, working_dir):
         fire_working_dir = os.path.join(working_dir,
@@ -180,13 +180,6 @@ class Feps(EmissionsBase):
         self.calculator = EmissionsCalculator(FepsEFLookup(),
             species=self.species)
 
-    def run(self, fires):
-        logging.info("Running emissions module FEPS EFs")
-
-        for fire in fires:
-            with self.fire_failure_handler(fire):
-                self._run_on_fire(fire)
-
     CONVERSION_FACTOR = 0.0005 # 1.0 ton / 2000.0 lbs
 
     def _run_on_fire(self, fire):
@@ -222,14 +215,6 @@ class PrichardOneill(EmissionsBase):
 
     def __init__(self, fire_failure_handler):
         super(PrichardOneill, self).__init__(fire_failure_handler)
-
-    def run(self, fires):
-        logging.info("Running emissions module with Prichard / O'Neill EFs")
-
-        # Instantiate two lookup object, one Rx and one WF, to be reused
-        for fire in fires:
-            with self.fire_failure_handler(fire):
-                self._run_on_fire(fire)
 
     # Consumption values are in tons, Prichard/ONeill EFS are in g/kg, and
     # we want emissions values in tons.  Since 1 g/kg == 2 lbs/ton, we need
@@ -281,17 +266,6 @@ class Consume(EmissionsBase):
             or Config().get('consumption','fuel_loadings'))
         self.fuel_loadings_manager = FuelLoadingsManager(
             all_fuel_loadings=all_fuel_loadings)
-
-
-    def run(self, fires):
-        logging.info("Running emissions module with CONSUME")
-
-        # look for custom fuel loadings first in the emissions config and then
-        # in the consumption config
-
-        for fire in fires:
-            with self.fire_failure_handler(fire):
-                self._run_on_fire(fire)
 
     def _run_on_fire(self, fire):
         logging.debug("Consume emissions - fire {}".format(fire.get("id")))
