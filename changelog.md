@@ -423,3 +423,7 @@
 ## 4.3.33
  - Upgrade emitcalc to v3.0.1 and support option to include emissions factors in output data
  - Dev script updates
+
+## 4.3.34
+ - Upgrade eflookup to v4.0.2
+ - Switch to using latest (SERA) Prichard-O'Neill emissions factors
