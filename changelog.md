@@ -427,3 +427,6 @@
 ## 4.3.34
  - Upgrade eflookup to v4.0.2
  - Switch to using latest (SERA) Prichard-O'Neill emissions factors
+
+## 4.3.35
+ - Support '%Y%m%d' date_time format in bsf loader
