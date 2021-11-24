@@ -279,7 +279,8 @@ class FiresManager(object):
                 logging.debug("Loading input over http: %s", file_name)
                 return io.BytesIO(urllib.request.urlopen(file_name).read())
             else:
-                logging.debug("Loading local file: %s", file_name)
+                action = "Loading" if (not flag or flag.startswith('r')) else "Writing to"
+                logging.debug("%s local file: %s", action, file_name)
                 return open(file_name, flag)
         else:
             if flag.startswith('r'):
