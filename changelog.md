@@ -430,3 +430,6 @@
 
 ## 4.3.35
  - Support '%Y%m%d' date_time format in bsf loader
+
+## 4.3.36
+ - Upgrade eflookup to v4.0.3
