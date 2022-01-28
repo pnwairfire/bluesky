@@ -3,6 +3,7 @@
  - area - acres
  - consumption output - tons
  - emissions output - tons (all models, FEPS, CONSUME, Prichard-Oneill)
+ - heat output - BTUs
 
 
 ## Notes About Specific Modules
