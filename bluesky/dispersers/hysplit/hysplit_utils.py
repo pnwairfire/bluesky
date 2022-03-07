@@ -198,12 +198,16 @@ def ensure_tranch_has_dummy_fire(fires, model_start, num_hours, grid_params):
     # Adds a dummy fire to ensure that there's at least one fire within
     # the dispersion domain. We can skip this step if the tranch was already
     # assigned a dummy fire (i.e. which would only have happened if
-    # there were fewer fires than tranches)
+    # there were fewer fires than tranches). We also skip this step if
+    # configured that way.
+    if not config('ensure_dummy_fire'):
+        logging.debug("Not ensuring dummy fire per hysplit process")
 
-    if not any([f.get('is_dummy') for f in fires]):
+    elif not any([f.get('is_dummy') for f in fires]):
         logging.debug("Adding dummy fire for HYSPLIT process")
         f = generate_dummy_fire(model_start, num_hours, grid_params)
         fires.append(f)
+
     else:
         logging.debug("hysplit process already has dummy fire")
 

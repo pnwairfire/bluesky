@@ -286,7 +286,7 @@ emissions config
  - ***'config' > 'trajectories' > 'delete_working_dir_if_no_error'*** -- *optional* -- default true
  - ***'config' > 'trajectories' > 'handle_existing'*** -- *optional* -- "fail"
 
-#### if running hysplit dispersion:
+#### if running hysplit trajectories:
 
  - ***'config' > 'trajectories' > 'hysplit' > 'binary'*** -- *optional* -- default: 'hyts_std'
  - ***'config' > 'trajectories' > 'hysplit' > 'start_hours'*** -- *optional* -- default: [0]
@@ -339,6 +339,7 @@ emissions config
  - ***'config' > 'dispersion' > 'hysplit' > 'output_file_name'*** -- *optional* -- default: 'hysplit_conc.nc'
  - ***'config' > 'dispersion' > 'hysplit' > 'archive_tranche_files'*** -- *optional* -- copy hysplit input and output files for tranched runs from working dir to output dir; default: false
  - ***'config' > 'dispersion' > 'hysplit' > 'archive_pardump_files'*** -- *optional* -- copy hysplit pardump files to output dir; default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'ensure_dummy_fire'*** -- *optional* -- Ensure that each hysplit process has a dummy fire (at the center of the dispersion grid), to in turn ensure that there's at least one fire within the disperion met domain; Note that some processes may still have a dummy fire, specifically if tranching and there are fewer fires than tranches; default: true
 
 
  ####### Config settings adopted from BlueSky Framework

@@ -57,8 +57,8 @@ Other fields
 
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuelbeds'*** -- *required* -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'area'*** -- *required* -- fire's total area
- - ***['fires'] > ['activity'] > ['active_areas'] > 'ignition_start'*** -- *required* -- fire's total area
- - ***['fires'] > ['activity'] > ['active_areas'] > 'ignition_end'*** -- *required* -- fire's total area
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'ignition_start'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'ignition_end'*** -- *required* --
 
 
 The following can be defined either under 'specified_points' or 'perimeter'

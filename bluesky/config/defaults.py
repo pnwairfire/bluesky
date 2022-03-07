@@ -413,6 +413,8 @@ _DEFAULTS = {
             "archive_tranche_files": False,
             "archive_pardump_files": False,
 
+            "ensure_dummy_fire": True,
+
             "CONVERT_HYSPLIT2NETCDF": True,
             "output_file_name": "hysplit_conc.nc",
 
