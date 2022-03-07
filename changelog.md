@@ -433,3 +433,6 @@
 
 ## 4.3.36
  - Upgrade eflookup to v4.0.3
+
+## 4.3.37
+ - Allow addition of dummy fire to all hysplit processes to be turned off
