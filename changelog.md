@@ -436,3 +436,6 @@
 
 ## 4.3.37
  - Allow addition of dummy fire to all hysplit processes to be turned off
+
+## 4.3.38
+ - Add HYSPLIT v5.2 binaries
