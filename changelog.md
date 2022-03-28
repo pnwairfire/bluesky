@@ -439,3 +439,6 @@
 
 ## 4.3.38
  - Add HYSPLIT v5.2 binaries
+
+## 4.3.39
+ - Support custom emissions rate in hysplit
