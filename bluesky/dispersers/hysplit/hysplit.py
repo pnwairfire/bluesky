@@ -868,7 +868,7 @@ class HYSPLITDispersion(DispersionBase):
             # Pollutant ID (4 characters)
             f.write("PM25\n")
             # Emissions rate (per hour) (Ken's code says "Emissions source strength (mass per second)" -- which is right?)
-            f.write("0.001\n")
+            f.write("{}\n".format(self.config("EMISSIONS_RATE")))
             # Duration of emissions (hours)
             f.write(" %9.3f\n" % self._num_hours)
             # Source release start time (year, month, day, hour, minute)

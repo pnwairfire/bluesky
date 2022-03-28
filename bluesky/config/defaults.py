@@ -436,6 +436,9 @@ _DEFAULTS = {
             #                    or 12 (5 min).
             "SUBHOUR_EMISSIONS_REDUCTION_INTERVAL": 1,
 
+            # Emissions rate
+            "EMISSIONS_RATE": 0.001,
+
             # Method of vertical motion calculation in HYSPLIT
             # Choices: DATA, ISOB, ISEN, DENS, SIGMA, DIVERG, ETA
             "VERTICAL_METHOD": "DATA",
