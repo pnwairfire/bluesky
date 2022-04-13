@@ -48,7 +48,6 @@ You can also use the ```--collect-only``` option to see a list of all tests.
 See [pytest](http://pytest.org/latest/getting-started.html#getstarted) for more information about using pytest.
 
 
-
 ## Testing export emails
 
 For testing export emails, you can use something like the
@@ -60,3 +59,15 @@ an smtp server that you cah use to catch and thus test export emails.
 
     ./dev/scripts/bump-version
     git push && git push --tags
+
+
+## Profiling
+
+To see how much time is being spent in each function call, you can
+profile a run by using `bsp`'s `--profile-output-file` option.
+
+    docker run --rm -ti --user bluesky \
+        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
+        -e PYTHONPATH=/bluesky/ \
+        -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+        bluesky bsp --profile-output-file ...
