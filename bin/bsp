@@ -456,6 +456,8 @@ def main():
     try:
         fires_manager = setup(args)
         if args.profile_output_file:
+            args.profile_output_file = replace_wildcards(
+                args, args.profile_output_file)
             profile_run(fires_manager, args.profile_output_file)
         else:
             fires_manager.run()
