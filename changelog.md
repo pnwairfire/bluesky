@@ -442,3 +442,6 @@
 
 ## 4.3.39
  - Support custom emissions rate in hysplit
+
+## 4.3.40
+ - Add option --profile-output-file to optionally profile a run
