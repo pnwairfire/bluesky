@@ -10,11 +10,17 @@ Example calls:
 
 import datetime
 import fcntl
+import io
 import json
 import logging
 import os
 import sys
+import pstats
 import traceback
+try:
+    import cProfile as profile
+except:
+    import profile
 
 from afscripting import args as scripting_args
 from afscripting.utils import exit_with_msg
@@ -82,6 +88,11 @@ OPTIONAL_ARGS = [
         'long': '--indent',
         'help': 'Format output json with newlines and given indent',
         'type': int
+    },
+    {
+        'short': "-p",
+        'long': '--profile-output-file',
+        'help': "Profile run and print output to file"
     },
     {
         'short': "-C",
@@ -421,6 +432,21 @@ def exit_with_traceback(e):
     logging.debug(traceback.format_exc())
     exit_with_msg(e)
 
+def profile_run(fires_manager, profile_output_file):
+    # Note that cProfile supports using Profile as a context manager,
+    # but profile does not. So, we won't use it. Also, we want exceptions
+    # to raise to calling code
+    # TODO: support profiling even with failures
+    pr = profile.Profile()
+    pr.enable()
+    fires_manager.run()
+    pr.disable()
+    s = io.StringIO()
+    ps = pstats.Stats(pr, stream=s).sort_stats(pstats.SortKey.CUMULATIVE)
+    ps.print_stats()
+    with open(profile_output_file, 'w') as f:
+        f.write(s.getvalue())
+
 def main():
     args = parse_args()
 
@@ -429,8 +455,10 @@ def main():
 
     try:
         fires_manager = setup(args)
-
-        fires_manager.run()
+        if args.profile_output_file:
+            profile_run(fires_manager, args.profile_output_file)
+        else:
+            fires_manager.run()
 
     except exceptions.BlueSkyModuleError as e:
         # The error was added to fires_manager's meta data, and will be
