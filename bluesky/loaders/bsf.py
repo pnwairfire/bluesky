@@ -255,14 +255,14 @@ class CsvFileLoader(BaseCsvFileLoader):
             for bsf_key, bsp_key in self.EMISSIONS_KEYS.items():
                 emissions[bsp_key] = [(row.get(bsf_key) or 0.0) * area]
 
-            # Emissions need to be broken out into phases. Assign all to flaming
-            zero_emissions = {k: [0.0] for k in self.EMISSIONS_KEYS.values()}
-
+            # Allocate 70% to flaming, 20% to smoldering, and 10% to residual.
+            # Phase specific fractions vary from fuelbed to fuelbed, so
+            # this is a rough, generic average.
             self._emissions_values[fire["id"]] = {
                 "total": emissions,
-                "flaming": emissions,
-                "smoldering": zero_emissions,
-                "residual": zero_emissions
+                "flaming": {k: [0.7 * v[0]] for k, v in emissions.items()},
+                "smoldering": {k: [0.2 * v[0]] for k, v in emissions.items()},
+                "residual": {k: [0.1 * v[0]] for k, v in emissions.items()}
             }
 
 
