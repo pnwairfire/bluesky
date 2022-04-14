@@ -445,3 +445,7 @@
 
 ## 4.3.40
  - Add option --profile-output-file to optionally profile a run
+
+## 4.3.41
+ - Update default 1000hr and duff FM values, and add new litter FM defaults
+ - Use true litter FM value, not live FM, when running consume
