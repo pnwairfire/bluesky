@@ -143,7 +143,7 @@ class ConsumeSettingFromFuelMoisture(ConsumeSettingFromOtherData):
         return self._get_mean('duff')
 
     def _get_fuel_moisture_litter_pct(self):
-        return self._get_mean('live')
+        return self._get_mean('litter')
 
 
 class FuelLoadingsManager(object):
