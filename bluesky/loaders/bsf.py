@@ -194,24 +194,23 @@ class CsvFileLoader(BaseCsvFileLoader):
         # Add consumption data if present and flag active.
         # This was implemented for the Canadian version of the SmartFire system.
         # It is important to note that this consumption marshalling was done with only the Canadian format
-        # in mind. If consumption is added to the input of the US system, further changes maybe required.
+        # in mind. If consumption is added to the input of the US system, further changes may be required.
         if self._load_consumption:
             flaming = 0
             smold = 0
             resid = 0
             duff = 0
 
-            if row.get("consumption_flaming") is not None:
+            if row.get("consumption_flaming") not in (None, ''):
                 flaming = get_optional_float(row.get("consumption_flaming"))
-            if row.get("consumption_smoldering") is not None:
+            if row.get("consumption_smoldering") not in (None, ''):
                 smold = get_optional_float(row.get("consumption_smoldering"))
-            if row.get("consumption_residual") is not None:
+            if row.get("consumption_residual") not in (None, ''):
                 resid = get_optional_float(row.get("consumption_residual"))
-            if row.get("consumption_duff") is not None:
+            if row.get("consumption_duff") not in (None, ''):
                 duff = get_optional_float(row.get("consumption_duff"))
 
             total_cons = flaming + smold + resid + duff
-
 
             area = sp.get('area') or 1
             consumption = {
