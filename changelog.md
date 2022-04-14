@@ -449,3 +449,6 @@
 ## 4.3.41
  - Update default 1000hr and duff FM values, and add new litter FM defaults
  - Use true litter FM value, not live FM, when running consume
+
+## 4.3.42
+ - Update BSF loader to support optionally loading emissions data
