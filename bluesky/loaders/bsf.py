@@ -87,7 +87,8 @@ LOCATION_FIELDS = [
 #   sf_stream_name, timezone
 #
 #   consumption_flaming, consumption_smoldering,
-#   consumption_residual, consumption_duff
+#   consumption_residual, consumption_duff,
+#   pm25,pm10,co,co2,ch4,nox,nh3,so2,voc
 #   are handled below
 
 class CsvFileLoader(BaseCsvFileLoader):
@@ -97,6 +98,7 @@ class CsvFileLoader(BaseCsvFileLoader):
         self._omit_nulls = config.get('omit_nulls')
         self._timeprofile_file = config.get('timeprofile_file')
         self._load_consumption = config.get('load_consumption')
+        self._load_emissions = config.get('load_emissions')
 
 
     def _marshal(self, data):
@@ -104,6 +106,7 @@ class CsvFileLoader(BaseCsvFileLoader):
 
         fires = {}
         self._consumption_values = {}
+        self._emissions_values = {}
 
         for row in data:
             with skip_failures(self._skip_failures):
@@ -192,6 +195,7 @@ class CsvFileLoader(BaseCsvFileLoader):
             fire["type"] = row["type"].lower()
 
         self._process_consumption_values(row, fire, sp)
+        self._process_emissions_values(row, fire, sp)
 
         # TODO: other marshaling
 
@@ -231,6 +235,38 @@ class CsvFileLoader(BaseCsvFileLoader):
 
             self._consumption_values[fire["id"]] = consumption
 
+    EMISSIONS_KEYS = {
+        'pm25': 'PM2.5',
+        'pm10': 'PM10',
+        'co': 'CO',
+        'co2': 'CO2',
+        'ch4': 'CH4',
+        'nox': 'NOx',
+        'nh3': 'NH3',
+        'so2': 'SO2',
+        'voc': 'VOC'
+    }
+
+    def _process_emissions_values(self, row, fire, sp):
+
+        if self._load_emissions:
+            area = sp.get('area') or 1
+            emissions = {}
+            for bsf_key, bsp_key in self.EMISSIONS_KEYS.items():
+                emissions[bsp_key] = [(row.get(bsf_key) or 0.0) * area]
+
+            # Emissions need to be broken out into phases. Assign all to flaming
+            zero_emissions = {k: [0.0] for k in self.EMISSIONS_KEYS.values()}
+
+            self._emissions_values[fire["id"]] = {
+                "total": emissions,
+                "flaming": emissions,
+                "smoldering": zero_emissions,
+                "residual": zero_emissions
+            }
+
+
+
     def _post_process_activity(self, fire):
         event_id = fire.get("event_of", {}).get("id")
         fire["activity"] = []
@@ -250,11 +286,19 @@ class CsvFileLoader(BaseCsvFileLoader):
                 })
                 if event_id and (start in self._timeprofile[event_id]):
                     fire['activity'][-1]["active_areas"][0]["timeprofile"] = self._timeprofile[event_id][start]
+
         # Again this is for the Canadian addition. Assumes one location per fire.
-        # TODO: Add check to see if fuelbed initialized.
-        if fire["id"] in self._consumption_values:
-            fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["fuelbeds"] = [{}]
-            fire["activity"][-1]["active_areas"][0]["specified_points"][-1]["fuelbeds"][0]["consumption"] = self._consumption_values[fire["id"]]
+        if (fire["id"] in self._consumption_values
+                or fire["id"] in self._emissions_values):
+            sp = fire["activity"][-1]["active_areas"][0]["specified_points"][-1]
+            if not sp.get('fuelbeds'):
+                sp['fuelbeds'] = [{}]
+
+            if fire["id"] in self._consumption_values:
+                sp["fuelbeds"][0]["consumption"] = self._consumption_values[fire["id"]]
+
+            if fire["id"] in self._emissions_values:
+                sp["fuelbeds"][0]["emissions"] = self._emissions_values[fire["id"]]
 
 
     # Note: Although 'timezone' (a numberical value) is defined alongsite

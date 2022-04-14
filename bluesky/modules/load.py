@@ -69,8 +69,11 @@ def run(fires_manager):
                 loaded_fires = _load_source(source)
                 fires_manager.add_fires(loaded_fires)
                 # TODO: add fires to fires_manager
-                if source.get("name").lower() == "bsf" and source.get("load_consumption"):
-                    datautils.summarize_all_levels(fires_manager, 'consumption')
+                if source.get("name").lower() == "bsf":
+                    if source.get("load_consumption"):
+                        datautils.summarize_all_levels(fires_manager, 'consumption')
+                    if source.get("load_emissions"):
+                        datautils.summarize_all_levels(fires_manager, 'emissions')
                 successfully_loaded_sources.append(source)
             except:
                 # Let skip_failed_sources be defined at top level

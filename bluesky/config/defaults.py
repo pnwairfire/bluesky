@@ -42,6 +42,7 @@ _DEFAULTS = {
         #  "omit_nulls"
         #  "timeprofile_file"
         #  "load_consumption"
+        #  "load_emissions"
         # File Sourcees
         #  'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)
         #  'events_file'*** -- *optional* for each file type source-- file containing fire events data; e.g. '/path/to/fire_events.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.)

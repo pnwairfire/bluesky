@@ -67,6 +67,7 @@ configuration json data are case-insensitive.***
  - ***'config' > 'load' > 'sources' > 'omit_nulls'*** -- don't include fire data keys with null/None values
  - ***'config' > 'load' > 'sources' > 'timeprofile_file'*** -- *optional*
  - ***'config' > 'load' > 'sources' > 'load_consumption'*** -- *optional*
+ - ***'config' > 'load' > 'sources' > 'load_emissions'*** -- *optional*
 
 #### if type 'file':
 
