@@ -191,6 +191,14 @@ class CsvFileLoader(BaseCsvFileLoader):
         if row.get("type"):
             fire["type"] = row["type"].lower()
 
+        self._process_consumption_values(row, fire, sp)
+
+        # TODO: other marshaling
+
+        return fire
+
+    def _process_consumption_values(self, row, fire, sp):
+
         # Add consumption data if present and flag active.
         # This was implemented for the Canadian version of the SmartFire system.
         # It is important to note that this consumption marshalling was done with only the Canadian format
@@ -222,10 +230,6 @@ class CsvFileLoader(BaseCsvFileLoader):
             }
 
             self._consumption_values[fire["id"]] = consumption
-
-        # TODO: other marshaling
-
-        return fire
 
     def _post_process_activity(self, fire):
         event_id = fire.get("event_of", {}).get("id")
