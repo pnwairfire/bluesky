@@ -452,3 +452,6 @@
 
 ## 4.3.42
  - Update BSF loader to support optionally loading emissions data
+
+## 4.3.43
+ - Allocate 70% of BSF loaded emissions to flaming, 20% to smoldering, and 10% to residual
