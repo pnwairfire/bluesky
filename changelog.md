@@ -455,3 +455,7 @@
 
 ## 4.3.43
  - Allocate 70% of BSF loaded emissions to flaming, 20% to smoldering, and 10% to residual
+
+## 4.3.44
+ - Don't persist fires of type 'unknown'
+ - List 'unknown' instead of 'WF' in fire_locations.csv if type is unknown
