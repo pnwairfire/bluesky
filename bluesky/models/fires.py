@@ -172,6 +172,10 @@ class Fire(dict):
     def is_wildfire(self):
         return self.type == 'wildfire' or self.type == 'wf'
 
+    @property
+    def is_rx(self):
+        return self.type == 'rx'
+
     VALID_FUEL_TYPES = ('natural', 'activity', 'piles')
     INVALID_FUEL_TYPE_MSG = "Invalid fire 'fuel_type': {}"
 

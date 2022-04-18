@@ -6,6 +6,7 @@ __version__ = "0.1.0"
 
 import copy
 import datetime
+import logging
 
 from afdatetime.parsing import parse as parse_dt
 
@@ -46,10 +47,12 @@ class Grower(GrowerBase):
             return
 
         # TODO: figure out how to actually specify the following
-        if fire.get('type', 'wf').lower() == 'rx':
+        if fire.is_rx:
             self._fill_in_rx(fire)
-        else:
+        elif fire.is_wf:
             self._fill_in_wf(fire)
+        else:
+            logging.debug(f'Not persisting type {fire.type}')
 
     def _fill_in_rx(self, fire):
         # do anything?
