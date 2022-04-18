@@ -49,7 +49,7 @@ class Grower(GrowerBase):
         # TODO: figure out how to actually specify the following
         if fire.is_rx:
             self._fill_in_rx(fire)
-        elif fire.is_wf:
+        elif fire.is_wildfire:
             self._fill_in_wf(fire)
         else:
             logging.debug(f'Not persisting type {fire.type}')
