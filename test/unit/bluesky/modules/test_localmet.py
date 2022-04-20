@@ -90,18 +90,30 @@ def monkeypatch_arl_profiler(monkeypatch):
 
 class TestLocalMetRun(object):
 
-    def test_no_met(self, reset_config, monkeypatch):
+    def test_no_met_no_skip_failures(self, reset_config, monkeypatch):
         monkeypatch_arl_profiler(monkeypatch)
 
         fm = FiresManager()
         fm.load({
             "fires": [FIRE]
         })
+        Config().set(False, 'localmet', 'skip_failures')
         with raises(ValueError) as e_info:
             localmet.run(fm)
         assert e_info.value.args[0] == localmet.NO_MET_ERROR_MSG
 
-    def test_fire_no_activity(self, reset_config, monkeypatch):
+    def test_no_met_skip_failures(self, reset_config, monkeypatch):
+        monkeypatch_arl_profiler(monkeypatch)
+
+        fm = FiresManager()
+        fm.load({
+            "fires": [FIRE]
+        })
+        localmet.run(fm)
+        assert _ARLP_ARGS == _ARLP_KWARGS == _ARLP_PROFILE_CALL_ARGS == None
+
+
+    def test_fire_no_activity_no_skip_failures(self, reset_config, monkeypatch):
         Config().set(False, 'skip_failed_fires')
         monkeypatch_arl_profiler(monkeypatch)
 
@@ -110,9 +122,23 @@ class TestLocalMetRun(object):
         fm.load({
             "fires": [FIRE_NO_ACTIVITY]
         })
+        Config().set(False, 'localmet', 'skip_failures')
         with raises(ValueError) as e_info:
             localmet.run(fm)
         assert e_info.value.args[0] == localmet.NO_ACTIVITY_ERROR_MSG
+
+    def test_fire_no_activity_skip_failures(self, reset_config, monkeypatch):
+        Config().set(False, 'skip_failed_fires')
+        monkeypatch_arl_profiler(monkeypatch)
+
+        fm = FiresManager()
+        fm.met = MET_INFO
+        fm.load({
+            "fires": [FIRE_NO_ACTIVITY]
+        })
+        Config().set(True, 'localmet', 'skip_failures')
+        localmet.run(fm)
+        assert _ARLP_ARGS == _ARLP_KWARGS == _ARLP_PROFILE_CALL_ARGS == None
 
     def test_no_fires(self, reset_config, monkeypatch):
         monkeypatch_arl_profiler(monkeypatch)
