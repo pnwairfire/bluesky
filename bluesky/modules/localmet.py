@@ -17,6 +17,7 @@ from met.arl import arlprofiler
 
 from bluesky.config import Config
 from bluesky.datetimeutils import parse_datetimes, parse_utc_offset
+from bluesky.exceptions import skip_failures
 from bluesky.locationutils import LatLng
 
 __all__ = [
@@ -38,15 +39,16 @@ def run(fires_manager):
      - fires_manager -- bluesky.models.fires.FiresManager object
     """
     fires_manager.processed(__name__, __version__)
-    if not fires_manager.met:
-        raise ValueError(NO_MET_ERROR_MSG)
 
-    if not fires_manager.fires:
-        logging.warning("No fires to run localmet")
-        return
+    with skip_failures(Config().get('localmet', 'skip_failures')):
+        if not fires_manager.met or not fires_manager.met.get('files'):
+            raise ValueError(NO_MET_ERROR_MSG)
 
+        if not fires_manager.fires:
+            logging.warning("No fires to run localmet")
+            return
 
-    LocalmetRunner(fires_manager).run()
+        LocalmetRunner(fires_manager).run()
 
     # fires_manager.summarize(...)
 
@@ -94,19 +96,10 @@ class LocalmetRunner(object):
         logging.debug("Extracting localmet data for %d locations",
             len(self._profiler_locations))
 
-        try:
-            localmet = arl_profiler.profile(
-                self._start_utc, self._end_utc, self._profiler_locations)
-        except Exception as e:
-            logging.error(f"Failed to extract localmet info: {e}")
-            if self._skip_failures:
-                return
-            raise
+        localmet = arl_profiler.profile(
+            self._start_utc, self._end_utc, self._profiler_locations)
 
         if len(localmet) != len(self._locations):
-            logging.error(PROFILER_RUN_ERROR_MSG)
-            if self._skip_failures:
-                return
             raise RuntimeError(PROFILER_RUN_ERROR_MSG)
 
         for i in range(len(localmet)):
