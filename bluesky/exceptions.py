@@ -3,6 +3,9 @@
 Defines exception classes to let calling code handle errors differently
 """
 
+import logging
+import traceback
+
 __author__ = "Joel Dubowy"
 
 __all__ = [
@@ -44,3 +47,23 @@ class BlueSkyUnavailableResourceError(ValueError):
 
 class BlueSkySubprocessError(RuntimeError):
     pass
+
+
+class skip_failures(object):
+    """Context manager that, if enabled, suppresses exceptions and
+    logs the error, allowing run to continue.
+    """
+
+    def __init__(self, enabled):
+        self._enabled = enabled
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, e_type, value, tb):
+        if e_type:
+            if self._enabled:
+                logging.warn("Skipping failure: %s", value)
+                return True
+
+            logging.debug(traceback.format_exc())

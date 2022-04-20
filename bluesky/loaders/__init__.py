@@ -30,7 +30,7 @@ from pyairfire.io import CSV2JSON
 from bluesky import datetimeutils
 from bluesky.datetimeutils import parse_datetime, parse_utc_offset
 from bluesky.exceptions import (
-    BlueSkyConfigurationError, BlueSkyUnavailableResourceError
+    BlueSkyConfigurationError, BlueSkyUnavailableResourceError, skip_failures
 )
 from bluesky.models.fires import Fire
 
@@ -40,23 +40,6 @@ __all__ = [
     'BaseApiLoader',
     'BaseFileLoader'
 ]
-
-class skip_failures(object):
-
-    def __init__(self, enabled):
-        self._enabled = enabled
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, e_type, value, tb):
-        if e_type:
-            if self._enabled:
-                logging.warning("Failed to load fire: %s", str(value))
-                return True
-
-            logging.debug(traceback.format_exc())
-
 
 
 class BaseLoader(object):
