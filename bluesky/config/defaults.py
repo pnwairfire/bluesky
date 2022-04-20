@@ -214,7 +214,8 @@ _DEFAULTS = {
             "accepted_forecasts": None,
             "index_filename_pattern": "arl12hrindex.csv",
             "max_days_out": 4
-        }
+        },
+        "skip_failures": False
     },
     "localmet": {
         # The following default is defined in the met package,

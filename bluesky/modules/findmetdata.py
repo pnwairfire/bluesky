@@ -17,7 +17,8 @@ from bluesky.datetimeutils import (
     parse_datetimes, is_round_hour, parse_utc_offset, to_datetime
 )
 from bluesky.exceptions import (
-    BlueSkyConfigurationError, BlueSkyUnavailableResourceError
+    BlueSkyConfigurationError, BlueSkyUnavailableResourceError,
+    skip_failures
 )
 
 __all__ = [
@@ -57,7 +58,8 @@ def run(fires_manager):
 
         return files
 
-    fires_manager.met = {"files": _find()}
+    with skip_failures(Config().get('findmetdata','skip_failures')):
+        fires_manager.met = {"files": _find()}
 
 
 def _get_met_root_dir(fires_manager):
