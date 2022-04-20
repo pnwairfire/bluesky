@@ -459,3 +459,7 @@
 ## 4.3.44
  - Don't persist fires of type 'unknown'
  - List 'unknown' instead of 'WF' in fire_locations.csv if type is unknown
+
+## 4.3.45
+ - Tweak failure skipping logic in localmet
+ - Add support to skip failures in findmetdata
