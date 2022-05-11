@@ -45,4 +45,4 @@ def run(fires_manager):
         raise BlueSkyConfigurationError(
             "Invalid growth module: {}".format(model))
 
-    getattr(growth_module, 'Grower')().grow(fires_manager)
+    getattr(growth_module, 'Grower')(fires_manager).grow()

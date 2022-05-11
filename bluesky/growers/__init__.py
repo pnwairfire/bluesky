@@ -8,11 +8,12 @@ from bluesky.config import Config
 
 class GrowerBase(object):
 
-    def __init__(self):
+    def __init__(self, fires_manager):
         self._model = self.__class__.__module__.split('.')[-1]
+        self._fires_manager = fires_manager
 
-    def config(self, *keys):
-        return Config().get('growth', self._model, *keys)
+    def config(self, *keys, **kwargs):
+        return Config().get('growth', self._model, *keys, **kwargs)
 
 
 def to_date(dt):

@@ -193,7 +193,9 @@ _DEFAULTS = {
         "persistence": {
             "date_to_persist": None, # will default to 'today'
             "days_to_persist": 1,
-            "truncate": False
+            "truncate": False,
+            "start_day": None,
+            "end_day": None
         }
     },
     "findmetdata": {

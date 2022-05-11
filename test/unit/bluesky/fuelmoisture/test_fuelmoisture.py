@@ -1,4 +1,4 @@
-"""Unit tests for bluesky.models.fires"""
+"""Unit tests for bluesky.fuelmoisture"""
 
 __author__ = "Joel Dubowy"
 

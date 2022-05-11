@@ -16,31 +16,89 @@ from . import GrowerBase, to_date
 
 
 DAYS_TO_PERSIST_NOT_INT = "'days_to_persist' must be a positive integer"
+INVALID_CONFIG = "Invalid persistence configuration ('config' > 'persistence')"
+EMPTY_CONFIG_LIST = "Don't specify empty list of persistence config sets"
+INVALID_START_END_DAY = "Invalid start/end day string: '{day_str}'"
 
 class Grower(GrowerBase):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, fires_manager):
+        super().__init__(fires_manager) # sets self._fires_manager
 
-        # Note: set date to persist in grow(), since we need fires_manager
-        # to set default to the run's 'today'
+        self._set_config()
 
-        # cast to int in case it was specified as string in config file or on
-        # command line (really, no excuse for this, since you can use -I option)
-        self._days_to_persist = int(self.config('days_to_persist'))
-        if self._days_to_persist <= 0:
-            raise BlueSkyConfigurationError(DAYS_TO_PERSIST_NOT_INT)
+    ##
+    ## Configuration related helpers
+    ##
 
-        self._truncate = self.config('truncate')
+    def _set_config(self):
 
-    def grow(self, fires_manager):
+        if isinstance(self.config(), dict):
+            self._select_config([self.config()])
 
-        self._date_to_persist = (to_date(self.config('date_to_persist'))
-            or fires_manager.today.date())
+        elif isinstance(self.config(), list):
+            self._select_config(self.config())
 
-        for fire in fires_manager.fires:
-            with fires_manager.fire_failure_handler(fire):
-                self._grow_fire(fire)
+        else:
+            raise BlueSkyConfigurationError(INVALID_CONFIG)
+
+    def _select_config(self, configs):
+        if len(configs) == 0:
+            raise BlueSkyConfigurationError(EMPTY_CONFIG_LIST)
+
+        # Find first matching set of config params
+        for c in configs:
+            dtp = (to_date(c.get('date_to_persist'))
+                or fires_manager.today.date())
+            start_day = self._parse_start_end_day(c.get('start_day'), dtp)
+            end_day = self._parse_start_end_day(c.get('start_day'), dtp)
+            if ((not start_day or start_day <= dtp)
+                    and (not end_day or dtp <= end_day)):
+
+                self._date_to_persist = dtp
+
+                # cast to int in case it was specified as string in config file or on
+                # command line (really, no excuse for this, since you can use -I option)
+                self._days_to_persist = int(c.get('days_to_persist') or 1)
+                if self._days_to_persist <= 0:
+                    raise BlueSkyConfigurationError(DAYS_TO_PERSIST_NOT_INT)
+
+                self._truncate = not not c.get('truncate')
+
+                return
+
+    SUPPORT_START_END_DAY_FORMATS = [
+        '%m-%d', '%b %d', '%b-%d', '%B %d', '%B-%d', '%j'
+    ]
+    def _parse_start_end_day(self, day_str, date_to_persist):
+        if day_str:
+            # cast to string in case day was specified as integer day of year
+            day_str = str(day_str)
+
+            try:
+                day = parse_dt(day_str, "%m-%d",
+                    extra_formats=self.SUPPORT_START_END_DAY_FORMATS)
+                return day.replace(year=date_to_persist.year)
+            except ValueError as e:
+                raise BlueSkyConfigurationError(
+                    INVALID_START_END_DAY.format(day_str=day_str))
+
+    ##
+    ## Public API
+    ##
+
+    def grow(self):
+        if self._date_to_persist:
+            for fire in self._fires_manager.fires:
+                with self._fires_manager.fire_failure_handler(fire):
+                    self._grow_fire(fire)
+        else:
+            logging.warn("Skipping persistence - date to persist outside"
+                " of configured time windows")
+
+    ##
+    ## Helpers for grow
+    ##
 
     def _grow_fire(self, fire):
         if not any([a.get('active_areas') for a in fire.get('activity', [])]):
