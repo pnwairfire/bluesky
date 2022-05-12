@@ -59,7 +59,7 @@ class Grower(GrowerBase):
 
                 # cast to int in case it was specified as string in config file or on
                 # command line (really, no excuse for this, since you can use -I option)
-                self._days_to_persist = int(c.get('days_to_persist') or 1)
+                self._days_to_persist = int(c.get('days_to_persist', 1))
                 if self._days_to_persist <= 0:
                     raise BlueSkyConfigurationError(DAYS_TO_PERSIST_NOT_INT)
 
