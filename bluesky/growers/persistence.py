@@ -176,5 +176,11 @@ class Grower(GrowerBase):
         # keys within for loop
         for f in fields:
             for k in list(d.get(f, {})):
-                new_k = (parse_dt(k) + t_diff).strftime('%Y-%m-%dT%H:%M:%S')
+                new_k = (parse_dt(k) + t_diff)
+
+                # if string, keep as string; if datetime.date object
+                # (which includes datetime.datetime), keep as datetime.date
+                if not isinstance(k, datetime.date):
+                    new_k = new_k.strftime('%Y-%m-%dT%H:%M:%S')
+
                 d[f][new_k] = d[f].pop(k)
