@@ -163,6 +163,8 @@ class Grower(GrowerBase):
                     self._add_time_diff_to_keys(aa, t_diff, ('timeprofile',))
                     for l in aa.locations:
                         self._add_time_diff_to_keys(l, t_diff, ('plumerise',))
+                        self._add_time_diff_to_keys(l, t_diff, ('timeprofile',))
+                        self._add_time_diff_to_keys(l, t_diff, ('hourly_frp',))
 
                 persisted_activity.append(a)
 
