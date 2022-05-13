@@ -463,3 +463,10 @@
 ## 4.3.45
  - Tweak failure skipping logic in localmet
  - Add support to skip failures in findmetdata
+
+## 4.3.46
+ - Updates to persistence growth module
+   - Added support for different configurations based on time of year
+   - Added support for daily percentages, to allow activity to trail off
+   - Added unit tests
+   - Other minor updates
