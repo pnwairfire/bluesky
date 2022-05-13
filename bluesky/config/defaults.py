@@ -192,7 +192,9 @@ _DEFAULTS = {
         "model": "persistence",
         "persistence": {
             "date_to_persist": None, # will default to 'today'
-            "days_to_persist": 1,
+            # 'days_to_persist' and 'percentages' can't both be specified
+            "days_to_persist": None, # will default to 1 if daily_percentages isn't specified either
+            "daily_percentages": None,
             "truncate": False,
             "start_day": None,
             "end_day": None

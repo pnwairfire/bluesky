@@ -10,15 +10,18 @@ import logging
 
 from afdatetime.parsing import parse as parse_dt
 
+from bluesky import datautils
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.config import Config
 from . import GrowerBase, to_date
 
 
-DAYS_TO_PERSIST_NOT_INT = "'days_to_persist' must be a positive integer"
+DAYS_TO_PERSIST_NOT_POS_INT = "'days_to_persist' must be a positive integer"
 INVALID_CONFIG = "Invalid persistence configuration ('config' > 'persistence')"
 EMPTY_CONFIG_LIST = "Don't specify empty list of persistence config sets"
 INVALID_START_END_DAY = "Invalid start/end day string: '{day_str}'"
+DAYS_TO_PERSIST_AND_PERCENTAGES_BOTH_SPECIFIED = "Specify 'days_to_persist' or 'daily_percentages', but not both"
+INVALID_DAILY_PERCENTAGES = "'daily_percentages', should be an array of percentage values"
 
 class Grower(GrowerBase):
 
@@ -43,11 +46,16 @@ class Grower(GrowerBase):
             raise BlueSkyConfigurationError(INVALID_CONFIG)
 
     def _select_config(self, configs):
+        # TODO: self._days_to_persist is redundant now that we have
+        #   self._daily_precentages, so we may eventually remove it
+
+
         if len(configs) == 0:
             raise BlueSkyConfigurationError(EMPTY_CONFIG_LIST)
 
         self._date_to_persist = None
         self._days_to_persist = 1
+        self._daily_percentages = [100]
         self._truncate = False
 
         # Find first matching set of config params
@@ -61,11 +69,26 @@ class Grower(GrowerBase):
 
                 self._date_to_persist = dtp
 
-                # cast to int in case it was specified as string in config file or on
-                # command line (really, no excuse for this, since you can use -I option)
-                self._days_to_persist = int(c.get('days_to_persist', 1))
-                if self._days_to_persist <= 0:
-                    raise BlueSkyConfigurationError(DAYS_TO_PERSIST_NOT_INT)
+                if c.get('days_to_persist') is not None and c.get('daily_percentages') is not None:
+                    raise BlueSkyConfigurationError(DAYS_TO_PERSIST_AND_PERCENTAGES_BOTH_SPECIFIED)
+
+                if c.get('daily_percentages'):
+                    if not isinstance(c['daily_percentages'], list):
+                        raise BlueSkyConfigurationError(INVALID_DAILY_PERCENTAGES)
+
+                    # TODO: make sure each value is numeric
+                    self._daily_percentages = c['daily_percentages']
+                    self._days_to_persist = len(c['daily_percentages'])
+
+                else:
+                    # cast to int in case it was specified as string in config file or on
+                    # command line (really, no excuse for this, since you can use -I option)
+                    self._days_to_persist = (1 if c.get('days_to_persist') is None
+                        else int(c['days_to_persist']))
+                    if self._days_to_persist <= 0:
+                        raise BlueSkyConfigurationError(DAYS_TO_PERSIST_NOT_POS_INT)
+
+                    self._daily_percentages = [100 for i in range(self._days_to_persist)]
 
                 self._truncate = not not c.get('truncate')
 
@@ -175,6 +198,9 @@ class Grower(GrowerBase):
                         self._add_time_diff_to_keys(l, t_diff, ('timeprofile',))
                         self._add_time_diff_to_keys(l, t_diff, ('hourly_frp',))
 
+                if self._daily_percentages[i] < 100:
+                    self._reduce_activity(a, self._daily_percentages[i])
+
                 persisted_activity.append(a)
 
         return persisted_activity
@@ -193,3 +219,23 @@ class Grower(GrowerBase):
                     new_k = new_k.strftime('%Y-%m-%dT%H:%M:%S')
 
                 d[f][new_k] = d[f].pop(k)
+
+    SCALAR_FIELDS_TO_REDUCE = ["area", "frp"]
+    NESTED_FIELDS_TO_REDUCE = ["emissions", "consumption", "heat"]
+    def _reduce_activity(self, a, percentage):
+        fraction = percentage / 100
+
+        def _reduce(v):
+            for f in self.SCALAR_FIELDS_TO_REDUCE:
+                if v.get(f):
+                    v[f] = v[f] * fraction
+            for f in self.NESTED_FIELDS_TO_REDUCE:
+                if v.get(f):
+                    datautils.multiply_nested_data(v[f], fraction)
+
+        for aa in a.active_areas:
+            _reduce(aa)
+            for loc in aa.locations:
+                _reduce(loc)
+                for fb in loc.get('fuelbeds', []):
+                    _reduce(fb)

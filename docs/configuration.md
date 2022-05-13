@@ -203,7 +203,8 @@ the third set specify one day at 50% from October 1st through Dec 31st. If
 parameters would be used.
 
  - ***'config' > 'growth' > 'persistence' > 'date_to_persist'*** -- *optional* -- default: whatever 'today' is set to; note that active area dates, which are local, are compared to this date as is
- - ***'config' > 'growth' > 'persistence' > 'days_to_persist'*** -- *optional* -- default: 1
+ - ***'config' > 'growth' > 'persistence' > 'days_to_persist'*** -- *optional* -- default: 1; can't be specified if 'daily_percentages' is also specified
+ - ***'config' > 'growth' > 'persistence' > 'daily_percentages'*** -- *optional* -- default: [100]; can't be specified if 'days_to_persist' is also specified
  - ***'config' > 'growth' > 'persistence' > 'truncate'*** -- *optional* -- If there is activity after the date to persist, and if 'truncate' is set to true, all activity after the date to persist is deleted and replaced with persisted activity, otherwise it is left in place and the persistence module moves on to the next active area; default: false
  - ***'config' > 'growth' > 'persistence' > 'start_day'*** -- *optional* -- Formatted as '%m-%d' (e.g. '06-01'), '%b %d' (e.g. 'Jun 01'), '%B %d' (e.g. 'June 01'), '%j' (e.g. '152'), or integer day of year (0 to 365)
  - ***'config' > 'growth' > 'persistence' > 'end_day'*** -- *optional* -- Formatted as '%m-%d' (e.g. '12-31'), '%b %d' (e.g. 'Dec 31'), '%B %d' (e.g. 'December 31'), '%j' (e.g. '365'), or integer day of year (0 to 365)

@@ -177,7 +177,7 @@ class TestPersistenceInvalidCases(object):
         }, "growth", "persistence")
         with raises(ValueError) as e_info:
             persistence.Grower(MockFiresManager([]))
-        assert e_info.value.args[0] == persistence.DAYS_TO_PERSIST_NOT_INT
+        assert e_info.value.args[0] == persistence.DAYS_TO_PERSIST_NOT_POS_INT
 
     def test_invalid_calls_zero_val_days_to_persist(self, reset_config):
         Config().set({
@@ -187,7 +187,29 @@ class TestPersistenceInvalidCases(object):
         # days_to_persist == 0
         with raises(ValueError) as e_info:
             persistence.Grower(MockFiresManager([]))
-        assert e_info.value.args[0] == persistence.DAYS_TO_PERSIST_NOT_INT
+        assert e_info.value.args[0] == persistence.DAYS_TO_PERSIST_NOT_POS_INT
+
+    def test_invalid_calls_daily_percentages_not_array(self, reset_config):
+        Config().set({
+            "date_to_persist": datetime.datetime(2016,8,1,0,0,0),
+            "daily_percentages": "asd"
+        }, "growth", "persistence")
+        # days_to_persist == 0
+        with raises(ValueError) as e_info:
+            persistence.Grower(MockFiresManager([]))
+        assert e_info.value.args[0] == persistence.INVALID_DAILY_PERCENTAGES
+
+    def test_invalid_calls_daily_percentages_and_days_to_persist_both_specified(self, reset_config):
+        Config().set({
+            "date_to_persist": datetime.datetime(2016,8,1,0,0,0),
+            "days_to_persist": 1,
+            "daily_percentages": [100]
+
+        }, "growth", "persistence")
+        # days_to_persist == 0
+        with raises(ValueError) as e_info:
+            persistence.Grower(MockFiresManager([]))
+        assert e_info.value.args[0] == persistence.DAYS_TO_PERSIST_AND_PERCENTAGES_BOTH_SPECIFIED
 
 
 class TestPersistencePickCorrectMatchingConfig(object):
@@ -209,6 +231,7 @@ class TestPersistencePickCorrectMatchingConfig(object):
         assert grower._date_to_persist == datetime.date(2016, 4, 20)
         assert grower._days_to_persist == 2
         assert grower._truncate == True
+        assert grower._daily_percentages == [100, 100]
 
     @freeze_time("2016-04-20 12:00:00", tz_offset=0)
     def test_one_config_date_to_persist_today_w_start_not_a_match(self, reset_config):
@@ -224,6 +247,7 @@ class TestPersistencePickCorrectMatchingConfig(object):
         assert grower._date_to_persist == None
         assert grower._days_to_persist == 1
         assert grower._truncate == False
+        assert grower._daily_percentages == [100]
 
     @freeze_time("2016-04-20 12:00:00", tz_offset=0)
     def test_one_config_date_to_persist_set_w_start_and_end_a_match(self, reset_config):
@@ -241,6 +265,7 @@ class TestPersistencePickCorrectMatchingConfig(object):
         assert grower._date_to_persist == datetime.date(2016, 10, 1)
         assert grower._days_to_persist == 2
         assert grower._truncate == True
+        assert grower._daily_percentages == [100, 100]
 
     ##
     ## Multiple Configs
@@ -263,6 +288,7 @@ class TestPersistencePickCorrectMatchingConfig(object):
         assert grower._date_to_persist == datetime.date(2016, 4, 20)
         assert grower._days_to_persist == 2
         assert grower._truncate == True
+        assert grower._daily_percentages == [100, 100]
 
 
     @freeze_time("2016-08-20 12:00:00", tz_offset=0)
@@ -275,7 +301,7 @@ class TestPersistencePickCorrectMatchingConfig(object):
             },
             {
                 "start_day": "October 01", # starts after today
-                "days_to_persist": 3,
+                "daily_percentages": [100, 50, 50],
                 "truncate": True
             },
             {
@@ -286,7 +312,7 @@ class TestPersistencePickCorrectMatchingConfig(object):
             },
             {
                 "start_day": "07-01",  # This is a match
-                "days_to_persist": 5,
+                "daily_percentages": [100, 50, 50, 25, 25],
                 "truncate": False
             },
             {
@@ -301,6 +327,7 @@ class TestPersistencePickCorrectMatchingConfig(object):
         assert grower._date_to_persist == datetime.date(2016, 8, 20)
         assert grower._days_to_persist == 5
         assert grower._truncate == False
+        assert grower._daily_percentages == [100, 50, 50, 25, 25]
 
 
 class TestPersistenceEmptyCases(object):
@@ -883,3 +910,219 @@ class TestPersistenceWfWithoutTruncation(object):
         fm = MockFiresManager([fire])
         persistence.Grower(fm).grow()
         assert fm.fires == [expected]
+
+
+class TestPersistenceWfWtihDailyPercentages(object):
+
+    def test(self, reset_config):
+        Config().set({
+            "date_to_persist": datetime.date(2016,8,1),
+            "daily_percentages": [100, 50],
+            'truncate': True,
+        }, "growth", "persistence")
+
+        fm = MockFiresManager([{
+            "id": "abc123",
+            "fuel_type": "natural",
+            "type": "wildfire",
+            "activity": [
+                # 2016-8-1
+                {
+                    "active_areas": [
+                        {
+                            "start": datetime.datetime(2016,8,1,8,0,0),
+                            "end": datetime.datetime(2016,8,1,10,0,0),
+                            "consumption": {"summary": {"flaming": 100,"residual": 80,"smoldering": 40,"total": 220}},
+                            "dropout": True,
+                            "emissions": {"summary": {"PM10": 20,"PM2.5": 10,"total": 30}},
+                            "heat": {"summary": {"flaming": 400,"residual": 200,"smoldering": 100,"total": 700}},
+                            "specified_points": [
+                                {
+                                    'lat': 40,'lng':-115,'area': 20,"utc_offset": "-05:00",
+                                    "consumption": {"summary": {"flaming": 100,"residual": 80,"smoldering": 40,"total": 220}},
+                                    "dropout": True,
+                                    "emissions": {"summary": {"PM10": 20,"PM2.5": 10,"total": 30}},
+                                    "heat": {"summary": {"flaming": 400,"residual": 200,"smoldering": 100,"total": 700}},
+                                    "frp": 20,
+                                    "fuelmoisture": {
+                                        "2016-08-01T08:00:00": {"1000_hr": 15,"100_hr": 9},
+                                        "2016-08-01T09:00:00": {"1000_hr": 15,"100_hr": 9},
+                                    },
+                                    "fuelbeds": [
+                                        {
+                                            "fccs_id": "52", "pct": 100.0,
+                                            "consumption": {
+                                                "canopy": {
+                                                    "ladder fuels": {"flaming": [80],"residual": [60],"smoldering": [30]},
+                                                    "midstory": {"flaming": [20],"residual": [20],"smoldering": [10]}
+                                                }
+                                            },
+                                            "emissions": {
+                                                "flaming": {"PM10": [16],"PM2.5": [8],"total": [20]},
+                                                "residual": {"PM10": [4],"PM2.5": [2],"total": [10]},
+                                                "smoldering": {"PM10": [0],"PM2.5": [0],"total": [0]},
+                                                "total": {"PM10": [20],"PM2.5": [10],"total": [30]}
+                                            },
+                                            "heat": {"flaming": [400],"residual": [200],"smoldering": [100],"total": [700]}
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }])
+
+        expected = [{
+            "id": "abc123",
+            "fuel_type": "natural",
+            "type": "wildfire",
+            "activity": [
+                # 2016-8-1
+                {
+                    "active_areas": [
+                        {
+                            "start": datetime.datetime(2016,8,1,8,0,0),
+                            "end": datetime.datetime(2016,8,1,10,0,0),
+                            "consumption": {"summary": {"flaming": 100,"residual": 80,"smoldering": 40,"total": 220}},
+                            "dropout": True,
+                            "emissions": {"summary": {"PM10": 20,"PM2.5": 10,"total": 30}},
+                            "heat": {"summary": {"flaming": 400,"residual": 200,"smoldering": 100,"total": 700}},
+                            "specified_points": [
+                                {
+                                    'lat': 40,'lng':-115,'area': 20,"utc_offset": "-05:00",
+                                    "consumption": {"summary": {"flaming": 100,"residual": 80,"smoldering": 40,"total": 220}},
+                                    "dropout": True,
+                                    "emissions": {"summary": {"PM10": 20,"PM2.5": 10,"total": 30}},
+                                    "heat": {"summary": {"flaming": 400,"residual": 200,"smoldering": 100,"total": 700}},
+                                    "frp": 20,
+                                    "fuelmoisture": {
+                                        "2016-08-01T08:00:00": {"1000_hr": 15,"100_hr": 9},
+                                        "2016-08-01T09:00:00": {"1000_hr": 15,"100_hr": 9},
+                                    },
+                                    "fuelbeds": [
+                                        {
+                                            "fccs_id": "52", "pct": 100.0,
+                                            "consumption": {
+                                                "canopy": {
+                                                    "ladder fuels": {"flaming": [80],"residual": [60],"smoldering": [30]},
+                                                    "midstory": {"flaming": [20],"residual": [20],"smoldering": [10]}
+                                                }
+                                            },
+                                            "emissions": {
+                                                "flaming": {"PM10": [16],"PM2.5": [8],"total": [20]},
+                                                "residual": {"PM10": [4],"PM2.5": [2],"total": [10]},
+                                                "smoldering": {"PM10": [0],"PM2.5": [0],"total": [0]},
+                                                "total": {"PM10": [20],"PM2.5": [10],"total": [30]}
+                                            },
+                                            "heat": {"flaming": [400],"residual": [200],"smoldering": [100],"total": [700]}
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                # 2016-8-2  -  100%
+                {
+                    "persisted": True,
+                    "active_areas": [
+                        {
+                            "start": datetime.datetime(2016,8,2,8,0,0),
+                            "end": datetime.datetime(2016,8,2,10,0,0),
+                            "consumption": {"summary": {"flaming": 100,"residual": 80,"smoldering": 40,"total": 220}},
+                            "dropout": True,
+                            "emissions": {"summary": {"PM10": 20,"PM2.5": 10,"total": 30}},
+                            "heat": {"summary": {"flaming": 400,"residual": 200,"smoldering": 100,"total": 700}},
+                            "specified_points": [
+                                {
+                                    'lat': 40,'lng':-115,'area': 20,"utc_offset": "-05:00",
+                                    "consumption": {"summary": {"flaming": 100,"residual": 80,"smoldering": 40,"total": 220}},
+                                    "dropout": True,
+                                    "emissions": {"summary": {"PM10": 20,"PM2.5": 10,"total": 30}},
+                                    "heat": {"summary": {"flaming": 400,"residual": 200,"smoldering": 100,"total": 700}},
+                                    "frp": 20,
+                                    "fuelmoisture": {
+                                        "2016-08-01T08:00:00": {"1000_hr": 15,"100_hr": 9},
+                                        "2016-08-01T09:00:00": {"1000_hr": 15,"100_hr": 9},
+                                    },
+                                    "fuelbeds": [
+                                        {
+                                            "fccs_id": "52", "pct": 100.0,
+                                            "consumption": {
+                                                "canopy": {
+                                                    "ladder fuels": {"flaming": [80],"residual": [60],"smoldering": [30]},
+                                                    "midstory": {"flaming": [20],"residual": [20],"smoldering": [10]}
+                                                }
+                                            },
+                                            "emissions": {
+                                                "flaming": {"PM10": [16],"PM2.5": [8],"total": [20]},
+                                                "residual": {"PM10": [4],"PM2.5": [2],"total": [10]},
+                                                "smoldering": {"PM10": [0],"PM2.5": [0],"total": [0]},
+                                                "total": {"PM10": [20],"PM2.5": [10],"total": [30]}
+                                            },
+                                            "heat": {"flaming": [400],"residual": [200],"smoldering": [100],"total": [700]}
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                # 2016-8-3  -  50%
+                {
+                    "persisted": True,
+                    "active_areas": [
+                        {
+                            "start": datetime.datetime(2016,8,3,8,0,0),
+                            "end": datetime.datetime(2016,8,3,10,0,0),
+                            "consumption": {"summary": {"flaming": 50,"residual": 40,"smoldering": 20,"total": 110}},
+                            "dropout": True,
+                            "emissions": {"summary": {"PM10": 10,"PM2.5": 5,"total": 15}},
+                            "heat": {"summary": {"flaming": 200,"residual": 100,"smoldering": 50,"total": 350}},
+                            "specified_points": [
+                                {
+                                    'lat': 40,'lng':-115,'area': 10,"utc_offset": "-05:00",  # STAYS THE SAME
+                                    "consumption": {"summary": {"flaming": 50,"residual": 40,"smoldering": 20,"total": 110}},
+                                    "dropout": True,
+                                    "emissions": {"summary": {"PM10": 10,"PM2.5": 5,"total": 15}},
+                                    "heat": {"summary": {"flaming": 200,"residual": 100,"smoldering": 50,"total": 350}},
+                                    "frp": 10,
+                                    "fuelmoisture": {
+                                        "2016-08-01T08:00:00": {"1000_hr": 15,"100_hr": 9},  # STAYS THE SAME
+                                        "2016-08-01T09:00:00": {"1000_hr": 15,"100_hr": 9},  # STAYS THE SAME
+                                    },
+                                    "fuelbeds": [
+                                        {
+                                            "fccs_id": "52", "pct": 100.0,  # STAYS THE SAME
+                                            "consumption": {
+                                                "canopy": {
+                                                    "ladder fuels": {"flaming": [40],"residual": [30],"smoldering": [15]},
+                                                    "midstory": {"flaming": [10],"residual": [10],"smoldering": [5]}
+                                                }
+                                            },
+                                            "emissions": {
+                                                "flaming": {"PM10": [8],"PM2.5": [4],"total": [10]},
+                                                "residual": {"PM10": [2],"PM2.5": [1],"total": [5]},
+                                                "smoldering": {"PM10": [0],"PM2.5": [0],"total": [0]},
+                                                "total": {"PM10": [10],"PM2.5": [5],"total": [15]}
+                                            },
+                                            "heat": {"flaming": [200],"residual": [100],"smoldering": [50],"total": [350]}
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }]
+
+        grower = persistence.Grower(fm)
+        grower.grow()
+        assert len(fm.fires[0]['activity']) == 3
+        assert fm.fires[0]['activity'][0] == expected[0]['activity'][0]
+        assert fm.fires[0]['activity'][1] == expected[0]['activity'][1]
+        assert fm.fires[0]['activity'][2] == expected[0]['activity'][2]
+        assert fm.fires == expected
