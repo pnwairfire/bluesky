@@ -20,6 +20,7 @@ from bluesky.models.fires import Fire
 class MockFiresManager(object):
     def __init__(self, fires):
         self.fires = [Fire(f) for f in fires]
+        self.today = datetime.datetime.now()
 
     @property
     def fire_failure_handler(self):
@@ -189,12 +190,117 @@ class TestPersistenceInvalidCases(object):
         assert e_info.value.args[0] == persistence.DAYS_TO_PERSIST_NOT_INT
 
 
-class TestPersistencePickCorrectMatchingConfigFromMultiple(object):
+class TestPersistencePickCorrectMatchingConfig(object):
+
+    ##
+    ## One Config
+    ##
 
     @freeze_time("2016-04-20 12:00:00", tz_offset=0)
-    def test(self, reset_config):
-        # TODO:
-        pass
+    def test_one_config_date_to_persist_today_no_start_end_days(self, reset_config):
+        Config().set([
+            {
+                "days_to_persist": 2,
+                "truncate": True
+            },
+        ], "growth", "persistence")
+
+        grower = persistence.Grower(MockFiresManager([]))
+        assert grower._date_to_persist == datetime.date(2016, 4, 20)
+        assert grower._days_to_persist == 2
+        assert grower._truncate == True
+
+    @freeze_time("2016-04-20 12:00:00", tz_offset=0)
+    def test_one_config_date_to_persist_today_w_start_not_a_match(self, reset_config):
+        Config().set([
+            {
+                "start_day": "05-01",
+                "days_to_persist": 2,
+                "truncate": True
+            },
+        ], "growth", "persistence")
+
+        grower = persistence.Grower(MockFiresManager([]))
+        assert grower._date_to_persist == None
+        assert grower._days_to_persist == 1
+        assert grower._truncate == False
+
+    @freeze_time("2016-04-20 12:00:00", tz_offset=0)
+    def test_one_config_date_to_persist_set_w_start_and_end_a_match(self, reset_config):
+        Config().set([
+            {
+                "start_day": "05-01",
+                "end_day": "10-31",
+                "date_to_persist": "2016-10-01",
+                "days_to_persist": 2,
+                "truncate": True
+            },
+        ], "growth", "persistence")
+
+        grower = persistence.Grower(MockFiresManager([]))
+        assert grower._date_to_persist == datetime.date(2016, 10, 1)
+        assert grower._days_to_persist == 2
+        assert grower._truncate == True
+
+    ##
+    ## Multiple Configs
+    ##
+
+    @freeze_time("2016-04-20 12:00:00", tz_offset=0)
+    def test_two_configs_date_to_persist_today_no_start_end_days(self, reset_config):
+        Config().set([
+            {
+                "days_to_persist": 2,
+                "truncate": True
+            },
+            {
+                "days_to_persist": 4,
+                "truncate": False
+            },
+        ], "growth", "persistence")
+
+        grower = persistence.Grower(MockFiresManager([]))
+        assert grower._date_to_persist == datetime.date(2016, 4, 20)
+        assert grower._days_to_persist == 2
+        assert grower._truncate == True
+
+
+    @freeze_time("2016-08-20 12:00:00", tz_offset=0)
+    def test_five_configs_date_to_persist_today_start_end_days(self, reset_config):
+        Config().set([
+            {
+                "end_day": "05-01", # ends before today
+                "days_to_persist": 2,
+                "truncate": True
+            },
+            {
+                "start_day": "October 01", # starts after today
+                "days_to_persist": 3,
+                "truncate": True
+            },
+            {
+                "start_day": "06-01",
+                "end_day": "Jun 30", # ends before today
+                "days_to_persist": 4,
+                "truncate": True
+            },
+            {
+                "start_day": "07-01",  # This is a match
+                "days_to_persist": 5,
+                "truncate": False
+            },
+            {
+                "end_day": "11-01",  # This is also a match, but not picked
+                "days_to_persist": 6,
+                "truncate": False
+            },
+
+        ], "growth", "persistence")
+
+        grower = persistence.Grower(MockFiresManager([]))
+        assert grower._date_to_persist == datetime.date(2016, 8, 20)
+        assert grower._days_to_persist == 5
+        assert grower._truncate == False
 
 
 class TestPersistenceEmptyCases(object):

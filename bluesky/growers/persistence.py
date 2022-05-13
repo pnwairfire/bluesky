@@ -46,12 +46,16 @@ class Grower(GrowerBase):
         if len(configs) == 0:
             raise BlueSkyConfigurationError(EMPTY_CONFIG_LIST)
 
+        self._date_to_persist = None
+        self._days_to_persist = 1
+        self._truncate = False
+
         # Find first matching set of config params
         for c in configs:
             dtp = (to_date(c.get('date_to_persist'))
-                or fires_manager.today.date())
+                or self._fires_manager.today.date())
             start_day = self._parse_start_end_day(c.get('start_day'), dtp)
-            end_day = self._parse_start_end_day(c.get('start_day'), dtp)
+            end_day = self._parse_start_end_day(c.get('end_day'), dtp)
             if ((not start_day or start_day <= dtp)
                     and (not end_day or dtp <= end_day)):
 
@@ -67,6 +71,10 @@ class Grower(GrowerBase):
 
                 return
 
+        # If we get this far, 'self._date_to_persist' will be None,
+        # which means that 'grow', below, will abort
+
+
     SUPPORT_START_END_DAY_FORMATS = [
         '%m-%d', '%b %d', '%b-%d', '%B %d', '%B-%d', '%j'
     ]
@@ -76,9 +84,10 @@ class Grower(GrowerBase):
             day_str = str(day_str)
 
             try:
-                day = parse_dt(day_str, "%m-%d",
+                day = parse_dt(day_str,
                     extra_formats=self.SUPPORT_START_END_DAY_FORMATS)
-                return day.replace(year=date_to_persist.year)
+                return day.replace(year=date_to_persist.year).date()
+
             except ValueError as e:
                 raise BlueSkyConfigurationError(
                     INVALID_START_END_DAY.format(day_str=day_str))
