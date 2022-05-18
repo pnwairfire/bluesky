@@ -470,3 +470,6 @@
    - Added support for daily percentages, to allow activity to trail off
    - Added unit tests
    - Other minor updates
+
+## 4.3.47
+ - Upgrade fccsmap to v3.0.2
