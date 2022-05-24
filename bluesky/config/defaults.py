@@ -63,7 +63,7 @@ _DEFAULTS = {
         "skip_failures": False
         # The following filter-specific sub-dicts have to be commented out
         # in the defaults, since each one's presence/absence determines whether
-        # or not the filter is run.  There are no default values anywa
+        # or not the filter is run.  There are no default values anyway
         # for the filter-specific options
         #   "area": {"min": None, "max": None}
         #   "time": {"start": None, "end": None}
@@ -190,15 +190,21 @@ _DEFAULTS = {
     },
     "growth": {
         "model": "persistence",
-        "persistence": {
-            "date_to_persist": None, # will default to 'today'
-            # 'days_to_persist' and 'percentages' can't both be specified
-            "days_to_persist": None, # will default to 1 if daily_percentages isn't specified either
-            "daily_percentages": None,
-            "truncate": False,
-            "start_day": None,
-            "end_day": None
-        }
+        # The "persistence" config must be set to None, since it may be either
+        # a single object or an array of objects.  Defining it here as one
+        # and then setting it as the other in the run's config file
+        # results in a config merge error.
+        "persistence": None
+        # The fields in each persistence config object are:
+        #     "date_to_persist" - defaults to 'today'
+        #     "days_to_persist" - defaults to 1
+        #     "daily_percentages" -  defaults to [100]
+        #     "truncate" - defaults to false
+        #     "start_day" - defaults to null
+        #     "end_day" - defaults to null
+        # 'days_to_persist' and 'daily_percentages' can't both be specified.
+        # in any single config object. If neither is specified,
+        # 'days_to_persist' (defaulted to 1) is used.
     },
     "findmetdata": {
         "met_root_dir": None,
