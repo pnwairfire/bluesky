@@ -234,3 +234,81 @@ class TestAdjustDispersionWindowForAvailableMet(object):
             {"message": "Incomplete met. Running dispersion for"
                 " 3 hours instead of 48"}
         ]
+
+class TestReduceVerticalLevels(object):
+
+    def test_equal_fractions_reduction_factor_4(self, monkeypatch):
+        monkeypatch.setattr(hysplit.HYSPLITDispersion, '_set_met_info',
+            lambda self, met_info: None)
+        h = hysplit.HYSPLITDispersion({})
+        h._reduction_factor = 4
+
+        plumerise_hour = {
+            'heights': [
+                1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900,
+                2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000
+            ],
+            'emission_fractions': [
+                0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+                0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05
+            ],
+            'smolder_fraction': 0.0
+        }
+
+        expected_fractions = [0.25, 0.25, 0.25, 0.25, 0]
+        expected_heights = [1400, 1800, 2200, 2600, 3000]
+
+        heights, fractions = h._reduce_vertical_levels(plumerise_hour)
+
+        assert heights == expected_heights
+        assert fractions == expected_fractions
+
+    def test_varying_fractions_reduction_factor_5(self, monkeypatch):
+        monkeypatch.setattr(hysplit.HYSPLITDispersion, '_set_met_info',
+            lambda self, met_info: None)
+        h = hysplit.HYSPLITDispersion({})
+        h._reduction_factor = 5
+
+        plumerise_hour = {
+            "heights":[
+                1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900,
+                2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000
+            ],
+            "emission_fractions": [
+                0.05, 0.05, 0.1, 0.1, 0.1, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04
+            ]
+        }
+
+        expected_fractions = [0.5, 0.25, 0.25, 0]
+        expected_heights = [1500, 2000, 2500, 3000]
+
+        heights, fractions = h._reduce_vertical_levels(plumerise_hour)
+
+        assert heights == expected_heights
+        assert fractions == expected_fractions
+
+    def test_all_emissions_in_top_reduced_level_reduction_factor_4(self, monkeypatch):
+        monkeypatch.setattr(hysplit.HYSPLITDispersion, '_set_met_info',
+            lambda self, met_info: None)
+        h = hysplit.HYSPLITDispersion({})
+        h._reduction_factor = 4
+
+        plumerise_hour = {
+            "heights":[
+                1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900,
+                2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000
+            ],
+            "emission_fractions": [
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.25, 0.25, 0.25
+            ]
+        }
+
+        expected_fractions = [0.25, 0.25, 0.25, 0.25, 0]
+        expected_heights = [1400, 1800, 2200, 2600, 3000]
+
+        heights, fractions = h._reduce_vertical_levels(plumerise_hour)
+
+        assert heights == expected_heights
+        assert fractions == expected_fractions

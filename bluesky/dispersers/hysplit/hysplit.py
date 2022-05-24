@@ -674,33 +674,11 @@ class HYSPLITDispersion(DispersionBase):
                     record_fmt = "%s %s %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
                     emis.write(record_fmt % (dt_str, min_dur_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
 
-                    for level in range(0, len(plumerise_hour['heights']) - 1, self._reduction_factor):
-                        height_meters = 0.0
-                        pm25_injected = 0.0
-                        if not dummy:
-                            # Loop through the heights (20 quantiles of smoke density)
-                            # For the unreduced case, we loop through 20 quantiles, but we have
-                            # 21 quantile-edge measurements.  So for each
-                            # quantile gap, we need to find a point halfway
-                            # between the two edges and inject that quantile's fraction of total emissions
+                    heights, fractions = self._reduce_vertical_levels(plumerise_hour)
+                    for height, fraction in zip(heights, fractions):
 
-                            # KJC optimization...
-                            # Reduce the number of vertical emission levels by a reduction factor
-                            # and place the appropriate fraction of emissions at each level.
-                            # ReductionFactor MUST evenly divide into the number of quantiles
-
-                            lower_height = plumerise_hour['heights'][level]
-                            upper_height_index = min(level + self._reduction_factor, len(plumerise_hour['heights']) - 1)
-                            upper_height = plumerise_hour['heights'][upper_height_index]
-                            if self._reduction_factor == 1:
-                                height_meters = (lower_height + upper_height) / 2.0  # original approach
-                            else:
-                                height_meters = upper_height # top-edge approach
-                            # Total PM2.5 entrained (lofted in the plume)
-                            pm25_entrained = pm25_emitted * entrainment_fraction
-                            # Inject the proper fraction of the entrained PM2.5 in each quantile gap.
-                            fraction = sum(plumerise_hour['emission_fractions'][level:level+self._reduction_factor])
-                            pm25_injected = pm25_entrained * fraction
+                        height_meters = 0.0 if dummy else height
+                        pm25_injected = 0.0 if dummy else pm25_entrained * fraction
 
                         # Write the record to the file
                         emis.write(record_fmt % (dt_str, min_dur_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
@@ -708,6 +686,66 @@ class HYSPLITDispersion(DispersionBase):
                 if fires_wo_emissions > 0:
                     logging.debug("%d of %d fires had no emissions for hour %d", fires_wo_emissions, num_fires, hour)
 
+
+    def _reduce_vertical_levels(self, plumerise_hour):
+        """The first step is to apply the reduction factor.
+
+        After applying the reduction factor, we want zero emissions in the
+        top level, whose emissions are allocated to the other levels based on
+        their proportion of the remaining emissions.
+
+        For example, if the reduction factor is 5 and the plume fractions are
+        the following:
+
+           [
+              0.05, 0.05, 0.1, 0.1, 0.1,
+              0.04, 0.04, 0.04, 0.04, 0.04,
+              0.04, 0.04, 0.04, 0.04, 0.04,
+              0.04, 0.04, 0.04, 0.04, 0.04
+           ]
+
+        That would get reduced to the following:
+
+           [0.4, 0.2, 0.2, 0.2]
+
+        And the last 0.2 would get allocated to the first three to get ths
+        following:
+
+           [0.5, 0.25, 0.25]
+
+        Note that, if the reduction factor is 20, then all emissions are
+        included in the smoldering emissions, written above
+        """
+        heights = []
+        fractions = []
+
+        ## Reduce
+
+        num_heights = len(plumerise_hour['heights']) - 1
+        for level in range(0, num_heights, self._reduction_factor):
+            lower_height = plumerise_hour['heights'][level]
+            upper_height_index = min(level + self._reduction_factor, num_heights)
+            upper_height = plumerise_hour['heights'][upper_height_index]
+            if self._reduction_factor == 1:
+                height_meters = (lower_height + upper_height) / 2.0  # original approach
+            else:
+                height_meters = upper_height # top-edge approach
+            heights.append(height_meters)
+
+            fractions.append(sum(plumerise_hour['emission_fractions'][level:level+self._reduction_factor]))
+
+        ## Allocation top level's emissions to the rest
+        num_heights = len(heights)
+        if num_heights > 1:
+            if fractions[-1] == 1:
+                # all emissions in top level
+                f = 1 / (num_heights-1)
+                fractions = ([f] * (num_heights-1)) + [0]
+            else:
+                factor = 1 / (1 - fractions[-1])
+                fractions = [f * factor for f in fractions[:-1]] + [0]
+
+        return heights, fractions
 
     VERTICAL_CHOICES = {
         "DATA": 0,
