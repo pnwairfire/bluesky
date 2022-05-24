@@ -477,3 +477,6 @@
 ## 4.3.48
  - Fix npm install error
  - Upgrade fccsmap to v3.0.3
+
+## 4.3.49
+ - Persistence follow-ups.
