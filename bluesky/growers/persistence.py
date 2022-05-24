@@ -17,7 +17,8 @@ from . import GrowerBase, to_date
 
 
 DAYS_TO_PERSIST_NOT_POS_INT = "'days_to_persist' must be a positive integer"
-INVALID_CONFIG = "Invalid persistence configuration ('config' > 'persistence')"
+INVALID_CONFIG = "Invalid persistence configuration ('config' > 'growth' > 'persistence')"
+CONFIG_NOT_SPECIFIED = "Persistence configuration ('config' > 'growth' > 'persistence') not specified"
 EMPTY_CONFIG_LIST = "Don't specify empty list of persistence config sets"
 INVALID_START_END_DAY = "Invalid start/end day string: '{day_str}'"
 DAYS_TO_PERSIST_AND_PERCENTAGES_BOTH_SPECIFIED = "Specify 'days_to_persist' or 'daily_percentages', but not both"
@@ -36,11 +37,15 @@ class Grower(GrowerBase):
 
     def _set_config(self):
 
-        if isinstance(self.config(), dict):
-            self._select_config([self.config()])
+        p_config = self.config()
+        if p_config is None:
+            raise BlueSkyConfigurationError(CONFIG_NOT_SPECIFIED)
 
-        elif isinstance(self.config(), list):
-            self._select_config(self.config())
+        if isinstance(p_config, dict):
+            self._select_config([p_config])
+
+        elif isinstance(p_config, list):
+            self._select_config(p_config)
 
         else:
             raise BlueSkyConfigurationError(INVALID_CONFIG)
@@ -48,7 +53,6 @@ class Grower(GrowerBase):
     def _select_config(self, configs):
         # TODO: self._days_to_persist is redundant now that we have
         #   self._daily_precentages, so we may eventually remove it
-
 
         if len(configs) == 0:
             raise BlueSkyConfigurationError(EMPTY_CONFIG_LIST)
