@@ -674,7 +674,7 @@ class HYSPLITDispersion(DispersionBase):
                     record_fmt = "%s %s %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
                     emis.write(record_fmt % (dt_str, min_dur_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
 
-                    heights, fractions = self._reduce_vertical_levels(plumerise_hour)
+                    heights, fractions = self._reduce_and_reallocate_vertical_levels(plumerise_hour)
                     for height, fraction in zip(heights, fractions):
 
                         height_meters = 0.0 if dummy else height
@@ -687,7 +687,7 @@ class HYSPLITDispersion(DispersionBase):
                     logging.debug("%d of %d fires had no emissions for hour %d", fires_wo_emissions, num_fires, hour)
 
 
-    def _reduce_vertical_levels(self, plumerise_hour):
+    def _reduce_and_reallocate_vertical_levels(self, plumerise_hour):
         """The first step is to apply the reduction factor.
 
         After applying the reduction factor, we want zero emissions in the
@@ -711,7 +711,7 @@ class HYSPLITDispersion(DispersionBase):
         And the last 0.2 would get allocated to the first three to get ths
         following:
 
-           [0.5, 0.25, 0.25]
+           [0.5, 0.25, 0.25, 0.0]
 
         Note that, if the reduction factor is 20, then all emissions are
         included in the smoldering emissions, written above

@@ -258,7 +258,7 @@ class TestReduceVerticalLevels(object):
         expected_fractions = [0.25, 0.25, 0.25, 0.25, 0]
         expected_heights = [1400, 1800, 2200, 2600, 3000]
 
-        heights, fractions = h._reduce_vertical_levels(plumerise_hour)
+        heights, fractions = h._reduce_and_reallocate_vertical_levels(plumerise_hour)
 
         assert heights == expected_heights
         assert fractions == expected_fractions
@@ -283,7 +283,7 @@ class TestReduceVerticalLevels(object):
         expected_fractions = [0.5, 0.25, 0.25, 0]
         expected_heights = [1500, 2000, 2500, 3000]
 
-        heights, fractions = h._reduce_vertical_levels(plumerise_hour)
+        heights, fractions = h._reduce_and_reallocate_vertical_levels(plumerise_hour)
 
         assert heights == expected_heights
         assert fractions == expected_fractions
@@ -308,7 +308,7 @@ class TestReduceVerticalLevels(object):
         expected_fractions = [0.25, 0.25, 0.25, 0.25, 0]
         expected_heights = [1400, 1800, 2200, 2600, 3000]
 
-        heights, fractions = h._reduce_vertical_levels(plumerise_hour)
+        heights, fractions = h._reduce_and_reallocate_vertical_levels(plumerise_hour)
 
         assert heights == expected_heights
         assert fractions == expected_fractions
