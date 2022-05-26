@@ -661,7 +661,7 @@ class HYSPLITDispersion(DispersionBase):
 
         # if reduction factor == 20 (i.e. one height), add
         # pm25_entrained to pm25_injected
-        if len(heights) == 0:
+        if len(heights) == 1:
             pm25_injected += pm25_entrained
             pm25_entrained = 0
 
