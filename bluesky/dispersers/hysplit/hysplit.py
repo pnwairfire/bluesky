@@ -638,33 +638,16 @@ class HYSPLITDispersion(DispersionBase):
                         logging.debug("Fire %s has no emissions for hour %s", fire.id, hour)
                         fires_wo_emissions += 1
 
-                    area_meters = 0.0
-                    smoldering_fraction = 0.0
-                    pm25_injected = 0.0
-                    if not dummy:
-                        # Extract the fraction of area burned in this timestep, and
-                        # convert it from acres to square meters.
-                        area_meters = hourly_area * SQUARE_METERS_PER_ACRE
+                    area_meters, pm25_entrained, pm25_injected, heat = self._get_emissions_params(
+                        timeprofiled_emissions_hour, plumerise_hour, hourly_area, dummy)
+                    heights, fractions = self._reduce_and_reallocate_vertical_levels(plumerise_hour)
 
-                        smoldering_fraction = plumerise_hour['smolder_fraction']
+                    # if reduction factor == 20 (i.e. one height), add
+                    # pm25_entrained to pm25_injected
+                    if len(heights) == 0:
+                        pm25_injected += pm25_entrained
+                        pm25_entrained = 0
 
-                        # Compute the total PM2.5 emitted at this timestep (grams) by
-                        # multiplying the phase-specific total emissions by the
-                        # phase-specific hourly fractions for this hour to get the
-                        # hourly emissions by phase for this hour, and then summing
-                        # the three values to get the total emissions for this hour
-                        # TODO: use fire.timeprofiled_emissions[local_dt]['PM2.5']
-                        pm25_emitted = timeprofiled_emissions_hour.get('PM2.5', 0.0)
-                        pm25_emitted *= GRAMS_PER_TON
-                        # Total PM2.5 smoldering (not lofted in the plume)
-                        pm25_injected = pm25_emitted * smoldering_fraction
-
-                    entrainment_fraction = 1.0 - smoldering_fraction
-
-                    # We don't assign any heat, so the PM2.5 mass isn't lofted
-                    # any higher.  This is because we are assigning explicit
-                    # heights from the plume rise.
-                    heat = 0.0
 
                     # Inject the smoldering fraction of the emissions at ground level
                     # (SMOLDER_HEIGHT represents a value slightly above ground level)
@@ -673,8 +656,6 @@ class HYSPLITDispersion(DispersionBase):
                     # Write the smoldering record to the file
                     record_fmt = "%s %s %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
                     emis.write(record_fmt % (dt_str, min_dur_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
-
-                    heights, fractions = self._reduce_and_reallocate_vertical_levels(plumerise_hour)
                     for height, fraction in zip(heights, fractions):
 
                         height_meters = 0.0 if dummy else height
@@ -686,6 +667,40 @@ class HYSPLITDispersion(DispersionBase):
                 if fires_wo_emissions > 0:
                     logging.debug("%d of %d fires had no emissions for hour %d", fires_wo_emissions, num_fires, hour)
 
+    def _get_emissions_params(self, timeprofiled_emissions_hour,
+            plumerise_hour, hourly_area, dummy):
+        """
+            TODO: rename this method!
+        """
+        if dummy:
+            return 0.0, 0.0, 0.0, 0.0
+
+        # convert area from acres to square meters.
+        area_meters = hourly_area * SQUARE_METERS_PER_ACRE
+
+        # Compute the total PM2.5 emitted at this timestep (grams) by
+        # multiplying the phase-specific total emissions by the
+        # phase-specific hourly fractions for this hour to get the
+        # hourly emissions by phase for this hour, and then summing
+        # the three values to get the total emissions for this hour
+        # TODO: use fire.timeprofiled_emissions[local_dt]['PM2.5']
+        pm25_emitted = timeprofiled_emissions_hour.get('PM2.5', 0.0)
+        pm25_emitted *= GRAMS_PER_TON
+
+        # Total PM2.5 smoldering (not lofted in the plume)
+        smoldering_fraction = plumerise_hour['smolder_fraction']
+        pm25_injected = pm25_emitted * smoldering_fraction
+
+        # Total PM2.5 lofted in the plume
+        entrainment_fraction = 1.0 - smoldering_fraction
+        pm25_entrained = pm25_emitted * entrainment_fraction
+
+        # We don't assign any heat, so the PM2.5 mass isn't lofted
+        # any higher.  This is because we are assigning explicit
+        # heights from the plume rise.
+        heat = 0.0
+
+        return area_meters, pm25_entrained, pm25_injected, heat
 
     def _reduce_and_reallocate_vertical_levels(self, plumerise_hour):
         """The first step is to apply the reduction factor.
