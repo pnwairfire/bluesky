@@ -480,3 +480,6 @@
 
 ## 4.3.49
  - Persistence follow-ups.
+
+## 4.3.50
+ - Refactor vertical allocation of emissions for hysplit so that top level has zero.
