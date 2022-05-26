@@ -5,7 +5,7 @@ import datetime
 import os
 
 import afconfig
-from py.test import raises
+from py.test import raises, approx
 
 from bluesky.config import to_lowercase_keys
 from bluesky.dispersers.hysplit import hysplit
@@ -312,3 +312,173 @@ class TestReduceVerticalLevels(object):
 
         assert heights == expected_heights
         assert fractions == expected_fractions
+
+    def test_varying_fractions_reduction_factor_20(self, monkeypatch):
+        monkeypatch.setattr(hysplit.HYSPLITDispersion, '_set_met_info',
+            lambda self, met_info: None)
+        h = hysplit.HYSPLITDispersion({})
+        h._reduction_factor = 20
+
+        plumerise_hour = {
+            "heights":[
+                1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900,
+                2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000
+            ],
+            "emission_fractions": [
+                0.05, 0.05, 0.1, 0.1, 0.1, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04
+            ]
+        }
+
+        expected_fractions = [1.0]
+        expected_heights = [3000]
+
+        heights, fractions = h._reduce_and_reallocate_vertical_levels(plumerise_hour)
+
+        assert heights == expected_heights
+        assert fractions == approx(expected_fractions, abs=0.00001)
+
+
+class TestGetEmissionsRowsDataForLatLon(object):
+
+    def test_equal_fractions_reduction_factor_4_not_dummy(self, monkeypatch):
+        monkeypatch.setattr(hysplit.HYSPLITDispersion, '_set_met_info',
+            lambda self, met_info: None)
+        h = hysplit.HYSPLITDispersion({})
+        h._reduction_factor = 4
+
+        plumerise_hour = {
+            'heights': [
+                1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900,
+                2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000
+            ],
+            'emission_fractions': [
+                0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+                0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05
+            ],
+            'smolder_fraction': 0.0
+        }
+        pm25 = 10
+        area = 10
+        dummy = False
+
+        expected_area = area * hysplit.SQUARE_METERS_PER_ACRE
+        expected_rows = [
+            (10.0, 0.0, expected_area, 0.0),
+            (1400, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (1800, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (2200, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (2600, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (3000, 0.0, expected_area, 0.0)
+        ]
+
+        rows = h._get_emissions_rows_data_for_lat_lon(plumerise_hour,
+            pm25, area, dummy)
+
+        assert rows == expected_rows
+
+    def test_varying_fractions_reduction_factor_5(self, monkeypatch):
+        monkeypatch.setattr(hysplit.HYSPLITDispersion, '_set_met_info',
+            lambda self, met_info: None)
+        h = hysplit.HYSPLITDispersion({})
+        h._reduction_factor = 5
+
+        plumerise_hour = {
+            "heights":[
+                1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900,
+                2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000
+            ],
+            "emission_fractions": [
+                0.05, 0.05, 0.1, 0.1, 0.1, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04
+            ],
+            'smolder_fraction': 0.0
+        }
+        pm25 = 10
+        area = 10
+        dummy = False
+
+        expected_area = area * hysplit.SQUARE_METERS_PER_ACRE
+        expected_rows = [
+            (10.0, 0.0, expected_area, 0.0),
+            (1500, 0.5 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (2000, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (2500, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (3000, 0.0, expected_area, 0.0)
+        ]
+
+        rows = h._get_emissions_rows_data_for_lat_lon(plumerise_hour,
+            pm25, area, dummy)
+
+        assert rows == expected_rows
+
+
+    def test_all_emissions_in_top_reduced_level_reduction_factor_4(self, monkeypatch):
+        monkeypatch.setattr(hysplit.HYSPLITDispersion, '_set_met_info',
+            lambda self, met_info: None)
+        h = hysplit.HYSPLITDispersion({})
+        h._reduction_factor = 4
+
+        plumerise_hour = {
+            "heights":[
+                1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900,
+                2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000
+            ],
+            "emission_fractions": [
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.25, 0.25, 0.25
+            ],
+            'smolder_fraction': 0.2  # Note that this is non-zero for this test
+        }
+        pm25 = 10
+        area = 10
+        dummy = False
+
+        expected_area = area * hysplit.SQUARE_METERS_PER_ACRE
+        expected_rows = [
+            (10.0, 0.2 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (1400, 0.2 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (1800, 0.2 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (2200, 0.2 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (2600, 0.2 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (3000, 0.0, expected_area, 0.0)
+        ]
+
+        rows = h._get_emissions_rows_data_for_lat_lon(plumerise_hour,
+            pm25, area, dummy)
+
+        assert len(rows) == len(expected_rows)
+        for i, r in enumerate(rows):
+            assert r == approx(expected_rows[i], abs=0.00001)
+
+    def test_varying_fractions_reduction_factor_20(self, monkeypatch):
+        monkeypatch.setattr(hysplit.HYSPLITDispersion, '_set_met_info',
+            lambda self, met_info: None)
+        h = hysplit.HYSPLITDispersion({})
+        h._reduction_factor = 20
+
+        plumerise_hour = {
+            "heights":[
+                1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900,
+                2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000
+            ],
+            "emission_fractions": [
+                0.05, 0.05, 0.1, 0.1, 0.1, 0.04, 0.04, 0.04, 0.04, 0.04,
+                0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04
+            ],
+            'smolder_fraction': 0.0
+        }
+        pm25 = 10
+        area = 10
+        dummy = False
+
+        expected_area = area * hysplit.SQUARE_METERS_PER_ACRE
+        expected_rows = [
+            (10.0, pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (3000, 0.0, expected_area, 0.0)
+        ]
+
+        rows = h._get_emissions_rows_data_for_lat_lon(plumerise_hour,
+            pm25, area, dummy)
+
+        assert rows == expected_rows
