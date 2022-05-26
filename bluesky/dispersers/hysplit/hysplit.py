@@ -655,23 +655,25 @@ class HYSPLITDispersion(DispersionBase):
 
                     # Write the smoldering record to the file
                     record_fmt = "%s %s %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
-                    emis.write(record_fmt % (dt_str, min_dur_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
+                    emis.write(record_fmt % (dt_str, min_dur_str, lat, lon,
+                        height_meters, pm25_injected, area_meters, heat))
                     for height, fraction in zip(heights, fractions):
 
                         height_meters = 0.0 if dummy else height
                         pm25_injected = 0.0 if dummy else pm25_entrained * fraction
 
                         # Write the record to the file
-                        emis.write(record_fmt % (dt_str, min_dur_str, lat, lon, height_meters, pm25_injected, area_meters, heat))
+                        emis.write(record_fmt % (dt_str, min_dur_str, lat, lon,
+                            height_meters, pm25_injected, area_meters, heat))
 
                 if fires_wo_emissions > 0:
-                    logging.debug("%d of %d fires had no emissions for hour %d", fires_wo_emissions, num_fires, hour)
+                    logging.debug("%d of %d fires had no emissions for hour %d",
+                        fires_wo_emissions, num_fires, hour)
+
+
 
     def _get_emissions_params(self, timeprofiled_emissions_hour,
             plumerise_hour, hourly_area, dummy):
-        """
-            TODO: rename this method!
-        """
         if dummy:
             return 0.0, 0.0, 0.0, 0.0
 
