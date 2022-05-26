@@ -163,6 +163,7 @@ class HYSPLITDispersion(DispersionBase):
         self._set_met_info(copy.deepcopy(met_info))
         self._output_file_name = self.config('output_file_name')
         self._has_parinit = []
+        self._smolder_height = self.config("SMOLDER_HEIGHT")
 
     def _required_activity_fields(self):
         return ('timeprofile', 'plumerise', 'emissions')
@@ -571,14 +572,20 @@ class HYSPLITDispersion(DispersionBase):
             timeprofiled_emissions_hour = fire.timeprofiled_emissions.get(local_dt)
             hourly_area = fire.timeprofiled_area.get(local_dt)
             if plumerise_hour and timeprofiled_emissions_hour and hourly_area:
-                return False, plumerise_hour, timeprofiled_emissions_hour, hourly_area
+                return (False, plumerise_hour,
+                    timeprofiled_emissions_hour.get('PM2.5', 0.0), hourly_area)
 
-        return (True, hysplit_utils.DUMMY_PLUMERISE_HOUR, dict(), 0.0)
+        # If we don't have real data for the given timestep, we apparently need
+        # to stick in dummy records anyway (so we have the correct number of sources).
+        logging.debug("Fire %s has no emissions for hour %s", fire.id,
+            dt.strftime('%Y-%m-%dT%H:%M:%SZ'))
+        self._fires_wo_emissions += 1
+
+        return (True, hysplit_utils.DUMMY_PLUMERISE_HOUR, 0.0, 0.0)
 
     def _write_emissions(self, fires, emissions_file):
         # A value slightly above ground level at which to inject smoldering
         # emissions into the model.
-        smolder_height = self.config("SMOLDER_HEIGHT")
 
         # sub-hour emissions?
         SERI = self.config("SUBHOUR_EMISSIONS_REDUCTION_INTERVAL")
@@ -613,7 +620,7 @@ class HYSPLITDispersion(DispersionBase):
                 # Write the header line for this timestep
                 emis.write("%s %02d %04d\n" % (dt_str, qinc, num_sources))
 
-                fires_wo_emissions = 0
+                self._fires_wo_emissions = 0
 
                 # Loop through the fire locations
                 for fire in fires:
@@ -630,50 +637,50 @@ class HYSPLITDispersion(DispersionBase):
                     lat = fire.latitude
                     lon = fire.longitude
 
-                    # If we don't have real data for the given timestep, we apparently need
-                    # to stick in dummy records anyway (so we have the correct number of sources).
-                    (dummy, plumerise_hour, timeprofiled_emissions_hour,
-                        hourly_area) = self._get_hour_data(dt, fire)
-                    if dummy:
-                        logging.debug("Fire %s has no emissions for hour %s", fire.id, hour)
-                        fires_wo_emissions += 1
+                    (dummy, plumerise_hour, pm25_emitted, hourly_area
+                        ) = self._get_hour_data(dt, fire)
 
-                    area_meters, pm25_entrained, pm25_injected, heat = self._get_emissions_params(
-                        timeprofiled_emissions_hour, plumerise_hour, hourly_area, dummy)
-                    heights, fractions = self._reduce_and_reallocate_vertical_levels(plumerise_hour)
-
-                    # if reduction factor == 20 (i.e. one height), add
-                    # pm25_entrained to pm25_injected
-                    if len(heights) == 0:
-                        pm25_injected += pm25_entrained
-                        pm25_entrained = 0
-
-
-                    # Inject the smoldering fraction of the emissions at ground level
-                    # (SMOLDER_HEIGHT represents a value slightly above ground level)
-                    height_meters = smolder_height
-
-                    # Write the smoldering record to the file
                     record_fmt = "%s %s %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
-                    emis.write(record_fmt % (dt_str, min_dur_str, lat, lon,
-                        height_meters, pm25_injected, area_meters, heat))
-                    for height, fraction in zip(heights, fractions):
-
-                        height_meters = 0.0 if dummy else height
-                        pm25_injected = 0.0 if dummy else pm25_entrained * fraction
-
-                        # Write the record to the file
+                    rows = self._get_emissions_rows_data_for_lat_lon(
+                        plumerise_hour, pm25_emitted, hourly_area, dummy)
+                    for height, pm25, area, heat in rows:
                         emis.write(record_fmt % (dt_str, min_dur_str, lat, lon,
-                            height_meters, pm25_injected, area_meters, heat))
+                            height, pm25, area, heat))
 
-                if fires_wo_emissions > 0:
+
+                if self._fires_wo_emissions > 0:
                     logging.debug("%d of %d fires had no emissions for hour %d",
-                        fires_wo_emissions, num_fires, hour)
+                        self._fires_wo_emissions, num_fires, hour)
 
+    def _get_emissions_rows_data_for_lat_lon(self, plumerise_hour,
+            pm25_emitted, hourly_area, dummy):
 
+        area_meters, pm25_entrained, pm25_injected, heat = self._get_emissions_params(
+            pm25_emitted, plumerise_hour, hourly_area, dummy)
+        heights, fractions = self._reduce_and_reallocate_vertical_levels(plumerise_hour)
 
-    def _get_emissions_params(self, timeprofiled_emissions_hour,
-            plumerise_hour, hourly_area, dummy):
+        # if reduction factor == 20 (i.e. one height), add
+        # pm25_entrained to pm25_injected
+        if len(heights) == 0:
+            pm25_injected += pm25_entrained
+            pm25_entrained = 0
+
+        # Inject the smoldering fraction of the emissions at ground level
+        # (SMOLDER_HEIGHT represents a value slightly above ground level)
+        height_meters = self._smolder_height
+
+        # Write the smoldering record to the file
+        record_fmt = "%s %s %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
+        rows = [(height_meters, pm25_injected, area_meters, heat)]
+        for height, fraction in zip(heights, fractions):
+            height_meters = 0.0 if dummy else height
+            pm25_injected = 0.0 if dummy else pm25_entrained * fraction
+
+            rows.append((height_meters, pm25_injected, area_meters, heat))
+
+        return rows
+
+    def _get_emissions_params(self, pm25_emitted, plumerise_hour, hourly_area, dummy):
         if dummy:
             return 0.0, 0.0, 0.0, 0.0
 
@@ -685,8 +692,6 @@ class HYSPLITDispersion(DispersionBase):
         # phase-specific hourly fractions for this hour to get the
         # hourly emissions by phase for this hour, and then summing
         # the three values to get the total emissions for this hour
-        # TODO: use fire.timeprofiled_emissions[local_dt]['PM2.5']
-        pm25_emitted = timeprofiled_emissions_hour.get('PM2.5', 0.0)
         pm25_emitted *= GRAMS_PER_TON
 
         # Total PM2.5 smoldering (not lofted in the plume)
