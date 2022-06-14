@@ -11,6 +11,8 @@ from math import degrees as deg, radians as rad
 
 from pyairfire import sun
 
+from bluesky.datetimeutils import parse_datetime
+
 # required executables
 FEPS_WEATHER_BINARY = "feps_weather"
 FEPS_TIMEPROFILE_BINARY = "feps_timeprofile"
@@ -75,7 +77,7 @@ class UbcBsfFEPSTimeProfiler(object):
         subprocess.check_output(timeProfileArgs)
 
         self.hourly_fractions = self.readProfile(active_area["start"], profileFile)
-        self.start_hour = active_area["start"]
+        self.start_hour = parse_datetime(active_area["start"])
         self.ONE_HOUR = timedelta(hours=1)
 
     def writeConsumption(self, active_area, filename):
