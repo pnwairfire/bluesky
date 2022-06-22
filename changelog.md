@@ -483,3 +483,6 @@
 
 ## 4.3.50
  - Refactor vertical allocation of emissions for hysplit so that top level has zero.
+
+## 4.3.51
+ - fix data type handling in ubcbsffeps timeprofilers and nfdrs fuelmoisture modules
