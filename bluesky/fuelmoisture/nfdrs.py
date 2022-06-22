@@ -16,7 +16,11 @@ class NfdrsFuelMoisture(object):
             process_func=lambda a: a):
         vals = met.get(met_key)
         if vals:
-            fm_1_10_args[key] = process_func(vals[0])
+            # Sometimes vals is a list and sometimes it's numerical value
+            if hasattr(vals, 'append'):
+                fm_1_10_args[key] = process_func(vals[0])
+            else:
+                fm_1_10_args[key] = vals
         # else, don't set it, so that `fm_1_10`s kward defualt is used
 
     def _convert_tcld_to_sow(self, tcld):
