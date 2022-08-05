@@ -17,6 +17,7 @@ import os
 import sys
 import pstats
 import traceback
+import urllib.request
 try:
     import cProfile as profile
 except:
@@ -29,18 +30,24 @@ from pyairfire import process
 try:
     from bluesky import (
         datetimeutils, exceptions,
-        modules, models, __version__
+        modules, models, __version__,
+        io as bluesky_io
     )
     from bluesky.config import Config
+    from bluesky.exceptions import BlueSkyUnavailableResourceError
+
 except:
     import os
     root_dir = os.path.abspath(os.path.join(sys.path[0], '../'))
     sys.path.insert(0, root_dir)
     from bluesky import (
         datetimeutils, exceptions,
-        modules, models, __version__
+        modules, models, __version__,
+        io as bluesky_io
     )
     from bluesky.config import Config
+    from bluesky.exceptions import BlueSkyUnavailableResourceError
+
 
 __author__ = "Joel Dubowy"
 
@@ -67,8 +74,8 @@ OPTIONAL_ARGS = [
         'help': ("Level of tolerance for input file failures - 'none', 'partial', 'complete'; default 'partial'\n"
             " - 'none': abort execution if any input files fail to load\n"
             " - 'partial': abort execution only if all input files fail to load\n"
-            " - 'complete': Never abort execution on input failures"),
-        'default': 'partial'
+            " - 'complete': Never abort execution on input failures\n"
+            "DEPRECATED - use config > input > input_file_failure_tolerance")
     },
     {
         'short': '-o',
@@ -298,8 +305,9 @@ def validate_args(args):
     elif args.input_files and is_po:
         exit_with_msg("Option '-i'/'--input-file' can't be "
             "specified if there's piped input")
-    elif (args.input_file_failure_tolerance
-            not in VALID_INPUT_FILE_FAILURE_TOLERANCE_VALUES):
+    elif (args.input_file_failure_tolerance and
+            args.input_file_failure_tolerance
+                not in VALID_INPUT_FILE_FAILURE_TOLERANCE_VALUES):
         exit_with_msg(f"Invalid value for '--input-file-failure-tolerance': "
             f"'{args.input_file_failure_tolerance}'. Valid values: "
             f"{', '.join(VALID_INPUT_FILE_FAILURE_TOLERANCE_VALUES)}")
@@ -371,6 +379,45 @@ def set_config(args, fires_manager):
             indent=args.indent, cls=models.fires.FireEncoder))
         sys.exit(0)
 
+
+# TODO: move input loading code to separate modile (like bluesky.io?)
+
+def load_input_files(args, fires_manager):
+    """Note: files are loaded synchronously
+
+    TODO: load asynchronously, at least if 'wait' is defined
+    """
+    wait_config = Config().get('input','wait')
+    @bluesky_io.wait_for_availability(wait_config)
+    def _load(f):
+        try:
+            fires_manager.loads(input_file=f, append_fires=True)
+        except FileNotFoundError as e:
+            raise BlueSkyUnavailableResourceError("Local file not found")
+        except urllib.request.HTTPError as e:
+            raise BlueSkyUnavailableResourceError("Failed to load remote file")
+        # TODO: Are there any other http related exceptions to handle?
+
+
+    tolerance = (args.input_file_failure_tolerance
+        or Config().get('input','input_file_failure_tolerance'))
+    at_least_one = False
+    for f in args.input_files:
+        try:
+            _load(f)
+            at_least_one = True
+        except Exception as e:
+            msg = f'failed to load {f}: {e}'
+            logging.error(msg)
+            if tolerance == 'none':
+                raise
+            else:
+                fires_manager.record_error(msg)
+
+    if not at_least_one and tolerance == 'partial':
+        # This will only get hit is --skip-failed-input-files was used
+        raise exceptions.BlueSkyInputError("No valid input files were loaded")
+
 def setup(args):
     fires_manager = models.fires.FiresManager()
     # Set today and run id first of two times. Setting here so that
@@ -392,23 +439,7 @@ def setup(args):
 
     # Note: Calling code handles exception
     if not args.no_input:
-        tolerance = args.input_file_failure_tolerance.lower()
-        at_least_one = False
-        for f in args.input_files:
-            try:
-                fires_manager.loads(input_file=f, append_fires=True)
-                at_least_one = True
-            except Exception as e:
-                msg = f'failed to load {f}: {e}'
-                logging.error(msg)
-                if tolerance == 'none':
-                    raise
-                else:
-                    fires_manager.record_error(msg)
-
-        if not at_least_one and tolerance == 'partial':
-            # This will only get hit is --skip-failed-input-files was used
-            raise exceptions.BlueSkyInputError("No valid input files were loaded")
+        load_input_files(args, fires_manager)
 
     set_modules(args, fires_manager)
 

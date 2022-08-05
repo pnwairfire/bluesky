@@ -25,6 +25,12 @@ _DEFAULTS = {
         "process": None,
         "domain": None
     },
+    "input": {
+        "input_file_failure_tolerance": 'partial',
+        # We need to default 'wait' to an empty dict, since an empty dict
+        # indicates that we aren't waiting (which is the default behavior)
+        "wait": {}, # {"strategy": None,"time": None,"max_attempts": None},
+    },
     "load": {
         "sources": []
         # Each source has some subset of the following defined, but

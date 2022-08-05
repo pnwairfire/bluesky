@@ -47,6 +47,17 @@ configuration json data are case-insensitive.***
  - ***'config' > 'skip_failed_fires'*** -- *optional* -- exclude failed fire rather than abort entire run; default false; applies to various modules
  - ***'config' > 'skip_failed_sources'*** -- *optional* -- exclude failed sources rather than abort entire run; default false;  *Note: this may alternatively be defined under 'load'*
 
+### input
+
+ - ***'config' > 'input' > 'input_file_failure_tolerance'*** -- Level of tolerance for input file failures - 'none', 'partial', 'complete'; default 'partial'
+   - 'none': abort execution if any input files fail to load
+   - 'partial': abort execution only if all input files fail to load
+   - 'complete': Never abort execution on input failures
+ - ***'config' > 'input' > 'wait' > 'strategy'*** -- *required* if 'wait' section is defined -- 'fixed' or 'backoff'
+ - ***'config' > 'input' > 'wait' > 'time'*** -- *required* if 'wait' section is defined -- time to wait until next attempt (initial wait only if backoff)
+ - ***'config' > 'input' > 'wait' > 'max_attempts'*** -- *required* if 'wait' section is defined  -- max number of attempts
+
+
 ### load
 
  - ***'config' > 'load' > 'sources'*** -- *optional* -- array of sources to load fire data from; if not defined or if empty array, nothing is loaded
