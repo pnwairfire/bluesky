@@ -486,3 +486,8 @@
 
 ## 4.3.51
  - fix data type handling in ubcbsffeps timeprofilers and nfdrs fuelmoisture modules
+
+## 4.3.52
+ - Support wait/retry logic when loading input files
+ - Load input files in parallel
+ - Fix broken unit tests
