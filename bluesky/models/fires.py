@@ -681,8 +681,8 @@ class FiresManager(object):
             input_stream = gzip.decompress(input_stream)
             logging.info("Decompressed input")
         except Exception as e:
-            logging.debug("Failed to gzip.decompress: %s", e)
-            logging.info("input not gzip'd")
+            logging.debug("Failed to gzip.decompress %s: %s", input_file or '', e)
+            logging.info("input %s not gzip'd", input_file or '')
 
         input_stream = input_stream.decode()
 
@@ -691,7 +691,8 @@ class FiresManager(object):
         except json.decoder.JSONDecodeError as e:
             raise ValueError(f"Invalid json: {str(e)}")
 
-        return self.load(data, append_fires=append_fires)
+        self.load(data, append_fires=append_fires)
+        logging.info("Loaded %s", input_file or '')
 
     ## Dumping data
 
