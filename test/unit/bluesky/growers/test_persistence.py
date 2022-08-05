@@ -332,23 +332,29 @@ class TestPersistencePickCorrectMatchingConfig(object):
 
 class TestPersistenceEmptyCases(object):
 
-    def setup(self):
+    def set_config(self):
+        # Note: reset_config gets called after setup is executed, so we
+        # need to set the config in a custom function which is explicitly
+        # called by each test function
         Config().set({
             "date_to_persist": datetime.date(2016,8,6),
             "days_to_persist": 1,
         }, "growth", "persistence")
 
     def test_no_fires(self, reset_config):
+        self.set_config()
         fm = MockFiresManager([])
         persistence.Grower(fm).grow()
         assert fm.fires == []
 
     def test_no_activity(self, reset_config):
+        self.set_config()
         fm = MockFiresManager([{"id": 'abc123'}])
         persistence.Grower(fm).grow()
         assert fm.fires == [{"id": 'abc123', 'type': 'wildfire', 'fuel_type': 'natural'}]
 
     def test_empty_activity(self, reset_config):
+        self.set_config()
         fm = MockFiresManager([{"id": 'abc123', 'activity': []}])
         persistence.Grower(fm).grow()
         assert fm.fires == [{"id": 'abc123', 'type': 'wildfire', 'fuel_type': 'natural', 'activity': []}]
@@ -389,7 +395,7 @@ class TestPersistenceRx(object):
 
 class TestPersistenceWfWithTruncation(object):
 
-    def setup(self):
+    def set_config(self):
         Config().set({
             # 'date_to_persist' will be changed by each test
             "date_to_persist": datetime.date(2016,8,7),
@@ -403,6 +409,7 @@ class TestPersistenceWfWithTruncation(object):
 
         There's nothing to persist, regardless of config settings
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,7),
             "growth", "persistence", "date_to_persist")
 
@@ -417,6 +424,7 @@ class TestPersistenceWfWithTruncation(object):
     def test_persist_2016_8_6(self, reset_config):
         """Activity before and on day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,6),
             "growth", "persistence", "date_to_persist")
 
@@ -472,6 +480,7 @@ class TestPersistenceWfWithTruncation(object):
     def test_persist_2016_8_5(self, reset_config):
         """Activity before and after, but not on day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,5),
             "growth", "persistence", "date_to_persist")
 
@@ -486,6 +495,7 @@ class TestPersistenceWfWithTruncation(object):
     def test_persist_2016_8_4(self, reset_config):
         """Growth before, on, and after day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,4),
             "growth", "persistence", "date_to_persist")
 
@@ -563,6 +573,7 @@ class TestPersistenceWfWithTruncation(object):
     def test_persist_2016_8_3(self, reset_config):
         """Growth before, on, and after day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,3),
             "growth", "persistence", "date_to_persist")
 
@@ -608,6 +619,7 @@ class TestPersistenceWfWithTruncation(object):
     def test_persist_2016_8_2(self, reset_config):
         """Growth before, on, and after day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,2),
             "growth", "persistence", "date_to_persist")
 
@@ -674,6 +686,7 @@ class TestPersistenceWfWithTruncation(object):
     def test_persist_2016_8_1(self, reset_config):
         """Growth on and after day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,1),
             "growth", "persistence", "date_to_persist")
 
@@ -739,6 +752,7 @@ class TestPersistenceWfWithTruncation(object):
     def test_persist_2016_7_31(self, reset_config):
         """All growth after day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,7,31),
             "growth", "persistence", "date_to_persist")
 
@@ -753,7 +767,7 @@ class TestPersistenceWfWithTruncation(object):
 
 class TestPersistenceWfWithoutTruncation(object):
 
-    def setup(self):
+    def set_config(self):
         Config().set({
             # 'date_to_persist' will be changed by each test
             "date_to_persist": datetime.date(2016,8,7),
@@ -767,6 +781,7 @@ class TestPersistenceWfWithoutTruncation(object):
 
         There's nothing to persist, regardless of config settings
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,7),
             "growth", "persistence", "date_to_persist")
 
@@ -780,6 +795,7 @@ class TestPersistenceWfWithoutTruncation(object):
     def test_persist_2016_8_6(self, reset_config):
         """Activity before and on day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,6),
             "growth", "persistence", "date_to_persist")
 
@@ -835,6 +851,7 @@ class TestPersistenceWfWithoutTruncation(object):
     def test_persist_2016_8_5(self, reset_config):
         """Growth before and after, but not on day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,5),
             "growth", "persistence", "date_to_persist")
 
@@ -849,6 +866,7 @@ class TestPersistenceWfWithoutTruncation(object):
     def test_persist_2016_8_4(self, reset_config):
         """Growth before, on, and after day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,4),
             "growth", "persistence", "date_to_persist")
 
@@ -862,6 +880,7 @@ class TestPersistenceWfWithoutTruncation(object):
     def test_persist_2016_8_3(self, reset_config):
         """Growth before, on, and after day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,3),
             "growth", "persistence", "date_to_persist")
 
@@ -875,6 +894,7 @@ class TestPersistenceWfWithoutTruncation(object):
     def test_persist_2016_8_2(self, reset_config):
         """Growth before, on, and after day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,2),
             "growth", "persistence", "date_to_persist")
 
@@ -888,6 +908,7 @@ class TestPersistenceWfWithoutTruncation(object):
     def test_persist_2016_8_1(self, reset_config):
         """Growth on and after day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,8,1),
             "growth", "persistence", "date_to_persist")
 
@@ -901,6 +922,7 @@ class TestPersistenceWfWithoutTruncation(object):
     def test_persist_2016_7_31(self, reset_config):
         """All growth after day to persist
         """
+        self.set_config()
         Config().set(datetime.date(2016,7,31),
             "growth", "persistence", "date_to_persist")
 

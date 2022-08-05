@@ -233,11 +233,17 @@ class TestPlumeRiseRun(object):
 class TestPlumeRiseRunFeps(object):
 
     def setup(self):
-        Config().set('feps', 'plumerise', 'model')
-        Config().set(False, 'skip_failed_fires')
         self.fm = FiresManager()
 
+    def set_config(self):
+        # Note: reset_config gets called after setup is executed, so we
+        # need to set the config in a custom function which is explicitly
+        # called by each test function
+        Config().set('feps', 'plumerise', 'model')
+        Config().set(False, 'skip_failed_fires')
+
     def test_fire_no_activity(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_NO_ACTIVITY]})
@@ -246,6 +252,7 @@ class TestPlumeRiseRunFeps(object):
         assert e_info.value.args[0] == plumerise.NO_ACTIVITY_ERROR_MSG
 
     def test_fire_missing_location_area(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_LOCATION_AREA]})
@@ -254,6 +261,7 @@ class TestPlumeRiseRunFeps(object):
         assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
 
     def test_fire_missing_location_consumption(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_CONSUMPTION]})
@@ -262,6 +270,7 @@ class TestPlumeRiseRunFeps(object):
         assert e_info.value.args[0] == plumerise.MISSING_CONSUMPTION_ERROR_MSG
 
     def test_fire_missing_timeprofile(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_TIMEPROFILE]})
@@ -270,6 +279,7 @@ class TestPlumeRiseRunFeps(object):
         assert e_info.value.args[0] == plumerise.MISSING_TIMEPROFILE_ERROR_MSG
 
     def test_fire_missing_start_time(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_START_TIME]})
@@ -281,6 +291,7 @@ class TestPlumeRiseRunFeps(object):
 
 
     def test_fire_missing_localmet(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
         monkeypatch_tempfile_mkdtemp(monkeypatch)
 
@@ -310,6 +321,7 @@ class TestPlumeRiseRunFeps(object):
         }
 
     def test_no_fires(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": []})
@@ -326,6 +338,7 @@ class TestPlumeRiseRunFeps(object):
         }
 
     def test_one_fire(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
         monkeypatch_tempfile_mkdtemp(monkeypatch)
 
@@ -363,11 +376,17 @@ class TestPlumeRiseRunFeps(object):
 class TestPlumeRiseRunSev(object):
 
     def setup(self):
-        Config().set('sev', 'plumerise', 'model')
-        Config().set(False, 'skip_failed_fires')
         self.fm = FiresManager()
 
+    def set_config(self):
+        # Note: reset_config gets called after setup is executed, so we
+        # need to set the config in a custom function which is explicitly
+        # called by each test function
+        Config().set('sev', 'plumerise', 'model')
+        Config().set(False, 'skip_failed_fires')
+
     def test_fire_no_activity(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_NO_ACTIVITY]})
@@ -376,6 +395,7 @@ class TestPlumeRiseRunSev(object):
         assert e_info.value.args[0] == plumerise.NO_ACTIVITY_ERROR_MSG
 
     def test_fire_missing_location_area(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_LOCATION_AREA]})
@@ -384,6 +404,7 @@ class TestPlumeRiseRunSev(object):
         assert e_info.value.args[0] == activity.INVALID_LOCATION_MSGS['specified_points']
 
     def test_fire_missing_location_consumption(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_CONSUMPTION]})
@@ -410,6 +431,7 @@ class TestPlumeRiseRunSev(object):
 
 
     def test_fire_missing_timeprofile(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_TIMEPROFILE]})
@@ -436,6 +458,7 @@ class TestPlumeRiseRunSev(object):
 
 
     def test_fire_missing_start_time(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_START_TIME]})
@@ -464,6 +487,7 @@ class TestPlumeRiseRunSev(object):
 
 
     def test_fire_missing_localmet(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_LOCALMET]})
@@ -472,6 +496,7 @@ class TestPlumeRiseRunSev(object):
         assert e_info.value.args[0] == plumerise.MISSING_LOCALMET_ERROR_MSG
 
     def test_no_fires(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": []})
@@ -488,6 +513,7 @@ class TestPlumeRiseRunSev(object):
         }
 
     def test_one_fire(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         fire = copy.deepcopy(FIRE)
@@ -525,11 +551,17 @@ class TestPlumeRiseRunSev(object):
 class TestPlumeRiseRunSevFeps(object):
 
     def setup(self):
-        Config().set('sev-feps', 'plumerise', 'model')
-        Config().set(False, 'skip_failed_fires')
         self.fm = FiresManager()
 
+    def set_config(self):
+        # Note: reset_config gets called after setup is executed, so we
+        # need to set the config in a custom function which is explicitly
+        # called by each test function
+        Config().set('sev-feps', 'plumerise', 'model')
+        Config().set(False, 'skip_failed_fires')
+
     def test_fire_no_activity(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_NO_ACTIVITY]})
@@ -538,6 +570,7 @@ class TestPlumeRiseRunSevFeps(object):
         assert e_info.value.args[0] == plumerise.NO_ACTIVITY_ERROR_MSG
 
     def test_fire_missing_location_area(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": [FIRE_MISSING_LOCATION_AREA]})
@@ -552,6 +585,7 @@ class TestPlumeRiseRunSevFeps(object):
     # def test_fire_missing_localmet(self, reset_config, monkeypatch):
 
     def test_no_fires(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
 
         self.fm.load({"fires": []})
@@ -568,6 +602,7 @@ class TestPlumeRiseRunSevFeps(object):
         }
 
     def test_one_fire_feps(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
         monkeypatch_tempfile_mkdtemp(monkeypatch)
 
@@ -603,6 +638,7 @@ class TestPlumeRiseRunSevFeps(object):
         # TOOD: assert plumerise return value
 
     def test_one_fire_sev(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
         monkeypatch_tempfile_mkdtemp(monkeypatch)
 
@@ -640,6 +676,7 @@ class TestPlumeRiseRunSevFeps(object):
         # TOOD: assert plumerise return value
 
     def test_one_fire_one_feps_one_sev(self, reset_config, monkeypatch):
+        self.set_config()
         monkeypatch_plumerise_class(monkeypatch)
         monkeypatch_tempfile_mkdtemp(monkeypatch)
 
