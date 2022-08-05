@@ -2,6 +2,7 @@
 
 __author__ = "Joel Dubowy"
 
+import asyncio
 import logging
 import io
 import os
@@ -145,7 +146,32 @@ def wait_for_availability(config):
                     else:
                         break
 
-            return decorated
+            async def decorated_async(*args, **kwargs):
+                sleep_time = config['time']
+                attempts = 0
+
+                while True:
+                    try:
+                        return await f(*args, **kwargs)
+
+                    except BlueSkyUnavailableResourceError as e:
+                        attempts += 1
+                        if attempts == config['max_attempts']:
+                            logging.info(
+                                "Resource doesn't exist. Reached max attempts."
+                                " (%s)", e)
+                            raise
+
+                        logging.info("Resource doesn't exist. Will attempt "
+                            "again in %s seconds. (%s)", sleep_time, e)
+                        await asyncio.sleep(sleep_time)
+                        if config['strategy'] == 'backoff':
+                            sleep_time *= 2
+
+                    else:
+                        break
+
+            return decorated_async if asyncio.iscoroutinefunction(f) else decorated
         else:
             return f
 

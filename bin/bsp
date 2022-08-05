@@ -8,6 +8,7 @@ Example calls:
  > bsp < fires-before.json > fires-after.json
 """
 
+import asyncio
 import datetime
 import fcntl
 import io
@@ -382,14 +383,26 @@ def set_config(args, fires_manager):
 
 # TODO: move input loading code to separate modile (like bluesky.io?)
 
-def load_input_files(args, fires_manager):
+async def load_input_file(fires_manager, f, _load, tolerance):
+    try:
+        await _load(f)
+        return True
+    except Exception as e:
+        msg = f'failed to load {f}: {e}'
+        logging.error(msg)
+        if tolerance == 'none':
+            raise
+        else:
+            fires_manager.record_error(msg)
+
+async def load_input_files(args, fires_manager):
     """Note: files are loaded synchronously
 
     TODO: load asynchronously, at least if 'wait' is defined
     """
     wait_config = Config().get('input','wait')
     @bluesky_io.wait_for_availability(wait_config)
-    def _load(f):
+    async def _load(f):
         try:
             fires_manager.loads(input_file=f, append_fires=True)
         except FileNotFoundError as e:
@@ -401,24 +414,15 @@ def load_input_files(args, fires_manager):
 
     tolerance = (args.input_file_failure_tolerance
         or Config().get('input','input_file_failure_tolerance'))
-    at_least_one = False
-    for f in args.input_files:
-        try:
-            _load(f)
-            at_least_one = True
-        except Exception as e:
-            msg = f'failed to load {f}: {e}'
-            logging.error(msg)
-            if tolerance == 'none':
-                raise
-            else:
-                fires_manager.record_error(msg)
+    results = await asyncio.gather(
+        *[load_input_file(fires_manager, f, _load, tolerance)
+            for f in args.input_files])
 
-    if not at_least_one and tolerance == 'partial':
+    if not any(results) and tolerance == 'partial':
         # This will only get hit is --skip-failed-input-files was used
         raise exceptions.BlueSkyInputError("No valid input files were loaded")
 
-def setup(args):
+async def setup(args):
     fires_manager = models.fires.FiresManager()
     # Set today and run id first of two times. Setting here so that
     # config data and intput file name wildcards are filled in correctly
@@ -439,7 +443,7 @@ def setup(args):
 
     # Note: Calling code handles exception
     if not args.no_input:
-        load_input_files(args, fires_manager)
+        await load_input_files(args, fires_manager)
 
     set_modules(args, fires_manager)
 
@@ -478,14 +482,14 @@ def profile_run(fires_manager, profile_output_file):
     with open(profile_output_file, 'w') as f:
         f.write(s.getvalue())
 
-def main():
+async def main():
     args = parse_args()
 
     # configure logging as soon as possible, before any log messages
     configure_logging(args)
 
     try:
-        fires_manager = setup(args)
+        fires_manager = await setup(args)
         if args.profile_output_file:
             args.profile_output_file = replace_wildcards(
                 args, args.profile_output_file)
@@ -505,4 +509,4 @@ def main():
     logging.summary("Run complete")
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
