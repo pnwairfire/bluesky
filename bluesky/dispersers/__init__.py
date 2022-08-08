@@ -13,6 +13,7 @@ __author__ = "Joel Dubowy"
 import abc
 import itertools
 import logging
+import math
 import os
 import shutil
 from datetime import timedelta
@@ -314,7 +315,13 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
     def _get_utc_offset(self, aa):
         utc_offset = aa.get('utc_offset')
-        return parse_utc_offset(utc_offset) if utc_offset else 0.0
+        utc_offset = parse_utc_offset(utc_offset) if utc_offset else 0.0
+        # round utc_offset offset down to the nearest whole hour (e.g. -3.5 -> -4),
+        # since we use it for referencing timeprofile and plumerise data, which
+        # have whole hour keys.  It's not used for anything else.
+        utc_offset = math.floor(utc_offset)
+        return utc_offset
+
 
     def _convert_keys_to_datetime(self, d):
         return { datetime_parsing.parse(k): v for k, v in d.items() }
