@@ -491,3 +491,6 @@
  - Support wait/retry logic when loading input files
  - Load input files in parallel
  - Fix broken unit tests
+
+## 4.3.53
+ - Update dispersion timeprofile and plumerise logic to work with partial hour UTC offsets
