@@ -35,6 +35,14 @@ def run(fires_manager):
     """
     fires_manager.processed(__name__, __version__)
 
+    # Remove any met info from any previous run. (e.g. Emissions run using
+    # NAM 12km met gets piped into dispersion run using PNW 4km met. If
+    # NAM 12km met exists, but PNW 4km does not, and if 'skip_failures' is
+    # set to True, then PNW 4km run will continue on after findmetdata,
+    # inadvertantly trying to use the NAM 12km data unless we remove the
+    # NAM 12km met info.)
+    fires_manager.pop("met", None)
+
     # TODO: For playground, there will be only one file containing data for
     # any particular hour.  Allow config to specify using simplified logic
     # for this scenario.  Otherwise, use more complicated logic in

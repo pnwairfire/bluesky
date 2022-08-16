@@ -439,11 +439,9 @@ class FiresManager(object):
         logging.summary("Fire counts: %s", counts)
         return counts
 
-
     ##
     ## Meta Properties
     ##
-
 
     def __getattr__(self, attr):
         """Provides get access to meta data
@@ -462,6 +460,9 @@ class FiresManager(object):
         if not attr.startswith('_') and not hasattr(FiresManager, attr):
             self._meta[attr] = val
         super(FiresManager, self).__setattr__(attr, val)
+
+    def pop(self, *args):
+        return self._meta.pop(*args)
 
     ##
     ## Running Modules
