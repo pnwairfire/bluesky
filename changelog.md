@@ -494,3 +494,6 @@
 
 ## 4.3.53
  - Update dispersion timeprofile and plumerise logic to work with partial hour UTC offsets
+
+## 4.3.54
+ - Update findmetdata to remove any met info from previous run
