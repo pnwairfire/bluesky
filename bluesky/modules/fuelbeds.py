@@ -11,6 +11,7 @@ from fccsmap.lookup import FccsLookUp
 from functools import reduce
 
 from bluesky.config import Config
+from bluesky.locationutils import LatLng
 
 __all__ = [
     'run'
@@ -35,6 +36,8 @@ def run(fires_manager):
     logging.debug('Using FCCS version %s',
         Config().get('fuelbeds', 'fccs_version'))
 
+    skip_failures = Config().get('fuelbeds', 'skip_failures')
+
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             for aa in fire.active_areas:
@@ -50,7 +53,13 @@ def run(fires_manager):
                             pass
 
                     if not loc.get('fuelbeds'):
-                        raise RuntimeError('Failed to lookup fuelbed information')
+                        latlng = LatLng(loc)
+                        msg = ("Failed to lookup fuelbeds information for "
+                            f"loc {latlng.latitude}, {latlng.longitude} ")
+                        logging.error(msg)
+                        if not skip_failures:
+                            raise RuntimeError(msg)
+
 
     # TODO: Add fuel loadings data to each fuelbed object (????)
     #  If we do so here, use bluesky.modules.consumption.FuelLoadingsManager

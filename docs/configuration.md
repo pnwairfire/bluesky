@@ -124,6 +124,7 @@ The following settings apply to filtering on any field (other than 'area') in th
 - ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
 - ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- fuelbeds to ignore; default ['0', '900']
 - ***'config' > 'fuelbeds' > 'no_sampling'*** -- *optional* -- don't sample surrounding area for Point and MultiPoint geometries
+- ***'config' > 'fuelbeds' > 'skip_failures'*** -- *optional* -- default `false`; if true, ignore fuelbed look-up failures and move on to next location; else (default), raise exception (which either aborts run or moves fire to `failed_fires`, depending on how top level `skip_failed_fires` is set)
 - ***'config' > 'fuelbeds' > 'fccs_fuelload_file'*** -- *optional* -- NetCDF
   file containing FCCS lookup map
 - ***'config' > 'fuelbeds' > 'fccs_fuelload_param'*** -- *optional* -- name of variable in NetCDF file

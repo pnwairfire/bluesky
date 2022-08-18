@@ -99,6 +99,8 @@ _DEFAULTS = {
         "ignored_fuelbeds": ['0', '900'],
         "no_sampling": False,
 
+        "skip_failures": False,
+
         # The following defaults are defined in the fccsmap package
         # and are based on the location of the package in the file
         # system. So, let fccsmap set defaults
