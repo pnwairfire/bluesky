@@ -85,7 +85,7 @@ def summarize(fires):
             for aa in ac.active_areas:
                 total_area += aa.total_area
                 for loc in aa.locations:
-                    for fb in loc['fuelbeds']:
+                    for fb in loc.get('fuelbeds', [{"fccs_id": "unknown", "pct": 100.0}]):
                         area_by_fccs_id[fb['fccs_id']] += (fb['pct'] / 100.0) * loc['area']
 
     summary = [{"fccs_id": fccs_id, "pct": (area / total_area) * 100.0}
