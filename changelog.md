@@ -500,3 +500,6 @@
 
 ## 4.3.55
  - Add option fuelbeds > skip_failures
+
+## 4.3.56
+ - Update fuelbeds summarization to handle fires with failed look-up
