@@ -497,3 +497,6 @@
 
 ## 4.3.54
  - Update findmetdata to remove any met info from previous run
+
+## 4.3.55
+ - Add option fuelbeds > skip_failures
