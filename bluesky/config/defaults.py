@@ -120,6 +120,7 @@ _DEFAULTS = {
         # multiple models
         "models": ["nfdrs"],
         "use_defaults": False,
+        "defaults_profile": None,
         "skip_failures": True,
         "nfdrs": {},
         "wims": {

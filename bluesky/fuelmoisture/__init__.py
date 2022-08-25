@@ -2,6 +2,9 @@ import datetime
 
 from afdatetime.parsing import parse_datetime
 
+from bluesky.config import Config
+from bluesky.exceptions import BlueSkyConfigurationError
+
 # Default FM profiles from BSF
 MOISTURE_PROFILES = {
     "very_dry": {
@@ -31,12 +34,18 @@ MOISTURE_PROFILES = {
 }
 
 def get_defaults(fire, loc):
-    # This logic is also from BSF
-    if fire.is_wildfire:
-        return MOISTURE_PROFILES['dry']
-    # TODO: only reutrn moist if rx ???
+    profile = Config().get('fuelmoisture','defaults_profile')
+    if profile:
+        if profile not in MOISTURE_PROFILES:
+            raise BlueSkyConfigurationError("Invalid moisture profile:")
+        return  MOISTURE_PROFILES[profile]
     else:
-        return MOISTURE_PROFILES['moist']
+        # This logic is also from BSF
+        if fire.is_wildfire:
+            return MOISTURE_PROFILES['dry']
+        # TODO: only reutrn moist if rx ???
+        else:
+            return MOISTURE_PROFILES['moist']
 
 ONE_HOUR = datetime.timedelta(hours=1)
 

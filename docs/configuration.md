@@ -143,6 +143,7 @@ The following settings apply to filtering on any field (other than 'area') in th
 
  - ***'config' > 'fuelmoisture' > 'models'*** -- *optional* -- fuel moisture models to run; default ["nfdrs"]
  - ***'config' > 'fuelmoisture' > 'use_defaults'*** -- *optional* -- after running fuel moisture models, set any remaining undefined fields to defaults, based on fire type (wildfire vs rx); otherwise, the fields are left undefined and other modules dependent on fuel moisture will use their own defaults
+ - ***'config' > 'fuelmoisture' > 'defaults_profile'*** -- *optional* -- if using defaults, 'defaults_profile' indicates which one of the defined profiles ("very_dry', 'dry', 'moderate', 'moist', 'wet', 'very_wet'). If not set (default behavior), bluesky uses 'dry' for wildfires and 'moist' for everything else
  - ***'config' > 'fuelmoisture' > 'skip_failures'*** -- *optional* -- default `true`; if true (default) ignore and move on to next model or location; else, raise exception (which either aborts run or moves fire to `failed_fires`, depending on how top level `skip_failed_fires` is set)
 #### if running NFDRS
 
