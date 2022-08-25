@@ -503,3 +503,6 @@
 
 ## 4.3.56
  - Update fuelbeds summarization to handle fires with failed look-up
+
+## 4.3.57
+ - Update fuelmoisture to support specifying defaults moisture profile
