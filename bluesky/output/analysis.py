@@ -158,7 +158,7 @@ class SummarizedFire(dict):
             for t in sorted(aa.get('timeprofile', {}).keys()):
                 d = aa['timeprofile'][t]
                 tp_emissions[t][s] += sum([
-                    d[p]*emissions[s][p] for p in self.PHASES
+                    d[p]*emissions[s].get(p, 0.0) for p in self.PHASES
                 ])
         return tp_emissions
 
