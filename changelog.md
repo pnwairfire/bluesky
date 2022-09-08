@@ -506,3 +506,7 @@
 
 ## 4.3.57
  - Update fuelmoisture to support specifying defaults moisture profile
+
+## 4.3.58
+ - bug fix in output analysis
+ - Upgrade blueskykml to v4.0.5
