@@ -510,3 +510,6 @@
 ## 4.3.58
  - bug fix in output analysis
  - Upgrade blueskykml to v4.0.5
+
+## 4.3.59
+ - fix docker build issue
