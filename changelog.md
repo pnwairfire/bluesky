@@ -514,5 +514,8 @@
 ## 4.3.59
  - fix docker build issue
 
-## 4.3.58
+## 4.3.60
  - Upgrade blueskykml to v4.0.6
+
+## 4.3.61
+ - Upgrade eflookup to v4.0.4
