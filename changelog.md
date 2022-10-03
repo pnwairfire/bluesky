@@ -519,3 +519,6 @@
 
 ## 4.3.61
  - Upgrade eflookup to v4.0.4
+
+## 4.3.62
+ - Fix setting of localmet data to reflect each location's time window
