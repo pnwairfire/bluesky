@@ -63,7 +63,7 @@ class LocalmetRunner(object):
 
         # keep array of references to locations passed into arlprofiler,
         # to update with local met data after bulk profiler is called
-        self._locations = []
+        self._locations_w_tw = []
 
         # actual array of locations to pass into arlprofiler
         self._profiler_locations = []
@@ -81,7 +81,7 @@ class LocalmetRunner(object):
 
     @property
     def locations(self):
-        return self._locations
+        return [l[0] for l in self._locations_w_tw]
 
     @property
     def profiler_locations(self):
@@ -99,11 +99,16 @@ class LocalmetRunner(object):
         localmet = arl_profiler.profile(
             self._start_utc, self._end_utc, self._profiler_locations)
 
-        if len(localmet) != len(self._locations):
+        if len(localmet) != len(self._locations_w_tw):
             raise RuntimeError(PROFILER_RUN_ERROR_MSG)
 
         for i in range(len(localmet)):
-            self._locations[i]['localmet'] = localmet[i]
+            # Only include localmet data for times within location's time window
+            loc_start = self._locations_w_tw[i][1].strftime('%Y-%m-%dT%H:%M:%S')
+            loc_end = self._locations_w_tw[i][2].strftime('%Y-%m-%dT%H:%M:%S')
+            self._locations_w_tw[i][0]['localmet'] = {
+                k:v for k,v in localmet[i].items() if k >= loc_start and k < loc_end
+            }
 
         if (working_dir and Config().get('localmet', 'delete_working_dir_if_no_error')):
             try:
@@ -133,7 +138,7 @@ class LocalmetRunner(object):
                     self._start_utc = min(self._start_utc, loc_start_utc) if self._start_utc else loc_start_utc
 
                     loc_end_utc = tw['end'] - datetime.timedelta(hours=utc_offset)
-                    self._end_utc = min(self._end_utc, loc_end_utc) if self._end_utc else loc_end_utc
+                    self._end_utc = max(self._end_utc, loc_end_utc) if self._end_utc else loc_end_utc
 
                     for loc in aa.locations:
                         latlng = LatLng(loc)
@@ -142,11 +147,11 @@ class LocalmetRunner(object):
                             'longitude': latlng.longitude
                         }
 
-                        self._locations.append(loc)
+                        self._locations_w_tw.append((loc, tw['start'], tw['end']))
                         self._profiler_locations.append(p_loc)
 
     def _validate(self):
-        if len(self._locations) != len(self._profiler_locations):
+        if len(self._locations_w_tw) != len(self._profiler_locations):
             raise RuntimeError(FAILED_TO_COMPILE_INPUT_ERROR_MSG)
 
         if not self._start_utc or not self._end_utc:

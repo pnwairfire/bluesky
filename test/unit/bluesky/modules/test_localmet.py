@@ -169,7 +169,7 @@ class TestLocalMetRun(object):
         assert _ARLP_PROFILE_CALL_ARGS == [
             (
                 datetime.datetime(2015, 1, 21, 0, 0),
-                datetime.datetime(2015, 1, 22, 0, 0),
+                datetime.datetime(2015, 1, 23, 0, 0),
                 [
                     {'latitude': 45.0, 'longitude': -119.0},
                     {'latitude': 47.415, 'longitude': -121.42}
