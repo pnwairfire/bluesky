@@ -522,3 +522,6 @@
 
 ## 4.3.62
  - Fix setting of localmet data to reflect each location's time window
+
+## 4.3.63
+ - Upgrade fccsmap to v3.0.4
