@@ -528,3 +528,6 @@
 
 ## 4.3.64
  - Upgrade blueskykml to v4.0.7
+
+## 4.3.65
+ - Specify all dependencies to avoid docker build issues
