@@ -62,6 +62,10 @@ RUN apt-get update \
 # upgrade distribute and pip
 # RUN pip3 install --upgrade distribute pip
 
+RUN mkdir /tmp/bluesky/
+WORKDIR /tmp/bluesky/
+COPY constraints.txt /tmp/bluesky/constraints.txt
+
 # blueskykml, consume, and fiona are relatively static these days; so, install
 # them here in order to avoid reinstalling them and their large dependencies
 # each time other dependencies in requirements.txt change.
@@ -76,20 +80,19 @@ RUN apt-get update \
 #   sure the correct version is installed
 RUN pip3 install matplotlib==3.3.4 \
     && pip3 install Fiona==1.8.18 \
-    && pip3 install --index-url https://pypi.airfire.org/simple \
+    && pip3 install \
+        -c constraints.txt --index-url https://pypi.airfire.org/simple \
         apps-consume==5.1.0 \
         blueskykml==4.0.7 \
         blueskyutils==1.0.0
 
 # Install python dependencies
-RUN mkdir /tmp/bluesky/
-WORKDIR /tmp/bluesky/
 COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
-RUN pip3 install -r requirements-test.txt
+RUN pip3 install -c constraints.txt -r requirements-test.txt
 COPY requirements-dev.txt /tmp/bluesky/requirements-dev.txt
-RUN pip3 install -r requirements-dev.txt
+RUN pip3 install -c constraints.txt -r requirements-dev.txt
 COPY requirements.txt /tmp/bluesky/requirements.txt
-RUN pip3 install --no-binary gdal -r requirements.txt
+RUN pip3 install -c constraints.txt --no-binary gdal -r requirements.txt
 
 # Install binary dependencies - for localmet, plumerise,
 # dipersion, and visualization

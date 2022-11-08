@@ -101,12 +101,12 @@ or http:
 Run the following to install python dependencies:
 
     cd pnwairfire-bluesky
-    pip3 install --no-binary gdal -r requirements.txt
+    pip3 install -c constraints.txt --no-binary gdal -r requirements.txt
 
 Run the following to install packages required for development and testing:
 
-    pip3 install -r requirements-test.txt
-    pip3 install -r requirements-dev.txt
+    pip3 install -c constraints.txt -r requirements-test.txt
+    pip3 install -c constraints.txt -r requirements-dev.txt
 
 
 
