@@ -531,3 +531,6 @@
 
 ## 4.3.65
  - Specify all dependencies to avoid docker build issues
+
+## 4.3.66
+ - Add HYSPLIT v5.2.3 binaries
