@@ -112,6 +112,10 @@ COPY bin/hycm_std-v5.2 /usr/local/bin/hycm_std-v5.2
 COPY bin/hycs_std-v5.2 /usr/local/bin/hycs_std-v5.2
 COPY bin/hyts_std-v5.2 /usr/local/bin/hyts_std-v5.2
 COPY bin/hytm_std-v5.2 /usr/local/bin/hytm_std-v5.2
+COPY bin/hycm_std-v5.2 /usr/local/bin/hycm_std-v5.2.3
+COPY bin/hycs_std-v5.2 /usr/local/bin/hycs_std-v5.2.3
+COPY bin/hyts_std-v5.2 /usr/local/bin/hyts_std-v5.2.3
+COPY bin/hytm_std-v5.2 /usr/local/bin/hytm_std-v5.2.3
 COPY bin/hysplit2netcdf /usr/local/bin/hysplit2netcdf
 COPY bin/profile /usr/local/bin/profile
 COPY bin/bulk_profiler_csv /usr/local/bin/bulk_profiler_csv
