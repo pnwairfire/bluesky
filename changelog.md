@@ -534,3 +534,6 @@
 
 ## 4.3.66
  - Add HYSPLIT v5.2.3 binaries
+
+## 4.3.67
+ - Add HYSPLIT v5.2.3 binaries to docker image
