@@ -533,7 +533,10 @@
  - Specify all dependencies to avoid docker build issues
 
 ## 4.3.66
- - Add HYSPLIT v5.2.3 binaries
+ - Add HYSPLIT v5.2.3 binaries (patched with fix for metpos errors)
 
 ## 4.3.67
  - Add HYSPLIT v5.2.3 binaries to docker image
+
+## 4.3.68
+ - Add HYSPLIT v5.1.0 binaries (patched with fix for metpos errors)
