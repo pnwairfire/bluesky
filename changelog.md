@@ -540,3 +540,6 @@
 
 ## 4.3.68
  - Add HYSPLIT v5.1.0 binaries (patched with fix for metpos errors)
+
+## 4.3.69
+ - Upgrade blueskykml to v4.0.8
