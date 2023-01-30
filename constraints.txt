@@ -7,7 +7,7 @@ asttokens==2.0.8
 attrs==22.1.0
 backcall==0.2.0
 bluesky==4.3.63
-blueskykml==4.0.7
+blueskykml==4.0.8
 blueskyutils==1.0.0
 boto3==1.16.52
 botocore==1.19.63
