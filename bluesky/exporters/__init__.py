@@ -208,6 +208,11 @@ class ExporterBase(object):
         """
         images = {}
         def _set(remaining_path, *path_elements):
+            # Don't include saved, pre-reprojected images
+            # (REPROJECT_IMAGES_SAVE_ORIGINAL=True)
+            if remaining_path.find('saved-original-images/') >= 0:
+                return
+
             if remaining_path:
                 parent_path, directory = os.path.split(remaining_path)
                 _set(parent_path, *(list(path_elements) + [directory]))
