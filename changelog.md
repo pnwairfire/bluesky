@@ -543,3 +543,7 @@
 
 ## 4.3.69
  - Upgrade blueskykml to v4.0.8
+
+## 4.3.70
+ - Upgrade blueskykml to v4.0.9
+ - Update hysplit visualization export to handle saved original images
