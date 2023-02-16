@@ -550,3 +550,6 @@
 
 ## 4.3.71
  - Update HYSPLIT v5.1.0 and v5.2.3 binaries
+
+## 4.3.72
+ - Support specifying constant smoldering fraction in hysplit
