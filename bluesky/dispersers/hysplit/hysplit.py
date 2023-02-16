@@ -696,7 +696,7 @@ class HYSPLITDispersion(DispersionBase):
 
         # Total PM2.5 smoldering (not lofted in the plume)
         smoldering_fraction = plumerise_hour['smolder_fraction']
-        if (self.config("USE_CONST_SMOLDERING_FRACTION"):
+        if self.config("USE_CONST_SMOLDERING_FRACTION"):
             smoldering_fraction = self.config("SMOLDERING_FRACTION_CONST")
         pm25_injected = pm25_emitted * smoldering_fraction
 
