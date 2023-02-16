@@ -440,7 +440,22 @@ _DEFAULTS = {
             "CONVERT_HYSPLIT2NETCDF": True,
             "output_file_name": "hysplit_conc.nc",
 
+            # default height to inject smoldering emissions
+            # NOTE: is adjusted by smolder_fraction (calculated elsewhere) or
+            #       adjusted to an an arbitrary constant for all sources
+            #       as defined below
             "SMOLDER_HEIGHT": 10.0,
+
+            # if False use calculated smolder_fraction else use constant
+            # defined below
+            "USE_CONST_SMOLDERING_FRACTION": False,
+
+            # if USE_CONST_SMOLDERING_FRACTION is True then set a constant
+            # value to determine amount lofted. 
+            #     0.0 =  all is lofted 
+            #     1.0 = none is lofted
+            # NOTE: ONLY WORKS IN HYSPLIT CURRENTLY (not in smokeready/CMAQ)
+            "SMOLDERING_FRACTION_CONST": 0.0,
 
             # Height in meters of the top of the model domain
             "TOP_OF_MODEL_DOMAIN": 10000.0,
