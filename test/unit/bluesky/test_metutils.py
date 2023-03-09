@@ -68,7 +68,7 @@ MET = {
     }
 }
 
-class TestFilterMet(object):
+class TestFilterMet():
 
     def test_no_filtering_needed(self):
         expected = copy.deepcopy(MET)

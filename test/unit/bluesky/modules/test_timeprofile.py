@@ -9,7 +9,7 @@ from bluesky.models import fires
 from bluesky.modules import timeprofile
 
 
-class TestTimeprofilingRunFire(object):
+class TestTimeprofilingRunFire():
 
     ##
     ## Failure cases

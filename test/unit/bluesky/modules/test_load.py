@@ -31,7 +31,7 @@ FILE_SOURCE_W_WAIT_CONFIG = {
     }
 }
 
-class TestFSFileLoadSource(object):
+class TestFSFileLoadSource():
 
     def setup(self):
         self._temp_dir = tempfile.mkdtemp()
@@ -143,5 +143,5 @@ class TestFSFileLoadSource(object):
         assert self.total_sleep == 0.0
 
 
-class TestFSApiLoadSource(object):
+class TestFSApiLoadSource():
     pass

@@ -13,7 +13,7 @@ from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models.fires import Fire
 from bluesky import locationutils
 
-class BaseFireMerger(object):
+class BaseFireMerger():
 
     def _sum_data(self, data1, data2):
         summed_data = {}

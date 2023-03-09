@@ -7,7 +7,7 @@ from py.test import raises
 from bluesky import  locationutils
 
 
-class TestLatLng(object):
+class TestLatLng():
 
     def test_invalid_location_data(self):
         with raises(ValueError) as e_info:
@@ -32,7 +32,7 @@ class TestLatLng(object):
         assert e_info.value.args[0] == locationutils.MISSING_LOCATION_INFO
 
 
-class TestLatLngActiveArea(object):
+class TestLatLngActiveArea():
 
     def test_active_area_with_specified_points_missing_lat_lng_info(self):
         active_area = {
@@ -148,7 +148,7 @@ class TestLatLngActiveArea(object):
         assert latlng.longitude == -120.5
 
 
-class TestLatLngSpecifiedPoint(object):
+class TestLatLngSpecifiedPoint():
 
     def test_specified_point_missing_lat_lng_info(self):
         sp = {'lng': -120.0}  # missing 'lat'
@@ -168,7 +168,7 @@ class TestLatLngSpecifiedPoint(object):
         assert latlng.longitude == -120.0
 
 
-class TestLatLngPerimeter(object):
+class TestLatLngPerimeter():
 
     def test_perimeter_missing_coordinates(self):
         with raises(ValueError) as e_info:

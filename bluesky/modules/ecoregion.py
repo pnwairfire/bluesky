@@ -25,7 +25,7 @@ def run(fires_manager):
     EcoregionRunner(fires_manager).run()
 
 
-class EcoregionRunner(object):
+class EcoregionRunner():
 
     def __init__(self, fires_manager):
         self._fires_manager = fires_manager

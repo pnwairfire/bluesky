@@ -42,7 +42,7 @@ TWO_LOC_THREE_HEIGHT_TDUMP = """         1     1
 
 """
 
-class test_output_file(object):
+class test_output_file():
     def __init__(self, contents):
         self._contents = contents.encode()
 
@@ -55,7 +55,7 @@ class test_output_file(object):
     def __exit__(self, exc_type, exc_value, traceback):
         os.unlink(self.f.name)
 
-class TestOutputLoader(object):
+class TestOutputLoader():
 
     def test_one_location_one_height(self):
         with test_output_file(ONE_LOC_ONE_HEIGHT_TDUMP) as filename:

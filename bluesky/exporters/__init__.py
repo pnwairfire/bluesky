@@ -19,7 +19,7 @@ from bluesky.config import Config
 #   and not have separate visualization section
 
 
-class ExporterBase(object):
+class ExporterBase():
 
     def __init__(self, extra_exports):
         self._export_mode = self.__class__.__module__.split('.')[-1]

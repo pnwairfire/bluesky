@@ -14,7 +14,7 @@ from bluesky.models import fires
 ##    using mock FireManager object
 
 
-class TestFiresManagerFilterFiresNoneSpecified(object):
+class TestFiresManagerFilterFiresNoneSpecified():
 
     ## Filtering
 
@@ -38,7 +38,7 @@ class TestFiresManagerFilterFiresNoneSpecified(object):
         assert self.init_fires == sorted(self.fm.fires, key=lambda e: int(e.id))
 
 
-class TestFiresManagerFilterFiresByCountry(object):
+class TestFiresManagerFilterFiresByCountry():
 
     def setup(self):
         self.fm = fires.FiresManager()
@@ -230,7 +230,7 @@ class TestFiresManagerFilterFiresByCountry(object):
         assert [] == self.fm.fires
 
 
-class TestFiresManagerFilterFiresByLocation(object):
+class TestFiresManagerFilterFiresByLocation():
 
     def setup(self):
         self.fm = fires.FiresManager()
@@ -459,7 +459,7 @@ class TestFiresManagerFilterFiresByLocation(object):
         assert [] == sorted(self.fm.fires, key=lambda e: int(e.id))
 
 
-class TestFiresManagerFilterFiresByArea(object):
+class TestFiresManagerFilterFiresByArea():
 
     def setup(self):
         self.fm = fires.FiresManager()
@@ -655,7 +655,7 @@ class TestFiresManagerFilterFiresByArea(object):
         assert [] == sorted(self.fm.fires, key=lambda e: int(e.id))
 
 
-class TestFiresManagerFilterFiresByTime(object):
+class TestFiresManagerFilterFiresByTime():
 
     def setup(self):
         self.fm = fires.FiresManager()

@@ -19,7 +19,7 @@ from bluesky.datetimeutils import parse_datetime
 FEPS_WEATHER_BINARY = "feps_weather"
 FEPS_TIMEPROFILE_BINARY = "feps_timeprofile"
 
-class UbcBsfFEPSTimeProfiler(object):
+class UbcBsfFEPSTimeProfiler():
     """ FEPS Time Profile Module
 
     FEPSTimeProfile was copied from BlueSky Framework, and subsequently modified

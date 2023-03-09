@@ -12,7 +12,7 @@ from bluesky.config import Config
 from bluesky.dispersers.hysplit import hysplit_utils
 from bluesky.exceptions import BlueSkyConfigurationError
 
-class MockFireLocationData(object):
+class MockFireLocationData():
     def __init__(self, location_id):
         self.id = location_id
 
@@ -25,7 +25,7 @@ class MockFireLocationData(object):
 ## Tranching
 ##
 
-class TestCreateFireSets(object):
+class TestCreateFireSets():
 
     def test(self, reset_config):
         fires = [
@@ -55,7 +55,7 @@ class TestCreateFireSets(object):
         assert expected_sets == sorted(fire_sets, key=lambda e: e[0].id)
 
 
-class TestCreateFireTranches(object):
+class TestCreateFireTranches():
     GRID_PARAMS = e = {
         "center_latitude": 45.0,
         "center_longitude": -118.0,
@@ -162,7 +162,7 @@ class TestCreateFireTranches(object):
         assert expected_tranches == fire_tranches
 
 
-class TestComputeNumProcesses(object):
+class TestComputeNumProcesses():
 
     def test(self, reset_config):
         n = hysplit_utils.compute_num_processes(4)
@@ -240,7 +240,7 @@ class TestComputeNumProcesses(object):
 ## Dummy Fires
 ##
 
-class TestDummyTimeprofiledEmissionsHour(object):
+class TestDummyTimeprofiledEmissionsHour():
 
     def test_one_hour(self, reset_config):
         expected = {
@@ -251,7 +251,7 @@ class TestDummyTimeprofiledEmissionsHour(object):
         }
         assert expected == hysplit_utils.dummy_timeprofiled_emissions_hour()
 
-class TestGenerateDummyFire(object):
+class TestGenerateDummyFire():
 
     EXPECTED_PLUMERISE_HOUR = {
         'emission_fractions': [
@@ -358,7 +358,7 @@ class TestGenerateDummyFire(object):
         assert expected == f
 
 
-class TestFillInDummyFires(object):
+class TestFillInDummyFires():
 
     def setup(self):
         self.fires = [
@@ -429,7 +429,7 @@ class TestFillInDummyFires(object):
 ## Dispersion Grid
 ##
 
-class TestKmPerLng(object):
+class TestKmPerLng():
 
     def test(self, reset_config):
         assert 111.32 == hysplit_utils.km_per_deg_lng(0)
@@ -441,7 +441,7 @@ class TestKmPerLng(object):
         #  that difference is insignificant
         assert hysplit_utils.km_per_deg_lng(90) < 0.000000000001
 
-class TestSquareGridFromLatLng(object):
+class TestSquareGridFromLatLng():
 
     def test(self, reset_config):
         e = {
@@ -471,7 +471,7 @@ class TestSquareGridFromLatLng(object):
     # TODO: test location that could equator
     # TODO: test any invalid cases
 
-class TestGridParamsFromGrid(object):
+class TestGridParamsFromGrid():
 
     def test_llc_projection(self, reset_config):
         grid = {
@@ -526,7 +526,7 @@ class TestGridParamsFromGrid(object):
         }
         assert expected == hysplit_utils.grid_params_from_grid(grid)
 
-class TestGetGridParams(object):
+class TestGetGridParams():
 
     def test_user_defined_grid(self, reset_config):
         Config().set(True, "dispersion", "hysplit" , "USER_DEFINED_GRID")

@@ -7,7 +7,7 @@ import datetime
 from bluesky.models import fires
 from bluesky.fuelmoisture import fill_in_defaults, MOISTURE_PROFILES
 
-class TestFillInDefaults(object):
+class TestFillInDefaults():
 
     def test_wildfire_no_fm(self):
         f = fires.Fire({

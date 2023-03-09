@@ -186,7 +186,7 @@ _PR_COMPUTE_CALL_KWARGS = {}
 
 def get_plumerise_class(model):
 
-    class MockPlumeRise(object):
+    class MockPlumeRise():
 
         def __init__(self, *args, **kwargs):
             global _PR_ARGS, _PR_KWARGS, _PR_COMPUTE_CALL_ARGS, _PR_COMPUTE_CALL_KWARGS
@@ -220,7 +220,7 @@ def monkeypatch_tempfile_mkdtemp(monkeypatch):
 
 # TODO: mock pyairfire.sun.Sun
 
-class TestPlumeRiseRun(object):
+class TestPlumeRiseRun():
 
     def test_invalid_module(self, reset_config, monkeypatch):
         monkeypatch_plumerise_class(monkeypatch)
@@ -230,7 +230,7 @@ class TestPlumeRiseRun(object):
             plumerise.run(fm)
         assert e_info.value.args[0] == plumerise.INVALID_PLUMERISE_MODEL_MSG.format('sdf')
 
-class TestPlumeRiseRunFeps(object):
+class TestPlumeRiseRunFeps():
 
     def setup(self):
         self.fm = FiresManager()
@@ -373,7 +373,7 @@ class TestPlumeRiseRunFeps(object):
         }
         # TOOD: assert plumerise return value
 
-class TestPlumeRiseRunSev(object):
+class TestPlumeRiseRunSev():
 
     def setup(self):
         self.fm = FiresManager()
@@ -548,7 +548,7 @@ class TestPlumeRiseRunSev(object):
         # TOOD: assert plumerise return value
 
 
-class TestPlumeRiseRunSevFeps(object):
+class TestPlumeRiseRunSevFeps():
 
     def setup(self):
         self.fm = FiresManager()
@@ -717,7 +717,7 @@ class TestPlumeRiseRunSevFeps(object):
 
 
 
-class TestFepsMetParams(object):
+class TestFepsMetParams():
 
     def test_full_localmet(self):
         localmet = {

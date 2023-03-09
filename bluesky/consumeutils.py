@@ -89,7 +89,7 @@ def _apply_settings(fc, location, burn_type):
                 field, burn_type))
 
 
-class ConsumeSettingFromOtherData(object):
+class ConsumeSettingFromOtherData():
 
     def __init__(self, field, data):
         self._data = data
@@ -146,7 +146,7 @@ class ConsumeSettingFromFuelMoisture(ConsumeSettingFromOtherData):
         return self._get_mean('litter')
 
 
-class FuelLoadingsManager(object):
+class FuelLoadingsManager():
 
     FUEL_LOADINGS_KEY_MAPPINGS = {
         "bas_loading": "basal_accum_loading",

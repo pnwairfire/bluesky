@@ -72,7 +72,7 @@ def foo(vals):
                 vals[c][s][p] = list(vals[c][s][p])
     return vals
 
-class TestConsumptionRunFire(object):
+class TestConsumptionRunFire():
 
     def test(self):
         # TODO: create mock fuel loading manager class

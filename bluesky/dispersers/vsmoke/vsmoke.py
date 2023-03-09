@@ -400,7 +400,7 @@ class VSMOKEDispersion(DispersionBase):
             self._geo_json.write(final_json)
             return final_json
 
-class GeoJSON(object):
+class GeoJSON():
     """ Used to create GeoJSON outputs """
 
     def __init__(self):
@@ -489,7 +489,7 @@ class GeoJSON(object):
         return self.__str__()
 
 
-class KMLFile(object):
+class KMLFile():
     """ Used to create KML files """
 
     def __init__(self, filename='test.kml'):
@@ -526,7 +526,7 @@ class KMLFile(object):
         self.content += '''</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>'''
 
 
-class KMZAnimation(object):
+class KMZAnimation():
     """For creating a KMZ file used for Google Earth"""
 
     def __init__(self, filename='doc.kml', overlay_title=" ", legend_image=" "):
@@ -617,7 +617,7 @@ class KMZAnimation(object):
         output.close()
 
 
-class INPUTVariables(object):
+class INPUTVariables():
     """ Defines input variables from Fire Location """
     MIN_STAB = 1
     MAX_STAB = 7

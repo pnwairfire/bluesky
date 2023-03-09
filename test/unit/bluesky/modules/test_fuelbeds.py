@@ -16,7 +16,7 @@ from bluesky.modules import fuelbeds
 ## Tests for summarize
 ##
 
-class TestSummarize(object):
+class TestSummarize():
 
     def test_no_fires(self):
         assert fuelbeds.summarize([]) == []
@@ -92,7 +92,7 @@ class TestSummarize(object):
 ## Tests for Estimator.estimate
 ##
 
-class TestEstimatorInsufficientDataForLookup(object):
+class TestEstimatorInsufficientDataForLookup():
 
     def setup(self):
         lookup = mock.Mock()
@@ -159,7 +159,7 @@ FUELBED_INFO_60_30['fuelbeds']['47']['percent'] = 30
 FUELBED_INFO_60_40_10 = copy.deepcopy(FUELBED_INFO_60_40)
 FUELBED_INFO_60_40_10['fuelbeds']['50'] = {"grid_cells": 1, "percent": 10.0}
 
-class BaseTestEstimatorEstimate(object):
+class BaseTestEstimatorEstimate():
     """Base class for testing Estimator.estimate
     """
 
@@ -242,7 +242,7 @@ class TestEstimatorGetFromLatLng(BaseTestEstimatorEstimate):
 ## Tests for Estimator._truncate
 ##
 
-class TestEstimatorDefaultTruncation(object):
+class TestEstimatorDefaultTruncation():
 
     def setup(self):
         lookup = mock.Mock()
@@ -358,7 +358,7 @@ class TestEstimatorDefaultTruncation(object):
         assert expected == actual
 
 
-class TestEstimatorCustomTruncation(object):
+class TestEstimatorCustomTruncation():
 
     def setup(self):
         lookup = mock.Mock()
@@ -448,7 +448,7 @@ class TestEstimatorCustomTruncation(object):
 
 
 
-class TestEstimatorNoTruncation(object):
+class TestEstimatorNoTruncation():
 
     def setup(self):
         lookup = mock.Mock()
@@ -537,7 +537,7 @@ class TestEstimatorNoTruncation(object):
 # ## Tests for Estimator._adjust_percentages
 # ##
 
-class TestEstimatorPercentageAdjustment(object):
+class TestEstimatorPercentageAdjustment():
 
     def setup(self):
         lookup = mock.Mock()

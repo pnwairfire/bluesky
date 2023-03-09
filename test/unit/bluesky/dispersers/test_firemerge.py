@@ -55,7 +55,7 @@ EMPTY_PLUMERISE_HOUR = {
     "smolder_fraction": 0.0
 }
 
-class TestFireMerger(object):
+class TestFireMerger():
 
     FIRE_1 = Fire({
         "id": "SF11C14225236095807750-0",
@@ -452,7 +452,7 @@ class TestFireMerger(object):
 ## PlumeMerge tests
 ##
 
-class BaseTestPlumeMerger(object):
+class BaseTestPlumeMerger():
 
     def setup(self):
         self.merger = firemerge.PlumeMerger({

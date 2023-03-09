@@ -42,7 +42,7 @@ __all__ = [
 ]
 
 
-class BaseLoader(object):
+class BaseLoader():
 
     def __init__(self, **config):
         self._config = config

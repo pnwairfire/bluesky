@@ -11,7 +11,7 @@ from bluesky.models import activity
 ## Tests for TestLocation
 ##
 
-class TestLocation(object):
+class TestLocation():
 
     def test_without_active_area(self):
         loc = activity.Location({
@@ -89,7 +89,7 @@ class TestLocation(object):
 ## Tests for ActiveArea
 ##
 
-class TestActiveAreaLocations(object):
+class TestActiveAreaLocations():
 
     def test_no_location_info(self):
         aa = activity.ActiveArea({
@@ -238,7 +238,7 @@ class TestActiveAreaLocations(object):
         assert aa['locations'] == expected
 
 
-class TestActiveAreaTotalArea(object):
+class TestActiveAreaTotalArea():
 
     def test_specified_points_no_area(self):
         with raises(ValueError) as e_info:
@@ -346,7 +346,7 @@ class TestActiveAreaTotalArea(object):
 ##
 
 
-class TestActivityCollectionActiveAreas(object):
+class TestActivityCollectionActiveAreas():
 
     def test_no_active_areas(self):
         assert [] == activity.ActivityCollection().active_areas
@@ -377,7 +377,7 @@ class TestActivityCollectionActiveAreas(object):
         assert expected == ac.active_areas
 
 
-class TestActivityCollectionLocations(object):
+class TestActivityCollectionLocations():
 
     def test_no_active_areas(self):
         assert [] == activity.ActivityCollection().locations

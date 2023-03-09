@@ -19,7 +19,7 @@ data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 ## Base test class
 ##
 
-class BaseFireSpiderLoaderTest(object):
+class BaseFireSpiderLoaderTest():
 
     def setup(self):
         # with open(FSV2_INPUT_FILENAME) as f:

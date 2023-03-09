@@ -49,7 +49,7 @@ class BlueSkySubprocessError(RuntimeError):
     pass
 
 
-class skip_failures(object):
+class skip_failures():
     """Context manager that, if enabled, suppresses exceptions and
     logs the error, allowing run to continue.
     """

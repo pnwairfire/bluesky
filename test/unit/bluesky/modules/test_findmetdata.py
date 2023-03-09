@@ -82,7 +82,7 @@ FIRE_3 = Fire({
     ]
 })
 
-class TestGetTimeWindows(object):
+class TestGetTimeWindows():
 
     def test_no_fires(self, reset_config):
         fm = FiresManager()
@@ -243,7 +243,7 @@ class TestGetTimeWindows(object):
         assert expected == findmetdata._get_time_windows(fm)
 
 
-class TestMergeTimeWindows(object):
+class TestMergeTimeWindows():
 
     def test_simple(self):
         time_windows = [

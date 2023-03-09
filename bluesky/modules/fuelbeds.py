@@ -98,7 +98,7 @@ def summarize(fires):
 # According to https://en.wikipedia.org/wiki/Acre, an acre is 4046.8564224 m^2
 ACRES_PER_SQUARE_METER = 1 / 4046.8564224  # == 0.0002471053814671653
 
-class Estimator(object):
+class Estimator():
 
     def __init__(self, lookup):
         self.lookup = lookup

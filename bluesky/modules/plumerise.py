@@ -76,7 +76,7 @@ def _get_fire_working_dir(fire, model, working_dir):
         os.makedirs(fire_working_dir)
     return fire_working_dir
 
-class ComputeFunction(object):
+class ComputeFunction():
     def __init__(self, fires_manager):
         model = Config().get('plumerise', 'model').lower()
         fires_manager.processed(__name__, __version__,
@@ -110,7 +110,7 @@ class ComputeFunction(object):
     ## compute function generators
 
 
-class PlumeComputeBase(object):
+class PlumeComputeBase():
 
     def __init__(self):
         self._feps_config = Config().get('plumerise', 'feps')
@@ -234,7 +234,7 @@ class SEVFEPSCompute(PlumeComputeBase):
             return self._feps(fire, aa, loc, working_dir)
 
 
-class FepsMetParams(object):
+class FepsMetParams():
 
     def __init__(self, localmet):
         self._localmet = localmet

@@ -11,7 +11,7 @@ from py.test import raises
 from bluesky import datetimeutils
 from bluesky.exceptions import BlueSkyDatetimeValueError
 
-class TestTodayAndYesterdayMidnight(object):
+class TestTodayAndYesterdayMidnight():
 
     NOON_4_20 = datetime.datetime(2016, 4, 20, 12, 0, 0)
     MN_4_18 = datetime.datetime(2016, 4, 18, 0, 0, 0)
@@ -61,7 +61,7 @@ class TestTodayAndYesterdayMidnight(object):
         assert datetimeutils.yesterday_midnight_utc() == self.MN_4_18
         assert datetimeutils.yesterday_utc() == self.MN_4_18.date()
 
-class TestReplaceWildcards(object):
+class TestReplaceWildcards():
     @freeze_time("2016-01-14T13:01:11")
     def test_today_not_defined(self):
         # None value - leave as is
@@ -233,7 +233,7 @@ class TestReplaceWildcards(object):
             "%Y%m%dT%H%M%S"
             "20160110031122")
 
-class TestToDatetime(object):
+class TestToDatetime():
 
     @freeze_time("2016-01-14")
     def test_date_not_defined(self):
@@ -375,7 +375,7 @@ class TestToDatetime(object):
 
 
 
-class TestSeasonFromDate(object):
+class TestSeasonFromDate():
 
     def test(self):
         sfd = datetimeutils.season_from_date

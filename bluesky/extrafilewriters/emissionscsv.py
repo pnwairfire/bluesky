@@ -17,7 +17,7 @@ from . import format_date_time
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 
-class EmissionsCsvWriter(object):
+class EmissionsCsvWriter():
 
     def __init__(self, dest_dir):
         self._filename = Config().get('extrafiles', 'emissionscsv', 'filename')

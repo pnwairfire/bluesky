@@ -14,7 +14,7 @@ __all__ = [
     'WimsFuelMoisture'
 ]
 
-class WimsFuelMoisture(object):
+class WimsFuelMoisture():
 
     def __init__(self):
         raise NotImplementedError("WIMS fuel moisture module is not yet implemented")

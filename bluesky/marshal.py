@@ -28,7 +28,7 @@ TO_COPY_UP = {
     'emissions_details',
 }
 
-class Blueskyv4_0To4_1(object):
+class Blueskyv4_0To4_1():
 
     def marshal(self, fires):
         return [self.marshal_fire(fire) for fire in fires]

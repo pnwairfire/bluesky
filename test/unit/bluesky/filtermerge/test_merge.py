@@ -11,7 +11,7 @@ from bluesky.models import fires
 ## TODO: unit test fires.FiresMerger directly,
 ##    using mock FireManager object
 
-class TestFiresManagerMergeFires(object):
+class TestFiresManagerMergeFires():
 
     def test_no_fires(self, reset_config):
         fm = fires.FiresManager()

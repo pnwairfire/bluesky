@@ -25,7 +25,7 @@ INVALID_LAT_LNG_DATA = ("Invalid latitude or longitude were entered. Ensure they
     " values")
 INVALID_FIPS_RESPONSE = ("An Error Occurred Locating the FIPS code for this Lat/Lng")
 
-class LatLng(object):
+class LatLng():
     """Determines single lat,lng coordinate best representing given
     active area information
     """
@@ -97,7 +97,7 @@ class LatLng(object):
         except:
             raise ValueError(MISSING_OR_INVALID_LAT_LNG_FOR_SPECIFIED_POINT)
 
-class Fips(object):
+class Fips():
     """
     Returns FIPS metadata from a given Lat/Lng
 

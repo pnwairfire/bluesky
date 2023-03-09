@@ -11,13 +11,13 @@ from bluesky.models.fires import Fire
 
 # TODO: moke Fire class
 
-class MockFiresManager(object):
+class MockFiresManager():
     def __init__(self, fires):
         self.fires = [Fire(f) for f in fires]
 
     @property
     def fire_failure_handler(self):
-        class klass(object):
+        class klass():
             def __init__(self, fire):
                 pass
 
@@ -33,7 +33,7 @@ class MockFiresManager(object):
         self.summary = summary
 
 
-class TestSummarizeAllLevels(object):
+class TestSummarizeAllLevels():
 
     def test_no_fires(self):
         fm = MockFiresManager([])

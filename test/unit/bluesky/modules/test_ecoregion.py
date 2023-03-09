@@ -74,7 +74,7 @@ FIRE = Fire({
 })
 
 
-class TestEcoRegionRun(object):
+class TestEcoRegionRun():
 
     def test_no_fires(self, reset_config):
         fm = FiresManager()

@@ -10,7 +10,7 @@ import csv
 # required executables
 FEPS_EMISSIONS_BINARY = 'feps_emissions'
 
-class UbcBsfFEPSEmissions(object):
+class UbcBsfFEPSEmissions():
     """ FEPS Emissions Module used in Canadian system
 
     FEPSEmissions was copied from BlueSky Framework, and subsequently modified

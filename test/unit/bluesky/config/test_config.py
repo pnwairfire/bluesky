@@ -11,7 +11,7 @@ from py.test import raises
 
 from bluesky.config import Config, DEFAULTS, to_lowercase_keys
 
-class TestToLowercaseKeys(object):
+class TestToLowercaseKeys():
 
     def test(self):
         before = {
@@ -89,7 +89,7 @@ class TestToLowercaseKeys(object):
             to_lowercase_keys(before)
 
 
-class TestGetAndSet(object):
+class TestGetAndSet():
 
     def setup(self):
         self._ORIGINAL_DEFAULTS = copy.deepcopy(DEFAULTS)
@@ -197,7 +197,7 @@ class TestGetAndSet(object):
 ## filled in, etc.) and merging
 ##
 
-class TestMerge(object):
+class TestMerge():
 
     def setup(self):
         self._ORIGINAL_DEFAULTS = copy.deepcopy(DEFAULTS)
@@ -341,7 +341,7 @@ class TestMerge(object):
         assert self._ORIGINAL_DEFAULTS == DEFAULTS
 
 
-class TestThreadSafety(object):
+class TestThreadSafety():
 
     def test_getting_defaults(self, reset_config):
 

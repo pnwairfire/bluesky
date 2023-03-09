@@ -178,7 +178,7 @@ def wait_for_availability(config):
     return decorator
 
 
-class capture_stdout(object):
+class capture_stdout():
     """Context manager that redirects stdout to a stringIO buffer
 
     Note: could also write to dev null like:
@@ -206,7 +206,7 @@ class capture_stdout(object):
         sys.stdout = sys.__stdout__
 
 
-class SubprocessExecutor(object):
+class SubprocessExecutor():
     """Wraps command execution in order to capture
     and optionally log stdout and stderr output
 

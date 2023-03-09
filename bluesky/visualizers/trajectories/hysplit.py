@@ -14,7 +14,7 @@ import os
 from bluesky import io
 from bluesky.config import Config
 
-class HysplitTrajectoriesVisualizer(object):
+class HysplitTrajectoriesVisualizer():
     """Generates KML from trajectores GeoJSON output file
 
     TODO: generate KML from scratch in order to:

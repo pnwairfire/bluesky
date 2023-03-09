@@ -19,7 +19,7 @@ from bluesky.exceptions import (
 ## io.wait_for_availability
 ##
 
-class TestWaitForAvailabilityBase(object):
+class TestWaitForAvailabilityBase():
 
     def setup(self):
         self.counter = 0
@@ -259,7 +259,7 @@ class TestWaitForAvailabilityBackoff(TestWaitForAvailabilityBase):
         assert self.total_sleep == 0.0
 
 
-class TestCaptureStdout(object):
+class TestCaptureStdout():
 
     def test(self):
         with io.capture_stdout() as stdout_buffer:
@@ -276,7 +276,7 @@ class TestCaptureStdout(object):
         assert sys.stdout == sys.__stdout__
 
 
-class TestSubprocessExecutor(object):
+class TestSubprocessExecutor():
 
     def monkeypatch_logging(self, monkeypatch):
         self.msgs = []

@@ -379,7 +379,7 @@ MULTI_GROWTH_FIRE_MARSHALED =     {
     ]
 }
 
-class TestMarshalBlueskyv4_0To4_1(object):
+class TestMarshalBlueskyv4_0To4_1():
 
     def setup(self):
         self.marshaler = marshal.Blueskyv4_0To4_1()

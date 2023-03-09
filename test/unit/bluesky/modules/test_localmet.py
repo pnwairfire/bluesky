@@ -74,7 +74,7 @@ _ARLP_ARGS = None
 _ARLP_KWARGS = None
 _ARLP_PROFILE_CALL_ARGS = None
 
-class MockArlProfiler(object):
+class MockArlProfiler():
     def __init__(self, *args, **kwargs):
         global _ARLP_ARGS, _ARLP_KWARGS, _ARLP_PROFILE_CALL_ARGS
         _ARLP_ARGS = args
@@ -88,7 +88,7 @@ class MockArlProfiler(object):
 def monkeypatch_arl_profiler(monkeypatch):
     monkeypatch.setattr(arlprofiler, 'ArlProfiler', MockArlProfiler)
 
-class TestLocalMetRun(object):
+class TestLocalMetRun():
 
     def test_no_met_no_skip_failures(self, reset_config, monkeypatch):
         monkeypatch_arl_profiler(monkeypatch)

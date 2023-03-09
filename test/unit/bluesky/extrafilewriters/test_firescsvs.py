@@ -7,7 +7,7 @@ from py.test import raises
 from bluesky.models.fires import Fire
 from bluesky.extrafilewriters import firescsvs
 
-class TestFiresCsvsPickRepresentativeFuelbed(object):
+class TestFiresCsvsPickRepresentativeFuelbed():
 
     def test_invalid_fuelbed(self):
         g = {
@@ -82,7 +82,7 @@ class TestFiresCsvsPickRepresentativeFuelbed(object):
         assert "46" == firescsvs._pick_representative_fuelbed({}, g)
 
 
-class TestFiresCsvsWriterCollectCsvFields(object):
+class TestFiresCsvsWriterCollectCsvFields():
 
     def test_one_fire_no_event(self):
         fire = Fire({

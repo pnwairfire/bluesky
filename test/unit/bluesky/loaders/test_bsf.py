@@ -19,7 +19,7 @@ data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 ## Base test class
 ##
 
-class TestBsfLoader(object):
+class TestBsfLoader():
 
     def setup(self):
         self._expected_output = {

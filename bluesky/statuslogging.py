@@ -14,7 +14,7 @@ __all__ = [
     'StatusLogger'
 ]
 
-class StatusLogger(object):
+class StatusLogger():
 
     def __init__(self, init_time, **config): #, log_level):
         self.enabled = config and config.get('enabled')

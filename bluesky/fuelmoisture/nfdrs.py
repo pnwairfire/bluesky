@@ -10,7 +10,7 @@ __all__ = [
 ]
 
 
-class NfdrsFuelMoisture(object):
+class NfdrsFuelMoisture():
 
     def _set_first_value(self, met, met_key, key, fm_1_10_args,
             process_func=lambda a: a):

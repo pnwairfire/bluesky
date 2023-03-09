@@ -53,7 +53,7 @@ def run(fires_manager):
     # fires_manager.summarize(...)
 
 
-class LocalmetRunner(object):
+class LocalmetRunner():
 
     def __init__(self, fires_manager):
         self._fires_manager = fires_manager

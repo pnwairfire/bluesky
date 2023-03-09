@@ -199,7 +199,7 @@ FIRE = Fire({
 })
 
 
-class MockEmissionsWriter(object):
+class MockEmissionsWriter():
     def __init__(self):
         self.rows = []
 
@@ -207,7 +207,7 @@ class MockEmissionsWriter(object):
         self.rows.append(list_of_values)
 
 
-class TestEmissionsCsvWriterWriteFire(object):
+class TestEmissionsCsvWriterWriteFire():
 
     def setup(self):
         Config().set('foo.csv', 'extrafiles', 'emissionscsv', 'filename')

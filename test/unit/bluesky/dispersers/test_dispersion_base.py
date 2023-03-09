@@ -19,7 +19,7 @@ class FakeDisperser(DispersionBase):
     def _run(wdir):
         pass
 
-class TestDispersionBaseConfig(object):
+class TestDispersionBaseConfig():
 
     def setup(self):
         Config().set(2.2, "dispersion", "hysplit", "QCYCLE")
@@ -93,7 +93,7 @@ EMPTY_PLUMERISE_HOUR = {
 }
 
 
-class TestDispersionBaseSetFireData(object):
+class TestDispersionBaseSetFireData():
 
     def setup(self):
         self.d = FakeDisperser({})

@@ -6,7 +6,7 @@ from afdatetime.parsing import parse as parse_dt
 
 from bluesky.config import Config
 
-class GrowerBase(object):
+class GrowerBase():
 
     def __init__(self, fires_manager):
         self._model = self.__class__.__module__.split('.')[-1]

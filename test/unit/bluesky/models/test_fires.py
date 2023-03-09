@@ -19,7 +19,7 @@ from bluesky.config import Config
 from bluesky.models import fires, activity
 
 
-class TestFire(object):
+class TestFire():
 
     def test_fills_in_id(self, monkeypatch, reset_config):
         monkeypatch.setattr(uuid, "uuid4", lambda: "abcd1234")
@@ -452,7 +452,7 @@ class TestFire(object):
 ## Tests for FiresManager
 ##
 
-class TestFiresManager(object):
+class TestFiresManager():
 
     ## Get/Set Fires and Meta
 
@@ -868,7 +868,7 @@ class TestFiresManager(object):
 
 
 
-class TestFiresManagerSettingToday(object):
+class TestFiresManagerSettingToday():
 
     @freezegun.freeze_time("2016-04-20")
     def not_explicitly_set(self):

@@ -23,7 +23,7 @@ __all__ = [
 # which must be defined once, in main thread.
 thread_local_data = threading.local()
 
-class Config(object):
+class Config():
     """Class for managing bluesky configuration.
 
     This is a Singleton, to facilitate making this module thread safe

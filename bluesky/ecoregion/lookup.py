@@ -25,7 +25,7 @@ ECOREGION_SHAPEFILE = os.path.join(os.path.dirname(__file__), 'data', '3ecoregio
 # ACCEPTED_VALUES = ["western","southern","boreal"]
 
 
-class EcoregionLookup(object):
+class EcoregionLookup():
 
     def __init__(self, implementation='ogr'):
         try:

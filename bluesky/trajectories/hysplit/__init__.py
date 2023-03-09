@@ -21,7 +21,7 @@ __all__ = [
     "HysplitTrajectories"
 ]
 
-class HysplitTrajectories(object):
+class HysplitTrajectories():
 
     def __init__(self, config, fires_manager, start, num_hours, output_dir,
             working_dir=None):

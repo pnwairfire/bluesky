@@ -6,7 +6,7 @@ from bluesky import locationutils
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError
 
-class ControlFileWriter(object):
+class ControlFileWriter():
     """Write CONTROL file to run hysplit trajectories
 
      CONTROL file format:
@@ -81,7 +81,7 @@ class ControlFileWriter(object):
             f.write("{}\n".format(self._config['output_file_name']))
 
 
-class SetupFileWriter(object):
+class SetupFileWriter():
 
     SETUP_FILE_TEMPLATE = """ &SETUP
  tm_tpot = {tm_tpot},

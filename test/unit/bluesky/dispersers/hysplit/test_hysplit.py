@@ -10,7 +10,7 @@ from py.test import raises, approx
 from bluesky.config import to_lowercase_keys
 from bluesky.dispersers.hysplit import hysplit
 
-class TestGetBinaries(object):
+class TestGetBinaries():
     # Notes:
     #    - hysplit._get_binaries will always be passed a dict;
     #    - the dict will have all lowercase top level keys
@@ -70,7 +70,7 @@ class TestGetBinaries(object):
         }
         assert hysplit._get_binaries(config_getter) == expected
 
-class TestSetMetInfo(object):
+class TestSetMetInfo():
 
     def test_with_grid(self, monkeypatch):
         monkeypatch.setattr(os.path, 'exists', lambda e: True)
@@ -132,7 +132,7 @@ class TestSetMetInfo(object):
         hysplitDisperser = hysplit.HYSPLITDispersion(met_info)
         assert hysplitDisperser._met_info == expected
 
-class TestAdjustDispersionWindowForAvailableMet(object):
+class TestAdjustDispersionWindowForAvailableMet():
 
     # class HYSPLITDispersionWithoutSetMetInfo(hysplit.HYSPLITDispersion):
 
@@ -235,7 +235,7 @@ class TestAdjustDispersionWindowForAvailableMet(object):
                 " 3 hours instead of 48"}
         ]
 
-class TestReduceVerticalLevels(object):
+class TestReduceVerticalLevels():
 
     def test_equal_fractions_reduction_factor_4(self, monkeypatch):
         monkeypatch.setattr(hysplit.HYSPLITDispersion, '_set_met_info',
@@ -339,7 +339,7 @@ class TestReduceVerticalLevels(object):
         assert fractions == approx(expected_fractions, abs=0.00001)
 
 
-class TestGetEmissionsRowsDataForLatLon(object):
+class TestGetEmissionsRowsDataForLatLon():
 
     def test_equal_fractions_reduction_factor_4_not_dummy(self, monkeypatch):
         monkeypatch.setattr(hysplit.HYSPLITDispersion, '_set_met_info',

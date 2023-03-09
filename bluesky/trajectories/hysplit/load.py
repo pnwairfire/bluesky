@@ -4,7 +4,7 @@ import re
 import os
 
 
-class OutputLoader(object):
+class OutputLoader():
     """Loads data from output file produced by hysplit trajectories
 
     Output file format (from a run with one location, starting at hour 0,

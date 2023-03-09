@@ -162,7 +162,7 @@ FIRES = [
     })
 ]
 
-class fire_failure_manager(object):
+class fire_failure_manager():
     def __init__(self, fire):
         self._fire = fire
 
@@ -174,7 +174,7 @@ class fire_failure_manager(object):
             self._fire['error'] = str(value)
         return True # return true even if there's an error
 
-class BaseEmissionsTest(object):
+class BaseEmissionsTest():
 
     def setup(self):
         self.fires = copy.deepcopy(FIRES)

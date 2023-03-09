@@ -17,14 +17,14 @@ from bluesky.models.fires import Fire
 # TODO: MockFiresManager was copied from test_datautils.py.
 #   Move it to common module
 
-class MockFiresManager(object):
+class MockFiresManager():
     def __init__(self, fires):
         self.fires = [Fire(f) for f in fires]
         self.today = datetime.datetime.now()
 
     @property
     def fire_failure_handler(self):
-        class klass(object):
+        class klass():
             def __init__(self, fire):
                 pass
 
@@ -157,7 +157,7 @@ FIRE_RX = copy.deepcopy(FIRE)
 FIRE_RX['type'] = 'rx'
 
 
-class TestPersistenceInvalidCases(object):
+class TestPersistenceInvalidCases():
 
     def test_invalid_calls_string_val_days_to_persist(self, reset_config):
         # days_to_persist isn't an integer
@@ -212,7 +212,7 @@ class TestPersistenceInvalidCases(object):
         assert e_info.value.args[0] == persistence.DAYS_TO_PERSIST_AND_PERCENTAGES_BOTH_SPECIFIED
 
 
-class TestPersistencePickCorrectMatchingConfig(object):
+class TestPersistencePickCorrectMatchingConfig():
 
     ##
     ## One Config
@@ -330,7 +330,7 @@ class TestPersistencePickCorrectMatchingConfig(object):
         assert grower._daily_percentages == [100, 50, 50, 25, 25]
 
 
-class TestPersistenceEmptyCases(object):
+class TestPersistenceEmptyCases():
 
     def set_config(self):
         # Note: reset_config gets called after setup is executed, so we
@@ -360,7 +360,7 @@ class TestPersistenceEmptyCases(object):
         assert fm.fires == [{"id": 'abc123', 'type': 'wildfire', 'fuel_type': 'natural', 'activity': []}]
 
 
-class TestPersistenceRx(object):
+class TestPersistenceRx():
     """For prescribed burns, presistence does nothing (i.e. it returns
     activity data identical to the raw data)
     """
@@ -393,7 +393,7 @@ class TestPersistenceRx(object):
                     persistence.Grower(fm).grow()
                     assert fm.fires == [expected]
 
-class TestPersistenceWfWithTruncation(object):
+class TestPersistenceWfWithTruncation():
 
     def set_config(self):
         Config().set({
@@ -765,7 +765,7 @@ class TestPersistenceWfWithTruncation(object):
         assert fm.fires == [expected]
 
 
-class TestPersistenceWfWithoutTruncation(object):
+class TestPersistenceWfWithoutTruncation():
 
     def set_config(self):
         Config().set({
@@ -934,7 +934,7 @@ class TestPersistenceWfWithoutTruncation(object):
         assert fm.fires == [expected]
 
 
-class TestPersistenceWfWtihDailyPercentages(object):
+class TestPersistenceWfWtihDailyPercentages():
 
     def test(self, reset_config):
         Config().set({

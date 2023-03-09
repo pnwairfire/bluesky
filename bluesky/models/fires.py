@@ -219,7 +219,7 @@ class FireEncoder(json.JSONEncoder):
 ## FireManager
 ##
 
-class FiresManager(object):
+class FiresManager():
 
     def __init__(self):
         self._meta = {}
@@ -586,7 +586,7 @@ class FiresManager(object):
                     ....
         """
         fires_manager = self
-        class klass(object):
+        class klass():
             def __init__(self, fire):
                 self._fire = fire
 

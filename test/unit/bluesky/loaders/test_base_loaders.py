@@ -12,7 +12,7 @@ from bluesky.exceptions import (
 )
 from bluesky.loaders import BaseJsonFileLoader, BaseCsvFileLoader
 
-class TestBaseFileLoader(object):
+class TestBaseFileLoader():
 
     def setup(self):
         self._temp_dir = tempfile.mkdtemp()

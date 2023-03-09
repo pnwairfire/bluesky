@@ -23,7 +23,7 @@ from bluesky import locationutils
 from bluesky.exceptions import BlueSkyConfigurationError
 from hashlib import blake2b
 
-class ColumnSpecificRecord(object):
+class ColumnSpecificRecord():
     columndefs = []
     has_newline = True
 
@@ -173,7 +173,7 @@ class PTHOURRecord(ColumnSpecificRecord):
                    ( 10, "SCC",     str) ]
 
 
-class SmokeReadyWriter(object):
+class SmokeReadyWriter():
   """
   SmokeReadyWriter is an object class that accepts a destination
   dir argument for file location and several kwargs specific to the

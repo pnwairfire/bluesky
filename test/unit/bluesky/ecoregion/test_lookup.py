@@ -9,12 +9,12 @@ from bluesky.exceptions import (
     BlueSkyConfigurationError
 )
 
-class TestInvalidimplementation(object):
+class TestInvalidimplementation():
     def test(self):
         with raises(BlueSkyConfigurationError) as e_info:
             EcoregionLookup(implementation='sdfsd')
 
-class BaseLookupEcoregionTest(object):
+class BaseLookupEcoregionTest():
 
     def test_valid(self):
         assert 'western' == self.ecoregion_lookup.lookup(45, -118)

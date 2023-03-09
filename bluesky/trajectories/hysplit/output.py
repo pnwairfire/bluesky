@@ -8,7 +8,7 @@ from bluesky import locationutils
 from bluesky.models.fires import FireEncoder
 
 
-class JsonOutputWriter(object):
+class JsonOutputWriter():
 
     def __init__(self, config, fires_manager, output_dir):
         self._config = config

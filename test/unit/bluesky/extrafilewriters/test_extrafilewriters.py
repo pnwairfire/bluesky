@@ -2,7 +2,7 @@ from bluesky.config import Config
 
 from bluesky.extrafilewriters import format_date_time
 
-class TestFormatDateTime(object):
+class TestFormatDateTime():
 
     def teardown(self):
         # TODO: figure out why this is required, even with

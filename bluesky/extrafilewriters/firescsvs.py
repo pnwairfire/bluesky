@@ -268,7 +268,7 @@ and aggregate.  Note that this list lacks 'id', which is the first column.
 ## Writer class
 ##
 
-class FiresCsvsWriter(object):
+class FiresCsvsWriter():
 
     def __init__(self, dest_dir, **kwargs):
         fl = (kwargs.get('fire_locations_filename') or
