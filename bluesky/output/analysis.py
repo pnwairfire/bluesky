@@ -1,3 +1,5 @@
+"""bluesky.output.analysis"""
+
 import datetime
 import json
 from collections import defaultdict

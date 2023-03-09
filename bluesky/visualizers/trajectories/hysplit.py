@@ -1,4 +1,4 @@
-"""bluesky.visualizers.disersion"""
+"""bluesky.visualizers.trajectories.hysplit"""
 
 __author__ = "Joel Dubowy"
 

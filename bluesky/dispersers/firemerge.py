@@ -1,3 +1,5 @@
+"""bluesky.dispersers.firemerge"""
+
 import copy
 import itertools
 import logging

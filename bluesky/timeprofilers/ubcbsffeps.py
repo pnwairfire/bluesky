@@ -1,3 +1,5 @@
+"""bluesky.timeprofilers.ubcbsffeps"""
+
 __author__      = "Tobias Schmidt"
 
 import os

@@ -1,4 +1,4 @@
-"""bluesky.dispersers.vsmoke
+"""bluesky.dispersers.vsmoke.vsmoke
 
 The code in this module was copied from BlueSky Framework, and modified
 significantly (mostly in VSMOKEDispersion).  It was originally written

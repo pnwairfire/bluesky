@@ -1,2 +1,1 @@
-"""bluesky.emitters
-"""
+"""bluesky.emitters"""

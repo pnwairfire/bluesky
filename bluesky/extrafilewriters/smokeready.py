@@ -1,4 +1,4 @@
-"""bluesky.extrafilewriters.SMOKEready
+"""bluesky.extrafilewriters.smokeready
 
 Writes three SMOKE Ready File Formats
 - PTINV

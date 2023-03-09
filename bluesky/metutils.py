@@ -1,3 +1,5 @@
+"""bluesky.metutils"""
+
 import copy
 import datetime
 import logging

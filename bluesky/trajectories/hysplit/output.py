@@ -1,3 +1,5 @@
+"""bluesky.trajectories.hysplit.output"""
+
 import json
 import os
 from collections import defaultdict

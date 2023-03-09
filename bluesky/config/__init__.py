@@ -1,3 +1,5 @@
+"""bluesky.config"""
+
 import copy
 import threading
 

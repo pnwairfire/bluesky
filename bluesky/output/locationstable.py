@@ -1,3 +1,5 @@
+"""bluesky.output.locationstable"""
+
 import dash_table as dt
 import dash_html_components as html
 from dash.dependencies import Input, Output

@@ -1,3 +1,5 @@
+"""bluesky.trajectories.hysplit.setup"""
+
 import os
 
 from bluesky import locationutils

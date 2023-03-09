@@ -1,3 +1,5 @@
+"""bluesky.output.graphs"""
+
 from collections import defaultdict
 
 import dash_html_components as html

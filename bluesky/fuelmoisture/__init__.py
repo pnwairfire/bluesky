@@ -1,3 +1,5 @@
+"""bluesky.fuelmoisture"""
+
 import datetime
 
 from afdatetime.parsing import parse_datetime

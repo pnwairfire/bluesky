@@ -1,3 +1,5 @@
+"""bluesky.emitters.ubcbsffeps"""
+
 __author__      = "Tobias Schmidt"
 
 import os

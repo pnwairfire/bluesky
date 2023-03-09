@@ -1,3 +1,5 @@
+"""bluesky.config.defaults"""
+
 import copy
 import os
 
