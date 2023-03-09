@@ -435,9 +435,9 @@ parameters would be used.
    - >= 10 - use this value as a constant
  - ***'config' > 'dispersion' > 'hysplit' > 'KMIX0'*** -- *optional* -- minimum mixing depth;  default: 150
  - ***'config' > 'dispersion' > 'hysplit' > 'OPTIMIZE_GRID_RESOLUTION'*** -- *optional* -- default: false
-PARTICLE_DENSITY = 1.0
-PARTICLE_DIAMETER = 1.0
-PARTICLE_SHAPE = 1.0
+ - ***'config' > 'dispersion' > 'hysplit' > 'PARTICLE_DENSITY'*** -- *optional* -- default: 1.0
+ - ***'config' > 'dispersion' > 'hysplit' > 'PARTICLE_DIAMETER'*** -- *optional* -- default: 1.0
+ - ***'config' > 'dispersion' > 'hysplit' > 'PARTICLE_SHAPE'*** -- *optional* -- default: 1.0
  - ***'config' > 'dispersion' > 'hysplit' > 'PARINIT'*** -- *optional* -- default: "./input/dispersion/PARINIT"
  - ***'config' > 'dispersion' > 'hysplit' > 'PARDUMP'*** -- *optional* -- default: "./input/dispersion/PARDUMP"
  - ***'config' > 'dispersion' > 'hysplit' > 'QCYCLE'*** -- *optional* -- default: 1.0
