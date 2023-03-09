@@ -422,17 +422,17 @@ parameters would be used.
  - ***'config' > 'dispersion' > 'hysplit' > 'KDEF'*** -- *optional* -- Horizontal Turbulence;  default: 0
  - ***'config' > 'dispersion' > 'hysplit' > 'KBLS'*** -- *optional* -- Boundary Layer Stability;  default: 1
  - ***'config' > 'dispersion' > 'hysplit' > 'KZMIX'*** -- *optional* -- Vertical Mixing Profile;  default: 0
-   - 0 - NONE Vertical diffusivity in PBL varies w/height (DEFAULT)
-   - 1 - vertical diffusivity in PBL single average value
-   - 2 - scale boundary-layer values multiplied by TVMIX
-   - 3 - scall free-troposphere values multiplied by TVMIX
+   - `0` - NONE Vertical diffusivity in PBL varies w/height (DEFAULT)
+   - `1` - vertical diffusivity in PBL single average value
+   - `2` - scale boundary-layer values multiplied by TVMIX
+   - `3` - scall free-troposphere values multiplied by TVMIX
  - ***'config' > 'dispersion' > 'hysplit' > 'TVMIX'*** -- *optional* -- default: 1.0
  - ***'config' > 'dispersion' > 'hysplit' > 'KMIXD'*** -- *optional* -- Mixed Layer Depth Computation; controls how the boundary layer depth is computed;  default: 0
-   - 0 = Use met model MIXD if avaialable (DEFAULT)
-   - 1 = Copmute from temp profile
-   - 2 = Compute from TKE profile
-   - 3 = Compute from modified Richardson number (STILT mode default)  (new in hysplit v5.0.0)
-   - >= 10 - use this value as a constant
+   - `0` - Use met model MIXD if avaialable (DEFAULT)
+   - `1` - Copmute from temp profile
+   - `2` - Compute from TKE profile
+   - `3` - Compute from modified Richardson number (STILT mode default)  (new in hysplit v5.0.0)
+   - `>= 10` - use this value as a constant
  - ***'config' > 'dispersion' > 'hysplit' > 'KMIX0'*** -- *optional* -- minimum mixing depth;  default: 150
  - ***'config' > 'dispersion' > 'hysplit' > 'OPTIMIZE_GRID_RESOLUTION'*** -- *optional* -- default: false
  - ***'config' > 'dispersion' > 'hysplit' > 'PARTICLE_DENSITY'*** -- *optional* -- default: 1.0
