@@ -1077,6 +1077,15 @@ class HYSPLITDispersion(DispersionBase):
         # minimum size in grid units of the meteorological sub-grid
         mgmin_val = int(self.config("MGMIN"))
 
+        # Turbulence-Dispersion Computations
+        kblt_val  = int(self.config("KBLT"))
+        kdef_val  = int(self.config("KDEF"))
+        kbls_val  = int(self.config("KBLS"))
+        kzmix_val = int(self.config("KZMIX"))
+        tvmix_val = self.config("TVMIX")
+        kmixd_val = int(self.config("KMIXD"))
+        kmix0_val = int(self.config("KMIX0"))
+
         with open(setup_file, "w") as f:
             f.write("&SETUP\n")
 
@@ -1155,5 +1164,14 @@ class HYSPLITDispersion(DispersionBase):
             # efile: the name of the emissions info (used to vary emission rate etc (and
             #        can also be used to change emissions time
             f.write("  EFILE = \"%s\",\n" % os.path.basename(emissions_file))
+
+            # Turbulence-Dispersion Computation
+            f.write("  KBLT = %d,\n" % kblt_val)
+            f.write("  KDEF = %d,\n" % kdef_val)
+            f.write("  KBLS = %d,\n" % kbls_val)
+            f.write("  KZMIX = %d,\n" % kzmix_val)
+            f.write("  TVMIX = %g,\n" % tvmix_val)
+            f.write("  KMIXD = %d,\n" % kmixd_val)
+            f.write("  KMIX0 = %d,\n" % kmix0_val)
 
             f.write("&END\n")

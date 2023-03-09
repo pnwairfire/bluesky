@@ -562,6 +562,40 @@ _DEFAULTS = {
             "NUMPAR": 1000,
             "MAXPAR": 10000000,
 
+            ## ADVANCED Turbulence-Dispersion Computation
+            ## see https://www.ready.noaa.gov/hysplitusersguide/S625.htm
+            ## for more details about possible options
+
+            # Vertical Turbulence
+            "KBLT": 2,
+
+            # Horizontal Turbulence
+            "KDEF": 0,
+
+            # Boundary Layer Stability
+            "KBLS": 1,
+
+            # Vertical Mixing Profile
+            # 0 - NONE Vertical diffusivity in PBL varies w/height (DEFAULT)
+            # 1 - vertical diffusivity in PBL single average value
+            # 2 - scale boundary-layer values multiplied by TVMIX
+            # 3 - scall free-troposphere values multiplied by TVMIX
+            "KZMIX": 0,
+            "TVMIX": 1.0,
+
+            # Mixed Layer Depth Computation
+            # KMIXD controls how the boundary layer depth is computed
+            # 0 = Use met model MIXD if avaialable (DEFAULT)
+            # 1 = Copmute from temp profile
+            # 2 = Compute from TKE profile
+            # 3 = Compute from modified Richardson number (STILT mode default)
+            #     (new in hysplit v5.0.0)
+            # >= 10 - use this value as a constant
+            "KMIXD": 0,
+            
+            # minimum mixing depth
+            "KMIX0": 150,
+
             #
             # MPI options
             #
