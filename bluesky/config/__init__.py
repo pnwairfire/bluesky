@@ -24,10 +24,12 @@ __all__ = [
 thread_local_data = threading.local()
 
 class Config(object):
+    """Class for managing bluesky configuration.
 
-    # This is a Singleton, to facilitate making this module thread safe
-    # (e.g. when using threads to execute parallel runs with different
-    # configurations)
+    This is a Singleton, to facilitate making this module thread safe
+    (e.g. when using threads to execute parallel runs with different
+    configurations)
+    """
 
     def __new__(cls, *args, **kwargs):
         if not hasattr(thread_local_data, 'config_manager'):
