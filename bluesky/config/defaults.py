@@ -595,8 +595,13 @@ _DEFAULTS = {
             # >= 10 - use this value as a constant
             "KMIXD": 0,
             
-            # minimum mixing depth
-            "KMIX0": 150,
+            # minimum mixing depth -  default in the manual is listed as 150 m,
+            # however, the code and a forum post seems to set it 250 m. also,
+            # it # appears that it is different for dispersion vs trajectories.
+            # so, in order to accomodate this, if hysplit.py sees a value less
+            # than # zero it won't write anything to the SETUP.CFG file;
+            # otherwise, it'll write the value given below
+            "KMIX0": -1,
 
             #
             # MPI options

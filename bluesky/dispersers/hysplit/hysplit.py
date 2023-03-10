@@ -1172,6 +1172,12 @@ class HYSPLITDispersion(DispersionBase):
             f.write("  KZMIX = %d,\n" % kzmix_val)
             f.write("  TVMIX = %g,\n" % tvmix_val)
             f.write("  KMIXD = %d,\n" % kmixd_val)
-            f.write("  KMIX0 = %d,\n" % kmix0_val)
+
+            # if kmix0_val < 0 don't write to the SETUP.CFG file. this allows
+            # for hysplit's default values (which can differ for dispersion vs
+            # trajectory runs) to be used; otherwise, use this value as the
+            # minimum value for the mixing depth
+            if ( kmix0_val > 0 ):
+              f.write("  KMIX0 = %d,\n" % kmix0_val)
 
             f.write("&END\n")
