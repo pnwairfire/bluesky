@@ -553,3 +553,6 @@
 
 ## 4.3.72
  - Support specifying constant smoldering fraction in hysplit
+
+## 4.3.73
+ - Support new hysplit options related to turbulence-dispersion
