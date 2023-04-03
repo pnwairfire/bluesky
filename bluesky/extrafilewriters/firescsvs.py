@@ -136,6 +136,7 @@ def _get_location_value(key, is_float):
 FIRE_LOCATIONS_CSV_FIELDS = (
     [
         ('id', lambda f, loc: f.id),
+        ('associated_fire', lambda f, loc: loc._active_area.get('associated_fire')),
         ('event_id', lambda f, loc: f.get('event_of', {}).get('id')),
         ('latitude', lambda f, loc: locationutils.LatLng(loc).latitude),
         ('longitude', lambda f, loc: locationutils.LatLng(loc).longitude),
