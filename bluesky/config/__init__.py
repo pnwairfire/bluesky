@@ -31,7 +31,7 @@ class Config():
     configurations)
     """
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls):
         if not hasattr(thread_local_data, 'config_manager'):
             thread_local_data.config_manager = object.__new__(cls)
         return thread_local_data.config_manager
