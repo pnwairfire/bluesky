@@ -556,3 +556,6 @@
 
 ## 4.3.73
  - Support new hysplit options related to turbulence-dispersion
+
+## 4.3.74
+ - Minor updates to consumption and extrafiles modules
