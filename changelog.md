@@ -559,3 +559,6 @@
 
 ## 4.3.74
  - Minor updates to consumption and extrafiles modules
+
+## 4.3.75
+ - Support adjusting modeled fuel load and consumption data based on estimated fuel load
