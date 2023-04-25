@@ -15,11 +15,13 @@ from bluesky.consumeutils import (
 from bluesky import exceptions
 from bluesky.locationutils import LatLng
 
+
 __all__ = [
     'run'
 ]
 
 __version__ = "0.1.0"
+
 
 def run(fires_manager):
     """Runs the fire data through consumption calculations, using the consume
@@ -77,6 +79,41 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
                 for fb in loc['fuelbeds']:
                     _run_fuelbed(fb, loc, fuel_loadings_manager, season,
                         burn_type, msg_level)
+                _scale_with_estimated_fuelload(loc)
+
+
+SCALE_WITH_ESTIMATED_FUELLOAD = Config().get('consumption',
+    'scale_with_estimated_fuelload')
+
+def _scale_with_estimated_fuelload(loc):
+    if (not SCALE_WITH_ESTIMATED_FUELLOAD
+            or not loc.get('input_est_fuelload_tpa')
+            or any([not fb.get('fuel_loadings') for fb in loc['fuelbeds']])):
+        return
+
+    # get fuel loadings keys from first fuelbed
+    loadings_keys = [k for k in loc['fuelbeds'][0]['fuel_loadings'] if k.endswith('_loading')]
+
+    # get total modeled fuel load per acre; note that values in 'fuel_loadings' are per acre
+    modeled_fuelload_tpa = 0
+    for fb in loc['fuelbeds']:
+        modeled_fuelload_tpa += sum([fb['fuel_loadings'][k] for k in loadings_keys])
+
+    scale_factor = loc['input_est_fuelload_tpa'] / modeled_fuelload_tpa
+    logging.debug("Using fuel loadings scale factor %s", scale_factor)
+
+    for fb in loc['fuelbeds']:
+        # adjust fuel load values
+        for k in loadings_keys:
+            fb['fuel_loadings'][k] *= scale_factor
+
+        # adjust consumption values
+        for cat in fb['consumption']:
+            for subcat in fb['consumption'][cat]:
+                for phase in fb['consumption'][cat][subcat]:
+                    fb['consumption'][cat][subcat][phase] = [
+                        v * scale_factor for v in fb['consumption'][cat][subcat][phase]]
+
 
 def _run_fuelbed(fb, location, fuel_loadings_manager, season,
         burn_type, msg_level):

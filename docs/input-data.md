@@ -64,6 +64,7 @@ Other fields
 The following can be defined either under 'specified_points' or 'perimeter'
 objects, or directly under the parent 'active_areas' object
 
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'input_est_fuelload_tpa'*** -- *optional* -- estimated fuel load per acre, used to adjust the modeled fuel load and consumption output if `config.consumption.scale_with_estimated_fuelload` is set to true
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'ecoregion'*** -- *required*
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'slope'*** -- *optional* -- default: 5
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'windspeed'*** -- *optional* -- default: 6

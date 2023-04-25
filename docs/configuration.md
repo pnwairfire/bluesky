@@ -159,6 +159,8 @@ The following settings apply to filtering on any field (other than 'area') in th
 ### consumption
 
  - ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
+ - ***'config' > 'consumption' > 'scale_with_estimated_fuelload'*** -- *optional* -- If set to true and if the estimated total fuel load is defined for the location (field `input_est_fuelload_tpa` in specified point or perimeter), then the modeled fuel load and consumption values are all scaled by `input_est_fuelload_tpa
+ \ <modeled fuel load per acre for that location>`
 
 The following consume_settings fields define what defaults to use when the
 field isn't defined in a fire's activity object (or in its localmet data, if
