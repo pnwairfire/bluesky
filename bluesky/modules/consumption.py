@@ -107,6 +107,9 @@ def _scale_with_estimated_consumption(loc):
                 for phase in fb['consumption'][cat][subcat]:
                     fb['consumption'][cat][subcat][phase] = [
                         v * scale_factor for v in fb['consumption'][cat][subcat][phase]]
+
+    loc['input_est_consumption_scale_factor'] = scale_factor
+
     return True
 
 SCALE_WITH_ESTIMATED_FUELLOAD = Config().get('consumption',
@@ -141,6 +144,9 @@ def _scale_with_estimated_fuelload(loc):
                 for phase in fb['consumption'][cat][subcat]:
                     fb['consumption'][cat][subcat][phase] = [
                         v * scale_factor for v in fb['consumption'][cat][subcat][phase]]
+
+    loc['input_est_fuelload_scale_factor'] = scale_factor
+
     return True
 
 def _run_fuelbed(fb, location, fuel_loadings_manager, season,
