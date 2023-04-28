@@ -104,12 +104,7 @@ def _scale_with_estimated_consumption(loc):
     logging.debug("Using consumption scale factor %s", scale_factor)
 
     for fb in loc['fuelbeds']:
-        # adjust consumption values
-        for cat in fb['consumption']:
-            for subcat in fb['consumption'][cat]:
-                for phase in fb['consumption'][cat][subcat]:
-                    fb['consumption'][cat][subcat][phase] = [
-                        v * scale_factor for v in fb['consumption'][cat][subcat][phase]]
+        datautils.multiply_nested_data(fb["consumption"], scale_factor)
 
     loc['input_est_consumption_scale_factor'] = scale_factor
 
@@ -142,11 +137,7 @@ def _scale_with_estimated_fuelload(loc):
             fb['fuel_loadings'][k] *= scale_factor
 
         # adjust consumption values
-        for cat in fb['consumption']:
-            for subcat in fb['consumption'][cat]:
-                for phase in fb['consumption'][cat][subcat]:
-                    fb['consumption'][cat][subcat][phase] = [
-                        v * scale_factor for v in fb['consumption'][cat][subcat][phase]]
+        datautils.multiply_nested_data(fb["consumption"], scale_factor)
 
     loc['input_est_fuelload_scale_factor'] = scale_factor
 
