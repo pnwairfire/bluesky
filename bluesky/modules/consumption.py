@@ -93,11 +93,14 @@ def _scale_with_estimated_consumption(loc):
             or not loc.get('input_est_consumption_tpa')):
         return False
 
+    # get total modeled consumption per acre; note that values in
+    # 'consumption' are total (not per acre)
     modeled_consumption_tpa = 0
     for fb in loc['fuelbeds']:
         modeled_consumption_tpa += fb['consumption']['summary']['total']['total'][0]
+    modeled_consumption_tpa /= loc['area']
 
-    scale_factor = loc['input_est_consumption_tpa']/ modeled_consumption_tpa
+    scale_factor = loc['input_est_consumption_tpa'] / modeled_consumption_tpa
     logging.debug("Using consumption scale factor %s", scale_factor)
 
     for fb in loc['fuelbeds']:
