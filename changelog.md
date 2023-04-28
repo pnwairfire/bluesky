@@ -565,3 +565,6 @@
 
 ## 4.3.76
  - Support adjusting modeled consumption data based on estimated consumption
+
+## 4.3.77
+ - Record estimated fuelload and consumption scaling factors if used to adjust fuel load and/or consumption
