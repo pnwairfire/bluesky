@@ -79,8 +79,35 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
                 for fb in loc['fuelbeds']:
                     _run_fuelbed(fb, loc, fuel_loadings_manager, season,
                         burn_type, msg_level)
-                _scale_with_estimated_fuelload(loc)
+                # scale with estimated consumption or fuel load, if specified
+                # and if configured to do so
+                (_scale_with_estimated_consumption(loc)
+                    or _scale_with_estimated_fuelload(loc))
 
+
+SCALE_WITH_ESTIMATED_CONSUMPTION = Config().get('consumption',
+    'scale_with_estimated_consumption')
+
+def _scale_with_estimated_consumption(loc):
+    if (not SCALE_WITH_ESTIMATED_CONSUMPTION
+            or not loc.get('input_est_consumption_tpa')):
+        return False
+
+    modeled_consumption_tpa = 0
+    for fb in loc['fuelbeds']:
+        modeled_consumption_tpa += fb['consumption']['summary']['total']['total'][0]
+
+    scale_factor = loc['input_est_consumption_tpa']/ modeled_consumption_tpa
+    logging.debug("Using consumption scale factor %s", scale_factor)
+
+    for fb in loc['fuelbeds']:
+        # adjust consumption values
+        for cat in fb['consumption']:
+            for subcat in fb['consumption'][cat]:
+                for phase in fb['consumption'][cat][subcat]:
+                    fb['consumption'][cat][subcat][phase] = [
+                        v * scale_factor for v in fb['consumption'][cat][subcat][phase]]
+    return True
 
 SCALE_WITH_ESTIMATED_FUELLOAD = Config().get('consumption',
     'scale_with_estimated_fuelload')
@@ -89,7 +116,7 @@ def _scale_with_estimated_fuelload(loc):
     if (not SCALE_WITH_ESTIMATED_FUELLOAD
             or not loc.get('input_est_fuelload_tpa')
             or any([not fb.get('fuel_loadings') for fb in loc['fuelbeds']])):
-        return
+        return False
 
     # get fuel loadings keys from first fuelbed
     loadings_keys = [k for k in loc['fuelbeds'][0]['fuel_loadings'] if k.endswith('_loading')]
@@ -98,6 +125,7 @@ def _scale_with_estimated_fuelload(loc):
     modeled_fuelload_tpa = 0
     for fb in loc['fuelbeds']:
         modeled_fuelload_tpa += sum([fb['fuel_loadings'][k] for k in loadings_keys])
+    logging.debug("Modeled fuel loading (per acre) %s", modeled_fuelload_tpa)
 
     scale_factor = loc['input_est_fuelload_tpa'] / modeled_fuelload_tpa
     logging.debug("Using fuel loadings scale factor %s", scale_factor)
@@ -113,7 +141,7 @@ def _scale_with_estimated_fuelload(loc):
                 for phase in fb['consumption'][cat][subcat]:
                     fb['consumption'][cat][subcat][phase] = [
                         v * scale_factor for v in fb['consumption'][cat][subcat][phase]]
-
+    return True
 
 def _run_fuelbed(fb, location, fuel_loadings_manager, season,
         burn_type, msg_level):
