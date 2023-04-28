@@ -562,3 +562,6 @@
 
 ## 4.3.75
  - Support adjusting modeled fuel load and consumption data based on estimated fuel load
+
+## 4.3.76
+ - Support adjusting modeled consumption data based on estimated consumption
