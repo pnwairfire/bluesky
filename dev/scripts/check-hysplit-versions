@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+for e in `ls bin/hy*_*`; do
+    echo
+    echo $e
+    docker run --rm bluesky `basename $e` 2>/dev/null
+done
