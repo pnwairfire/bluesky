@@ -16,7 +16,7 @@ apps-consume==5.1.1
 Fiona==1.8.18
 shapely==1.7.1
 geopandas==0.8.2
-requests==2.25.1
+requests==2.31.0
 # TODO: upgrade flask and dash* packages, if necessary
 Flask==2.0.2
 Flask-Compress==1.10.1
