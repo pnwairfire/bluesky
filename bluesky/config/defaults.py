@@ -263,6 +263,19 @@ _DEFAULTS = {
     "timeprofile": {
         "hourly_fractions": None,
         "model": "default",
+        "time_window": {
+            # The timeprofile window defaults to the active_area start and end times
+            'rx': {
+                "first_hour": None,
+                "last_hour": None,
+                "num_hours": None, # hours after ignition start
+            },
+            'wf' : {
+                "first_hour": None,
+                "last_hour": None,
+                "num_hours": None, # hours after start of active area  time window
+            }
+        },
         "ubc-bsf-feps": {
             "interpolation_type": 1,
             "normalize": True,

@@ -17,11 +17,17 @@ class TestTimeprofilingRunFire():
 
     def test_4_hourly_fractions_and_multiple_active_areas(self, reset_config):
         # setting
-        hourly_fractions = {
-            "flaming": [0.8, 0.1, 0.1],
-            "smoldering": [0.8, 0.1, 0.1],
-            "area_fraction": [0.8, 0.1, 0.1],
-            "residual": [0.8, 0.1, 0.1]
+        t_config = {
+            'hourly_fractions': {
+                "flaming": [0.8, 0.1, 0.1],
+                "smoldering": [0.8, 0.1, 0.1],
+                "area_fraction": [0.8, 0.1, 0.1],
+                "residual": [0.8, 0.1, 0.1]
+            },
+            "time_windows": {
+                'rx': {"first_hour": None,"last_hour": None,"num_hours": None},
+                'wf' : {"first_hour": None,"last_hour": None,"num_hours": None}
+            }
         }
         #Config().set(hourly_fractions, "timeprofile","hourly_fractions")
 
@@ -42,7 +48,7 @@ class TestTimeprofilingRunFire():
             ]
         })
         with raises(BlueSkyConfigurationError) as e_info:
-            timeprofile._run_fire(hourly_fractions, fire)
+            timeprofile._run_fire(t_config, fire)
         assert e_info.value.args[0] == timeprofile.NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS_MSG
 
         fire = fires.Fire({
@@ -66,15 +72,22 @@ class TestTimeprofilingRunFire():
             ]
         })
         with raises(BlueSkyConfigurationError) as e_info:
-            timeprofile._run_fire(hourly_fractions, fire)
+            timeprofile._run_fire(t_config, fire)
         assert e_info.value.args[0] == timeprofile.NOT_24_HOURLY_FRACTIONS_W_MULTIPLE_ACTIVE_AREAS_MSG
 
     def test_no_active_areas(self, reset_config):
+        t_config = {
+            'hourly_fractions': None,
+            "time_windows": {
+                'rx': {"first_hour": None,"last_hour": None,"num_hours": None},
+                'wf' : {"first_hour": None,"last_hour": None,"num_hours": None}
+            }
+        }
         fire = fires.Fire({
             "id": "slijlfdsljfsdkljf"
         })
         with raises(ValueError) as e_info:
-            timeprofile._run_fire(None, fire)
+            timeprofile._run_fire(t_config, fire)
         assert e_info.value.args[0] == timeprofile.MISSING_ACTIVITY_AREA_MSG
 
         fire = fires.Fire({
@@ -86,10 +99,17 @@ class TestTimeprofilingRunFire():
             ]
         })
         with raises(ValueError) as e_info:
-            timeprofile._run_fire(None, fire)
+            timeprofile._run_fire(t_config, fire)
         assert e_info.value.args[0] == timeprofile.MISSING_ACTIVITY_AREA_MSG
 
     def test_active_area_missing_start(self, reset_config):
+        t_config = {
+            'hourly_fractions': None,
+            "time_windows": {
+                'rx': {"first_hour": None,"last_hour": None,"num_hours": None},
+                'wf' : {"first_hour": None,"last_hour": None,"num_hours": None}
+            }
+        }
         fire = fires.Fire({
             "id": "slijlfdsljfsdkljf",
             "activity": [
@@ -115,7 +135,7 @@ class TestTimeprofilingRunFire():
             ],
         })
         with raises(ValueError) as e_info:
-            timeprofile._run_fire(None, fire)
+            timeprofile._run_fire(t_config, fire)
         assert e_info.value.args[0] == timeprofile.INSUFFICIENT_ACTIVITY_INFP_MSG
 
 
@@ -124,6 +144,13 @@ class TestTimeprofilingRunFire():
     ##
 
     def test_one_active_area(self, reset_config):
+        t_config = {
+            'hourly_fractions': None,
+            "time_windows": {
+                'rx': {"first_hour": None,"last_hour": None,"num_hours": None},
+                'wf' : {"first_hour": None,"last_hour": None,"num_hours": None}
+            }
+        }
         fire = fires.Fire({
             "id": "SF11C14225236095807750",
             "activity": [
@@ -151,6 +178,6 @@ class TestTimeprofilingRunFire():
                 "smoldering": 0.5
             }
         }
-        timeprofile._run_fire(None, fire)
+        timeprofile._run_fire(t_config, fire)
         actual = fire['activity'][0]['active_areas'][0]['timeprofile']
         assert actual == expected

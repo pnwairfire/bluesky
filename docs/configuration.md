@@ -258,6 +258,10 @@ parameters would be used.
 
  - ***'config' > 'timeprofile' > 'hourly_fractions'*** -- *optional* -- custom hourly fractions (either 24-hour fractions or for the span of the activity window)
  - ***'config' > 'timeprofile' > 'model'*** -- *optional* -- default: "default"; only used if you want to use the 'ubc-bsf-feps' model
+ - ***'config' > 'timeprofile' > 'time_window' > 'rx'/'wf' > 'first_hour'*** -- *optional* --
+ - ***'config' > 'timeprofile' > 'time_window' > 'rx'/'wf' > 'last_hour'*** -- *optional* --
+ - ***'config' > 'timeprofile' > 'time_window' > 'rx'/'wf' > 'num_hours'*** -- *optional* --
+
 
 #### If running ubc-bsf-feps model:
 
