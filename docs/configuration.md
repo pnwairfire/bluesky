@@ -307,6 +307,18 @@ parameters would be used.
 - ***'config' > 'extrafiles' > 'firescsvs' > 'fire_locations_filename'*** -- *optional* -- default: 'fire_locations.csv'
 - ***'config' > 'extrafiles' > 'firescsvs' > 'fire_events_filename'*** -- *optiona* -- default: 'fire_events.csv'
 
+#### if writing smokeready files
+
+*Note that each `pt*` filename requires a datestamp.*
+
+- ***'config' > 'extrafiles' > 'smokeready' > 'ptinv_filename'*** -- *optional* -- defailt: `ptinv-{today:%Y%m%d%H}.ida`;
+- ***'config' > 'extrafiles' > 'smokeready' > 'ptday_filename'*** -- *optional* -- defailt: `ptday-{today:%Y%m%d%H}.ems95`;
+- ***'config' > 'extrafiles' > 'smokeready' > 'pthour_filename'*** -- *optional* -- defailt: `pthour-{today:%Y%m%d%H}.ems95`;
+- ***'config' > 'extrafiles' > 'smokeready' > 'separate_smolder'*** -- *optional* -- defailt: true
+- ***'config' > 'extrafiles' > 'smokeready' > 'write_ptinv_totals'*** -- *optional* -- defailt: True
+- ***'config' > 'extrafiles' > 'smokeready' > 'write_ptday_file'*** -- *optional* -- defailt: true
+- ***'config' > 'extrafiles' > 'smokeready' > 'use_fips'*** -- *optional* -- defailt: false
+
 
 ### trajectories
 
