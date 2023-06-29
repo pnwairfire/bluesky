@@ -19,6 +19,7 @@ from collections import defaultdict
 
 from pyairfire.io import CSV2JSON
 
+from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.models.fires import Fire
 from . import BaseCsvFileLoader, skip_failures
 from bluesky.datetimeutils import parse_datetime, parse_utc_offset
@@ -99,6 +100,20 @@ class CsvFileLoader(BaseCsvFileLoader):
         self._timeprofile_file = config.get('timeprofile_file')
         self._load_consumption = config.get('load_consumption')
         self._load_emissions = config.get('load_emissions')
+        self._set_area_multiplier(config)
+
+
+    AREA_MULTIPLIERS = {
+        'hectares': 2.471054
+    }
+
+    def _set_area_multiplier(self, config):
+        self._area_multiplier = None
+        area_units = config.get('area_units')
+        if area_units and area_units.lower() != 'acres':
+            self._area_multiplier = self.AREA_MULTIPLIERS.get(area_units.lower())
+            if not self._area_multiplier:
+                raise BlueSkyConfigurationError(f"Invalid area units: {area_units}")
 
 
     def _marshal(self, data):
@@ -181,6 +196,11 @@ class CsvFileLoader(BaseCsvFileLoader):
         if self._omit_nulls:
             sp = {k: v for k, v in sp.items() if v is not None}
 
+        # Set and adjust area if necessary
+        sp['area'] = sp.get('area') or 1
+        if self._area_multiplier:
+            sp['area'] *= self._area_multiplier
+
         fire['specified_points_by_date_n_offset'][start][utc_offset].append(sp)
 
         # event and type could have been set when the Fire object was
@@ -224,7 +244,7 @@ class CsvFileLoader(BaseCsvFileLoader):
 
             total_cons = flaming + smold + resid + duff
 
-            area = sp.get('area') or 1
+            area = sp['area']
             consumption = {
                 "flaming": [area * flaming],
                 "residual": [area * resid],
@@ -250,7 +270,7 @@ class CsvFileLoader(BaseCsvFileLoader):
     def _process_emissions_values(self, row, fire, sp):
 
         if self._load_emissions:
-            area = sp.get('area') or 1
+            area = sp['area']
             emissions = {}
             for bsf_key, bsp_key in self.EMISSIONS_KEYS.items():
                 emissions[bsp_key] = [(row.get(bsf_key) or 0.0) * area]
