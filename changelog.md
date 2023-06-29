@@ -571,3 +571,6 @@
 
 ## 4.3.78
  - Fix adjustment of modeled consumption based on estimate
+
+## 4.3.79
+ - Support BSF imported data with area in hectares
