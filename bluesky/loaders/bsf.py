@@ -101,8 +101,9 @@ class CsvFileLoader(BaseCsvFileLoader):
         self._load_consumption = config.get('load_consumption')
         self._load_emissions = config.get('load_emissions')
         self._set_area_multiplier(config)
+        self._set_consumption_multiplier(config)
 
-
+    DEFAULT_AREA_UNITS = 'acres'
     AREA_MULTIPLIERS = {
         'hectares': 2.471054
     }
@@ -110,11 +111,23 @@ class CsvFileLoader(BaseCsvFileLoader):
     def _set_area_multiplier(self, config):
         self._area_multiplier = None
         area_units = config.get('area_units')
-        if area_units and area_units.lower() != 'acres':
+        if area_units and area_units.lower() != self.DEFAULT_AREA_UNITS:
             self._area_multiplier = self.AREA_MULTIPLIERS.get(area_units.lower())
             if not self._area_multiplier:
                 raise BlueSkyConfigurationError(f"Invalid area units: {area_units}")
 
+    DEFAULT_CONSUMPTION_UNITS = 'tons/acre'
+    CONSUMPTION_MULTIPLIERS = {
+        'kg/m^2': 4.05
+    }
+
+    def _set_consumption_multiplier(self, config):
+        self._consumption_multiplier = 1
+        consumption_units = config.get('consumption_units')
+        if consumption_units and consumption_units.lower() != self.DEFAULT_CONSUMPTION_UNITS:
+            self._consumption_multiplier = self.CONSUMPTION_MULTIPLIERS.get(consumption_units.lower())
+            if not self._consumption_multiplier:
+                raise BlueSkyConfigurationError(f"Invalid consumption units: {consumption_units}")
 
     def _marshal(self, data):
         self._load_timeprofile_file()
@@ -246,11 +259,11 @@ class CsvFileLoader(BaseCsvFileLoader):
 
             area = sp['area']
             consumption = {
-                "flaming": [area * flaming],
-                "residual": [area * resid],
-                "smoldering": [area * smold],
-                "duff": [area * duff],
-                "total": [area * total_cons]
+                "flaming": [area * flaming * self._consumption_multiplier],
+                "residual": [area * resid * self._consumption_multiplier],
+                "smoldering": [area * smold * self._consumption_multiplier],
+                "duff": [area * duff * self._consumption_multiplier],
+                "total": [area * total_cons * self._consumption_multiplier]
             }
 
             self._consumption_values[fire["id"]] = consumption

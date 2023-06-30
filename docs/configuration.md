@@ -79,7 +79,8 @@ configuration json data are case-insensitive.***
  - ***'config' > 'load' > 'sources' > 'timeprofile_file'*** -- *optional*
  - ***'config' > 'load' > 'sources' > 'load_consumption'*** -- *optional*
  - ***'config' > 'load' > 'sources' > 'load_emissions'*** -- *optional*
- - ***'config' > 'load' > 'sources' > 'area_units'*** -- *optional* -- default 'acres'
+ - ***'config' > 'load' > 'sources' > 'area_units'*** -- *optional* -- default 'acres'; supported: 'acrea', 'hectares'
+ - ***'config' > 'load' > 'sources' > 'consumption_units'*** -- *optional* -- default 'tons/acre'; supported 'tons/acre', 'kg/m^2'
 
 #### if type 'file':
 
