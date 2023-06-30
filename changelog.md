@@ -574,3 +574,6 @@
 
 ## 4.3.79
  - Support BSF imported data with area in hectares
+
+## 4.3.80
+ - Support BSF imported data with consumption in kg/m^2
