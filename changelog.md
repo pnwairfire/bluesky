@@ -577,3 +577,6 @@
 
 ## 4.3.80
  - Support BSF imported data with consumption in kg/m^2
+
+## 4.3.81
+ - Upgrade consume to v5.1.2 and add support for specifying available duff, sound cwd, and rotten cwd
