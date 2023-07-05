@@ -186,6 +186,9 @@ They also define what synonyms to recognize, if any, for each field.
  - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'canopy_consumption_pct' > 'default'*** -- *optional* -- default 0
  - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'shrub_blackened_pct' > 'default'*** -- *optional* -- default 50
  - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'pile_blackened_pct' > 'default'*** -- *optional* -- default 0
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'duff_pct_available' > 'default'*** -- *optional* -- default 100
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'sound_cwd_pct_available' > 'default'*** -- *optional* -- default 100
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'rotten_cwd_pct_available' > 'default'*** -- *optional* -- default 100
 
 ### emissions
 

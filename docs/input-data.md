@@ -78,6 +78,9 @@ objects, or directly under the parent 'active_areas' object
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'canopy_consumption_pct'*** -- *optional* -- default: 0
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'shrub_blackened_pct'*** -- *optional* -- default: 50
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'pile_blackened_pct'*** -- *optional* -- default: 0
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'duff_pct_available'*** -- *optional* -- default: 100
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'sound_cwd_pct_available'*** -- *optional* -- default: 100
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'rotten_cwd_pct_available'*** -- *optional* -- default: 100
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'output_units'*** -- *optional* -- default: "tons_ac"
  - ***['fires'] > 'type'*** -- *optional* -- fire type ('rx' vs. 'wildfire'); default: 'wildfire'
  - ***['fires'] > 'fuel_type'*** -- *optional* -- fuel type ('natural', 'activity', or 'piles'); default: 'natural'

@@ -189,6 +189,15 @@ _DEFAULTS = {
                 'pile_blackened_pct': {
                     'default': 0
                 },
+                'duff_pct_available': {
+                    'default': 100,
+                },
+                'sound_cwd_pct_available': {
+                    'default': 100,
+                },
+                'rotten_cwd_pct_available': {
+                    'default': 100,
+                }
             }
         }
     },
