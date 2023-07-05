@@ -63,6 +63,7 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
     if fire.fuel_type == 'piles':
         raise ValueError("Consume can't be used for fuel type 'piles'")
     burn_type = fire.fuel_type
+    fire_type = fire.type
 
     # TODO: can I run consume on all fuelbeds at once and get per-fuelbed
     # results?  If it is simply a matter of parsing separated values from
@@ -78,7 +79,7 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
             for loc in aa.locations:
                 for fb in loc['fuelbeds']:
                     _run_fuelbed(fb, loc, fuel_loadings_manager, season,
-                        burn_type, msg_level)
+                        burn_type, fire_type, msg_level)
                 # scale with estimated consumption or fuel load, if specified
                 # and if configured to do so
                 (_scale_with_estimated_consumption(loc)
@@ -144,7 +145,7 @@ def _scale_with_estimated_fuelload(loc):
     return True
 
 def _run_fuelbed(fb, location, fuel_loadings_manager, season,
-        burn_type, msg_level):
+        burn_type, fire_type, msg_level):
     fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
         fb['fccs_id'])
 
@@ -168,7 +169,7 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
     fc.fuelbed_area_acres = [area]
     fc.fuelbed_ecoregion = [location['ecoregion']]
 
-    _apply_settings(fc, location, burn_type)
+    _apply_settings(fc, location, burn_type, fire_type)
     _results = fc.results()
     if _results:
         # TODO: validate that _results['consumption'] and

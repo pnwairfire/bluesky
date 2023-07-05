@@ -144,59 +144,124 @@ _DEFAULTS = {
             'natural': {},
             'activity': {
                 'slope': {
-                    'default': 5 # percent, from 1 to 100; default from consume package
+                    # percent, from 1 to 100;  consume package defaults to 5%
+                    'defaults': {
+                        'rx': 5,
+                        'wf': 5,
+                        'other': 5,
+                    },
                 },
                 'windspeed': {
-                    'default': 6,  # default from consume package
+                    # consume package defaults to 5mph
+                    'defaults': {
+                        'rx': 6,
+                        'wf': 6,
+                        'other': 6,
+                    },
                     # TODO: is 'max_wind' a valid synonym? or 'min_wind_aloft'?
                 },
                 'days_since_rain': {
-                    'default': 10,   # our default
+                    'defaults': {
+                        'rx': 10,
+                        'wf': 10,
+                        'other': 10,
+                    },
                     'synonyms': ['rain_days'] # TODO: confirm
                 },
                 'fuel_moisture_10hr_pct': {
-                    'default': 50, # default from consume package
+                    # consume package defaults to 50%
+                    'defaults': {
+                        'rx': 50,
+                        'wf': 50,
+                        'other': 50,
+                    },
                     'synonyms': ['moisture_10hr'] # TODO: confirm
                 },
                 'length_of_ignition': {
-                    'default': 120 # in minutes; our default
+                    # in minutes
+                    'defaults': {
+                        'rx': 120,
+                        'wf': 120,
+                        'other': 120,
+                    },
                 },
                 'fm_type': {
-                    'default': "MEAS-Th" # default from consume package
+                    # consume package defaults to 'MEAS-Th'
+                    'defaults': {
+                        'rx': 'MEAS-Th',
+                        'wf': 'MEAS-Th',
+                        'other': 'MEAS-Th',
+                    },
                 }
             },
             'all': {
                 'fuel_moisture_1000hr_pct': {
-                    'default': 30,
+                    'defaults': {
+                        'rx': 30,
+                        'wf': 30,
+                        'other': 30,
+                    },
                     'synonyms': ['moisture_1khr'] # TODO: confirm
                 },
                 'fuel_moisture_duff_pct': {
-                    'default': 75,
+                    'defaults': {
+                        'rx': 75,
+                        'wf': 75,
+                        'other': 75,
+                    },
                     'synonyms': ['moisture_duff'] # TODO: confirm
                 },
                 'fuel_moisture_litter_pct': {
-                    'default': 16,
+                    'defaults': {
+                        'rx': 16,
+                        'wf': 16,
+                        'other': 16,
+                    },
                     'synonyms': ['moisture_litter'] # TODO: confirm
                 },
                 'canopy_consumption_pct': {
-                    'default': 0,
+                    'defaults': {
+                        'rx': 0,
+                        'wf': 0,
+                        'other': 0,
+                    },
                     # TDOO: is 'canopy' a valid synonym
                 },
                 'shrub_blackened_pct': {
-                    'default': 50,
+                    'defaults': {
+                        'rx': 50,
+                        'wf': 50,
+                        'other': 50,
+                    },
                     # TODO: is 'shrub' a valid synonym
                 },
                 'pile_blackened_pct': {
-                    'default': 0
+                    'defaults': {
+                        'rx': 0,
+                        'wf': 0,
+                        'other': 0,
+                    },
                 },
                 'duff_pct_available': {
-                    'default': 100,
+                    'defaults': {
+                        'rx': 100,
+                        'wf': 100,
+                        'other': 100,
+                    },
                 },
                 'sound_cwd_pct_available': {
-                    'default': 100,
+                    'defaults': {
+                        'rx': 100,
+                        'wf': 100,
+                        'other': 100,
+                    },
                 },
                 'rotten_cwd_pct_available': {
-                    'default': 100,
+                    'defaults': {
+                        'rx': 100,
+                        'wf': 100,
+                        'other': 100,
+                    },
                 }
             }
         }

@@ -46,7 +46,7 @@ SETTINGS['all']['output_units'] = {
     'default': "tons_ac"
 }
 
-def _apply_settings(fc, location, burn_type):
+def _apply_settings(fc, location, burn_type, fire_type):
     valid_settings = dict(SETTINGS[burn_type], **SETTINGS['all'])
     for field, d in valid_settings.items():
         value = None
@@ -84,6 +84,11 @@ def _apply_settings(fc, location, burn_type):
 
         if value is not None:
             setattr(fc, field, value)
+        elif 'defaults' in d and fire_type and fire_type in d['defaults']:
+            setattr(fc, field, d['defaults'][fire_type])
+        elif 'defaults' in d and 'other' in d['defaults']:
+            setattr(fc, field, d['defaults']['other'])
+        # support 'default' for backwards compatibility (old configs)
         elif 'default' in d:
             setattr(fc, field, d['default'])
         else:
@@ -359,8 +364,8 @@ CONSUME_FUEL_CATEGORIES = {
 CONSUME_FIELDS = ["flaming", "smoldering", "residual", "total"]
 
 class FuelConsumptionForEmissions(consume.FuelConsumption):
-    def __init__(self, consumption_data, heat_data, area, burn_type, fccs_id,
-            season, location, fccs_file=None):
+    def __init__(self, consumption_data, heat_data, area, burn_type,
+            fire_type, fccs_id, season, location, fccs_file=None):
         fccs_file = fccs_file or ""
         super(FuelConsumptionForEmissions, self).__init__(fccs_file=fccs_file)
 
@@ -378,7 +383,7 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
         self.fuelbed_ecoregion = [location['ecoregion']]
         self.season = [season]
 
-        _apply_settings(self, location, burn_type)
+        _apply_settings(self, location, burn_type, fire_type)
 
     # def _calculate(self):
     #     """Overrides consume.FuelConsumption._calculate so that it doesn't
