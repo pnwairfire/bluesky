@@ -580,3 +580,7 @@
 
 ## 4.3.81
  - Upgrade consume to v5.1.2 and add support for specifying available duff, sound cwd, and rotten cwd
+
+## 4.4.0
+ - Support fire type specific consume settings defaults
+ - Update consume setting defaults
