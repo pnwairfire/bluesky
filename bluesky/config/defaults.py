@@ -197,25 +197,25 @@ _DEFAULTS = {
             'all': {
                 'fuel_moisture_1000hr_pct': {
                     'defaults': {
-                        'rx': 30,
-                        'wf': 30,
-                        'other': 30,
+                        'rx': 35,
+                        'wf': 15,
+                        'other': 15,
                     },
                     'synonyms': ['moisture_1khr'] # TODO: confirm
                 },
                 'fuel_moisture_duff_pct': {
                     'defaults': {
-                        'rx': 75,
-                        'wf': 75,
-                        'other': 75,
+                        'rx': 100,
+                        'wf': 40,
+                        'other': 40,
                     },
                     'synonyms': ['moisture_duff'] # TODO: confirm
                 },
                 'fuel_moisture_litter_pct': {
                     'defaults': {
-                        'rx': 16,
-                        'wf': 16,
-                        'other': 16,
+                        'rx': 22,
+                        'wf': 10,
+                        'other': 10,
                     },
                     'synonyms': ['moisture_litter'] # TODO: confirm
                 },
@@ -244,23 +244,23 @@ _DEFAULTS = {
                 },
                 'duff_pct_available': {
                     'defaults': {
-                        'rx': 100,
-                        'wf': 100,
-                        'other': 100,
+                        'rx': 5,
+                        'wf': 10,
+                        'other': 10,
                     },
                 },
                 'sound_cwd_pct_available': {
                     'defaults': {
-                        'rx': 100,
-                        'wf': 100,
-                        'other': 100,
+                        'rx': 5,
+                        'wf': 10,
+                        'other': 10,
                     },
                 },
                 'rotten_cwd_pct_available': {
                     'defaults': {
-                        'rx': 100,
-                        'wf': 100,
-                        'other': 100,
+                        'rx': 5,
+                        'wf': 10,
+                        'other': 10,
                     },
                 }
             }
