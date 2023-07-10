@@ -13,6 +13,8 @@ from bluesky.consumeutils import FuelLoadingsManager
 from bluesky.models.fires import Fire
 from bluesky.modules import consumption
 
+from . import set_old_consume_defaults
+
 
 fire = Fire({
     'type': "rx",
@@ -75,6 +77,8 @@ def foo(vals):
 class TestConsumptionRunFire():
 
     def test(self):
+        set_old_consume_defaults()
+
         # TODO: create mock fuel loading manager class
         fuel_loadings_manager = FuelLoadingsManager()
         consumption._run_fire(fire, fuel_loadings_manager, 1)

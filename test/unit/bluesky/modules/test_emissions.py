@@ -15,6 +15,8 @@ from bluesky.config import Config
 from bluesky.models.fires import Fire
 from bluesky.modules import emissions
 
+from . import set_old_consume_defaults
+
 FIRES = [
     Fire({
         'source': 'GOES-16',
@@ -464,6 +466,8 @@ class TestConsumeEmissions(BaseEmissionsTest):
     def test_wo_details(self, reset_config):
         Config().set("consume", 'emissions', "model")
         Config().set(False, 'emissions', "include_emissions_details")
+        set_old_consume_defaults()
+
         emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
@@ -476,6 +480,8 @@ class TestConsumeEmissions(BaseEmissionsTest):
     def test_with_details(self, reset_config):
         Config().set("consume", 'emissions', "model")
         Config().set(True, 'emissions', "include_emissions_details")
+        set_old_consume_defaults()
+
         emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
@@ -489,6 +495,8 @@ class TestConsumeEmissions(BaseEmissionsTest):
         Config().set("consume", 'emissions', "model")
         Config().set(False, 'emissions', "include_emissions_details")
         Config().set(['PM2.5', 'PM10'], 'emissions', "species")
+        set_old_consume_defaults()
+
         emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
@@ -502,6 +510,8 @@ class TestConsumeEmissions(BaseEmissionsTest):
         Config().set("consume", 'emissions', "model")
         Config().set(True, 'emissions', "include_emissions_details")
         Config().set(['PM2.5', 'PM10'], 'emissions', "species")
+        set_old_consume_defaults()
+
         emissions.Consume(fire_failure_manager).run(self.fires)
 
         assert self.fires[0]['error'] == (
