@@ -169,26 +169,56 @@ field isn't defined in a fire's activity object (or in its localmet data, if
 it's a met related field).
 They also define what synonyms to recognize, if any, for each field.
 
- - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'slope' > 'default'*** -- *optional* -- percent, from 1 to 100; default 5
- - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'windspeed' > 'default'*** -- *optional* -- default 6; valid values: 0 to 35
- - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'days_since_rain' > 'default'*** -- *optional* -- default 10,   # our default
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'slope' > 'defaults' > 'rx'*** -- *optional* -- percent, from 1 to 100; default 5
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'slope' > 'defaults' > 'wf'*** -- *optional* -- percent, from 1 to 100; default 5
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'slope' > 'defaults' > 'other'*** -- *optional* -- percent, from 1 to 100; default 5
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'windspeed' > 'defaults' > 'rx'*** -- *optional* -- default 6; valid values: 0 to 35
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'windspeed' > 'defaults' > 'wf'*** -- *optional* -- default 6; valid values: 0 to 35
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'windspeed' > 'defaults' > 'other'*** -- *optional* -- default 6; valid values: 0 to 35
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'days_since_rain' > 'defaults' > 'rx'*** -- *optional* -- default 10,   # our default
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'days_since_rain' > 'defaults' > 'wf'*** -- *optional* -- default 10,   # our default
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'days_since_rain' > 'defaults' > 'other'*** -- *optional* -- default 10,   # our default
  - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'days_since_rain' > 'synonyms'*** -- *optional* -- default ['rain_days']
- - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fuel_moisture_10hr_pct' > 'default'*** -- *optional* -- default 50
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fuel_moisture_10hr_pct' > 'defaults' > 'rx'*** -- *optional* -- default 50
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fuel_moisture_10hr_pct' > 'defaults' > 'wf'*** -- *optional* -- default 50
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fuel_moisture_10hr_pct' > 'defaults' > 'other'*** -- *optional* -- default 50
  - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fuel_moisture_10hr_pct' > 'synonyms'*** -- *optional* -- default ['moisture_10hr']
- - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'length_of_ignition' > 'default'*** -- *optional* -- in minutes; default 120; used if `ignition_start` and `ignition_end` aren't specified for a fire
- - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fm_type' > 'default'*** -- *optional* -- defailt "MEAS-Th"
- - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_1000hr_pct' > 'default'*** -- *optional* -- default 30
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'length_of_ignition' > 'defaults' > 'rx'*** -- *optional* -- in minutes; default 120; used if `ignition_start` and `ignition_end` aren't specified for a fire
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'length_of_ignition' > 'defaults' > 'wf'*** -- *optional* -- in minutes; default 120; used if `ignition_start` and `ignition_end` aren't specified for a fire
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'length_of_ignition' > 'defaults' > 'other'*** -- *optional* -- in minutes; default 120; used if `ignition_start` and `ignition_end` aren't specified for a fire
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fm_type' > 'defaults' > 'rx'*** -- *optional* -- defailt "MEAS-Th"
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fm_type' > 'defaults' > 'wf'*** -- *optional* -- defailt "MEAS-Th"
+ - ***'config' > 'consumption' > 'consume_settings' > 'activity' > 'fm_type' > 'defaults' > 'other'*** -- *optional* -- defailt "MEAS-Th"
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_1000hr_pct' > 'defaults' > 'rx'*** -- *optional* -- default 35
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_1000hr_pct' > 'defaults' > 'wf'*** -- *optional* -- default 15
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_1000hr_pct' > 'defaults' > 'other'*** -- *optional* -- default 15
  - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_1000hr_pct' > 'synonyms'*** -- *optional* -- default ['moisture_1khr']
- - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_duff_pct' > 'default'*** -- *optional* -- default 75
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_duff_pct' > 'defaults' > 'rx'*** -- *optional* -- default 100
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_duff_pct' > 'defaults' > 'wf'*** -- *optional* -- default 40
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_duff_pct' > 'defaults' > 'other'*** -- *optional* -- default 40
  - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_duff_pct' > 'synonyms'*** -- *optional* -- default ['moisture_duff']
- - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_litter_pct' > 'default'*** -- *optional* -- default 16
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_litter_pct' > 'defaults' > 'rx'*** -- *optional* -- default 22
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_litter_pct' > 'defaults' > 'wf'*** -- *optional* -- default 10
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_litter_pct' > 'defaults' > 'other'*** -- *optional* -- default 10
  - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'fuel_moisture_litter_pct' > 'synonyms'*** -- *optional* -- default ['moisture_litter']
- - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'canopy_consumption_pct' > 'default'*** -- *optional* -- default 0
- - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'shrub_blackened_pct' > 'default'*** -- *optional* -- default 50
- - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'pile_blackened_pct' > 'default'*** -- *optional* -- default 0
- - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'duff_pct_available' > 'default'*** -- *optional* -- default 100
- - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'sound_cwd_pct_available' > 'default'*** -- *optional* -- default 100
- - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'rotten_cwd_pct_available' > 'default'*** -- *optional* -- default 100
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'canopy_consumption_pct' > 'defaults' > 'rx'*** -- *optional* -- default 0
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'canopy_consumption_pct' > 'defaults' > 'wf'*** -- *optional* -- default 0
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'canopy_consumption_pct' > 'defaults' > 'other'*** -- *optional* -- default 0
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'shrub_blackened_pct' > 'defaults' > 'rx'*** -- *optional* -- default 50
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'shrub_blackened_pct' > 'defaults' > 'wf'*** -- *optional* -- default 50
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'shrub_blackened_pct' > 'defaults' > 'other'*** -- *optional* -- default 50
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'pile_blackened_pct' > 'defaults' > 'rx'*** -- *optional* -- default 0
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'pile_blackened_pct' > 'defaults' > 'wf'*** -- *optional* -- default 0
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'pile_blackened_pct' > 'defaults' > 'other'*** -- *optional* -- default 0
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'duff_pct_available' > 'defaults' > 'rx'*** -- *optional* -- default 5
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'duff_pct_available' > 'defaults' > 'wf'*** -- *optional* -- default 10
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'duff_pct_available' > 'defaults' > 'other'*** -- *optional* -- default 10
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'sound_cwd_pct_available' > 'defaults' > 'rx'*** -- *optional* -- default 5
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'sound_cwd_pct_available' > 'defaults' > 'wf'*** -- *optional* -- default 10
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'sound_cwd_pct_available' > 'defaults' > 'other'*** -- *optional* -- default 10
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'rotten_cwd_pct_available' > 'defaults' > 'rx'*** -- *optional* -- default 5
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'rotten_cwd_pct_available' > 'defaults' > 'wf'*** -- *optional* -- default 10
+ - ***'config' > 'consumption' > 'consume_settings' > 'all' > 'rotten_cwd_pct_available' > 'defaults' > 'other'*** -- *optional* -- default 10
 
 ### emissions
 
