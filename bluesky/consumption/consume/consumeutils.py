@@ -1,4 +1,4 @@
-"""bluesky.consumeutils
+"""bluesky.consumption.consume.consumeutils
 
 TODO: move this (and other top level utility modules?) into nested package ?
 """

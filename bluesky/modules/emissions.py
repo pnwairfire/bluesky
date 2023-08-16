@@ -23,7 +23,7 @@ from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.io import capture_stdout
 from bluesky.emitters.ubcbsffeps import UbcBsfFEPSEmissions
 
-from bluesky.consumeutils import (
+from bluesky.consumption.consume.consumeutils import (
     FuelLoadingsManager, FuelConsumptionForEmissions,
     CONSUME_FIELDS, CONSUME_VERSION_STR
 )

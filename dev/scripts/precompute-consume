@@ -14,7 +14,7 @@ import os
 root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
 sys.path.insert(0, root_dir)
 
-from bluesky.consumeutils import (FuelLoadingsManager)
+from bluesky.consumption.consume.consumeutils import (FuelLoadingsManager)
 
 
 ##

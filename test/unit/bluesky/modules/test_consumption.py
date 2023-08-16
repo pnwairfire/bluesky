@@ -9,7 +9,7 @@ from numpy import array
 from numpy.testing import assert_approx_equal
 from pytest import raises
 
-from bluesky.consumeutils import FuelLoadingsManager
+from bluesky.consumption.consume.consumeutils import FuelLoadingsManager
 from bluesky.models.fires import Fire
 from bluesky.modules import consumption
 

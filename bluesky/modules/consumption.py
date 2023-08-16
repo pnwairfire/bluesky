@@ -9,7 +9,7 @@ import consume
 
 from bluesky.config import Config
 from bluesky import datautils, datetimeutils
-from bluesky.consumeutils import (
+from bluesky.consumption.consume.consumeutils import (
     _apply_settings, FuelLoadingsManager, CONSUME_VERSION_STR
 )
 from bluesky import exceptions
