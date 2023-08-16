@@ -1,7 +1,9 @@
 """bluesky.consumption.consume.precomputed
 """
 
+import csv
 import logging
+import os
 
 import consume
 
@@ -142,6 +144,31 @@ VARIABLE_SETTINGS = {
     },
 }
 
+##
+## Methods used during pre-computation and look-up
+##
+
+def create_key(fire_type, burn_type, ecoregion, season, fccs_group,
+        thousandHrFMLevel, duffFMLevel, litterFMLevel):
+    # TODO: craete
+    pass
+
+def flatten_consumption_dict(results):
+    """Flattens the consumption dict and converts numpy.ndarray values to scalars
+    """
+    d = {}
+    for c in results['consumption']: # fuel catefory (e.g. 'shrub')
+        for fc in results['consumption'][c]: # fuel sub-category (e.g. 'primary live')
+            for p in results['consumption'][c][fc]: # phase (e.g. 'flaming')
+                d[';'.join([c,fc,p])] = results['consumption'][c][fc][p][0]
+    return d
+
+def nest_consumption_dict():
+    """Reconstitutes nested dict structure with numpy.ndarray values, as
+    originally returned by consume
+    """
+    pass
+
 
 
 ##
@@ -162,7 +189,8 @@ def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
     #fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
 
     # TODO: pick the most representative FCCS Id
-    fc.fuelbed_fccs_ids = [FCCS_GROUPS[fccs_group]][0]
+    #    (for now we're just using the first)
+    fc.fuelbed_fccs_ids = [FCCS_GROUPS[fccs_group][0]]
 
     if burn_type == 'activity':
         for k, v in ACTIVITY_SETTINGS.items():
@@ -180,27 +208,51 @@ def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
     fc.fuel_moisture_duff_pct = VARIABLE_SETTINGS['fuel_moisture_duff_pct'][duffFMLevel]
     fc.fuel_moisture_litter_pct = VARIABLE_SETTINGS['fuel_moisture_litter_pct'][litterFMLevel]
 
-    results = fc.results()
-
-    # TODO: write to file
+    return fc.results()
 
 def precompute():
     #fuel_loadings_manager = FuelLoadingsManager()
 
-    for fire_type in FIRE_TYPES:
-        for burn_type in BURN_TYPES:
-            for ecoregion in ECOREGIONS:
-                for season in SEASONS:
-                    for fccs_group in FCCS_GROUPS:
-                        for thousandHrFMLevel in VARIABLE_SETTINGS['fuel_moisture_1000hr_pct']:
-                            for duffFMLevel in VARIABLE_SETTINGS['fuel_moisture_duff_pct']:
-                                for litterFMLevel in VARIABLE_SETTINGS['fuel_moisture_litter_pct']:
-                                    run_consume(fire_type, burn_type, ecoregion,
-                                        season, fccs_group, thousandHrFMLevel,
-                                        duffFMLevel, litterFMLevel)
+    # We'll instantiate once we have fiel
 
+    filename = os.path.join(os.path.dirname(__file__), 'data', 'precomputed.csv')
+    with open(filename, 'w') as csvfile:
+        # run consume once to get field names
+        r = run_consume(FIRE_TYPES[0], BURN_TYPES[0], ECOREGIONS[0],
+            SEASONS[0], list(FCCS_GROUPS)[0],
+            list(VARIABLE_SETTINGS['fuel_moisture_1000hr_pct'])[0],
+            list(VARIABLE_SETTINGS['fuel_moisture_duff_pct'])[0],
+            list(VARIABLE_SETTINGS['fuel_moisture_litter_pct'])[0])
+        flat_cons = flatten_consumption_dict(r)
+
+        writer = csv.DictWriter(csvfile, fieldnames=list(flat_cons))
+        writer.writeheader()
+
+        for fire_type in FIRE_TYPES:
+            for burn_type in BURN_TYPES:
+                for ecoregion in ECOREGIONS:
+                    for season in SEASONS:
+                        for fccs_group in FCCS_GROUPS:
+                            for thousandHrFMLevel in VARIABLE_SETTINGS['fuel_moisture_1000hr_pct']:
+                                for duffFMLevel in VARIABLE_SETTINGS['fuel_moisture_duff_pct']:
+                                    for litterFMLevel in VARIABLE_SETTINGS['fuel_moisture_litter_pct']:
+                                        r = run_consume(fire_type, burn_type, ecoregion,
+                                            season, fccs_group, thousandHrFMLevel,
+                                            duffFMLevel, litterFMLevel)
+                                        flat_cons = flatten_consumption_dict(r)
+                                        writer.writerow(flat_cons)
 
 
 ##
 ## Reading
 ##
+
+
+def look_up():
+    # TODO:
+    #  - determine FM categories
+    #  - create key from parameters
+    #  - look up data using key
+    #  - unflatten dict
+    #  - convert scalar vals to arrays (to match consumption output)
+    pass

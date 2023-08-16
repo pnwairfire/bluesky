@@ -38,6 +38,7 @@ setup(
         # Update: the following way seems to be the only way to work both
         # via `python setup.py install` as well as via pip
         'bluesky': [
+            'consumption/consume/data/*',
             'dispersers/hysplit/bdyfiles/*',
             'trajectories/hysplit/bdyfiles/*',
             'dispersers/vsmoke/images/*',
