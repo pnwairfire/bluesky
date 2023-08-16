@@ -82,6 +82,7 @@ FCCS_GROUPS = {
         1280, 1281, 1290, 1291, 1292, 1293, 1294, 1295, 1296, 1297, 1298, 1299,
     ]
 }
+FCCS_ID_TO_GROUP = {f:g for g in FCCS_GROUPS for f in FCCS_GROUPS[g] }
 
 FIRE_TYPES = ['rx', 'wf']
 BURN_TYPES = ['natural', 'activity'] # a.k.a. 'fuel_type'
@@ -149,9 +150,9 @@ VARIABLE_SETTINGS = {
 ##
 
 def create_key(fire_type, burn_type, ecoregion, season, fccs_group,
-        thousandHrFMLevel, duffFMLevel, litterFMLevel):
-    # TODO: craete
-    pass
+        thousand_hr_fm_level, duff_fm_level, litter_fm_level):
+    return ';'.join([fire_type, burn_type, ecoregion, season, fccs_group,
+        thousand_hr_fm_level, duff_fm_level, litter_fm_level])
 
 def flatten_consumption_dict(results):
     """Flattens the consumption dict and converts numpy.ndarray values to scalars
@@ -176,7 +177,7 @@ def nest_consumption_dict():
 ##
 
 def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
-        thousandHrFMLevel, duffFMLevel, litterFMLevel):
+        thousand_hr_fm_level, duff_fm_level, litter_fm_level):
     # It may be more efficient to create one FuelConsumption
     # object for all runs, but it's safer to start with a clean
     # slate for each run
@@ -204,9 +205,9 @@ def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
             # TODO: figure out why we're failing to set some inputs
             logging.warn("Failed to set %s", k)
 
-    fc.fuel_moisture_1000hr_pct = VARIABLE_SETTINGS['fuel_moisture_1000hr_pct'][thousandHrFMLevel]
-    fc.fuel_moisture_duff_pct = VARIABLE_SETTINGS['fuel_moisture_duff_pct'][duffFMLevel]
-    fc.fuel_moisture_litter_pct = VARIABLE_SETTINGS['fuel_moisture_litter_pct'][litterFMLevel]
+    fc.fuel_moisture_1000hr_pct = VARIABLE_SETTINGS['fuel_moisture_1000hr_pct'][thousand_hr_fm_level]
+    fc.fuel_moisture_duff_pct = VARIABLE_SETTINGS['fuel_moisture_duff_pct'][duff_fm_level]
+    fc.fuel_moisture_litter_pct = VARIABLE_SETTINGS['fuel_moisture_litter_pct'][litter_fm_level]
 
     return fc.results()
 
@@ -224,8 +225,8 @@ def precompute():
             list(VARIABLE_SETTINGS['fuel_moisture_duff_pct'])[0],
             list(VARIABLE_SETTINGS['fuel_moisture_litter_pct'])[0])
         flat_cons = flatten_consumption_dict(r)
-
-        writer = csv.DictWriter(csvfile, fieldnames=list(flat_cons))
+        fieldnames = ['key'] + list(flat_cons)
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
         for fire_type in FIRE_TYPES:
@@ -233,13 +234,17 @@ def precompute():
                 for ecoregion in ECOREGIONS:
                     for season in SEASONS:
                         for fccs_group in FCCS_GROUPS:
-                            for thousandHrFMLevel in VARIABLE_SETTINGS['fuel_moisture_1000hr_pct']:
-                                for duffFMLevel in VARIABLE_SETTINGS['fuel_moisture_duff_pct']:
-                                    for litterFMLevel in VARIABLE_SETTINGS['fuel_moisture_litter_pct']:
+                            for thousand_hr_fm_level in VARIABLE_SETTINGS['fuel_moisture_1000hr_pct']:
+                                for duff_fm_level in VARIABLE_SETTINGS['fuel_moisture_duff_pct']:
+                                    for litter_fm_level in VARIABLE_SETTINGS['fuel_moisture_litter_pct']:
                                         r = run_consume(fire_type, burn_type, ecoregion,
-                                            season, fccs_group, thousandHrFMLevel,
-                                            duffFMLevel, litterFMLevel)
+                                            season, fccs_group, thousand_hr_fm_level,
+                                            duff_fm_level, litter_fm_level)
                                         flat_cons = flatten_consumption_dict(r)
+                                        flat_cons['key'] = create_key(fire_type,
+                                            burn_type, ecoregion, season,
+                                            fccs_group, thousand_hr_fm_level,
+                                            duff_fm_level, litter_fm_level)
                                         writer.writerow(flat_cons)
 
 
@@ -247,12 +252,37 @@ def precompute():
 ## Reading
 ##
 
+class ConsumeLookup():
+    """Class for managing bluesky configuration.
 
-def look_up():
+    This is a Singleton, to facilitate making this module thread safe
+    (e.g. when using threads to execute parallel runs with different
+    configurations)
+    """
+
+    def __new__(cls):
+        if not hasattr(thread_local_data, 'consume_lookup'):
+            thread_local_data.consume_lookup = object.__new__(cls)
+        return thread_local_data.consume_lookup
+
+    def __init__(self):
+        # __init__ will be called each time __new__ is called. So, we need to
+        # keep track of initialization to abort subsequent reinitialization
+        if not hasattr(self, '_initialized'):
+            self._data = thread_local_data
+            self.reset()
+            self._initialized = True
+
+
+def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
+        thousand_hr_fm_level, duff_fm_level, litter_fm_level):
     # TODO:
+    #  - use Singleton lookup object
     #  - determine FM categories
     #  - create key from parameters
     #  - look up data using key
     #  - unflatten dict
     #  - convert scalar vals to arrays (to match consumption output)
-    pass
+    group = FCCS_ID_TO_GROUP(fccs_id)
+    key = create_key(fire_type, burn_type, ecoregion, season, fccs_group,
+        thousand_hr_fm_level, duff_fm_level, litter_fm_level)
