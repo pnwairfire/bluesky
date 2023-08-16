@@ -1,6 +1,4 @@
 """bluesky.consumption.consume.consumeutils
-
-TODO: move this (and other top level utility modules?) into nested package ?
 """
 
 __author__ = "Joel Dubowy"
