@@ -22,6 +22,7 @@ __all__ = [
     'precompute',
 ]
 
+
 ##
 ## Params
 ##
@@ -154,22 +155,24 @@ def create_key(fire_type, burn_type, ecoregion, season, fccs_group,
     return ';'.join([fire_type, burn_type, ecoregion, season, fccs_group,
         thousand_hr_fm_level, duff_fm_level, litter_fm_level])
 
-def flatten_consumption_dict(results):
+def flatten_consumption_dict(nested_cons):
     """Flattens the consumption dict and converts numpy.ndarray values to scalars
     """
     d = {}
-    for c in results['consumption']: # fuel catefory (e.g. 'shrub')
-        for fc in results['consumption'][c]: # fuel sub-category (e.g. 'primary live')
-            for p in results['consumption'][c][fc]: # phase (e.g. 'flaming')
-                d[';'.join([c,fc,p])] = results['consumption'][c][fc][p][0]
+    for c in nested_cons['consumption']: # fuel catefory (e.g. 'shrub')
+        for fc in nested_cons['consumption'][c]: # fuel sub-category (e.g. 'primary live')
+            for p in nested_cons['consumption'][c][fc]: # phase (e.g. 'flaming')
+                d[';'.join([c,fc,p])] = nested_cons['consumption'][c][fc][p][0]
     return d
 
-def nest_consumption_dict():
+def nest_consumption_dict(flat_cons):
     """Reconstitutes nested dict structure with numpy.ndarray values, as
     originally returned by consume
     """
     pass
 
+def get_data_filename():
+    return os.path.join(os.path.dirname(__file__), 'data', 'precomputed.csv')
 
 
 ##
@@ -216,15 +219,14 @@ def precompute():
 
     # We'll instantiate once we have fiel
 
-    filename = os.path.join(os.path.dirname(__file__), 'data', 'precomputed.csv')
-    with open(filename, 'w') as csvfile:
+    with open(get_data_filename(), 'w') as csvfile:
         # run consume once to get field names
-        r = run_consume(FIRE_TYPES[0], BURN_TYPES[0], ECOREGIONS[0],
+        nested_cons = run_consume(FIRE_TYPES[0], BURN_TYPES[0], ECOREGIONS[0],
             SEASONS[0], list(FCCS_GROUPS)[0],
             list(VARIABLE_SETTINGS['fuel_moisture_1000hr_pct'])[0],
             list(VARIABLE_SETTINGS['fuel_moisture_duff_pct'])[0],
             list(VARIABLE_SETTINGS['fuel_moisture_litter_pct'])[0])
-        flat_cons = flatten_consumption_dict(r)
+        flat_cons = flatten_consumption_dict(nested_cons)
         fieldnames = ['key'] + list(flat_cons)
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
@@ -237,10 +239,11 @@ def precompute():
                             for thousand_hr_fm_level in VARIABLE_SETTINGS['fuel_moisture_1000hr_pct']:
                                 for duff_fm_level in VARIABLE_SETTINGS['fuel_moisture_duff_pct']:
                                     for litter_fm_level in VARIABLE_SETTINGS['fuel_moisture_litter_pct']:
-                                        r = run_consume(fire_type, burn_type, ecoregion,
-                                            season, fccs_group, thousand_hr_fm_level,
+                                        nested_cons = run_consume(fire_type,
+                                            burn_type, ecoregion, season,
+                                            fccs_group, thousand_hr_fm_level,
                                             duff_fm_level, litter_fm_level)
-                                        flat_cons = flatten_consumption_dict(r)
+                                        flat_cons = flatten_consumption_dict(nested_cons)
                                         flat_cons['key'] = create_key(fire_type,
                                             burn_type, ecoregion, season,
                                             fccs_group, thousand_hr_fm_level,
@@ -255,23 +258,30 @@ def precompute():
 class ConsumeLookup():
     """Class for managing bluesky configuration.
 
-    This is a Singleton, to facilitate making this module thread safe
-    (e.g. when using threads to execute parallel runs with different
-    configurations)
+    This is a Singleton, so that data are loaded only once
     """
 
+    instance = None
+
     def __new__(cls):
-        if not hasattr(thread_local_data, 'consume_lookup'):
-            thread_local_data.consume_lookup = object.__new__(cls)
-        return thread_local_data.consume_lookup
+        if not cls.instance:
+            cls.instance = object.__new__(cls)
+        return cls.instance
 
     def __init__(self):
-        # __init__ will be called each time __new__ is called. So, we need to
-        # keep track of initialization to abort subsequent reinitialization
-        if not hasattr(self, '_initialized'):
-            self._data = thread_local_data
-            self.reset()
-            self._initialized = True
+        self._load()
+
+    def _load(self):
+        self._data = {}
+        logging.info("Loading pre-computed CONSUME data")
+        with open(get_data_filename()) as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                key = row.pop('key')
+                self._data[key] = nest_consumption_dict(row)
+
+    def get(self, key):
+        return self._data[key]
 
 
 def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
@@ -298,3 +308,5 @@ def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
         duff_fm_level.lower(),
         litter_fm_level.lower()
     )
+
+    return ConsumeLookup().get(key)
