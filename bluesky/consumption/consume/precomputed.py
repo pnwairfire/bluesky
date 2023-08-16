@@ -82,7 +82,7 @@ FCCS_GROUPS = {
         1280, 1281, 1290, 1291, 1292, 1293, 1294, 1295, 1296, 1297, 1298, 1299,
     ]
 }
-FCCS_ID_TO_GROUP = {f:g for g in FCCS_GROUPS for f in FCCS_GROUPS[g] }
+FCCS_ID_TO_GROUP = {str(f): g for g in FCCS_GROUPS for f in FCCS_GROUPS[g] }
 
 FIRE_TYPES = ['rx', 'wf']
 BURN_TYPES = ['natural', 'activity'] # a.k.a. 'fuel_type'
@@ -283,6 +283,18 @@ def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
     #  - look up data using key
     #  - unflatten dict
     #  - convert scalar vals to arrays (to match consumption output)
-    group = FCCS_ID_TO_GROUP(fccs_id)
-    key = create_key(fire_type, burn_type, ecoregion, season, fccs_group,
-        thousand_hr_fm_level, duff_fm_level, litter_fm_level)
+
+    if fccs_id not in FCCS_ID_TO_GROUP:
+        raise RuntimeError(f"Invalid FCCS Id {fccs_id}")
+
+    fccs_group = FCCS_ID_TO_GROUP[fccs_id]
+    key = create_key(
+        fire_type.lower(),
+        burn_type.lower(),
+        ecoregion.lower(),
+        season.lower(),
+        fccs_group,
+        thousand_hr_fm_level.lower(),
+        duff_fm_level.lower(),
+        litter_fm_level.lower()
+    )
