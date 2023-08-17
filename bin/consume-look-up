@@ -13,7 +13,7 @@ except:
     sys.path.insert(0, root_dir)
     from bluesky.consumption.consume.precomputed import (
         look_up, FIRE_TYPES, BURN_TYPES, ECOREGIONS, SEASONS,
-        VARIABLE_SETTINGS
+        FM_INPUT_VALS
     )
 
 
@@ -24,7 +24,7 @@ except:
 EXAMPLES_STRING = """
 Examples:
 
-    {script} -i 52 -f rx -b natural -e western -s spring -t dry -d 'very dry' -l 'dry'
+    {script} -i 52 -f rx -b natural -e western -s spring -t 10 -d 43 -l 32 --log-level DEBUG
 
  """.format(script=sys.argv[0])
 
@@ -35,9 +35,9 @@ def parse_args():
     parser.add_argument('-b', '--burn-type', required=True, help=f"Options: '{', '.join(BURN_TYPES)}'")
     parser.add_argument('-e', '--ecoregion', required=True, help=f"Options: '{', '.join(ECOREGIONS)}'")
     parser.add_argument('-s', '--season', required=True, help=f"Options: '{', '.join(SEASONS)}'")
-    parser.add_argument('-t', '--thousand-hr-fm-level', required=True, help=f"Options: '{', '.join(list(VARIABLE_SETTINGS['fuel_moisture_1000hr_pct']))}'")
-    parser.add_argument('-d', '--duff-fm-level', required=True, help=f"Options: '{', '.join(list(VARIABLE_SETTINGS['fuel_moisture_duff_pct']))}'")
-    parser.add_argument('-l', '--litter-fm-level', required=True, help=f"Options: '{', '.join(list(VARIABLE_SETTINGS['fuel_moisture_litter_pct']))}'")
+    parser.add_argument('-t', '--thousand-hr-fm', required=True, type=float, help="e.g. 24")
+    parser.add_argument('-d', '--duff-fm', required=True, type=float, help="e.g. 23")
+    parser.add_argument('-l', '--litter-fm', required=True, type=float, help="e.g. 44")
     parser.add_argument('--log-level', default="INFO", help="Log level")
 
     parser.epilog = EXAMPLES_STRING
@@ -63,14 +63,8 @@ def main():
     args = parse_args()
 
     c = look_up(args.fccs_id, args.fire_type, args.burn_type, args.ecoregion,
-        args.season, args.thousand_hr_fm_level, args.duff_fm_level,
-        args.litter_fm_level)
+        args.season, args.thousand_hr_fm, args.duff_fm, args.litter_fm)
 
-    logging.info(c)
-
-    c = look_up(args.fccs_id, args.fire_type, args.burn_type, args.ecoregion,
-        args.season, args.thousand_hr_fm_level, args.duff_fm_level,
-        args.litter_fm_level)
     logging.info(c)
 
 if __name__ == "__main__":

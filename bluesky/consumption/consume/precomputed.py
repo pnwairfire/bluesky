@@ -19,7 +19,7 @@ __all__ = [
     'ACTIVITY_SETTINGS',
     # 'VARIABLE_ACTIVITY_SETTINGS',
     'OTHER_SETTINGS',
-    'VARIABLE_SETTINGS',
+    'FM_INPUT_VALS',
     'precompute',
 ]
 
@@ -120,32 +120,37 @@ OTHER_SETTINGS = {
     'rotten_cwd_pct_available': {'rx': 5, 'wf': 10}
 }
 
-VARIABLE_SETTINGS = {
-    'fuel_moisture_1000hr_pct': {  # normal defualts: {'rx': 35, 'wf': 15},
-        'very dry': 10,
-        'dry': 15,
-        'moderate': 30,
-        'moist': 35,
-        'wet': 40,
-        'very wet': 60
-    },
-    'fuel_moisture_duff_pct': {  # normal defualts: {'rx': 100, 'wf': 40},
-        'very dry': 20,
-        'dry': 40,
-        'moderate': 75,
-        'moist': 100,
-        'wet': 130,
-        'very wet': 180
-    },
-    'fuel_moisture_litter_pct': {  # normal defualts: {'rx': 22, 'wf': 10},
-        'very dry': 4,
-        'dry': 10,
-        'moderate': 16,
-        'moist': 22,
-        'wet': 30,
-        'very wet': 40
-    },
+FM_LEVELS = {
+    'fuel_moisture_1000hr_pct': [  # normal defualts: {'rx': 35, 'wf': 15},
+        {'level': 'very dry', 'up_to': 12.5, 'input_val': 10},
+        {'level': 'dry', 'up_to': 22.5, 'input_val': 15},
+        {'level': 'moderate', 'up_to': 32.5, 'input_val': 30},
+        {'level': 'moist', 'up_to': 37.5, 'input_val': 35},
+        {'level': 'wet', 'up_to': 50.5, 'input_val': 40},
+        {'level': 'very wet', 'up_to': None, 'input_val': 60}
+    ],
+    'fuel_moisture_duff_pct': [  # normal defualts: {'rx': 100, 'wf': 40},
+        {'level': 'very dry', 'up_to': 30, 'input_val': 20},
+        {'level': 'dry', 'up_to': 57.2, 'input_val': 40},
+        {'level': 'moderate', 'up_to': 87.5, 'input_val': 75},
+        {'level': 'moist', 'up_to': 115, 'input_val': 100},
+        {'level': 'wet', 'up_to': 150, 'input_val': 130},
+        {'level': 'very wet', 'up_to': None, 'input_val': 180}
+    ],
+    'fuel_moisture_litter_pct': [  # normal defualts: {'rx': 22, 'wf': 10},
+        {'level': 'very dry', 'up_to': 7, 'input_val': 4},
+        {'level': 'dry', 'up_to': 13, 'input_val': 10},
+        {'level': 'moderate', 'up_to': 19, 'input_val': 16},
+        {'level': 'moist', 'up_to': 26, 'input_val': 22},
+        {'level': 'wet', 'up_to': 35, 'input_val': 30},
+        {'level': 'very wet', 'up_to': None, 'input_val': 40}
+    ],
 }
+FM_INPUT_VALS = {k: {} for k in FM_LEVELS}
+for k in FM_LEVELS:
+    FM_INPUT_VALS[k] = {}
+    for e in FM_LEVELS[k]:
+        FM_INPUT_VALS[k][e['level']] = e['input_val']
 
 ##
 ## Methods used during pre-computation and look-up
@@ -224,9 +229,9 @@ def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
             # TODO: figure out why we're failing to set some inputs
             logging.warn("Failed to set %s", k)
 
-    fc.fuel_moisture_1000hr_pct = VARIABLE_SETTINGS['fuel_moisture_1000hr_pct'][thousand_hr_fm_level]
-    fc.fuel_moisture_duff_pct = VARIABLE_SETTINGS['fuel_moisture_duff_pct'][duff_fm_level]
-    fc.fuel_moisture_litter_pct = VARIABLE_SETTINGS['fuel_moisture_litter_pct'][litter_fm_level]
+    fc.fuel_moisture_1000hr_pct = FM_INPUT_VALS['fuel_moisture_1000hr_pct'][thousand_hr_fm_level]
+    fc.fuel_moisture_duff_pct = FM_INPUT_VALS['fuel_moisture_duff_pct'][duff_fm_level]
+    fc.fuel_moisture_litter_pct = FM_INPUT_VALS['fuel_moisture_litter_pct'][litter_fm_level]
 
     return fc.results()
 
@@ -239,9 +244,9 @@ def precompute():
         # run consume once to get field names
         nested_cons = run_consume(FIRE_TYPES[0], BURN_TYPES[0], ECOREGIONS[0],
             SEASONS[0], list(FCCS_GROUPS)[0],
-            list(VARIABLE_SETTINGS['fuel_moisture_1000hr_pct'])[0],
-            list(VARIABLE_SETTINGS['fuel_moisture_duff_pct'])[0],
-            list(VARIABLE_SETTINGS['fuel_moisture_litter_pct'])[0])
+            list(FM_INPUT_VALS['fuel_moisture_1000hr_pct'])[0],
+            list(FM_INPUT_VALS['fuel_moisture_duff_pct'])[0],
+            list(FM_INPUT_VALS['fuel_moisture_litter_pct'])[0])
         flat_cons = flatten_consumption_dict(nested_cons)
         fieldnames = ['key'] + list(flat_cons)
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -252,9 +257,9 @@ def precompute():
                 for ecoregion in ECOREGIONS:
                     for season in SEASONS:
                         for fccs_group in FCCS_GROUPS:
-                            for thousand_hr_fm_level in VARIABLE_SETTINGS['fuel_moisture_1000hr_pct']:
-                                for duff_fm_level in VARIABLE_SETTINGS['fuel_moisture_duff_pct']:
-                                    for litter_fm_level in VARIABLE_SETTINGS['fuel_moisture_litter_pct']:
+                            for thousand_hr_fm_level in FM_INPUT_VALS['fuel_moisture_1000hr_pct']:
+                                for duff_fm_level in FM_INPUT_VALS['fuel_moisture_duff_pct']:
+                                    for litter_fm_level in FM_INPUT_VALS['fuel_moisture_litter_pct']:
                                         nested_cons = run_consume(fire_type,
                                             burn_type, ecoregion, season,
                                             fccs_group, thousand_hr_fm_level,
@@ -300,9 +305,17 @@ class ConsumeLookup(object):
     def get(self, key):
         return self._data[key]
 
+def get_fm_level(key, fm_val):
+    for l in FM_LEVELS[key]:
+        if not l['up_to'] or fm_val < l['up_to']:
+            return l['level']
+    # Should never get here, since the last level should have 'up_to' set
+    # to None, but just in case it's accidentally defined, just
+    # return the last level
+    return l['level']
 
 def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
-        thousand_hr_fm_level, duff_fm_level, litter_fm_level):
+        thousand_hr_fm, duff_fm, litter_fm):
     # TODO:
     #  - use Singleton lookup object
     #  - determine FM categories
@@ -314,6 +327,14 @@ def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
     if fccs_id not in FCCS_ID_TO_GROUP:
         raise RuntimeError(f"Invalid FCCS Id {fccs_id}")
 
+    thousand_hr_fm_level = get_fm_level('fuel_moisture_1000hr_pct', thousand_hr_fm)
+    duff_fm_level = get_fm_level('fuel_moisture_duff_pct', duff_fm)
+    litter_fm_level = get_fm_level('fuel_moisture_litter_pct', litter_fm)
+
+    logging.debug("100hr FM %s -> %s", thousand_hr_fm, thousand_hr_fm_level)
+    logging.debug("Duff FM %s -> %s", duff_fm, duff_fm_level)
+    logging.debug("Litter FM %s -> %s", litter_fm, litter_fm_level)
+
     fccs_group = FCCS_ID_TO_GROUP[fccs_id]
     key = create_key(
         fire_type.lower(),
@@ -321,9 +342,9 @@ def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
         ecoregion.lower(),
         season.lower(),
         fccs_group,
-        thousand_hr_fm_level.lower(),
-        duff_fm_level.lower(),
-        litter_fm_level.lower()
+        thousand_hr_fm_level,
+        duff_fm_level,
+        litter_fm_level
     )
 
     return ConsumeLookup().get(key)
