@@ -137,6 +137,7 @@ _DEFAULTS = {
         "fuel_loadings": {},
         "scale_with_estimated_fuelload": False,
         "scale_with_estimated_consumption": False,
+        "use_precomputed_data": False,
         "consume_settings": {
             # TODO: Confirm with Susan P, Susan O. to confirm that these
             #    burn-type specific settings (defaults and synonyms) are

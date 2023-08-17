@@ -10,8 +10,9 @@ import consume
 from bluesky.config import Config
 from bluesky import datautils, datetimeutils
 from bluesky.consumption.consume.consumeutils import (
-    _apply_settings, FuelLoadingsManager, CONSUME_VERSION_STR
+    _get_setting, _apply_settings, FuelLoadingsManager, CONSUME_VERSION_STR
 )
+from bluesky.consumption.consume.precomputed import look_up
 from bluesky import exceptions
 from bluesky.locationutils import LatLng
 
@@ -78,8 +79,12 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
             season = datetimeutils.season_from_date(aa.get('start'))
             for loc in aa.locations:
                 for fb in loc['fuelbeds']:
-                    _run_fuelbed(fb, loc, fuel_loadings_manager, season,
-                        burn_type, fire_type, msg_level)
+                    if Config().get('consumption','use_precomputed_data'):
+                        _lookup_precomputed(fb, loc, fuel_loadings_manager,
+                            season, burn_type, fire_type)
+                    else:
+                        _run_fuelbed(fb, loc, fuel_loadings_manager, season,
+                            burn_type, fire_type, msg_level)
                 # scale with estimated consumption or fuel load, if specified
                 # and if configured to do so
                 (_scale_with_estimated_consumption(loc)
@@ -143,6 +148,22 @@ def _scale_with_estimated_fuelload(loc):
     loc['input_est_fuelload_scale_factor'] = scale_factor
 
     return True
+
+def _lookup_precomputed(fb, location, fuel_loadings_manager, season,
+        burn_type, fire_type):
+    thousand_hr_fm = _get_setting(location,'fuel_moisture_1000hr_pct')
+    duff_fm = _get_setting(location, 'fuel_moisture_duff_pct')
+    litter_fm = _get_setting(location, 'fuel_moisture_litter_pct')
+
+    c, h = look_up(fb['fccs_id'], fire_type, burn_type, location['ecoregion'], season,
+        thousand_hr_fm, duff_fm, litter_fm)
+
+    fb["consumption"] = c
+    fb["heat"] = h
+
+    area = (fb['pct'] / 100.0) * location['area']
+    datautils.multiply_nested_data(fb["consumption"], area)
+    datautils.multiply_nested_data(fb["heat"], area)
 
 def _run_fuelbed(fb, location, fuel_loadings_manager, season,
         burn_type, fire_type, msg_level):
