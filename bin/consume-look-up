@@ -66,6 +66,7 @@ def main():
         args.season, args.thousand_hr_fm, args.duff_fm, args.litter_fm)
 
     logging.info(c)
+    logging.info(h)
 
 if __name__ == "__main__":
     main()
