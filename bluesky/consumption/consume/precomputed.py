@@ -6,6 +6,7 @@ import logging
 import os
 
 import consume
+import numpy
 
 from .consumeutils import FuelLoadingsManager
 
@@ -150,10 +151,14 @@ VARIABLE_SETTINGS = {
 ## Methods used during pre-computation and look-up
 ##
 
+KEY_JOIN_CHAR = ';'
+
 def create_key(fire_type, burn_type, ecoregion, season, fccs_group,
         thousand_hr_fm_level, duff_fm_level, litter_fm_level):
-    return ';'.join([fire_type, burn_type, ecoregion, season, fccs_group,
+    return KEY_JOIN_CHAR.join([fire_type, burn_type, ecoregion, season, fccs_group,
         thousand_hr_fm_level, duff_fm_level, litter_fm_level])
+
+HEADER_JOIN_CHAR = ';'
 
 def flatten_consumption_dict(nested_cons):
     """Flattens the consumption dict and converts numpy.ndarray values to scalars
@@ -162,14 +167,25 @@ def flatten_consumption_dict(nested_cons):
     for c in nested_cons['consumption']: # fuel catefory (e.g. 'shrub')
         for fc in nested_cons['consumption'][c]: # fuel sub-category (e.g. 'primary live')
             for p in nested_cons['consumption'][c][fc]: # phase (e.g. 'flaming')
-                d[';'.join([c,fc,p])] = nested_cons['consumption'][c][fc][p][0]
+                d[HEADER_JOIN_CHAR.join([c,fc,p])] = nested_cons['consumption'][c][fc][p][0]
     return d
 
 def nest_consumption_dict(flat_cons):
     """Reconstitutes nested dict structure with numpy.ndarray values, as
     originally returned by consume
     """
-    pass
+    nested_cons = {}
+    for k in flat_cons:
+        keys = k.split(HEADER_JOIN_CHAR)
+        d = nested_cons
+        prev = None
+        for f in keys:
+            d[f] = {} if f not in d else d[f]
+            prev = d
+            d = d[f]
+        prev[f] = numpy.array(flat_cons[k])
+
+    return nested_cons
 
 def get_data_filename():
     return os.path.join(os.path.dirname(__file__), 'data', 'precomputed.csv')
@@ -255,21 +271,21 @@ def precompute():
 ## Reading
 ##
 
-class ConsumeLookup():
+
+class ConsumeLookup(object):
     """Class for managing bluesky configuration.
 
     This is a Singleton, so that data are loaded only once
     """
 
-    instance = None
-
     def __new__(cls):
-        if not cls.instance:
-            cls.instance = object.__new__(cls)
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(ConsumeLookup, cls).__new__(cls)
         return cls.instance
 
     def __init__(self):
-        self._load()
+        if not hasattr(self, '_data'):
+            self._load()
 
     def _load(self):
         self._data = {}
@@ -279,6 +295,7 @@ class ConsumeLookup():
             for row in reader:
                 key = row.pop('key')
                 self._data[key] = nest_consumption_dict(row)
+        logging.info("Finished loading pre-computed CONSUME data")
 
     def get(self, key):
         return self._data[key]
