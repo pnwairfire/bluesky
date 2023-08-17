@@ -314,11 +314,11 @@ class ConsumeLookup(object):
 
     def _load(self):
         if not hasattr(self, '_consumption_data'):
-            self._consumption_data = _load_file(get_consumption_data_filename())
+            self._consumption_data = self._load_file(get_consumption_data_filename())
         if not hasattr(self, '_heat_data'):
-            self._heat_data = _load_file(get_heat_data_filename())
+            self._heat_data = self._load_file(get_heat_data_filename())
 
-    def _load_file(filename):
+    def _load_file(self, filename):
         data = {}
 
         logging.info("Loading %s data", filename)
