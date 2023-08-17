@@ -165,35 +165,40 @@ def create_key(fire_type, burn_type, ecoregion, season, fccs_group,
 
 HEADER_JOIN_CHAR = ';'
 
-def flatten_consumption_dict(nested_cons):
-    """Flattens the consumption dict and converts numpy.ndarray values to scalars
+def nested_to_flat(nested_dict, parent_key=None):
+    """Flattens the dict and converts numpy.ndarray values to scalars
     """
-    d = {}
-    for c in nested_cons['consumption']: # fuel catefory (e.g. 'shrub')
-        for fc in nested_cons['consumption'][c]: # fuel sub-category (e.g. 'primary live')
-            for p in nested_cons['consumption'][c][fc]: # phase (e.g. 'flaming')
-                d[HEADER_JOIN_CHAR.join([c,fc,p])] = nested_cons['consumption'][c][fc][p][0]
-    return d
+    items = []
+    for k, v in nested_dict.items():
+        new_key = parent_key + HEADER_JOIN_CHAR + k if parent_key else k
+        if hasattr(v, 'keys'):
+            items.extend(nested_to_flat(v, new_key).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
 
-def nest_consumption_dict(flat_cons):
+def flat_to_nested(flat_dict):
     """Reconstitutes nested dict structure with numpy.ndarray values, as
     originally returned by consume
     """
-    nested_cons = {}
-    for k in flat_cons:
+    nested_dict = {}
+    for k in flat_dict:
         keys = k.split(HEADER_JOIN_CHAR)
-        d = nested_cons
+        d = nested_dict
         prev = None
         for f in keys:
             d[f] = {} if f not in d else d[f]
             prev = d
             d = d[f]
-        prev[f] = numpy.array(flat_cons[k])
+        prev[f] = numpy.array(flat_dict[k])
 
-    return nested_cons
+    return nested_dict
 
-def get_data_filename():
-    return os.path.join(os.path.dirname(__file__), 'data', 'precomputed.csv')
+def get_consumption_data_filename():
+    return os.path.join(os.path.dirname(__file__), 'data', 'precomputed-consumption.csv')
+
+def get_heat_data_filename():
+    return os.path.join(os.path.dirname(__file__), 'data', 'precomputed-heat.csv')
 
 
 ##
@@ -233,43 +238,59 @@ def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
     fc.fuel_moisture_duff_pct = FM_INPUT_VALS['fuel_moisture_duff_pct'][duff_fm_level]
     fc.fuel_moisture_litter_pct = FM_INPUT_VALS['fuel_moisture_litter_pct'][litter_fm_level]
 
-    return fc.results()
+    r = fc.results()
+    r['consumption'].pop('debug', None)
+
+    return r
 
 def precompute():
     #fuel_loadings_manager = FuelLoadingsManager()
 
     # We'll instantiate once we have fiel
 
-    with open(get_data_filename(), 'w') as csvfile:
-        # run consume once to get field names
-        nested_cons = run_consume(FIRE_TYPES[0], BURN_TYPES[0], ECOREGIONS[0],
-            SEASONS[0], list(FCCS_GROUPS)[0],
-            list(FM_INPUT_VALS['fuel_moisture_1000hr_pct'])[0],
-            list(FM_INPUT_VALS['fuel_moisture_duff_pct'])[0],
-            list(FM_INPUT_VALS['fuel_moisture_litter_pct'])[0])
-        flat_cons = flatten_consumption_dict(nested_cons)
-        fieldnames = ['key'] + list(flat_cons)
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+    with open(get_consumption_data_filename(), 'w') as cons_csvfile:
+        with open(get_heat_data_filename(), 'w') as heat_csvfile:
+            # run consume once to get field names
+            nested_results = run_consume(FIRE_TYPES[0], BURN_TYPES[0], ECOREGIONS[0],
+                SEASONS[0], list(FCCS_GROUPS)[0],
+                list(FM_INPUT_VALS['fuel_moisture_1000hr_pct'])[0],
+                list(FM_INPUT_VALS['fuel_moisture_duff_pct'])[0],
+                list(FM_INPUT_VALS['fuel_moisture_litter_pct'])[0])
 
-        for fire_type in FIRE_TYPES:
-            for burn_type in BURN_TYPES:
-                for ecoregion in ECOREGIONS:
-                    for season in SEASONS:
-                        for fccs_group in FCCS_GROUPS:
-                            for thousand_hr_fm_level in FM_INPUT_VALS['fuel_moisture_1000hr_pct']:
-                                for duff_fm_level in FM_INPUT_VALS['fuel_moisture_duff_pct']:
-                                    for litter_fm_level in FM_INPUT_VALS['fuel_moisture_litter_pct']:
-                                        nested_cons = run_consume(fire_type,
-                                            burn_type, ecoregion, season,
-                                            fccs_group, thousand_hr_fm_level,
-                                            duff_fm_level, litter_fm_level)
-                                        flat_cons = flatten_consumption_dict(nested_cons)
-                                        flat_cons['key'] = create_key(fire_type,
-                                            burn_type, ecoregion, season,
-                                            fccs_group, thousand_hr_fm_level,
-                                            duff_fm_level, litter_fm_level)
-                                        writer.writerow(flat_cons)
+            flat_cons = nested_to_flat(nested_results['consumption'])
+            cons_fieldnames = ['key'] + list(flat_cons)
+            cons_writer = csv.DictWriter(cons_csvfile, fieldnames=cons_fieldnames)
+            cons_writer.writeheader()
+
+            flat_heat = nested_to_flat(nested_results['heat release'])
+            heat_fieldnames = ['key'] + list(flat_heat)
+            heat_writer = csv.DictWriter(heat_csvfile, fieldnames=heat_fieldnames)
+            heat_writer.writeheader()
+
+            for fire_type in FIRE_TYPES:
+                for burn_type in BURN_TYPES:
+                    for ecoregion in ECOREGIONS:
+                        for season in SEASONS:
+                            for fccs_group in FCCS_GROUPS:
+                                for thousand_hr_fm_level in FM_INPUT_VALS['fuel_moisture_1000hr_pct']:
+                                    for duff_fm_level in FM_INPUT_VALS['fuel_moisture_duff_pct']:
+                                        for litter_fm_level in FM_INPUT_VALS['fuel_moisture_litter_pct']:
+                                            nested_results = run_consume(fire_type,
+                                                burn_type, ecoregion, season,
+                                                fccs_group, thousand_hr_fm_level,
+                                                duff_fm_level, litter_fm_level)
+                                            key = create_key(fire_type,
+                                                burn_type, ecoregion, season,
+                                                fccs_group, thousand_hr_fm_level,
+                                                duff_fm_level, litter_fm_level)
+
+                                            flat_cons = nested_to_flat(nested_results['consumption'])
+                                            flat_cons['key'] = key
+                                            cons_writer.writerow(flat_cons)
+
+                                            flat_heat = nested_to_flat(nested_results['heat release'])
+                                            flat_heat['key'] = key
+                                            heat_writer.writerow(flat_heat)
 
 
 ##
@@ -289,23 +310,35 @@ class ConsumeLookup(object):
         return cls.instance
 
     def __init__(self):
-        if not hasattr(self, '_data'):
-            self._load()
+        self._load()
 
     def _load(self):
-        self._data = {}
-        logging.info("Loading pre-computed CONSUME data")
-        with open(get_data_filename()) as f:
+        if not hasattr(self, '_consumption_data'):
+            self._consumption_data = _load_file(get_consumption_data_filename())
+        if not hasattr(self, '_heat_data'):
+            self._heat_data = _load_file(get_heat_data_filename())
+
+    def _load_file(filename):
+        data = {}
+
+        logging.info("Loading %s data", filename)
+        with open(filename) as f:
             reader = csv.DictReader(f)
             for row in reader:
                 key = row.pop('key')
-                self._data[key] = nest_consumption_dict(row)
-        logging.info("Finished loading pre-computed CONSUME data")
+                data[key] = flat_to_nested(row)
+        logging.info("Finished loading %s", filename)
+
+        return data
 
     def get(self, key):
-        return self._data[key]
+        return self._consumption_data[key], self._heat_data[key]
 
 def get_fm_level(key, fm_val):
+    if not fm_val:
+        # TODO: is this appropriate?
+        return 'moderate'
+
     for l in FM_LEVELS[key]:
         if not l['up_to'] or fm_val < l['up_to']:
             return l['level']

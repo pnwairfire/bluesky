@@ -62,7 +62,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    c = look_up(args.fccs_id, args.fire_type, args.burn_type, args.ecoregion,
+    c, h = look_up(args.fccs_id, args.fire_type, args.burn_type, args.ecoregion,
         args.season, args.thousand_hr_fm, args.duff_fm, args.litter_fm)
 
     logging.info(c)
