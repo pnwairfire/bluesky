@@ -227,12 +227,12 @@ def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
             setattr(fc, k, v)
 
     for k, vDict in OTHER_SETTINGS.items():
-        logging.warn("Setting %s to %s", k, vDict[fire_type])
+        #logging.warn("Setting %s to %s", k, vDict[fire_type])
         try:
             setattr(fc, k, vDict[fire_type])
         except Exception as e:
             # TODO: figure out why we're failing to set some inputs
-            logging.warn("Failed to set %s", k)
+            logging.warn("Failed to set %s: %s", k, e)
 
     fc.fuel_moisture_1000hr_pct = FM_INPUT_VALS['fuel_moisture_1000hr_pct'][thousand_hr_fm_level]
     fc.fuel_moisture_duff_pct = FM_INPUT_VALS['fuel_moisture_duff_pct'][duff_fm_level]
