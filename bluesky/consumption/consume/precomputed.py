@@ -174,7 +174,7 @@ def nested_to_flat(nested_dict, parent_key=None):
         if hasattr(v, 'keys'):
             items.extend(nested_to_flat(v, new_key).items())
         else:
-            items.append((new_key, v))
+            items.append((new_key, v[0]))
     return dict(items)
 
 def flat_to_nested(flat_dict):
