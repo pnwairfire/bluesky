@@ -30,22 +30,40 @@ CONSUME_VERSION_STR = '.'.join([
     ]
 ])
 
-SETTINGS = Config().get('consumption', 'consume_settings')
-# User can configure output_units
-SETTINGS['all']['output_units'] = {
-    # The default in the consume package is 'tons_ac'. When we tried
-    # setting it to 'tons' here, it still ended up being 'tons_ac' in
-    # the consumption results.  So, just set it to 'tons_ac' to avoid
-    # confusion.
-    # (We ultimately want tons, and so we end up multiplying by
-    # acreage to get it.  It would be nice if setting output_units to
-    # tons worked.)
-    # Note that setting output_units='tons' does behave as expected
-    # when computing emissions.
-    'default': "tons_ac"
-}
+class SettingsManager(object):
+    """SETTINGS and ALL_SETTINGS can't be defined at module scope
+    because they wouldn't reflect any dynamically modified settings.
+    We'll store them in a singleton to avoid redundant creation
+    of SETTINGS and ALL_SETTINGS dicts.
+    """
 
-ALL_SETTINGS = dict(SETTINGS['all'], **SETTINGS['natural'], **SETTINGS['activity'])
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(SettingsManager, cls).__new__(cls)
+        return cls.instance
+
+    def __init__(self):
+        if hasattr(self, 'SETTINGS'):
+            return
+
+        self.SETTINGS = Config().get('consumption', 'consume_settings')
+
+        # User can configure output_units
+        self.SETTINGS['all']['output_units'] = {
+            # The default in the consume package is 'tons_ac'. When we tried
+            # setting it to 'tons' here, it still ended up being 'tons_ac' in
+            # the consumption results.  So, just set it to 'tons_ac' to avoid
+            # confusion.
+            # (We ultimately want tons, and so we end up multiplying by
+            # acreage to get it.  It would be nice if setting output_units to
+            # tons worked.)
+            # Note that setting output_units='tons' does behave as expected
+            # when computing emissions.
+            'default': "tons_ac"
+        }
+
+        self.ALL_SETTINGS = dict(self.SETTINGS['all'],
+            **self.SETTINGS['natural'], **self.SETTINGS['activity'])
 
 def _get_setting(location, field):
     value = None
@@ -61,7 +79,7 @@ def _get_setting(location, field):
         elif location.get('length_of_ignition'):
             value = location['length_of_ignition']
     else:
-        possible_name = [field] + ALL_SETTINGS[field].get('synonyms', [])
+        possible_name = [field] + SettingsManager().ALL_SETTINGS[field].get('synonyms', [])
         defined_fields = [f for f in possible_name if f in location]
         if defined_fields:
             # use first of defined fields - it's not likely that
@@ -87,7 +105,8 @@ def _get_setting(location, field):
 def _apply_settings(fc, location, burn_type, fire_type):
     # Read settings here instead of at module scope to support unit testing
 
-    valid_settings = dict(SETTINGS[burn_type], **SETTINGS['all'])
+    valid_settings = dict(SettingsManager().SETTINGS[burn_type],
+        **SettingsManager().SETTINGS['all'])
     for field, d in valid_settings.items():
         value = _get_setting(location, field)
 
