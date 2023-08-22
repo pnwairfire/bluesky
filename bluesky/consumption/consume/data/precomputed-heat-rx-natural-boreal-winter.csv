@@ -1,433 +1,433 @@
 key,flaming,smoldering,residual,total
-group-1;very dry;very dry;very dry,[0.],[0.],[0.],[0.]
-group-1;very dry;very dry;dry,[0.],[0.],[0.],[0.]
-group-1;very dry;very dry;moderate,[0.],[0.],[0.],[0.]
-group-1;very dry;very dry;moist,[0.],[0.],[0.],[0.]
-group-1;very dry;very dry;wet,[0.],[0.],[0.],[0.]
-group-1;very dry;very dry;very wet,[0.],[0.],[0.],[0.]
-group-1;very dry;dry;very dry,[0.],[0.],[0.],[0.]
-group-1;very dry;dry;dry,[0.],[0.],[0.],[0.]
-group-1;very dry;dry;moderate,[0.],[0.],[0.],[0.]
-group-1;very dry;dry;moist,[0.],[0.],[0.],[0.]
-group-1;very dry;dry;wet,[0.],[0.],[0.],[0.]
-group-1;very dry;dry;very wet,[0.],[0.],[0.],[0.]
-group-1;very dry;moderate;very dry,[0.],[0.],[0.],[0.]
-group-1;very dry;moderate;dry,[0.],[0.],[0.],[0.]
-group-1;very dry;moderate;moderate,[0.],[0.],[0.],[0.]
-group-1;very dry;moderate;moist,[0.],[0.],[0.],[0.]
-group-1;very dry;moderate;wet,[0.],[0.],[0.],[0.]
-group-1;very dry;moderate;very wet,[0.],[0.],[0.],[0.]
-group-1;very dry;moist;very dry,[0.],[0.],[0.],[0.]
-group-1;very dry;moist;dry,[0.],[0.],[0.],[0.]
-group-1;very dry;moist;moderate,[0.],[0.],[0.],[0.]
-group-1;very dry;moist;moist,[0.],[0.],[0.],[0.]
-group-1;very dry;moist;wet,[0.],[0.],[0.],[0.]
-group-1;very dry;moist;very wet,[0.],[0.],[0.],[0.]
-group-1;very dry;wet;very dry,[0.],[0.],[0.],[0.]
-group-1;very dry;wet;dry,[0.],[0.],[0.],[0.]
-group-1;very dry;wet;moderate,[0.],[0.],[0.],[0.]
-group-1;very dry;wet;moist,[0.],[0.],[0.],[0.]
-group-1;very dry;wet;wet,[0.],[0.],[0.],[0.]
-group-1;very dry;wet;very wet,[0.],[0.],[0.],[0.]
-group-1;very dry;very wet;very dry,[0.],[0.],[0.],[0.]
-group-1;very dry;very wet;dry,[0.],[0.],[0.],[0.]
-group-1;very dry;very wet;moderate,[0.],[0.],[0.],[0.]
-group-1;very dry;very wet;moist,[0.],[0.],[0.],[0.]
-group-1;very dry;very wet;wet,[0.],[0.],[0.],[0.]
-group-1;very dry;very wet;very wet,[0.],[0.],[0.],[0.]
-group-1;dry;very dry;very dry,[0.],[0.],[0.],[0.]
-group-1;dry;very dry;dry,[0.],[0.],[0.],[0.]
-group-1;dry;very dry;moderate,[0.],[0.],[0.],[0.]
-group-1;dry;very dry;moist,[0.],[0.],[0.],[0.]
-group-1;dry;very dry;wet,[0.],[0.],[0.],[0.]
-group-1;dry;very dry;very wet,[0.],[0.],[0.],[0.]
-group-1;dry;dry;very dry,[0.],[0.],[0.],[0.]
-group-1;dry;dry;dry,[0.],[0.],[0.],[0.]
-group-1;dry;dry;moderate,[0.],[0.],[0.],[0.]
-group-1;dry;dry;moist,[0.],[0.],[0.],[0.]
-group-1;dry;dry;wet,[0.],[0.],[0.],[0.]
-group-1;dry;dry;very wet,[0.],[0.],[0.],[0.]
-group-1;dry;moderate;very dry,[0.],[0.],[0.],[0.]
-group-1;dry;moderate;dry,[0.],[0.],[0.],[0.]
-group-1;dry;moderate;moderate,[0.],[0.],[0.],[0.]
-group-1;dry;moderate;moist,[0.],[0.],[0.],[0.]
-group-1;dry;moderate;wet,[0.],[0.],[0.],[0.]
-group-1;dry;moderate;very wet,[0.],[0.],[0.],[0.]
-group-1;dry;moist;very dry,[0.],[0.],[0.],[0.]
-group-1;dry;moist;dry,[0.],[0.],[0.],[0.]
-group-1;dry;moist;moderate,[0.],[0.],[0.],[0.]
-group-1;dry;moist;moist,[0.],[0.],[0.],[0.]
-group-1;dry;moist;wet,[0.],[0.],[0.],[0.]
-group-1;dry;moist;very wet,[0.],[0.],[0.],[0.]
-group-1;dry;wet;very dry,[0.],[0.],[0.],[0.]
-group-1;dry;wet;dry,[0.],[0.],[0.],[0.]
-group-1;dry;wet;moderate,[0.],[0.],[0.],[0.]
-group-1;dry;wet;moist,[0.],[0.],[0.],[0.]
-group-1;dry;wet;wet,[0.],[0.],[0.],[0.]
-group-1;dry;wet;very wet,[0.],[0.],[0.],[0.]
-group-1;dry;very wet;very dry,[0.],[0.],[0.],[0.]
-group-1;dry;very wet;dry,[0.],[0.],[0.],[0.]
-group-1;dry;very wet;moderate,[0.],[0.],[0.],[0.]
-group-1;dry;very wet;moist,[0.],[0.],[0.],[0.]
-group-1;dry;very wet;wet,[0.],[0.],[0.],[0.]
-group-1;dry;very wet;very wet,[0.],[0.],[0.],[0.]
-group-1;moderate;very dry;very dry,[0.],[0.],[0.],[0.]
-group-1;moderate;very dry;dry,[0.],[0.],[0.],[0.]
-group-1;moderate;very dry;moderate,[0.],[0.],[0.],[0.]
-group-1;moderate;very dry;moist,[0.],[0.],[0.],[0.]
-group-1;moderate;very dry;wet,[0.],[0.],[0.],[0.]
-group-1;moderate;very dry;very wet,[0.],[0.],[0.],[0.]
-group-1;moderate;dry;very dry,[0.],[0.],[0.],[0.]
-group-1;moderate;dry;dry,[0.],[0.],[0.],[0.]
-group-1;moderate;dry;moderate,[0.],[0.],[0.],[0.]
-group-1;moderate;dry;moist,[0.],[0.],[0.],[0.]
-group-1;moderate;dry;wet,[0.],[0.],[0.],[0.]
-group-1;moderate;dry;very wet,[0.],[0.],[0.],[0.]
-group-1;moderate;moderate;very dry,[0.],[0.],[0.],[0.]
-group-1;moderate;moderate;dry,[0.],[0.],[0.],[0.]
-group-1;moderate;moderate;moderate,[0.],[0.],[0.],[0.]
-group-1;moderate;moderate;moist,[0.],[0.],[0.],[0.]
-group-1;moderate;moderate;wet,[0.],[0.],[0.],[0.]
-group-1;moderate;moderate;very wet,[0.],[0.],[0.],[0.]
-group-1;moderate;moist;very dry,[0.],[0.],[0.],[0.]
-group-1;moderate;moist;dry,[0.],[0.],[0.],[0.]
-group-1;moderate;moist;moderate,[0.],[0.],[0.],[0.]
-group-1;moderate;moist;moist,[0.],[0.],[0.],[0.]
-group-1;moderate;moist;wet,[0.],[0.],[0.],[0.]
-group-1;moderate;moist;very wet,[0.],[0.],[0.],[0.]
-group-1;moderate;wet;very dry,[0.],[0.],[0.],[0.]
-group-1;moderate;wet;dry,[0.],[0.],[0.],[0.]
-group-1;moderate;wet;moderate,[0.],[0.],[0.],[0.]
-group-1;moderate;wet;moist,[0.],[0.],[0.],[0.]
-group-1;moderate;wet;wet,[0.],[0.],[0.],[0.]
-group-1;moderate;wet;very wet,[0.],[0.],[0.],[0.]
-group-1;moderate;very wet;very dry,[0.],[0.],[0.],[0.]
-group-1;moderate;very wet;dry,[0.],[0.],[0.],[0.]
-group-1;moderate;very wet;moderate,[0.],[0.],[0.],[0.]
-group-1;moderate;very wet;moist,[0.],[0.],[0.],[0.]
-group-1;moderate;very wet;wet,[0.],[0.],[0.],[0.]
-group-1;moderate;very wet;very wet,[0.],[0.],[0.],[0.]
-group-1;moist;very dry;very dry,[0.],[0.],[0.],[0.]
-group-1;moist;very dry;dry,[0.],[0.],[0.],[0.]
-group-1;moist;very dry;moderate,[0.],[0.],[0.],[0.]
-group-1;moist;very dry;moist,[0.],[0.],[0.],[0.]
-group-1;moist;very dry;wet,[0.],[0.],[0.],[0.]
-group-1;moist;very dry;very wet,[0.],[0.],[0.],[0.]
-group-1;moist;dry;very dry,[0.],[0.],[0.],[0.]
-group-1;moist;dry;dry,[0.],[0.],[0.],[0.]
-group-1;moist;dry;moderate,[0.],[0.],[0.],[0.]
-group-1;moist;dry;moist,[0.],[0.],[0.],[0.]
-group-1;moist;dry;wet,[0.],[0.],[0.],[0.]
-group-1;moist;dry;very wet,[0.],[0.],[0.],[0.]
-group-1;moist;moderate;very dry,[0.],[0.],[0.],[0.]
-group-1;moist;moderate;dry,[0.],[0.],[0.],[0.]
-group-1;moist;moderate;moderate,[0.],[0.],[0.],[0.]
-group-1;moist;moderate;moist,[0.],[0.],[0.],[0.]
-group-1;moist;moderate;wet,[0.],[0.],[0.],[0.]
-group-1;moist;moderate;very wet,[0.],[0.],[0.],[0.]
-group-1;moist;moist;very dry,[0.],[0.],[0.],[0.]
-group-1;moist;moist;dry,[0.],[0.],[0.],[0.]
-group-1;moist;moist;moderate,[0.],[0.],[0.],[0.]
-group-1;moist;moist;moist,[0.],[0.],[0.],[0.]
-group-1;moist;moist;wet,[0.],[0.],[0.],[0.]
-group-1;moist;moist;very wet,[0.],[0.],[0.],[0.]
-group-1;moist;wet;very dry,[0.],[0.],[0.],[0.]
-group-1;moist;wet;dry,[0.],[0.],[0.],[0.]
-group-1;moist;wet;moderate,[0.],[0.],[0.],[0.]
-group-1;moist;wet;moist,[0.],[0.],[0.],[0.]
-group-1;moist;wet;wet,[0.],[0.],[0.],[0.]
-group-1;moist;wet;very wet,[0.],[0.],[0.],[0.]
-group-1;moist;very wet;very dry,[0.],[0.],[0.],[0.]
-group-1;moist;very wet;dry,[0.],[0.],[0.],[0.]
-group-1;moist;very wet;moderate,[0.],[0.],[0.],[0.]
-group-1;moist;very wet;moist,[0.],[0.],[0.],[0.]
-group-1;moist;very wet;wet,[0.],[0.],[0.],[0.]
-group-1;moist;very wet;very wet,[0.],[0.],[0.],[0.]
-group-1;wet;very dry;very dry,[0.],[0.],[0.],[0.]
-group-1;wet;very dry;dry,[0.],[0.],[0.],[0.]
-group-1;wet;very dry;moderate,[0.],[0.],[0.],[0.]
-group-1;wet;very dry;moist,[0.],[0.],[0.],[0.]
-group-1;wet;very dry;wet,[0.],[0.],[0.],[0.]
-group-1;wet;very dry;very wet,[0.],[0.],[0.],[0.]
-group-1;wet;dry;very dry,[0.],[0.],[0.],[0.]
-group-1;wet;dry;dry,[0.],[0.],[0.],[0.]
-group-1;wet;dry;moderate,[0.],[0.],[0.],[0.]
-group-1;wet;dry;moist,[0.],[0.],[0.],[0.]
-group-1;wet;dry;wet,[0.],[0.],[0.],[0.]
-group-1;wet;dry;very wet,[0.],[0.],[0.],[0.]
-group-1;wet;moderate;very dry,[0.],[0.],[0.],[0.]
-group-1;wet;moderate;dry,[0.],[0.],[0.],[0.]
-group-1;wet;moderate;moderate,[0.],[0.],[0.],[0.]
-group-1;wet;moderate;moist,[0.],[0.],[0.],[0.]
-group-1;wet;moderate;wet,[0.],[0.],[0.],[0.]
-group-1;wet;moderate;very wet,[0.],[0.],[0.],[0.]
-group-1;wet;moist;very dry,[0.],[0.],[0.],[0.]
-group-1;wet;moist;dry,[0.],[0.],[0.],[0.]
-group-1;wet;moist;moderate,[0.],[0.],[0.],[0.]
-group-1;wet;moist;moist,[0.],[0.],[0.],[0.]
-group-1;wet;moist;wet,[0.],[0.],[0.],[0.]
-group-1;wet;moist;very wet,[0.],[0.],[0.],[0.]
-group-1;wet;wet;very dry,[0.],[0.],[0.],[0.]
-group-1;wet;wet;dry,[0.],[0.],[0.],[0.]
-group-1;wet;wet;moderate,[0.],[0.],[0.],[0.]
-group-1;wet;wet;moist,[0.],[0.],[0.],[0.]
-group-1;wet;wet;wet,[0.],[0.],[0.],[0.]
-group-1;wet;wet;very wet,[0.],[0.],[0.],[0.]
-group-1;wet;very wet;very dry,[0.],[0.],[0.],[0.]
-group-1;wet;very wet;dry,[0.],[0.],[0.],[0.]
-group-1;wet;very wet;moderate,[0.],[0.],[0.],[0.]
-group-1;wet;very wet;moist,[0.],[0.],[0.],[0.]
-group-1;wet;very wet;wet,[0.],[0.],[0.],[0.]
-group-1;wet;very wet;very wet,[0.],[0.],[0.],[0.]
-group-1;very wet;very dry;very dry,[0.],[0.],[0.],[0.]
-group-1;very wet;very dry;dry,[0.],[0.],[0.],[0.]
-group-1;very wet;very dry;moderate,[0.],[0.],[0.],[0.]
-group-1;very wet;very dry;moist,[0.],[0.],[0.],[0.]
-group-1;very wet;very dry;wet,[0.],[0.],[0.],[0.]
-group-1;very wet;very dry;very wet,[0.],[0.],[0.],[0.]
-group-1;very wet;dry;very dry,[0.],[0.],[0.],[0.]
-group-1;very wet;dry;dry,[0.],[0.],[0.],[0.]
-group-1;very wet;dry;moderate,[0.],[0.],[0.],[0.]
-group-1;very wet;dry;moist,[0.],[0.],[0.],[0.]
-group-1;very wet;dry;wet,[0.],[0.],[0.],[0.]
-group-1;very wet;dry;very wet,[0.],[0.],[0.],[0.]
-group-1;very wet;moderate;very dry,[0.],[0.],[0.],[0.]
-group-1;very wet;moderate;dry,[0.],[0.],[0.],[0.]
-group-1;very wet;moderate;moderate,[0.],[0.],[0.],[0.]
-group-1;very wet;moderate;moist,[0.],[0.],[0.],[0.]
-group-1;very wet;moderate;wet,[0.],[0.],[0.],[0.]
-group-1;very wet;moderate;very wet,[0.],[0.],[0.],[0.]
-group-1;very wet;moist;very dry,[0.],[0.],[0.],[0.]
-group-1;very wet;moist;dry,[0.],[0.],[0.],[0.]
-group-1;very wet;moist;moderate,[0.],[0.],[0.],[0.]
-group-1;very wet;moist;moist,[0.],[0.],[0.],[0.]
-group-1;very wet;moist;wet,[0.],[0.],[0.],[0.]
-group-1;very wet;moist;very wet,[0.],[0.],[0.],[0.]
-group-1;very wet;wet;very dry,[0.],[0.],[0.],[0.]
-group-1;very wet;wet;dry,[0.],[0.],[0.],[0.]
-group-1;very wet;wet;moderate,[0.],[0.],[0.],[0.]
-group-1;very wet;wet;moist,[0.],[0.],[0.],[0.]
-group-1;very wet;wet;wet,[0.],[0.],[0.],[0.]
-group-1;very wet;wet;very wet,[0.],[0.],[0.],[0.]
-group-1;very wet;very wet;very dry,[0.],[0.],[0.],[0.]
-group-1;very wet;very wet;dry,[0.],[0.],[0.],[0.]
-group-1;very wet;very wet;moderate,[0.],[0.],[0.],[0.]
-group-1;very wet;very wet;moist,[0.],[0.],[0.],[0.]
-group-1;very wet;very wet;wet,[0.],[0.],[0.],[0.]
-group-1;very wet;very wet;very wet,[0.],[0.],[0.],[0.]
-group-2;very dry;very dry;very dry,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;very dry;very dry;dry,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;very dry;very dry;moderate,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;very dry;very dry;moist,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;very dry;very dry;wet,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;very dry;very dry;very wet,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;very dry;dry;very dry,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;very dry;dry;dry,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;very dry;dry;moderate,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;very dry;dry;moist,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;very dry;dry;wet,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;very dry;dry;very wet,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;very dry;moderate;very dry,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;very dry;moderate;dry,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;very dry;moderate;moderate,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;very dry;moderate;moist,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;very dry;moderate;wet,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;very dry;moderate;very wet,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;very dry;moist;very dry,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;very dry;moist;dry,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;very dry;moist;moderate,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;very dry;moist;moist,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;very dry;moist;wet,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;very dry;moist;very wet,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;very dry;wet;very dry,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;very dry;wet;dry,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;very dry;wet;moderate,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;very dry;wet;moist,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;very dry;wet;wet,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;very dry;wet;very wet,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;very dry;very wet;very dry,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;very dry;very wet;dry,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;very dry;very wet;moderate,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;very dry;very wet;moist,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;very dry;very wet;wet,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;very dry;very wet;very wet,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;dry;very dry;very dry,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;dry;very dry;dry,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;dry;very dry;moderate,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;dry;very dry;moist,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;dry;very dry;wet,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;dry;very dry;very wet,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;dry;dry;very dry,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;dry;dry;dry,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;dry;dry;moderate,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;dry;dry;moist,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;dry;dry;wet,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;dry;dry;very wet,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;dry;moderate;very dry,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;dry;moderate;dry,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;dry;moderate;moderate,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;dry;moderate;moist,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;dry;moderate;wet,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;dry;moderate;very wet,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;dry;moist;very dry,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;dry;moist;dry,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;dry;moist;moderate,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;dry;moist;moist,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;dry;moist;wet,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;dry;moist;very wet,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;dry;wet;very dry,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;dry;wet;dry,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;dry;wet;moderate,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;dry;wet;moist,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;dry;wet;wet,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;dry;wet;very wet,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;dry;very wet;very dry,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;dry;very wet;dry,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;dry;very wet;moderate,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;dry;very wet;moist,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;dry;very wet;wet,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;dry;very wet;very wet,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moderate;very dry;very dry,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moderate;very dry;dry,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moderate;very dry;moderate,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moderate;very dry;moist,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moderate;very dry;wet,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moderate;very dry;very wet,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moderate;dry;very dry,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moderate;dry;dry,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moderate;dry;moderate,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moderate;dry;moist,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moderate;dry;wet,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moderate;dry;very wet,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moderate;moderate;very dry,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moderate;moderate;dry,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moderate;moderate;moderate,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moderate;moderate;moist,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moderate;moderate;wet,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moderate;moderate;very wet,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moderate;moist;very dry,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moderate;moist;dry,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moderate;moist;moderate,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moderate;moist;moist,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moderate;moist;wet,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moderate;moist;very wet,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moderate;wet;very dry,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moderate;wet;dry,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moderate;wet;moderate,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moderate;wet;moist,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moderate;wet;wet,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moderate;wet;very wet,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moderate;very wet;very dry,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moderate;very wet;dry,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moderate;very wet;moderate,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moderate;very wet;moist,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moderate;very wet;wet,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moderate;very wet;very wet,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moist;very dry;very dry,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moist;very dry;dry,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moist;very dry;moderate,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moist;very dry;moist,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moist;very dry;wet,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moist;very dry;very wet,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;moist;dry;very dry,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moist;dry;dry,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moist;dry;moderate,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moist;dry;moist,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moist;dry;wet,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moist;dry;very wet,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;moist;moderate;very dry,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moist;moderate;dry,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moist;moderate;moderate,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moist;moderate;moist,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moist;moderate;wet,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moist;moderate;very wet,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;moist;moist;very dry,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moist;moist;dry,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moist;moist;moderate,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moist;moist;moist,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moist;moist;wet,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moist;moist;very wet,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;moist;wet;very dry,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moist;wet;dry,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moist;wet;moderate,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moist;wet;moist,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moist;wet;wet,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moist;wet;very wet,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;moist;very wet;very dry,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moist;very wet;dry,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moist;very wet;moderate,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moist;very wet;moist,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moist;very wet;wet,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;moist;very wet;very wet,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;wet;very dry;very dry,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;wet;very dry;dry,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;wet;very dry;moderate,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;wet;very dry;moist,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;wet;very dry;wet,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;wet;very dry;very wet,[35412400.10875097],[8943624.01208344],[2224056.],[46580080.12083442]
-group-2;wet;dry;very dry,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;wet;dry;dry,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;wet;dry;moderate,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;wet;dry;moist,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;wet;dry;wet,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;wet;dry;very wet,[33829562.66875097],[4059059.85208344],[857016.],[38745638.52083442]
-group-2;wet;moderate;very dry,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;wet;moderate;dry,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;wet;moderate;moderate,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;wet;moderate;moist,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;wet;moderate;wet,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;wet;moderate;very wet,[32255757.14875097],[3884192.57208344],[857016.],[36996965.72083442]
-group-2;wet;moist;very dry,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;wet;moist;dry,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;wet;moist;moderate,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;wet;moist;moist,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;wet;moist;wet,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;wet;moist;very wet,[31131610.34875097],[3759287.37208344],[857016.],[35747913.72083442]
-group-2;wet;wet;very dry,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;wet;wet;dry,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;wet;wet;moderate,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;wet;wet;moist,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;wet;wet;wet,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;wet;wet;very wet,[29782634.18875097],[3609401.13208344],[857016.],[34249051.32083442]
-group-2;wet;very wet;very dry,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;wet;very wet;dry,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;wet;very wet;moderate,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;wet;very wet;moist,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;wet;very wet;wet,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;wet;very wet;very wet,[27534340.58875097],[3359590.73208344],[857016.],[31750947.32083442]
-group-2;very wet;very dry;very dry,[35092400.10875097],[8463624.01208344],[1424056.],[44980080.12083442]
-group-2;very wet;very dry;dry,[35092400.10875097],[8463624.01208344],[1424056.],[44980080.12083442]
-group-2;very wet;very dry;moderate,[35092400.10875097],[8463624.01208344],[1424056.],[44980080.12083442]
-group-2;very wet;very dry;moist,[35092400.10875097],[8463624.01208344],[1424056.],[44980080.12083442]
-group-2;very wet;very dry;wet,[35092400.10875097],[8463624.01208344],[1424056.],[44980080.12083442]
-group-2;very wet;very dry;very wet,[35092400.10875097],[8463624.01208344],[1424056.],[44980080.12083442]
-group-2;very wet;dry;very dry,[33509562.66875098],[3579059.85208344],[57016.],[37145638.52083442]
-group-2;very wet;dry;dry,[33509562.66875098],[3579059.85208344],[57016.],[37145638.52083442]
-group-2;very wet;dry;moderate,[33509562.66875098],[3579059.85208344],[57016.],[37145638.52083442]
-group-2;very wet;dry;moist,[33509562.66875098],[3579059.85208344],[57016.],[37145638.52083442]
-group-2;very wet;dry;wet,[33509562.66875098],[3579059.85208344],[57016.],[37145638.52083442]
-group-2;very wet;dry;very wet,[33509562.66875098],[3579059.85208344],[57016.],[37145638.52083442]
-group-2;very wet;moderate;very dry,[31935757.14875097],[3404192.57208344],[57016.],[35396965.72083442]
-group-2;very wet;moderate;dry,[31935757.14875097],[3404192.57208344],[57016.],[35396965.72083442]
-group-2;very wet;moderate;moderate,[31935757.14875097],[3404192.57208344],[57016.],[35396965.72083442]
-group-2;very wet;moderate;moist,[31935757.14875097],[3404192.57208344],[57016.],[35396965.72083442]
-group-2;very wet;moderate;wet,[31935757.14875097],[3404192.57208344],[57016.],[35396965.72083442]
-group-2;very wet;moderate;very wet,[31935757.14875097],[3404192.57208344],[57016.],[35396965.72083442]
-group-2;very wet;moist;very dry,[30811610.34875097],[3279287.37208344],[57016.],[34147913.72083442]
-group-2;very wet;moist;dry,[30811610.34875097],[3279287.37208344],[57016.],[34147913.72083442]
-group-2;very wet;moist;moderate,[30811610.34875097],[3279287.37208344],[57016.],[34147913.72083442]
-group-2;very wet;moist;moist,[30811610.34875097],[3279287.37208344],[57016.],[34147913.72083442]
-group-2;very wet;moist;wet,[30811610.34875097],[3279287.37208344],[57016.],[34147913.72083442]
-group-2;very wet;moist;very wet,[30811610.34875097],[3279287.37208344],[57016.],[34147913.72083442]
-group-2;very wet;wet;very dry,[29462634.18875097],[3129401.13208344],[57016.],[32649051.32083442]
-group-2;very wet;wet;dry,[29462634.18875097],[3129401.13208344],[57016.],[32649051.32083442]
-group-2;very wet;wet;moderate,[29462634.18875097],[3129401.13208344],[57016.],[32649051.32083442]
-group-2;very wet;wet;moist,[29462634.18875097],[3129401.13208344],[57016.],[32649051.32083442]
-group-2;very wet;wet;wet,[29462634.18875097],[3129401.13208344],[57016.],[32649051.32083442]
-group-2;very wet;wet;very wet,[29462634.18875097],[3129401.13208344],[57016.],[32649051.32083442]
-group-2;very wet;very wet;very dry,[27214340.58875097],[2879590.73208344],[57016.],[30150947.32083442]
-group-2;very wet;very wet;dry,[27214340.58875097],[2879590.73208344],[57016.],[30150947.32083442]
-group-2;very wet;very wet;moderate,[27214340.58875097],[2879590.73208344],[57016.],[30150947.32083442]
-group-2;very wet;very wet;moist,[27214340.58875097],[2879590.73208344],[57016.],[30150947.32083442]
-group-2;very wet;very wet;wet,[27214340.58875097],[2879590.73208344],[57016.],[30150947.32083442]
-group-2;very wet;very wet;very wet,[27214340.58875097],[2879590.73208344],[57016.],[30150947.32083442]
+group-1;very dry;very dry;very dry,0.0,0.0,0.0,0.0
+group-1;very dry;very dry;dry,0.0,0.0,0.0,0.0
+group-1;very dry;very dry;moderate,0.0,0.0,0.0,0.0
+group-1;very dry;very dry;moist,0.0,0.0,0.0,0.0
+group-1;very dry;very dry;wet,0.0,0.0,0.0,0.0
+group-1;very dry;very dry;very wet,0.0,0.0,0.0,0.0
+group-1;very dry;dry;very dry,0.0,0.0,0.0,0.0
+group-1;very dry;dry;dry,0.0,0.0,0.0,0.0
+group-1;very dry;dry;moderate,0.0,0.0,0.0,0.0
+group-1;very dry;dry;moist,0.0,0.0,0.0,0.0
+group-1;very dry;dry;wet,0.0,0.0,0.0,0.0
+group-1;very dry;dry;very wet,0.0,0.0,0.0,0.0
+group-1;very dry;moderate;very dry,0.0,0.0,0.0,0.0
+group-1;very dry;moderate;dry,0.0,0.0,0.0,0.0
+group-1;very dry;moderate;moderate,0.0,0.0,0.0,0.0
+group-1;very dry;moderate;moist,0.0,0.0,0.0,0.0
+group-1;very dry;moderate;wet,0.0,0.0,0.0,0.0
+group-1;very dry;moderate;very wet,0.0,0.0,0.0,0.0
+group-1;very dry;moist;very dry,0.0,0.0,0.0,0.0
+group-1;very dry;moist;dry,0.0,0.0,0.0,0.0
+group-1;very dry;moist;moderate,0.0,0.0,0.0,0.0
+group-1;very dry;moist;moist,0.0,0.0,0.0,0.0
+group-1;very dry;moist;wet,0.0,0.0,0.0,0.0
+group-1;very dry;moist;very wet,0.0,0.0,0.0,0.0
+group-1;very dry;wet;very dry,0.0,0.0,0.0,0.0
+group-1;very dry;wet;dry,0.0,0.0,0.0,0.0
+group-1;very dry;wet;moderate,0.0,0.0,0.0,0.0
+group-1;very dry;wet;moist,0.0,0.0,0.0,0.0
+group-1;very dry;wet;wet,0.0,0.0,0.0,0.0
+group-1;very dry;wet;very wet,0.0,0.0,0.0,0.0
+group-1;very dry;very wet;very dry,0.0,0.0,0.0,0.0
+group-1;very dry;very wet;dry,0.0,0.0,0.0,0.0
+group-1;very dry;very wet;moderate,0.0,0.0,0.0,0.0
+group-1;very dry;very wet;moist,0.0,0.0,0.0,0.0
+group-1;very dry;very wet;wet,0.0,0.0,0.0,0.0
+group-1;very dry;very wet;very wet,0.0,0.0,0.0,0.0
+group-1;dry;very dry;very dry,0.0,0.0,0.0,0.0
+group-1;dry;very dry;dry,0.0,0.0,0.0,0.0
+group-1;dry;very dry;moderate,0.0,0.0,0.0,0.0
+group-1;dry;very dry;moist,0.0,0.0,0.0,0.0
+group-1;dry;very dry;wet,0.0,0.0,0.0,0.0
+group-1;dry;very dry;very wet,0.0,0.0,0.0,0.0
+group-1;dry;dry;very dry,0.0,0.0,0.0,0.0
+group-1;dry;dry;dry,0.0,0.0,0.0,0.0
+group-1;dry;dry;moderate,0.0,0.0,0.0,0.0
+group-1;dry;dry;moist,0.0,0.0,0.0,0.0
+group-1;dry;dry;wet,0.0,0.0,0.0,0.0
+group-1;dry;dry;very wet,0.0,0.0,0.0,0.0
+group-1;dry;moderate;very dry,0.0,0.0,0.0,0.0
+group-1;dry;moderate;dry,0.0,0.0,0.0,0.0
+group-1;dry;moderate;moderate,0.0,0.0,0.0,0.0
+group-1;dry;moderate;moist,0.0,0.0,0.0,0.0
+group-1;dry;moderate;wet,0.0,0.0,0.0,0.0
+group-1;dry;moderate;very wet,0.0,0.0,0.0,0.0
+group-1;dry;moist;very dry,0.0,0.0,0.0,0.0
+group-1;dry;moist;dry,0.0,0.0,0.0,0.0
+group-1;dry;moist;moderate,0.0,0.0,0.0,0.0
+group-1;dry;moist;moist,0.0,0.0,0.0,0.0
+group-1;dry;moist;wet,0.0,0.0,0.0,0.0
+group-1;dry;moist;very wet,0.0,0.0,0.0,0.0
+group-1;dry;wet;very dry,0.0,0.0,0.0,0.0
+group-1;dry;wet;dry,0.0,0.0,0.0,0.0
+group-1;dry;wet;moderate,0.0,0.0,0.0,0.0
+group-1;dry;wet;moist,0.0,0.0,0.0,0.0
+group-1;dry;wet;wet,0.0,0.0,0.0,0.0
+group-1;dry;wet;very wet,0.0,0.0,0.0,0.0
+group-1;dry;very wet;very dry,0.0,0.0,0.0,0.0
+group-1;dry;very wet;dry,0.0,0.0,0.0,0.0
+group-1;dry;very wet;moderate,0.0,0.0,0.0,0.0
+group-1;dry;very wet;moist,0.0,0.0,0.0,0.0
+group-1;dry;very wet;wet,0.0,0.0,0.0,0.0
+group-1;dry;very wet;very wet,0.0,0.0,0.0,0.0
+group-1;moderate;very dry;very dry,0.0,0.0,0.0,0.0
+group-1;moderate;very dry;dry,0.0,0.0,0.0,0.0
+group-1;moderate;very dry;moderate,0.0,0.0,0.0,0.0
+group-1;moderate;very dry;moist,0.0,0.0,0.0,0.0
+group-1;moderate;very dry;wet,0.0,0.0,0.0,0.0
+group-1;moderate;very dry;very wet,0.0,0.0,0.0,0.0
+group-1;moderate;dry;very dry,0.0,0.0,0.0,0.0
+group-1;moderate;dry;dry,0.0,0.0,0.0,0.0
+group-1;moderate;dry;moderate,0.0,0.0,0.0,0.0
+group-1;moderate;dry;moist,0.0,0.0,0.0,0.0
+group-1;moderate;dry;wet,0.0,0.0,0.0,0.0
+group-1;moderate;dry;very wet,0.0,0.0,0.0,0.0
+group-1;moderate;moderate;very dry,0.0,0.0,0.0,0.0
+group-1;moderate;moderate;dry,0.0,0.0,0.0,0.0
+group-1;moderate;moderate;moderate,0.0,0.0,0.0,0.0
+group-1;moderate;moderate;moist,0.0,0.0,0.0,0.0
+group-1;moderate;moderate;wet,0.0,0.0,0.0,0.0
+group-1;moderate;moderate;very wet,0.0,0.0,0.0,0.0
+group-1;moderate;moist;very dry,0.0,0.0,0.0,0.0
+group-1;moderate;moist;dry,0.0,0.0,0.0,0.0
+group-1;moderate;moist;moderate,0.0,0.0,0.0,0.0
+group-1;moderate;moist;moist,0.0,0.0,0.0,0.0
+group-1;moderate;moist;wet,0.0,0.0,0.0,0.0
+group-1;moderate;moist;very wet,0.0,0.0,0.0,0.0
+group-1;moderate;wet;very dry,0.0,0.0,0.0,0.0
+group-1;moderate;wet;dry,0.0,0.0,0.0,0.0
+group-1;moderate;wet;moderate,0.0,0.0,0.0,0.0
+group-1;moderate;wet;moist,0.0,0.0,0.0,0.0
+group-1;moderate;wet;wet,0.0,0.0,0.0,0.0
+group-1;moderate;wet;very wet,0.0,0.0,0.0,0.0
+group-1;moderate;very wet;very dry,0.0,0.0,0.0,0.0
+group-1;moderate;very wet;dry,0.0,0.0,0.0,0.0
+group-1;moderate;very wet;moderate,0.0,0.0,0.0,0.0
+group-1;moderate;very wet;moist,0.0,0.0,0.0,0.0
+group-1;moderate;very wet;wet,0.0,0.0,0.0,0.0
+group-1;moderate;very wet;very wet,0.0,0.0,0.0,0.0
+group-1;moist;very dry;very dry,0.0,0.0,0.0,0.0
+group-1;moist;very dry;dry,0.0,0.0,0.0,0.0
+group-1;moist;very dry;moderate,0.0,0.0,0.0,0.0
+group-1;moist;very dry;moist,0.0,0.0,0.0,0.0
+group-1;moist;very dry;wet,0.0,0.0,0.0,0.0
+group-1;moist;very dry;very wet,0.0,0.0,0.0,0.0
+group-1;moist;dry;very dry,0.0,0.0,0.0,0.0
+group-1;moist;dry;dry,0.0,0.0,0.0,0.0
+group-1;moist;dry;moderate,0.0,0.0,0.0,0.0
+group-1;moist;dry;moist,0.0,0.0,0.0,0.0
+group-1;moist;dry;wet,0.0,0.0,0.0,0.0
+group-1;moist;dry;very wet,0.0,0.0,0.0,0.0
+group-1;moist;moderate;very dry,0.0,0.0,0.0,0.0
+group-1;moist;moderate;dry,0.0,0.0,0.0,0.0
+group-1;moist;moderate;moderate,0.0,0.0,0.0,0.0
+group-1;moist;moderate;moist,0.0,0.0,0.0,0.0
+group-1;moist;moderate;wet,0.0,0.0,0.0,0.0
+group-1;moist;moderate;very wet,0.0,0.0,0.0,0.0
+group-1;moist;moist;very dry,0.0,0.0,0.0,0.0
+group-1;moist;moist;dry,0.0,0.0,0.0,0.0
+group-1;moist;moist;moderate,0.0,0.0,0.0,0.0
+group-1;moist;moist;moist,0.0,0.0,0.0,0.0
+group-1;moist;moist;wet,0.0,0.0,0.0,0.0
+group-1;moist;moist;very wet,0.0,0.0,0.0,0.0
+group-1;moist;wet;very dry,0.0,0.0,0.0,0.0
+group-1;moist;wet;dry,0.0,0.0,0.0,0.0
+group-1;moist;wet;moderate,0.0,0.0,0.0,0.0
+group-1;moist;wet;moist,0.0,0.0,0.0,0.0
+group-1;moist;wet;wet,0.0,0.0,0.0,0.0
+group-1;moist;wet;very wet,0.0,0.0,0.0,0.0
+group-1;moist;very wet;very dry,0.0,0.0,0.0,0.0
+group-1;moist;very wet;dry,0.0,0.0,0.0,0.0
+group-1;moist;very wet;moderate,0.0,0.0,0.0,0.0
+group-1;moist;very wet;moist,0.0,0.0,0.0,0.0
+group-1;moist;very wet;wet,0.0,0.0,0.0,0.0
+group-1;moist;very wet;very wet,0.0,0.0,0.0,0.0
+group-1;wet;very dry;very dry,0.0,0.0,0.0,0.0
+group-1;wet;very dry;dry,0.0,0.0,0.0,0.0
+group-1;wet;very dry;moderate,0.0,0.0,0.0,0.0
+group-1;wet;very dry;moist,0.0,0.0,0.0,0.0
+group-1;wet;very dry;wet,0.0,0.0,0.0,0.0
+group-1;wet;very dry;very wet,0.0,0.0,0.0,0.0
+group-1;wet;dry;very dry,0.0,0.0,0.0,0.0
+group-1;wet;dry;dry,0.0,0.0,0.0,0.0
+group-1;wet;dry;moderate,0.0,0.0,0.0,0.0
+group-1;wet;dry;moist,0.0,0.0,0.0,0.0
+group-1;wet;dry;wet,0.0,0.0,0.0,0.0
+group-1;wet;dry;very wet,0.0,0.0,0.0,0.0
+group-1;wet;moderate;very dry,0.0,0.0,0.0,0.0
+group-1;wet;moderate;dry,0.0,0.0,0.0,0.0
+group-1;wet;moderate;moderate,0.0,0.0,0.0,0.0
+group-1;wet;moderate;moist,0.0,0.0,0.0,0.0
+group-1;wet;moderate;wet,0.0,0.0,0.0,0.0
+group-1;wet;moderate;very wet,0.0,0.0,0.0,0.0
+group-1;wet;moist;very dry,0.0,0.0,0.0,0.0
+group-1;wet;moist;dry,0.0,0.0,0.0,0.0
+group-1;wet;moist;moderate,0.0,0.0,0.0,0.0
+group-1;wet;moist;moist,0.0,0.0,0.0,0.0
+group-1;wet;moist;wet,0.0,0.0,0.0,0.0
+group-1;wet;moist;very wet,0.0,0.0,0.0,0.0
+group-1;wet;wet;very dry,0.0,0.0,0.0,0.0
+group-1;wet;wet;dry,0.0,0.0,0.0,0.0
+group-1;wet;wet;moderate,0.0,0.0,0.0,0.0
+group-1;wet;wet;moist,0.0,0.0,0.0,0.0
+group-1;wet;wet;wet,0.0,0.0,0.0,0.0
+group-1;wet;wet;very wet,0.0,0.0,0.0,0.0
+group-1;wet;very wet;very dry,0.0,0.0,0.0,0.0
+group-1;wet;very wet;dry,0.0,0.0,0.0,0.0
+group-1;wet;very wet;moderate,0.0,0.0,0.0,0.0
+group-1;wet;very wet;moist,0.0,0.0,0.0,0.0
+group-1;wet;very wet;wet,0.0,0.0,0.0,0.0
+group-1;wet;very wet;very wet,0.0,0.0,0.0,0.0
+group-1;very wet;very dry;very dry,0.0,0.0,0.0,0.0
+group-1;very wet;very dry;dry,0.0,0.0,0.0,0.0
+group-1;very wet;very dry;moderate,0.0,0.0,0.0,0.0
+group-1;very wet;very dry;moist,0.0,0.0,0.0,0.0
+group-1;very wet;very dry;wet,0.0,0.0,0.0,0.0
+group-1;very wet;very dry;very wet,0.0,0.0,0.0,0.0
+group-1;very wet;dry;very dry,0.0,0.0,0.0,0.0
+group-1;very wet;dry;dry,0.0,0.0,0.0,0.0
+group-1;very wet;dry;moderate,0.0,0.0,0.0,0.0
+group-1;very wet;dry;moist,0.0,0.0,0.0,0.0
+group-1;very wet;dry;wet,0.0,0.0,0.0,0.0
+group-1;very wet;dry;very wet,0.0,0.0,0.0,0.0
+group-1;very wet;moderate;very dry,0.0,0.0,0.0,0.0
+group-1;very wet;moderate;dry,0.0,0.0,0.0,0.0
+group-1;very wet;moderate;moderate,0.0,0.0,0.0,0.0
+group-1;very wet;moderate;moist,0.0,0.0,0.0,0.0
+group-1;very wet;moderate;wet,0.0,0.0,0.0,0.0
+group-1;very wet;moderate;very wet,0.0,0.0,0.0,0.0
+group-1;very wet;moist;very dry,0.0,0.0,0.0,0.0
+group-1;very wet;moist;dry,0.0,0.0,0.0,0.0
+group-1;very wet;moist;moderate,0.0,0.0,0.0,0.0
+group-1;very wet;moist;moist,0.0,0.0,0.0,0.0
+group-1;very wet;moist;wet,0.0,0.0,0.0,0.0
+group-1;very wet;moist;very wet,0.0,0.0,0.0,0.0
+group-1;very wet;wet;very dry,0.0,0.0,0.0,0.0
+group-1;very wet;wet;dry,0.0,0.0,0.0,0.0
+group-1;very wet;wet;moderate,0.0,0.0,0.0,0.0
+group-1;very wet;wet;moist,0.0,0.0,0.0,0.0
+group-1;very wet;wet;wet,0.0,0.0,0.0,0.0
+group-1;very wet;wet;very wet,0.0,0.0,0.0,0.0
+group-1;very wet;very wet;very dry,0.0,0.0,0.0,0.0
+group-1;very wet;very wet;dry,0.0,0.0,0.0,0.0
+group-1;very wet;very wet;moderate,0.0,0.0,0.0,0.0
+group-1;very wet;very wet;moist,0.0,0.0,0.0,0.0
+group-1;very wet;very wet;wet,0.0,0.0,0.0,0.0
+group-1;very wet;very wet;very wet,0.0,0.0,0.0,0.0
+group-2;very dry;very dry;very dry,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;very dry;very dry;dry,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;very dry;very dry;moderate,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;very dry;very dry;moist,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;very dry;very dry;wet,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;very dry;very dry;very wet,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;very dry;dry;very dry,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;very dry;dry;dry,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;very dry;dry;moderate,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;very dry;dry;moist,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;very dry;dry;wet,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;very dry;dry;very wet,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;very dry;moderate;very dry,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;very dry;moderate;dry,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;very dry;moderate;moderate,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;very dry;moderate;moist,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;very dry;moderate;wet,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;very dry;moderate;very wet,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;very dry;moist;very dry,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;very dry;moist;dry,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;very dry;moist;moderate,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;very dry;moist;moist,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;very dry;moist;wet,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;very dry;moist;very wet,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;very dry;wet;very dry,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;very dry;wet;dry,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;very dry;wet;moderate,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;very dry;wet;moist,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;very dry;wet;wet,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;very dry;wet;very wet,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;very dry;very wet;very dry,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;very dry;very wet;dry,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;very dry;very wet;moderate,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;very dry;very wet;moist,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;very dry;very wet;wet,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;very dry;very wet;very wet,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;dry;very dry;very dry,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;dry;very dry;dry,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;dry;very dry;moderate,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;dry;very dry;moist,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;dry;very dry;wet,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;dry;very dry;very wet,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;dry;dry;very dry,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;dry;dry;dry,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;dry;dry;moderate,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;dry;dry;moist,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;dry;dry;wet,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;dry;dry;very wet,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;dry;moderate;very dry,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;dry;moderate;dry,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;dry;moderate;moderate,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;dry;moderate;moist,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;dry;moderate;wet,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;dry;moderate;very wet,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;dry;moist;very dry,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;dry;moist;dry,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;dry;moist;moderate,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;dry;moist;moist,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;dry;moist;wet,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;dry;moist;very wet,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;dry;wet;very dry,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;dry;wet;dry,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;dry;wet;moderate,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;dry;wet;moist,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;dry;wet;wet,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;dry;wet;very wet,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;dry;very wet;very dry,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;dry;very wet;dry,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;dry;very wet;moderate,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;dry;very wet;moist,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;dry;very wet;wet,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;dry;very wet;very wet,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moderate;very dry;very dry,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moderate;very dry;dry,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moderate;very dry;moderate,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moderate;very dry;moist,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moderate;very dry;wet,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moderate;very dry;very wet,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moderate;dry;very dry,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moderate;dry;dry,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moderate;dry;moderate,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moderate;dry;moist,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moderate;dry;wet,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moderate;dry;very wet,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moderate;moderate;very dry,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moderate;moderate;dry,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moderate;moderate;moderate,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moderate;moderate;moist,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moderate;moderate;wet,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moderate;moderate;very wet,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moderate;moist;very dry,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moderate;moist;dry,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moderate;moist;moderate,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moderate;moist;moist,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moderate;moist;wet,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moderate;moist;very wet,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moderate;wet;very dry,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moderate;wet;dry,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moderate;wet;moderate,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moderate;wet;moist,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moderate;wet;wet,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moderate;wet;very wet,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moderate;very wet;very dry,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moderate;very wet;dry,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moderate;very wet;moderate,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moderate;very wet;moist,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moderate;very wet;wet,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moderate;very wet;very wet,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moist;very dry;very dry,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moist;very dry;dry,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moist;very dry;moderate,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moist;very dry;moist,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moist;very dry;wet,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moist;very dry;very wet,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;moist;dry;very dry,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moist;dry;dry,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moist;dry;moderate,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moist;dry;moist,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moist;dry;wet,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moist;dry;very wet,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;moist;moderate;very dry,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moist;moderate;dry,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moist;moderate;moderate,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moist;moderate;moist,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moist;moderate;wet,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moist;moderate;very wet,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;moist;moist;very dry,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moist;moist;dry,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moist;moist;moderate,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moist;moist;moist,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moist;moist;wet,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moist;moist;very wet,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;moist;wet;very dry,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moist;wet;dry,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moist;wet;moderate,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moist;wet;moist,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moist;wet;wet,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moist;wet;very wet,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;moist;very wet;very dry,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moist;very wet;dry,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moist;very wet;moderate,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moist;very wet;moist,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moist;very wet;wet,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;moist;very wet;very wet,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;wet;very dry;very dry,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;wet;very dry;dry,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;wet;very dry;moderate,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;wet;very dry;moist,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;wet;very dry;wet,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;wet;very dry;very wet,35412400.10875097,8943624.01208344,2224055.999999999,46580080.12083442
+group-2;wet;dry;very dry,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;wet;dry;dry,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;wet;dry;moderate,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;wet;dry;moist,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;wet;dry;wet,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;wet;dry;very wet,33829562.66875097,4059059.8520834413,857016.0,38745638.520834416
+group-2;wet;moderate;very dry,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;wet;moderate;dry,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;wet;moderate;moderate,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;wet;moderate;moist,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;wet;moderate;wet,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;wet;moderate;very wet,32255757.148750972,3884192.5720834415,857016.0,36996965.72083442
+group-2;wet;moist;very dry,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;wet;moist;dry,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;wet;moist;moderate,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;wet;moist;moist,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;wet;moist;wet,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;wet;moist;very wet,31131610.348750975,3759287.372083442,857016.0,35747913.72083442
+group-2;wet;wet;very dry,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;wet;wet;dry,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;wet;wet;moderate,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;wet;wet;moist,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;wet;wet;wet,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;wet;wet;very wet,29782634.188750975,3609401.1320834416,857016.0,34249051.32083442
+group-2;wet;very wet;very dry,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;wet;very wet;dry,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;wet;very wet;moderate,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;wet;very wet;moist,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;wet;very wet;wet,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;wet;very wet;very wet,27534340.588750973,3359590.7320834417,857016.0,31750947.32083442
+group-2;very wet;very dry;very dry,35092400.10875097,8463624.01208344,1424055.9999999993,44980080.12083442
+group-2;very wet;very dry;dry,35092400.10875097,8463624.01208344,1424055.9999999993,44980080.12083442
+group-2;very wet;very dry;moderate,35092400.10875097,8463624.01208344,1424055.9999999993,44980080.12083442
+group-2;very wet;very dry;moist,35092400.10875097,8463624.01208344,1424055.9999999993,44980080.12083442
+group-2;very wet;very dry;wet,35092400.10875097,8463624.01208344,1424055.9999999993,44980080.12083442
+group-2;very wet;very dry;very wet,35092400.10875097,8463624.01208344,1424055.9999999993,44980080.12083442
+group-2;very wet;dry;very dry,33509562.668750975,3579059.852083442,57016.00000000001,37145638.520834416
+group-2;very wet;dry;dry,33509562.668750975,3579059.852083442,57016.00000000001,37145638.520834416
+group-2;very wet;dry;moderate,33509562.668750975,3579059.852083442,57016.00000000001,37145638.520834416
+group-2;very wet;dry;moist,33509562.668750975,3579059.852083442,57016.00000000001,37145638.520834416
+group-2;very wet;dry;wet,33509562.668750975,3579059.852083442,57016.00000000001,37145638.520834416
+group-2;very wet;dry;very wet,33509562.668750975,3579059.852083442,57016.00000000001,37145638.520834416
+group-2;very wet;moderate;very dry,31935757.148750972,3404192.5720834415,57016.00000000001,35396965.72083442
+group-2;very wet;moderate;dry,31935757.148750972,3404192.5720834415,57016.00000000001,35396965.72083442
+group-2;very wet;moderate;moderate,31935757.148750972,3404192.5720834415,57016.00000000001,35396965.72083442
+group-2;very wet;moderate;moist,31935757.148750972,3404192.5720834415,57016.00000000001,35396965.72083442
+group-2;very wet;moderate;wet,31935757.148750972,3404192.5720834415,57016.00000000001,35396965.72083442
+group-2;very wet;moderate;very wet,31935757.148750972,3404192.5720834415,57016.00000000001,35396965.72083442
+group-2;very wet;moist;very dry,30811610.348750975,3279287.372083442,57016.00000000001,34147913.72083442
+group-2;very wet;moist;dry,30811610.348750975,3279287.372083442,57016.00000000001,34147913.72083442
+group-2;very wet;moist;moderate,30811610.348750975,3279287.372083442,57016.00000000001,34147913.72083442
+group-2;very wet;moist;moist,30811610.348750975,3279287.372083442,57016.00000000001,34147913.72083442
+group-2;very wet;moist;wet,30811610.348750975,3279287.372083442,57016.00000000001,34147913.72083442
+group-2;very wet;moist;very wet,30811610.348750975,3279287.372083442,57016.00000000001,34147913.72083442
+group-2;very wet;wet;very dry,29462634.188750975,3129401.1320834416,57016.00000000001,32649051.320834417
+group-2;very wet;wet;dry,29462634.188750975,3129401.1320834416,57016.00000000001,32649051.320834417
+group-2;very wet;wet;moderate,29462634.188750975,3129401.1320834416,57016.00000000001,32649051.320834417
+group-2;very wet;wet;moist,29462634.188750975,3129401.1320834416,57016.00000000001,32649051.320834417
+group-2;very wet;wet;wet,29462634.188750975,3129401.1320834416,57016.00000000001,32649051.320834417
+group-2;very wet;wet;very wet,29462634.188750975,3129401.1320834416,57016.00000000001,32649051.320834417
+group-2;very wet;very wet;very dry,27214340.588750973,2879590.7320834417,57016.00000000001,30150947.32083442
+group-2;very wet;very wet;dry,27214340.588750973,2879590.7320834417,57016.00000000001,30150947.32083442
+group-2;very wet;very wet;moderate,27214340.588750973,2879590.7320834417,57016.00000000001,30150947.32083442
+group-2;very wet;very wet;moist,27214340.588750973,2879590.7320834417,57016.00000000001,30150947.32083442
+group-2;very wet;very wet;wet,27214340.588750973,2879590.7320834417,57016.00000000001,30150947.32083442
+group-2;very wet;very wet;very wet,27214340.588750973,2879590.7320834417,57016.00000000001,30150947.32083442
