@@ -151,7 +151,7 @@ _DEFAULTS = {
                     # percent, from 1 to 100;  consume package defaults to 5%
                     'defaults': {
                         'rx': 5,
-                        'wf': 5,
+                        'wildfire': 5,
                         'other': 5,
                     },
                 },
@@ -159,7 +159,7 @@ _DEFAULTS = {
                     # consume package defaults to 5mph
                     'defaults': {
                         'rx': 6,
-                        'wf': 6,
+                        'wildfire': 6,
                         'other': 6,
                     },
                     # TODO: is 'max_wind' a valid synonym? or 'min_wind_aloft'?
@@ -167,7 +167,7 @@ _DEFAULTS = {
                 'days_since_rain': {
                     'defaults': {
                         'rx': 10,
-                        'wf': 10,
+                        'wildfire': 10,
                         'other': 10,
                     },
                     'synonyms': ['rain_days'] # TODO: confirm
@@ -176,7 +176,7 @@ _DEFAULTS = {
                     # consume package defaults to 50%
                     'defaults': {
                         'rx': 50,
-                        'wf': 50,
+                        'wildfire': 50,
                         'other': 50,
                     },
                     'synonyms': ['moisture_10hr'] # TODO: confirm
@@ -185,7 +185,7 @@ _DEFAULTS = {
                     # in minutes
                     'defaults': {
                         'rx': 120,
-                        'wf': 120,
+                        'wildfire': 120,
                         'other': 120,
                     },
                 },
@@ -193,7 +193,7 @@ _DEFAULTS = {
                     # consume package defaults to 'MEAS-Th'
                     'defaults': {
                         'rx': 'MEAS-Th',
-                        'wf': 'MEAS-Th',
+                        'wildfire': 'MEAS-Th',
                         'other': 'MEAS-Th',
                     },
                 }
@@ -202,7 +202,7 @@ _DEFAULTS = {
                 'fuel_moisture_1000hr_pct': {
                     'defaults': {
                         'rx': 35,
-                        'wf': 15,
+                        'wildfire': 15,
                         'other': 15,
                     },
                     'synonyms': ['moisture_1khr'] # TODO: confirm
@@ -210,7 +210,7 @@ _DEFAULTS = {
                 'fuel_moisture_duff_pct': {
                     'defaults': {
                         'rx': 100,
-                        'wf': 40,
+                        'wildfire': 40,
                         'other': 40,
                     },
                     'synonyms': ['moisture_duff'] # TODO: confirm
@@ -218,7 +218,7 @@ _DEFAULTS = {
                 'fuel_moisture_litter_pct': {
                     'defaults': {
                         'rx': 22,
-                        'wf': 10,
+                        'wildfire': 10,
                         'other': 10,
                     },
                     'synonyms': ['moisture_litter'] # TODO: confirm
@@ -226,7 +226,7 @@ _DEFAULTS = {
                 'canopy_consumption_pct': {
                     'defaults': {
                         'rx': 0,
-                        'wf': 0,
+                        'wildfire': 0,
                         'other': 0,
                     },
                     # TDOO: is 'canopy' a valid synonym
@@ -234,7 +234,7 @@ _DEFAULTS = {
                 'shrub_blackened_pct': {
                     'defaults': {
                         'rx': 50,
-                        'wf': 50,
+                        'wildfire': 50,
                         'other': 50,
                     },
                     # TODO: is 'shrub' a valid synonym
@@ -242,28 +242,28 @@ _DEFAULTS = {
                 'pile_blackened_pct': {
                     'defaults': {
                         'rx': 0,
-                        'wf': 0,
+                        'wildfire': 0,
                         'other': 0,
                     },
                 },
                 'duff_pct_available': {
                     'defaults': {
                         'rx': 5,
-                        'wf': 10,
+                        'wildfire': 10,
                         'other': 10,
                     },
                 },
                 'sound_cwd_pct_available': {
                     'defaults': {
                         'rx': 5,
-                        'wf': 10,
+                        'wildfire': 10,
                         'other': 10,
                     },
                 },
                 'rotten_cwd_pct_available': {
                     'defaults': {
                         'rx': 5,
-                        'wf': 10,
+                        'wildfire': 10,
                         'other': 10,
                     },
                 }

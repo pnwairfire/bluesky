@@ -241,7 +241,7 @@ Examples:
     {script} -m fccs-ids
     {script} -m fccs-ids -i 1,2,3
     {script} -m coordinates -c "45.1,-120;34,-114.2"
-    {script} -m coordinates -t wf -a 1000 --indented-output \\
+    {script} -m coordinates -t wildfire -a 1000 --indented-output \\
         --produce-emissions-csv --run-through-plumerise
 
  """.format(script=sys.argv[0])
@@ -254,8 +254,8 @@ def parse_args():
         help="comma-dilimited list of fccs ids to run")
     parser.add_argument('-c','--coordinates',
         help="semi-colon-dilimited list of coordinages; e.g. '45,-123;33,-119'")
-    parser.add_argument('-t', '--fire-type', default="wf",
-        help="'wf' or 'rx'; default 'wf'")
+    parser.add_argument('-t', '--fire-type', default="wildfire",
+        help="'wildfire' or 'rx'; default 'wildfire'")
     parser.add_argument('-a', '--area', default=DEFAULT_AREA,
         type=float, help="Are per fire; default {}".format(DEFAULT_AREA))
     parser.add_argument('-e', '--ecoregion', default="western",

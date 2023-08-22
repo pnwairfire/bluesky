@@ -31,7 +31,7 @@ __all__ = [
 """
 We pre-compute CONSUME for every combination of the following parameters
   - FCCS Group
-  - Fire type - 'rx', 'wf' (which determines values for
+  - Fire type - 'rx', 'wildfire' (which determines values for
     'canopy_consumption_pct', 'shrub_blackened_pct', 'pile_blackened_pct',
     'duff_pct_available', 'sound_cwd_pct_available', and 'rotten_cwd_pct_available'
   - Burn (fire) type - 'natural', 'activity' (which determines
@@ -86,12 +86,12 @@ FCCS_GROUPS = {
 }
 FCCS_ID_TO_GROUP = {str(f): g for g in FCCS_GROUPS for f in FCCS_GROUPS[g] }
 
-FIRE_TYPES = ['rx', 'wf']
+FIRE_TYPES = ['rx', 'wildfire']
 BURN_TYPES = ['natural', 'activity'] # a.k.a. 'fuel_type'
 ECOREGIONS =  ["western", "southern", "boreal"]
 SEASONS = ['spring', 'summer', 'fall', 'winter']
 
-# Activity settings are the same for rx and wf
+# Activity settings are the same for rx and wildfire
 ACTIVITY_SETTINGS = {
     'slope': 5,
     'windspeed': 6,
@@ -112,16 +112,16 @@ ACTIVITY_SETTINGS = {
 # }
 
 OTHER_SETTINGS = {
-    'canopy_consumption_pct': {'rx': 0, 'wf': 0},
-    'shrub_blackened_pct': {'rx': 50, 'wf': 50},
-    'pile_blackened_pct': {'rx': 0, 'wf': 0},
-    'duff_pct_available': {'rx': 5, 'wf': 10},
-    'sound_cwd_pct_available': {'rx': 5, 'wf': 10},
-    'rotten_cwd_pct_available': {'rx': 5, 'wf': 10}
+    'canopy_consumption_pct': {'rx': 0, 'wildfire': 0},
+    'shrub_blackened_pct': {'rx': 50, 'wildfire': 50},
+    'pile_blackened_pct': {'rx': 0, 'wildfire': 0},
+    'duff_pct_available': {'rx': 5, 'wildfire': 10},
+    'sound_cwd_pct_available': {'rx': 5, 'wildfire': 10},
+    'rotten_cwd_pct_available': {'rx': 5, 'wildfire': 10}
 }
 
 FM_LEVELS = {
-    'fuel_moisture_1000hr_pct': [  # normal defualts: {'rx': 35, 'wf': 15},
+    'fuel_moisture_1000hr_pct': [  # normal defualts: {'rx': 35, 'wildfire': 15},
         {'level': 'very dry', 'up_to': 12.5, 'input_val': 10},
         {'level': 'dry', 'up_to': 22.5, 'input_val': 15},
         {'level': 'moderate', 'up_to': 32.5, 'input_val': 30},
@@ -129,7 +129,7 @@ FM_LEVELS = {
         {'level': 'wet', 'up_to': 50.5, 'input_val': 40},
         {'level': 'very wet', 'up_to': None, 'input_val': 60}
     ],
-    'fuel_moisture_duff_pct': [  # normal defualts: {'rx': 100, 'wf': 40},
+    'fuel_moisture_duff_pct': [  # normal defualts: {'rx': 100, 'wildfire': 40},
         {'level': 'very dry', 'up_to': 30, 'input_val': 20},
         {'level': 'dry', 'up_to': 57.2, 'input_val': 40},
         {'level': 'moderate', 'up_to': 87.5, 'input_val': 75},
@@ -137,7 +137,7 @@ FM_LEVELS = {
         {'level': 'wet', 'up_to': 150, 'input_val': 130},
         {'level': 'very wet', 'up_to': None, 'input_val': 180}
     ],
-    'fuel_moisture_litter_pct': [  # normal defualts: {'rx': 22, 'wf': 10},
+    'fuel_moisture_litter_pct': [  # normal defualts: {'rx': 22, 'wildfire': 10},
         {'level': 'very dry', 'up_to': 7, 'input_val': 4},
         {'level': 'dry', 'up_to': 13, 'input_val': 10},
         {'level': 'moderate', 'up_to': 19, 'input_val': 16},
