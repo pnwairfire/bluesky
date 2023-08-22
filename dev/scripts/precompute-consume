@@ -19,6 +19,7 @@ EXAMPLES_STRING = """
 Examples:
 
     {script}
+    {script} -f rx -b natural -e western -s spring
 
  """.format(script=sys.argv[0])
 
@@ -27,16 +28,16 @@ def parse_args():
     # parser.add_argument('--indented-output', default=False,
     #     action="store_true", help="produce indented output")
     parser.add_argument('--log-level', default="INFO", help="Log level")
-    parser.add_argument('-f', '--fire-type', action="store_true",
+    parser.add_argument('-f', '--fire-type',
         help=f"Only create precomputed data files for one fire type."
               " Options: '{', '.join(FIRE_TYPES)}'")
-    parser.add_argument('-b', '--burn-type', action="store_true",
+    parser.add_argument('-b', '--burn-type',
         help=f"Only create precomputed data files for one burn type."
               " Options: '{', '.join(BURN_TYPES)}'")
-    parser.add_argument('-e', '--ecoregion', action="store_true",
+    parser.add_argument('-e', '--ecoregion',
         help=f"Only create precomputed data files for one fire ecoregion."
               " Options: '{', '.join(ECOREGIONS)}'")
-    parser.add_argument('-s', '--season', action="store_true",
+    parser.add_argument('-s', '--season',
         help=f"Only create precomputed data files for one fire season."
               " Options: '{', '.join(SEASONS)}'")
 
