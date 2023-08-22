@@ -79,7 +79,7 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
             season = datetimeutils.season_from_date(aa.get('start'))
             for loc in aa.locations:
                 for fb in loc['fuelbeds']:
-                    if Config().get('consumption','use_precomputed_data'):
+                    if Config().get('consumption', 'precomputed', 'enabled'):
                         try:
                             _lookup_precomputed(fb, loc, fuel_loadings_manager,
                                 season, burn_type, fire_type)
@@ -87,10 +87,13 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
                         except Exception as e:
                             logging.warning("Failed to look up precomputed consume data."
                                 " Running conume in realtime. Error: %s", e)
-                            fb.pop("consumption", None)
-                            fb.pop("heat", None)
-                            _run_fuelbed(fb, loc, fuel_loadings_manager, season,
-                                burn_type, fire_type, msg_level)
+                            if Config().get('consumption', 'precomputed', 'run_consume_on_failure'):
+                                fb.pop("consumption", None)
+                                fb.pop("heat", None)
+                                _run_fuelbed(fb, loc, fuel_loadings_manager, season,
+                                    burn_type, fire_type, msg_level)
+                            else:
+                                raise
 
                     else:
                         _run_fuelbed(fb, loc, fuel_loadings_manager, season,
