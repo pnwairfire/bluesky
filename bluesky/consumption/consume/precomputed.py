@@ -296,13 +296,13 @@ def precompute(options):
 
     fire_types = [options.fire_type.lower()] if options.fire_type else FIRE_TYPES
     burn_types = [options.burn_type.lower()] if options.burn_type else BURN_TYPES
-    ecoregion = [options.ecoregion.lower()] if options.ecoregion else ECOREGIONS
-    season = [options.season.lower()] if options.season else SEASONS
+    ecoregions = [options.ecoregion.lower()] if options.ecoregion else ECOREGIONS
+    seasons = [options.season.lower()] if options.season else SEASONS
 
-    for fire_type in FIRE_TYPES:
-        for burn_type in BURN_TYPES:
-            for ecoregion in ECOREGIONS:
-                for season in SEASONS:
+    for fire_type in fire_types:
+        for burn_type in burn_types:
+            for ecoregion in ecoregions:
+                for season in seasons:
                     precompute_file(fire_type, burn_type, ecoregion,
                         season, cons_fieldnames, heat_fieldnames)
 
