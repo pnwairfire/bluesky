@@ -158,10 +158,10 @@ for k in FM_LEVELS:
 
 KEY_JOIN_CHAR = ';'
 
-def create_key(fire_type, burn_type, ecoregion, season, fccs_group,
-        thousand_hr_fm_level, duff_fm_level, litter_fm_level):
-    return KEY_JOIN_CHAR.join([fire_type, burn_type, ecoregion, season, fccs_group,
-        thousand_hr_fm_level, duff_fm_level, litter_fm_level])
+def create_key(fccs_group, thousand_hr_fm_level, duff_fm_level, litter_fm_level):
+    return KEY_JOIN_CHAR.join([
+        fccs_group, thousand_hr_fm_level, duff_fm_level, litter_fm_level
+    ])
 
 HEADER_JOIN_CHAR = ';'
 
@@ -194,11 +194,13 @@ def flat_to_nested(flat_dict):
 
     return nested_dict
 
-def get_consumption_data_filename():
-    return os.path.join(os.path.dirname(__file__), 'data', 'precomputed-consumption.csv')
+def get_consumption_data_filename(fire_type, burn_type, ecoregion, season):
+    return os.path.join(os.path.dirname(__file__), 'data',
+        f"precomputed-consumption-{fire_type}-{burn_type}-{ecoregion}-{season}.csv")
 
-def get_heat_data_filename():
-    return os.path.join(os.path.dirname(__file__), 'data', 'precomputed-heat.csv')
+def get_heat_data_filename(fire_type, burn_type, ecoregion, season):
+    return os.path.join(os.path.dirname(__file__), 'data',
+        f"precomputed-heat-{fire_type}-{burn_type}-{ecoregion}-{season}.csv")
 
 
 ##
@@ -243,54 +245,66 @@ def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
 
     return r
 
-def precompute():
-    #fuel_loadings_manager = FuelLoadingsManager()
+def get_fieldnames():
+    nested_results = run_consume(FIRE_TYPES[0], BURN_TYPES[0], ECOREGIONS[0],
+        SEASONS[0], list(FCCS_GROUPS)[0],
+        list(FM_INPUT_VALS['fuel_moisture_1000hr_pct'])[0],
+        list(FM_INPUT_VALS['fuel_moisture_duff_pct'])[0],
+        list(FM_INPUT_VALS['fuel_moisture_litter_pct'])[0])
 
-    # We'll instantiate once we have fiel
+    flat_cons = nested_to_flat(nested_results['consumption'])
 
-    with open(get_consumption_data_filename(), 'w') as cons_csvfile:
-        with open(get_heat_data_filename(), 'w') as heat_csvfile:
+    flat_heat = nested_to_flat(nested_results['heat release'])
+
+
+    return ['key'] + list(flat_cons), ['key'] + list(flat_heat)
+
+def precompute_file(fire_type, burn_type, ecoregion, season, cons_fieldnames, heat_fieldnames):
+    cons_filename = get_consumption_data_filename(fire_type, burn_type, ecoregion, season)
+    heat_filename = get_heat_data_filename(fire_type, burn_type, ecoregion, season)
+
+    with open(cons_filename, 'w') as cons_csvfile:
+        with open(heat_filename, 'w') as heat_csvfile:
             # run consume once to get field names
-            nested_results = run_consume(FIRE_TYPES[0], BURN_TYPES[0], ECOREGIONS[0],
-                SEASONS[0], list(FCCS_GROUPS)[0],
-                list(FM_INPUT_VALS['fuel_moisture_1000hr_pct'])[0],
-                list(FM_INPUT_VALS['fuel_moisture_duff_pct'])[0],
-                list(FM_INPUT_VALS['fuel_moisture_litter_pct'])[0])
-
-            flat_cons = nested_to_flat(nested_results['consumption'])
-            cons_fieldnames = ['key'] + list(flat_cons)
             cons_writer = csv.DictWriter(cons_csvfile, fieldnames=cons_fieldnames)
             cons_writer.writeheader()
 
-            flat_heat = nested_to_flat(nested_results['heat release'])
-            heat_fieldnames = ['key'] + list(flat_heat)
             heat_writer = csv.DictWriter(heat_csvfile, fieldnames=heat_fieldnames)
             heat_writer.writeheader()
 
-            for fire_type in FIRE_TYPES:
-                for burn_type in BURN_TYPES:
-                    for ecoregion in ECOREGIONS:
-                        for season in SEASONS:
-                            for fccs_group in FCCS_GROUPS:
-                                for thousand_hr_fm_level in FM_INPUT_VALS['fuel_moisture_1000hr_pct']:
-                                    for duff_fm_level in FM_INPUT_VALS['fuel_moisture_duff_pct']:
-                                        for litter_fm_level in FM_INPUT_VALS['fuel_moisture_litter_pct']:
-                                            nested_results = run_consume(fire_type,
-                                                burn_type, ecoregion, season,
-                                                fccs_group, thousand_hr_fm_level,
-                                                duff_fm_level, litter_fm_level)
-                                            key = create_key(fire_type,
-                                                burn_type, ecoregion, season,
-                                                fccs_group, thousand_hr_fm_level,
-                                                duff_fm_level, litter_fm_level)
+            for fccs_group in FCCS_GROUPS:
+                for thousand_hr_fm_level in FM_INPUT_VALS['fuel_moisture_1000hr_pct']:
+                    for duff_fm_level in FM_INPUT_VALS['fuel_moisture_duff_pct']:
+                        for litter_fm_level in FM_INPUT_VALS['fuel_moisture_litter_pct']:
+                            nested_results = run_consume(fire_type,
+                                burn_type, ecoregion, season,
+                                fccs_group, thousand_hr_fm_level,
+                                duff_fm_level, litter_fm_level)
+                            key = create_key(fccs_group, thousand_hr_fm_level,
+                                duff_fm_level, litter_fm_level)
 
-                                            flat_cons = nested_to_flat(nested_results['consumption'])
-                                            flat_cons['key'] = key
-                                            cons_writer.writerow(flat_cons)
+                            flat_cons = nested_to_flat(nested_results['consumption'])
+                            flat_cons['key'] = key
+                            cons_writer.writerow(flat_cons)
 
-                                            flat_heat = nested_to_flat(nested_results['heat release'])
-                                            flat_heat['key'] = key
-                                            heat_writer.writerow(flat_heat)
+                            flat_heat = nested_to_flat(nested_results['heat release'])
+                            flat_heat['key'] = key
+                            heat_writer.writerow(flat_heat)
+
+def precompute(options):
+    cons_fieldnames, heat_fieldnames = get_fieldnames()
+
+    fire_types = [options.fire_type.lower()] if options.fire_type else FIRE_TYPES
+    burn_types = [options.burn_type.lower()] if options.burn_type else BURN_TYPES
+    ecoregion = [options.ecoregion.lower()] if options.ecoregion else ECOREGIONS
+    season = [options.season.lower()] if options.season else SEASONS
+
+    for fire_type in FIRE_TYPES:
+        for burn_type in BURN_TYPES:
+            for ecoregion in ECOREGIONS:
+                for season in SEASONS:
+                    precompute_file(fire_type, burn_type, ecoregion,
+                        season, cons_fieldnames, heat_fieldnames)
 
 
 ##
@@ -304,19 +318,24 @@ class ConsumeLookup(object):
     This is a Singleton, so that data are loaded only once
     """
 
-    def __new__(cls):
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(ConsumeLookup, cls).__new__(cls)
-        return cls.instance
+    instances = {}
 
-    def __init__(self):
-        self._load()
+    def __new__(cls, fire_type, burn_type, ecoregion, season):
+        i_key = '-'.join([fire_type, burn_type, ecoregion, season])
+        if i_key not in cls.instances:
+            cls.instances[i_key] = super(ConsumeLookup, cls).__new__(cls)
+        return cls.instances[i_key]
 
-    def _load(self):
+    def __init__(self, fire_type, burn_type, ecoregion, season):
+        self._load(fire_type, burn_type, ecoregion, season)
+
+    def _load(self, fire_type, burn_type, ecoregion, season):
         if not hasattr(self, '_consumption_data'):
-            self._consumption_data = self._load_file(get_consumption_data_filename())
+            self._consumption_data = self._load_file(
+                get_consumption_data_filename(fire_type, burn_type, ecoregion, season))
         if not hasattr(self, '_heat_data'):
-            self._heat_data = self._load_file(get_heat_data_filename())
+            self._heat_data = self._load_file(
+                get_heat_data_filename(fire_type, burn_type, ecoregion, season))
 
     def _load_file(self, filename):
         data = {}
@@ -354,16 +373,21 @@ def get_fm_level(key, fm_val, season):
 
 def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
         thousand_hr_fm, duff_fm, litter_fm):
-    # TODO:
-    #  - use Singleton lookup object
-    #  - determine FM categories
-    #  - create key from parameters
-    #  - look up data using key
-    #  - unflatten dict
-    #  - convert scalar vals to arrays (to match consumption output)
+    fire_type = fire_type.lower()
+    burn_type = burn_type.lower()
+    ecoregion = ecoregion.lower()
+    season = season.lower()
 
     if fccs_id not in FCCS_ID_TO_GROUP:
         raise RuntimeError(f"Invalid FCCS Id {fccs_id}")
+    if fire_type not in FIRE_TYPES:
+        raise RuntimeError(f"Invalid fire type {fire_type}")
+    if burn_type not in BURN_TYPES:
+        raise RuntimeError(f"Invalid burn type {burn_type}")
+    if ecoregion not in ECOREGIONS:
+        raise RuntimeError(f"Invalid ecoregion {ecoregion}")
+    if season not in SEASONS:
+        raise RuntimeError(f"Invalid season {season}")
 
     thousand_hr_fm_level = get_fm_level('fuel_moisture_1000hr_pct', thousand_hr_fm, season)
     duff_fm_level = get_fm_level('fuel_moisture_duff_pct', duff_fm, season)
@@ -374,15 +398,7 @@ def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
     logging.debug("Litter FM %s -> %s", litter_fm, litter_fm_level)
 
     fccs_group = FCCS_ID_TO_GROUP[fccs_id]
-    key = create_key(
-        fire_type.lower(),
-        burn_type.lower(),
-        ecoregion.lower(),
-        season.lower(),
-        fccs_group,
-        thousand_hr_fm_level,
-        duff_fm_level,
-        litter_fm_level
-    )
+    key = create_key(fccs_group, thousand_hr_fm_level,
+        duff_fm_level, litter_fm_level)
 
-    return ConsumeLookup().get(key)
+    return ConsumeLookup(fire_type, burn_type, ecoregion, season).get(key)

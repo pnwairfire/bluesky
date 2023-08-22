@@ -27,6 +27,18 @@ def parse_args():
     # parser.add_argument('--indented-output', default=False,
     #     action="store_true", help="produce indented output")
     parser.add_argument('--log-level', default="INFO", help="Log level")
+    parser.add_argument('-f', '--fire-type', action="store_true",
+        help=f"Only create precomputed data files for one fire type."
+              " Options: '{', '.join(FIRE_TYPES)}'")
+    parser.add_argument('-b', '--burn-type', action="store_true",
+        help=f"Only create precomputed data files for one burn type."
+              " Options: '{', '.join(BURN_TYPES)}'")
+    parser.add_argument('-e', '--ecoregion', action="store_true",
+        help=f"Only create precomputed data files for one fire ecoregion."
+              " Options: '{', '.join(ECOREGIONS)}'")
+    parser.add_argument('-s', '--season', action="store_true",
+        help=f"Only create precomputed data files for one fire season."
+              " Options: '{', '.join(SEASONS)}'")
 
     parser.epilog = EXAMPLES_STRING
     parser.formatter_class = argparse.RawTextHelpFormatter
@@ -50,7 +62,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    precompute()
+    precompute(args)
 
 if __name__ == "__main__":
     main()
