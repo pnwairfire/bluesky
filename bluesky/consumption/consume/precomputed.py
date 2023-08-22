@@ -334,10 +334,15 @@ class ConsumeLookup(object):
     def get(self, key):
         return self._consumption_data[key], self._heat_data[key]
 
-def get_fm_level(key, fm_val):
+SEASONAL_FM_LEVELS = {
+    'spring': 'moist',
+    'summer': 'dry',
+    'fall': 'moderate',
+    'winter': 'dry' #???
+}
+def get_fm_level(key, fm_val, season):
     if not fm_val:
-        # TODO: is this appropriate?
-        return 'moderate'
+        return SEASONAL_FM_LEVELS[season.lower()]
 
     for l in FM_LEVELS[key]:
         if not l['up_to'] or fm_val < l['up_to']:
@@ -360,9 +365,9 @@ def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
     if fccs_id not in FCCS_ID_TO_GROUP:
         raise RuntimeError(f"Invalid FCCS Id {fccs_id}")
 
-    thousand_hr_fm_level = get_fm_level('fuel_moisture_1000hr_pct', thousand_hr_fm)
-    duff_fm_level = get_fm_level('fuel_moisture_duff_pct', duff_fm)
-    litter_fm_level = get_fm_level('fuel_moisture_litter_pct', litter_fm)
+    thousand_hr_fm_level = get_fm_level('fuel_moisture_1000hr_pct', thousand_hr_fm, season)
+    duff_fm_level = get_fm_level('fuel_moisture_duff_pct', duff_fm, season)
+    litter_fm_level = get_fm_level('fuel_moisture_litter_pct', litter_fm, season)
 
     logging.debug("100hr FM %s -> %s", thousand_hr_fm, thousand_hr_fm_level)
     logging.debug("Duff FM %s -> %s", duff_fm, duff_fm_level)
