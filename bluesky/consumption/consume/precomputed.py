@@ -190,7 +190,7 @@ def flat_to_nested(flat_dict):
             d[f] = {} if f not in d else d[f]
             prev = d
             d = d[f]
-        prev[f] = numpy.array(flat_dict[k])
+        prev[f] = numpy.array([float(flat_dict[k])])
 
     return nested_dict
 
