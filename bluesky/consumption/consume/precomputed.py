@@ -116,6 +116,14 @@ OTHER_SETTINGS = {
 }
 
 FM_LEVELS = {
+
+    # TODO: defaults for each moisture level shyould be per region
+    #   from Ernesto:
+    #      Th values depend on the regions. There are values for
+    #      the NW (Ottmar’s work), there are also values for the
+    #      SE (Dale Wade’s publications). The values are related
+    #      to moisture of extinction.
+
     'fuel_moisture_1000hr_pct': [  # normal defualts: {'rx': 35, 'wildfire': 15},
         {'level': 'very dry', 'up_to': 12.5, 'input_val': 10},
         {'level': 'dry', 'up_to': 22.5, 'input_val': 15},
@@ -185,6 +193,8 @@ def flat_to_nested(flat_dict):
             d[f] = {} if f not in d else d[f]
             prev = d
             d = d[f]
+        # TODO: is there a way to explicitly create an numpy.ndarray ?
+        #    https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html
         prev[f] = numpy.array([float(flat_dict[k])])
 
     return nested_dict
@@ -224,11 +234,10 @@ def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
             setattr(fc, k, v)
 
     for k, vDict in OTHER_SETTINGS.items():
-        #logging.warn("Setting %s to %s", k, vDict[fire_type])
+        #logging.debug("Setting %s to %s", k, vDict[fire_type])
         try:
             setattr(fc, k, vDict[fire_type])
         except Exception as e:
-            # TODO: figure out why we're failing to set some inputs
             logging.warn("Failed to set %s: %s", k, e)
 
     fc.fuel_moisture_1000hr_pct = FM_INPUT_VALS['fuel_moisture_1000hr_pct'][thousand_hr_fm_level]
