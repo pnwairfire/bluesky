@@ -448,8 +448,7 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
     #     self._heat_data = numpy.array([[heat_data[f] for f in CONSUME_FIELDS]])
 
 
-# This comes from a paper on consume
-# #TODO:
+# From https://www.researchgate.net/publication/265929605_Consume_30_User's_Guide
 ECOREGIONS = {
     'western': [210, 220, 240, 250, 260, 330, 340],
     'southern': [230, 310, 320, 410, 420],
