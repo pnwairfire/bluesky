@@ -19,7 +19,7 @@ EXAMPLES_STRING = """
 Examples:
 
     {script}
-    {script} -f rx -b natural -e western -s spring
+    {script} --log-level DEBUG -f wildfire -b natural -s summer
 
  """.format(script=sys.argv[0])
 
@@ -34,9 +34,6 @@ def parse_args():
     parser.add_argument('-b', '--burn-type',
         help=f"Only create precomputed data files for one burn type."
               " Options: '{', '.join(BURN_TYPES)}'")
-    parser.add_argument('-e', '--ecoregion',
-        help=f"Only create precomputed data files for one fire ecoregion."
-              " Options: '{', '.join(ECOREGIONS)}'")
     parser.add_argument('-s', '--season',
         help=f"Only create precomputed data files for one fire season."
               " Options: '{', '.join(SEASONS)}'")

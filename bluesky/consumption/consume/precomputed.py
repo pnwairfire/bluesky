@@ -8,13 +8,12 @@ import os
 import consume
 import numpy
 
-from .consumeutils import FuelLoadingsManager
+from .consumeutils import FuelLoadingsManager, ECO_REGION_BY_FCCS_ID
 
 __all__ = [
     'FCCS_GROUPS',
     'FIRE_TYPES',
     'BURN_TYPES',
-    'ECOREGIONS',
     'SEASONS',
     'ACTIVITY_SETTINGS',
     # 'VARIABLE_ACTIVITY_SETTINGS',
@@ -36,7 +35,6 @@ We pre-compute CONSUME for every combination of the following parameters
     'duff_pct_available', 'sound_cwd_pct_available', and 'rotten_cwd_pct_available'
   - Burn (fire) type - 'natural', 'activity' (which determines
     which input fields are passed into CONSUME
-  - Ecoregion - "western", "southern", "boreal"
   - Season - 'spring', 'summer', 'fall', 'winter'
   - 1000hr moisture level - 'very dry', 'dry', 'moderate', 'moist', 'wet', 'very wet'
   - Duff moisture level - 'very dry', 'dry', 'moderate', 'moist', 'wet', 'very wet'
@@ -79,11 +77,13 @@ FCCS_GROUPS = {
     "group-1241": [1241, 1242, 1243, 1244, 1245, 1247, 1252, 1260, 1261, 1262, 1271, 1273],
     "group-1280": [1280, 1281, 1290, 1291, 1292, 1293, 1294, 1295, 1296, 1297, 1298, 1299],
 }
-FCCS_ID_TO_GROUP = {str(f): g for g in FCCS_GROUPS for f in FCCS_GROUPS[g] }
+for g in FCCS_GROUPS:
+    FCCS_GROUPS[g] = [str(fccs_id) for fccs_id in FCCS_GROUPS[g]]
+
+FCCS_ID_TO_GROUP = {f: g for g in FCCS_GROUPS for f in FCCS_GROUPS[g] }
 
 FIRE_TYPES = ['rx', 'wildfire']
 BURN_TYPES = ['natural', 'activity'] # a.k.a. 'fuel_type'
-ECOREGIONS =  ["western", "southern", "boreal"]
 SEASONS = ['spring', 'summer', 'fall', 'winter']
 
 # Activity settings are the same for rx and wildfire
@@ -199,27 +199,31 @@ def flat_to_nested(flat_dict):
 
     return nested_dict
 
-def get_consumption_data_filename(fire_type, burn_type, ecoregion, season):
+def get_consumption_data_filename(fire_type, burn_type, season):
     return os.path.join(os.path.dirname(__file__), 'data',
-        f"precomputed-consumption-{fire_type}-{burn_type}-{ecoregion}-{season}.csv")
+        f"precomputed-consumption-{fire_type}-{burn_type}-{season}.csv")
 
-def get_heat_data_filename(fire_type, burn_type, ecoregion, season):
+def get_heat_data_filename(fire_type, burn_type, season):
     return os.path.join(os.path.dirname(__file__), 'data',
-        f"precomputed-heat-{fire_type}-{burn_type}-{ecoregion}-{season}.csv")
+        f"precomputed-heat-{fire_type}-{burn_type}-{season}.csv")
 
 
 ##
 ## Generation of data
 ##
 
-def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
+def run_consume(fire_type, burn_type, season, fccs_group,
         thousand_hr_fm_level, duff_fm_level, litter_fm_level):
     # It may be more efficient to create one FuelConsumption
     # object for all runs, but it's safer to start with a clean
     # slate for each run
     fc = consume.FuelConsumption()
     fc.burn_type = burn_type
-    fc.fuelbed_ecoregion = [ecoregion]
+
+    fccs_id = FCCS_GROUPS[fccs_group][0]
+
+    # TODO: get ecoregion from FCCS Id from consume's fuel loadings file
+    fc.fuelbed_ecoregion = ECO_REGION_BY_FCCS_ID[fccs_id]
     fc.season = [season]
     fc.fuelbed_area_acres = [1]
 
@@ -227,7 +231,7 @@ def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
 
     # TODO: pick the most representative FCCS Id
     #    (for now we're just using the first)
-    fc.fuelbed_fccs_ids = [FCCS_GROUPS[fccs_group][0]]
+    fc.fuelbed_fccs_ids = [fccs_id]
 
     if burn_type == 'activity':
         for k, v in ACTIVITY_SETTINGS.items():
@@ -250,7 +254,7 @@ def run_consume(fire_type, burn_type, ecoregion, season, fccs_group,
     return r
 
 def get_fieldnames():
-    nested_results = run_consume(FIRE_TYPES[0], BURN_TYPES[0], ECOREGIONS[0],
+    nested_results = run_consume(FIRE_TYPES[0], BURN_TYPES[0],
         SEASONS[0], list(FCCS_GROUPS)[0],
         list(FM_INPUT_VALS['fuel_moisture_1000hr_pct'])[0],
         list(FM_INPUT_VALS['fuel_moisture_duff_pct'])[0],
@@ -263,9 +267,9 @@ def get_fieldnames():
 
     return ['key'] + list(flat_cons), ['key'] + list(flat_heat)
 
-def precompute_file(fire_type, burn_type, ecoregion, season, cons_fieldnames, heat_fieldnames):
-    cons_filename = get_consumption_data_filename(fire_type, burn_type, ecoregion, season)
-    heat_filename = get_heat_data_filename(fire_type, burn_type, ecoregion, season)
+def precompute_file(fire_type, burn_type, season, cons_fieldnames, heat_fieldnames):
+    cons_filename = get_consumption_data_filename(fire_type, burn_type, season)
+    heat_filename = get_heat_data_filename(fire_type, burn_type, season)
 
     with open(cons_filename, 'w') as cons_csvfile:
         with open(heat_filename, 'w') as heat_csvfile:
@@ -281,7 +285,7 @@ def precompute_file(fire_type, burn_type, ecoregion, season, cons_fieldnames, he
                     for duff_fm_level in FM_INPUT_VALS['fuel_moisture_duff_pct']:
                         for litter_fm_level in FM_INPUT_VALS['fuel_moisture_litter_pct']:
                             nested_results = run_consume(fire_type,
-                                burn_type, ecoregion, season,
+                                burn_type, season,
                                 fccs_group, thousand_hr_fm_level,
                                 duff_fm_level, litter_fm_level)
                             key = create_key(fccs_group, thousand_hr_fm_level,
@@ -300,15 +304,13 @@ def precompute(options):
 
     fire_types = [options.fire_type.lower()] if options.fire_type else FIRE_TYPES
     burn_types = [options.burn_type.lower()] if options.burn_type else BURN_TYPES
-    ecoregions = [options.ecoregion.lower()] if options.ecoregion else ECOREGIONS
     seasons = [options.season.lower()] if options.season else SEASONS
 
     for fire_type in fire_types:
         for burn_type in burn_types:
-            for ecoregion in ecoregions:
-                for season in seasons:
-                    precompute_file(fire_type, burn_type, ecoregion,
-                        season, cons_fieldnames, heat_fieldnames)
+            for season in seasons:
+                precompute_file(fire_type, burn_type,
+                    season, cons_fieldnames, heat_fieldnames)
 
 
 ##
@@ -324,22 +326,22 @@ class ConsumeLookup(object):
 
     instances = {}
 
-    def __new__(cls, fire_type, burn_type, ecoregion, season):
-        i_key = '-'.join([fire_type, burn_type, ecoregion, season])
+    def __new__(cls, fire_type, burn_type, season):
+        i_key = '-'.join([fire_type, burn_type, season])
         if i_key not in cls.instances:
             cls.instances[i_key] = super(ConsumeLookup, cls).__new__(cls)
         return cls.instances[i_key]
 
-    def __init__(self, fire_type, burn_type, ecoregion, season):
-        self._load(fire_type, burn_type, ecoregion, season)
+    def __init__(self, fire_type, burn_type, season):
+        self._load(fire_type, burn_type, season)
 
-    def _load(self, fire_type, burn_type, ecoregion, season):
+    def _load(self, fire_type, burn_type, season):
         if not hasattr(self, '_consumption_data'):
             self._consumption_data = self._load_file(
-                get_consumption_data_filename(fire_type, burn_type, ecoregion, season))
+                get_consumption_data_filename(fire_type, burn_type, season))
         if not hasattr(self, '_heat_data'):
             self._heat_data = self._load_file(
-                get_heat_data_filename(fire_type, burn_type, ecoregion, season))
+                get_heat_data_filename(fire_type, burn_type, season))
 
     def _load_file(self, filename):
         data = {}
@@ -375,11 +377,10 @@ def get_fm_level(key, fm_val, season):
     # return the last level
     return l['level']
 
-def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
+def look_up(fccs_id, fire_type, burn_type, season,
         thousand_hr_fm, duff_fm, litter_fm):
     fire_type = fire_type.lower()
     burn_type = burn_type.lower()
-    ecoregion = ecoregion.lower()
     season = season.lower()
 
     if fccs_id not in FCCS_ID_TO_GROUP:
@@ -388,8 +389,6 @@ def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
         raise RuntimeError(f"Invalid fire type {fire_type}")
     if burn_type not in BURN_TYPES:
         raise RuntimeError(f"Invalid burn type {burn_type}")
-    if ecoregion not in ECOREGIONS:
-        raise RuntimeError(f"Invalid ecoregion {ecoregion}")
     if season not in SEASONS:
         raise RuntimeError(f"Invalid season {season}")
 
@@ -405,4 +404,4 @@ def look_up(fccs_id, fire_type, burn_type, ecoregion, season,
     key = create_key(fccs_group, thousand_hr_fm_level,
         duff_fm_level, litter_fm_level)
 
-    return ConsumeLookup(fire_type, burn_type, ecoregion, season).get(key)
+    return ConsumeLookup(fire_type, burn_type, season).get(key)

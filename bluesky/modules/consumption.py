@@ -168,7 +168,7 @@ def _lookup_precomputed(fb, location, fuel_loadings_manager, season,
     duff_fm = _get_setting(location, 'fuel_moisture_duff_pct')
     litter_fm = _get_setting(location, 'fuel_moisture_litter_pct')
 
-    c, h = look_up(fb['fccs_id'], fire_type, burn_type, location['ecoregion'], season,
+    c, h = look_up(fb['fccs_id'], fire_type, burn_type, season,
         thousand_hr_fm, duff_fm, litter_fm)
 
     fb["consumption"] = c

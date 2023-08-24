@@ -3,7 +3,9 @@
 
 __author__ = "Joel Dubowy"
 
+import csv
 import copy
+import os
 import tempfile
 
 from afdatetime.parsing import parse_datetime
@@ -444,3 +446,35 @@ class FuelConsumptionForEmissions(consume.FuelConsumption):
     # def _set_heat_data(self, heat_data):
     #     # _heat_data is indeed supposed to be an array with a single nested array
     #     self._heat_data = numpy.array([[heat_data[f] for f in CONSUME_FIELDS]])
+
+
+# This comes from a paper on consume
+# #TODO:
+ECOREGIONS = {
+    'western': [210, 220, 240, 250, 260, 330, 340],
+    'southern': [230, 310, 320, 410, 420],
+    'boreal': [120, 130]
+}
+# Mapping the numbers (e.g. 210) to the categories (e.g. 'western')
+ECOREGIONS_MAPPINGS = {
+    eco: cat for cat, l in ECOREGIONS.items() for eco in l
+}
+
+# Mapping FCCS id to the ecoregion category (e.g. 'western') which
+# is passed into consume as an input
+ECO_REGION_BY_FCCS_ID = {}
+FCCS_IDS = []
+fccs_loadings_csv = os.path.join(os.path.dirname(consume.__file__), 'input_data', 'fccs_loadings.csv')
+with open(fccs_loadings_csv) as f:
+    # The first line is *not* the header. Throw it away.
+    # The second line has the col headers
+    f.readline()
+    reader = csv.DictReader(f)
+    for row in reader:
+        fccs_id = row['fuelbed_number']
+        FCCS_IDS.append(fccs_id)
+        eco = int(float(row['ecoregion']))
+        # FCCS ID 0 has ecoregion 0, which isn't in ECOREGIONS_MAPPINGS;
+        #  Just set it to 'western'. so that every fuelbed has an assignment
+        cat = ECOREGIONS_MAPPINGS.get(eco) or 'western'
+        ECO_REGION_BY_FCCS_ID[fccs_id] = cat
