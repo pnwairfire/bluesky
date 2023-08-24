@@ -463,7 +463,7 @@ ECOREGIONS_MAPPINGS = {
 # Mapping FCCS id to the ecoregion category (e.g. 'western') which
 # is passed into consume as an input
 ECO_REGION_BY_FCCS_ID = {}
-FCCS_IDS = []
+ALL_FCCS_IDS = []
 fccs_loadings_csv = os.path.join(os.path.dirname(consume.__file__), 'input_data', 'fccs_loadings.csv')
 with open(fccs_loadings_csv) as f:
     # The first line is *not* the header. Throw it away.
@@ -472,7 +472,7 @@ with open(fccs_loadings_csv) as f:
     reader = csv.DictReader(f)
     for row in reader:
         fccs_id = row['fuelbed_number']
-        FCCS_IDS.append(fccs_id)
+        ALL_FCCS_IDS.append(fccs_id)
         eco = int(float(row['ecoregion']))
         # FCCS ID 0 has ecoregion 0, which isn't in ECOREGIONS_MAPPINGS;
         #  Just set it to 'western'. so that every fuelbed has an assignment

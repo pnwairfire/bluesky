@@ -37,6 +37,8 @@ def parse_args():
     parser.add_argument('-s', '--season',
         help=f"Only create precomputed data files for one fire season."
               " Options: '{', '.join(SEASONS)}'")
+    parser.add_argument('-i', '--fccs-id', action="append", dest="fccs_ids",
+        help=f"compute for specific FCCS Id(s)", default=[])
 
     parser.epilog = EXAMPLES_STRING
     parser.formatter_class = argparse.RawTextHelpFormatter
