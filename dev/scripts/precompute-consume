@@ -4,6 +4,7 @@ import argparse
 import logging
 import os
 import sys
+import time
 
 root_dir = os.path.abspath(os.path.join(sys.path[0], '../../'))
 sys.path.insert(0, root_dir)
@@ -62,7 +63,11 @@ def parse_args():
 def main():
     args = parse_args()
 
+    start_time = time.perf_counter_ns()
     precompute(args)
+    end_time = time.perf_counter_ns()
+    elapsed_time = (end_time - start_time) / 1e9
+    logging.info(f"Computation time: {elapsed_time} seconds")
 
 if __name__ == "__main__":
     main()
