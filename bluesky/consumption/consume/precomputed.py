@@ -144,7 +144,7 @@ def nested_to_flat(nested_dict, parent_key=None):
         if hasattr(v, 'keys'):
             items.extend(nested_to_flat(v, new_key).items())
         else:
-            # Truncate precision to 2 decimal points; Note that we could
+            # Truncate precision to 2 decimal places; Note that we could
             # leave the value as a string (i.e. not cast back to float), but
             # that didn't seem to significantly affect performance
             items.append((new_key, float(f'{v[0]:.2f}')))
@@ -188,19 +188,19 @@ def run_consume(fire_type, burn_type, season, fccs_id,
     # object for all runs, but it's safer to start with a clean
     # slate for each run
     fc = consume.FuelConsumption()
+
     fc.burn_type = burn_type
-
-
-    # TODO: get ecoregion from FCCS Id from consume's fuel loadings file
-    fc.fuelbed_ecoregion = ECO_REGION_BY_FCCS_ID[fccs_id]
     fc.season = [season]
-    fc.fuelbed_area_acres = [1]
 
     #fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
 
-    # TODO: pick the most representative FCCS Id
-    #    (for now we're just using the first)
+    # ecoregion was determined, per FCCS Id,  from consume's fuel loadings file
+    fc.fuelbed_ecoregion = [ECO_REGION_BY_FCCS_ID[fccs_id]]
     fc.fuelbed_fccs_ids = [fccs_id]
+    fc.fuelbed_area_acres = [1]
+
+    # According to comments in consume, some of the inputs can be set as either
+    # lists or scalars. We're assuming the following are all ok to be set as scalars.
 
     if burn_type == 'activity':
         for k, v in ACTIVITY_SETTINGS.items():
