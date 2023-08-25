@@ -144,7 +144,10 @@ def nested_to_flat(nested_dict, parent_key=None):
         if hasattr(v, 'keys'):
             items.extend(nested_to_flat(v, new_key).items())
         else:
-            items.append((new_key, v[0]))
+            # Truncate precision to 2 decimal points; Note that we could
+            # leave the value as a string (i.e. not cast back to float), but
+            # that didn't seem to significantly affect performance
+            items.append((new_key, float(f'{v[0]:.2f}')))
     return dict(items)
 
 def flat_to_nested(flat_dict):
