@@ -190,6 +190,7 @@ def run_consume(fire_type, burn_type, season, fccs_id,
     fc = consume.FuelConsumption()
 
     fc.burn_type = burn_type
+    # TODO: should season be set as a scalar or list?
     fc.season = [season]
 
     #fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
@@ -264,6 +265,8 @@ def precompute_file(fire_type, burn_type, season, cons_fieldnames,
 
                             flat_cons = nested_to_flat(nested_results['consumption'])
                             flat_cons['key'] = key
+
+                            # TODO: if all zeros, don't write row
                             cons_writer.writerow(flat_cons)
 
                             flat_heat = nested_to_flat(nested_results['heat release'])
