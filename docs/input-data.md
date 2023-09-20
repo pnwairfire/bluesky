@@ -38,16 +38,17 @@ TODO: fill in this section...
 
 ##### fuelbeds
 
-Looking up fuelbeds requires either point data:
+Looking up fuelbeds requires either point data. If both are specified, the perimeter data are ignored
 
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lat'*** -- *required* (if not specifying perimeter) --
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lng'*** -- *required* (if not specifying perimeter) --
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'area'*** -- *required* (if not specifying perimeter) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lat'*** -- *required*
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lng'*** -- *required*
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'area'*** -- *required*
 
 or perimeter data
 
- - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'polygon'*** -- *required* (if not specifying point data) --
- - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'area'*** -- *optional* (if not specifying point data) -- filled in by fuelbeds module if not specified
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'polygon'*** -- *required* (if not specifying shapefile) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'shapefile'*** -- *required* (if not specifying polygon directly) -- Can reference either a .shp file or a .zip file containing a .shp file
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'area'*** -- *optional*  -- filled in by fuelbeds module if not specified
 
 Other fields
 

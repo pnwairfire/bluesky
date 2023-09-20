@@ -2,14 +2,16 @@
 
 __author__ = "Joel Dubowy"
 
-from geoutils.geojson import get_centroid
-
 # FIPS
 import os
-from shapely.geometry import Point
-import geopandas as gpd
 import requests
 import json
+import zipfile
+
+import geopandas as gpd
+import fiona
+from shapely.geometry import Point
+from geoutils.geojson import get_centroid
 
 INVALID_LOCATION_DATA = ("Invalid location data required for"
     " determining single, representative lat/lng")
@@ -192,3 +194,31 @@ class Fips():
         self._state_name = None
         self._state_fips = data.STATEFP
         self._state_code = None
+
+def load_polygon_from_shapefile(shapefile_name):
+    shapefile_name = os.path.abspath(shapefile_name)
+
+    # If a zipfile, extract and set shapefile_name to .shp file
+    if shapefile_name.endswith('.zip'):
+        with zipfile.ZipFile(shapefile_name, 'r') as zip_ref:
+            zip_dir = shapefile_name.replace('.zip', '')
+            zip_ref.extractall(zip_dir)
+            for f in os.listdir(zip_dir):
+                if f.endswith('.shp'):
+                    shapefile_name = os.path.join(zip_dir, f)
+
+    with fiona.open(shapefile_name) as features:
+        # TODO: support multiple features
+        if len(features) > 1:
+            raise ValueError("Only shapesfiles with single feature are supported")
+
+        if features[0]['geometry']['type'] not in ('Polygon', 'MultiPolygon'):
+            raise ValueError("Shapefile feature must be of type Polygon or MultiPolygon")
+
+        if (features[0]['geometry']['type'] == 'MultiPolygon'
+                and len(features[0]['geometry']['coordinates']) > 1):
+            raise ValueError("Only MultiPolygon with single polygon are supported")
+
+        return (features[0]['geometry']['coordinates']
+            if features[0]['geometry']['type'] == 'MultiPolygon'
+            else features[0]['geometry']['coordinates'][0])

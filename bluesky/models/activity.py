@@ -4,8 +4,13 @@ __author__ = "Joel Dubowy"
 
 import itertools
 
+from bluesky.locationutils import load_polygon_from_shapefile
+
 REQUIRED_LOCATION_FIELDS = {
     'specified_points': ['lat', 'lng', 'area'],
+    # either 'polygon' or 'shapefile' are allowed for perimeters, but
+    # specifying 'shapefile' will result in 'polygon' being set if
+    # the shapefile contains supported geometry
     'perimeter': ['polygon']
 }
 
@@ -22,6 +27,11 @@ class Location(dict):
         super().__init__(*args, **kwargs)
 
         self._active_area = self.pop('active_area', None)
+
+        if self.get('shapefile'):
+            if self.get('polygon'):
+                logging.warning("Overwriting polygon with contents in shapefile")
+            self['polygon'] = load_polygon_from_shapefile(self['shapefile'])
 
     # TODO: should we use inclusion list of fields
     #   instead of exclusion list, to be safer?
