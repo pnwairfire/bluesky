@@ -38,13 +38,15 @@ TODO: fill in this section...
 
 ##### fuelbeds
 
-Looking up fuelbeds requires either point data. If both are specified, the perimeter data are ignored
+Looking up fuelbeds requires either point or perimeter data. If both are specified, the perimeter data are ignored.
+
+If point data:
 
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lat'*** -- *required*
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lng'*** -- *required*
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'area'*** -- *required*
 
-or perimeter data
+else perimeter data
 
  - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'polygon'*** -- *required* (if not specifying shapefile) --
  - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'shapefile'*** -- *required* (if not specifying polygon directly) -- Can reference either a .shp file or a .zip file containing a .shp file
@@ -109,17 +111,6 @@ objects, or directly under the parent 'active_areas' object
 ##### localmet
 
  - ***'met' > 'files'*** -- *required* -- array of met file objects, each containing 'first_hour', 'last_hour', and 'file' keys
-
-localmet requires either point data:
-
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lat'*** -- *required* (if not specifying perimeter) --
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lng'*** -- *required* (if not specifying perimeter) --
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'area'*** -- *required* (if not specifying perimeter) --
-
-or perimeter data
-
- - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'polygon'*** -- *required* (if not specifying point data) --
- - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'area'*** -- *required* (if not specifying point data) --
 
 The following can be defined either under 'specified_points' or 'perimeter'
 objects, or directly under the parent 'active_areas' object
@@ -201,18 +192,6 @@ objects, or directly under the parent 'active_areas' object
  - ***'dispersion' > 'model'*** -- *required* --
  - ***'dispersion' > 'output' > 'directory'*** -- *required* --
  - ***'dispersion' > 'output' > 'grid_filename'*** -- *required* --
-
-
-Looking up fuelbeds requires either point data:
-
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lat'*** -- *required* (if not specifying perimeter) --
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'lng'*** -- *required* (if not specifying perimeter) --
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] > 'area'*** -- *required* (if not specifying perimeter) --
-
-or perimeter data
-
- - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'polygon'*** -- *required* (if not specifying point data) --
- - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'area'*** -- *required* (if not specifying point data) --
 
 other fields
 
