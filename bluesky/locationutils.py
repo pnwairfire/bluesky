@@ -219,6 +219,6 @@ def load_polygon_from_shapefile(shapefile_name):
                 and len(features[0]['geometry']['coordinates']) > 1):
             raise ValueError("Only MultiPolygon with single polygon are supported")
 
-        return (features[0]['geometry']['coordinates']
+        return (features[0]['geometry']['coordinates'][0][0]
             if features[0]['geometry']['type'] == 'MultiPolygon'
             else features[0]['geometry']['coordinates'][0])
