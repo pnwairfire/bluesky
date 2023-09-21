@@ -71,6 +71,10 @@ class LatLng():
             self._compute_from_geo_data(
                 self._location_data['perimeter'].get('geometry'))
 
+        elif 'geometry' in self._location_data:
+            self._compute_from_geo_data(
+                self._location_data.get('geometry'))
+
         elif 'polygon' in self._location_data:
             logging.warning("Location data should define a "
                 "perimeter with 'geometry', not 'polygon'")
