@@ -36,7 +36,7 @@ class Location(dict):
             polygon_coordinates = self.pop('polygon')
             if not hasattr(polygon_coordinates[0][0], 'count'):
                 logging.warning("Converting deprecated polygon nesting depth")
-                polyton_coordinates = [polygon_coordinates]
+                polygon_coordinates = [polygon_coordinates]
 
             # See https://datatracker.ietf.org/doc/html/rfc7946#appendix-A.3
             # for GeoJSON standard
