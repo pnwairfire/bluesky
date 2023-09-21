@@ -584,3 +584,8 @@
 ## 4.4.0
  - Support fire type specific consume settings defaults
  - Update consume setting defaults
+
+## 4.4.1
+ - Use standard GeoJSON geometry structure for active area perimeter polygons (see https://datatracker.ietf.org/doc/html/rfc7946#appendix-A.3), which includes support for holes
+ - Add support for perimeter multi-polygons (see https://datatracker.ietf.org/doc/html/rfc7946#appendix-A.6)
+ - Support loading active-area perimeter polygons from shapefiles
