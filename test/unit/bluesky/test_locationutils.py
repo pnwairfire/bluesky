@@ -74,13 +74,18 @@ class TestLatLngActiveArea():
             "start": "2014-05-27T17:00:00",
             "end": "2014-05-28T17:00:00",
             "perimeter": {
-                "polygon": [
-                    ["SDF", 47.43],
-                    [-121.39, 47.43],
-                    [-121.39, 47.40],
-                    [-121.45, 47.40],
-                    [-121.45, 47.43]
-                ]
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            ["SDF", 47.43],
+                            [-121.39, 47.43],
+                            [-121.39, 47.40],
+                            [-121.45, 47.40],
+                            [-121.45, 47.43]
+                        ]
+                    ]
+                }
             }
         }
         with raises(ValueError) as e_info:
@@ -114,13 +119,18 @@ class TestLatLngActiveArea():
     def test_active_area_with_perimeter(self):
         latlng = locationutils.LatLng({
             "perimeter": {
-                "polygon": [
-                    [-100.0, 35.0],
-                    [-101.0, 35.0],
-                    [-101.0, 31.0],
-                    [-99.0, 31.0],
-                    [-100.0, 35.0]
-                ]
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [-100.0, 35.0],
+                            [-101.0, 35.0],
+                            [-101.0, 31.0],
+                            [-99.0, 31.0],
+                            [-100.0, 35.0]
+                        ]
+                    ]
+                }
             }
         })
         assert latlng.latitude == 33
@@ -135,13 +145,18 @@ class TestLatLngActiveArea():
                 {'area': 20, 'lat': 35.0, 'lng': -121.0}
             ],
             "perimeter": {
-                "polygon": [
-                    [-100.0, 35.0],
-                    [-101.0, 35.0],
-                    [-101.0, 31.0],
-                    [-99.0, 31.0],
-                    [-100.0, 35.0]
-                ]
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [-100.0, 35.0],
+                            [-101.0, 35.0],
+                            [-101.0, 31.0],
+                            [-99.0, 31.0],
+                            [-100.0, 35.0]
+                        ]
+                    ]
+                }
             }
         })
         assert latlng.latitude == 40.0
@@ -177,13 +192,18 @@ class TestLatLngPerimeter():
 
     def test_perimeter_invalid_coordinates(self):
         perimeter =  {
-                "polygon": [
-                    ["SDF", 47.43],
-                    [-121.39, 47.43],
-                    [-121.39, 47.40],
-                    [-121.45, 47.40],
-                    [-121.45, 47.43]
-                ]
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            ["SDF", 47.43],
+                            [-121.39, 47.43],
+                            [-121.39, 47.40],
+                            [-121.45, 47.40],
+                            [-121.45, 47.43]
+                        ]
+                    ]
+                }
             }
 
         with raises(ValueError) as e_info:
@@ -192,13 +212,18 @@ class TestLatLngPerimeter():
 
     def test_valid_perimeter(self):
         latlng = locationutils.LatLng({
-            "polygon": [
-                [-100.0, 35.0],
-                [-101.0, 35.0],
-                [-101.0, 31.0],
-                [-99.0, 31.0],
-                [-100.0, 35.0]
-            ]
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [-100.0, 35.0],
+                        [-101.0, 35.0],
+                        [-101.0, 31.0],
+                        [-99.0, 31.0],
+                        [-100.0, 35.0]
+                    ]
+                ]
+            }
         })
         assert latlng.latitude == 33
         assert latlng.longitude == -100.25
