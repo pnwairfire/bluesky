@@ -67,9 +67,10 @@ class LatLng():
                     'coordinates': coordinates
                 })
 
-        elif 'perimeter' in self._location_data:
+        elif ('perimeter' in self._location_data
+                and self._location_data['perimeter'].get('geometry')):
             self._compute_from_geo_data(
-                self._location_data['perimeter'].get('geometry'))
+                self._location_data['perimeter']['geometry'])
 
         elif 'geometry' in self._location_data:
             self._compute_from_geo_data(
