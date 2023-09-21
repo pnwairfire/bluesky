@@ -137,8 +137,9 @@ TODO: fill in this section...
 ##### GeoJSON vs. Lat + Lng + Area
 
 One thing to note about the fire data is that the location can be specified by
-a single lat/lng pair with area (assumed to be acres) or by GeoJSON
-data, such as a polygon or multi-polygon representing the perimeter.
+a single lat/lng pair with area (assumed to be acres) or by perimeter
+data, represented by a polygon or multi-polygon.
+
 The following is an example of the former:
 
     # TODO: fill in new example

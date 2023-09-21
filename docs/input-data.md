@@ -48,8 +48,8 @@ If point data:
 
 else perimeter data
 
- - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'polygon'*** -- *required* (if not specifying shapefile) --
- - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'shapefile'*** -- *required* (if not specifying polygon directly) -- Can reference either a .shp file or a .zip file containing a .shp file
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'geometry'*** -- *required* (if not specifying shapefile) --
+ - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'shapefile'*** -- *required* (if not specifying geometry directly) -- Can reference either a .shp file or a .zip file containing a .shp file
  - ***['fires'] > ['activity'] > ['active_areas'] > 'perimeter' > 'area'*** -- *optional*  -- filled in by fuelbeds module if not specified
 
 Other fields
@@ -212,4 +212,3 @@ other fields
 ###### if saving locally or uploading:
 
  - ***'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, generates new guid
-
