@@ -238,10 +238,20 @@ class TestFiresManagerFilterFiresByLocation():
             fires.Fire({'id': '1', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -80.0}]}]}]}),
             fires.Fire({'id': '2', 'activity': [{'active_areas': [{'specified_points':[{'lat': 45.0, 'lng': -81.0}, {'lat': 55.0, 'lng': -79.0}]}]}]}),
             fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]}),
-            fires.Fire({'id': '4', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-61, 71], [-61, 69], [-59, 69], [-59, 71], [-61, 71]]}}]}]}),
+            fires.Fire({'id': '4', 'activity': [{'active_areas': [{'perimeter': {
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [[[-61, 71], [-61, 69], [-59, 69], [-59, 71], [-61, 71]]]
+                }
+            }}]}]}),
             fires.Fire({'id': '5', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -60.0}]}]}]}),
             fires.Fire({'id': '6', 'activity': [{'active_areas': [{'specified_points':[{'lat': 61.0, 'lng': -60.0}]}]}]}),
-            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]}}]}]}),
+            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [[[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]]
+                }
+            }}]}]}),
             fires.Fire({'id': '8', 'activity': [{'active_areas': [{'specified_points':[{'lat': 70.0, 'lng': -120.0}]}]}]}),
             fires.Fire({'id': '9', 'activity': [{'active_areas': [{'specified_points':[{'lat': -10.0, 'lng': 10.0}]}]}]}),
             fires.Fire({'id': '10', 'activity': [
@@ -328,11 +338,16 @@ class TestFiresManagerFilterFiresByLocation():
             # specified point missing both lat and lng
             (fires.Fire({'id': '1', 'activity': [{'active_areas':[{'specified_points': [{}]}]}]}),
              fires.FireActivityFilter.MISSING_FIRE_LOCATION_INFO_MSG),
-            # perimeter missing polygon
+            # perimeter missing geometry
             (fires.Fire({'id': '1', 'activity': [{'active_areas':[{'perimeter': {}}]}]}),
              fires.FireActivityFilter.MISSING_FIRE_LOCATION_INFO_MSG),
             # perimeter empty polygon
-            (fires.Fire({'id': '1', 'activity': [{'active_areas':[{'perimeter': {'polygon':[]}}]}]}),
+            (fires.Fire({'id': '1', 'activity': [{'active_areas':[{'perimeter': {
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': []
+                }
+                }}]}]}),
              fires.FireActivityFilter.MISSING_FIRE_LOCATION_INFO_MSG),
         )
         for f, err_msg in scenarios:
@@ -372,10 +387,20 @@ class TestFiresManagerFilterFiresByLocation():
             fires.Fire({'id': '1', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -80.0}]}]}]}),
             fires.Fire({'id': '2', 'activity': [{'active_areas': [{'specified_points':[{'lat': 45.0, 'lng': -81.0}, {'lat': 55.0, 'lng': -79.0}]}]}]}),
             fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]}),
-            fires.Fire({'id': '4', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-61, 71], [-61, 69], [-59, 69], [-59, 71], [-61, 71]]}}]}]}),
+            fires.Fire({'id': '4', 'activity': [{'active_areas': [{'perimeter': {
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [[[-61, 71], [-61, 69], [-59, 69], [-59, 71], [-61, 71]]]
+                }
+            }}]}]}),
             fires.Fire({'id': '5', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -60.0}]}]}]}),
             fires.Fire({'id': '6', 'activity': [{'active_areas': [{'specified_points':[{'lat': 61.0, 'lng': -60.0}]}]}]}),
-            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]}}]}]}),
+            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [[[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]]
+                }
+            }}]}]}),
             fires.Fire({'id': '8', 'activity': [{'active_areas': [{'specified_points':[{'lat': 70.0, 'lng': -120.0}]}]}]}),
             fires.Fire({'id': '10', 'activity': [{'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}]})
         ]
@@ -391,10 +416,20 @@ class TestFiresManagerFilterFiresByLocation():
             fires.Fire({'id': '1', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -80.0}]}]}]}),
             fires.Fire({'id': '2', 'activity': [{'active_areas': [{'specified_points':[{'lat': 45.0, 'lng': -81.0}, {'lat': 55.0, 'lng': -79.0}]}]}]}),
             fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]}),
-            fires.Fire({'id': '4', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-61, 71], [-61, 69], [-59, 69], [-59, 71], [-61, 71]]}}]}]}),
+            fires.Fire({'id': '4', 'activity': [{'active_areas': [{'perimeter': {
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [[[-61, 71], [-61, 69], [-59, 69], [-59, 71], [-61, 71]]]
+                }
+            }}]}]}),
             fires.Fire({'id': '5', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -60.0}]}]}]}),
             fires.Fire({'id': '6', 'activity': [{'active_areas': [{'specified_points':[{'lat': 61.0, 'lng': -60.0}]}]}]}),
-            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]}}]}]}),
+            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [[[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]]
+                }
+            }}]}]}),
             fires.Fire({'id': '10', 'activity': [{'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}]})
         ]
         self.fm.filter_fires()
@@ -411,7 +446,12 @@ class TestFiresManagerFilterFiresByLocation():
             fires.Fire({'id': '3', 'activity': [{'active_areas': [{'specified_points':[{'lat': 60.0, 'lng': -62.0}]}]}]}),
             fires.Fire({'id': '5', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -60.0}]}]}]}),
             fires.Fire({'id': '6', 'activity': [{'active_areas': [{'specified_points':[{'lat': 61.0, 'lng': -60.0}]}]}]}),
-            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {'polygon': [[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]}}]}]}),
+            fires.Fire({'id': '7', 'activity': [{'active_areas': [{'perimeter': {
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [[[-51,61], [-49, 61], [-49, 59], [-51, 59], [-51, 61]]]
+                }
+            }}]}]}),
             fires.Fire({'id': '10', 'activity': [{'active_areas': [{'specified_points': [{'lat': 40.0, 'lng': -80.0}]}]}]})
         ]
         self.fm.filter_fires()
