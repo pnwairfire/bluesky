@@ -75,14 +75,16 @@ class Blueskyv4_0To4_1():
                 if geojson['type'] == 'Polygon':
                     aa = copy.deepcopy(aa_template)
                     aa["perimeter"] = dict(loc_template,
-                        polygon=geojson['coordinates'][0], area=area)
+                        geometry=geojson, area=area)
                     new_a["active_areas"].append(aa)
 
                 elif geojson['type'] == 'MultiPolygon':
+                    # split into separate active_areas, one per polygon
                     for p in geojson['coordinates']:
                         aa = copy.deepcopy(aa_template)
                         aa["perimeter"] = dict(loc_template,
-                            polygon=p[0], area=area)
+                            geometry={'type': 'Polygon', 'coordinates': p},
+                            area=area)
                         new_a['active_areas'].append(aa)
 
                 elif geojson['type'] == 'MultiPoint' and area:

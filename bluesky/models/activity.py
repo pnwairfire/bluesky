@@ -4,14 +4,14 @@ __author__ = "Joel Dubowy"
 
 import itertools
 
-from bluesky.locationutils import load_polygon_from_shapefile
+from bluesky.locationutils import load_perimeter_geometry_from_shapefile
 
 REQUIRED_LOCATION_FIELDS = {
     'specified_points': ['lat', 'lng', 'area'],
-    # either 'polygon' or 'shapefile' are allowed for perimeters, but
-    # specifying 'shapefile' will result in 'polygon' being set if
+    # either 'geometry' or 'shapefile' are allowed for perimeters, but
+    # specifying 'shapefile' will result in 'geometry' being set if
     # the shapefile contains supported geometry
-    'perimeter': ['polygon']
+    'perimeter': ['geometry']
 }
 
 INVALID_LOCATION_MSGS = {
@@ -28,10 +28,28 @@ class Location(dict):
 
         self._active_area = self.pop('active_area', None)
 
+        # Support deprecated 'polygon' field, with possibly reduced nesting
+        # (array of coordinates rather than an array of array of coordinates)
+        if self.get('polygon'):
+            logging.warning("Converting deprecated 'polygon' to 'geometry")
+            polygon_coordinates = self.pop('polygon')
+            if not hasattr(polygon_coordinates[0][0], 'count'):
+                logging.warning("Converting deprecated polygon nesting depth")
+                polyton_coordinates = [polygon_coordinates]
+
+            # See https://datatracker.ietf.org/doc/html/rfc7946#appendix-A.3
+            # for GeoJSON standard
+            self['geometry'] = {
+                "type": "Polygon",
+                "coordinates": polygon_coordinates
+            }
+
         if self.get('shapefile'):
-            if self.get('polygon'):
-                logging.warning("Overwriting polygon with contents in shapefile")
-            self['polygon'] = load_polygon_from_shapefile(self['shapefile'])
+            logging.debug("Loading polygon from shapefile")
+            if self.get('geometry'):
+                logging.warning("Overwriting perimeter geometry with contents in shapefile")
+            self['geometry'] = load_perimeter_geometry_from_shapefile(self['shapefile'])
+
 
     # TODO: should we use inclusion list of fields
     #   instead of exclusion list, to be safer?
@@ -94,7 +112,7 @@ class ActiveArea(dict):
 
     @property
     def locations(self):
-        """Returns the specified_points or perimeter polygon as list.
+        """Returns the specified_points or perimeter as list.
 
         This method validates data and casts areas to float every time it
         is called, in case fire activity data is made invalid mid-run

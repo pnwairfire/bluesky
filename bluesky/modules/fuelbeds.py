@@ -42,7 +42,7 @@ def run(fires_manager):
         with fires_manager.fire_failure_handler(fire):
             for aa in fire.active_areas:
                 # Note that aa.locations validates that each location object
-                # has either lat+lng+area or polygon
+                # has either lat+lng+area or perimeter
                 for loc in aa.locations:
                     # try each lookup object until one succeeds
                     for lookup in FCCS_LOOKUPS:
@@ -109,18 +109,15 @@ class Estimator():
                 setattr(self, attr.replace('truncation_', ''), val)
 
     def estimate(self, loc):
-        """Estimates fuelbed composition based on lat/lng or polygon
+        """Estimates fuelbed composition based on lat/lng or perimeter
         """
         if not loc:
             raise ValueError("Insufficient data for looking up fuelbed information")
 
-        elif loc.get('polygon'):
-            geo_data =  {
-                "type": "Polygon",
-                "coordinates": [loc['polygon']]
-            }
-            logging.debug("Converted polygon to geojson: %s", geo_data)
+        elif loc.get('geometry'):
+            geo_data = loc['geometry']
             fuelbed_info = self.lookup.look_up(geo_data)
+
             # If loc['area'] is defined, then we want to keep it. We're dealing
             # with a perimeter which may not be all burning.  If it isn't
             # defined, then set loc['area'] to fuelbed_info['area']

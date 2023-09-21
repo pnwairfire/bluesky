@@ -61,32 +61,35 @@ class LatLng():
                         for p in self._location_data['specified_points']]
                 except:
                     raise ValueError(MISSING_OR_INVALID_LAT_LNG_FOR_SPECIFIED_POINT)
-                self._compute_from_geo_data('MultiPoint', coordinates)
+                self._compute_from_geo_data({
+                    "type": 'MultiPoint',
+                    'coordinates': coordinates
+                })
 
         elif 'perimeter' in self._location_data:
-            self._compute_from_geo_data('Polygon',
-                [self._location_data['perimeter'].get('polygon')])
+            self._compute_from_geo_data(
+                self._location_data['perimeter'].get('geometry'))
 
         elif 'polygon' in self._location_data:
-            self._compute_from_geo_data('Polygon',
-                [self._location_data['polygon']])
+            logging.warning("Location data should define a "
+                "perimeter with 'geometry', not 'polygon'")
+            self._compute_from_geo_data({
+                'type': 'Polygon',
+                'coordinate': self._location_data['polygon']
+            })
 
         else:
             raise ValueError(MISSING_LOCATION_INFO)
 
-    def _compute_from_geo_data(self, geo_type, coordinates):
+    def _compute_from_geo_data(self, geo_data):
         try:
-            geo_data = {
-                "type": geo_type,
-                'coordinates': coordinates
-            }
             coordinate = get_centroid(geo_data)
             self._latitude = coordinate[1]
             self._longitude = coordinate[0]
 
         except:
             error_msg = (MISSING_OR_INVALID_COORDINATES_FOR_PERIMETER
-                if geo_type == 'Polygon'
+                if geo_data["type"] in ('Polygon', 'MultiPolygon')
                 else MISSING_OR_INVALID_LAT_LNG_FOR_SPECIFIED_POINT)
             raise ValueError(error_msg)
 
@@ -195,7 +198,7 @@ class Fips():
         self._state_fips = data.STATEFP
         self._state_code = None
 
-def load_polygon_from_shapefile(shapefile_name):
+def load_perimeter_geometry_from_shapefile(shapefile_name):
     shapefile_name = os.path.abspath(shapefile_name)
 
     # If a zipfile, extract and set shapefile_name to .shp file
@@ -213,12 +216,6 @@ def load_polygon_from_shapefile(shapefile_name):
             raise ValueError("Only shapesfiles with single feature are supported")
 
         if features[0]['geometry']['type'] not in ('Polygon', 'MultiPolygon'):
-            raise ValueError("Shapefile feature must be of type Polygon or MultiPolygon")
+            raise ValueError("Perimeter shapefile must be of type Polygon or MultiPolygon")
 
-        if (features[0]['geometry']['type'] == 'MultiPolygon'
-                and len(features[0]['geometry']['coordinates']) > 1):
-            raise ValueError("Only MultiPolygon with single polygon are supported")
-
-        return (features[0]['geometry']['coordinates'][0][0]
-            if features[0]['geometry']['type'] == 'MultiPolygon'
-            else features[0]['geometry']['coordinates'][0])
+        return features[0]['geometry']

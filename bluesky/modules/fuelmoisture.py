@@ -55,7 +55,7 @@ def run(fires_manager):
                 start = parse_dt(aa['start']).date()
 
                 # Note that aa.locations validates that each location object
-                # has either lat+lng+area or polygon
+                # has either lat+lng+area or perimeter
                 for loc in aa.locations:
                     loc['fuelmoisture'] = {}
                     for fm in fms:
