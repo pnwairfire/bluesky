@@ -3,6 +3,7 @@
 __author__ = "Joel Dubowy"
 
 import itertools
+import logging
 
 from bluesky.locationutils import load_perimeter_geometry_from_shapefile
 

@@ -4,8 +4,9 @@ __author__ = "Joel Dubowy"
 
 # FIPS
 import os
-import requests
+import logging
 import json
+import requests
 import zipfile
 
 import geopandas as gpd
