@@ -183,7 +183,7 @@ class TestActiveAreaLocations():
         assert aa.locations == expected
         assert aa['locations'] == expected
 
-    def test_perimeter(self):
+    def test_perimeter_w_deprecated_polygon(self):
         aa = activity.ActiveArea({
             "start": "2014-05-25T17:00:00",
             "end": "2014-05-26T17:00:00",
@@ -199,13 +199,56 @@ class TestActiveAreaLocations():
         })
         expected = [
             {
-                "polygon": [
-                    [-121.45, 47.43],
-                    [-121.39, 47.43],
-                    [-121.39, 47.40],
-                    [-121.45, 47.40],
-                    [-121.45, 47.43]
-                ]
+                'geometry': {
+                    'type': 'Polygon',
+                    "coordinates": [
+                        [
+                            [-121.45, 47.43],
+                            [-121.39, 47.43],
+                            [-121.39, 47.40],
+                            [-121.45, 47.40],
+                            [-121.45, 47.43]
+                        ]
+                    ]
+                }
+            }
+        ]
+        assert aa.locations == expected
+        assert aa['locations'] == expected
+
+    def test_perimeter(self):
+        aa = activity.ActiveArea({
+            "start": "2014-05-25T17:00:00",
+            "end": "2014-05-26T17:00:00",
+            'perimeter': {
+                'geometry': {
+                    'type': 'Polygon',
+                    "coordinates": [
+                        [
+                            [-121.45, 47.43],
+                            [-121.39, 47.43],
+                            [-121.39, 47.40],
+                            [-121.45, 47.40],
+                            [-121.45, 47.43]
+                        ]
+                    ]
+                }
+            }
+        })
+        expected = [
+            {
+                'geometry': {
+                    'type': 'Polygon',
+                    "coordinates": [
+                        [
+                            [-121.45, 47.43],
+                            [-121.39, 47.43],
+                            [-121.39, 47.40],
+                            [-121.45, 47.40],
+                            [-121.45, 47.43]
+                        ]
+                    ]
+                }
             }
         ]
         assert aa.locations == expected
@@ -221,13 +264,18 @@ class TestActiveAreaLocations():
                 {'area': 34, 'lat': 44.0, 'lng': -119.0}
             ],
             'perimeter': {
-                "polygon": [
-                    [-121.45, 47.43],
-                    [-121.39, 47.43],
-                    [-121.39, 47.40],
-                    [-121.45, 47.40],
-                    [-121.45, 47.43]
-                ]
+                'geometry': {
+                    'type': 'Polygon',
+                    "coordinates": [
+                        [
+                            [-121.45, 47.43],
+                            [-121.39, 47.43],
+                            [-121.39, 47.40],
+                            [-121.45, 47.40],
+                            [-121.45, 47.43]
+                        ]
+                    ]
+                }
             }
         })
         expected = [
@@ -269,13 +317,18 @@ class TestActiveAreaTotalArea():
                 "start": "2014-05-27T17:00:00",
                 "end": "2014-05-28T17:00:00",
                 "perimeter": {
-                    "polygon": [
-                        [-121.45, 47.43],
-                        [-121.39, 47.43],
-                        [-121.39, 47.40],
-                        [-121.45, 47.40],
-                        [-121.45, 47.43]
-                    ]
+                    'geometry': {
+                        'type': 'Polygon',
+                        "coordinates": [
+                            [
+                                [-121.45, 47.43],
+                                [-121.39, 47.43],
+                                [-121.39, 47.40],
+                                [-121.45, 47.40],
+                                [-121.45, 47.43]
+                            ]
+                        ]
+                    }
                 }
             }).total_area
         assert e_info.value.args[0] == activity.ActiveArea.MISSING_OR_INVALID_AREA_FOR_PERIMIETER
@@ -307,13 +360,18 @@ class TestActiveAreaTotalArea():
             "end": "2014-05-28T17:00:00",
             "perimeter": {
                 "area": 232,
-                "polygon": [
-                    [-121.45, 47.43],
-                    [-121.39, 47.43],
-                    [-121.39, 47.40],
-                    [-121.45, 47.40],
-                    [-121.45, 47.43]
-                ]
+                'geometry': {
+                    'type': 'Polygon',
+                    "coordinates": [
+                        [
+                            [-121.45, 47.43],
+                            [-121.39, 47.43],
+                            [-121.39, 47.40],
+                            [-121.45, 47.40],
+                            [-121.45, 47.43]
+                        ]
+                    ]
+                }
             }
         })
         assert aa.total_area == 232
@@ -328,13 +386,18 @@ class TestActiveAreaTotalArea():
             ],
             "perimeter": {
                 "area": 232,
-                "polygon": [
-                    [-121.45, 47.43],
-                    [-121.39, 47.43],
-                    [-121.39, 47.40],
-                    [-121.45, 47.40],
-                    [-121.45, 47.43]
-                ]
+                'geometry': {
+                    'type': 'Polygon',
+                    "coordinates": [
+                        [
+                            [-121.45, 47.43],
+                            [-121.39, 47.43],
+                            [-121.39, 47.40],
+                            [-121.45, 47.40],
+                            [-121.45, 47.43]
+                        ]
+                    ]
+                }
             }
         })
         assert aa.total_area == 54
@@ -405,13 +468,18 @@ class TestActivityCollectionLocations():
                         {'area': 34, 'lat': 44.0, 'lng': -119.0}
                     ],
                     'perimeter': {
-                        "polygon": [
-                            [-121.45, 47.43],
-                            [-121.39, 47.43],
-                            [-121.39, 47.40],
-                            [-121.45, 47.40],
-                            [-121.45, 47.43]
-                        ]
+                        'geometry': {
+                            'type': 'Polygon',
+                            "coordinates": [
+                                [
+                                    [-121.45, 47.43],
+                                    [-121.39, 47.43],
+                                    [-121.39, 47.40],
+                                    [-121.45, 47.40],
+                                    [-121.45, 47.43]
+                                ]
+                            ]
+                        }
                     }
                 },
                 {
@@ -426,13 +494,18 @@ class TestActivityCollectionLocations():
                     "start": "2014-05-25T17:00:00",
                     "end": "2014-05-26T17:00:00",
                     'perimeter': {
-                        "polygon": [
-                            [-111.45, 23.43],
-                            [-111.39, 23.43],
-                            [-111.39, 23.40],
-                            [-111.45, 23.40],
-                            [-111.45, 23.43]
-                        ]
+                        'geometry': {
+                            'type': 'Polygon',
+                            "coordinates": [
+                                [
+                                    [-121.45, 47.43],
+                                    [-121.39, 47.43],
+                                    [-121.39, 47.40],
+                                    [-121.45, 47.40],
+                                    [-121.45, 47.43]
+                                ]
+                            ]
+                        }
                     }
                 }
             ]
@@ -442,13 +515,18 @@ class TestActivityCollectionLocations():
             {'area': 34, 'lat': 44.0, 'lng': -119.0},
             {'area': 52, 'lat': 42.0, 'lng': -116.0},
             {
-                "polygon": [
-                    [-111.45, 23.43],
-                    [-111.39, 23.43],
-                    [-111.39, 23.40],
-                    [-111.45, 23.40],
-                    [-111.45, 23.43]
-                ]
+                'geometry': {
+                    'type': 'Polygon',
+                    "coordinates": [
+                        [
+                            [-121.45, 47.43],
+                            [-121.39, 47.43],
+                            [-121.39, 47.40],
+                            [-121.45, 47.40],
+                            [-121.45, 47.43]
+                        ]
+                    ]
+                }
             }
         ]
 

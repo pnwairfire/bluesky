@@ -221,13 +221,18 @@ class TestEstimatorGetFromPerimeter(BaseTestEstimatorEstimate):
     def setup(self):
 
         perimeter = {
-            "polygon": [
-                [-84.8194, 30.5222],
-                [-84.8197, 30.5209],
-                # ...add more coordinates...
-                [-84.8193, 30.5235],
-                [-84.8194, 30.5222]
-            ]
+            'geometry': {
+                'type': 'Polygon',
+                "coordinates": [
+                    [
+                        [-84.8194, 30.5222],
+                        [-84.8197, 30.5209],
+                        # ...add more coordinates...
+                        [-84.8193, 30.5235],
+                        [-84.8194, 30.5222]
+                    ]
+                ]
+            }
         }
         self.active_area_location = perimeter
         super(TestEstimatorGetFromPerimeter, self).setup()
