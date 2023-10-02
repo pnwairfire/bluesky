@@ -42,7 +42,7 @@ Flask-Compress==1.10.1
 fonttools==4.43.0
 freezegun==1.2.2
 GDAL==3.0.4
-geopandas==0.8.2
+geopandas==0.14.0
 geoutils==1.0.3
 green==3.2.5
 idna==2.8
@@ -64,7 +64,7 @@ nested-dict==1.61
 netCDF4==1.6.4
 numpy==1.26.0
 packaging==23.2
-pandas==0.25.3
+pandas==2.1.1
 parso==0.8.3
 pexpect==4.8.0
 pickleshare==0.7.5

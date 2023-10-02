@@ -15,7 +15,7 @@ blueskykml==5.0.0
 apps-consume==5.1.2
 Fiona==1.9.4.post1
 shapely==2.0.1
-geopandas==0.8.2
+geopandas==0.14.0
 requests==2.25.1
 # TODO: upgrade flask and dash* packages, if necessary
 Flask==2.0.2
