@@ -18,7 +18,7 @@ shapely==2.0.1
 geopandas==0.14.0
 requests==2.25.1
 # TODO: upgrade flask and dash* packages, if necessary
-Flask==2.0.2
+Flask==3.0.0
 Flask-Compress==1.10.1
 dash==1.1.1
 dash-daq==0.1.0
