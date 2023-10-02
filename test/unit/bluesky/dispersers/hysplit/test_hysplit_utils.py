@@ -5,7 +5,7 @@ import copy
 import datetime
 import time
 
-from py.test import raises
+from pytest import raises
 from numpy.testing import assert_approx_equal
 
 from bluesky.config import Config
@@ -360,7 +360,7 @@ class TestGenerateDummyFire():
 
 class TestFillInDummyFires():
 
-    def setup(self):
+    def setup_method(self):
         self.fires = [
             {"id": 1},
             {"id": 2},

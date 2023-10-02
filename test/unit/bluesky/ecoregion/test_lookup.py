@@ -1,7 +1,7 @@
 """Unit tests for looking up ecoregion from lat/lng
 """
 
-from py.test import raises
+from pytest import raises
 
 from bluesky.ecoregion.lookup import EcoregionLookup
 from bluesky.exceptions import (
@@ -38,10 +38,10 @@ class BaseLookupEcoregionTest():
 
 class TestLookupEcoregionShapely(BaseLookupEcoregionTest):
 
-    def setup(self):
+    def setup_method(self):
         self.ecoregion_lookup = EcoregionLookup(implementation='shapely')
 
 class TestLookupEcoregionOgr(BaseLookupEcoregionTest):
 
-    def setup(self):
+    def setup_method(self):
         self.ecoregion_lookup = EcoregionLookup(implementation='ogr')

@@ -391,7 +391,7 @@ MULTI_GROWTH_FIRE_MARSHALED =     {
 
 class TestMarshalBlueskyv4_0To4_1():
 
-    def setup(self):
+    def setup_method(self):
         self.marshaler = marshal.Blueskyv4_0To4_1()
 
     def test_no_growth_fire(self):

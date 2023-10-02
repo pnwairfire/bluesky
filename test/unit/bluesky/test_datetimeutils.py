@@ -6,7 +6,7 @@ import datetime
 import imp
 
 from freezegun import freeze_time
-from py.test import raises
+from pytest import raises
 
 from bluesky import datetimeutils
 from bluesky.exceptions import BlueSkyDatetimeValueError

@@ -5,7 +5,7 @@ import datetime
 import os
 
 import afconfig
-from py.test import raises, approx
+from pytest import raises, approx
 
 from bluesky.config import to_lowercase_keys
 from bluesky.dispersers.hysplit import hysplit

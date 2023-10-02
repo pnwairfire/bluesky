@@ -198,7 +198,7 @@ class TestFireMerger():
         "heat": 6000000.0
     })
 
-    # def setup(self):
+    # def setup_method(self):
     #     pass
 
     ## Cases that do *not* merge
@@ -454,7 +454,7 @@ class TestFireMerger():
 
 class BaseTestPlumeMerger():
 
-    def setup(self):
+    def setup_method(self):
         self.merger = firemerge.PlumeMerger({
             "grid": {
                 "spacing": 0.5,
@@ -706,7 +706,7 @@ class TestPlumeMerger_MergeFires(BaseTestPlumeMerger):
         "heat": 2000.0
     })
 
-    def setup(self):
+    def setup_method(self):
         # The config won't come into play in these tests, since we're
         # calling _merge_fires directly
         self.merger = firemerge.PlumeMerger({

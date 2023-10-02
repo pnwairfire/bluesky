@@ -7,7 +7,7 @@ import sys
 import time
 from collections import defaultdict
 
-from py.test import raises
+from pytest import raises
 
 from bluesky import io
 from bluesky.exceptions import (
@@ -21,7 +21,7 @@ from bluesky.exceptions import (
 
 class TestWaitForAvailabilityBase():
 
-    def setup(self):
+    def setup_method(self):
         self.counter = 0
 
     def monkeypatch_sleep(self, monkeypatch):

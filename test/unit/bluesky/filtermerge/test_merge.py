@@ -2,7 +2,7 @@
 
 __author__ = "Joel Dubowy"
 
-from py.test import raises
+from pytest import raises
 
 from bluesky.config import Config
 from bluesky.filtermerge.merge import FiresMerger

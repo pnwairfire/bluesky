@@ -8,7 +8,7 @@ import tempfile
 import time
 from unittest import mock
 
-from py.test import raises
+from pytest import raises
 
 from bluesky.exceptions import BlueSkyUnavailableResourceError
 from bluesky.loaders import BaseFileLoader
@@ -33,7 +33,7 @@ FILE_SOURCE_W_WAIT_CONFIG = {
 
 class TestFSFileLoadSource():
 
-    def setup(self):
+    def setup_method(self):
         self._temp_dir = tempfile.mkdtemp()
         self._filename = os.path.join(self._temp_dir, "fires.json")
         self._source = copy.deepcopy(FILE_SOURCE_W_WAIT_CONFIG)

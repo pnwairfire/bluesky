@@ -4,7 +4,7 @@ __author__ = "Joel Dubowy"
 
 import datetime
 
-from py.test import raises
+from pytest import raises
 
 from bluesky.config import Config
 from bluesky.filtermerge.filter import FireActivityFilter
@@ -18,7 +18,7 @@ class TestFiresManagerFilterFiresNoneSpecified():
 
     ## Filtering
 
-    def setup(self):
+    def setup_method(self):
         self.fm = fires.FiresManager()
         self.init_fires = [
             fires.Fire({'id': '1', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
@@ -40,7 +40,7 @@ class TestFiresManagerFilterFiresNoneSpecified():
 
 class TestFiresManagerFilterFiresByCountry():
 
-    def setup(self):
+    def setup_method(self):
         self.fm = fires.FiresManager()
         self.init_fires = [
             fires.Fire({'id': '01', 'name': 'n1', 'dfd':'a1', 'baz':'baz1'}),
@@ -232,7 +232,7 @@ class TestFiresManagerFilterFiresByCountry():
 
 class TestFiresManagerFilterFiresByLocation():
 
-    def setup(self):
+    def setup_method(self):
         self.fm = fires.FiresManager()
         self.init_fires = [
             fires.Fire({'id': '1', 'activity': [{'active_areas': [{'specified_points':[{'lat': 40.0, 'lng': -80.0}]}]}]}),
@@ -501,7 +501,7 @@ class TestFiresManagerFilterFiresByLocation():
 
 class TestFiresManagerFilterFiresByArea():
 
-    def setup(self):
+    def setup_method(self):
         self.fm = fires.FiresManager()
         self.init_fires = [
             fires.Fire({'id': '1', 'activity': [{'active_areas':[{'specified_points': [{'area': 45}]}]} ]}),
@@ -697,7 +697,7 @@ class TestFiresManagerFilterFiresByArea():
 
 class TestFiresManagerFilterFiresByTime():
 
-    def setup(self):
+    def setup_method(self):
         self.fm = fires.FiresManager()
         self.init_fires = [
             fires.Fire({'id': '1', 'activity': [

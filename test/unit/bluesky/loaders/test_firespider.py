@@ -6,7 +6,7 @@ import datetime
 import json
 import os
 
-from py.test import raises
+from pytest import raises
 
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.loaders import firespider
@@ -21,7 +21,7 @@ data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 class BaseFireSpiderLoaderTest():
 
-    def setup(self):
+    def setup_method(self):
         # with open(FSV2_INPUT_FILENAME) as f:
         #     self._input = json.loads(f.read())
         with open(self.LOADED_FILENAME) as f:

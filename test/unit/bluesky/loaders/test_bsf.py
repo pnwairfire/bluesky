@@ -6,7 +6,7 @@ import datetime
 import json
 import os
 
-from py.test import raises
+from pytest import raises
 
 from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.loaders import bsf
@@ -21,7 +21,7 @@ data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 class TestBsfLoader():
 
-    def setup(self):
+    def setup_method(self):
         self._expected_output = {
             False: self._load_expected_output(
                 os.path.join(data_dir, 'bsf-loaded.json')),

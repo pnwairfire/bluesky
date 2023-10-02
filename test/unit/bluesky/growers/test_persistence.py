@@ -6,7 +6,7 @@ import copy
 import datetime
 
 from freezegun import freeze_time
-from py.test import raises
+from pytest import raises
 
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError

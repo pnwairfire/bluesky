@@ -6,7 +6,7 @@ __author__ = "Joel Dubowy"
 import copy
 import datetime
 
-#from py.test import raises
+#from pytest import raises
 
 from bluesky import metutils
 

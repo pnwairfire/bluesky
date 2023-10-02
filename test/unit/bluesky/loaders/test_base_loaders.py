@@ -5,7 +5,7 @@ import datetime
 import os
 import tempfile
 
-from py.test import raises
+from pytest import raises
 
 from bluesky.exceptions import (
     BlueSkyConfigurationError, BlueSkyUnavailableResourceError
@@ -14,7 +14,7 @@ from bluesky.loaders import BaseJsonFileLoader, BaseCsvFileLoader
 
 class TestBaseFileLoader():
 
-    def setup(self):
+    def setup_method(self):
         self._temp_dir = tempfile.mkdtemp()
 
     def test_file_not_defined(self):

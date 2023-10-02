@@ -8,7 +8,7 @@ import os
 import tempfile
 import uuid
 
-from py.test import raises
+from pytest import raises
 from plumerise import sev, feps
 from pyairfire import osutils
 
@@ -232,7 +232,7 @@ class TestPlumeRiseRun():
 
 class TestPlumeRiseRunFeps():
 
-    def setup(self):
+    def setup_method(self):
         self.fm = FiresManager()
 
     def set_config(self):
@@ -375,7 +375,7 @@ class TestPlumeRiseRunFeps():
 
 class TestPlumeRiseRunSev():
 
-    def setup(self):
+    def setup_method(self):
         self.fm = FiresManager()
 
     def set_config(self):
@@ -550,7 +550,7 @@ class TestPlumeRiseRunSev():
 
 class TestPlumeRiseRunSevFeps():
 
-    def setup(self):
+    def setup_method(self):
         self.fm = FiresManager()
 
     def set_config(self):

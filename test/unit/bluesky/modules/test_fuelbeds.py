@@ -5,7 +5,7 @@ __author__ = "Joel Dubowy"
 import copy
 from unittest import mock
 
-from py.test import raises
+from pytest import raises
 
 from bluesky.config import Config
 from bluesky.models.fires import Fire
@@ -94,7 +94,7 @@ class TestSummarize():
 
 class TestEstimatorInsufficientDataForLookup():
 
-    def setup(self):
+    def setup_method(self):
         lookup = mock.Mock()
         self.estimator = fuelbeds.Estimator(lookup)
 
@@ -163,7 +163,7 @@ class BaseTestEstimatorEstimate():
     """Base class for testing Estimator.estimate
     """
 
-    def setup(self):
+    def setup_method(self):
         lookup = mock.Mock()
         self.estimator = fuelbeds.Estimator(lookup)
 
@@ -218,7 +218,7 @@ class BaseTestEstimatorEstimate():
         assert 96.0 == self.active_area_location.get('fuelbeds_total_accounted_for_pct')
 
 class TestEstimatorGetFromPerimeter(BaseTestEstimatorEstimate):
-    def setup(self):
+    def setup_method(self):
 
         perimeter = {
             'geometry': {
@@ -235,13 +235,13 @@ class TestEstimatorGetFromPerimeter(BaseTestEstimatorEstimate):
             }
         }
         self.active_area_location = perimeter
-        super(TestEstimatorGetFromPerimeter, self).setup()
+        super(TestEstimatorGetFromPerimeter, self).setup_method()
 
 class TestEstimatorGetFromLatLng(BaseTestEstimatorEstimate):
 
-    def setup(self):
+    def setup_method(self):
         self.active_area_location = {"lat": 46.0, 'lng': -120.34}
-        super(TestEstimatorGetFromLatLng, self).setup()
+        super(TestEstimatorGetFromLatLng, self).setup_method()
 
 ##
 ## Tests for Estimator._truncate
@@ -249,7 +249,7 @@ class TestEstimatorGetFromLatLng(BaseTestEstimatorEstimate):
 
 class TestEstimatorDefaultTruncation():
 
-    def setup(self):
+    def setup_method(self):
         lookup = mock.Mock()
         self.estimator = fuelbeds.Estimator(lookup)
 
@@ -365,7 +365,7 @@ class TestEstimatorDefaultTruncation():
 
 class TestEstimatorCustomTruncation():
 
-    def setup(self):
+    def setup_method(self):
         lookup = mock.Mock()
         Config().set(75.0, "fuelbeds", "truncation_percentage_threshold")
         Config().set(2, "fuelbeds", "truncation_count_threshold")
@@ -455,7 +455,7 @@ class TestEstimatorCustomTruncation():
 
 class TestEstimatorNoTruncation():
 
-    def setup(self):
+    def setup_method(self):
         lookup = mock.Mock()
         Config().set(None, "fuelbeds", "truncation_percentage_threshold")
         Config().set(None, "fuelbeds", "truncation_count_threshold")
@@ -544,7 +544,7 @@ class TestEstimatorNoTruncation():
 
 class TestEstimatorPercentageAdjustment():
 
-    def setup(self):
+    def setup_method(self):
         lookup = mock.Mock()
         self.estimator = fuelbeds.Estimator(lookup)
 

@@ -7,7 +7,7 @@ import copy
 
 from numpy import array
 from numpy.testing import assert_approx_equal
-from py.test import raises
+from pytest import raises
 
 import afconfig
 
@@ -178,7 +178,7 @@ class fire_failure_manager():
 
 class BaseEmissionsTest():
 
-    def setup(self):
+    def setup_method(self):
         self.fires = copy.deepcopy(FIRES)
 
     def _check_emissions(self, expected, actual):

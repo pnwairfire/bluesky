@@ -4,7 +4,7 @@ __author__ = "Joel Dubowy"
 
 import copy
 import datetime
-from py.test import raises
+from pytest import raises
 
 from bluesky.config import Config
 from bluesky.exceptions import BlueSkyConfigurationError

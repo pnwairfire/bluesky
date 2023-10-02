@@ -21,7 +21,7 @@ class FakeDisperser(DispersionBase):
 
 class TestDispersionBaseConfig():
 
-    def setup(self):
+    def setup_method(self):
         Config().set(2.2, "dispersion", "hysplit", "QCYCLE")
         Config().set(333, "dispersion", "hysplit", "numpar")
         Config().set(34, "dispersion", "hysplit", "FOO")
@@ -95,7 +95,7 @@ EMPTY_PLUMERISE_HOUR = {
 
 class TestDispersionBaseSetFireData():
 
-    def setup(self):
+    def setup_method(self):
         self.d = FakeDisperser({})
         self.d._model_start = datetime.datetime(2015, 8, 5, 0, 0, 0)
         self.d._num_hours = 2

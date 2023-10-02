@@ -4,7 +4,7 @@ __author__ = "Joel Dubowy"
 
 import datetime
 
-from py.test import raises
+from pytest import raises
 from met.arl import arlprofiler
 
 from bluesky.config import defaults, Config

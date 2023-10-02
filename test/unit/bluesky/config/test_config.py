@@ -7,7 +7,7 @@ import datetime
 import threading
 
 from freezegun import freeze_time
-from py.test import raises
+from pytest import raises
 
 from bluesky.config import Config, DEFAULTS, to_lowercase_keys
 
@@ -91,7 +91,7 @@ class TestToLowercaseKeys():
 
 class TestGetAndSet():
 
-    def setup(self):
+    def setup_method(self):
         self._ORIGINAL_DEFAULTS = copy.deepcopy(DEFAULTS)
 
     def test_getting_defaults(self, reset_config):
@@ -199,7 +199,7 @@ class TestGetAndSet():
 
 class TestMerge():
 
-    def setup(self):
+    def setup_method(self):
         self._ORIGINAL_DEFAULTS = copy.deepcopy(DEFAULTS)
 
     @freeze_time("2016-04-20 12:00:00", tz_offset=0)

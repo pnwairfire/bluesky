@@ -2,7 +2,7 @@
 
 __author__ = "Joel Dubowy"
 
-from py.test import raises
+from pytest import raises
 
 from bluesky.config import Config
 from bluesky.extrafilewriters import emissionscsv
@@ -209,7 +209,7 @@ class MockEmissionsWriter():
 
 class TestEmissionsCsvWriterWriteFire():
 
-    def setup(self):
+    def setup_method(self):
         Config().set('foo.csv', 'extrafiles', 'emissionscsv', 'filename')
         self.writer = emissionscsv.EmissionsCsvWriter('/tmp/')
         self.writer.emissions_writer = MockEmissionsWriter()

@@ -7,7 +7,7 @@ from unittest import mock
 
 from numpy import array
 from numpy.testing import assert_approx_equal
-from py.test import raises
+from pytest import raises
 
 from bluesky.consumeutils import FuelLoadingsManager
 from bluesky.models.fires import Fire

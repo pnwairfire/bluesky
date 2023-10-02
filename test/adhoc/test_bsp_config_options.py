@@ -15,7 +15,7 @@ import subprocess
 import sys
 import tempfile
 
-from py.test import raises
+from pytest import raises
 
 from bluesky import datetimeutils
 from bluesky.config import DEFAULTS

@@ -11,7 +11,7 @@ import uuid
 
 import freezegun
 
-from py.test import raises
+from pytest import raises
 from numpy.testing import assert_approx_equal
 
 from bluesky import __version__
