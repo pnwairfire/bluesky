@@ -9,7 +9,7 @@ backcall==0.2.0
 beautifulsoup4==4.12.2
 blinker==1.6.2
 bluesky==4.3.63
-blueskykml==5.0.0
+blueskykml==5.0.1
 blueskyutils==2.0.0
 boto3==1.16.52
 botocore==1.19.63

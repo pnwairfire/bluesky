@@ -83,7 +83,7 @@ RUN pip3 install matplotlib==3.3.4 \
     && pip3 install \
         -c constraints.txt --index-url https://pypi.airfire.org/simple \
         apps-consume==5.2.0 \
-        blueskykml==5.0.0 \
+        blueskykml==5.0.1 \
         blueskyutils==2.0.0
 
 # Install python dependencies
