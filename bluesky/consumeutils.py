@@ -276,7 +276,7 @@ fuelbed_number,filename,cover_type,ecoregion,overstory_loading,midstory_loading,
         # iterate through the rows in the fccsdb_obj.loadings_data_
         # pandas.DataFrame until you find row with fuel loadings for fccs_id
         for i, row in fccsdb_obj.loadings_data_.iterrows():
-            if row[0] == str(fccs_id):
+            if row['fccs_id'] == str(fccs_id):
                 d = dict(row)
                 for k in list(d.keys()):
                     if k in self.FUEL_LOADINGS_KEY_MAPPINGS:
