@@ -63,7 +63,7 @@ class skip_failures():
     def __exit__(self, e_type, value, tb):
         if e_type:
             if self._enabled:
-                logging.warn("Skipping failure: %s", value)
+                logging.warning("Skipping failure: %s", value)
                 return True
 
             logging.debug(traceback.format_exc())

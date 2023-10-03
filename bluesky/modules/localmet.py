@@ -116,7 +116,7 @@ class LocalmetRunner():
                 shutil.rmtree(working_dir)
 
             except Exception as e:
-                logging.warn('Failed to delete localmet working dir %s', working_dir)
+                logging.warning('Failed to delete localmet working dir %s', working_dir)
 
 
     def _compile(self):

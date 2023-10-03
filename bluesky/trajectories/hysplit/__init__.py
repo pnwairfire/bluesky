@@ -53,7 +53,7 @@ class HysplitTrajectories():
 
         if (not self._locations):
             msg = "Did not run HYSPLIT trajectories - no fire locations"
-            logging.warn(msg)
+            logging.warning(msg)
             r['warning'] = msg
 
         else:
@@ -99,7 +99,7 @@ class HysplitTrajectories():
 
         locations = self._filter_locations(start_s)
         if not locations:
-            logging.warn("No activity at start hour %s. Skipping hysplit", start_s)
+            logging.warning("No activity at start hour %s. Skipping hysplit", start_s)
             return
 
         delete_if_no_error = Config().get(

@@ -129,7 +129,7 @@ class Grower(GrowerBase):
                 with self._fires_manager.fire_failure_handler(fire):
                     self._grow_fire(fire)
         else:
-            logging.warn("Skipping persistence - date to persist outside"
+            logging.warning("Skipping persistence - date to persist outside"
                 " of configured time windows")
 
     ##

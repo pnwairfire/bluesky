@@ -382,7 +382,7 @@ class CsvFileLoader(BaseCsvFileLoader):
                         break
 
             except Exception as e:
-                logging.warn("Failed to parse 'date_time' value %s",
+                logging.warning("Failed to parse 'date_time' value %s",
                     date_time)
                 logging.debug(traceback.format_exc())
 
