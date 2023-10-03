@@ -589,3 +589,7 @@
  - Use standard GeoJSON geometry structure for active area perimeter polygons (see https://datatracker.ietf.org/doc/html/rfc7946#appendix-A.3), which includes support for holes
  - Add support for perimeter multi-polygons (see https://datatracker.ietf.org/doc/html/rfc7946#appendix-A.6)
  - Support loading active-area perimeter polygons from shapefiles
+
+## 4.5.0
+ - Upgrade docker image to ubuntu 22.04 & python v3.10.12
+ - Upgrade to consume==5.2.1, blueskykml==5.0.1, met==4.0.0, Flask==3.0.0, pyairfire==5.0.0, pytest==7.4.2, geopandas==0.14.0, blueskyutils==2.0.0, fccsmap==4.0.0
