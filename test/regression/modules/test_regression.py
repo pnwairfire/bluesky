@@ -136,7 +136,7 @@ def check_value(expected, actual, *keys_for_error_log):
 
 def check(expected, actual):
     success = True
-    expected.pop('runtime')
+    expected.pop('runtime', None)
     actual.pop('runtime')
     # TODO: cherry pick other fields to check
     if len(expected['fires']) != len(actual['fires']):
@@ -216,12 +216,15 @@ def run_input(module, input_file):
     # dumps and loads actual to convert datetimest, etc.
     actual = json.loads(json.dumps(fires_manager.dump(),
         cls=models.fires.FireEncoder))
-    # Use the following to generate new output, to compare to or replace
-    # the old, when emissions models change
-    # with open(output_file.replace('.json', '-NEW.json'), 'w') as f:
-    #     f.write(json.dumps(actual, indent=4))
 
     success = check(expected, actual)
+
+    # Use the following to generate new output, to compare to or replace
+    # the old, when emissions models change
+    # if not success:
+    #     with open(output_file.replace('.json', '-NEW.json'), 'w') as f:
+    #         f.write(json.dumps(actual, indent=4))
+
     logging.info('PASSED - %s', input_file) if success else logging.error('FAILED - %s', input_file)
     return success
 
