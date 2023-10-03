@@ -9,7 +9,7 @@ import os
 
 #import shapefile
 import fiona
-import ogr
+from osgeo import ogr
 from shapely import geometry
 
 from bluesky.exceptions import (
