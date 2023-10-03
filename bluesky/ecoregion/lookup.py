@@ -71,7 +71,7 @@ class EcoregionLookup():
 
         ecoregion = None
         for sr in self._input:
-            polygon = geometry.asShape(sr['geometry'])
+            polygon = geometry.shape(sr['geometry'])
             if polygon.contains(point):
                 return sr['properties']['DOMAIN']
 
