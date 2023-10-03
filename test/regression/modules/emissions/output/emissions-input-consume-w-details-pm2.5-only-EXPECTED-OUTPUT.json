@@ -1,22 +1,65 @@
 {
-    "counts": {
-        "failed_fires": 1,
-        "fires": 1
-    },
-    "runtime": {
-        "modules": [
-            {
-                "end": "2019-03-25T21:54:58.305258Z",
-                "start": "2019-03-25T21:54:57.908990Z",
-                "module_name": "emissions",
-                "total": "0h 0m 0.396268s"
+    "processing": [
+        {
+            "module_name": "emissions",
+            "module": "bluesky.modules.emissions",
+            "version": "0.1.1",
+            "model": "consume",
+            "emitcalc_version": "3.0.1",
+            "eflookup_version": "4.0.4",
+            "consume_version": "5.2.1"
+        }
+    ],
+    "failed_fires": [
+        {
+            "id": "slijlfdsljfsdkljf",
+            "event_of": {
+                "id": "ssdlfjsldfj",
+                "name": "Activity Fire missing consumption"
+            },
+            "activity": [
+                {
+                    "active_areas": [
+                        {
+                            "specified_points": [
+                                {
+                                    "area": 200,
+                                    "lat": 47.4316976,
+                                    "fuelbeds": [
+                                        {
+                                            "fccs_id": "41",
+                                            "pct": 45.0
+                                        }
+                                    ],
+                                    "lng": -121.3990506
+                                }
+                            ],
+                            "ecoregion": "southern",
+                            "moisture_10hr": 50,
+                            "canopy_consumption_pct": 0,
+                            "moisture_litter": 30,
+                            "utc_offset": "-09:00",
+                            "fm_type": "MEAS-Th",
+                            "rain_days": 10,
+                            "moisture_1khr": 50,
+                            "shrub_blackened_pct": 50,
+                            "pile_blackened_pct": 0,
+                            "windspeed": 5,
+                            "slope": 5,
+                            "moisture_duff": 50
+                        }
+                    ]
+                }
+            ],
+            "type": "wildfire",
+            "fuel_type": "natural",
+            "error": {
+                "type": "ValueError",
+                "message": "Missing consumption data required for computing emissions",
+                "traceback": "['  File \"/bluesky/bluesky/modules/emissions.py\", line 118, in run\\n    self._run_on_fire(fire)\\n', '  File \"/bluesky/bluesky/modules/emissions.py\", line 305, in _run_on_fire\\n    self._run_on_fuelbed(aa, loc, fb, season, burn_type, fire_type)\\n', '  File \"/bluesky/bluesky/modules/emissions.py\", line 309, in _run_on_fuelbed\\n    raise ValueError(\\n']"
             }
-        ],
-        "total": "0h 0m 0.396312s",
-        "end": "2019-03-25T21:54:58.305290Z",
-        "start": "2019-03-25T21:54:57.908978Z"
-    },
-    "run_id": "3d174b2a-138a-44e9-b765-466b21a0261e",
+        }
+    ],
     "summary": {
         "emissions": {
             "flaming": {
@@ -45,389 +88,798 @@
             }
         }
     },
-    "failed_fires": [
-        {
-            "activity": [
-                {
-                    "location": {
-                        "fm_type": "MEAS-Th",
-                        "pile_blackened_pct": 0,
-                        "latitude": 47.4316976,
-                        "slope": 5,
-                        "rain_days": 10,
-                        "ecoregion": "southern",
-                        "moisture_litter": 30,
-                        "utc_offset": "-09:00",
-                        "windspeed": 5,
-                        "shrub_blackened_pct": 50,
-                        "moisture_1khr": 50,
-                        "moisture_10hr": 50,
-                        "longitude": -121.3990506,
-                        "canopy_consumption_pct": 0,
-                        "moisture_duff": 50,
-                        "area": 200
-                    },
-                    "fuelbeds": [
-                        {
-                            "fccs_id": "41",
-                            "pct": 45.0
-                        }
-                    ]
-                }
-            ],
-            "event_of": {
-                "name": "Activity Fire missing consumption",
-                "id": "ssdlfjsldfj"
-            },
-            "error": {
-                "traceback": "['  File \"/bluesky/bluesky/modules/emissions.py\", line 240, in run\\n    self._run_on_fire(fire)\\n', '  File \"/bluesky/bluesky/modules/emissions.py\", line 262, in _run_on_fire\\n    self._run_on_fuelbed(fb, season, g[\\'location\\'], burn_type)\\n', '  File \"/bluesky/bluesky/modules/emissions.py\", line 267, in _run_on_fuelbed\\n    \"Missing consumption data required for computing emissions\")\\n']",
-                "message": "Missing consumption data required for computing emissions",
-                "type": "ValueError"
-            },
-            "id": "slijlfdsljfsdkljf",
-            "fuel_type": "natural",
-            "type": "wildfire"
-        }
-    ],
-    "bluesky_version": "4.0.6",
-    "run_config": {
-        "timeprofiling": {
-            "hourly_fractions": null
-        },
-        "splitactivity": {
-            "record_original_activity": false
-        },
-        "merge": {
-            "skip_failures": false
-        },
-        "export": {
-            "upload": {
-                "json_output_filename": "output.json",
-                "tarball_name": null,
-                "output_dir_name": null,
-                "handle_existing": "fail",
-                "extra_exports_dir_name": null,
-                "scp": {
-                    "host": null,
-                    "user": null,
-                    "port": 22,
-                    "dest_dir": null
-                }
-            },
-            "extra_exports": [],
-            "modes": [],
-            "localsave": {
-                "json_output_filename": "output.json",
-                "output_dir_name": null,
-                "dest_dir": null,
-                "handle_existing": "fail",
-                "extra_exports_dir_name": null
-            },
-            "email": {
-                "smtp_starttls": false,
-                "smtp_server": "localhost",
-                "recipients": null,
-                "username": null,
-                "handle_existing": "fail",
-                "subject": "bluesky run output",
-                "sender": "bsp@airfire.org",
-                "smtp_port": 25,
-                "password": null
-            }
-        },
-        "filter": {
-            "skip_failures": false
-        },
-        "ingestion": {
-            "keep_heat": false,
-            "keep_emissions": false
-        },
-        "skip_failed_fires": true,
-        "statuslogging": {
-            "api_endpoint": null,
-            "process": null,
-            "api_secret": null,
-            "api_key": null,
-            "domain": null,
-            "enabled": false
-        },
-        "plumerising": {
-            "model": "feps",
-            "sev": {
-                "working_dir": null
-            },
-            "feps": {
-                "working_dir": null
-            }
-        },
-        "localmet": {
-            "time_step": 1
-        },
-        "dispersion": {
-            "model": "hysplit",
-            "vsmoke": {
-                "dutmfe": 0,
-                "tconst": 4,
-                "bkgpma": 0.0,
-                "rfrc": -0.75,
-                "dutmfn": 100,
-                "irha": 25,
-                "xend": 200,
-                "efco": 250,
-                "emtqr": -0.75,
-                "efpm": 30,
-                "xntvl": 0.05,
-                "stability": 4,
-                "pres": 1013.25,
-                "thot": 4,
-                "viscrt": 0.125,
-                "create_json": true,
-                "overlay_title": "Peak Hourly PM2.5",
-                "tdecay": 2,
-                "legend_image": "/bluesky/bluesky/dispersers/vsmoke/images/aqi_legend.png",
-                "oyinta": 0.0,
-                "icover": 0,
-                "xbgn": 150,
-                "grad_rise": true,
-                "ceil": 99999,
-                "ozinta": 0.0,
-                "kmz_file": "smoke_dispersion.kmz",
-                "json_file": "smoke_dispersion.json",
-                "tol": 0.1,
-                "ltofdy": true,
-                "mix_ht": 1500.0,
-                "temp_fire": 59.0,
-                "bkgcoa": 0.0,
-                "cc0crt": 0.02
-            },
-            "handle_existing": "fail",
-            "hysplit": {
-                "vertical_levels": [
-                    100
-                ],
-                "vertical_method": "DATA",
-                "ascdata_file": "/bluesky/bluesky/dispersers/hysplit/bdyfiles/ASCDATA.CFG",
-                "ninit": 0,
-                "spacing_longitude": null,
-                "qcycle": 1.0,
-                "nfires_per_process": -1,
-                "rouglen_file": "/bluesky/bluesky/dispersers/hysplit/bdyfiles/ROUGLEN.ASC",
-                "user_defined_grid": false,
-                "wet_dep_in_cloud_scav": 0.0,
-                "dry_dep_velocity": 0.0,
-                "sampling_interval_min": 0,
-                "dry_dep_eff_henry": 0.0,
-                "dispersion_folder": "./input/dispersion",
-                "make_init_file": false,
-                "ichem": 0,
-                "dispersion_offset": 0,
-                "initd": 0,
-                "fire_intervals": [
-                    0,
-                    100,
-                    200,
-                    500,
-                    1000
-                ],
-                "particle_density": 1.0,
-                "pardump": "./input/dispersion/PARDUMP",
-                "nprocesses": 1,
-                "stop_if_no_parinit": true,
-                "width_longitude": null,
-                "landuse_file": "/bluesky/bluesky/dispersers/hysplit/bdyfiles/LANDUSE.ASC",
-                "particle_diameter": 1.0,
-                "optimize_grid_resolution": false,
-                "spacing_latitude": null,
-                "nprocesses_max": -1,
-                "radioactive_half_live": 0.0,
-                "particle_shape": 1.0,
-                "smolder_height": 10.0,
-                "binaries": {},
-                "max_spacing_latitude": 0.5,
-                "sampling_interval_hour": 1,
-                "convert_hysplit2netcdf": true,
-                "khmax": 72,
-                "delt": 0.0,
-                "grid_length": 2000,
-                "dry_dep_diffusivity": 0.0,
-                "center_latitude": null,
-                "ncycl": 0,
-                "mgmin": 10,
-                "grid": {},
-                "output_file_name": "hysplit_conc.nc",
-                "max_spacing_longitude": 0.5,
-                "projection": "LatLon",
-                "dry_dep_reactivity": 0.0,
-                "parinit": "./input/dispersion/PARINIT",
-                "mpi": false,
-                "tratio": 0.75,
-                "vertical_emislevels_reduction_factor": 1,
-                "ncpus": 1,
-                "compute_grid": false,
-                "wet_dep_actual_henry": 0.0,
-                "ndump": 0,
-                "center_longitude": null,
-                "height_latitude": null,
-                "dry_dep_mol_weight": 0.0,
-                "maxpar": 10000000,
-                "sampling_interval_type": 0,
-                "skip_invalid_fires": false,
-                "top_of_model_domain": 30000.0,
-                "numpar": 1000,
-                "wet_dep_below_cloud_scav": 0.0
-            },
-            "output_dir": null,
-            "num_hours": null,
-            "start": null,
-            "working_dir": null
-        },
-        "skip_failed_sources": false,
-        "fuelbeds": {
-            "ignored_percent_resampling_threshold": 99.9,
-            "ignored_fuelbeds": [
-                "0",
-                "900"
-            ],
-            "total_pct_threshold": 0.5,
-            "fccs_version": "2",
-            "truncation_percentage_threshold": 90.0,
-            "truncation_count_threshold": 5,
-            "no_sampling": false
-        },
-        "load": {
-            "sources": []
-        },
-        "consumption": {
-            "fuel_loadings": {},
-            "ecoregion_lookup_implemenation": "ogr",
-            "default_ecoregion": null
-        },
-        "visualization": {
-            "hysplit": {
-                "create_summary_json": false,
-                "fire_locations_csv_filename": "fire_locations.csv",
-                "smoke_dispersion_kmz_filename": "smoke_dispersion.kmz",
-                "fire_kmz_filename": "fire_locations.kmz",
-                "blueskykml_config": {
-                    "DispersionGridOutput": {
-                        "OUTPUT_DIR": null
-                    },
-                    "SmokeDispersionKMLInput": {
-                        "FIRE_EVENT_ICON": "http://maps.google.com/mapfiles/ms/micons/firedept.png"
-                    }
-                },
-                "layers": [
-                    0
-                ],
-                "prettykml": false,
-                "output_dir": null,
-                "images_dir": null,
-                "data_dir": "",
-                "fire_events_csv_filename": "fire_events.csv"
-            },
-            "target": "dispersion"
-        },
-        "findmetdata": {
-            "arl": {
-                "max_days_out": 4,
-                "index_filename_pattern": "arl12hrindex.csv"
-            },
-            "met_format": "arl",
-            "time_window": {},
-            "met_root_dir": null,
-            "wait": {}
-        },
-        "emissions": {
-            "fuel_loadings": {},
-            "model": "consume",
-            "species": [
-                "PM2.5"
-            ],
-            "include_emissions_details": true
-        },
-        "extrafiles": {
-            "firescsvs": {
-                "fire_locations_filename": "fire_locations.csv",
-                "fire_events_filename": "fire_events.csv"
-            },
-            "emissionscsv": {
-                "filename": null
-            },
-            "sets": [],
-            "dest_dir": null
-        }
-    },
     "fires": [
         {
+            "id": "SF11C14225236095807750",
+            "event_of": {
+                "id": "SF11E826544",
+                "name": "Natural Fire near Snoqualmie Pass, WA"
+            },
             "activity": [
                 {
                     "active_areas": [
                         {
-                            "fm_type": "MEAS-Th",
-                            "pile_blackened_pct": 0,
-                            "slope": 5,
-                            "windspeed": 5,
-                            "end": "2015-01-21T17:00:00",
-                            "ecoregion": "southern",
                             "specified_points": [
                                 {
-                                    "lng": -121.3990506,
                                     "area": 200,
+                                    "lat": 47.4316976,
                                     "fuelbeds": [
                                         {
                                             "fuel_loadings": {
-                                                "duff_lower_depth": 0.2,
-                                                "shrubs_primary_loading": 12.061473,
-                                                "shrubs_secondary_loading": 0.172292,
-                                                "pile_clean_loading": 0.0,
-                                                "lichen_depth": 0.0,
-                                                "total_available_fuel_loading": 18.153765,
-                                                "efg_activity": 7,
-                                                "w_sound_quarter_1_loading": 1.0,
-                                                "duff_lower_loading": 2.16,
-                                                "moss_loading": 0.0,
-                                                "pile_vdirty_loading": 0.0,
-                                                "shrubs_secondary_perc_live": 0.85,
-                                                "w_stump_sound_loading": 0.0,
-                                                "nw_secondary_loading": 0.0,
-                                                "midstory_loading": 0.0,
-                                                "w_rotten_9_20_loading": 0.0,
-                                                "lichen_loading": 0.0,
-                                                "w_stump_lightered_loading": 0.0,
-                                                "nw_primary_loading": 0.0,
-                                                "litter_loading": 0.3,
-                                                "snags_c1wo_foliage_loading": 0.0,
-                                                "duff_upper_depth": 0.2,
-                                                "w_sound_1_3_loading": 1.0,
-                                                "snags_c1_wood_loading": 0.0,
-                                                "ladderfuels_loading": 0.0,
-                                                "snags_c3_loading": 0.0,
-                                                "w_rotten_gt20_loading": 0.0,
-                                                "basal_accum_loading": 0.0,
-                                                "w_sound_3_9_loading": 0.0,
-                                                "efg_natural": 7,
-                                                "pile_dirty_loading": 0.0,
-                                                "w_stump_rotten_loading": 0.0,
-                                                "duff_upper_loading": 0.96,
-                                                "snags_c2_loading": 0.0,
-                                                "ecoregion": 260.0,
-                                                "cover_type": 161,
-                                                "nw_secondary_perc_live": 0.0,
-                                                "w_sound_gt20_loading": 0.0,
-                                                "w_sound_9_20_loading": 0.0,
-                                                "litter_depth": 1.0,
-                                                "squirrel_midden_loading": 0.0,
-                                                "snags_c1_foliage_loading": 0.0,
-                                                "moss_depth": 0.0,
-                                                "w_rotten_3_9_loading": 0.0,
-                                                "filename": "FB_0046_FCCS.xml",
-                                                "understory_loading": 0.0,
-                                                "nw_primary_perc_live": 0.0,
                                                 "overstory_loading": 0.0,
+                                                "ecoregion": 260.0,
+                                                "w_sound_1_3_loading": 1.0,
+                                                "lichen_loading": 0.0,
+                                                "shrubs_secondary_perc_live": 0.85,
+                                                "efg_activity": 7,
+                                                "basal_accum_loading": 0.0,
+                                                "w_rotten_gt20_loading": 0.0,
+                                                "litter_loading": 0.3,
+                                                "snags_c1_wood_loading": 0.0,
+                                                "nw_secondary_perc_live": 0.0,
+                                                "midstory_loading": 0.0,
+                                                "litter_depth": 1.0,
+                                                "total_available_fuel_loading": 18.153765,
+                                                "ladderfuels_loading": 0.0,
+                                                "snags_c1wo_foliage_loading": 0.0,
+                                                "pile_clean_loading": 0.0,
+                                                "pile_dirty_loading": 0.0,
+                                                "w_rotten_3_9_loading": 0.0,
+                                                "w_stump_lightered_loading": 0.0,
+                                                "filename": "FB_0046_FCCS.xml",
+                                                "w_sound_gt20_loading": 0.0,
+                                                "pile_vdirty_loading": 0.0,
                                                 "w_sound_0_quarter_loading": 0.5,
-                                                "shrubs_primary_perc_live": 0.85
+                                                "nw_primary_perc_live": 0.0,
+                                                "duff_lower_loading": 2.16,
+                                                "nw_secondary_loading": 0.0,
+                                                "w_sound_9_20_loading": 0.0,
+                                                "w_sound_3_9_loading": 0.0,
+                                                "snags_c3_loading": 0.0,
+                                                "duff_upper_depth": 0.2,
+                                                "shrubs_secondary_loading": 0.172292,
+                                                "shrubs_primary_perc_live": 0.85,
+                                                "w_stump_sound_loading": 0.0,
+                                                "moss_loading": 0.0,
+                                                "moss_depth": 0.0,
+                                                "snags_c2_loading": 0.0,
+                                                "snags_c1_foliage_loading": 0.0,
+                                                "efg_natural": 7,
+                                                "duff_lower_depth": 0.2,
+                                                "cover_type": 161,
+                                                "w_stump_rotten_loading": 0.0,
+                                                "lichen_depth": 0.0,
+                                                "squirrel_midden_loading": 0.0,
+                                                "w_rotten_9_20_loading": 0.0,
+                                                "understory_loading": 0.0,
+                                                "shrubs_primary_loading": 12.061473,
+                                                "duff_upper_loading": 0.96,
+                                                "w_sound_quarter_1_loading": 1.0,
+                                                "nw_primary_loading": 0.0
                                             },
                                             "fccs_id": "46",
+                                            "consumption": {
+                                                "ground fuels": {
+                                                    "basal accumulations": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "duff upper": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "duff lower": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "squirrel middens": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    }
+                                                },
+                                                "litter-lichen-moss": {
+                                                    "litter": {
+                                                        "smoldering": [
+                                                            0.016801800000000002
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.168018
+                                                        ],
+                                                        "flaming": [
+                                                            0.1512162
+                                                        ]
+                                                    },
+                                                    "moss": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "lichen": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    }
+                                                },
+                                                "nonwoody": {
+                                                    "secondary dead": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "primary dead": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "secondary live": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "primary live": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    }
+                                                },
+                                                "canopy": {
+                                                    "midstory": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "understory": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "snags class 2": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "snags class 3": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "snags class 1 no foliage": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "snags class 1 foliage": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "snags class 1 wood": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "overstory": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "ladder fuels": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    }
+                                                },
+                                                "shrub": {
+                                                    "secondary dead": {
+                                                        "smoldering": [
+                                                            0.0018252225125226875
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.018252225125226874
+                                                        ],
+                                                        "flaming": [
+                                                            0.01642700261270419
+                                                        ]
+                                                    },
+                                                    "primary dead": {
+                                                        "smoldering": [
+                                                            0.1277765192451452
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            1.277765192451452
+                                                        ],
+                                                        "flaming": [
+                                                            1.1499886732063067
+                                                        ]
+                                                    },
+                                                    "secondary live": {
+                                                        "smoldering": [
+                                                            0.005171463785480947
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.10342927570961893
+                                                        ],
+                                                        "flaming": [
+                                                            0.09825781192413799
+                                                        ]
+                                                    },
+                                                    "primary live": {
+                                                        "smoldering": [
+                                                            0.362033471194578
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            7.24066942389156
+                                                        ],
+                                                        "flaming": [
+                                                            6.878635952696981
+                                                        ]
+                                                    }
+                                                },
+                                                "summary": {
+                                                    "ground fuels": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "woody fuels": {
+                                                        "smoldering": [
+                                                            0.15172000000000002
+                                                        ],
+                                                        "residual": [
+                                                            0.020110000000000003
+                                                        ],
+                                                        "total": [
+                                                            1.7671999999999999
+                                                        ],
+                                                        "flaming": [
+                                                            1.59537
+                                                        ]
+                                                    },
+                                                    "nonwoody": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "canopy": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "shrub": {
+                                                        "smoldering": [
+                                                            0.4968066767377268
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            8.640116117177858
+                                                        ],
+                                                        "flaming": [
+                                                            8.143309440440131
+                                                        ]
+                                                    },
+                                                    "litter-lichen-moss": {
+                                                        "smoldering": [
+                                                            0.016801800000000002
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.168018
+                                                        ],
+                                                        "flaming": [
+                                                            0.1512162
+                                                        ]
+                                                    },
+                                                    "total": {
+                                                        "smoldering": [
+                                                            0.6653284767377268
+                                                        ],
+                                                        "residual": [
+                                                            0.020110000000000003
+                                                        ],
+                                                        "total": [
+                                                            10.575334117177857
+                                                        ],
+                                                        "flaming": [
+                                                            9.88989564044013
+                                                        ]
+                                                    }
+                                                },
+                                                "woody fuels": {
+                                                    "10k+-hr fuels sound": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "1000-hr fuels rotten": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "10000-hr fuels sound": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "stumps rotten": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "10000-hr fuels rotten": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "stumps sound": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "10k+-hr fuels rotten": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "100-hr fuels": {
+                                                        "smoldering": [
+                                                            0.040220000000000006
+                                                        ],
+                                                        "residual": [
+                                                            0.020110000000000003
+                                                        ],
+                                                        "total": [
+                                                            0.4022
+                                                        ],
+                                                        "flaming": [
+                                                            0.34187
+                                                        ]
+                                                    },
+                                                    "1-hr fuels": {
+                                                        "smoldering": [
+                                                            0.025
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.5
+                                                        ],
+                                                        "flaming": [
+                                                            0.475
+                                                        ]
+                                                    },
+                                                    "stumps lightered": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "piles": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    },
+                                                    "10-hr fuels": {
+                                                        "smoldering": [
+                                                            0.08650000000000001
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.865
+                                                        ],
+                                                        "flaming": [
+                                                            0.7785
+                                                        ]
+                                                    },
+                                                    "1000-hr fuels sound": {
+                                                        "smoldering": [
+                                                            0.0
+                                                        ],
+                                                        "residual": [
+                                                            0.0
+                                                        ],
+                                                        "total": [
+                                                            0.0
+                                                        ],
+                                                        "flaming": [
+                                                            0.0
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "pct": 100.0,
+                                            "heat": {
+                                                "smoldering": [
+                                                    100000.0
+                                                ],
+                                                "residual": [
+                                                    100000.0
+                                                ],
+                                                "total": [
+                                                    300000.0
+                                                ],
+                                                "flaming": [
+                                                    100000.0
+                                                ]
+                                            },
+                                            "emissions_fuel_loadings": {
+                                                "shrubs_needledrape_loading": 0.0,
+                                                "filename": "FB_0046_FCCS.xml",
+                                                "cover_type": 161,
+                                                "ecoregion": 260.0,
+                                                "overstory_loading": 0.0,
+                                                "midstory_loading": 0.0,
+                                                "understory_loading": 0.0,
+                                                "snags_c1_foliage_loading": 0.0,
+                                                "snags_c1wo_foliage_loading": 0.0,
+                                                "snags_c1_wood_loading": 0.0,
+                                                "snags_c2_loading": 0.0,
+                                                "snags_c3_loading": 0.0,
+                                                "shrubs_primary_loading": 12.061473,
+                                                "shrubs_secondary_loading": 0.172292,
+                                                "shrubs_primary_perc_live": 0.85,
+                                                "shrubs_secondary_perc_live": 0.85,
+                                                "nw_primary_loading": 0.0,
+                                                "nw_secondary_loading": 0.0,
+                                                "nw_primary_perc_live": 0.0,
+                                                "nw_secondary_perc_live": 0.0,
+                                                "w_sound_0_quarter_loading": 0.5,
+                                                "w_sound_quarter_1_loading": 1.0,
+                                                "w_sound_1_3_loading": 1.0,
+                                                "w_sound_3_9_loading": 0.0,
+                                                "w_sound_9_20_loading": 0.0,
+                                                "w_sound_gt20_loading": 0.0,
+                                                "w_rotten_3_9_loading": 0.0,
+                                                "w_rotten_9_20_loading": 0.0,
+                                                "w_rotten_gt20_loading": 0.0,
+                                                "w_stump_sound_loading": 0.0,
+                                                "w_stump_rotten_loading": 0.0,
+                                                "w_stump_lightered_loading": 0.0,
+                                                "litter_depth": 1.0,
+                                                "litter_loading": 0.3,
+                                                "lichen_depth": 0.0,
+                                                "lichen_loading": 0.0,
+                                                "moss_depth": 0.0,
+                                                "moss_loading": 0.0,
+                                                "basal_accum_loading": 0.0,
+                                                "squirrel_midden_loading": 0.0,
+                                                "ladderfuels_loading": 0.0,
+                                                "duff_lower_depth": 0.2,
+                                                "duff_lower_loading": 2.16,
+                                                "duff_upper_depth": 0.4,
+                                                "duff_upper_loading": 1.92,
+                                                "pile_clean_loading": 0.0,
+                                                "pile_dirty_loading": 0.0,
+                                                "pile_vdirty_loading": 0.0,
+                                                "total_available_fuel_loading": 19.113764,
+                                                "efg_natural": 7,
+                                                "efg_activity": 7
+                                            },
+                                            "emissions": {
+                                                "flaming": {
+                                                    "PM2.5": [
+                                                        11.468664110712156
+                                                    ]
+                                                },
+                                                "smoldering": {
+                                                    "PM2.5": [
+                                                        1.713464761358802
+                                                    ]
+                                                },
+                                                "residual": {
+                                                    "PM2.5": [
+                                                        0.05604774999999999
+                                                    ]
+                                                },
+                                                "total": {
+                                                    "PM2.5": [
+                                                        13.238176622070958
+                                                    ]
+                                                }
+                                            },
                                             "emissions_details": {
                                                 "summary": {
                                                     "canopy": {
@@ -563,754 +1015,39 @@
                                                         }
                                                     }
                                                 }
-                                            },
-                                            "pct": 100.0,
-                                            "heat": {
-                                                "total": [
-                                                    300000.0
-                                                ],
-                                                "smoldering": [
-                                                    100000.0
-                                                ],
-                                                "residual": [
-                                                    100000.0
-                                                ],
-                                                "flaming": [
-                                                    100000.0
-                                                ]
-                                            },
-                                            "consumption": {
-                                                "canopy": {
-                                                    "snags class 1 foliage": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "snags class 3": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "snags class 1 wood": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "ladder fuels": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "midstory": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "overstory": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "snags class 1 no foliage": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "understory": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "snags class 2": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    }
-                                                },
-                                                "ground fuels": {
-                                                    "basal accumulations": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "duff lower": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "duff upper": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "squirrel middens": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    }
-                                                },
-                                                "summary": {
-                                                    "canopy": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "ground fuels": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "total": {
-                                                        "total": [
-                                                            10.575334117177857
-                                                        ],
-                                                        "smoldering": [
-                                                            0.6653284767377268
-                                                        ],
-                                                        "residual": [
-                                                            0.020110000000000003
-                                                        ],
-                                                        "flaming": [
-                                                            9.88989564044013
-                                                        ]
-                                                    },
-                                                    "woody fuels": {
-                                                        "total": [
-                                                            1.7671999999999999
-                                                        ],
-                                                        "smoldering": [
-                                                            0.15172000000000002
-                                                        ],
-                                                        "residual": [
-                                                            0.020110000000000003
-                                                        ],
-                                                        "flaming": [
-                                                            1.59537
-                                                        ]
-                                                    },
-                                                    "shrub": {
-                                                        "total": [
-                                                            8.640116117177858
-                                                        ],
-                                                        "smoldering": [
-                                                            0.4968066767377268
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            8.143309440440131
-                                                        ]
-                                                    },
-                                                    "nonwoody": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "litter-lichen-moss": {
-                                                        "total": [
-                                                            0.168018
-                                                        ],
-                                                        "smoldering": [
-                                                            0.016801800000000002
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.1512162
-                                                        ]
-                                                    }
-                                                },
-                                                "woody fuels": {
-                                                    "stumps rotten": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "10000-hr fuels sound": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "1-hr fuels": {
-                                                        "total": [
-                                                            0.5
-                                                        ],
-                                                        "smoldering": [
-                                                            0.025
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.475
-                                                        ]
-                                                    },
-                                                    "piles": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "1000-hr fuels rotten": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "10-hr fuels": {
-                                                        "total": [
-                                                            0.865
-                                                        ],
-                                                        "smoldering": [
-                                                            0.08650000000000001
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.7785
-                                                        ]
-                                                    },
-                                                    "10k+-hr fuels sound": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "10k+-hr fuels rotten": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "10000-hr fuels rotten": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "stumps sound": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "1000-hr fuels sound": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "stumps lightered": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "100-hr fuels": {
-                                                        "total": [
-                                                            0.4022
-                                                        ],
-                                                        "smoldering": [
-                                                            0.040220000000000006
-                                                        ],
-                                                        "residual": [
-                                                            0.020110000000000003
-                                                        ],
-                                                        "flaming": [
-                                                            0.34187
-                                                        ]
-                                                    }
-                                                },
-                                                "shrub": {
-                                                    "secondary dead": {
-                                                        "total": [
-                                                            0.018252225125226874
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0018252225125226875
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.01642700261270419
-                                                        ]
-                                                    },
-                                                    "primary dead": {
-                                                        "total": [
-                                                            1.277765192451452
-                                                        ],
-                                                        "smoldering": [
-                                                            0.1277765192451452
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            1.1499886732063067
-                                                        ]
-                                                    },
-                                                    "primary live": {
-                                                        "total": [
-                                                            7.24066942389156
-                                                        ],
-                                                        "smoldering": [
-                                                            0.362033471194578
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            6.878635952696981
-                                                        ]
-                                                    },
-                                                    "secondary live": {
-                                                        "total": [
-                                                            0.10342927570961893
-                                                        ],
-                                                        "smoldering": [
-                                                            0.005171463785480947
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.09825781192413799
-                                                        ]
-                                                    }
-                                                },
-                                                "nonwoody": {
-                                                    "secondary dead": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "primary dead": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "primary live": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "secondary live": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    }
-                                                },
-                                                "litter-lichen-moss": {
-                                                    "lichen": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    },
-                                                    "litter": {
-                                                        "total": [
-                                                            0.168018
-                                                        ],
-                                                        "smoldering": [
-                                                            0.016801800000000002
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.1512162
-                                                        ]
-                                                    },
-                                                    "moss": {
-                                                        "total": [
-                                                            0.0
-                                                        ],
-                                                        "smoldering": [
-                                                            0.0
-                                                        ],
-                                                        "residual": [
-                                                            0.0
-                                                        ],
-                                                        "flaming": [
-                                                            0.0
-                                                        ]
-                                                    }
-                                                }
-                                            },
-                                            "emissions": {
-                                                "flaming": {
-                                                    "PM2.5": [
-                                                        11.468664110712156
-                                                    ]
-                                                },
-                                                "smoldering": {
-                                                    "PM2.5": [
-                                                        1.713464761358802
-                                                    ]
-                                                },
-                                                "residual": {
-                                                    "PM2.5": [
-                                                        0.05604774999999999
-                                                    ]
-                                                },
-                                                "total": {
-                                                    "PM2.5": [
-                                                        13.238176622070958
-                                                    ]
-                                                }
-                                            },
-                                            "emissions_fuel_loadings": {
-                                                "shrubs_primary_loading": 12.061473,
-                                                "shrubs_secondary_loading": 0.172292,
-                                                "pile_clean_loading": 0.0,
-                                                "lichen_depth": 0.0,
-                                                "total_available_fuel_loading": 19.113764,
-                                                "efg_activity": 7,
-                                                "duff_lower_depth": 0.2,
-                                                "duff_lower_loading": 2.16,
-                                                "moss_loading": 0.0,
-                                                "pile_vdirty_loading": 0.0,
-                                                "shrubs_secondary_perc_live": 0.85,
-                                                "nw_primary_perc_live": 0.0,
-                                                "w_stump_sound_loading": 0.0,
-                                                "nw_secondary_loading": 0.0,
-                                                "midstory_loading": 0.0,
-                                                "w_rotten_9_20_loading": 0.0,
-                                                "w_sound_quarter_1_loading": 1.0,
-                                                "lichen_loading": 0.0,
-                                                "w_stump_lightered_loading": 0.0,
-                                                "nw_primary_loading": 0.0,
-                                                "litter_loading": 0.3,
-                                                "snags_c1wo_foliage_loading": 0.0,
-                                                "duff_upper_depth": 0.4,
-                                                "w_sound_1_3_loading": 1.0,
-                                                "snags_c1_wood_loading": 0.0,
-                                                "ladderfuels_loading": 0.0,
-                                                "snags_c3_loading": 0.0,
-                                                "w_rotten_gt20_loading": 0.0,
-                                                "w_rotten_3_9_loading": 0.0,
-                                                "w_sound_3_9_loading": 0.0,
-                                                "efg_natural": 7,
-                                                "pile_dirty_loading": 0.0,
-                                                "w_stump_rotten_loading": 0.0,
-                                                "duff_upper_loading": 1.92,
-                                                "snags_c2_loading": 0.0,
-                                                "ecoregion": 260.0,
-                                                "cover_type": 161,
-                                                "nw_secondary_perc_live": 0.0,
-                                                "w_sound_gt20_loading": 0.0,
-                                                "w_sound_9_20_loading": 0.0,
-                                                "litter_depth": 1.0,
-                                                "moss_depth": 0.0,
-                                                "snags_c1_foliage_loading": 0.0,
-                                                "squirrel_midden_loading": 0.0,
-                                                "filename": "FB_0046_FCCS.xml",
-                                                "understory_loading": 0.0,
-                                                "basal_accum_loading": 0.0,
-                                                "overstory_loading": 0.0,
-                                                "w_sound_0_quarter_loading": 0.5,
-                                                "shrubs_primary_perc_live": 0.85
                                             }
                                         }
                                     ],
+                                    "lng": -121.3990506,
                                     "emissions": {
                                         "summary": {
                                             "total": 13.238176622070958,
                                             "PM2.5": 13.238176622070958
                                         }
-                                    },
-                                    "lat": 47.4316976
+                                    }
                                 }
                             ],
-                            "moisture_litter": 30,
+                            "ecoregion": "southern",
+                            "canopy_consumption_pct": 0,
+                            "end": "2015-01-21T17:00:00",
                             "utc_offset": "-09:00",
+                            "slope": 5,
+                            "fm_type": "MEAS-Th",
                             "rain_days": 10,
                             "moisture_1khr": 50,
-                            "moisture_10hr": 50,
-                            "canopy_consumption_pct": 0,
+                            "pile_blackened_pct": 0,
+                            "moisture_duff": 50,
+                            "shrub_blackened_pct": 50,
                             "start": "2015-01-20T17:00:00",
+                            "windspeed": 5,
+                            "moisture_litter": 30,
+                            "moisture_10hr": 50,
                             "emissions": {
                                 "summary": {
                                     "total": 13.238176622070958,
                                     "PM2.5": 13.238176622070958
                                 }
-                            },
-                            "moisture_duff": 50,
-                            "shrub_blackened_pct": 50
+                            }
                         }
                     ],
                     "emissions": {
@@ -1321,31 +1058,548 @@
                     }
                 }
             ],
-            "event_of": {
-                "name": "Natural Fire near Snoqualmie Pass, WA",
-                "id": "SF11E826544"
-            },
-            "id": "SF11C14225236095807750",
+            "type": "wildfire",
             "fuel_type": "natural",
             "emissions": {
                 "summary": {
                     "total": 13.238176622070958,
                     "PM2.5": 13.238176622070958
                 }
-            },
-            "type": "wildfire"
+            }
         }
     ],
-    "processing": [
-        {
-            "module": "bluesky.modules.emissions",
+    "today": "2023-10-03T00:00:00",
+    "run_id": "58d3a3a2-37c8-4bc9-b41b-2bf841c5d160",
+    "counts": {
+        "fires": 1,
+        "locations": 1,
+        "failed_fires": 1
+    },
+    "bluesky_version": "4.4.1",
+    "run_config": {
+        "skip_failed_fires": true,
+        "skip_failed_sources": false,
+        "statuslogging": {
+            "enabled": false,
+            "api_endpoint": null,
+            "api_key": null,
+            "api_secret": null,
+            "process": null,
+            "domain": null
+        },
+        "input": {
+            "input_file_failure_tolerance": "partial",
+            "wait": {}
+        },
+        "load": {
+            "sources": []
+        },
+        "merge": {
+            "skip_failures": false
+        },
+        "filter": {
+            "skip_failures": false
+        },
+        "ecoregion": {
+            "lookup_implementation": "ogr",
+            "skip_failures": true,
+            "default": null
+        },
+        "fuelbeds": {
+            "fccs_version": "2",
+            "ignored_percent_resampling_threshold": 99.9,
+            "ignored_fuelbeds": [
+                "0",
+                "900"
+            ],
+            "no_sampling": false,
+            "use_all_grid_cells": false,
+            "sampling_radius_factors": null,
+            "skip_failures": false,
+            "truncation_percentage_threshold": 90.0,
+            "truncation_count_threshold": 5,
+            "total_pct_threshold": 0.5
+        },
+        "fuelmoisture": {
+            "models": [
+                "nfdrs"
+            ],
+            "use_defaults": false,
+            "defaults_profile": null,
+            "skip_failures": true,
+            "nfdrs": {},
+            "wims": {
+                "url": "https://www.wfas.net/archive/www.fs.fed.us/land/wfas/archive/%Y/%m/%d/fdr_obs.dat",
+                "data_dir": null
+            }
+        },
+        "consumption": {
+            "fuel_loadings": {},
+            "scale_with_estimated_fuelload": false,
+            "scale_with_estimated_consumption": false,
+            "consume_settings": {
+                "natural": {},
+                "activity": {
+                    "slope": {
+                        "defaults": {
+                            "rx": 5,
+                            "wf": 5,
+                            "other": 5
+                        }
+                    },
+                    "windspeed": {
+                        "defaults": {
+                            "rx": 6,
+                            "wf": 6,
+                            "other": 6
+                        }
+                    },
+                    "days_since_rain": {
+                        "defaults": {
+                            "rx": 10,
+                            "wf": 10,
+                            "other": 10
+                        },
+                        "synonyms": [
+                            "rain_days"
+                        ]
+                    },
+                    "fuel_moisture_10hr_pct": {
+                        "defaults": {
+                            "rx": 50,
+                            "wf": 50,
+                            "other": 50
+                        },
+                        "synonyms": [
+                            "moisture_10hr"
+                        ]
+                    },
+                    "length_of_ignition": {
+                        "defaults": {
+                            "rx": 120,
+                            "wf": 120,
+                            "other": 120
+                        }
+                    },
+                    "fm_type": {
+                        "defaults": {
+                            "rx": "MEAS-Th",
+                            "wf": "MEAS-Th",
+                            "other": "MEAS-Th"
+                        }
+                    }
+                },
+                "all": {
+                    "fuel_moisture_1000hr_pct": {
+                        "defaults": {
+                            "rx": 30,
+                            "wf": 30,
+                            "other": 30
+                        },
+                        "synonyms": [
+                            "moisture_1khr"
+                        ]
+                    },
+                    "fuel_moisture_duff_pct": {
+                        "defaults": {
+                            "rx": 75,
+                            "wf": 75,
+                            "other": 75
+                        },
+                        "synonyms": [
+                            "moisture_duff"
+                        ]
+                    },
+                    "fuel_moisture_litter_pct": {
+                        "defaults": {
+                            "rx": 16,
+                            "wf": 16,
+                            "other": 16
+                        },
+                        "synonyms": [
+                            "moisture_litter"
+                        ]
+                    },
+                    "canopy_consumption_pct": {
+                        "defaults": {
+                            "rx": 0,
+                            "wf": 0,
+                            "other": 0
+                        }
+                    },
+                    "shrub_blackened_pct": {
+                        "defaults": {
+                            "rx": 50,
+                            "wf": 50,
+                            "other": 50
+                        }
+                    },
+                    "pile_blackened_pct": {
+                        "defaults": {
+                            "rx": 0,
+                            "wf": 0,
+                            "other": 0
+                        }
+                    },
+                    "duff_pct_available": {
+                        "defaults": {
+                            "rx": 100,
+                            "wf": 100,
+                            "other": 100
+                        }
+                    },
+                    "sound_cwd_pct_available": {
+                        "defaults": {
+                            "rx": 100,
+                            "wf": 100,
+                            "other": 100
+                        }
+                    },
+                    "rotten_cwd_pct_available": {
+                        "defaults": {
+                            "rx": 100,
+                            "wf": 100,
+                            "other": 100
+                        }
+                    },
+                    "output_units": {
+                        "default": "tons_ac"
+                    }
+                }
+            }
+        },
+        "emissions": {
             "model": "consume",
-            "eflookup_version": "3.1.1",
-            "emitcalc_version": "2.0.1",
-            "module_name": "emissions",
-            "consume_version": "5.0.2",
-            "version": "0.1.0"
+            "include_emissions_details": true,
+            "include_emissions_factors": false,
+            "species": [
+                "PM2.5"
+            ],
+            "fuel_loadings": {},
+            "ubc-bsf-feps": {
+                "working_dir": null,
+                "delete_working_dir_if_no_error": true
+            }
+        },
+        "growth": {
+            "model": "persistence",
+            "persistence": null
+        },
+        "findmetdata": {
+            "met_root_dir": null,
+            "time_window": {},
+            "wait": {},
+            "met_format": "arl",
+            "arl": {
+                "accepted_forecasts": null,
+                "index_filename_pattern": "arl12hrindex.csv",
+                "max_days_out": 4
+            },
+            "skip_failures": false
+        },
+        "localmet": {
+            "time_step": 1,
+            "skip_failures": true,
+            "working_dir": null,
+            "delete_working_dir_if_no_error": true
+        },
+        "timeprofile": {
+            "hourly_fractions": null,
+            "model": "default",
+            "ubc-bsf-feps": {
+                "interpolation_type": 1,
+                "normalize": true,
+                "working_dir": null,
+                "delete_working_dir_if_no_error": true
+            }
+        },
+        "plumerise": {
+            "model": "feps",
+            "working_dir": null,
+            "delete_working_dir_if_no_error": true,
+            "feps": {
+                "load_heat": false
+            },
+            "sev": {},
+            "sev-feps": {}
+        },
+        "extrafiles": {
+            "sets": [],
+            "dest_dir": null,
+            "emissionscsv": {
+                "filename": null,
+                "date_time_format": "%Y-%m-%dT%H:%M:%S{utc_offset}"
+            },
+            "firescsvs": {
+                "fire_locations_filename": "fire_locations.csv",
+                "fire_events_filename": "fire_events.csv",
+                "date_time_format": "%Y%m%d"
+            },
+            "smokeready": {
+                "ptinv_filename": "ptinv-2023100300.ida",
+                "ptday_filename": "ptday-2023100300.ems95",
+                "pthour_filename": "pthour-2023100300.ems95",
+                "separate_smolder": true,
+                "write_ptinv_totals": true,
+                "write_ptday_file": true,
+                "use_fips": false
+            }
+        },
+        "trajectories": {
+            "model": "hysplit",
+            "start": null,
+            "num_hours": 24,
+            "output_dir": null,
+            "working_dir": null,
+            "delete_working_dir_if_no_error": true,
+            "handle_existing": "fail",
+            "hysplit": {
+                "binary": "hyts_std",
+                "start_hours": [
+                    0
+                ],
+                "heights": [
+                    10,
+                    100,
+                    1000
+                ],
+                "vertical_motion": 0,
+                "top_of_model_domain": 10000,
+                "output_file_name": "tdump",
+                "json_indent": null,
+                "json_file_name": "hysplit-trajectories.json",
+                "geojson_file_name": "hysplit-trajectories.geojson",
+                "setup_file_params": {
+                    "tm_tpot": 1,
+                    "tm_tamb": 1,
+                    "tm_rain": 1,
+                    "tm_mixd": 1,
+                    "tm_relh": 1,
+                    "tm_dswf": 1,
+                    "tm_terr": 0,
+                    "kmsl": 0
+                },
+                "static_files": {
+                    "ascdata_file": "/bluesky/bluesky/trajectories/hysplit/bdyfiles/ASCDATA.CFG",
+                    "landuse_file": "/bluesky/bluesky/trajectories/hysplit/bdyfiles/LANDUSE.ASC",
+                    "rouglen_file": "/bluesky/bluesky/trajectories/hysplit/bdyfiles/ROUGLEN.ASC",
+                    "terrain_file": "/bluesky/bluesky/trajectories/hysplit/bdyfiles/TERRAIN.ASC"
+                }
+            }
+        },
+        "dispersion": {
+            "model": "hysplit",
+            "start": null,
+            "num_hours": null,
+            "output_dir": null,
+            "working_dir": null,
+            "delete_working_dir_if_no_error": true,
+            "handle_existing": "fail",
+            "plume_merge": {},
+            "hysplit": {
+                "binaries": {},
+                "skip_invalid_fires": false,
+                "user_defined_grid": false,
+                "center_latitude": null,
+                "center_longitude": null,
+                "width_longitude": null,
+                "height_latitude": null,
+                "spacing_longitude": null,
+                "spacing_latitude": null,
+                "projection": "LatLon",
+                "grid": {},
+                "compute_grid": false,
+                "grid_length": 2000,
+                "optimize_grid_resolution": false,
+                "max_spacing_longitude": 0.5,
+                "max_spacing_latitude": 0.5,
+                "ascdata_file": "/bluesky/bluesky/dispersers/hysplit/bdyfiles/ASCDATA.CFG",
+                "landuse_file": "/bluesky/bluesky/dispersers/hysplit/bdyfiles/LANDUSE.ASC",
+                "rouglen_file": "/bluesky/bluesky/dispersers/hysplit/bdyfiles/ROUGLEN.ASC",
+                "archive_tranche_files": false,
+                "archive_pardump_files": false,
+                "ensure_dummy_fire": true,
+                "convert_hysplit2netcdf": true,
+                "output_file_name": "hysplit_conc.nc",
+                "smolder_height": 10.0,
+                "use_const_smoldering_fraction": false,
+                "smoldering_fraction_const": 0.0,
+                "top_of_model_domain": 10000.0,
+                "vertical_levels": [
+                    100
+                ],
+                "vertical_emislevels_reduction_factor": 1,
+                "subhour_emissions_reduction_interval": 1,
+                "emissions_rate": 0.001,
+                "vertical_method": "DATA",
+                "dispersion_folder": "./input/dispersion",
+                "ichem": 0,
+                "fire_intervals": [
+                    0,
+                    100,
+                    200,
+                    500,
+                    1000
+                ],
+                "parinit": "./input/dispersion/PARINIT",
+                "ninit": 0,
+                "stop_if_no_parinit": true,
+                "make_init_file": false,
+                "pardump": "./input/dispersion/PARDUMP",
+                "ndump": 0,
+                "ncycl": 0,
+                "mgmin": 10,
+                "khmax": 72,
+                "qcycle": 1.0,
+                "initd": 0,
+                "tratio": 0.75,
+                "delt": 0.0,
+                "numpar": 1000,
+                "maxpar": 10000000,
+                "kblt": 2,
+                "kdef": 0,
+                "kbls": 1,
+                "kzmix": 0,
+                "tvmix": 1.0,
+                "kmixd": 0,
+                "kmix0": -1,
+                "mpi": false,
+                "ncpus": 1,
+                "nprocesses": 1,
+                "nfires_per_process": -1,
+                "nprocesses_max": -1,
+                "sampling_interval_type": 0,
+                "sampling_interval_hour": 1,
+                "sampling_interval_min": 0,
+                "particle_diameter": 1.0,
+                "particle_density": 1.0,
+                "particle_shape": 1.0,
+                "dry_dep_velocity": 0.0,
+                "dry_dep_mol_weight": 0.0,
+                "dry_dep_reactivity": 0.0,
+                "dry_dep_diffusivity": 0.0,
+                "dry_dep_eff_henry": 0.0,
+                "wet_dep_actual_henry": 0.0,
+                "wet_dep_in_cloud_scav": 0.0,
+                "wet_dep_below_cloud_scav": 0.0,
+                "radioactive_half_live": 0.0,
+                "dispersion_offset": 0
+            },
+            "vsmoke": {
+                "temp_fire": 59.0,
+                "pres": 1013.25,
+                "irha": 25,
+                "ltofdy": true,
+                "stability": 4,
+                "mix_ht": 1500.0,
+                "oyinta": 0.0,
+                "ozinta": 0.0,
+                "bkgpma": 0.0,
+                "bkgcoa": 0.0,
+                "thot": 4,
+                "tconst": 4,
+                "tdecay": 2,
+                "efpm": 30,
+                "efco": 250,
+                "icover": 0,
+                "ceil": 99999,
+                "cc0crt": 0.02,
+                "viscrt": 0.125,
+                "grad_rise": true,
+                "rfrc": -0.75,
+                "emtqr": -0.75,
+                "kmz_file": "smoke_dispersion.kmz",
+                "overlay_title": "Peak Hourly PM2.5",
+                "legend_image": "/bluesky/bluesky/dispersers/vsmoke/images/aqi_legend.png",
+                "json_file": "smoke_dispersion.json",
+                "create_json": true,
+                "dutmfe": 0,
+                "dutmfn": 100,
+                "xbgn": 150,
+                "xend": 200,
+                "xntvl": 0.05,
+                "tol": 0.1
+            }
+        },
+        "visualization": {
+            "targets": [],
+            "trajectories": {
+                "hysplit": {
+                    "kml_file_name": "hysplit-trajectories.kml"
+                }
+            },
+            "dispersion": {
+                "hysplit": {
+                    "websky_version": "2",
+                    "fire_locations_csv_filename": "fire_locations.csv",
+                    "fire_events_csv_filename": "fire_events.csv",
+                    "smoke_dispersion_kmz_filename": "smoke_dispersion.kmz",
+                    "fire_kmz_filename": "fire_locations.kmz",
+                    "prettykml": false,
+                    "output_dir": null,
+                    "images_dir": null,
+                    "data_dir": "",
+                    "create_summary_json": false,
+                    "blueskykml_config": {
+                        "SmokeDispersionKMLInput": {
+                            "FIRE_EVENT_ICON": "http://maps.google.com/mapfiles/ms/micons/firedept.png"
+                        },
+                        "DispersionGridOutput": {
+                            "OUTPUT_DIR": null
+                        }
+                    },
+                    "layers": [
+                        0
+                    ]
+                }
+            }
+        },
+        "export": {
+            "modes": [],
+            "extra_exports": [],
+            "email": {
+                "handle_existing": "fail",
+                "recipients": null,
+                "sender": "bsp@airfire.org",
+                "subject": "bluesky run output",
+                "smtp_server": "localhost",
+                "smtp_port": 25,
+                "smtp_starttls": false,
+                "username": null,
+                "password": null
+            },
+            "localsave": {
+                "handle_existing": "fail",
+                "output_dir_name": null,
+                "extra_exports_dir_name": null,
+                "json_output_filename": "output.json",
+                "dest_dir": null
+            },
+            "upload": {
+                "handle_existing": "fail",
+                "output_dir_name": null,
+                "extra_exports_dir_name": null,
+                "json_output_filename": "output.json",
+                "tarball_name": null,
+                "scp_defaults": {
+                    "port": 22
+                }
+            },
+            "s3": {
+                "handle_existing": "replace",
+                "output_dir_name": null,
+                "extra_exports_dir_name": null,
+                "json_output_filename": "output.json.gz",
+                "tarball_name": null,
+                "include_tarball": true,
+                "bucket": null,
+                "key_prefix": null,
+                "default_region_name": "us-west-2",
+                "compress": true
+            }
+        },
+        "archive": {
+            "tarzip": []
         }
-    ],
-    "today": "2019-03-25"
+    }
 }
