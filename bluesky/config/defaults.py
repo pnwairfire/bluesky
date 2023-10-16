@@ -450,6 +450,10 @@ _DEFAULTS = {
             # }
         },
         "hysplit": {
+            "emissions_split": {
+                "enabled": False,
+                "target_pm25": 10.0
+            },
             "binaries": {},
             "skip_invalid_fires": False,
 

@@ -64,6 +64,7 @@ from .. import (
 )
 
 from . import hysplit_utils
+from .emissionssplit import EmissionsSplitter
 
 __all__ = [
     'HYSPLITDispersion'
@@ -182,6 +183,11 @@ class HYSPLITDispersion(DispersionBase):
         self._set_grid_params()
         self._set_reduction_factor()
         self._compute_tranches()
+
+        self._fires = EmissionsSplitter(
+            self.config, self._grid_params,
+            self._num_processes, self._fires
+        ).split()
 
         if 1 < self._num_processes:
                 # hysplit_utils.create_fire_tranches will log number of processes
