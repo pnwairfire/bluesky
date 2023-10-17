@@ -166,6 +166,11 @@ class HYSPLITDispersion(DispersionBase):
         self._has_parinit = []
         self._smolder_height = self.config("SMOLDER_HEIGHT")
 
+        # If configured for sub-hour emissions, SERI must be 1 to 12 and
+        # result in an integer when 60 is divided by it
+        SERI = self.config("SUBHOUR_EMISSIONS_REDUCTION_INTERVAL")
+        self._SERI = 1 if ( SERI < 1 or SERI > 13 or 60%SERI > 0) else SERI
+
     def _required_activity_fields(self):
         return ('timeprofile', 'plumerise', 'emissions')
 
@@ -593,16 +598,7 @@ class HYSPLITDispersion(DispersionBase):
         # A value slightly above ground level at which to inject smoldering
         # emissions into the model.
 
-        # sub-hour emissions?
-        SERI = self.config("SUBHOUR_EMISSIONS_REDUCTION_INTERVAL")
-
-        # must be 1 to 12 and result in an integer when 60 is divided by it
-        if ( SERI < 1 or SERI > 13 ):
-            SERI = 1
-            temp = 60%SERI
-            if temp > 0:
-                SERI = 1
-        minutes_per_interval = int(60/SERI)
+        minutes_per_interval = int(60/self._SERI)
 
         with open(emissions_file, "w") as emis:
             # HYSPLIT skips past the first two records, so these are for comment purposes only
@@ -617,7 +613,7 @@ class HYSPLITDispersion(DispersionBase):
                 num_fires = len(fires)
                 #num_heights = 21 # 20 quantile gaps, plus ground level
                 num_heights = self.num_output_quantiles + 1
-                num_sources = num_fires * num_heights * SERI
+                num_sources = num_fires * num_heights * self._SERI
 
                 # TODO: What is this and what does it do?
                 # A reasonable guess would be that it means a time increment of 1 hour
@@ -633,9 +629,9 @@ class HYSPLITDispersion(DispersionBase):
 
                   # loop over sub-hour interval (default hourly)
                   icount = 0
-                  for interval in range(SERI):
+                  for interval in range(self._SERI):
                     min_dur_str = "{:0>2}".format(icount*minutes_per_interval) + " 00"+"{:0>2}".format(minutes_per_interval)
-                    if (SERI == 1):
+                    if (self._SERI == 1):
                         min_dur_str = "00 0100"
                     icount += 1
 
@@ -803,19 +799,9 @@ class HYSPLITDispersion(DispersionBase):
 
     def _write_control_file(self, fires, control_file, concFile):
 
-        # sub-hour emissions?
-        SERI = self.config("SUBHOUR_EMISSIONS_REDUCTION_INTERVAL")
-
-        # must be 1 to 12 and result in an integer when 60 is divided by it
-        if ( SERI < 1 or SERI > 13 ):
-            SERI = 1
-            temp = 60%SERI
-            if temp > 0:
-                SERI = 1
-
         num_fires = len(fires)
         num_heights = self.num_output_quantiles + 1  # number of quantiles used, plus ground level
-        num_sources = num_fires * num_heights * SERI
+        num_sources = num_fires * num_heights * self._SERI
 
         # An arbitrary height value.  Used for the default source height
         # in the CONTROL file.  This can be anything we want, because
@@ -912,7 +898,7 @@ class HYSPLITDispersion(DispersionBase):
             # Source locations
             for fire in fires:
                 for height in range(num_heights):
-                  for intervals in range(SERI):
+                  for intervals in range(self._SERI):
                     f.write("%9.3f %9.3f %9.3f\n" % (fire.latitude, fire.longitude, sourceHeight))
 
             # Total run time (hours)
