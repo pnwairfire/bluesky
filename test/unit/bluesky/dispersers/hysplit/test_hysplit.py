@@ -9,6 +9,11 @@ from pytest import raises, approx
 
 from bluesky.config import to_lowercase_keys
 from bluesky.dispersers.hysplit import hysplit
+from bluesky.dispersers import SQUARE_METERS_PER_ACRE, GRAMS_PER_TON
+from bluesky.dispersers.hysplit.emissions_file_utils import (
+    _compute_emissions_rows_data,
+    _reduce_and_reallocate_vertical_levels
+)
 
 class TestGetBinaries():
     # Notes:
@@ -258,7 +263,8 @@ class TestReduceVerticalLevels():
         expected_fractions = [0.25, 0.25, 0.25, 0.25, 0]
         expected_heights = [1400, 1800, 2200, 2600, 3000]
 
-        heights, fractions = h._reduce_and_reallocate_vertical_levels(plumerise_hour)
+        heights, fractions = _reduce_and_reallocate_vertical_levels(
+            plumerise_hour, h._reduction_factor)
 
         assert heights == expected_heights
         assert fractions == expected_fractions
@@ -283,7 +289,8 @@ class TestReduceVerticalLevels():
         expected_fractions = [0.5, 0.25, 0.25, 0]
         expected_heights = [1500, 2000, 2500, 3000]
 
-        heights, fractions = h._reduce_and_reallocate_vertical_levels(plumerise_hour)
+        heights, fractions = _reduce_and_reallocate_vertical_levels(
+            plumerise_hour, h._reduction_factor)
 
         assert heights == expected_heights
         assert fractions == expected_fractions
@@ -308,7 +315,8 @@ class TestReduceVerticalLevels():
         expected_fractions = [0.25, 0.25, 0.25, 0.25, 0]
         expected_heights = [1400, 1800, 2200, 2600, 3000]
 
-        heights, fractions = h._reduce_and_reallocate_vertical_levels(plumerise_hour)
+        heights, fractions = _reduce_and_reallocate_vertical_levels(
+            plumerise_hour, h._reduction_factor)
 
         assert heights == expected_heights
         assert fractions == expected_fractions
@@ -333,7 +341,8 @@ class TestReduceVerticalLevels():
         expected_fractions = [1.0]
         expected_heights = [3000]
 
-        heights, fractions = h._reduce_and_reallocate_vertical_levels(plumerise_hour)
+        heights, fractions = _reduce_and_reallocate_vertical_levels(
+            plumerise_hour, h._reduction_factor)
 
         assert heights == expected_heights
         assert fractions == approx(expected_fractions, abs=0.00001)
@@ -362,18 +371,18 @@ class TestGetEmissionsRowsDataForLatLon():
         area = 10
         dummy = False
 
-        expected_area = area * hysplit.SQUARE_METERS_PER_ACRE
+        expected_area = area * SQUARE_METERS_PER_ACRE
         expected_rows = [
             (10.0, 0.0, expected_area, 0.0),
-            (1400, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
-            (1800, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
-            (2200, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
-            (2600, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (1400, 0.25 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
+            (1800, 0.25 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
+            (2200, 0.25 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
+            (2600, 0.25 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
             (3000, 0.0, expected_area, 0.0)
         ]
 
-        rows = h._get_emissions_rows_data_for_lat_lon(plumerise_hour,
-            pm25, area, dummy)
+        rows = _compute_emissions_rows_data(h.config, h._reduction_factor,
+            plumerise_hour, pm25, area, dummy)
 
         assert rows == expected_rows
 
@@ -398,17 +407,17 @@ class TestGetEmissionsRowsDataForLatLon():
         area = 10
         dummy = False
 
-        expected_area = area * hysplit.SQUARE_METERS_PER_ACRE
+        expected_area = area * SQUARE_METERS_PER_ACRE
         expected_rows = [
             (10.0, 0.0, expected_area, 0.0),
-            (1500, 0.5 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
-            (2000, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
-            (2500, 0.25 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (1500, 0.5 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
+            (2000, 0.25 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
+            (2500, 0.25 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
             (3000, 0.0, expected_area, 0.0)
         ]
 
-        rows = h._get_emissions_rows_data_for_lat_lon(plumerise_hour,
-            pm25, area, dummy)
+        rows = _compute_emissions_rows_data(h.config, h._reduction_factor,
+            plumerise_hour, pm25, area, dummy)
 
         assert rows == expected_rows
 
@@ -434,18 +443,18 @@ class TestGetEmissionsRowsDataForLatLon():
         area = 10
         dummy = False
 
-        expected_area = area * hysplit.SQUARE_METERS_PER_ACRE
+        expected_area = area * SQUARE_METERS_PER_ACRE
         expected_rows = [
-            (10.0, 0.2 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
-            (1400, 0.2 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
-            (1800, 0.2 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
-            (2200, 0.2 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
-            (2600, 0.2 * pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (10.0, 0.2 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
+            (1400, 0.2 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
+            (1800, 0.2 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
+            (2200, 0.2 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
+            (2600, 0.2 * pm25 * GRAMS_PER_TON, expected_area, 0.0),
             (3000, 0.0, expected_area, 0.0)
         ]
 
-        rows = h._get_emissions_rows_data_for_lat_lon(plumerise_hour,
-            pm25, area, dummy)
+        rows = _compute_emissions_rows_data(h.config, h._reduction_factor,
+            plumerise_hour, pm25, area, dummy)
 
         assert len(rows) == len(expected_rows)
         for i, r in enumerate(rows):
@@ -472,13 +481,13 @@ class TestGetEmissionsRowsDataForLatLon():
         area = 10
         dummy = False
 
-        expected_area = area * hysplit.SQUARE_METERS_PER_ACRE
+        expected_area = area * SQUARE_METERS_PER_ACRE
         expected_rows = [
-            (10.0, pm25 * hysplit.GRAMS_PER_TON, expected_area, 0.0),
+            (10.0, pm25 * GRAMS_PER_TON, expected_area, 0.0),
             (3000, 0.0, expected_area, 0.0)
         ]
 
-        rows = h._get_emissions_rows_data_for_lat_lon(plumerise_hour,
-            pm25, area, dummy)
+        rows = _compute_emissions_rows_data(h.config, h._reduction_factor,
+            plumerise_hour, pm25, area, dummy)
 
         assert rows == expected_rows

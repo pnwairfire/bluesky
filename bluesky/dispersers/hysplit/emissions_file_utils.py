@@ -7,8 +7,13 @@ from .. import GRAMS_PER_TON, SQUARE_METERS_PER_ACRE
 
 def get_emissions_rows_data(fire, dt, config, reduction_factor):
 
-    (dummy, plumerise_hour, pm25_emitted, hourly_area) = _get_hour_data(dt, fire)
+    (plumerise_hour, pm25_emitted, hourly_area, dummy) = _get_hour_data(dt, fire)
+    rows = _compute_emissions_rows_data(config, reduction_factor,
+        plumerise_hour, pm25_emitted, hourly_area, dummy)
+    return rows, dummy
 
+def _compute_emissions_rows_data(config, reduction_factor,
+        plumerise_hour, pm25_emitted, hourly_area, dummy):
     area_meters, pm25_entrained, pm25_injected, heat = _get_emissions_params(
         pm25_emitted, plumerise_hour, hourly_area, dummy, config)
     heights, fractions = _reduce_and_reallocate_vertical_levels(
@@ -33,7 +38,7 @@ def get_emissions_rows_data(fire, dt, config, reduction_factor):
 
         rows.append((height_meters, pm25_injected, area_meters, heat))
 
-    return rows, dummy
+    return rows
 
 def _get_hour_data(dt, fire):
     if fire.plumerise and fire.timeprofiled_emissions and fire.timeprofiled_area:
@@ -45,15 +50,19 @@ def _get_hour_data(dt, fire):
         timeprofiled_emissions_hour = fire.timeprofiled_emissions.get(local_dt)
         hourly_area = fire.timeprofiled_area.get(local_dt)
         if plumerise_hour and timeprofiled_emissions_hour and hourly_area:
-            return (False, plumerise_hour,
-                timeprofiled_emissions_hour.get('PM2.5', 0.0), hourly_area)
+            return (
+                plumerise_hour,
+                timeprofiled_emissions_hour.get('PM2.5', 0.0),
+                hourly_area,
+                False
+            )
 
     # If we don't have real data for the given timestep, we apparently need
     # to stick in dummy records anyway (so we have the correct number of sources).
     logging.debug("Fire %s has no emissions for hour %s", fire.id,
         dt.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
-    return (True, DUMMY_PLUMERISE_HOUR, 0.0, 0.0)
+    return (DUMMY_PLUMERISE_HOUR, 0.0, 0.0, True)
 
 def _get_emissions_params(pm25_emitted, plumerise_hour, hourly_area, dummy, config):
     if dummy:
