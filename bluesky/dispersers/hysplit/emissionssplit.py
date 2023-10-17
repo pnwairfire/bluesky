@@ -1,14 +1,26 @@
+import logging
 import math
+
+from afdatetime.parsing import parse_datetime
+
+from .. import GRAMS_PER_TON
+from .emissions_file_utils import get_emissions_rows_data
 
 __all__ = [
     'EmissionsSplitter'
 ]
 
+
+# use a delta theta of 15 degrees (convert to radians) and a radius of 0.0005
 RADIANS_PER_DEGREE   = 0.01745329251994329576
+DTHETA = 15.0 * RADIANS_PER_DEGREE
+DR =     0.0005
 
 class EmissionsSplitter():
-    def __init__(self, config_getter, grid_params, num_traunches, fires):
+    def __init__(self, config_getter, reduction_factor, grid_params,
+            num_traunches, fires):
         self._config_getter = config_getter
+        self._reduction_factor = reduction_factor
         self._grid_params = grid_params
         self._num_traunches = num_traunches
         self._fires = fires
@@ -78,48 +90,67 @@ class EmissionsSplitter():
     ##
 
     def split(self):
-        import pdb;pdb.set_trace()
-
         if not self._config_getter('emissions_split', 'enabled'):
             return self._fires
 
-        for fire in fires:
-            # TODO: get input rate for the fire (based on max hourly
-            #  emissions value?)
-            RATE1 = 803200000
+        fires = []
 
-            # number of times to split the input rate
-            NUMSPLIT = math.ceil(RATE1 / self._emissions_rate_target)
+        for fire in self._fires:
+            try:
+                max_emiss_rate = self._compute_emission_rate(fire)
 
-            # create an Archimedean spiral to place the new points
-            # r = a + b * theta
+                # number of times to split the input rate
+                num_split = math.ceil(max_emiss_rate / self._emissions_rate_target)
 
-            # need to define the rate of increase of theta around the fire and the
-            # rate of increase of the distance from it
+                if num_split == 1:
+                    fires.append(fire)
 
-            # use a delta theta of 15 degrees (convert to radians) and a radius of 0.0005
-            dtheta = 15.0 * RADIANS_PER_DEGREE
-            dr =     0.0005
-            # start at the original source. this needs to update the original source with
-            # the new emission rate (index zero) all of the following need to create a new
-            # source
-            r     = 0
+                else:
+                    lat_lngs = self._compute_new_lat_lngs(fire, num_split)
 
-            print("FIRE CENTER LAT LON    %f %f" % ( fire.latitude, fire.longitude ))
+            except Exception as e:
+                logging.warn("Failed to consider fire for splitting emissions: %s", e)
+                # Just add fire as is
+                fires.append(fire)
 
-            # loop over the number of sources (orig + extras)
-            for i in range (NUMSPLIT):
+    def _compute_emission_rate(self, fire):
+        # TODO: get input rate for the fire (based on max hourly
+        #  emissions value?)  <-- from Robert:  (it is essentially the
+        #  value that gets written to the EMISS.CFG file)
+        #RATE1 = 803200000
+        max_rate = 0
+        for dt in fire.timeprofiled_emissions:
+            dt = parse_datetime(dt)
+            rows, dummy = get_emissions_rows_data(fire, dt,
+                self._config_getter, self._reduction_factor)
 
-              x = r * math.cos( theta )
-              y = r * math.sin( theta )
+            max_rate = max([pm25 for (height, pm25, area, heat) in rows])
 
-              theta += dtheta
-              r     += dr
+        return max_rate
 
-              lonstar = x
-              latstar = y
+    def _compute_new_lat_lngs(self, fire, num_split):
+        """Creates an Archimedean spiral to place the new points
 
-            # the new lat and lon of the split source (may need to do something to treat the orignal
-            # source differently)
-              newlat = fire.latitude + latstar
-              newlon = fire.longitude + lonstar
+            r = a + b * theta
+
+        Need to define the rate of increase of theta around the fire and the
+        rate of increase of the distance from it
+        """
+        logging.info("Splitting emissions for fire centered at LAT LON %f %f",
+            fire.latitude, fire.longitude)
+
+        # start at the original source. this needs to update the original source with
+        # the new emission rate (index zero) all of the following need to create a new
+        # source
+        lat_lngs = []
+        r = 0
+        for i in range (num_split):
+            x = r * math.cos( theta )
+            y = r * math.sin( theta )
+
+            theta += DTHETA
+            r += DR
+
+            lat_lngs.append([fire.latitude + y, fire.longitude + x])
+
+        return lat_lngs
