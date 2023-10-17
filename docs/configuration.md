@@ -405,6 +405,14 @@ parameters would be used.
 
 #### if running hysplit dispersion:
 
+ - ***'config' > 'dispersion' > 'hysplit' > 'emissions_split' > 'enabled'*** -- *optional* -- default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'emissions_split' > 'target_pm25'*** -- *optional* -- default: 10.0
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit'*** -- *optional* -- default: "hycs_std"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit_mpi'*** -- *optional* -- default: "hycm_std"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'ncea'*** -- *optional* -- default: "ncea"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'ncks'*** -- *optional* -- default: "ncks"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'mpi'*** -- *optional* -- default: "mpiexec"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit2netcdf'*** -- *optional* -- default: "hysplit2netcdf"
  - ***'config' > 'dispersion' > 'hysplit' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'spacing'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed -- grid cell dimensions ***in km unless 'projection' is 'LatLng' (see below)***
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'projection'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed -- default: 'LatLng' (which means the spacing is in degrees)
