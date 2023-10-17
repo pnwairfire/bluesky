@@ -185,10 +185,15 @@ class HYSPLITDispersion(DispersionBase):
 
         self._set_grid_params()
         self._set_reduction_factor()
-        self._compute_tranches()
 
+        # TODO: We're using self.config("NPROCESSES") instead of
+        #   self._num_processes (computed in self._num_processes) because we
+        #   can't compute self._num_processes until we get the final number
+        #   of self._fires
         self._fires = EmissionsSplitter(self.config, self._reduction_factor,
-            self._grid_params, self._num_processes, self._fires).split()
+            self._grid_params, self.config("NPROCESSES"), self._fires).split()
+
+        self._compute_tranches()
 
         if 1 < self._num_processes:
                 # hysplit_utils.create_fire_tranches will log number of processes
@@ -350,6 +355,9 @@ class HYSPLITDispersion(DispersionBase):
                         self.tranche_num)
                 except Exception as e:
                     self.exc = e
+
+        # TODO: consider emissions when tranching in order to allocate
+        #  emissions equally (as much as possible)
 
         fire_tranches = hysplit_utils.create_fire_tranches(self._fire_sets,
             self._num_processes, self._model_start, self._num_hours,

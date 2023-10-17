@@ -1,8 +1,11 @@
 import logging
 import math
+import copy
 
 from afdatetime.parsing import parse_datetime
+from pyairfire.data.utils import multiply_nested_data
 
+from bluesky.models.fires import Fire
 from .. import GRAMS_PER_TON
 from .emissions_file_utils import get_emissions_rows_data
 
@@ -107,11 +110,16 @@ class EmissionsSplitter():
 
                 else:
                     lat_lngs = self._compute_new_lat_lngs(fire, num_split)
+                    split_fires = self._split_fire(fire, lat_lngs)
+                    fires.extend(split_fires)
 
             except Exception as e:
                 logging.warn("Failed to consider fire for splitting emissions: %s", e)
                 # Just add fire as is
                 fires.append(fire)
+
+        logging.info(f"Fires before splitting emissions: {len(self._fires)}; and after: {len(fires)}")
+        return fires
 
     def _compute_emission_rate(self, fire):
         # TODO: get input rate for the fire (based on max hourly
@@ -144,6 +152,7 @@ class EmissionsSplitter():
         # source
         lat_lngs = []
         r = 0
+        theta = 0
         for i in range (num_split):
             x = r * math.cos( theta )
             y = r * math.sin( theta )
@@ -154,3 +163,39 @@ class EmissionsSplitter():
             lat_lngs.append([fire.latitude + y, fire.longitude + x])
 
         return lat_lngs
+
+    def _split_fire(self, fire, lat_lngs):
+        num_split = len(lat_lngs)
+
+        new_fires = []
+        for i, lat_lng in enumerate(lat_lngs):
+            f = Fire(
+                id=f"{fire.id}-{i}",
+                # TODO: how should original_fire_ids be assiend?
+                original_fire_ids=fire.original_fire_ids,
+                meta=fire.get('meta', {}),
+                start=fire.start,
+                end=fire.end,
+                area=fire.area / num_split,
+                latitude=lat_lng[0],
+                longitude=lat_lng[1],
+                utc_offset=fire.utc_offset,
+                plumerise=self._get_reduced(fire, 'plumerise', num_split),
+                timeprofiled_emissions=self._get_reduced(fire,
+                    'timeprofiled_emissions', num_split),
+                timeprofiled_area=self._get_reduced(fire,
+                    'timeprofiled_area', num_split),
+                consumption=self._get_reduced(fire, 'consumption', num_split),
+            )
+
+            if fire.heat:
+                f.heat = fire.heat / num_split
+
+            new_fires.append(f)
+
+        return new_fires
+
+    def _get_reduced(self, fire, key, num_split):
+        data = copy.deepcopy(fire[key])
+        multiply_nested_data(data, 1 / num_split)
+        return data
