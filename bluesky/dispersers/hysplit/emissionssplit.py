@@ -176,20 +176,19 @@ class EmissionsSplitter():
                 meta=fire.get('meta', {}),
                 start=fire.start,
                 end=fire.end,
-                area=fire.area / num_split,
+                area=fire.area,  # fire.area / num_split,
                 latitude=lat_lng[0],
                 longitude=lat_lng[1],
                 utc_offset=fire.utc_offset,
-                plumerise=self._get_reduced(fire, 'plumerise', num_split),
-                timeprofiled_emissions=self._get_reduced(fire,
-                    'timeprofiled_emissions', num_split),
-                timeprofiled_area=self._get_reduced(fire,
-                    'timeprofiled_area', num_split),
+                plumerise=fire.plumerise,
+                timeprofiled_emissions=self._get_reduced(
+                    fire, 'timeprofiled_emissions', num_split),
+                timeprofiled_area=fire.timeprofiled_area,
                 consumption=self._get_reduced(fire, 'consumption', num_split),
             )
 
             if fire.heat:
-                f.heat = fire.heat / num_split
+                f.heat = fire.heat  #fire.heat / num_split
 
             new_fires.append(f)
 
