@@ -593,3 +593,6 @@
 ## 4.5.0
  - Upgrade docker image to ubuntu 22.04 & python v3.10.12
  - Upgrade to consume==5.2.1, blueskykml==5.0.1, met==4.0.0, Flask==3.0.0, pyairfire==5.0.0, pytest==7.4.2, geopandas==0.14.0, blueskyutils==2.0.0, fccsmap==4.0.0
+
+## 4.5.1
+ - Fix loading of perimeter geometry from shapefile (broken by python upgrade)
