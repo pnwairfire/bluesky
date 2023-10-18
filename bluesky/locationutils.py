@@ -224,4 +224,7 @@ def load_perimeter_geometry_from_shapefile(shapefile_name):
         if features[0]['geometry']['type'] not in ('Polygon', 'MultiPolygon'):
             raise ValueError("Perimeter shapefile must be of type Polygon or MultiPolygon")
 
-        return features[0]['geometry']
+        return {
+            "type": features[0]['geometry'].type,
+            "coordinates": features[0]['geometry'].coordinates
+        }
