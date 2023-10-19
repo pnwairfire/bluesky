@@ -596,3 +596,6 @@
 
 ## 4.5.1
  - Fix loading of perimeter geometry from shapefile (broken by python upgrade)
+
+## 4.5.2
+ - Add option to split HYSPLIT emissions sources based on hourly rate
