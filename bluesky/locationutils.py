@@ -217,7 +217,9 @@ def load_perimeter_geometry_from_shapefile(shapefile_name):
                     shapefile_name = os.path.join(zip_dir, f)
 
     with fiona.open(shapefile_name) as features:
-        # TODO: support multiple features
+        # TODO: support multiple features - could combine into single
+        #  multi-polygon perimeter or split into multiple active areas,
+        #  one active area per feature
         if len(features) > 1:
             raise ValueError("Only shapesfiles with single feature are supported")
 
