@@ -599,3 +599,7 @@
 
 ## 4.5.2
  - Add option to split HYSPLIT emissions sources based on hourly rate
+
+## 4.5.3
+ - Replace HYSPLIT v5.1.0 and v5.2.3 binaries with ones built on ubuntu 22.04
+ - Replace HYSPLIT v5.1 and v5.2 binaries with sym links to corresponding v5.1.0 and v5.2.3 binaries
