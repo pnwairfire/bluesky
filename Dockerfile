@@ -104,22 +104,22 @@ COPY bin/hycm_std /usr/local/bin/hycm_std
 COPY bin/hycs_std /usr/local/bin/hycs_std
 COPY bin/hyts_std /usr/local/bin/hyts_std
 COPY bin/hytm_std /usr/local/bin/hytm_std
-COPY bin/hycm_std-v5.1 /usr/local/bin/hycm_std-v5.1
-COPY bin/hycs_std-v5.1 /usr/local/bin/hycs_std-v5.1
-COPY bin/hyts_std-v5.1 /usr/local/bin/hyts_std-v5.1
-COPY bin/hytm_std-v5.1 /usr/local/bin/hytm_std-v5.1
 COPY bin/hycm_std-v5.1.0 /usr/local/bin/hycm_std-v5.1.0
 COPY bin/hycs_std-v5.1.0 /usr/local/bin/hycs_std-v5.1.0
 COPY bin/hyts_std-v5.1.0 /usr/local/bin/hyts_std-v5.1.0
 COPY bin/hytm_std-v5.1.0 /usr/local/bin/hytm_std-v5.1.0
-COPY bin/hycm_std-v5.2 /usr/local/bin/hycm_std-v5.2
-COPY bin/hycs_std-v5.2 /usr/local/bin/hycs_std-v5.2
-COPY bin/hyts_std-v5.2 /usr/local/bin/hyts_std-v5.2
-COPY bin/hytm_std-v5.2 /usr/local/bin/hytm_std-v5.2
+RUN ln -s /usr/local/bin/hycm_std-v5.1.0 /usr/local/bin/hycm_std-v5.1
+RUN ln -s /usr/local/bin/hycs_std-v5.1.0 /usr/local/bin/hycs_std-v5.1
+RUN ln -s /usr/local/bin/hyts_std-v5.1.0 /usr/local/bin/hyts_std-v5.1
+RUN ln -s /usr/local/bin/hytm_std-v5.1.0 /usr/local/bin/hytm_std-v5.1
 COPY bin/hycm_std-v5.2.3 /usr/local/bin/hycm_std-v5.2.3
 COPY bin/hycs_std-v5.2.3 /usr/local/bin/hycs_std-v5.2.3
 COPY bin/hyts_std-v5.2.3 /usr/local/bin/hyts_std-v5.2.3
 COPY bin/hytm_std-v5.2.3 /usr/local/bin/hytm_std-v5.2.3
+RUN ln -s /usr/local/bin/hycm_std-v5.2.3 /usr/local/bin/hycm_std-v5.2
+RUN ln -s /usr/local/bin/hycs_std-v5.2.3 /usr/local/bin/hycs_std-v5.2
+RUN ln -s /usr/local/bin/hyts_std-v5.2.3 /usr/local/bin/hyts_std-v5.2
+RUN ln -s /usr/local/bin/hytm_std-v5.2.3 /usr/local/bin/hytm_std-v5.2
 COPY bin/hysplit2netcdf /usr/local/bin/hysplit2netcdf
 COPY bin/profile /usr/local/bin/profile
 COPY bin/bulk_profiler_csv /usr/local/bin/bulk_profiler_csv
