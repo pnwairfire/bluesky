@@ -58,10 +58,10 @@ Additionally, you'll need the following executables:
 
  - ```ncea```:  ...
  - ```ncks```:  ...
- - ```hycs_std```: hysplit executable
- - ```hycm_std```: multi-processor hysplit executable
- - ```hyts_std```: hysplit trajectories executable
- - ```hytm_std```: multi-processor hysplit trajectories executable
+ - ```hycs_std[-v5.2.3]```: hysplit executable
+ - ```hycm_std[-v5.2.3]```: multi-processor hysplit executable
+ - ```hyts_std[-v5.2.3]```: hysplit trajectories executable
+ - ```hytm_std[-v5.2.3]```: multi-processor hysplit trajectories executable
  - ```mpiexec```: needed to run multi-processor hysplit
  - ```hysplit2netcdf```: this is only needed if opting to convert hysplit output to netcdf; to obtain, ...
 

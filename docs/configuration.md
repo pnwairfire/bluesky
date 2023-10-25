@@ -367,7 +367,7 @@ parameters would be used.
 
 #### if running hysplit trajectories:
 
- - ***'config' > 'trajectories' > 'hysplit' > 'binary'*** -- *optional* -- default: 'hyts_std'
+ - ***'config' > 'trajectories' > 'hysplit' > 'binary'*** -- *optional* -- default: 'hyts_std-v5.2.3'
  - ***'config' > 'trajectories' > 'hysplit' > 'start_hours'*** -- *optional* -- default: [0]
  - ***'config' > 'trajectories' > 'hysplit' > 'heights'*** -- *optional* -- default: [10, 100, 1000]
  - ***'config' > 'trajectories' > 'hysplit' > 'vertical_motion'*** -- *optional* -- default: 0 (0 = from met file)
@@ -407,8 +407,8 @@ parameters would be used.
 
  - ***'config' > 'dispersion' > 'hysplit' > 'emissions_split' > 'enabled'*** -- *optional* -- default: false
  - ***'config' > 'dispersion' > 'hysplit' > 'emissions_split' > 'target_pm25'*** -- *optional* -- default: 10.0
- - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit'*** -- *optional* -- default: "hycs_std"
- - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit_mpi'*** -- *optional* -- default: "hycm_std"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit'*** -- *optional* -- default: "hycs_std-v5.2.3"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit_mpi'*** -- *optional* -- default: "hycm_std-v5.2.3"
  - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'ncea'*** -- *optional* -- default: "ncea"
  - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'ncks'*** -- *optional* -- default: "ncks"
  - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'mpi'*** -- *optional* -- default: "mpiexec"

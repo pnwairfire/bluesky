@@ -400,7 +400,7 @@ _DEFAULTS = {
         "delete_working_dir_if_no_error": True,
         "handle_existing": "fail",
         "hysplit": {
-            "binary": 'hyts_std',
+            "binary": 'hyts_std-v5.2.3',
             "start_hours": [0],
             "heights": [10, 100, 1000],
             "vertical_motion": 0, # 0 = from met file

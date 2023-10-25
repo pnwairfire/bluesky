@@ -100,10 +100,6 @@ COPY bin/feps_emissions /usr/local/bin/feps_emissions
 COPY bin/feps_plumerise /usr/local/bin/feps_plumerise
 COPY bin/feps_timeprofile /usr/local/bin/feps_timeprofile
 COPY bin/feps_weather /usr/local/bin/feps_weather
-COPY bin/hycm_std /usr/local/bin/hycm_std
-COPY bin/hycs_std /usr/local/bin/hycs_std
-COPY bin/hyts_std /usr/local/bin/hyts_std
-COPY bin/hytm_std /usr/local/bin/hytm_std
 COPY bin/hycm_std-v5.1.0 /usr/local/bin/hycm_std-v5.1.0
 COPY bin/hycs_std-v5.1.0 /usr/local/bin/hycs_std-v5.1.0
 COPY bin/hyts_std-v5.1.0 /usr/local/bin/hyts_std-v5.1.0
