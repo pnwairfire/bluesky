@@ -100,7 +100,7 @@ class EmissionsSplitter():
 
         for fire in self._fires:
             try:
-                max_emiss_rate = self._compute_emission_rate(fire)
+                max_emiss_rate = self._compute_max_emission_rate(fire)
 
                 # number of times to split the input rate
                 num_split = max(1, math.ceil(max_emiss_rate / self._emissions_rate_target))
@@ -121,18 +121,20 @@ class EmissionsSplitter():
         logging.info(f"Fires before splitting emissions: {len(self._fires)}; and after: {len(fires)}")
         return fires
 
-    def _compute_emission_rate(self, fire):
-        # TODO: get input rate for the fire (based on max hourly
-        #  emissions value?)  <-- from Robert:  (it is essentially the
-        #  value that gets written to the EMISS.CFG file)
-        #RATE1 = 803200000
+    def _compute_max_emission_rate(self, fire):
+        # Returns the max emissions rate for the fire - the max of the hourly
+        # emissions values that get written to the EMISS.CFG file)
         max_rate = 0
-        for dt in fire.timeprofiled_emissions:
-            dt = parse_datetime(dt)
+        # We'll save max rate per hour, to be used in emissions allocation code
+        fire['max_emiss_rate_per_hour'] = {}
+        for dt_obj in fire.timeprofiled_emissions:
+            dt = parse_datetime(dt_obj)
             rows, dummy = get_emissions_rows_data(fire, dt,
                 self._config_getter, self._reduction_factor)
 
-            max_rate = max([pm25 for (height, pm25, area, heat) in rows])
+            max_rate_in_row = max([pm25 for (height, pm25, area, heat) in rows])
+            fire['max_emiss_rate_per_hour'][dt_obj] = max_rate_in_row
+            max_rate = max([max_rate, max_rate_in_row])
 
         return max_rate
 
@@ -144,9 +146,6 @@ class EmissionsSplitter():
         Need to define the rate of increase of theta around the fire and the
         rate of increase of the distance from it
         """
-        logging.info("Splitting emissions for fire centered at LAT LON %f %f",
-            fire.latitude, fire.longitude)
-
         # start at the original source. this needs to update the original source with
         # the new emission rate (index zero) all of the following need to create a new
         # source
@@ -162,6 +161,8 @@ class EmissionsSplitter():
 
             lat_lngs.append([fire.latitude + y, fire.longitude + x])
 
+        logging.info("Splitting emissions for fire centered at lat, lon %f, %f into %d -> %s",
+            fire.latitude, fire.longitude, num_split, lat_lngs)
         return lat_lngs
 
     def _split_fire(self, fire, lat_lngs):
@@ -181,8 +182,7 @@ class EmissionsSplitter():
                 longitude=lat_lng[1],
                 utc_offset=fire.utc_offset,
                 plumerise=fire.plumerise,
-                timeprofiled_emissions=self._get_reduced(
-                    fire, 'timeprofiled_emissions', num_split),
+                timeprofiled_emissions=self._allocate_emissions(fire, i),
                 timeprofiled_area=fire.timeprofiled_area,
                 consumption=self._get_reduced(fire, 'consumption', num_split),
             )
@@ -193,6 +193,26 @@ class EmissionsSplitter():
             new_fires.append(f)
 
         return new_fires
+
+    def _allocate_emissions(self, fire, i):
+        """Allocates emissions per hour, distributing to as few new fires as
+        possible.
+        """
+        tpe = {}
+        for dt in fire['timeprofiled_emissions']:
+            # num_split_this_hr will never be greater than num_split, above,
+            num_split_this_hr = max(1, math.ceil(fire['max_emiss_rate_per_hour'][dt]
+                / self._emissions_rate_target))
+
+            if i < num_split_this_hr:
+                tpe[dt] = {species: val / num_split_this_hr
+                    for species, val in fire['timeprofiled_emissions'][dt].items()}
+
+            else:
+                # assign all zeros
+                tpe[dt] = {species: 0.0 for species in fire['timeprofiled_emissions'][dt]}
+
+        return tpe
 
     def _get_reduced(self, fire, key, num_split):
         data = copy.deepcopy(fire[key])
