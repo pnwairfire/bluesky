@@ -604,6 +604,9 @@
  - Replace HYSPLIT v5.1.0 and v5.2.3 binaries with ones built on ubuntu 22.04
  - Replace HYSPLIT v5.1 and v5.2 binaries with sym links to corresponding v5.1.0 and v5.2.3 binaries
 
-## 4.5.3
+## 4.5.4
  - Remove HYSPLIT v4 binaries and default to v5.2.3
  - Remove HYSPLIT v5.1 and v5.2 sym links
+
+## 4.5.5
+ - Follow-ups to HYSPLIT emissions splitting
