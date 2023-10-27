@@ -452,7 +452,8 @@ _DEFAULTS = {
         "hysplit": {
             "emissions_split": {
                 "enabled": False,
-                "target_pm25": 10.0
+                "target_pm25": 10.0,  # (specified in ug/m3)
+                "min_pm25": None  # (specified in ug/m3)
             },
             "binaries": {},
             "skip_invalid_fires": False,

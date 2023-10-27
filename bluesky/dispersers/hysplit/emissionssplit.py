@@ -6,6 +6,7 @@ from afdatetime.parsing import parse_datetime
 from pyairfire.data.utils import multiply_nested_data
 
 from bluesky.models.fires import Fire
+from bluesky.exceptions import BlueSkyConfigurationError
 from .. import GRAMS_PER_TON
 from .emissions_file_utils import get_emissions_rows_data
 
@@ -73,11 +74,16 @@ class EmissionsSplitter():
         # TODO: set DZ from fires data?
         DZ = 500.0  # in meters
 
-        # target PM2.5 value (micrograms/m3)
-        PM25star  = self._config_getter('emissions_split', 'target_pm25')
+        # target PM2.5 value (ug/m3)
+        target_pm25  = self._config_getter('emissions_split', 'target_pm25') # i.e. PM25star
+        min_pm25 = self._config_getter('emissions_split', 'min_pm25')
+        if min_pm25 and target_pm25 <= min_pm25:
+            raise BlueSkyConfigurationError("Target PM2.5 must be greater than "
+                "min PM2.5 in HYSPLIT emissions splitting code")
 
         # target mass per particle (grams)
-        self._target_mass = PM25star * self._dx * self._dy * DZ / 1e6
+        self._target_mass = target_pm25 * self._dx * self._dy * DZ / 1e6
+        self._min_mass = min_pm25 and (min_pm25 * self._dx * self._dy * DZ / 1e6)
 
     def _set_emissions_rate_target(self):
         # for each hour, if emissions exceed threshold, split emissions out
@@ -86,7 +92,10 @@ class EmissionsSplitter():
         # locations to zero (some hours will require no re-allocation at all)
 
         # emission rate target
-        self._emissions_rate_target = self._target_mass * self._numpar_per_src_per_timestep / self._deltsec
+        self._emissions_rate_target = (
+            self._target_mass * self._numpar_per_src_per_timestep / self._deltsec)
+        self._emissions_rate_min = self._min_mass and (
+            self._min_mass * self._numpar_per_src_per_timestep / self._deltsec)
 
     ##
     ## Public API
@@ -101,6 +110,13 @@ class EmissionsSplitter():
         for fire in self._fires:
             try:
                 max_emiss_rate = self._compute_max_emission_rate(fire)
+                logging.debug("Max emissions rate for fire centered at lat, lon %f, %f: (%f)",
+                    fire.latitude, fire.longitude, max_emiss_rate)
+
+                if self._emissions_rate_min and max_emiss_rate < self._emissions_rate_min:
+                    logging.info("Removing fire centered at lat, lon %f, %f for low pm25 rate (%f)",
+                        fire.latitude, fire.longitude, max_emiss_rate)
+                    continue
 
                 # number of times to split the input rate
                 num_split = max(1, math.ceil(max_emiss_rate / self._emissions_rate_target))
