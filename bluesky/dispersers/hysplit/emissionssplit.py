@@ -103,7 +103,7 @@ class EmissionsSplitter():
                 max_emiss_rate = self._compute_emission_rate(fire)
 
                 # number of times to split the input rate
-                num_split = math.ceil(max_emiss_rate / self._emissions_rate_target)
+                num_split = max(1, math.ceil(max_emiss_rate / self._emissions_rate_target))
 
                 if num_split == 1:
                     fires.append(fire)
