@@ -610,3 +610,7 @@
 
 ## 4.5.5
  - Follow-ups to HYSPLIT emissions splitting
+
+## 4.5.6
+ - More follow-ups to HYSPLIT emissions splitting
+ - Add HYSPLIT option to remove locations (i.e. plumes) whose max hourly PM 2.5 rate is less than a given threshold
