@@ -23,11 +23,14 @@ DR =     0.0005
 class EmissionsSplitter():
     def __init__(self, config_getter, reduction_factor, grid_params,
             num_traunches, fires):
+        self._fires = fires
         self._config_getter = config_getter
+        if not self._config_getter('emissions_split', 'enabled'):
+            return
+
         self._reduction_factor = reduction_factor
         self._grid_params = grid_params
         self._num_traunches = num_traunches
-        self._fires = fires
 
         self._set_dx_dy()
         self._set_deltsec()
