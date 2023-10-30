@@ -18,7 +18,11 @@ from .. import PHASES
 from bluesky.config import Config
 
 __all__ = [
-    'create_fire_sets', 'create_fire_tranches'
+    'create_fire_sets',
+    'create_fire_tranches',
+    'compute_num_processes',
+    'ensure_tranch_has_dummy_fire',
+    'get_grid_params'
 ]
 
 
