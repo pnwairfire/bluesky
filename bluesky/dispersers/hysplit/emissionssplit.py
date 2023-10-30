@@ -59,7 +59,8 @@ class EmissionsSplitter():
     def _set_numpar_per_src_per_timestep(self):
         # NUMPAR allocated per fires source
         num_traunches = max(1, self._config_getter('NPROCESSES'))
-        num_fires_per_traunche = len(self._fires)/num_traunches
+        # Handle case of no fires - set num_fires_per_traunche to 1
+        num_fires_per_traunche = len(self._fires)/num_traunches or 1
         # number of particles per source per hour
         numpar = abs(int(self._config_getter('NUMPAR')))
         numpar_per_src = float(math.ceil(numpar/num_fires_per_traunche))
