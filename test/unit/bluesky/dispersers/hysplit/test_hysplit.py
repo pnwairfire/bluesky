@@ -35,7 +35,7 @@ class TestGetBinaries():
             'HYSPLIT_MPI': "hycm_std-v5.2.3",
             'NCEA': "ncea",
             'NCKS': "ncks",
-            'MPI': "mpiexec",
+            'MPI': "mpiexec.openmpi",
             'HYSPLIT2NETCDF': "hysplit2netcdf"
         }
         assert hysplit._get_binaries(config_getter) == expected
@@ -49,14 +49,14 @@ class TestGetBinaries():
             'HYSPLIT_MPI': "hycm_std-v5.2.3",
             'NCEA': "ncea",
             'NCKS': "ncks",
-            'MPI': "mpiexec",
+            'MPI': "mpiexec.openmpi",
             'HYSPLIT2NETCDF': "hysplit2netcdf"
         }
         assert hysplit._get_binaries(config_getter) == expected
 
     def test_old_and_new(self):
         config_getter = self._config_getter({
-            'mpiexec': 'foo',
+            'mpiexec.openmpi': 'foo',
             'binaries': {
                 'MPI': 'bar', # takes precedence over 'MPIEXEC'
                 'ncea': 'sdfsdf',

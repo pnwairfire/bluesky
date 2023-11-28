@@ -62,7 +62,7 @@ Additionally, you'll need the following executables:
  - ```hycm_std[-v5.2.3]```: multi-processor hysplit executable
  - ```hyts_std[-v5.2.3]```: hysplit trajectories executable
  - ```hytm_std[-v5.2.3]```: multi-processor hysplit trajectories executable
- - ```mpiexec```: needed to run multi-processor hysplit
+ - ```mpiexec (mpiexec.openmpi, mpiexec.mpich, or mpiexec.hydra)```: needed to run multi-processor hysplit
  - ```hysplit2netcdf```: this is only needed if opting to convert hysplit output to netcdf; to obtain, ...
 
 Each of these executables are assumed to reside in a directory in the search

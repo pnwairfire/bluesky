@@ -88,7 +88,7 @@ DEFAULT_BINARIES = {
     },
     'MPI': {
         "old_config_key": "MPIEXEC",
-        "default":"mpiexec"
+        "default":"mpiexec.openmpi"
     },
     'HYSPLIT2NETCDF': {
         "old_config_key": "HYSPLIT2NETCDF_BINARY",
@@ -110,7 +110,7 @@ def _get_binaries(config_getter):
                     "HYSPLIT_MPI_BINARY": "hycm_std-v5.2.3",
                     "NCEA_EXECUTABLE": "ncea",
                     "NCKS_EXECUTABLE": "ncks",
-                    "MPIEXEC": "mpiexec",
+                    "MPIEXEC": "mpiexec.openmpi",
                     "HYSPLIT2NETCDF_BINARY": "hysplit2netcdf"
                 }
             }
@@ -127,7 +127,7 @@ def _get_binaries(config_getter):
                         'hysplit_mpi': "hycm_std-v5.2.3",
                         'ncea': "ncea",
                         'ncks': "ncks",
-                        'mpi': "mpiexec",
+                        'mpi': "mpiexec.openmpi",
                         'hysplit2netcdf': "hysplit2netcdf"
                     }
                 }
@@ -496,7 +496,7 @@ class HYSPLITDispersion(DispersionBase):
             # self.BINARIES['HYSPLIT_MPI'] to try running with -v or -h option or
             # something similar,  or remove them
             # if not os.path.isfile(self.BINARIES['MPI']):
-            #     msg = "Failed to find %s. Check self.BINARIES['MPI'] setting and/or your MPICH2 installation." % mpiexec
+            #     msg = "Failed to find %s. Check self.BINARIES['MPI'] setting and/or your MPICH2 installation." % mpiexec.openmpi
             #     raise AssertionError(msg)
             # if not os.path.isfile(self.BINARIES['HYSPLIT_MPI']):
             #     msg = "HYSPLIT MPI executable %s not found." % self.BINARIES['HYSPLIT_MPI']

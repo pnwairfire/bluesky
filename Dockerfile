@@ -56,7 +56,11 @@ RUN apt-get update \
         gdal-bin \
         mpich \
         libmpich-dev \
-        libmpich12
+        libmpich12 \
+        libopenmpi-dev \
+        libopenmpi3 \
+        openmpi-bin \
+        openmpi-common
 
 
 # upgrade distribute and pip

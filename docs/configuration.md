@@ -412,7 +412,7 @@ parameters would be used.
  - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit_mpi'*** -- *optional* -- default: "hycm_std-v5.2.3"
  - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'ncea'*** -- *optional* -- default: "ncea"
  - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'ncks'*** -- *optional* -- default: "ncks"
- - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'mpi'*** -- *optional* -- default: "mpiexec"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'mpi'*** -- *optional* -- default: "mpiexec.openmpi"
  - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit2netcdf'*** -- *optional* -- default: "hysplit2netcdf"
  - ***'config' > 'dispersion' > 'hysplit' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'spacing'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed -- grid cell dimensions ***in km unless 'projection' is 'LatLng' (see below)***
