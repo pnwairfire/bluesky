@@ -617,3 +617,6 @@
 
 ## 4.5.7
  - Upgrade to met==4.0.1
+
+## 4.5.8
+ - Install openmpi alongside mpich and make mpiexec.openmpi the default
