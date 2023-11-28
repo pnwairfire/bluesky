@@ -452,8 +452,8 @@ _DEFAULTS = {
         "hysplit": {
             "emissions_split": {
                 "enabled": False,
-                "target_pm25": 10.0,  # (specified in ug/m3)
-                "min_pm25": None  # (specified in ug/m3)
+                "target_pm25": 10.0,  # (specified in ug/m^3)
+                "min_pm25": None  # (specified in ug/m^3)
             },
             "binaries": {},
             "skip_invalid_fires": False,
@@ -778,7 +778,7 @@ _DEFAULTS = {
             # Period's initial vertical dispersion at the surface (m)
             "OZINTA": 0.0,
 
-            # Period's background PM (ug/m3)
+            # Period's background PM (ug/m^3)
             "BKGPMA": 0.0,
 
             # Period's background CO (ppm)
