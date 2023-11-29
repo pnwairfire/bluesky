@@ -620,3 +620,6 @@
 
 ## 4.5.8
  - Install openmpi alongside mpich and make mpiexec.openmpi the default
+
+## 4.5.9
+ - Replace hysplit mpi binaries with mpich and openmpi optimized versions
