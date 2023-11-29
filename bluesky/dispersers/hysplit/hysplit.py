@@ -76,7 +76,7 @@ DEFAULT_BINARIES = {
     },
     'HYSPLIT_MPI': {
         "old_config_key": "HYSPLIT_MPI_BINARY",
-        "default":"hycm_std-v5.2.3"
+        "default":"hycm_std-v5.2.3-openmpi"
     },
     'NCEA': {
         "old_config_key": "NCEA_EXECUTABLE",
@@ -107,7 +107,7 @@ def _get_binaries(config_getter):
             "config": {
                 "hysplit": {
                     "HYSPLIT_BINARY": "hycs_std-v5.2.3",
-                    "HYSPLIT_MPI_BINARY": "hycm_std-v5.2.3",
+                    "HYSPLIT_MPI_BINARY": "hycm_std-v5.2.3-openmpi",
                     "NCEA_EXECUTABLE": "ncea",
                     "NCKS_EXECUTABLE": "ncks",
                     "MPIEXEC": "mpiexec.openmpi",
@@ -124,7 +124,7 @@ def _get_binaries(config_getter):
                 "hysplit": {
                     "binaries" : {
                         'hysplit': "hycs_std-v5.2.3",
-                        'hysplit_mpi': "hycm_std-v5.2.3",
+                        'hysplit_mpi': "hycm_std-v5.2.3-openmpi",
                         'ncea': "ncea",
                         'ncks': "ncks",
                         'mpi': "mpiexec.openmpi",

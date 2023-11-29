@@ -409,7 +409,7 @@ parameters would be used.
  - ***'config' > 'dispersion' > 'hysplit' > 'emissions_split' > 'target_pm25'*** -- *optional* -- default: 10.0 -- Split up locations (i.e. plumes) so that no plume has an hourly rate greater than this amount (specified in ug/m3)
  - ***'config' > 'dispersion' > 'hysplit' > 'emissions_split' > 'min_pm25'*** -- *optional* -- default: None -- If defined, remove locations (i.e. plumes) whose max hourly PM 2.5 rate is less than this amount (specified in ug/m3)
  - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit'*** -- *optional* -- default: "hycs_std-v5.2.3"
- - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit_mpi'*** -- *optional* -- default: "hycm_std-v5.2.3"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit_mpi'*** -- *optional* -- default: "hycm_std-v5.2.3-openmpi"
  - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'ncea'*** -- *optional* -- default: "ncea"
  - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'ncks'*** -- *optional* -- default: "ncks"
  - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'mpi'*** -- *optional* -- default: "mpiexec.openmpi"

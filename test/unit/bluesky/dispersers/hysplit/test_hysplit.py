@@ -32,7 +32,7 @@ class TestGetBinaries():
         config_getter = self._config_getter({})
         expected = {
             'HYSPLIT': "hycs_std-v5.2.3",
-            'HYSPLIT_MPI': "hycm_std-v5.2.3",
+            'HYSPLIT_MPI': "hycm_std-v5.2.3-openmpi",
             'NCEA': "ncea",
             'NCKS': "ncks",
             'MPI': "mpiexec.openmpi",
@@ -46,7 +46,7 @@ class TestGetBinaries():
         })
         expected = {
             'HYSPLIT': "zzz",
-            'HYSPLIT_MPI': "hycm_std-v5.2.3",
+            'HYSPLIT_MPI': "hycm_std-v5.2.3-openmpi",
             'NCEA': "ncea",
             'NCKS': "ncks",
             'MPI': "mpiexec.openmpi",
