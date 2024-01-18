@@ -622,4 +622,4 @@
  - Install openmpi alongside mpich and make mpiexec.openmpi the default
 
 ## 4.5.9
- - Replace hysplit mpi binaries with mpich and openmpi optimized versions
+ - Replace hysplit mpi binaries with mpich and openmpi optimized versions.  ***(Note that this removes hycm_std-v5.2.3, hycm_std-v5.1.0, hytm_std-v5.2.3, and hytm_std-v5.1.0)***
