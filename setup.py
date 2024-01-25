@@ -19,7 +19,8 @@ setup(
     scripts=[
         'bin/bsp',
         'bin/bsp-run-info',
-        'bin/bsp-output-visualizer'
+        'bin/bsp-output-visualizer',
+        'bin/ecoregion-lookup'
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
