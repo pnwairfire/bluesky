@@ -27,6 +27,8 @@ def parse_args():
     parser.add_argument('--lng', help="longitude", type=float, required=True)
     parser.add_argument('--implementation', default='ogr',
         help="look up implementation; default 'ogr'")
+    parser.add_argument('--try-nearby', action="store_true",
+        help="try nearby locations if specified lat,lng fails")
 
     parser.epilog = EXAMPLES_STRING
     parser.formatter_class = argparse.RawTextHelpFormatter
@@ -35,5 +37,6 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
 
-    ecoregion_lookup = EcoregionLookup(args.implementation)
+    ecoregion_lookup = EcoregionLookup(implementation=args.implementation,
+        try_nearby=args.try_nearby)
     print(f"Ecoregion: {ecoregion_lookup.lookup(args.lat, args.lng)}")

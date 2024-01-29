@@ -27,14 +27,15 @@ ECOREGION_SHAPEFILE = os.path.join(os.path.dirname(__file__), 'data', '3ecoregio
 
 class EcoregionLookup():
 
-    def __init__(self, implementation='ogr'):
+    def __init__(self, implementation='ogr', try_nearby=False):
         try:
             self._lookup = getattr(self, '_lookup_ecoregion_{}'.format(
                 implementation))
+
         except AttributeError:
             raise BlueSkyConfigurationError(
                 "Invalid ecoregion lookup implementation: %s", implementation)
-
+        self._try_nearby = try_nearby
         self._input = None # instantiate when necessary
 
     def _validate_lat_lng(self, lat, lng):
@@ -47,7 +48,44 @@ class EcoregionLookup():
         self._validate_lat_lng(lat, lng)
 
         # TODO: Handle exceptions here or in calling code ?
-        return self._lookup(lat, lng)
+        ecoregion = None
+        exc = None
+        try:
+            ecoregion = self._lookup(lat, lng)
+        except Exception as e:
+            exc = e
+
+        if not ecoregion and self._try_nearby:
+            ecoregion = self._lookup_nearby(lat, lng)
+
+        if not ecoregion and exc:
+            # raise original exeption if nearby locations all failed
+            raise exc
+
+        return ecoregion
+
+    def _lookup_nearby(self, lat, lng):
+        delta = 0.01
+        locs = [
+            (lat + delta, lng),         # N
+            (lat + delta, lng + delta), # NE
+            (lat, lng + delta),         # E
+            (lat - delta, lng + delta), # SE
+            (lat - delta, lng),         # S
+            (lat - delta, lng - delta), # SW
+            (lat, lng - delta),         # W
+            (lat + delta, lng - delta), # NW
+        ]
+        logging.debug("Looking up ecoregion nearby %s, %s - %s", lat, lng, locs)
+        for _lat, _lng in locs:
+            try:
+                return self._lookup(_lat, _lng)
+            except:
+                # continue on to next nearby location
+                pass
+
+        # no nearby locations worked; return None
+
 
     ## Fiona + shapely
 

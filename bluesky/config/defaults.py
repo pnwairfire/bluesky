@@ -92,6 +92,7 @@ _DEFAULTS = {
     },
     "ecoregion": {
         "lookup_implementation": "ogr",
+        "try_nearby_on_failure": False,
         "skip_failures": True,
         "default": None
     },

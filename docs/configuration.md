@@ -140,6 +140,7 @@ The following settings apply to filtering on any field (other than 'area') in th
 ### ecoregion
 
  - ***'config' > 'ecoregion' > 'lookup_implementation'*** -- *optional* -- default 'ogr'
+ - ***'config' > 'ecoregion' > 'try_nearby_on_failure'*** -- *optional* -- default false; if true, try nearby locations when the specified location fails
  - ***'config' > 'ecoregion' > 'skip_failures'*** -- *optional* -- default true; if true (default) continue on to next location in fire; else, raise exception
  - ***'config' > 'ecoregion' > 'default'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
 
