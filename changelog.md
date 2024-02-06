@@ -623,3 +623,9 @@
 
 ## 4.5.9
  - Replace hysplit mpi binaries with mpich and openmpi optimized versions.  ***(Note that this removes hycm_std-v5.2.3, hycm_std-v5.1.0, hytm_std-v5.2.3, and hytm_std-v5.1.0)***
+
+## 4.5.10
+ - Include `ecoregion-lookup` in bluesky package
+ - Update `EcoregionLookup` class and `ecoregion-lookup` script to support optionally checking nearby locations when specified location fails
+ - Upgrade eflookup to v4.0.8
+ - Upgrade consume to v5.2.2
