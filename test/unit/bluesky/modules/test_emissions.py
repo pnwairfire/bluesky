@@ -386,80 +386,85 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
 class TestConsumeEmissions(BaseEmissionsTest):
 
     EXPECTED_FIRE1_EMISSIONS = {
-        'flaming': {'CH4': array([0.64459607]),
-            'CO': array([15.11681762]),
-            'CO2': array([314.34360837]),
-            'NH3': array([0.15689582]),
-            'NMHC': array([0.]),
-            'NMOC': array([5.09911411]),
-            'NO': array([0.32324319]),
-            'NO2': array([0.26464355]),
-            'NOX': array([0.28165635]),
-            'PM': array([0.]),
-            'PM10': array([2.83518306]),
-            'PM2.5': array([2.55191994]),
-            'SO2': array([0.25519199])
+        'flaming': {
+            'CH4': array([0.63216253]),
+             'CO': array([15.52232756]),
+             'CO2': array([314.26604022]),
+             'NH3': array([0.20604391]),
+             'NMHC': array([0.]),
+             'NMOC': array([5.09911411]),
+             'NO': array([0.]),
+             'NO2': array([0.]),
+             'NOX': array([0.32324319]),
+             'PM': array([0.]),
+             'PM10': array([2.6698849]),
+             'PM2.5': array([2.40313672]),
+             'SO2': array([0.24886516])
         },
-        'residual': {'CH4': array([0.63597235]),
-            'CO': array([11.75585251]),
-            'CO2': array([132.33922632]),
-            'NH3': array([0.14579603]),
+        'residual': {
+            'CH4': array([0.56784315]),
+            'CO': array([11.74173634]),
+            'CO2': array([131.62614253]),
+            'NH3': array([0.15417511]),
             'NMHC': array([0.]),
             'NMOC': array([2.26025746]),
-            'NO': array([0.21785614]),
-            'NO2': array([0.08798036]),
+            'NO': array([0.]),
+            'NO2': array([0.]),
             'NOX': array([0.09049409]),
             'PM': array([0.]),
-            'PM10': array([1.86648667]),
-            'PM2.5': array([1.68000601]),
-            'SO2': array([0.14495812])
+            'PM10': array([1.37807174]),
+            'PM2.5': array([1.24038861]),
+            'SO2': array([0.14509694])
         },
-        'smoldering': {'CH4': array([1.14446127]),
-            'CO': array([21.15519317]),
-            'CO2': array([238.15047817]),
-            'NH3': array([0.26236662]),
+        'smoldering': {
+            'CH4': array([1.02185966]),
+            'CO': array([21.12979048]),
+            'CO2': array([236.86725135]),
+            'NH3': array([0.27744516]),
             'NMHC': array([0.]),
             'NMOC': array([4.06743646]),
-            'NO': array([0.39204207]),
-            'NO2': array([0.15832468]),
+            'NO': array([0.]),
+            'NO2': array([0.]),
             'NOX': array([0.16284824]),
             'PM': array([0.]),
-            'PM10': array([3.35882796]),
-            'PM2.5': array([3.02324749]),
-            'SO2': array([0.26085876])
+            'PM10': array([2.479903]),
+            'PM2.5': array([2.23213591]),
+            'SO2': array([0.26110856])
         },
-        'total': {'CH4': array([2.42502969]),
-            'CO': array([48.0278633]),
-            'CO2': array([684.83331286]),
-            'NH3': array([0.56505847]),
+        'total': {
+            'CH4': array([2.22186534]),
+            'CO': array([48.39385439]),
+            'CO2': array([682.7594341]),
+            'NH3': array([0.63766418]),
             'NMHC': array([0.]),
             'NMOC': array([11.42680803]),
-            'NO': array([0.9331414]),
-            'NO2': array([0.5109486]),
-            'NOX': array([0.53499868]),
+            'NO': array([0.]),
+            'NO2': array([0.]),
+            'NOX': array([0.57658553]),
             'PM': array([0.]),
-            'PM10': array([8.06049769]),
-            'PM2.5': array([7.25517344]),
-           'SO2': array([0.66100888])
+            'PM10': array([6.52785964]),
+            'PM2.5': array([5.87566124]),
+            'SO2': array([0.65507066])
         }
     }
 
+
     EXPECTED_FIRE1_EMISSIONS_PM_ONLY = {
         'flaming': {
-            'PM10': array([ 2.8351830576]),
-            'PM2.5': array([ 2.5519199438617])
+             'PM10': array([2.6698849]),
+             'PM2.5': array([2.40313672])
         },
         'residual': {
-            'PM10': array([ 1.866486673905]),
-            'PM2.5': array([ 1.680006007115])
+            'PM10': array([1.37807174]),
+            'PM2.5': array([1.24038861])
         },
         'smoldering': {
-            'PM10': array([ 3.35882796256]),
-            'PM2.5': array([ 3.02324749105])
+            'PM10': array([2.479903]),
+            'PM2.5': array([2.23213591])
         },
         'total': {
-            'PM10': array([ 8.0604976940957]),
-            'PM2.5': array([ 7.25517344203])
+            'PM10': array([6.52785964]),
+            'PM2.5': array([5.87566124])
         }
     }
 
