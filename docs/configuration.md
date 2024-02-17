@@ -122,19 +122,19 @@ The following settings apply to filtering on any field (other than 'area') in th
 
 ### fuelbeds
 
-- ***'config' > 'fuelbeds' > 'fccs_version'*** -- *optional* -- '1' or '2'
-- ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
-- ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- fuelbeds to ignore; default ['0', '900']
-- ***'config' > 'fuelbeds' > 'no_sampling'*** -- *optional* -- don't sample surrounding area for Point and MultiPoint geometries
-- ***'config' > 'fuelbeds' > 'use_all_grid_cells'*** -- *optional* --
-- ***'config' > 'fuelbeds' > 'sampling_radius_factors'*** -- *optional* --
 - ***'config' > 'fuelbeds' > 'skip_failures'*** -- *optional* -- default `false`; if true, ignore fuelbed look-up failures and move on to next location; else (default), raise exception (which either aborts run or moves fire to `failed_fires`, depending on how top level `skip_failed_fires` is set)
-- ***'config' > 'fuelbeds' > 'fccs_fuelload_file'*** -- *optional* -- NetCDF
-  file containing FCCS lookup map
-- ***'config' > 'fuelbeds' > 'fccs_fuelload_param'*** -- *optional* -- name of variable in NetCDF file
-- ***'config' > 'fuelbeds' > 'fccs_fuelload_grid_resolution'*** -- *optional* -- length of grid cells in km
-- ***'config' > 'fuelbeds' > 'truncation_percentage_threshold'*** -- *optional* -- use first N largest fuelbeds making up this percentage for a location; default 90.0
-- ***'config' > 'fuelbeds' > 'truncation_count_threshold'*** -- *optional* -- use only up to this many fuelbeds for a location; default 5
+- ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- fuelbeds to ignore; default ['0', '900']
+- ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
+- ***'config' > 'fuelbeds' > 'insignificance_threshold'*** -- *optional* -- remove least prevalent fuelbeds that cumulatively add up to this percentage or less; default: 10.0
+- ***'config' > 'fuelbeds' > 'max_fuelbed_count_threshold'*** -- *optional* -- remove least prevalent fuelbeds until the number of fuelbeds is this number or less; default: 5
+- ***'config' > 'fuelbeds' > 'no_sampling'*** -- *optional* -- don't sample surrounding area for Point and MultiPoint geometries
+- ***'config' > 'fuelbeds' > 'sampling_radius_km'*** -- *optional* --
+- ***'config' > 'fuelbeds' > 'sampling_radius_factors'*** -- *optional* --
+- ***'config' > 'fuelbeds' > 'use_all_grid_cells'*** -- *optional* --
+- ***'config' > 'fuelbeds' > ['fccs_fuelload_tile_sets'] > 'directory'*** -- *optional* --
+- ***'config' > 'fuelbeds' > ['fccs_fuelload_tile_sets'] > 'index_shapefile'*** -- *optional* --
+- ***'config' > 'fuelbeds' > ['fccs_fuelload_files']*** -- *optional* -- array or one or more raster FCCS lookup map raster files
+- ***'config' > 'fuelbeds' > 'fccs_version'*** -- *optional* -- '1' or '2'; only comes into play if neither fuel load files or tile sets are specieid
 - ***'config' > 'fuelbeds' > 'total_pct_threshold'*** -- *optional* -- Allow summed fuel percentages to be this much off of 100%; default is 0.5% (i.e. between 99.5% and 100.5%)
 
 ### ecoregion

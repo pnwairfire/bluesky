@@ -97,28 +97,24 @@ _DEFAULTS = {
         "default": None
     },
     "fuelbeds": {
-        # The following defaults are defined in the fccsmap package,
-        # so they could be removed from here
-        "fccs_version": "2",
-        "ignored_percent_resampling_threshold": 99.9,
-        "ignored_fuelbeds": ['0', '900'],
-        "no_sampling": False,
-        "use_all_grid_cells": False,
-        "sampling_radius_factors": None,
         "skip_failures": False,
 
-        # The following defaults are defined in the fccsmap package
-        # and are based on the location of the package in the file
-        # system. So, let fccsmap set defaults
-        # "fccs_fuelload_file": None,
-        # "fccs_fuelload_param": None,
-        # "fccs_fuelload_grid_resolution": None,
+        # The following defaults are defined in the fccsmap package,
+        # so they could be removed from here
+        "ignored_fuelbeds": ['0', '900'],
+        "ignored_percent_resampling_threshold": 99.9,
+        "insignificance_threshold": 10.0,
+        "max_fuelbed_count_threshold": 5,
+        "no_sampling": False,
+        "sampling_radius_km": 1.0,
+        "sampling_radius_factors": None,
+        "use_all_grid_cells": False,
 
-        # The following defaults are *not* defined in fccsmap package
-        # If user override truncation threshold defaults by setting to
-        # None or 0, we won't truncate by that criterion
-        "truncation_percentage_threshold": 90.0,
-        "truncation_count_threshold": 5,
+        # fccs_version only comes into play if files aren't specified
+        "fccs_fuelload_tile_sets": [], # each fileset is a dict with 'directory' and optionally 'index_shapefile'
+        "fccs_fuelload_files": [],
+        "fccs_version": "2",
+
         # Allow summed fuel percentages to be between 99.5% and 100.5%
         "total_pct_threshold": 0.5
     },

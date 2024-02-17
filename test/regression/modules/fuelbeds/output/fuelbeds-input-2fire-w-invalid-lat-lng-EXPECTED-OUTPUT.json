@@ -319,7 +319,6 @@
                             "specified_points": [
                                 {
                                     "lat": 45.0,
-                                    "fuelbeds_total_accounted_for_pct": 100.0,
                                     "lng": -115.0,
                                     "fuelbeds": [
                                         {
