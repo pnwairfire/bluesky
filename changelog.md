@@ -629,3 +629,8 @@
  - Update `EcoregionLookup` class and `ecoregion-lookup` script to support optionally checking nearby locations when specified location fails
  - Upgrade eflookup to v4.0.8
  - Upgrade consume to v5.2.2
+
+## 4.5.11
+ - Upgrade fccsmap to v4.1.2 and update fuelbeds configuration options
+ - Remove truncation options from fuelbeds module that were compounding truncation done in fccsmap
+ - Fill in date wildcards in config defaults with current date if `today` isn't set
