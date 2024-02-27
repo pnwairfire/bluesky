@@ -634,3 +634,6 @@
  - Upgrade fccsmap to v4.1.2 and update fuelbeds configuration options
  - Remove truncation options from fuelbeds module that were compounding truncation done in fccsmap
  - Fill in date wildcards in config defaults with current date if `today` isn't set
+
+## 4.5.12
+ - Fix bug in consume emissions
