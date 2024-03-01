@@ -637,3 +637,7 @@
 
 ## 4.5.12
  - Fix bug in consume emissions
+
+## 4.5.13
+ - Upgrade eflookup to v4.0.9
+ - Upgrade consume to v5.2.3
