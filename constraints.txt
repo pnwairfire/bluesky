@@ -87,7 +87,7 @@ prompt-toolkit==3.0.39
 ptyprocess==0.7.0
 pure-eval==0.2.2
 py==1.11.0
-pyairfire==5.0.0
+pyairfire==5.0.1
 Pygments==2.16.1
 PyGObject==3.36.0
 pymongo==4.5.0
