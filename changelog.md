@@ -644,3 +644,8 @@
 
 ## 4.5.14
  - Fix setting of consume settings defauts for wildfires
+
+## 4.5.15
+ - Upgrade pyairfire to 5.0.1
+ - Record fuel loadings in total tons, to be consistent with consumption and heat output
+ - Add option to summarize/aggregate fuel loadings across fuelbeds, locations, etc.
