@@ -34,6 +34,12 @@ CONSUME_VERSION_STR = '.'.join([
 def _apply_settings(fc, location, burn_type, fire_type):
     # Read settings here instead of at module scope to support unit testing
 
+
+    # 'wf' gets translated to 'wildfire' in the fire model, model, but the
+    # consume_settings configuration uses 'wf'
+    if fire_type == 'wildfire':
+        fire_type = 'wf'
+
     settings = Config().get('consumption', 'consume_settings')
     # User can configure output_units
     settings['all']['output_units'] = {
