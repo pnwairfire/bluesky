@@ -641,3 +641,6 @@
 ## 4.5.13
  - Upgrade eflookup to v4.0.9
  - Upgrade consume to v5.2.3
+
+## 4.5.14
+ - Fix setting of consume settings defauts for wildfires
