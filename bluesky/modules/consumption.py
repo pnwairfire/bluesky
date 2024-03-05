@@ -4,6 +4,7 @@ __author__ = "Joel Dubowy"
 
 import itertools
 import logging
+import re
 
 import consume
 
@@ -22,6 +23,9 @@ __all__ = [
 
 __version__ = "0.1.0"
 
+
+SUMMARIZE_FUEL_LOADINGS = Config().get('consumption', 'summarize_fuel_loadings')
+LOADINGS_KEY_MATCHER = re.compile('.*_loading')
 
 def run(fires_manager):
     """Runs the fire data through consumption calculations, using the consume
@@ -55,6 +59,9 @@ def run(fires_manager):
 
     datautils.summarize_all_levels(fires_manager, 'consumption')
     datautils.summarize_all_levels(fires_manager, 'heat')
+    if SUMMARIZE_FUEL_LOADINGS:
+        datautils.summarize_all_levels(fires_manager, 'fuel_loadings',
+            data_key_matcher=LOADINGS_KEY_MATCHER)
 
 def _run_fire(fire, fuel_loadings_manager, msg_level):
     logging.debug("Consume consumption - fire {}".format(fire.id))
