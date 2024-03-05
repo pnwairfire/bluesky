@@ -187,6 +187,8 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
         if fc.output_units == 'tons_ac':
             datautils.multiply_nested_data(fb["consumption"], area)
             datautils.multiply_nested_data(fb["heat"], area)
+            datautils.multiply_nested_data(fb["fuel_loadings"], area,
+                data_key_matcher=LOADINGS_KEY_MATCHER)
 
     else:
         # TODO: somehow get error information from fc object; when
