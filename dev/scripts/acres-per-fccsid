@@ -2,6 +2,7 @@
 
 import argparse
 import csv
+import datetime
 import gzip
 import json
 import logging
@@ -24,6 +25,8 @@ def parse_args():
     parser.add_argument('-o','--output-csv-file', help="write csv output to file")
     parser.add_argument('--include-failed-fires', action="store_true",
         help="Include fires under 'failed_fires' in the bluesky output")
+    parser.add_argument('--single-day-only', action='store_true',
+        help="Only consider a single day of activity, based on the output's 'today'")
     parser.add_argument('--log-level', default="INFO", help="Log level")
 
     parser.epilog = EXAMPLES_STRING
@@ -43,14 +46,35 @@ def parse_args():
 
     return args
 
+def same_day(aa, today):
+    today
+
+def get_single_day_activity(args, today, a):
+    active_areas = a.get('active_areas', [])
+    if not active_areas or not args.single_day_only:
+        return active_areas
+
+    # TODO: if none are today, return first day's worth of active areas?
+    reduced_active_areas = [aa for aa in active_areas if aa.get('start','').startswith(today)]
+    logging.debug(f"Single day filter: {[aa.get('start') for aa in active_areas]}"
+        f" -> {[aa.get('start') for aa in reduced_active_areas]}")
+
+    return reduced_active_areas
+
 def process_file(args, data, stats):
     data = json.loads(data)
+
     fires = data.get('fires', [])
     if args.include_failed_fires:
         fires.extend(data.get('failed_fires', []))
+
+    #today = datetime.datetime.strptime(data.get('today'), "%Y-%m-%dT%H:%M:%s")
+    today = data['today'][0:10]
     for f in data.get('fires', []):
+        logging.debug(f"Fire {f.get('id')}")
         for a in f.get('activity', []):
-            for aa in a.get('active_areas', []):
+            active_areas = get_single_day_activity(args, today, a)
+            for aa in active_areas:
                 locs = (aa.get('specified_points')
                     or ([aa['perimeter']] if aa.get('perimeter') else []))
                 for loc in locs:
