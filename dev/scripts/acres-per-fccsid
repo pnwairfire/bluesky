@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+
+import argparse
+import csv
+import gzip
+import json
+import logging
+import os
+import sys
+from collections import defaultdict
+
+
+EXAMPLES_STRING = """
+Examples:
+
+    {script} output-2024-*.json
+    {script} output-2024-*.json.gz -o acres-per-fccs.csv
+
+ """.format(script=sys.argv[0])
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('bluesky_output_files', nargs='+')
+    parser.add_argument('-o','--output-csv-file', help="write csv output to file")
+    parser.add_argument('--log-level', default="INFO", help="Log level")
+
+    parser.epilog = EXAMPLES_STRING
+    parser.formatter_class = argparse.RawTextHelpFormatter
+
+    args = parser.parse_args()
+
+    logging.basicConfig(level=getattr(logging, args.log_level),
+        format='%(asctime)s %(levelname)s: %(message)s')
+
+    logging.info(" Args:")
+    for k,v in args.__dict__.items():
+        if k in ('fccs_ids', 'coordinates'):
+            logging.info("   %s: %s", k, v and v[:50])
+        else:
+            logging.info("   %s: %s", k, v)
+
+    return args
+
+def parse_file(data, stats):
+    data = json.loads(data)
+    for f in data.get('fires', []):
+        for a in f.get('activity', []):
+            for aa in a.get('active_areas', []):
+                locs = (aa.get('specified_points')
+                    or ([aa['perimeter']] if aa.get('perimeter') else []))
+                for loc in locs:
+                    area = loc.get('area') or 0
+                    for fb in loc.get('fuelbeds', []):
+                        # TODO: divide total by 100 at the end to reduce number
+                        #   of divisions
+                        stats[fb['fccs_id']] += area * (fb['pct'] / 100)
+
+def output_csv(args, stats):
+    o = open(args.output_csv_file, 'w') if args.output_csv_file else sys.stdout
+    csv_writer = csv.writer(o)
+    csv_writer.writerow(['fccs_id', 'acres'])
+
+    def _s(fccs_id):
+        try:
+            return int(fccs_id)
+        except:
+            return fccs_id
+
+    for fccs_id in sorted(list(stats.keys()), key=lambda e: _s(e)):
+        csv_writer.writerow([fccs_id, stats[fccs_id]])
+
+def main():
+    args = parse_args()
+    stats = defaultdict(lambda: 0)
+    for filename in args.bluesky_output_files:
+        with open(filename, 'rb') as f:
+            data = b''.join([d.encode() if hasattr(d, 'encode') else d for d in f])
+            try:
+                data = gzip.decompress(data)
+            except Exception as e:
+                logging.info("input %s not gzip'd", filename or '')
+
+            data = data.decode()
+            parse_file(data, stats)
+
+
+    output_csv(args, stats)
+
+
+if __name__ == "__main__":
+    main()
