@@ -61,7 +61,7 @@ def get_single_day_activity(args, today, a):
 
     return reduced_active_areas
 
-def process_file(args, data, stats):
+def process_bluesky_output(args, data, stats):
     data = json.loads(data)
 
     fires = data.get('fires', [])
@@ -85,6 +85,22 @@ def process_file(args, data, stats):
                             #   to reduce number of divisions
                             stats[fb['fccs_id']] += area * (fb['pct'] / 100)
 
+def process_file(args, filename, stats):
+    logging.info(f"Processing {filename}")
+    with open(filename, 'rb') as f:
+        data = b''.join([d.encode() if hasattr(d, 'encode') else d for d in f])
+        try:
+            data = gzip.decompress(data)
+        except Exception as e:
+            logging.debug("input %s not gzip'd", filename or '')
+
+        data = data.decode()
+
+        try:
+            process_bluesky_output(args, data, stats)
+        except:
+            logging.warning(f"Failed to process bluesky output from {filename}")
+
 def output_csv(args, stats):
     o = open(args.output_csv_file, 'w') if args.output_csv_file else sys.stdout
     csv_writer = csv.writer(o)
@@ -103,24 +119,12 @@ def main():
     args = parse_args()
     stats = defaultdict(lambda: 0)
     for filename in args.bluesky_output_files:
-        logging.info(f"Processing {filename}")
-        with open(filename, 'rb') as f:
-            data = b''.join([d.encode() if hasattr(d, 'encode') else d for d in f])
-            try:
-                data = gzip.decompress(data)
-            except Exception as e:
-                logging.debug("input %s not gzip'd", filename or '')
-
-            data = data.decode()
-
-            try:
-                process_file(args, data, stats)
-            except:
-                logging.warning(f"Failed to process{filename}")
-
+        try:
+            process_file(args, filename, stats)
+        except:
+            logging.warning(f"Failed to process {filename}")
 
     output_csv(args, stats)
-
 
 if __name__ == "__main__":
     main()
