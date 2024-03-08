@@ -103,15 +103,20 @@ def main():
     args = parse_args()
     stats = defaultdict(lambda: 0)
     for filename in args.bluesky_output_files:
+        logging.info(f"Processing {filename}")
         with open(filename, 'rb') as f:
             data = b''.join([d.encode() if hasattr(d, 'encode') else d for d in f])
             try:
                 data = gzip.decompress(data)
             except Exception as e:
-                logging.info("input %s not gzip'd", filename or '')
+                logging.debug("input %s not gzip'd", filename or '')
 
             data = data.decode()
-            process_file(args, data, stats)
+
+            try:
+                process_file(args, data, stats)
+            except:
+                logging.warning(f"Failed to process{filename}")
 
 
     output_csv(args, stats)
