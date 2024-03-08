@@ -22,6 +22,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('bluesky_output_files', nargs='+')
     parser.add_argument('-o','--output-csv-file', help="write csv output to file")
+    parser.add_argument('--include-failed-fires', action="store_true",
+        help="Include fires under 'failed_fires' in the bluesky output")
     parser.add_argument('--log-level', default="INFO", help="Log level")
 
     parser.epilog = EXAMPLES_STRING
@@ -41,8 +43,11 @@ def parse_args():
 
     return args
 
-def parse_file(data, stats):
+def process_file(args, data, stats):
     data = json.loads(data)
+    fires = data.get('fires', [])
+    if args.include_failed_fires:
+        fires.extend(data.get('failed_fires', []))
     for f in data.get('fires', []):
         for a in f.get('activity', []):
             for aa in a.get('active_areas', []):
@@ -51,9 +56,10 @@ def parse_file(data, stats):
                 for loc in locs:
                     area = loc.get('area') or 0
                     for fb in loc.get('fuelbeds', []):
-                        # TODO: divide total by 100 at the end to reduce number
-                        #   of divisions
-                        stats[fb['fccs_id']] += area * (fb['pct'] / 100)
+                        if fb.get('fccs_id'):
+                            # TODO: divide total by 100 at the end
+                            #   to reduce number of divisions
+                            stats[fb['fccs_id']] += area * (fb['pct'] / 100)
 
 def output_csv(args, stats):
     o = open(args.output_csv_file, 'w') if args.output_csv_file else sys.stdout
@@ -81,7 +87,7 @@ def main():
                 logging.info("input %s not gzip'd", filename or '')
 
             data = data.decode()
-            parse_file(data, stats)
+            process_file(args, data, stats)
 
 
     output_csv(args, stats)
