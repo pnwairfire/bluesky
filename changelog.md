@@ -649,3 +649,8 @@
  - Upgrade pyairfire to 5.0.1
  - Record fuel loadings in total tons, to be consistent with consumption and heat output
  - Add option to summarize/aggregate fuel loadings across fuelbeds, locations, etc.
+
+## 4.5.16
+ - Upgrade to consume==5.2.4
+ - Update smokeready module to support perimeters as well as specified points
+ - dev script updates
