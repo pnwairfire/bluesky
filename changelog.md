@@ -654,3 +654,7 @@
  - Upgrade to consume==5.2.4
  - Update smokeready module to support perimeters as well as specified points
  - dev script updates
+
+## 4.5.17
+ - Upgrade eflookup to v4.0.10
+ - Upgrade consume to v5.2.5
