@@ -42,9 +42,6 @@ def run(fires_manager):
     fires_manager.processed(__name__, __version__,
         consume_version=CONSUME_VERSION_STR)
 
-    # TODO: get msg_level and burn_type from fires_manager's config
-    msg_level = 2  # 1 => fewest messages; 3 => most messages
-
     all_fuel_loadings = Config().get('consumption', 'fuel_loadings')
     fuel_loadings_manager = FuelLoadingsManager(all_fuel_loadings=all_fuel_loadings)
 
@@ -55,7 +52,7 @@ def run(fires_manager):
     # a single fire?
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            _run_fire(fire, fuel_loadings_manager, msg_level)
+            _run_fire(fire, fuel_loadings_manager)
 
     datautils.summarize_all_levels(fires_manager, 'consumption')
     datautils.summarize_all_levels(fires_manager, 'heat')
@@ -63,7 +60,7 @@ def run(fires_manager):
         datautils.summarize_all_levels(fires_manager, 'fuel_loadings',
             data_key_matcher=LOADINGS_KEY_MATCHER)
 
-def _run_fire(fire, fuel_loadings_manager, msg_level):
+def _run_fire(fire, fuel_loadings_manager):
     logging.debug("Consume consumption - fire {}".format(fire.id))
 
     # TODO: set burn type to 'activity' if fire.fuel_type == 'piles' ?
@@ -86,7 +83,7 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
             for loc in aa.locations:
                 for fb in loc['fuelbeds']:
                     _run_fuelbed(fb, loc, fuel_loadings_manager, season,
-                        burn_type, fire_type, msg_level)
+                        burn_type, fire_type)
                 # scale with estimated consumption or fuel load, if specified
                 # and if configured to do so
                 (_scale_with_estimated_consumption(loc)
@@ -152,12 +149,13 @@ def _scale_with_estimated_fuelload(loc):
     return True
 
 def _run_fuelbed(fb, location, fuel_loadings_manager, season,
-        burn_type, fire_type, msg_level):
+        burn_type, fire_type):
     fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
         fb['fccs_id'])
 
     fc = consume.FuelConsumption(
-        fccs_file=fuel_loadings_csv_filename) #msg_level=msg_level)
+        fccs_file=fuel_loadings_csv_filename,
+        msg_level=logging.root.level)
 
     fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
 
