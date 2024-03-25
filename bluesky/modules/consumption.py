@@ -174,7 +174,10 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
     fc.fuelbed_area_acres = [area]
     fc.fuelbed_ecoregion = [location['ecoregion']]
 
+    # TODO: see comment, below, re. capturing err messages when applying settings
     _apply_settings(fc, location, burn_type, fire_type)
+
+    # TODO: see comment, below, re. capturing err messages when computing results
     _results = fc.results()
     if _results:
         # TODO: validate that _results['consumption'] and
@@ -202,6 +205,15 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
         #
         #     !!! Error settings problem, the following are required:
         #            fm_type
+        #
+        #   And sometimes you see error output to stdout or stderr (?)
+        #   when `_apply_settings` is called, above.  e.g.:
+        #
+        #     Error: the following values are not permitted for setting fm_duff:
+        #     [203]
+        #
+        #     Error settings problem ---> {'fm_duff'}
+        #
         #   it would be nice to access that error message here and
         #   include it in the exception message
         raise RuntimeError("Failed to calculate consumption for "
