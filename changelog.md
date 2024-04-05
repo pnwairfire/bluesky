@@ -658,3 +658,8 @@
 ## 4.5.17
  - Upgrade eflookup to v4.0.10
  - Upgrade consume to v5.2.5
+
+## 4.5.18
+ - Upgrade plumerise to v2.0.4
+ - Upgrade eflookup to v4.0.11
+ - Upgrade consume to v5.2.6
