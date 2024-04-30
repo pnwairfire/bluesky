@@ -41,8 +41,6 @@ def create_lookup_objects():
 
     return fccs_lookups
 
-FCCS_LOOKUPS = create_lookup_objects()
-
 def run(fires_manager):
     """Runs emissions module
 
@@ -57,6 +55,10 @@ def run(fires_manager):
 
     skip_failures = Config().get('fuelbeds', 'skip_failures')
 
+    # Look up Objects need to be instantiated each time run is called in case
+    # the configuration changes from run to run (as happens in bluesky-web)
+    fccs_lookups = create_lookup_objects()
+
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             for aa in fire.active_areas:
@@ -64,7 +66,7 @@ def run(fires_manager):
                 # has either lat+lng+area or perimeter
                 for loc in aa.locations:
                     # try each lookup object until one succeeds
-                    for lookup in FCCS_LOOKUPS:
+                    for lookup in fccs_lookups:
                         try:
                             Estimator(lookup).estimate(loc)
                             break
