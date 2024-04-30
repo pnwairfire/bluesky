@@ -663,3 +663,6 @@
  - Upgrade plumerise to v2.0.4
  - Upgrade eflookup to v4.0.11
  - Upgrade consume to v5.2.6
+
+## 4.5.19
+ - Fix edge-case issue in fuelbeds module
