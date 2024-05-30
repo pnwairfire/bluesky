@@ -59,11 +59,11 @@ from afdatetime.parsing import parse_datetime
 from bluesky import io
 from bluesky.config import Config
 from bluesky.models.fires import Fire
-from .. import (
-    DispersionBase, GRAMS_PER_TON, SQUARE_METERS_PER_ACRE, PHASES
-)
+from .. import DispersionBase
 
 from . import hysplit_utils
+from .emissions_file_utils import get_emissions_rows_data
+from .emissionssplit import EmissionsSplitter
 
 __all__ = [
     'HYSPLITDispersion'
@@ -72,11 +72,11 @@ __all__ = [
 DEFAULT_BINARIES = {
     'HYSPLIT': {
         "old_config_key": "HYSPLIT_BINARY",
-        "default":"hycs_std"
+        "default":"hycs_std-v5.2.3"
     },
     'HYSPLIT_MPI': {
         "old_config_key": "HYSPLIT_MPI_BINARY",
-        "default":"hycm_std"
+        "default":"hycm_std-v5.2.3-openmpi"
     },
     'NCEA': {
         "old_config_key": "NCEA_EXECUTABLE",
@@ -88,7 +88,7 @@ DEFAULT_BINARIES = {
     },
     'MPI': {
         "old_config_key": "MPIEXEC",
-        "default":"mpiexec"
+        "default":"mpiexec.openmpi"
     },
     'HYSPLIT2NETCDF': {
         "old_config_key": "HYSPLIT2NETCDF_BINARY",
@@ -106,11 +106,11 @@ def _get_binaries(config_getter):
             ...,
             "config": {
                 "hysplit": {
-                    "HYSPLIT_BINARY": "hycs_std",
-                    "HYSPLIT_MPI_BINARY": "hycm_std",
+                    "HYSPLIT_BINARY": "hycs_std-v5.2.3",
+                    "HYSPLIT_MPI_BINARY": "hycm_std-v5.2.3-openmpi",
                     "NCEA_EXECUTABLE": "ncea",
                     "NCKS_EXECUTABLE": "ncks",
-                    "MPIEXEC": "mpiexec",
+                    "MPIEXEC": "mpiexec.openmpi",
                     "HYSPLIT2NETCDF_BINARY": "hysplit2netcdf"
                 }
             }
@@ -123,11 +123,11 @@ def _get_binaries(config_getter):
             "config": {
                 "hysplit": {
                     "binaries" : {
-                        'hysplit': "hycs_std",
-                        'hysplit_mpi': "hycm_std",
+                        'hysplit': "hycs_std-v5.2.3",
+                        'hysplit_mpi': "hycm_std-v5.2.3-openmpi",
                         'ncea': "ncea",
                         'ncks': "ncks",
-                        'mpi': "mpiexec",
+                        'mpi': "mpiexec.openmpi",
                         'hysplit2netcdf': "hysplit2netcdf"
                     }
                 }
@@ -163,7 +163,11 @@ class HYSPLITDispersion(DispersionBase):
         self._set_met_info(copy.deepcopy(met_info))
         self._output_file_name = self.config('output_file_name')
         self._has_parinit = []
-        self._smolder_height = self.config("SMOLDER_HEIGHT")
+
+        # If configured for sub-hour emissions, SERI must be 1 to 12 and
+        # result in an integer when 60 is divided by it
+        SERI = self.config("SUBHOUR_EMISSIONS_REDUCTION_INTERVAL")
+        self._SERI = 1 if ( SERI < 1 or SERI > 13 or 60%SERI > 0) else SERI
 
     def _required_activity_fields(self):
         return ('timeprofile', 'plumerise', 'emissions')
@@ -181,6 +185,14 @@ class HYSPLITDispersion(DispersionBase):
 
         self._set_grid_params()
         self._set_reduction_factor()
+
+        # TODO: We're using self.config("NPROCESSES") instead of
+        #   self._num_processes (computed in self._num_processes) because we
+        #   can't compute self._num_processes until we get the final number
+        #   of self._fires
+        self._fires = EmissionsSplitter(self.config, self._reduction_factor,
+            self._grid_params, self.config("NPROCESSES"), self._fires).split()
+
         self._compute_tranches()
 
         if 1 < self._num_processes:
@@ -344,6 +356,9 @@ class HYSPLITDispersion(DispersionBase):
                 except Exception as e:
                     self.exc = e
 
+        # TODO: consider emissions when tranching in order to allocate
+        #  emissions equally (as much as possible)
+
         fire_tranches = hysplit_utils.create_fire_tranches(self._fire_sets,
             self._num_processes, self._model_start, self._num_hours,
             self._grid_params)
@@ -481,7 +496,7 @@ class HYSPLITDispersion(DispersionBase):
             # self.BINARIES['HYSPLIT_MPI'] to try running with -v or -h option or
             # something similar,  or remove them
             # if not os.path.isfile(self.BINARIES['MPI']):
-            #     msg = "Failed to find %s. Check self.BINARIES['MPI'] setting and/or your MPICH2 installation." % mpiexec
+            #     msg = "Failed to find %s. Check self.BINARIES['MPI'] setting and/or your MPICH2 installation." % mpiexec.openmpi
             #     raise AssertionError(msg)
             # if not os.path.isfile(self.BINARIES['HYSPLIT_MPI']):
             #     msg = "HYSPLIT MPI executable %s not found." % self.BINARIES['HYSPLIT_MPI']
@@ -562,41 +577,12 @@ class HYSPLITDispersion(DispersionBase):
         io.create_sym_link(self.config("ROUGLEN_FILE"),
             os.path.join(working_dir, 'ROUGLEN.ASC'))
 
-    def _get_hour_data(self, dt, fire):
-        if fire.plumerise and fire.timeprofiled_emissions and fire.timeprofiled_area:
-            local_dt = dt + datetime.timedelta(hours=fire.utc_offset)
-            # TODO: will fire.plumerise and fire.timeprofile always
-            #    have string value keys
-            local_dt = local_dt.strftime('%Y-%m-%dT%H:%M:%S')
-            plumerise_hour = fire.plumerise.get(local_dt)
-            timeprofiled_emissions_hour = fire.timeprofiled_emissions.get(local_dt)
-            hourly_area = fire.timeprofiled_area.get(local_dt)
-            if plumerise_hour and timeprofiled_emissions_hour and hourly_area:
-                return (False, plumerise_hour,
-                    timeprofiled_emissions_hour.get('PM2.5', 0.0), hourly_area)
-
-        # If we don't have real data for the given timestep, we apparently need
-        # to stick in dummy records anyway (so we have the correct number of sources).
-        logging.debug("Fire %s has no emissions for hour %s", fire.id,
-            dt.strftime('%Y-%m-%dT%H:%M:%SZ'))
-        self._fires_wo_emissions += 1
-
-        return (True, hysplit_utils.DUMMY_PLUMERISE_HOUR, 0.0, 0.0)
 
     def _write_emissions(self, fires, emissions_file):
         # A value slightly above ground level at which to inject smoldering
         # emissions into the model.
 
-        # sub-hour emissions?
-        SERI = self.config("SUBHOUR_EMISSIONS_REDUCTION_INTERVAL")
-
-        # must be 1 to 12 and result in an integer when 60 is divided by it
-        if ( SERI < 1 or SERI > 13 ):
-            SERI = 1
-            temp = 60%SERI
-            if temp > 0:
-                SERI = 1
-        minutes_per_interval = int(60/SERI)
+        minutes_per_interval = int(60/self._SERI)
 
         with open(emissions_file, "w") as emis:
             # HYSPLIT skips past the first two records, so these are for comment purposes only
@@ -611,7 +597,7 @@ class HYSPLITDispersion(DispersionBase):
                 num_fires = len(fires)
                 #num_heights = 21 # 20 quantile gaps, plus ground level
                 num_heights = self.num_output_quantiles + 1
-                num_sources = num_fires * num_heights * SERI
+                num_sources = num_fires * num_heights * self._SERI
 
                 # TODO: What is this and what does it do?
                 # A reasonable guess would be that it means a time increment of 1 hour
@@ -627,9 +613,9 @@ class HYSPLITDispersion(DispersionBase):
 
                   # loop over sub-hour interval (default hourly)
                   icount = 0
-                  for interval in range(SERI):
+                  for interval in range(self._SERI):
                     min_dur_str = "{:0>2}".format(icount*minutes_per_interval) + " 00"+"{:0>2}".format(minutes_per_interval)
-                    if (SERI == 1):
+                    if self._SERI == 1:
                         min_dur_str = "00 0100"
                     icount += 1
 
@@ -637,139 +623,19 @@ class HYSPLITDispersion(DispersionBase):
                     lat = fire.latitude
                     lon = fire.longitude
 
-                    (dummy, plumerise_hour, pm25_emitted, hourly_area
-                        ) = self._get_hour_data(dt, fire)
-
                     record_fmt = "%s %s %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
-                    rows = self._get_emissions_rows_data_for_lat_lon(
-                        plumerise_hour, pm25_emitted, hourly_area, dummy)
+                    rows, dummy  = get_emissions_rows_data(fire, dt, self.config, self._reduction_factor)
                     for height, pm25, area, heat in rows:
                         emis.write(record_fmt % (dt_str, min_dur_str, lat, lon,
                             height, pm25, area, heat))
+                    if dummy:
+                        self._fires_wo_emissions += 1
 
 
                 if self._fires_wo_emissions > 0:
                     logging.debug("%d of %d fires had no emissions for hour %d",
                         self._fires_wo_emissions, num_fires, hour)
 
-    def _get_emissions_rows_data_for_lat_lon(self, plumerise_hour,
-            pm25_emitted, hourly_area, dummy):
-
-        area_meters, pm25_entrained, pm25_injected, heat = self._get_emissions_params(
-            pm25_emitted, plumerise_hour, hourly_area, dummy)
-        heights, fractions = self._reduce_and_reallocate_vertical_levels(plumerise_hour)
-
-        # if reduction factor == 20 (i.e. one height), add
-        # pm25_entrained to pm25_injected
-        if len(heights) == 1:
-            pm25_injected += pm25_entrained
-            pm25_entrained = 0
-
-        # Inject the smoldering fraction of the emissions at ground level
-        # (SMOLDER_HEIGHT represents a value slightly above ground level)
-        height_meters = self._smolder_height
-
-        # Write the smoldering record to the file
-        record_fmt = "%s %s %8.4f %9.4f %6.0f %7.2f %7.2f %15.2f\n"
-        rows = [(height_meters, pm25_injected, area_meters, heat)]
-        for height, fraction in zip(heights, fractions):
-            height_meters = 0.0 if dummy else height
-            pm25_injected = 0.0 if dummy else pm25_entrained * fraction
-
-            rows.append((height_meters, pm25_injected, area_meters, heat))
-
-        return rows
-
-    def _get_emissions_params(self, pm25_emitted, plumerise_hour, hourly_area, dummy):
-        if dummy:
-            return 0.0, 0.0, 0.0, 0.0
-
-        # convert area from acres to square meters.
-        area_meters = hourly_area * SQUARE_METERS_PER_ACRE
-
-        # Compute the total PM2.5 emitted at this timestep (grams) by
-        # multiplying the phase-specific total emissions by the
-        # phase-specific hourly fractions for this hour to get the
-        # hourly emissions by phase for this hour, and then summing
-        # the three values to get the total emissions for this hour
-        pm25_emitted *= GRAMS_PER_TON
-
-        # Total PM2.5 smoldering (not lofted in the plume)
-        smoldering_fraction = plumerise_hour['smolder_fraction']
-        if self.config("USE_CONST_SMOLDERING_FRACTION"):
-            smoldering_fraction = self.config("SMOLDERING_FRACTION_CONST")
-        pm25_injected = pm25_emitted * smoldering_fraction
-
-        # Total PM2.5 lofted in the plume
-        entrainment_fraction = 1.0 - smoldering_fraction
-        pm25_entrained = pm25_emitted * entrainment_fraction
-
-        # We don't assign any heat, so the PM2.5 mass isn't lofted
-        # any higher.  This is because we are assigning explicit
-        # heights from the plume rise.
-        heat = 0.0
-
-        return area_meters, pm25_entrained, pm25_injected, heat
-
-    def _reduce_and_reallocate_vertical_levels(self, plumerise_hour):
-        """The first step is to apply the reduction factor.
-
-        After applying the reduction factor, we want zero emissions in the
-        top level, whose emissions are allocated to the other levels based on
-        their proportion of the remaining emissions.
-
-        For example, if the reduction factor is 5 and the plume fractions are
-        the following:
-
-           [
-              0.05, 0.05, 0.1, 0.1, 0.1,
-              0.04, 0.04, 0.04, 0.04, 0.04,
-              0.04, 0.04, 0.04, 0.04, 0.04,
-              0.04, 0.04, 0.04, 0.04, 0.04
-           ]
-
-        That would get reduced to the following:
-
-           [0.4, 0.2, 0.2, 0.2]
-
-        And the last 0.2 would get allocated to the first three to get ths
-        following:
-
-           [0.5, 0.25, 0.25, 0.0]
-
-        Note that, if the reduction factor is 20, then all emissions are
-        included in the smoldering emissions, written above
-        """
-        heights = []
-        fractions = []
-
-        ## Reduce
-
-        num_heights = len(plumerise_hour['heights']) - 1
-        for level in range(0, num_heights, self._reduction_factor):
-            lower_height = plumerise_hour['heights'][level]
-            upper_height_index = min(level + self._reduction_factor, num_heights)
-            upper_height = plumerise_hour['heights'][upper_height_index]
-            if self._reduction_factor == 1:
-                height_meters = (lower_height + upper_height) / 2.0  # original approach
-            else:
-                height_meters = upper_height # top-edge approach
-            heights.append(height_meters)
-
-            fractions.append(sum(plumerise_hour['emission_fractions'][level:level+self._reduction_factor]))
-
-        ## Allocation top level's emissions to the rest
-        num_heights = len(heights)
-        if num_heights > 1:
-            if fractions[-1] == 1:
-                # all emissions in top level
-                f = 1 / (num_heights-1)
-                fractions = ([f] * (num_heights-1)) + [0]
-            else:
-                factor = 1 / (1 - fractions[-1])
-                fractions = [f * factor for f in fractions[:-1]] + [0]
-
-        return heights, fractions
 
     VERTICAL_CHOICES = {
         "DATA": 0,
@@ -797,19 +663,9 @@ class HYSPLITDispersion(DispersionBase):
 
     def _write_control_file(self, fires, control_file, concFile):
 
-        # sub-hour emissions?
-        SERI = self.config("SUBHOUR_EMISSIONS_REDUCTION_INTERVAL")
-
-        # must be 1 to 12 and result in an integer when 60 is divided by it
-        if ( SERI < 1 or SERI > 13 ):
-            SERI = 1
-            temp = 60%SERI
-            if temp > 0:
-                SERI = 1
-
         num_fires = len(fires)
         num_heights = self.num_output_quantiles + 1  # number of quantiles used, plus ground level
-        num_sources = num_fires * num_heights * SERI
+        num_sources = num_fires * num_heights * self._SERI
 
         # An arbitrary height value.  Used for the default source height
         # in the CONTROL file.  This can be anything we want, because
@@ -906,7 +762,7 @@ class HYSPLITDispersion(DispersionBase):
             # Source locations
             for fire in fires:
                 for height in range(num_heights):
-                  for intervals in range(SERI):
+                  for intervals in range(self._SERI):
                     f.write("%9.3f %9.3f %9.3f\n" % (fire.latitude, fire.longitude, sourceHeight))
 
             # Total run time (hours)

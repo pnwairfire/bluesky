@@ -290,13 +290,15 @@ class PlumeMerger(BaseFireMerger):
         # The following handles:
         #    - levels == [] (and min_height=1000000 and max_height = 0)
         #    - min_height == max_height == 0  (i.e. all heights were zero)
-        if max_height == 0:
+        #    - total_pm25 == 0
+        if max_height == 0 or total_pm25 == 0:
             # It doesn't matter what fractions we use, so just return
             # first fire's
             return copy.deepcopy(fires[0].plumerise[dt])
 
-        # this will never divide by zero; if total_pm25 is zero, so is
-        # weighted_smolder_fraction
+        # this will never divide by zero; we will never get to this point in
+        # this function if total_pm25 is zero, and weighted_smolder_fraction
+        # would be zero anyway
         smolder_fraction = (weighted_smolder_fraction and
             (weighted_smolder_fraction / total_pm25))
 

@@ -72,7 +72,7 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
         return Config().get('dispersion', self._model, *keys, **kwargs)
 
     def run(self, fires_manager, start, num_hours, output_dir, working_dir=None):
-        """Runs hysplit
+        """Runs dispersion model (e.g. hysplit)
 
         args:
          - fires_manager - FiresManager object

@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+
+import argparse
+import csv
+import datetime
+import gzip
+import json
+import logging
+import os
+import sys
+from collections import defaultdict
+
+
+EXAMPLES_STRING = """
+Examples:
+
+    {script} output-2024-*.json
+    {script} output-2024-*.json.gz -o acres-per-fccs.csv
+
+ """.format(script=sys.argv[0])
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('bluesky_output_files', nargs='+')
+    parser.add_argument('-o','--output-csv-file', help="write csv output to file")
+    parser.add_argument('--include-failed-fires', action="store_true",
+        help="Include fires under 'failed_fires' in the bluesky output")
+    parser.add_argument('--single-day-only', action='store_true',
+        help="Only consider a single day of activity, based on the output's 'today'")
+    parser.add_argument('--log-level', default="INFO", help="Log level")
+
+    parser.epilog = EXAMPLES_STRING
+    parser.formatter_class = argparse.RawTextHelpFormatter
+
+    args = parser.parse_args()
+
+    logging.basicConfig(level=getattr(logging, args.log_level),
+        format='%(asctime)s %(levelname)s: %(message)s')
+
+    logging.info(" Args:")
+    for k,v in args.__dict__.items():
+        if k in ('fccs_ids', 'coordinates'):
+            logging.info("   %s: %s", k, v and v[:50])
+        else:
+            logging.info("   %s: %s", k, v)
+
+    return args
+
+def same_day(aa, today):
+    today
+
+def get_single_day_activity(args, today, a):
+    active_areas = a.get('active_areas', [])
+    if not active_areas or not args.single_day_only:
+        return active_areas
+
+    # TODO: if none are today, return first day's worth of active areas?
+    reduced_active_areas = [aa for aa in active_areas if aa.get('start','').startswith(today)]
+    logging.debug(f"Single day filter: {[aa.get('start') for aa in active_areas]}"
+        f" -> {[aa.get('start') for aa in reduced_active_areas]}")
+
+    return reduced_active_areas
+
+def process_bluesky_output(args, data, stats):
+    data = json.loads(data)
+
+    fires = data.get('fires', [])
+    if args.include_failed_fires:
+        fires.extend(data.get('failed_fires', []))
+
+    #today = datetime.datetime.strptime(data.get('today'), "%Y-%m-%dT%H:%M:%s")
+    today = data['today'][0:10]
+    for f in data.get('fires', []):
+        logging.debug(f"Fire {f.get('id')}")
+        for a in f.get('activity', []):
+            active_areas = get_single_day_activity(args, today, a)
+            for aa in active_areas:
+                locs = (aa.get('specified_points')
+                    or ([aa['perimeter']] if aa.get('perimeter') else []))
+                for loc in locs:
+                    area = loc.get('area') or 0
+                    for fb in loc.get('fuelbeds', []):
+                        if fb.get('fccs_id'):
+                            # TODO: divide total by 100 at the end
+                            #   to reduce number of divisions
+                            stats[fb['fccs_id']] += area * (fb['pct'] / 100)
+
+def process_file(args, filename, stats):
+    logging.info(f"Processing {filename}")
+    with open(filename, 'rb') as f:
+        data = b''.join([d.encode() if hasattr(d, 'encode') else d for d in f])
+        try:
+            data = gzip.decompress(data)
+        except Exception as e:
+            logging.debug("input %s not gzip'd", filename or '')
+
+        data = data.decode()
+
+        try:
+            process_bluesky_output(args, data, stats)
+        except:
+            logging.warning(f"Failed to process bluesky output from {filename}")
+
+def output_csv(args, stats):
+    o = open(args.output_csv_file, 'w') if args.output_csv_file else sys.stdout
+    csv_writer = csv.writer(o)
+    csv_writer.writerow(['fccs_id', 'acres'])
+
+    def _s(fccs_id):
+        try:
+            return int(fccs_id)
+        except:
+            return fccs_id
+
+    for fccs_id in sorted(list(stats.keys()), key=lambda e: _s(e)):
+        csv_writer.writerow([fccs_id, stats[fccs_id]])
+
+def main():
+    args = parse_args()
+    stats = defaultdict(lambda: 0)
+    for filename in args.bluesky_output_files:
+        try:
+            process_file(args, filename, stats)
+        except:
+            logging.warning(f"Failed to process {filename}")
+
+    output_csv(args, stats)
+
+if __name__ == "__main__":
+    main()

@@ -265,7 +265,12 @@ class SmokeReadyWriter():
     for fire_info in fires_info:
       with fires_manager.fire_failure_handler(fire_info):
        for fire_loc in fire_info.locations:
-        if any([k not in fire_loc for k in ('lat', 'lng')]):
+
+        # Use locationutils.LatLng rather than just look for 'lat' and 'lng'
+        #  keys in order to support both specified points and perimeters
+        try:
+          lat_lng = locationutils.LatLng(fire_loc)
+        except:
           skip_no_lat_lng += 1
           total_skipped += 1
           continue
@@ -281,7 +286,7 @@ class SmokeReadyWriter():
           total_skipped += 1
           continue
 
-        lat, lng = fire_loc['lat'], fire_loc['lng']
+        lat, lng = lat_lng.latitude, lat_lng.longitude
 
         emissions = self._get_location_emissions(fire_loc)
 

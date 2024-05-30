@@ -302,9 +302,9 @@ class Consume(EmissionsBase):
                         "Missing fuelbed data required for computing emissions")
 
                 for fb in loc['fuelbeds']:
-                    self._run_on_fuelbed(aa, loc, fb, season, burn_type, fire_type)
+                    self._run_on_fuelbed(loc, fb, season, burn_type, fire_type)
 
-    def _run_on_fuelbed(self, active_area, loc, fb, season, burn_type, fire_type):
+    def _run_on_fuelbed(self, loc, fb, season, burn_type, fire_type):
         if 'consumption' not in fb:
             raise ValueError(
                 "Missing consumption data required for computing emissions")
@@ -314,7 +314,7 @@ class Consume(EmissionsBase):
         if 'pct' not in fb:
             raise ValueError(
                 "Missing fuelbed 'ptc' required for computing emissions")
-        if 'ecoregion' not in active_area:
+        if 'ecoregion' not in loc:
             raise ValueError(
                 "Missing ecoregion required for computing emissions")
 
@@ -324,7 +324,7 @@ class Consume(EmissionsBase):
         # how you set area and output_units
         area = (fb['pct'] / 100.0) * loc['area']
         fc = FuelConsumptionForEmissions(fb["consumption"], fb['heat'],
-            area, burn_type, fire_type, fb['fccs_id'], season, active_area,
+            area, burn_type, fire_type, fb['fccs_id'], season, loc,
             fccs_file=fuel_loadings_csv_filename)
 
         e_fuel_loadings = self.fuel_loadings_manager.get_fuel_loadings(

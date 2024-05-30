@@ -593,3 +593,76 @@
 ## 4.5.0
  - Upgrade docker image to ubuntu 22.04 & python v3.10.12
  - Upgrade to consume==5.2.1, blueskykml==5.0.1, met==4.0.0, Flask==3.0.0, pyairfire==5.0.0, pytest==7.4.2, geopandas==0.14.0, blueskyutils==2.0.0, fccsmap==4.0.0
+
+## 4.5.1
+ - Fix loading of perimeter geometry from shapefile (broken by python upgrade)
+
+## 4.5.2
+ - Add option to split HYSPLIT emissions sources based on hourly rate
+
+## 4.5.3
+ - Replace HYSPLIT v5.1.0 and v5.2.3 binaries with ones built on ubuntu 22.04
+ - Replace HYSPLIT v5.1 and v5.2 binaries with sym links to corresponding v5.1.0 and v5.2.3 binaries
+
+## 4.5.4
+ - Remove HYSPLIT v4 binaries and default to v5.2.3
+ - Remove HYSPLIT v5.1 and v5.2 sym links
+
+## 4.5.5
+ - Follow-ups to HYSPLIT emissions splitting
+
+## 4.5.6
+ - More follow-ups to HYSPLIT emissions splitting
+ - Add HYSPLIT option to remove locations (i.e. plumes) whose max hourly PM 2.5 rate is less than a given threshold
+
+## 4.5.7
+ - Upgrade to met==4.0.1
+
+## 4.5.8
+ - Install openmpi alongside mpich and make mpiexec.openmpi the default
+
+## 4.5.9
+ - Replace hysplit mpi binaries with mpich and openmpi optimized versions.  ***(Note that this removes hycm_std-v5.2.3, hycm_std-v5.1.0, hytm_std-v5.2.3, and hytm_std-v5.1.0)***
+
+## 4.5.10
+ - Include `ecoregion-lookup` in bluesky package
+ - Update `EcoregionLookup` class and `ecoregion-lookup` script to support optionally checking nearby locations when specified location fails
+ - Upgrade eflookup to v4.0.8
+ - Upgrade consume to v5.2.2
+
+## 4.5.11
+ - Upgrade fccsmap to v4.1.2 and update fuelbeds configuration options
+ - Remove truncation options from fuelbeds module that were compounding truncation done in fccsmap
+ - Fill in date wildcards in config defaults with current date if `today` isn't set
+
+## 4.5.12
+ - Fix bug in consume emissions
+
+## 4.5.13
+ - Upgrade eflookup to v4.0.9
+ - Upgrade consume to v5.2.3
+
+## 4.5.14
+ - Fix setting of consume settings defauts for wildfires
+
+## 4.5.15
+ - Upgrade pyairfire to 5.0.1
+ - Record fuel loadings in total tons, to be consistent with consumption and heat output
+ - Add option to summarize/aggregate fuel loadings across fuelbeds, locations, etc.
+
+## 4.5.16
+ - Upgrade to consume==5.2.4
+ - Update smokeready module to support perimeters as well as specified points
+ - dev script updates
+
+## 4.5.17
+ - Upgrade eflookup to v4.0.10
+ - Upgrade consume to v5.2.5
+
+## 4.5.18
+ - Upgrade plumerise to v2.0.4
+ - Upgrade eflookup to v4.0.11
+ - Upgrade consume to v5.2.6
+
+## 4.5.19
+ - Fix edge-case issue in fuelbeds module

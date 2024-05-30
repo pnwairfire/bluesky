@@ -265,6 +265,8 @@ def parse_args():
     parser.add_argument('-l', '--local-code',
         default=False, action="store_true",
         help="Run with local code mounted in docker container")
+    parser.add_argument('--docker-image', default="bluesky",
+        help="e.g. pnwaifire/bluesky:v4.5.10")
     parser.add_argument('--produce-emissions-csv', action="store_true",
         help="run extrafiles to produce the emisisons csv")
     parser.add_argument('--run-through-plumerise', action="store_true")
@@ -439,7 +441,8 @@ def get_command(args, docker_output_dir):
             " -e PYTHONPATH=/code/"
             " -e PATH=/code/bin/:$PATH")
 
-    cmd += (" bluesky bsp --log-level=" + args.log_level
+    cmd += (" " + args.docker_image + " bsp "
+        + " --log-level=" + args.log_level
         + " --log-file " + docker_output_dir + "/output.log"
         + " -c " + docker_output_dir + "/config.json"
         + " -i " + docker_output_dir + "/input.json"

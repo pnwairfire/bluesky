@@ -6,6 +6,7 @@ import copy
 import datetime
 import threading
 
+from bluesky import datetimeutils
 from freezegun import freeze_time
 from pytest import raises
 
@@ -89,14 +90,28 @@ class TestToLowercaseKeys():
             to_lowercase_keys(before)
 
 
+def defaults_with_wildcards_replaced(today):
+    defaults = copy.deepcopy(DEFAULTS)
+    for k in ('ptinv_filename', 'ptday_filename', 'pthour_filename'):
+        defaults['extrafiles']['smokeready'][k] = datetimeutils.fill_in_datetime_strings(
+            defaults['extrafiles']['smokeready'][k], today=today)
+    return defaults
+
+
 class TestGetAndSet():
 
     def setup_method(self):
         self._ORIGINAL_DEFAULTS = copy.deepcopy(DEFAULTS)
 
+    @freeze_time("2024-01-10 00:00:00", tz_offset=0)
     def test_getting_defaults(self, reset_config):
+        # We need to call reset within the freeze_time context so that
+        # wildcards in the defaults are replaced with the freeze_time
+        # date rather than the actual date
+        Config().reset()
+
         # getting defaults
-        assert Config().get() == DEFAULTS
+        assert Config().get() == defaults_with_wildcards_replaced(datetime.datetime(2024,1,10))
         assert Config().get('skip_failed_fires') == True
         assert Config().get('fuelbeds', 'fccs_version') == '2'
         # last key can be upper or lower
@@ -117,9 +132,10 @@ class TestGetAndSet():
         Config().set({"FOO": "{run_id}_{today-2:%Y%m%d}_bar", "bar": "baz"})
         assert Config()._data._RUN_ID == None
         assert Config()._data._TODAY == None
-        EXPECTED_RAW =  dict(DEFAULTS,
+        EXPECTED_RAW =  dict(copy.deepcopy(DEFAULTS),
             foo="{run_id}_{today-2:%Y%m%d}_bar", bar="baz")
-        EXPECTED = dict(DEFAULTS,
+        # before today is set, the default is today midnight
+        EXPECTED = dict(defaults_with_wildcards_replaced(datetime.datetime(2016,4,20)),
             foo="{run_id}_20160418_bar", bar="baz")
         assert Config()._data._RAW_CONFIG == EXPECTED_RAW
         assert Config()._data._CONFIG == EXPECTED
@@ -129,9 +145,9 @@ class TestGetAndSet():
         Config().set_today(datetime.datetime(2019, 1, 5, 10, 12, 1))
         assert Config()._data._RUN_ID == None
         assert Config()._data._TODAY == datetime.datetime(2019,1,5,10,12,1)
-        EXPECTED_RAW =  dict(DEFAULTS,
+        EXPECTED_RAW =  dict(copy.deepcopy(DEFAULTS),
             foo="{run_id}_{today-2:%Y%m%d}_bar", bar="baz")
-        EXPECTED = dict(DEFAULTS,
+        EXPECTED = dict(defaults_with_wildcards_replaced(datetime.datetime(2019,1,5,10,12,1)),
             foo="{run_id}_20190103_bar", bar="baz")
         assert Config()._data._RAW_CONFIG == EXPECTED_RAW
         assert Config()._data._CONFIG == EXPECTED
@@ -141,9 +157,9 @@ class TestGetAndSet():
         Config().set({"fOO": "{run_id}_{today:%Y%m%d%H}_bar", "bar": "sdfsdf"})
         assert Config()._data._RUN_ID == None
         assert Config()._data._TODAY == datetime.datetime(2019,1,5,10,12,1)
-        EXPECTED_RAW =  dict(DEFAULTS,
+        EXPECTED_RAW =  dict(copy.deepcopy(DEFAULTS),
             foo="{run_id}_{today:%Y%m%d%H}_bar", bar="sdfsdf")
-        EXPECTED = dict(DEFAULTS,
+        EXPECTED = dict(defaults_with_wildcards_replaced(datetime.datetime(2019,1,5,10,12,1)),
             foo="{run_id}_2019010510_bar", bar="sdfsdf")
         assert Config()._data._RAW_CONFIG == EXPECTED_RAW
         assert Config()._data._CONFIG == EXPECTED
@@ -153,9 +169,9 @@ class TestGetAndSet():
         Config().set_run_id("abc123")
         assert Config()._data._RUN_ID == "abc123"
         assert Config()._data._TODAY == datetime.datetime(2019,1,5,10,12,1)
-        EXPECTED_RAW =  dict(DEFAULTS,
+        EXPECTED_RAW =  dict(copy.deepcopy(DEFAULTS),
             foo="{run_id}_{today:%Y%m%d%H}_bar", bar="sdfsdf")
-        EXPECTED = dict(DEFAULTS,
+        EXPECTED = dict(defaults_with_wildcards_replaced(datetime.datetime(2019,1,5,10,12,1)),
             foo="abc123_2019010510_bar", bar="sdfsdf")
         assert Config()._data._RAW_CONFIG == EXPECTED_RAW
         assert Config()._data._CONFIG == EXPECTED
@@ -165,9 +181,9 @@ class TestGetAndSet():
         Config().set({"foo": "FOO_{run_id}_{today:%Y%m%d%H}_bar", "bar": "zz"})
         assert Config()._data._RUN_ID == "abc123"
         assert Config()._data._TODAY == datetime.datetime(2019,1,5,10,12,1)
-        EXPECTED_RAW =  dict(DEFAULTS,
+        EXPECTED_RAW =  dict(copy.deepcopy(DEFAULTS),
             foo="FOO_{run_id}_{today:%Y%m%d%H}_bar", bar="zz")
-        EXPECTED = dict(DEFAULTS,
+        EXPECTED = dict(defaults_with_wildcards_replaced(datetime.datetime(2019,1,5,10,12,1)),
             foo="FOO_abc123_2019010510_bar", bar="zz")
         assert Config()._data._RAW_CONFIG == EXPECTED_RAW
         assert Config()._data._CONFIG == EXPECTED
@@ -180,10 +196,10 @@ class TestGetAndSet():
         Config().set("{run_id}", "BAZ", "b")
         assert Config()._data._RUN_ID == "abc123"
         assert Config()._data._TODAY == datetime.datetime(2019,1,5,10,12,1)
-        EXPECTED_RAW =  dict(DEFAULTS,
+        EXPECTED_RAW =  dict(copy.deepcopy(DEFAULTS),
             foo="FOO_{run_id}_{today:%Y%m%d%H}_bar", bar=100, baaar=200,
             baz={"a": "sdfsdf{run_id}", "b": "{run_id}"})
-        EXPECTED = dict(DEFAULTS,
+        EXPECTED = dict(defaults_with_wildcards_replaced(datetime.datetime(2019,1,5,10,12,1)),
             foo="FOO_abc123_2019010510_bar", bar=100, baaar=200,
             baz={"a": "sdfsdfabc123", "b": "abc123"})
         assert Config()._data._RAW_CONFIG == EXPECTED_RAW
@@ -204,13 +220,18 @@ class TestMerge():
 
     @freeze_time("2016-04-20 12:00:00", tz_offset=0)
     def test_merge_configs(self, reset_config):
+        # We need to call reset within the freeze_time context so that
+        # wildcards in the defaults are replaced with the freeze_time
+        # date rather than the actual date
+        Config().reset()
+
         Config().merge({
             "foo": {"A": "{run_id}-{today}","b": 222,"c": 333,"d": 444}
         })
-        EXPECTED_RAW = dict(DEFAULTS, **{
+        EXPECTED_RAW = dict(copy.deepcopy(DEFAULTS), **{
             "foo": {"a": "{run_id}-{today}","b": 222,"c": 333,"d": 444}
         })
-        EXPECTED = dict(DEFAULTS, **{
+        EXPECTED = dict(defaults_with_wildcards_replaced(datetime.datetime(2016,4,20)), **{
             "foo": {"a": "{run_id}-20160420","b": 222,"c": 333,"d": 444}
         })
         assert Config()._data._RUN_ID == None
@@ -220,10 +241,10 @@ class TestMerge():
         assert Config().get() == EXPECTED
 
         Config().set_today(datetime.datetime(2019, 2, 4))
-        EXPECTED_RAW = dict(DEFAULTS, **{
+        EXPECTED_RAW = dict(copy.deepcopy(DEFAULTS), **{
             "foo": {"a": "{run_id}-{today}","b": 222,"c": 333,"d": 444}
         })
-        EXPECTED = dict(DEFAULTS, **{
+        EXPECTED = dict(defaults_with_wildcards_replaced(datetime.datetime(2019,2,4)), **{
             "foo": {"a": "{run_id}-20190204","b": 222,"c": 333,"d": 444}
         })
         assert Config()._data._RUN_ID == None
@@ -237,13 +258,13 @@ class TestMerge():
             "BAR": {"b": "b"},
             "b": "b"
         })
-        EXPECTED_RAW = dict(DEFAULTS, **{
+        EXPECTED_RAW = dict(copy.deepcopy(DEFAULTS), **{
             "foo": {"a": "{run_id}-{today}","b": "{today-1}-{run_id}",
                 "c": 3333,"d": 4444,"bb": "bb"},
             "bar": {"b": "b"},
             "b": "b"
         })
-        EXPECTED = dict(DEFAULTS, **{
+        EXPECTED = dict(defaults_with_wildcards_replaced(datetime.datetime(2019,2,4)), **{
             "foo": {"a": "{run_id}-20190204","b": "20190203-{run_id}",
                 "c": 3333,"d": 4444,"bb": "bb"},
             "bar": {"b": "b"},
@@ -260,7 +281,7 @@ class TestMerge():
             "baz": {"c": "c"},
             "c": "c"
         })
-        EXPECTED_RAW = dict(DEFAULTS, **{
+        EXPECTED_RAW = dict(copy.deepcopy(DEFAULTS), **{
             "foo": {"a": "{run_id}-{today}","b": "{today-1}-{run_id}",
                 "c": 33333,"d": 44444,"bb": "bb","cc": "cc"},
             "bar": {"b": "b"},
@@ -268,7 +289,7 @@ class TestMerge():
             "b": "b",
             "c": "c"
         })
-        EXPECTED = dict(DEFAULTS, **{
+        EXPECTED = dict(defaults_with_wildcards_replaced(datetime.datetime(2019,2,4)), **{
             "foo": {"a": "{run_id}-20190204","b": "20190203-{run_id}",
                 "c": 33333,"d": 44444,"bb": "bb","cc": "cc"},
             "bar": {"b": "b"},
@@ -292,7 +313,7 @@ class TestMerge():
         Config().set(123.23, 'df')
         Config().set('23', 'dci')
         Config().set('123.23', 'dcf')
-        EXPECTED_RAW = dict(DEFAULTS, **{
+        EXPECTED_RAW = dict(copy.deepcopy(DEFAULTS), **{
             "foo": {
                 "a": "{run_id}-{today}","b": "{today-1}-{run_id}",
                 "c": 33333,"bb": "bb","cc": "cc","dd": "dd",
@@ -312,7 +333,7 @@ class TestMerge():
             "dci": "23",
             "dcf": "123.23"
         })
-        EXPECTED = dict(DEFAULTS, **{
+        EXPECTED = dict(defaults_with_wildcards_replaced(datetime.datetime(2019,2,4)), **{
             "foo": {
                 "a": "{run_id}-20190204","b": "20190203-{run_id}",
                 "c": 33333,"bb": "bb","cc": "cc","dd": "dd",
@@ -343,8 +364,12 @@ class TestMerge():
 
 class TestThreadSafety():
 
+    @freeze_time("2024-01-10 00:00:00", tz_offset=0)
     def test_getting_defaults(self, reset_config):
-
+        # We need to call reset within the freeze_time context so that
+        # wildcards in the defaults are replaced with the freeze_time
+        # date rather than the actual date
+        Config().reset()
 
         class T(threading.Thread):
             def  __init__(self, i):
@@ -357,7 +382,7 @@ class TestThreadSafety():
             def run(self):
                 try:
                     # getting defaults
-                    assert Config().get() == DEFAULTS
+                    assert Config().get() == defaults_with_wildcards_replaced(datetime.datetime(2024,1,10))
                     assert Config().get('skip_failed_fires') == True
                     Config().set(self.i, 'skip_failed_fires')
                     assert Config().get('skip_failed_fires') == self.i

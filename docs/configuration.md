@@ -122,24 +122,25 @@ The following settings apply to filtering on any field (other than 'area') in th
 
 ### fuelbeds
 
-- ***'config' > 'fuelbeds' > 'fccs_version'*** -- *optional* -- '1' or '2'
-- ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
-- ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- fuelbeds to ignore; default ['0', '900']
-- ***'config' > 'fuelbeds' > 'no_sampling'*** -- *optional* -- don't sample surrounding area for Point and MultiPoint geometries
-- ***'config' > 'fuelbeds' > 'use_all_grid_cells'*** -- *optional* --
-- ***'config' > 'fuelbeds' > 'sampling_radius_factors'*** -- *optional* --
 - ***'config' > 'fuelbeds' > 'skip_failures'*** -- *optional* -- default `false`; if true, ignore fuelbed look-up failures and move on to next location; else (default), raise exception (which either aborts run or moves fire to `failed_fires`, depending on how top level `skip_failed_fires` is set)
-- ***'config' > 'fuelbeds' > 'fccs_fuelload_file'*** -- *optional* -- NetCDF
-  file containing FCCS lookup map
-- ***'config' > 'fuelbeds' > 'fccs_fuelload_param'*** -- *optional* -- name of variable in NetCDF file
-- ***'config' > 'fuelbeds' > 'fccs_fuelload_grid_resolution'*** -- *optional* -- length of grid cells in km
-- ***'config' > 'fuelbeds' > 'truncation_percentage_threshold'*** -- *optional* -- use first N largest fuelbeds making up this percentage for a location; default 90.0
-- ***'config' > 'fuelbeds' > 'truncation_count_threshold'*** -- *optional* -- use only up to this many fuelbeds for a location; default 5
+- ***'config' > 'fuelbeds' > 'ignored_fuelbeds'*** -- *optional* -- fuelbeds to ignore; default ['0', '900']
+- ***'config' > 'fuelbeds' > 'ignored_percent_resampling_threshold'*** -- *optional* -- percentage of ignored fuelbeds which should trigger resampling in larger area; only plays a part in Point and MultiPoint look-ups
+- ***'config' > 'fuelbeds' > 'insignificance_threshold'*** -- *optional* -- remove least prevalent fuelbeds that cumulatively add up to this percentage or less; default: 10.0
+- ***'config' > 'fuelbeds' > 'max_fuelbed_count_threshold'*** -- *optional* -- remove least prevalent fuelbeds until the number of fuelbeds is this number or less; default: 5
+- ***'config' > 'fuelbeds' > 'no_sampling'*** -- *optional* -- don't sample surrounding area for Point and MultiPoint geometries
+- ***'config' > 'fuelbeds' > 'sampling_radius_km'*** -- *optional* --
+- ***'config' > 'fuelbeds' > 'sampling_radius_factors'*** -- *optional* --
+- ***'config' > 'fuelbeds' > 'use_all_grid_cells'*** -- *optional* --
+- ***'config' > 'fuelbeds' > ['fccs_fuelload_tile_sets'] > 'directory'*** -- *optional* --
+- ***'config' > 'fuelbeds' > ['fccs_fuelload_tile_sets'] > 'index_shapefile'*** -- *optional* --
+- ***'config' > 'fuelbeds' > ['fccs_fuelload_files']*** -- *optional* -- array or one or more raster FCCS lookup map raster files
+- ***'config' > 'fuelbeds' > 'fccs_version'*** -- *optional* -- '1' or '2'; only comes into play if neither fuel load files or tile sets are specieid
 - ***'config' > 'fuelbeds' > 'total_pct_threshold'*** -- *optional* -- Allow summed fuel percentages to be this much off of 100%; default is 0.5% (i.e. between 99.5% and 100.5%)
 
 ### ecoregion
 
  - ***'config' > 'ecoregion' > 'lookup_implementation'*** -- *optional* -- default 'ogr'
+ - ***'config' > 'ecoregion' > 'try_nearby_on_failure'*** -- *optional* -- default false; if true, try nearby locations when the specified location fails
  - ***'config' > 'ecoregion' > 'skip_failures'*** -- *optional* -- default true; if true (default) continue on to next location in fire; else, raise exception
  - ***'config' > 'ecoregion' > 'default'*** -- *optional* -- ecoregion to use in case fire info lacks it and lookup fails; e.g. 'western', 'southern', 'boreal'
 
@@ -163,6 +164,7 @@ The following settings apply to filtering on any field (other than 'area') in th
  - ***'config' > 'consumption' > 'fuel_loadings'*** -- *optional* -- custom, fuelbed-specific fuel loadings
  - ***'config' > 'consumption' > 'scale_with_estimated_fuelload'*** -- *optional* -- If set to true and if the estimated fuel load per acre is defined for the location (field `input_est_fuelload_tpa` in specified point or perimeter), then the modeled fuel load and consumption values are all scaled by `input_est_fuelload_tpa \ <modeled fuel load per acre for that location>`
  - ***'config' > 'consumption' > 'scale_with_estimated_consumption'*** -- *optional* -- If set to true and if the estimated consumption per acre is defined for the location (field `input_est_consumption_tpa` in specified point or perimeter), then the modeled consumption values are all scaled by `input_est_consumption_tpa \ <modeled consumption per acre for that location>`
+ - ***'config' > 'consumption' > 'summarize_fuel_loadings'*** -- *optional* -- default false; whether or not to summarize/aggregate fuel loadings across fuelbeds, locations, etc.
 
 The following consume_settings fields define what defaults to use when the
 field isn't defined in a fire's activity object (or in its localmet data, if
@@ -222,7 +224,7 @@ They also define what synonyms to recognize, if any, for each field.
 
 ### emissions
 
- - ***'config' > 'emissions' > 'model'*** -- *optional* -- emissions model; 'prichard-oneill' (which replaced 'urbanski'), 'feps', or 'consume'; default 'feps'
+ - ***'config' > 'emissions' > 'model'*** -- *optional* -- emissions model; 'prichard-oneill' (which replaced 'urbanski'), 'feps', or 'consume'; default 'prichard-oneill'
  - ***'config' > 'emissions' > 'species'*** -- *optional* -- list of species to compute emissions levels for
  - ***'config' > 'emissions' > 'include_emissions_details'*** -- *optional* -- whether or not to include emissions levels by fuel category; default: false
  - ***'config' > 'emissions' > 'include_emissions_factors'*** -- *optional* -- whether or not to include the emissions factors used for computing emissions in the output data; default: false
@@ -367,7 +369,7 @@ parameters would be used.
 
 #### if running hysplit trajectories:
 
- - ***'config' > 'trajectories' > 'hysplit' > 'binary'*** -- *optional* -- default: 'hyts_std'
+ - ***'config' > 'trajectories' > 'hysplit' > 'binary'*** -- *optional* -- default: 'hyts_std-v5.2.3'
  - ***'config' > 'trajectories' > 'hysplit' > 'start_hours'*** -- *optional* -- default: [0]
  - ***'config' > 'trajectories' > 'hysplit' > 'heights'*** -- *optional* -- default: [10, 100, 1000]
  - ***'config' > 'trajectories' > 'hysplit' > 'vertical_motion'*** -- *optional* -- default: 0 (0 = from met file)
@@ -405,6 +407,15 @@ parameters would be used.
 
 #### if running hysplit dispersion:
 
+ - ***'config' > 'dispersion' > 'hysplit' > 'emissions_split' > 'enabled'*** -- *optional* -- default: false
+ - ***'config' > 'dispersion' > 'hysplit' > 'emissions_split' > 'target_pm25'*** -- *optional* -- default: 10.0 -- Split up locations (i.e. plumes) so that no plume has an hourly rate greater than this amount (specified in ug/m3)
+ - ***'config' > 'dispersion' > 'hysplit' > 'emissions_split' > 'min_pm25'*** -- *optional* -- default: None -- If defined, remove locations (i.e. plumes) whose max hourly PM 2.5 rate is less than this amount (specified in ug/m3)
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit'*** -- *optional* -- default: "hycs_std-v5.2.3"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit_mpi'*** -- *optional* -- default: "hycm_std-v5.2.3-openmpi"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'ncea'*** -- *optional* -- default: "ncea"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'ncks'*** -- *optional* -- default: "ncks"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'mpi'*** -- *optional* -- default: "mpiexec.openmpi"
+ - ***'config' > 'dispersion' > 'hysplit' > 'binaries' > 'hysplit2netcdf'*** -- *optional* -- default: "hysplit2netcdf"
  - ***'config' > 'dispersion' > 'hysplit' > 'skip_invalid_fires'*** -- *optional* -- skips fires lacking data necessary for hysplit; default behavior is to raise an exception that stops the bluesky run
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'spacing'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed -- grid cell dimensions ***in km unless 'projection' is 'LatLng' (see below)***
  - ***'config' > 'dispersion' > 'hysplit' > 'grid' > 'projection'*** -- *required* if grid is not defined in met data or by USER_DEFINED_GRID settings, and it's not being computed -- default: 'LatLng' (which means the spacing is in degrees)

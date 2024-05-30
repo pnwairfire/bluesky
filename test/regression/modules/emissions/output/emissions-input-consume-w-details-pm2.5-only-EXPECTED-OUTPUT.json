@@ -6,8 +6,8 @@
             "version": "0.1.1",
             "model": "consume",
             "emitcalc_version": "3.0.1",
-            "eflookup_version": "4.0.4",
-            "consume_version": "5.2.1"
+            "eflookup_version": "4.0.11",
+            "consume_version": "5.2.6"
         }
     ],
     "failed_fires": [
@@ -56,7 +56,7 @@
             "error": {
                 "type": "ValueError",
                 "message": "Missing consumption data required for computing emissions",
-                "traceback": "['  File \"/bluesky/bluesky/modules/emissions.py\", line 118, in run\\n    self._run_on_fire(fire)\\n', '  File \"/bluesky/bluesky/modules/emissions.py\", line 305, in _run_on_fire\\n    self._run_on_fuelbed(aa, loc, fb, season, burn_type, fire_type)\\n', '  File \"/bluesky/bluesky/modules/emissions.py\", line 309, in _run_on_fuelbed\\n    raise ValueError(\\n']"
+                "traceback": "['  File \"/bluesky/bluesky/modules/emissions.py\", line 118, in run\\n    self._run_on_fire(fire)\\n', '  File \"/bluesky/bluesky/modules/emissions.py\", line 305, in _run_on_fire\\n    self._run_on_fuelbed(loc, fb, season, burn_type, fire_type)\\n', '  File \"/bluesky/bluesky/modules/emissions.py\", line 309, in _run_on_fuelbed\\n    raise ValueError(\\n']"
             }
         }
     ],
@@ -64,22 +64,22 @@
         "emissions": {
             "flaming": {
                 "PM2.5": [
-                    11.468664110712156
+                    17.85857851059911
                 ]
             },
             "smoldering": {
                 "PM2.5": [
-                    1.713464761358802
+                    1.9404682133999016
                 ]
             },
             "residual": {
                 "PM2.5": [
-                    0.05604774999999999
+                    0.063473075
                 ]
             },
             "summary": {
-                "total": 13.238176622070958,
-                "PM2.5": 13.238176622070958
+                "total": 19.862519798999013,
+                "PM2.5": 19.862519798999013
             }
         },
         "emissions_details": {
@@ -806,9 +806,9 @@
                                                 ]
                                             },
                                             "emissions_fuel_loadings": {
-                                                "shrubs_needledrape_loading": 0.0,
+                                                "FCCSID": "46",
                                                 "filename": "FB_0046_FCCS.xml",
-                                                "cover_type": 161,
+                                                "cover_type": 161.0,
                                                 "ecoregion": 260.0,
                                                 "overstory_loading": 0.0,
                                                 "midstory_loading": 0.0,
@@ -855,28 +855,28 @@
                                                 "pile_dirty_loading": 0.0,
                                                 "pile_vdirty_loading": 0.0,
                                                 "total_available_fuel_loading": 19.113764,
-                                                "efg_natural": 7,
-                                                "efg_activity": 7
+                                                "efg_natural": 7.0,
+                                                "efg_activity": 7.0
                                             },
                                             "emissions": {
                                                 "flaming": {
                                                     "PM2.5": [
-                                                        11.468664110712156
+                                                        17.85857851059911
                                                     ]
                                                 },
                                                 "smoldering": {
                                                     "PM2.5": [
-                                                        1.713464761358802
+                                                        1.9404682133999016
                                                     ]
                                                 },
                                                 "residual": {
                                                     "PM2.5": [
-                                                        0.05604774999999999
+                                                        0.063473075
                                                     ]
                                                 },
                                                 "total": {
                                                     "PM2.5": [
-                                                        13.238176622070958
+                                                        19.862519798999013
                                                     ]
                                                 }
                                             },
@@ -907,12 +907,12 @@
                                                     "shrub": {
                                                         "flaming": {
                                                             "PM2.5": [
-                                                                9.473435766712157
+                                                                14.751682913699113
                                                             ]
                                                         },
                                                         "smoldering": {
                                                             "PM2.5": [
-                                                                1.4473304643588019
+                                                                1.6390758792999016
                                                             ]
                                                         },
                                                         "residual": {
@@ -922,7 +922,7 @@
                                                         },
                                                         "total": {
                                                             "PM2.5": [
-                                                                10.92076623107096
+                                                                16.390758792999012
                                                             ]
                                                         }
                                                     },
@@ -951,12 +951,12 @@
                                                     "litter-lichen-moss": {
                                                         "flaming": {
                                                             "PM2.5": [
-                                                                0.265983264
+                                                                0.41417927639999996
                                                             ]
                                                         },
                                                         "smoldering": {
                                                             "PM2.5": [
-                                                                0.040636332
+                                                                0.046019919599999994
                                                             ]
                                                         },
                                                         "residual": {
@@ -966,7 +966,7 @@
                                                         },
                                                         "total": {
                                                             "PM2.5": [
-                                                                0.306619596
+                                                                0.4601991959999999
                                                             ]
                                                         }
                                                     },
@@ -995,22 +995,22 @@
                                                     "woody fuels": {
                                                         "flaming": {
                                                             "PM2.5": [
-                                                                1.7292450799999997
+                                                                2.6927163204999993
                                                             ]
                                                         },
                                                         "smoldering": {
                                                             "PM2.5": [
-                                                                0.22549796500000002
+                                                                0.25537241450000003
                                                             ]
                                                         },
                                                         "residual": {
                                                             "PM2.5": [
-                                                                0.05604774999999999
+                                                                0.063473075
                                                             ]
                                                         },
                                                         "total": {
                                                             "PM2.5": [
-                                                                2.0107907949999997
+                                                                3.011561809999999
                                                             ]
                                                         }
                                                     }
@@ -1021,8 +1021,8 @@
                                     "lng": -121.3990506,
                                     "emissions": {
                                         "summary": {
-                                            "total": 13.238176622070958,
-                                            "PM2.5": 13.238176622070958
+                                            "total": 19.862519798999013,
+                                            "PM2.5": 19.862519798999013
                                         }
                                     }
                                 }
@@ -1044,16 +1044,16 @@
                             "moisture_10hr": 50,
                             "emissions": {
                                 "summary": {
-                                    "total": 13.238176622070958,
-                                    "PM2.5": 13.238176622070958
+                                    "total": 19.862519798999013,
+                                    "PM2.5": 19.862519798999013
                                 }
                             }
                         }
                     ],
                     "emissions": {
                         "summary": {
-                            "total": 13.238176622070958,
-                            "PM2.5": 13.238176622070958
+                            "total": 19.862519798999013,
+                            "PM2.5": 19.862519798999013
                         }
                     }
                 }
@@ -1062,20 +1062,20 @@
             "fuel_type": "natural",
             "emissions": {
                 "summary": {
-                    "total": 13.238176622070958,
-                    "PM2.5": 13.238176622070958
+                    "total": 19.862519798999013,
+                    "PM2.5": 19.862519798999013
                 }
             }
         }
     ],
-    "today": "2023-10-03T00:00:00",
-    "run_id": "58d3a3a2-37c8-4bc9-b41b-2bf841c5d160",
+    "today": "2024-04-05T00:00:00",
+    "run_id": "b8d197e8-2656-4564-9483-5b449ec5b1f9",
     "counts": {
         "fires": 1,
         "locations": 1,
         "failed_fires": 1
     },
-    "bluesky_version": "4.4.1",
+    "bluesky_version": "4.5.17",
     "run_config": {
         "skip_failed_fires": true,
         "skip_failed_sources": false,
@@ -1102,22 +1102,26 @@
         },
         "ecoregion": {
             "lookup_implementation": "ogr",
+            "try_nearby_on_failure": false,
             "skip_failures": true,
             "default": null
         },
         "fuelbeds": {
-            "fccs_version": "2",
-            "ignored_percent_resampling_threshold": 99.9,
+            "skip_failures": false,
             "ignored_fuelbeds": [
                 "0",
                 "900"
             ],
+            "ignored_percent_resampling_threshold": 99.9,
+            "insignificance_threshold": 10.0,
+            "max_fuelbed_count_threshold": 5,
             "no_sampling": false,
-            "use_all_grid_cells": false,
+            "sampling_radius_km": 1.0,
             "sampling_radius_factors": null,
-            "skip_failures": false,
-            "truncation_percentage_threshold": 90.0,
-            "truncation_count_threshold": 5,
+            "use_all_grid_cells": false,
+            "fccs_fuelload_tile_sets": [],
+            "fccs_fuelload_files": [],
+            "fccs_version": "2",
             "total_pct_threshold": 0.5
         },
         "fuelmoisture": {
@@ -1137,6 +1141,7 @@
             "fuel_loadings": {},
             "scale_with_estimated_fuelload": false,
             "scale_with_estimated_consumption": false,
+            "summarize_fuel_loadings": false,
             "consume_settings": {
                 "natural": {},
                 "activity": {
@@ -1336,9 +1341,9 @@
                 "date_time_format": "%Y%m%d"
             },
             "smokeready": {
-                "ptinv_filename": "ptinv-2023100300.ida",
-                "ptday_filename": "ptday-2023100300.ems95",
-                "pthour_filename": "pthour-2023100300.ems95",
+                "ptinv_filename": "ptinv-2024040500.ida",
+                "ptday_filename": "ptday-2024040500.ems95",
+                "pthour_filename": "pthour-2024040500.ems95",
                 "separate_smolder": true,
                 "write_ptinv_totals": true,
                 "write_ptday_file": true,
@@ -1354,7 +1359,7 @@
             "delete_working_dir_if_no_error": true,
             "handle_existing": "fail",
             "hysplit": {
-                "binary": "hyts_std",
+                "binary": "hyts_std-v5.2.3",
                 "start_hours": [
                     0
                 ],
@@ -1397,6 +1402,11 @@
             "handle_existing": "fail",
             "plume_merge": {},
             "hysplit": {
+                "emissions_split": {
+                    "enabled": false,
+                    "target_pm25": 10.0,
+                    "min_pm25": null
+                },
                 "binaries": {},
                 "skip_invalid_fires": false,
                 "user_defined_grid": false,

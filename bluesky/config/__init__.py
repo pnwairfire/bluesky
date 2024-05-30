@@ -52,7 +52,7 @@ class Config():
         self._data._RUN_ID = None
         self._data._TODAY = None
         self._data._RAW_CONFIG = copy.deepcopy(DEFAULTS)
-        self._data._CONFIG = copy.deepcopy(self._data._RAW_CONFIG)
+        self._data._CONFIG = self.replace_config_wildcards(copy.deepcopy(self._data._RAW_CONFIG))
         self._data._IM_CONFIG = afconfig.ImmutableConfigDict(self._data._CONFIG)
 
         return self
@@ -81,7 +81,7 @@ class Config():
 
         else:
             self._data._RAW_CONFIG = copy.deepcopy(DEFAULTS)
-            self._data._CONFIG = copy.deepcopy(self._data._RAW_CONFIG)
+            self._data._CONFIG = self.replace_config_wildcards(copy.deepcopy(self._data._RAW_CONFIG))
             self.merge(config_dict)
 
         return self

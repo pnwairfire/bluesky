@@ -1,21 +1,21 @@
 --extra-index https://pypi.airfire.org/simple/
 -f https://pypi.airfire.org/simple/
-pyairfire==5.0.0
+pyairfire==5.0.1
 afconfig==1.1.3
 afdatetime==2.0.0
 afscripting==2.0.0
 geoutils==1.0.3
-eflookup==4.0.4
+eflookup==4.0.11
 emitcalc==3.0.1
-fccsmap==4.0.0
+fccsmap==4.1.2
 timeprofile==1.1.3
-met==4.0.0
-plumerise==2.0.3
+met==4.0.1
+plumerise==2.0.4
 blueskykml==5.0.1
-apps-consume==5.2.1
+apps-consume==5.2.6
 Fiona==1.9.4.post1
 shapely==2.0.1
-geopandas==0.14.0
+geopandas==0.14.2
 requests==2.25.1
 # TODO: upgrade flask and dash* packages, if necessary
 Flask==3.0.0

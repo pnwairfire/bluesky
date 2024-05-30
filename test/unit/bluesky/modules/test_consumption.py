@@ -81,7 +81,7 @@ class TestConsumptionRunFire():
 
         # TODO: create mock fuel loading manager class
         fuel_loadings_manager = FuelLoadingsManager()
-        consumption._run_fire(fire, fuel_loadings_manager, 1)
+        consumption._run_fire(fire, fuel_loadings_manager)
         fb = fire['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
 
         expected_heat = {

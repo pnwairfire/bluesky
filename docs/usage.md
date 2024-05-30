@@ -190,13 +190,22 @@ the bluesky package includes these other executables:
   - feps_plumerise - computes FEPS plumrise
   - feps_timeprofile
   - feps_weather
-  - hycm_std - MPI hysplit
-  - hycs_std - hysplit
+  - hycm_std-v5.1.0-openmpi - MPI hysplit, optimized for openmpi
+  - hycm_std-v5.1.0-mpich - MPI hysplit, optimized for mpich
+  - hycs_std-v5.1.0 - hysplit
+  - hytm_std-v5.1.0-openmpi - MPI hysplit trajectories, optimized for openmpi
+  - hytm_std-v5.1.0-mpich - MPI hysplit trajectories, optimized for mpich
+  - hyts_std-v5.1.0 - hysplit trajectories
+  - hycm_std-v5.2.3-openmpi - MPI hysplit, optimized for openmpi
+  - hycm_std-v5.2.3-mpich - MPI hysplit, optimized for mpich
+  - hycs_std-v5.2.3 - hysplit
+  - hytm_std-v5.2.3-openmpi - MPI hysplit trajectories, optimized for openmpi
+  - hytm_std-v5.2.3-mpich - MPI hysplit trajectories, optimized for mpich
+  - hyts_std-v5.2.3 - hysplit trajectories
   - hysplit2netcdf - converts hysplit concentration output to netcdf
-  - hytm_std - MPI hysplit trajectories
-  - hyts_std - hysplit trajectories
   - makepolygons
   - profile - extracts local met information
+  - bulk_profiler_csv
   - vsmkgs
   - vsmoke
 

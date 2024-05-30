@@ -37,8 +37,10 @@ class EcoregionRunner():
         # lazy import EcoregionLookup
         if not self._ecoregion_lookup:
             from bluesky.ecoregion.lookup import EcoregionLookup
-            implementation = Config().get('ecoregion', 'lookup_implementation')
-            self._ecoregion_lookup = EcoregionLookup(implementation)
+            self._ecoregion_lookup = EcoregionLookup(
+                implementation=Config().get('ecoregion', 'lookup_implementation'),
+                try_nearby=Config().get('ecoregion', 'try_nearby_on_failure')
+            )
         return self._ecoregion_lookup
 
     def run(self):

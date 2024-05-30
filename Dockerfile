@@ -56,7 +56,11 @@ RUN apt-get update \
         gdal-bin \
         mpich \
         libmpich-dev \
-        libmpich12
+        libmpich12 \
+        libopenmpi-dev \
+        libopenmpi3 \
+        openmpi-bin \
+        openmpi-common
 
 
 # upgrade distribute and pip
@@ -82,7 +86,7 @@ RUN pip3 install matplotlib==3.3.4 \
     && pip3 install Fiona==1.8.18 \
     && pip3 install \
         -c constraints.txt --index-url https://pypi.airfire.org/simple \
-        apps-consume==5.2.1 \
+        apps-consume==5.2.6 \
         blueskykml==5.0.1 \
         blueskyutils==2.0.0
 
@@ -100,26 +104,18 @@ COPY bin/feps_emissions /usr/local/bin/feps_emissions
 COPY bin/feps_plumerise /usr/local/bin/feps_plumerise
 COPY bin/feps_timeprofile /usr/local/bin/feps_timeprofile
 COPY bin/feps_weather /usr/local/bin/feps_weather
-COPY bin/hycm_std /usr/local/bin/hycm_std
-COPY bin/hycs_std /usr/local/bin/hycs_std
-COPY bin/hyts_std /usr/local/bin/hyts_std
-COPY bin/hytm_std /usr/local/bin/hytm_std
-COPY bin/hycm_std-v5.1 /usr/local/bin/hycm_std-v5.1
-COPY bin/hycs_std-v5.1 /usr/local/bin/hycs_std-v5.1
-COPY bin/hyts_std-v5.1 /usr/local/bin/hyts_std-v5.1
-COPY bin/hytm_std-v5.1 /usr/local/bin/hytm_std-v5.1
-COPY bin/hycm_std-v5.1.0 /usr/local/bin/hycm_std-v5.1.0
+COPY bin/hycm_std-v5.1.0-mpich /usr/local/bin/hycm_std-v5.1.0-mpich
+COPY bin/hycm_std-v5.1.0-openmpi /usr/local/bin/hycm_std-v5.1.0-openmpi
 COPY bin/hycs_std-v5.1.0 /usr/local/bin/hycs_std-v5.1.0
+COPY bin/hytm_std-v5.1.0-mpich /usr/local/bin/hytm_std-v5.1.0-mpich
+COPY bin/hytm_std-v5.1.0-openmpi /usr/local/bin/hytm_std-v5.1.0-openmpi
 COPY bin/hyts_std-v5.1.0 /usr/local/bin/hyts_std-v5.1.0
-COPY bin/hytm_std-v5.1.0 /usr/local/bin/hytm_std-v5.1.0
-COPY bin/hycm_std-v5.2 /usr/local/bin/hycm_std-v5.2
-COPY bin/hycs_std-v5.2 /usr/local/bin/hycs_std-v5.2
-COPY bin/hyts_std-v5.2 /usr/local/bin/hyts_std-v5.2
-COPY bin/hytm_std-v5.2 /usr/local/bin/hytm_std-v5.2
-COPY bin/hycm_std-v5.2.3 /usr/local/bin/hycm_std-v5.2.3
+COPY bin/hycm_std-v5.2.3-mpich /usr/local/bin/hycm_std-v5.2.3-mpich
+COPY bin/hycm_std-v5.2.3-openmpi /usr/local/bin/hycm_std-v5.2.3-openmpi
 COPY bin/hycs_std-v5.2.3 /usr/local/bin/hycs_std-v5.2.3
+COPY bin/hytm_std-v5.2.3-mpich /usr/local/bin/hytm_std-v5.2.3-mpich
+COPY bin/hytm_std-v5.2.3-openmpi /usr/local/bin/hytm_std-v5.2.3-openmpi
 COPY bin/hyts_std-v5.2.3 /usr/local/bin/hyts_std-v5.2.3
-COPY bin/hytm_std-v5.2.3 /usr/local/bin/hytm_std-v5.2.3
 COPY bin/hysplit2netcdf /usr/local/bin/hysplit2netcdf
 COPY bin/profile /usr/local/bin/profile
 COPY bin/bulk_profiler_csv /usr/local/bin/bulk_profiler_csv

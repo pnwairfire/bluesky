@@ -19,10 +19,27 @@ __all__ = [
 
 __version__ = "0.1.0"
 
-FCCS_LOOKUPS = [
-    FccsLookUp(is_alaska=False, **Config().get('fuelbeds')), # Lower 48
-    FccsLookUp(is_alaska=True, **Config().get('fuelbeds')) # AK
-]
+
+def create_lookup_objects():
+    fccs_lookups = []
+
+    for f in Config().get('fuelbeds', 'fccs_fuelload_files'):
+        options = dict(**Config().get('fuelbeds'), fccs_fuelload_file=f)
+        fccs_lookups.append(FccsLookUp(**options))
+
+    for ts in Config().get('fuelbeds', 'fccs_fuelload_tile_sets'):
+        options = dict(**Config().get('fuelbeds'),
+            tiles_directory=ts.get('directory'),
+            index_shapefile=ts.get('index_shapefile'))
+        fccs_lookups.append(FccsLookUp(**options))
+
+    if not fccs_lookups:
+        fccs_lookups = [
+            FccsLookUp(is_alaska=False, **Config().get('fuelbeds')), # Lower 48
+            FccsLookUp(is_alaska=True, **Config().get('fuelbeds')) # AK
+        ]
+
+    return fccs_lookups
 
 def run(fires_manager):
     """Runs emissions module
@@ -38,6 +55,10 @@ def run(fires_manager):
 
     skip_failures = Config().get('fuelbeds', 'skip_failures')
 
+    # Look up Objects need to be instantiated each time run is called in case
+    # the configuration changes from run to run (as happens in bluesky-web)
+    fccs_lookups = create_lookup_objects()
+
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
             for aa in fire.active_areas:
@@ -45,7 +66,7 @@ def run(fires_manager):
                 # has either lat+lng+area or perimeter
                 for loc in aa.locations:
                     # try each lookup object until one succeeds
-                    for lookup in FCCS_LOOKUPS:
+                    for lookup in fccs_lookups:
                         try:
                             Estimator(lookup).estimate(loc)
                             break
@@ -103,11 +124,6 @@ class Estimator():
     def __init__(self, lookup):
         self.lookup = lookup
 
-        # Is this necessary?
-        for attr, val in Config().get('fuelbeds').items():
-            if attr.startswith('truncation_'):
-                setattr(self, attr.replace('truncation_', ''), val)
-
     def estimate(self, loc):
         """Estimates fuelbed composition based on lat/lng or perimeter
         """
@@ -150,51 +166,4 @@ class Estimator():
         fuelbeds = [{'fccs_id':f, 'pct':d['percent']}
             for f,d in fuelbed_info['fuelbeds'].items()]
 
-        loc.update(**self._truncate(fuelbeds))
-
-    def _truncate(self, fuelbeds):
-        """Sorts fuelbeds by decreasing percentage, and
-
-        Sort fuelbeds by decreasing percentage, use first N fuelbeds that
-        reach 90% coverage or 5 count (defaults, both configurable), and
-        then adjust percentages of included location so that total is 100%.
-        e.g. if 3 fuelbeds, 85%, 8%, and 7%, use only the first and second,
-        and then adjust percentages as follows:
-          85% -> 85% * 100 / (100 - 7) = 91.4%
-          8% -> 7% * 100 / (100 - 7) = 8.6%
-        """
-        truncated_fuelbeds = []
-        total_pct = 0.0
-        # iterate through fuelbeds sorted by pct (decreasing) and then by
-        # fccs_id (for deterministic results in the case of equal percentages)
-        for i, f in enumerate(sorted(fuelbeds, key=lambda fb: (-fb['pct'], fb['fccs_id']) )):
-            truncated_fuelbeds.append(f)
-            total_pct += f['pct']
-
-            # if either treshold is None or 0, then don't truncate
-            # by that that criterion
-            if ((self.percentage_threshold and total_pct >= self.percentage_threshold)
-                    or (self.count_threshold and i+1 >= self.count_threshold)):
-                break
-
-        # Note: we'll run adjust percentages even if nothing was truncated
-        # in case percentages of initial set of fuelbeds don't add up to 100
-        # (which should really never happen)
-
-        return {
-            "fuelbeds": self._adjust_percentages(truncated_fuelbeds),
-            "fuelbeds_total_accounted_for_pct": total_pct
-        }
-
-    def _adjust_percentages(self, fuelbeds):
-        total_pct = sum([fb['pct'] for fb in fuelbeds])
-
-        if total_pct != 100.0:
-            for fb in fuelbeds:
-                # divide by total_pct before multiplying by 100 to avoid
-                # rounding errors
-                fb['pct'] = (fb['pct'] / total_pct) * 100.0
-        # else, no adjustment necessary
-
-        # return for convenience
-        return fuelbeds
+        loc.update(fuelbeds=fuelbeds)

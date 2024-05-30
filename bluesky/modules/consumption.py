@@ -4,6 +4,7 @@ __author__ = "Joel Dubowy"
 
 import itertools
 import logging
+import re
 
 import consume
 
@@ -24,6 +25,9 @@ __all__ = [
 __version__ = "0.1.0"
 
 
+SUMMARIZE_FUEL_LOADINGS = Config().get('consumption', 'summarize_fuel_loadings')
+LOADINGS_KEY_MATCHER = re.compile('.*_loading')
+
 def run(fires_manager):
     """Runs the fire data through consumption calculations, using the consume
     package for the underlying computations.
@@ -39,9 +43,6 @@ def run(fires_manager):
     fires_manager.processed(__name__, __version__,
         consume_version=CONSUME_VERSION_STR)
 
-    # TODO: get msg_level and burn_type from fires_manager's config
-    msg_level = 2  # 1 => fewest messages; 3 => most messages
-
     all_fuel_loadings = Config().get('consumption', 'fuel_loadings')
     fuel_loadings_manager = FuelLoadingsManager(all_fuel_loadings=all_fuel_loadings)
 
@@ -52,12 +53,15 @@ def run(fires_manager):
     # a single fire?
     for fire in fires_manager.fires:
         with fires_manager.fire_failure_handler(fire):
-            _run_fire(fire, fuel_loadings_manager, msg_level)
+            _run_fire(fire, fuel_loadings_manager)
 
     datautils.summarize_all_levels(fires_manager, 'consumption')
     datautils.summarize_all_levels(fires_manager, 'heat')
+    if SUMMARIZE_FUEL_LOADINGS:
+        datautils.summarize_all_levels(fires_manager, 'fuel_loadings',
+            data_key_matcher=LOADINGS_KEY_MATCHER)
 
-def _run_fire(fire, fuel_loadings_manager, msg_level):
+def _run_fire(fire, fuel_loadings_manager):
     logging.debug("Consume consumption - fire {}".format(fire.id))
 
     # TODO: set burn type to 'activity' if fire.fuel_type == 'piles' ?
@@ -91,13 +95,14 @@ def _run_fire(fire, fuel_loadings_manager, msg_level):
                                 fb.pop("consumption", None)
                                 fb.pop("heat", None)
                                 _run_fuelbed(fb, loc, fuel_loadings_manager, season,
-                                    burn_type, fire_type, msg_level)
+                                    burn_type, fire_type)
                             else:
                                 raise
 
                     else:
                         _run_fuelbed(fb, loc, fuel_loadings_manager, season,
-                            burn_type, fire_type, msg_level)
+                            burn_type, fire_type)
+
                 # scale with estimated consumption or fuel load, if specified
                 # and if configured to do so
                 (_scale_with_estimated_consumption(loc)
@@ -179,12 +184,13 @@ def _lookup_precomputed(fb, location, fuel_loadings_manager, season,
     datautils.multiply_nested_data(fb["heat"], area)
 
 def _run_fuelbed(fb, location, fuel_loadings_manager, season,
-        burn_type, fire_type, msg_level):
+        burn_type, fire_type):
     fuel_loadings_csv_filename = fuel_loadings_manager.generate_custom_csv(
         fb['fccs_id'])
 
     fc = consume.FuelConsumption(
-        fccs_file=fuel_loadings_csv_filename) #msg_level=msg_level)
+        fccs_file=fuel_loadings_csv_filename,
+        msg_level=logging.root.level)
 
     fb['fuel_loadings'] = fuel_loadings_manager.get_fuel_loadings(fb['fccs_id'], fc.FCCS)
 
@@ -203,7 +209,10 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
     fc.fuelbed_area_acres = [area]
     fc.fuelbed_ecoregion = [location['ecoregion']]
 
+    # TODO: see comment, below, re. capturing err messages when applying settings
     _apply_settings(fc, location, burn_type, fire_type)
+
+    # TODO: see comment, below, re. capturing err messages when computing results
     _results = fc.results()
     if _results:
         # TODO: validate that _results['consumption'] and
@@ -221,6 +230,8 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
         if fc.output_units == 'tons_ac':
             datautils.multiply_nested_data(fb["consumption"], area)
             datautils.multiply_nested_data(fb["heat"], area)
+            datautils.multiply_nested_data(fb["fuel_loadings"], area,
+                data_key_matcher=LOADINGS_KEY_MATCHER)
 
     else:
         # TODO: somehow get error information from fc object; when
@@ -229,6 +240,15 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
         #
         #     !!! Error settings problem, the following are required:
         #            fm_type
+        #
+        #   And sometimes you see error output to stdout or stderr (?)
+        #   when `_apply_settings` is called, above.  e.g.:
+        #
+        #     Error: the following values are not permitted for setting fm_duff:
+        #     [203]
+        #
+        #     Error settings problem ---> {'fm_duff'}
+        #
         #   it would be nice to access that error message here and
         #   include it in the exception message
         raise RuntimeError("Failed to calculate consumption for "
