@@ -478,8 +478,12 @@ with open(fccs_loadings_csv) as f:
     for row in reader:
         fccs_id = row['fuelbed_number']
         ALL_FCCS_IDS.append(fccs_id)
-        eco = int(float(row['ecoregion']))
-        # FCCS ID 0 has ecoregion 0, which isn't in ECOREGIONS_MAPPINGS;
-        #  Just set it to 'western'. so that every fuelbed has an assignment
-        cat = ECOREGIONS_MAPPINGS.get(eco) or 'western'
-        ECO_REGION_BY_FCCS_ID[fccs_id] = cat
+        try:
+            eco = int(float(row['ecoregion']))
+            # FCCS ID 0 has ecoregion 0, which isn't in ECOREGIONS_MAPPINGS;
+            #  Just set it to 'western'. so that every fuelbed has an assignment
+            cat = ECOREGIONS_MAPPINGS.get(eco) or 'western'
+            ECO_REGION_BY_FCCS_ID[fccs_id] = cat
+        except Exception as e:
+            # This happens, for example, when row['ecoregion'] is an blank
+            ECO_REGION_BY_FCCS_ID[fccs_id] = 'western'
