@@ -666,3 +666,6 @@
 
 ## 4.5.19
  - Fix edge-case issue in fuelbeds module
+
+## 4.5.20
+ - Upgrade to met==4.0.2
