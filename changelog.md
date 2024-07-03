@@ -672,3 +672,7 @@
 
 ## 4.5.21
  - Upgrade to met==4.0.3
+
+## 4.5.22
+ - Update localmet bulkprofiler binary
+ - Add fire count information (fires, failed fires, locations, modeled plumes) to status logs
