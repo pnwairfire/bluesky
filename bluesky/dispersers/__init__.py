@@ -119,9 +119,8 @@ class DispersionBase(object, metaclass=abc.ABCMeta):
 
         counts['plumes'] = len(self._fires)
         notes = "Plumes to be modeled by dispersion"
-        # Note: 'number_of_locations' is now redundant, but is kept for backwards compatibility
         fires_manager.log_status('Good', 'dispersion', 'Continue',
-            number_of_locations=counts['plumes'], notes=notes, counts=counts)
+            number_of_locations=counts['plumes'], notes=notes)
 
         delete_if_no_error = Config().get(
             'dispersion', 'delete_working_dir_if_no_error')
