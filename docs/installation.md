@@ -12,7 +12,7 @@ installation instructions.
 
 You can pull a pre-built docker image from docker hub:
 
-    docker pull pnwairfire/bluesky:v4.5.22
+    docker pull pnwairfire/bluesky:v4.5.23
 
 See the
 [bluesky docker hub page](https://hub.docker.com/r/pnwairfire/bluesky/)
@@ -26,7 +26,7 @@ and user ids as your host machine user, you can use the following
 script included in this repo:
 
     ./dev/scripts/docker/add-user-to-bluesky-image \
-        -i pnwairfire/bluesky:v4.5.22 -n bluesky2
+        -i pnwairfire/bluesky:v4.5.23 -n bluesky2
 
 Then, run bluesky with that user:
 
@@ -67,15 +67,15 @@ First, install pip3 (with sudo if necessary):
     apt-get install python3-pip
     pip3 install --upgrade pip
 
-Then, to install, for example, v4.5.22, use the following (with sudo if necessary):
+Then, to install, for example, v4.5.23, use the following (with sudo if necessary):
 
-    pip3 install --no-binary gdal --extra-index https://pypi.airfire.org/simple bluesky==4.5.22
+    pip3 install --no-binary gdal --extra-index https://pypi.airfire.org/simple bluesky==4.5.23
 
 Or, if using the bluesky package in another project, add it to your project's
 requirements.txt:
 
     --extra-index https://pypi.airfire.org/simple/
-    bluesky==4.5.22
+    bluesky==4.5.23
 
 See the Notes section, below, for information on resolving pip and
 gdal issues.
