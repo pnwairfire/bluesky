@@ -5,6 +5,9 @@ __author__ = "Joel Dubowy"
 import itertools
 import logging
 import re
+import io
+
+from contextlib import redirect_stdout
 
 import consume
 
@@ -199,25 +202,14 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
                 data_key_matcher=LOADINGS_KEY_MATCHER)
 
     else:
-        # TODO: somehow get error information from fc object; when
-        #   you call fc.results() in an error situation, it writes to
-        #   stdout or stderr (?), something like:
-        #
-        #     !!! Error settings problem, the following are required:
-        #            fm_type
-        #
-        #   And sometimes you see error output to stdout or stderr (?)
-        #   when `_apply_settings` is called, above.  e.g.:
-        #
-        #     Error: the following values are not permitted for setting fm_duff:
-        #     [203]
-        #
-        #     Error settings problem ---> {'fm_duff'}
-        #
-        #   it would be nice to access that error message here and
-        #   include it in the exception message
+        # In an error situation, fc.results() writes an error message to stdout
+        # which we have to capture to include in our error message.
+        stdout_target = io.StringIO()
+        with redirect_stdout(stdout_target):
+            fc.results()
+
         raise RuntimeError("Failed to calculate consumption for "
-            "fuelbed {}".format(fb['fccs_id']))
+            "fuelbed {}: {}".format(fb['fccs_id'], stdout_target.getvalue()))
 
 VALIDATION_ERROR_MSGS = {
     'NO_ACTIVITY': "Fire missing activity data required for computing consumption",
