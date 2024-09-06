@@ -177,11 +177,13 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
     fc.fuelbed_area_acres = [area]
     fc.fuelbed_ecoregion = [location['ecoregion']]
 
-    # TODO: see comment, below, re. capturing err messages when applying settings
-    _apply_settings(fc, location, burn_type, fire_type)
+    # In an error situation these two calls print errors to stdout
+    # which we have to capture to include in our error message.
+    stdout_target = io.StringIO()
+    with redirect_stdout(stdout_target):
+        _apply_settings(fc, location, burn_type, fire_type)
+        _results = fc.results()
 
-    # TODO: see comment, below, re. capturing err messages when computing results
-    _results = fc.results()
     if _results:
         # TODO: validate that _results['consumption'] and
         #   _results['heat'] are defined
@@ -202,12 +204,6 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
                 data_key_matcher=LOADINGS_KEY_MATCHER)
 
     else:
-        # In an error situation, fc.results() writes an error message to stdout
-        # which we have to capture to include in our error message.
-        stdout_target = io.StringIO()
-        with redirect_stdout(stdout_target):
-            fc.results()
-
         raise RuntimeError("Failed to calculate consumption for "
             "fuelbed {}: {}".format(fb['fccs_id'], stdout_target.getvalue()))
 
