@@ -5,6 +5,9 @@ __author__ = "Joel Dubowy"
 import itertools
 import logging
 import re
+import io
+
+from contextlib import redirect_stdout
 
 import consume
 
@@ -174,11 +177,13 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
     fc.fuelbed_area_acres = [area]
     fc.fuelbed_ecoregion = [location['ecoregion']]
 
-    # TODO: see comment, below, re. capturing err messages when applying settings
-    _apply_settings(fc, location, burn_type, fire_type)
+    # In an error situation these two calls print errors to stdout
+    # which we have to capture to include in our error message.
+    stdout_target = io.StringIO()
+    with redirect_stdout(stdout_target):
+        _apply_settings(fc, location, burn_type, fire_type)
+        _results = fc.results()
 
-    # TODO: see comment, below, re. capturing err messages when computing results
-    _results = fc.results()
     if _results:
         # TODO: validate that _results['consumption'] and
         #   _results['heat'] are defined
@@ -199,25 +204,8 @@ def _run_fuelbed(fb, location, fuel_loadings_manager, season,
                 data_key_matcher=LOADINGS_KEY_MATCHER)
 
     else:
-        # TODO: somehow get error information from fc object; when
-        #   you call fc.results() in an error situation, it writes to
-        #   stdout or stderr (?), something like:
-        #
-        #     !!! Error settings problem, the following are required:
-        #            fm_type
-        #
-        #   And sometimes you see error output to stdout or stderr (?)
-        #   when `_apply_settings` is called, above.  e.g.:
-        #
-        #     Error: the following values are not permitted for setting fm_duff:
-        #     [203]
-        #
-        #     Error settings problem ---> {'fm_duff'}
-        #
-        #   it would be nice to access that error message here and
-        #   include it in the exception message
         raise RuntimeError("Failed to calculate consumption for "
-            "fuelbed {}".format(fb['fccs_id']))
+            "fuelbed {}: {}".format(fb['fccs_id'], stdout_target.getvalue()))
 
 VALIDATION_ERROR_MSGS = {
     'NO_ACTIVITY': "Fire missing activity data required for computing consumption",
