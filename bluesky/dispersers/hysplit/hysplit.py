@@ -568,6 +568,9 @@ class HYSPLITDispersion(DispersionBase):
             io.create_sym_link(f,
                 os.path.join(working_dir, os.path.basename(f)))
 
+        # TODO: create sym links to pardump files, to avoid hysplit error
+        #    when file pathname is longer than 80 char
+
         # Create sym links to ancillary data files (note: HYSPLIT49 balks
         # if it can't find ASCDATA.CFG).
         io.create_sym_link(self.config("ASCDATA_FILE"),
