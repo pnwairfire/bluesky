@@ -1,2 +1,2 @@
-pytest==7.4.2
-freezegun==1.2.2
+pytest==8.3.3
+freezegun==1.5.1

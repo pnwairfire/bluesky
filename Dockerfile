@@ -21,18 +21,30 @@ MAINTAINER Joel Dubowy
 
 ## Install Dependencies
 
+# Install python first, so that v3.12 gets installed.  For some reason,
+# if python3, python3-dev, and python3-pip are installed along with g++,
+# gcc, etc. (below), v 3.10 gets installed
+RUN apt-get update \
+    && TZ=America/Los_Angeles DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        python3 \
+        python3-dev \
+        python3-pip
+
+# Install numpy==2.1.1. Otherwise, something in the next apt-get install call
+# installs numpy==1.26.4
+RUN pip3 install --break-system-packages numpy==2.1.1
+
 # Install
 #  - base dependencies and utilities
 #  - png and freetype libs for matplotlib, which is needed
 #    by bluesky kml, as well as netcdf and proj libs
-#  - numpy
-#  - gdal, it's python bindings, and it's utilities
+#  - gdal and it's utilities
 #  - xml libs
 #  - gdal-bin for gdalwarp and gdal_translate
 #  - openpmi and mpich libs (TODO: install libopenmpi1.10
 #    and libmpich12 instead of the dev versions?)
 RUN apt-get update \
-    && TZ=America/Los_Angeles DEBIAN_FRONTEND=noninteractive apt-get install -y\
+    && TZ=America/Los_Angeles DEBIAN_FRONTEND=noninteractive apt-get install -y \
         g++ \
         gcc \
         make \
@@ -40,17 +52,12 @@ RUN apt-get update \
         vim \
         dialog \
         less \
-        python3 \
-        python3-dev \
-        python3-pip \
         libpng-dev \
         libfreetype6-dev \
         libnetcdf-dev \
         libproj-dev \
-        python3-numpy \
         libgdal-dev \
         nco \
-        python3-gdal \
         libxml2-dev \
         libxslt1-dev \
         gdal-bin \
@@ -73,30 +80,32 @@ COPY constraints.txt /tmp/bluesky/constraints.txt
 # blueskykml, consume, and fiona are relatively static these days; so, install
 # them here in order to avoid reinstalling them and their large dependencies
 # each time other dependencies in requirements.txt change.
-# Also install blueskyutils for merging emissions, etc.
 # Notable sub-dependencies:
-#  - blueskykml:  Pillow==8.1.0, ~9.0MB, and matplotlib==3.3.4, ~50.4MB
+#  - blueskykml:  Pillow==10.4.0, ~9.0MB, and matplotlib==3.9.2, ~50.4MB
 #  - consume:  pandas, etc.
 #  - fiona:  39.7MB for fiona itself
 # Note: this RUN command will need to be updated if fiona,
-#   consume, blueskykml, or blueskyutils are ever updated in setup.py
+#   consume, or blueskykml are ever updated in setup.py
 # Another Note: matplotlib must be explicitly installed to make
 #   sure the correct version is installed
-RUN pip3 install matplotlib==3.3.4 \
-    && pip3 install Fiona==1.8.18 \
-    && pip3 install \
+# Another Note: without --break-system-packages, pip install fails with
+#   a message about using virtual environments.  This docker image
+#   is soley for bluesky, so we're installing system wide.
+RUN pip3 install --break-system-packages numpy==2.1.1 \
+    && pip3 install --break-system-packages matplotlib==3.9.2 \
+    && pip3 install --break-system-packages fiona==1.10.1 \
+    && pip3 install --break-system-packages \
         -c constraints.txt --index-url https://pypi.airfire.org/simple \
-        apps-consume==5.2.6 \
-        blueskykml==5.0.1 \
-        blueskyutils==2.0.0
+        apps-consume==5.3.1 \
+        blueskykml==6.0.1
 
 # Install python dependencies
 COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
-RUN pip3 install -c constraints.txt -r requirements-test.txt
+RUN pip3 install --break-system-packages -c constraints.txt -r requirements-test.txt
 COPY requirements-dev.txt /tmp/bluesky/requirements-dev.txt
-RUN pip3 install -c constraints.txt -r requirements-dev.txt
+RUN pip3 install --break-system-packages -c constraints.txt -r requirements-dev.txt
 COPY requirements.txt /tmp/bluesky/requirements.txt
-RUN pip3 install -c constraints.txt --no-binary gdal -r requirements.txt
+RUN pip3 install --break-system-packages -c constraints.txt --no-binary gdal -r requirements.txt
 
 # Install binary dependencies - for localmet, plumerise,
 # dipersion, and visualization
