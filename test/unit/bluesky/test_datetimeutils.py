@@ -3,7 +3,7 @@
 __author__ = "Joel Dubowy"
 
 import datetime
-import imp
+import importlib
 
 from freezegun import freeze_time
 from pytest import raises
@@ -290,7 +290,7 @@ class TestToDatetime():
 
         # reload datetimeutils so that VALID_DATETIME_RANGE is
         # corrected relative to the frozen time, 2016-01-14
-        imp.reload(datetimeutils)
+        importlib.reload(datetimeutils)
         with raises(BlueSkyDatetimeValueError) as e_info:
             dt = datetimeutils.to_datetime('1915-12-14T10:02:01', limit_range=True)
         assert e_info.value.args[0] == 'Invalid datetime string value: 1915-12-14T10:02:01 (outside of valid range)'

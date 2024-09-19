@@ -84,7 +84,7 @@ class TestFiresCsvsPickRepresentativeFuelbed():
 
 class TestFiresCsvsWriterCollectCsvFields():
 
-    def test_one_fire_no_event(self):
+    def test_one_fire_no_event(self, reset_config):
         fire = Fire({
             "fuel_type": "natural",
             "id": "SF11C14225236095807750",
@@ -350,7 +350,7 @@ class TestFiresCsvsWriterCollectCsvFields():
         assert events_fields == expected_events_fields
 
 
-    def test_two_fires_one_event(self):
+    def test_two_fires_one_event(self, reset_config):
         fires = [
             Fire({
                 "fuel_type": "natural",
@@ -784,7 +784,7 @@ class TestFiresCsvsWriterCollectCsvFields():
         }
         assert events_fields == expected_events_fields
 
-    def test_two_fires_one_event_two_days(self):
+    def test_two_fires_one_event_two_days(self, reset_config):
         fires = [
             Fire({
                 "fuel_type": "natural",
