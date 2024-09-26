@@ -69,6 +69,11 @@ RUN apt-get update \
         openmpi-bin \
         openmpi-common
 
+# Without the following, GDAL gets installed without `_gdal_array`, possibly
+# being build with an older version of numpy (?), which breaks blueskykml.
+# See: https://stackoverflow.com/questions/75372275/importerror-cannot-import-name-gdal-array-from-osgeo
+# and https://gis.stackexchange.com/questions/83138/cannot-import-gdal-array
+RUN pip3 install --break-system-packages --no-cache-dir --force-reinstall 'GDAL[numpy]==3.8.4'
 
 # upgrade distribute and pip
 # RUN pip3 install --upgrade distribute pip
