@@ -679,3 +679,8 @@
 
 ## 4.5.23
  - Upgrade to met==4.0.4
+
+## 4.6.0
+ - Upgrade docker image to ubuntu 24.04 & python v3.12.3
+ - Upgrade dependency packages
+ - Include Consume errors from stdout in bluesky error messages
