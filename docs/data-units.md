@@ -4,6 +4,7 @@
  - consumption output - tons
  - emissions output - tons (all models, FEPS, CONSUME, Prichard-Oneill)
  - heat output - BTUs
+ - FRP - Watts
 
 
 ## Notes About Specific Modules
