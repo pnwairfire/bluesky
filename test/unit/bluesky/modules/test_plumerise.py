@@ -643,8 +643,8 @@ class TestPlumeRiseRunSevFeps():
         monkeypatch_tempfile_mkdtemp(monkeypatch)
 
         fire = copy.deepcopy(FIRE)
-        fire['activity'][0]['active_areas'][0]['specified_points'][0]['frp'] = 123123
-        fire['activity'][0]['active_areas'][1]['perimeter']['frp'] = 43443
+        fire['activity'][0]['active_areas'][0]['specified_points'][0]['frp'] = 1.23
+        fire['activity'][0]['active_areas'][1]['perimeter']['frp'] = 4.3443
         self.fm.load({"fires": [fire]})
         plumerise.run(self.fm)
 
@@ -669,8 +669,8 @@ class TestPlumeRiseRunSevFeps():
         assert _PR_COMPUTE_CALL_KWARGS == {
             'feps': [],
             'sev':[
-                {'frp': 123123},
-                {'frp': 43443}
+                {'frp': 1230000},
+                {'frp': 4344300}
             ]
         }
         # TOOD: assert plumerise return value
@@ -682,7 +682,7 @@ class TestPlumeRiseRunSevFeps():
 
         fire = copy.deepcopy(FIRE)
         fire['activity'][0]['active_areas'][0]['specified_points'][0]['frp'] = None
-        fire['activity'][0]['active_areas'][1]['perimeter']['frp'] = 43443
+        fire['activity'][0]['active_areas'][1]['perimeter']['frp'] = 4.3443
         self.fm.load({"fires": [fire]})
         plumerise.run(self.fm)
 
@@ -710,7 +710,7 @@ class TestPlumeRiseRunSevFeps():
                 {'working_dir': os.path.join(TEMPFILE_DIRS[-1], 'feps-plumerise-'+ fire.id)},
             ],
             'sev':[
-                {'frp': 43443}
+                {'frp': 4344300}
             ]
         }
         # TOOD: assert plumerise retur
