@@ -207,6 +207,10 @@ class PlumeComputeBase():
         #   do we need to multiple by activity's
         #   percentage of the fire's total area?
         loc_frp = loc.get('frp', fire_frp)
+
+        # FRP is in Megawatts, but SEV expects Watts, so convert it
+        loc_frp = loc_frp and loc_frp * 1000000
+
         plumerise_data = self._sev_pr.compute(loc['localmet'],
             loc['area'], frp=loc_frp)
         loc['plumerise'] = plumerise_data['hours']
