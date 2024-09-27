@@ -684,3 +684,6 @@
  - Upgrade docker image to ubuntu 24.04 & python v3.12.3
  - Upgrade dependency packages
  - Include Consume errors from stdout in bluesky error messages
+
+## 4.6.1
+ - Update SEV wrapper to convert FRP from Megawatts (the standard unit) to Watts (what's expected by SEV)
