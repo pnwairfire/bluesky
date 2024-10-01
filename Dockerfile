@@ -145,10 +145,29 @@ RUN python3 setup.py install
 WORKDIR /bluesky/
 
 ARG UNAME=bluesky
-ARG UID=0
-ARG GID=0
-RUN groupadd -g $GID -o $UNAME
-RUN useradd -m -u $UID -g $GID -o -s /bin/bash $UNAME
+ARG UID=1000
+ARG GID=1000
+
+# We used to always add a new group, even if the GID was already used:
+#    RUN groupadd -g $GID -o $UNAME
+# Now we rename the group if GID already exists
+RUN if id -ng $GID; \
+    then \
+        echo "Group $GID ($(id -ng $GID)) exists. Renaming as $UNAME"; \
+        groupmod -n $UNAME "$(id -ng $GID)"; \
+    else \
+        groupadd -g $GID $UNAME; fi
+
+# Similarly, we used to always add a new user, even if the UID was already used:
+#    RUN useradd -m -u $UID -g $GID -s /bin/bash -o $UNAME
+# Now we rename the user if UID already exists
+RUN if id -nu $UID; \
+    then \
+        echo "User $UID ($(id -nu $UID)) exists. Renaming as $UNAME"; \
+        usermod -l $UNAME $(id -nu $UID); \
+    else \
+        useradd -m -u $UID -g $GID -s /bin/bash $UNAME; fi
+
 USER $UNAME
 
 # default command is to display bsp help string
