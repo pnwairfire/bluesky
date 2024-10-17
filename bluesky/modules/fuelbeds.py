@@ -132,7 +132,9 @@ class Estimator():
 
         elif loc.get('geometry'):
             geo_data = loc['geometry']
-            fuelbed_info = self.lookup.look_up(geo_data)
+            # `area_acres` will only be considered if the geometry's type
+            # is Point or MultiPoint
+            fuelbed_info = self.lookup.look_up(geo_data, area_acres=loc.get('area'))
 
             # If loc['area'] is defined, then we want to keep it. We're dealing
             # with a perimeter which may not be all burning.  If it isn't
@@ -150,7 +152,7 @@ class Estimator():
                 ]
             }
             logging.debug("Converted lat,lng to geojson: %s", geo_data)
-            fuelbed_info = self.lookup.look_up(geo_data)
+            fuelbed_info = self.lookup.look_up(geo_data, area_acres=loc.get('area'))
 
         else:
             raise ValueError("Insufficient data for looking up fuelbed information")

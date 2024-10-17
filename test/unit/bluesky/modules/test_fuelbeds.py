@@ -170,22 +170,22 @@ class BaseTestEstimatorEstimate():
     # Tests of invalid lookup data
 
     def test_none_lookup_info(self):
-        self.estimator.lookup.look_up = lambda p: None
+        self.estimator.lookup.look_up = lambda p, area_acres=None: None
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.active_area_location)
 
     def test_empty_lookup_info(self):
-        self.estimator.lookup.look_up = lambda p: {}
+        self.estimator.lookup.look_up = lambda p, area_acres=None: {}
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.active_area_location)
 
     def test_lookup_info_percentages_less_than_100(self):
-        self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_30
+        self.estimator.lookup.look_up = lambda p, area_acres=None: FUELBED_INFO_60_30
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.active_area_location)
 
     def test_lookup_info_percentages_greater_than_100(self):
-        self.estimator.lookup.look_up = lambda p: FUELBED_INFO_60_40_10
+        self.estimator.lookup.look_up = lambda p, area_acres=None: FUELBED_INFO_60_40_10
         with raises(RuntimeError) as e:
             self.estimator.estimate(self.active_area_location)
 
