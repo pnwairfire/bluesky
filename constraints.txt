@@ -31,7 +31,7 @@ dnspython==2.6.1
 eflookup==5.0.1
 emitcalc==4.0.1
 executing==2.1.0
-fccsmap==5.0.1
+fccsmap==5.0.2
 fiona==1.10.1
 Flask==3.0.3
 Flask-Compress==1.15
