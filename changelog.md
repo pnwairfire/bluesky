@@ -693,3 +693,6 @@
 
 ## 4.6.3
  - Upgrade to fccsmap==5.0.2
+
+## 4.6.4
+ - Pass area into fuelbeds look-up
