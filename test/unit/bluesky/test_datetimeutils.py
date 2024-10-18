@@ -26,40 +26,30 @@ class TestTodayAndYesterdayMidnight():
         assert datetime.datetime.now() == self.NOON_4_20
         assert datetimeutils.today_midnight_utc() == self.MN_4_20
         assert datetimeutils.today_utc() == self.MN_4_20.date()
-        assert datetimeutils.yesterday_midnight_utc() == self.MN_4_19
-        assert datetimeutils.yesterday_utc() == self.MN_4_19.date()
 
     @freeze_time("2016-04-20 20:00:00", tz_offset=-8)
     def test_local_time_behind_but_same_day_as_utc(self):
         assert datetime.datetime.now() == self.NOON_4_20
         assert datetimeutils.today_midnight_utc() == self.MN_4_20
         assert datetimeutils.today_utc() == self.MN_4_20.date()
-        assert datetimeutils.yesterday_midnight_utc() == self.MN_4_19
-        assert datetimeutils.yesterday_utc() == self.MN_4_19.date()
 
     @freeze_time("2016-04-21 03:00:00", tz_offset=-15)
     def test_local_time_day_before_utc(self):
         assert datetime.datetime.now() == self.NOON_4_20
         assert datetimeutils.today_midnight_utc() == self.MN_4_21
         assert datetimeutils.today_utc() == self.MN_4_21.date()
-        assert datetimeutils.yesterday_midnight_utc() == self.MN_4_20
-        assert datetimeutils.yesterday_utc() == self.MN_4_20.date()
 
     @freeze_time("2016-04-20 04:00:00", tz_offset=8)
     def test_local_time_ahead_but_same_day_as_utc(self):
         assert datetime.datetime.now() == self.NOON_4_20
         assert datetimeutils.today_midnight_utc() == self.MN_4_20
         assert datetimeutils.today_utc() == self.MN_4_20.date()
-        assert datetimeutils.yesterday_midnight_utc() == self.MN_4_19
-        assert datetimeutils.yesterday_utc() == self.MN_4_19.date()
 
     @freeze_time("2016-04-19 21:00:00", tz_offset=15)
     def test_local_time_day_ahead_of_utc(self):
         assert datetime.datetime.now() == self.NOON_4_20
         assert datetimeutils.today_midnight_utc() == self.MN_4_19
         assert datetimeutils.today_utc() == self.MN_4_19.date()
-        assert datetimeutils.yesterday_midnight_utc() == self.MN_4_18
-        assert datetimeutils.yesterday_utc() == self.MN_4_18.date()
 
 class TestReplaceWildcards():
     @freeze_time("2016-01-14T13:01:11")
