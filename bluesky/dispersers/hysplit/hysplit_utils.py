@@ -63,7 +63,7 @@ def create_fire_tranches(fire_sets, num_processes, model_start, num_hours,
     min_n_fire_sets_per_process = n_sets // num_processes
     extra_fire_cutoff = n_sets % num_processes
 
-    logging.info("Running %d HYSPLIT49 Dispersion model processes "
+    logging.info("Running %d HYSPLIT Dispersion model processes "
         "on %d fires (i.e. events)" % (num_processes, n_sets))
     logging.info(" - %d processes with %d fires" % (
         num_processes - extra_fire_cutoff, min_n_fire_sets_per_process))
@@ -127,7 +127,7 @@ def compute_num_processes(num_fire_sets, **tranching_config):
             tranching_config.get('num_processes', 0),
             tranching_config.get('num_processes_max', 0))
 
-    logging.debug('Parallel HYSPLIT? num_fire_sets=%s, %s -> num_processes=%s' %(
+    logging.debug('Parallel HYSPLIT: num_fire_sets=%s, %s -> num_processes=%s' %(
         num_fire_sets, ', '.join(['%s=%s'%(k,v) for k,v in tranching_config.items()]),
         computed_num_processes
     ))

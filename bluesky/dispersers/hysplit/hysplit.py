@@ -408,7 +408,7 @@ class HYSPLITDispersion(DispersionBase):
         hysplit_utils.ensure_tranch_has_dummy_fire(fires, self._model_start,
             self._num_hours, self._grid_params)
 
-        logging.info("Running one HYSPLIT49 Dispersion model process")
+        logging.info("Running one HYSPLIT Dispersion model process")
         # TODO: set all but fires, working_dir, and tranche_num as instance
         # properties in self.run so that they don't have to be passed into
         # each call to _run_process.
@@ -513,10 +513,12 @@ class HYSPLITDispersion(DispersionBase):
         try:
             # Run HYSPLIT
             if self.config("MPI"):
+                logging.info(f"Using {self.BINARIES['HYSPLIT_MPI']}")
                 args = [self.BINARIES['MPI']]
                 args.extend(["-n", str(NCPUS), self.BINARIES['HYSPLIT_MPI']])
                 io.SubprocessExecutor().execute(*args, cwd=working_dir)
             else:  # standard serial run
+                logging.info(f"Using {self.BINARIES['HYSPLIT']}")
                 io.SubprocessExecutor().execute(self.BINARIES['HYSPLIT'], cwd=working_dir)
 
             if not os.path.exists(output_conc_file):
