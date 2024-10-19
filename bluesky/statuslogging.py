@@ -54,7 +54,7 @@ class StatusLogger():
 
     def log(self, status, step, action, **extra_fields):
         if self.enabled:
-            ts = datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%S.%fZ')
+            ts = datetime.datetime.now(datetime.UTC).strftime('%Y%m%dT%H%M%S.%fZ')
             fields = {
                 'initialization_time': self.init_time,
                 'status': status,

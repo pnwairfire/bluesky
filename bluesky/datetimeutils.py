@@ -21,7 +21,7 @@ from afdatetime.parsing import (
 from bluesky.exceptions import BlueSkyDatetimeValueError
 
 def today_midnight_utc():
-    d = datetime.datetime.utcnow()
+    d = datetime.datetime.now(datetime.UTC)
     return datetime.datetime(d.year, d.month, d.day)
 
 def today_utc():
@@ -39,7 +39,7 @@ DEFAULT_DATE_FORMAT_STRINGS = {
 DATE_RETURNER = {
     'today': lambda today: today,
     'yesterday': lambda today: today - ONE_DAY,
-    'timestamp': lambda today: datetime.datetime.utcnow(),
+    'timestamp': lambda today: datetime.datetime.now(datetime.UTC),
 }
 def fill_in_datetime_strings(val, today=None):
     """Replaces strftime control codes and special wildcards if input is a string

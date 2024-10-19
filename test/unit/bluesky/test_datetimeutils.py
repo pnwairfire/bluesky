@@ -6,48 +6,53 @@ import datetime
 import importlib
 
 from freezegun import freeze_time
+import time_machine
+from zoneinfo import ZoneInfo
 from pytest import raises
 
 from bluesky import datetimeutils
 from bluesky.exceptions import BlueSkyDatetimeValueError
 
-class TestTodayAndYesterdayMidnight():
+class TestTodayAndTodayMidnight():
 
     NOON_4_20 = datetime.datetime(2016, 4, 20, 12, 0, 0)
-    MN_4_18 = datetime.datetime(2016, 4, 18, 0, 0, 0)
     MN_4_19 = datetime.datetime(2016, 4, 19, 0, 0, 0)
     MN_4_20 = datetime.datetime(2016, 4, 20, 0, 0, 0)
     MN_4_21 = datetime.datetime(2016, 4, 21, 0, 0, 0)
 
     # Note: in call to freeze_time, specified time is UTC.
 
-    @freeze_time("2016-04-20 12:00:00", tz_offset=0)
+    @time_machine.travel(datetime.datetime(2016, 4, 20, 12, 0, 0, tzinfo=datetime.UTC))
     def test_local_time_same_as_utc(self):
         assert datetime.datetime.now() == self.NOON_4_20
         assert datetimeutils.today_midnight_utc() == self.MN_4_20
         assert datetimeutils.today_utc() == self.MN_4_20.date()
 
-    @freeze_time("2016-04-20 20:00:00", tz_offset=-8)
+    @time_machine.travel(datetime.datetime(2016, 4, 20, 12, 0, 0,
+        tzinfo=ZoneInfo("America/Anchorage"))) # UTC-0800
     def test_local_time_behind_but_same_day_as_utc(self):
         assert datetime.datetime.now() == self.NOON_4_20
         assert datetimeutils.today_midnight_utc() == self.MN_4_20
         assert datetimeutils.today_utc() == self.MN_4_20.date()
 
-    @freeze_time("2016-04-21 03:00:00", tz_offset=-15)
+    @time_machine.travel(datetime.datetime(2016, 4, 20, 20, 0, 0,
+        tzinfo=ZoneInfo("America/Anchorage"))) # UTC-0800
     def test_local_time_day_before_utc(self):
-        assert datetime.datetime.now() == self.NOON_4_20
-        assert datetimeutils.today_midnight_utc() == self.MN_4_21
-        assert datetimeutils.today_utc() == self.MN_4_21.date()
+        assert datetime.datetime.now() == datetime.datetime(2016, 4, 20, 20, 0, 0)
+        assert datetimeutils.today_midnight_utc() == datetime.datetime(2016, 4, 21, 0, 0, 0)
+        assert datetimeutils.today_utc() == datetime.date(2016, 4, 21)
 
-    @freeze_time("2016-04-20 04:00:00", tz_offset=8)
+    @time_machine.travel(datetime.datetime(2016, 4, 20, 12, 0, 0,
+        tzinfo=ZoneInfo("Australia/Perth"))) # UTC+0800
     def test_local_time_ahead_but_same_day_as_utc(self):
         assert datetime.datetime.now() == self.NOON_4_20
         assert datetimeutils.today_midnight_utc() == self.MN_4_20
         assert datetimeutils.today_utc() == self.MN_4_20.date()
 
-    @freeze_time("2016-04-19 21:00:00", tz_offset=15)
+    @time_machine.travel(datetime.datetime(2016, 4, 20, 4, 0, 0,
+        tzinfo=ZoneInfo("Australia/Perth"))) # UTC+0800
     def test_local_time_day_ahead_of_utc(self):
-        assert datetime.datetime.now() == self.NOON_4_20
+        assert datetime.datetime.now() == datetime.datetime(2016, 4, 20, 4, 0, 0)
         assert datetimeutils.today_midnight_utc() == self.MN_4_19
         assert datetimeutils.today_utc() == self.MN_4_19.date()
 

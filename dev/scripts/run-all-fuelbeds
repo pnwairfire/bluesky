@@ -478,7 +478,7 @@ def main():
         sys.exit(1)
 
     run_id = (("by-fccsids" if args.mode == 'fccs-ids' else 'by-coordinates')
-        + '_' + datetime.datetime.utcnow().strftime('%Y%m%dT%H%M%SZ'))
+        + '_' + datetime.datetime.now(datetime.UTC).strftime('%Y%m%dT%H%M%SZ'))
     host_output_dir = './tmp/run-all-fuelbeds/' + run_id.replace('_','/')
     if not os.path.exists(host_output_dir):
         os.makedirs(host_output_dir)
