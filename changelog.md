@@ -696,3 +696,7 @@
 
 ## 4.6.4
  - Pass area into fuelbeds look-up
+
+## 4.6.5
+ - Address deprecation warnings
+ - Upgrade to pyairfire==6.0.3
