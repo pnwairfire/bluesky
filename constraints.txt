@@ -71,7 +71,7 @@ plumerise==2.0.4
 prompt_toolkit==3.0.47
 ptyprocess==0.7.0
 pure_eval==0.2.3
-pyairfire==6.0.2
+pyairfire==6.0.3
 pycparser==2.22
 Pygments==2.18.0
 pymongo==4.9.1
