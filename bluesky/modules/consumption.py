@@ -135,6 +135,7 @@ def _scale_with_estimated_fuelload(loc):
     modeled_fuelload_tpa = 0
     for fb in loc['fuelbeds']:
         modeled_fuelload_tpa += sum([fb['fuel_loadings'][k] for k in loadings_keys])
+    modeled_fuelload_tpa /= loc['area']
     logging.debug("Modeled fuel loading (per acre) %s", modeled_fuelload_tpa)
 
     scale_factor = loc['input_est_fuelload_tpa'] / modeled_fuelload_tpa
