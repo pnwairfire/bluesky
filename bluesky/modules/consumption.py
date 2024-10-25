@@ -127,23 +127,29 @@ def _scale_with_estimated_fuelload(loc):
             or any([not fb.get('fuel_loadings') for fb in loc['fuelbeds']])):
         return False
 
-    # get fuel loadings keys from first fuelbed
-    loadings_keys = [k for k in loc['fuelbeds'][0]['fuel_loadings']
-        if k.endswith('_loading') and not k.startswith('total_')]
-
-    # get total modeled fuel load per acre; note that values in 'fuel_loadings' are per acre
+    # get total modeled fuel load per acre; note
+    # that values in 'fuel_loadings' are total, not per acre
+    # We'll all sum fuel loadings values except for 'total_'
+    # (which is only 'total_available_fuel_loading')
+    loadings_keys_to_sum = [
+        k for k in loc['fuelbeds'][0]['fuel_loadings']
+            if k.endswith('_loading') and not k.startswith('total_')
+    ]
     modeled_fuelload_tpa = 0
     for fb in loc['fuelbeds']:
-        modeled_fuelload_tpa += sum([fb['fuel_loadings'][k] for k in loadings_keys])
+        modeled_fuelload_tpa += sum([fb['fuel_loadings'][k] for k in loadings_keys_to_sum])
     modeled_fuelload_tpa /= loc['area']
     logging.debug("Modeled fuel loading (per acre) %s", modeled_fuelload_tpa)
 
     scale_factor = loc['input_est_fuelload_tpa'] / modeled_fuelload_tpa
     logging.debug("Using fuel loadings scale factor %s", scale_factor)
 
+    loadings_keys_to_scale = [
+        k for k in loc['fuelbeds'][0]['fuel_loadings'] if k.endswith('_loading')
+    ]
     for fb in loc['fuelbeds']:
         # adjust fuel load values
-        for k in loadings_keys:
+        for k in loadings_keys_to_scale:
             fb['fuel_loadings'][k] *= scale_factor
 
         # adjust consumption values
