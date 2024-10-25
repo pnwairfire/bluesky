@@ -128,7 +128,8 @@ def _scale_with_estimated_fuelload(loc):
         return False
 
     # get fuel loadings keys from first fuelbed
-    loadings_keys = [k for k in loc['fuelbeds'][0]['fuel_loadings'] if k.endswith('_loading')]
+    loadings_keys = [k for k in loc['fuelbeds'][0]['fuel_loadings']
+        if k.endswith('_loading') and not k.startswith('total_')]
 
     # get total modeled fuel load per acre; note that values in 'fuel_loadings' are per acre
     modeled_fuelload_tpa = 0
