@@ -700,3 +700,6 @@
 ## 4.6.5
  - Address deprecation warnings
  - Upgrade to pyairfire==6.0.3
+
+## 4.6.6
+ - Fix logic that adjusts consumption, heat, and fuel loadings based on estimated per-acre fuel loadings
