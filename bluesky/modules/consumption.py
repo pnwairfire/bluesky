@@ -149,6 +149,9 @@ def _scale_with_estimated_fuelload(loc):
         # adjust consumption values
         datautils.multiply_nested_data(fb["consumption"], scale_factor)
 
+        # adjust heat values
+        datautils.multiply_nested_data(fb["heat"], scale_factor)
+
     loc['input_est_fuelload_scale_factor'] = scale_factor
 
     return True
