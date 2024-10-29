@@ -3,6 +3,9 @@
 fm_1_10 written by asbova17
 """
 
+import logging
+
+
 __version__ = '0.1.0'
 
 __all__ = [
@@ -74,6 +77,9 @@ class NfdrsFuelMoisture():
         """Extracts the closest WIMS data. Assigns default fuel moisture
          values if no WIMS data is found
         """
+        if not location.get('localmet'):
+            logging.warning("Localmet data are needed by the NFDRS fuel moisture model.")
+
         for hr, met in location.get('localmet', {}).items():
             fm_1_10_args = {}
             # The profiler code says that TEMP is in Kelvin, but
