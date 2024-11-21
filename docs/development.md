@@ -3,7 +3,7 @@
 First, clone the repo and build the docker image,
 as described in the [installation](installation.md).  (If opting
 to develop without docker, see also the
-[dependencies](dependencies.md) docs.  The instrucitons on this
+[dependencies](dependencies.md) docs.  The instructions on this
 page, however, assume that you use docker.)
 
 ## PYTHONPATH
@@ -71,3 +71,52 @@ profile a run by using `bsp`'s `--profile-output-file` option.
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         bluesky bsp --profile-output-file ...
+
+## How to debug tests in VSCode
+
+cd repos/uw/bluesky  
+add debugpy to requirements.txt  
+bluesky % docker build  -t bluesky .   
+
+In VSCode, open the bluesky folder, click on Debug icon (left side), add "python debugger, remote attach"  
+Will generate launch.json that looks similar to this... add port and justMyCode settings.   
+
+    {
+        // Use IntelliSense to learn about possible attributes.
+        // Hover to view descriptions of existing attributes.
+        // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Python Debugger: Remote Attach",
+                "type": "debugpy",
+                "request": "attach",
+                "connect": {
+                    "host": "localhost",
+                    "port": 5678
+                },
+                "pathMappings": [
+                    {
+                        "localRoot": "${workspaceFolder}",
+                        "remoteRoot": "."
+                    }
+                ],
+                "justMyCode": false
+            }
+        ]
+    }
+
+Add breakpoints to unit tests or other code in VSCode.  
+Use this command to start docker with port 5678 expoed, and pause until the debugger is connected.  
+note: I had to change py.test to "pytest".  
+
+    docker run --rm -ti --user bluesky \
+        -v $HOME/repos/uw/bluesky/:/bluesky/ \
+        -p 5678:5678 \
+        -e PYTHONPATH=/bluesky/ \
+        -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+        bluesky python3 -m debugpy --wait-for-client --listen 0.0.0.0:5678 -m pytest --disable-pytest-warnings
+
+In VSCode, click the debug icon, then click the green triangle to "run and debug". The tests will start running and the output will be displayed in the debug console of VSCode. The breakpoints should work.  
+
+
