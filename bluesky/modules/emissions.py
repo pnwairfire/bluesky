@@ -8,6 +8,7 @@ import itertools
 import logging
 import sys
 import os
+import pandas as pd
 
 import consume
 from emitcalc import __version__ as emitcalc_version
@@ -216,6 +217,11 @@ class PrichardOneill(EmissionsBase):
     def __init__(self, fire_failure_handler):
         super(PrichardOneill, self).__init__(fire_failure_handler)
 
+        all_fuel_loadings = (Config().get('emissions','fuel_loadings')
+            or Config().get('consumption','fuel_loadings'))
+        self.fuel_loadings_manager = FuelLoadingsManager(
+            all_fuel_loadings=all_fuel_loadings)
+
     # Consumption values are in tons, Prichard/ONeill EFS are in g/kg, and
     # we want emissions values in tons.  Since 1 g/kg == 2 lbs/ton, we need
     # to multiple the emissions output by:
@@ -240,6 +246,20 @@ class PrichardOneill(EmissionsBase):
                         raise ValueError(
                             "Missing FCCS Id required for computing emissions")
                     lookup = self._get_lookup_object(fire, fb)
+
+                    # use EmissionsCalculator (emitCalc) for non-pile emissions
+                    # if a fb has piles, remove them, so EmissionsCalculator
+                    #  doesn't calculate them. 
+                    if 'woody fuels' in fb["consumption"]:
+                        if 'piles' in fb["consumption"]['woody fuels']:
+                            pileFlamingTemp = fb['consumption']['woody fuels']['piles']['flaming'][0]
+                            pileSmolderingTemp = fb['consumption']['woody fuels']['piles']['smoldering'][0]
+                            pileResidualTemp = fb['consumption']['woody fuels']['piles']['residual'][0]
+                            fb['consumption']['woody fuels']['piles']['flaming'][0] = 0
+                            fb['consumption']['woody fuels']['piles']['smoldering'][0] = 0
+                            fb['consumption']['woody fuels']['piles']['residual'][0] = 0
+
+
                     calculator = EmissionsCalculator(lookup, species=self.species)
                     _calculate(calculator, fb, self.include_emissions_details,
                         self.include_emissions_factors)
@@ -250,6 +270,72 @@ class PrichardOneill(EmissionsBase):
                     datautils.multiply_nested_data(fb['emissions'], self.CONVERSION_FACTOR)
                     if self.include_emissions_details:
                         datautils.multiply_nested_data(fb['emissions_details'], self.CONVERSION_FACTOR)
+
+                    # calculate pile emissions by using consume.Emissions class
+                    if 'woody fuels' in fb["consumption"]:
+                        if 'piles' in fb["consumption"]['woody fuels']:
+                            fb['consumption']['woody fuels']['piles']['flaming'][0] = pileFlamingTemp
+                            fb['consumption']['woody fuels']['piles']['smoldering'][0] = pileSmolderingTemp
+                            fb['consumption']['woody fuels']['piles']['residual'][0] = pileResidualTemp
+
+                            if fb['consumption']['woody fuels']['piles']['flaming'][0] > 0 or \
+                                fb['consumption']['woody fuels']['piles']['smoldering'][0] > 0 or \
+                                fb['consumption']['woody fuels']['piles']['residual'][0] > 0:
+                                fire_type = fire.get("type")
+                                burn_type = fire.get("fuel_type") or 'natural'
+                                season = datetimeutils.season_from_date(aa.get('start'))
+
+                                fuel_loadings_csv_filename = self.fuel_loadings_manager.generate_custom_csv(fb['fccs_id'])
+                                area = (fb['pct'] / 100.0) * loc['area']
+
+                                fc = FuelConsumptionForEmissions(fb["consumption"], fb['heat'],
+                                area, burn_type, fire_type, fb['fccs_id'], season, loc,
+                                fccs_file=fuel_loadings_csv_filename)
+
+                                # custom fuel loadings for this fuelbed 
+                                config_fuel_loadings = Config().get('consumption','fuel_loadings')[fb['fccs_id']]
+                                fb['emissions_fuel_loadings'] = config_fuel_loadings
+                                e = consume.Emissions(fuel_consumption_object=fc)
+                                e.output_units = 'tons'
+
+                                pile_black_pct = (fc._settings.get('pile_black_pct') * 0.01)
+                                config_fuel_loadings_df = pd.DataFrame([config_fuel_loadings])
+                                pile_loadings = pd.Series([config_fuel_loadings['pile_clean_loading'] + config_fuel_loadings['pile_dirty_loading'] + config_fuel_loadings['pile_vdirty_loading']])
+                                (pile_pm, pile_pm10, pile_pm25) = e._emissions_calc_pm_piles(config_fuel_loadings_df, pile_loadings, pile_black_pct)
+
+                                (pile_co, pile_co2, pile_ch4, pile_nmhc, pile_nmoc, pile_nh3, pile_no, pile_no2, pile_nox, pile_so2) = \
+                                    e._emissions_calc_pollutants_piles(pile_loadings, pile_black_pct)
+                                
+                                self.add_pile_emissions(fb, 'PM2.5', pile_pm25)
+                                self.add_pile_emissions(fb, 'PM10', pile_pm10)
+                                self.add_pile_emissions(fb, 'CO', pile_co)
+                                self.add_pile_emissions(fb, 'CO2', pile_co2)
+                                self.add_pile_emissions(fb, 'CH4', pile_ch4)
+                                self.add_pile_emissions(fb, 'NH3', pile_nh3)
+                                self.add_pile_emissions(fb, 'NOx', pile_nox)
+                                self.add_pile_emissions(fb, 'SO2', pile_so2)
+                            
+
+    def add_pile_emissions(self, fb, pollutant, pile_fsrt_emissions):
+        fb['emissions']['flaming'][pollutant][0] += pile_fsrt_emissions[0][0]
+        fb['emissions']['smoldering'][pollutant][0] += pile_fsrt_emissions[1][0]
+        fb['emissions']['residual'][pollutant][0] += pile_fsrt_emissions[2][0]
+        fb['emissions']['total'][pollutant][0] += pile_fsrt_emissions[3][0]
+        if self.include_emissions_details:
+            fb['emissions_details']['woody fuels']['piles']['flaming'][pollutant][0] += pile_fsrt_emissions[0][0]
+            fb['emissions_details']['woody fuels']['piles']['smoldering'][pollutant][0] += pile_fsrt_emissions[1][0]
+            fb['emissions_details']['woody fuels']['piles']['residual'][pollutant][0] += pile_fsrt_emissions[2][0]
+
+            fb['emissions_details']['summary']['total']['flaming'][pollutant][0] += pile_fsrt_emissions[0][0]
+            fb['emissions_details']['summary']['total']['smoldering'][pollutant][0] += pile_fsrt_emissions[1][0]
+            fb['emissions_details']['summary']['total']['residual'][pollutant][0] += pile_fsrt_emissions[2][0]
+            fb['emissions_details']['summary']['total']['total'][pollutant][0] += pile_fsrt_emissions[3][0]
+
+            fb['emissions_details']['summary']['woody fuels']['flaming'][pollutant][0] += pile_fsrt_emissions[0][0]
+            fb['emissions_details']['summary']['woody fuels']['smoldering'][pollutant][0] += pile_fsrt_emissions[1][0]
+            fb['emissions_details']['summary']['woody fuels']['residual'][pollutant][0] += pile_fsrt_emissions[2][0]
+
+
 
     def _get_lookup_object(self, fire, fuelbed):
         return Fccs2SeraEf(fuelbed["fccs_id"], is_rx=(fire["type"]=="rx"))
@@ -388,3 +474,4 @@ def _calculate(calculator, fb, include_emissions_details,
         fb['emissions_details'] = emissions_details
     if include_emissions_factors:
         fb['emissions_factors'] = calculator.emissions_factors
+
