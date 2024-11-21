@@ -109,6 +109,7 @@ Will generate launch.json that looks similar to this... add port and justMyCode 
 Add breakpoints to unit tests or other code in VSCode.  
 Use this command to start docker with port 5678 expoed, and pause until the debugger is connected.  
 note: I had to change py.test to "pytest".  
+change "$HOME/repos/uw/bluesky/" to match where your source code is located on local machine
 
     docker run --rm -ti --user bluesky \
         -v $HOME/repos/uw/bluesky/:/bluesky/ \
