@@ -75,7 +75,6 @@ profile a run by using `bsp`'s `--profile-output-file` option.
 ## How to debug tests in VSCode
 
 cd repos/uw/bluesky  
-add debugpy to requirements.txt  
 bluesky % docker build  -t bluesky .   
 
 In VSCode, open the bluesky folder, click on Debug icon (left side), add "python debugger, remote attach"  
