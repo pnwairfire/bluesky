@@ -703,3 +703,6 @@
 
 ## 4.6.6
  - Fix logic that adjusts consumption, heat, and fuel loadings based on estimated per-acre fuel loadings
+
+## 4.6.7
+ - Add piles support to emissions module
