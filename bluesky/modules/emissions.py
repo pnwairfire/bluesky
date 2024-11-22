@@ -249,7 +249,7 @@ class PrichardOneill(EmissionsBase):
 
                     # use EmissionsCalculator (emitCalc) for non-pile emissions
                     # if a fb has piles, remove them, so EmissionsCalculator
-                    #  doesn't calculate them. 
+                    #  doesn't calculate them.
                     if 'woody fuels' in fb["consumption"]:
                         if 'piles' in fb["consumption"]['woody fuels']:
                             pileFlamingTemp = fb['consumption']['woody fuels']['piles']['flaming'][0]
@@ -292,7 +292,7 @@ class PrichardOneill(EmissionsBase):
                                 area, burn_type, fire_type, fb['fccs_id'], season, loc,
                                 fccs_file=fuel_loadings_csv_filename)
 
-                                # custom fuel loadings for this fuelbed 
+                                # custom fuel loadings for this fuelbed
                                 config_fuel_loadings = Config().get('consumption','fuel_loadings')[fb['fccs_id']]
                                 fb['emissions_fuel_loadings'] = config_fuel_loadings
                                 e = consume.Emissions(fuel_consumption_object=fc)
@@ -305,7 +305,7 @@ class PrichardOneill(EmissionsBase):
 
                                 (pile_co, pile_co2, pile_ch4, pile_nmhc, pile_nmoc, pile_nh3, pile_no, pile_no2, pile_nox, pile_so2) = \
                                     e._emissions_calc_pollutants_piles(pile_loadings, pile_black_pct)
-                                
+
                                 self.add_pile_emissions(fb, 'PM2.5', pile_pm25)
                                 self.add_pile_emissions(fb, 'PM10', pile_pm10)
                                 self.add_pile_emissions(fb, 'CO', pile_co)
@@ -314,7 +314,7 @@ class PrichardOneill(EmissionsBase):
                                 self.add_pile_emissions(fb, 'NH3', pile_nh3)
                                 self.add_pile_emissions(fb, 'NOx', pile_nox)
                                 self.add_pile_emissions(fb, 'SO2', pile_so2)
-                            
+
 
     def add_pile_emissions(self, fb, pollutant, pile_fsrt_emissions):
         fb['emissions']['flaming'][pollutant][0] += pile_fsrt_emissions[0][0]
