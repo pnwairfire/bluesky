@@ -706,3 +706,6 @@
 
 ## 4.6.7
  - Add piles support to emissions module
+
+## 4.6.8
+ - Fix units bug in piles emissions
