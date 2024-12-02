@@ -518,13 +518,13 @@ CONFIG_FOR_PILE_ONLY_TESTS = {"consumption":{"fuel_loadings":{"foo":{"bar":"baz"
 "52":{"expertFuelbeds":{"1":{"is_active":True,"Total_available_fuel_loading":99.16,"total_fuels":99.16,"contributed_fuels":11.51,"percent_of_fire":100,"basal_accum_loading":0,"cover_type":118,"duff_lower_depth":0,"duff_lower_loading":0,"duff_upper_depth":0,"duff_upper_loading":0,"ecoregion":240,"efg_activity":1,"efg_natural":8,"filename":"","fuelbed_name":"","fuelbed_row":1,"fuel_consumptionEquation":"natural","fccs_number":52000000,"ladderfuels_loading":0,"lichen_depth":0,"lichen_loading":0,"litter_depth":0,"litter_loading":0,"midstory_loading":0,"moss_depth":0,"moss_loading":0,"overstory_loading":0,"pile_clean_loading":99.16,"pile_dirty_loading":0,"pile_vdirty_loading":0,"shrubs_needledrape_loading":0,"shrubs_herbs_primary_loading":0,"shrubs_herbs_primary_perc_live":0,"shrubs_herbs_secondary_loading":0,"shrubs_herbs_secondary_perc_live":0,"snags_c1_foliage_loading":0,"snags_c1_wood_loading":0,"snags_c1wo_foliage_loading":0,"snags_c2_loading":0,"snags_c3_loading":0,"squirrel_midden_loading":0,"understory_loading":0,"w_rotten_3_9_loading":0,"w_rotten_9_20_loading":0,"w_rotten_gt20_loading":0,"w_sound_0_quarter_loading":0,"w_sound_1_3_loading":0,"w_sound_3_9_loading":0,"w_sound_9_20_loading":0,"w_sound_gt20_loading":0,"w_sound_quarter_1_loading":0,"w_stump_lightered_loading":0,"w_stump_rotten_loading":0,"w_stump_sound_loading":0,"fuel_lengthOfIgnition":120,"fuel_3MonthHarvest":True,"_id":"","nw_primary_loading":0,"shrubs_secondary_loading":0,"shrubs_secondary_perc_live":95,"nw_primary_perc_live":70,"nw_secondary_perc_live":80,"shrubs_primary_loading":0,"fuelbed_number":52,"nw_secondary_loading":0,"shrubs_primary_perc_live":89},"2":{},"3":{},"4":{},"5":{}},"is_active":True,"Total_available_fuel_loading":99.16,"total_fuels":99.16,"contributed_fuels":11.51,"basal_accum_loading":0,"cover_type":118,"duff_lower_depth":0,"duff_lower_loading":0,"duff_upper_depth":0,"duff_upper_loading":0,"ecoregion":240,"efg_activity":1,"efg_natural":8,"filename":"FB_0052_FCCS.xml","fuelbed_name":"","fuelbed_row":1,"ladderfuels_loading":0,"lichen_depth":0,"lichen_loading":0,"litter_depth":0,"litter_loading":0,"midstory_loading":0,"moss_depth":0,"moss_loading":0,"overstory_loading":0,"pile_clean_loading":99.16,"pile_dirty_loading":0,"pile_vdirty_loading":0,"shrubs_needledrape_loading":0,"snags_c1_foliage_loading":0,"snags_c1_wood_loading":0,"snags_c1wo_foliage_loading":0,"snags_c2_loading":0,"snags_c3_loading":0,"squirrel_midden_loading":0,"understory_loading":0,"w_rotten_3_9_loading":0,"w_rotten_9_20_loading":0,"w_rotten_gt20_loading":0,"w_sound_0_quarter_loading":0,"w_sound_1_3_loading":0,"w_sound_3_9_loading":0,"w_sound_9_20_loading":0,"w_sound_gt20_loading":0,"w_sound_quarter_1_loading":0,"w_stump_lightered_loading":0,"w_stump_rotten_loading":0,"w_stump_sound_loading":0,"fuel_lengthOfIgnition":120,"fuel_3MonthHarvest":True,"_id":"","nw_primary_loading":0,"shrubs_secondary_loading":0,"shrubs_secondary_perc_live":0,"nw_primary_perc_live":0,"nw_secondary_perc_live":0,"shrubs_primary_loading":0,"fuelbed_number":52,"nw_secondary_loading":0,"shrubs_primary_perc_live":0},
 "53":{"expertFuelbeds":{"1":{"is_active":True,"Total_available_fuel_loading":99.16,"total_fuels":99.16,"contributed_fuels":11.51,"percent_of_fire":100,"basal_accum_loading":0,"cover_type":118,"duff_lower_depth":0,"duff_lower_loading":0,"duff_upper_depth":0,"duff_upper_loading":0,"ecoregion":240,"efg_activity":1,"efg_natural":8,"filename":"","fuelbed_name":"","fuelbed_row":1,"fuel_consumptionEquation":"natural","fccs_number":53000000,"ladderfuels_loading":0,"lichen_depth":0,"lichen_loading":0,"litter_depth":0,"litter_loading":0,"midstory_loading":0,"moss_depth":0,"moss_loading":0,"overstory_loading":0,"pile_clean_loading":99.16,"pile_dirty_loading":0,"pile_vdirty_loading":0,"shrubs_needledrape_loading":0,"shrubs_herbs_primary_loading":0,"shrubs_herbs_primary_perc_live":0,"shrubs_herbs_secondary_loading":0,"shrubs_herbs_secondary_perc_live":0,"snags_c1_foliage_loading":0,"snags_c1_wood_loading":0,"snags_c1wo_foliage_loading":0,"snags_c2_loading":0,"snags_c3_loading":0,"squirrel_midden_loading":0,"understory_loading":0,"w_rotten_3_9_loading":0,"w_rotten_9_20_loading":0,"w_rotten_gt20_loading":0,"w_sound_0_quarter_loading":0,"w_sound_1_3_loading":0,"w_sound_3_9_loading":0,"w_sound_9_20_loading":0,"w_sound_gt20_loading":0,"w_sound_quarter_1_loading":0,"w_stump_lightered_loading":0,"w_stump_rotten_loading":0,"w_stump_sound_loading":0,"fuel_lengthOfIgnition":120,"fuel_3MonthHarvest":True,"_id":"","nw_primary_loading":0,"shrubs_secondary_loading":0,"shrubs_secondary_perc_live":95,"nw_primary_perc_live":70,"nw_secondary_perc_live":80,"shrubs_primary_loading":0,"fuelbed_number":53,"nw_secondary_loading":0,"shrubs_primary_perc_live":89},"2":{},"3":{},"4":{},"5":{}},"is_active":True,"Total_available_fuel_loading":99.16,"total_fuels":99.16,"contributed_fuels":11.51,"basal_accum_loading":0,"cover_type":118,"duff_lower_depth":0,"duff_lower_loading":0,"duff_upper_depth":0,"duff_upper_loading":0,"ecoregion":240,"efg_activity":1,"efg_natural":8,"filename":"FB_0053_FCCS.xml","fuelbed_name":"","fuelbed_row":1,"ladderfuels_loading":0,"lichen_depth":0,"lichen_loading":0,"litter_depth":0,"litter_loading":0,"midstory_loading":0,"moss_depth":0,"moss_loading":0,"overstory_loading":0,"pile_clean_loading":99.16,"pile_dirty_loading":0,"pile_vdirty_loading":0,"shrubs_needledrape_loading":0,"snags_c1_foliage_loading":0,"snags_c1_wood_loading":0,"snags_c1wo_foliage_loading":0,"snags_c2_loading":0,"snags_c3_loading":0,"squirrel_midden_loading":0,"understory_loading":0,"w_rotten_3_9_loading":0,"w_rotten_9_20_loading":0,"w_rotten_gt20_loading":0,"w_sound_0_quarter_loading":0,"w_sound_1_3_loading":0,"w_sound_3_9_loading":0,"w_sound_9_20_loading":0,"w_sound_gt20_loading":0,"w_sound_quarter_1_loading":0,"w_stump_lightered_loading":0,"w_stump_rotten_loading":0,"w_stump_sound_loading":0,"fuel_lengthOfIgnition":120,"fuel_3MonthHarvest":True,"_id":"","nw_primary_loading":0,"shrubs_secondary_loading":0,"shrubs_secondary_perc_live":0,"nw_primary_perc_live":0,"nw_secondary_perc_live":0,"shrubs_primary_loading":0,"fuelbed_number":53,"nw_secondary_loading":0,"shrubs_primary_perc_live":0},
 "0":{"expertFuelbeds":{"1":{"is_active":True,"Total_available_fuel_loading":99.16,"total_fuels":99.16,"contributed_fuels":11.51,"percent_of_fire":100,"basal_accum_loading":0,"cover_type":118,"duff_lower_depth":0,"duff_lower_loading":0,"duff_upper_depth":0,"duff_upper_loading":0,"ecoregion":240,"efg_activity":1,"efg_natural":8,"filename":"","fuelbed_name":"","fuelbed_row":1,"fuel_consumptionEquation":"natural","fccs_number":0,"ladderfuels_loading":0,"lichen_depth":0,"lichen_loading":0,"litter_depth":0,"litter_loading":0,"midstory_loading":0,"moss_depth":0,"moss_loading":0,"overstory_loading":0,"pile_clean_loading":99.16,"pile_dirty_loading":0,"pile_vdirty_loading":0,"shrubs_needledrape_loading":0,"shrubs_herbs_primary_loading":0,"shrubs_herbs_primary_perc_live":0,"shrubs_herbs_secondary_loading":0,"shrubs_herbs_secondary_perc_live":0,"snags_c1_foliage_loading":0,"snags_c1_wood_loading":0,"snags_c1wo_foliage_loading":0,"snags_c2_loading":0,"snags_c3_loading":0,"squirrel_midden_loading":0,"understory_loading":0,"w_rotten_3_9_loading":0,"w_rotten_9_20_loading":0,"w_rotten_gt20_loading":0,"w_sound_0_quarter_loading":0,"w_sound_1_3_loading":0,"w_sound_3_9_loading":0,"w_sound_9_20_loading":0,"w_sound_gt20_loading":0,"w_sound_quarter_1_loading":0,"w_stump_lightered_loading":0,"w_stump_rotten_loading":0,"w_stump_sound_loading":0,"fuel_lengthOfIgnition":120,"fuel_3MonthHarvest":True,"_id":"","nw_primary_loading":0,"shrubs_secondary_loading":0,"shrubs_secondary_perc_live":95,"nw_primary_perc_live":70,"nw_secondary_perc_live":80,"shrubs_primary_loading":0,"fuelbed_number":0,"nw_secondary_loading":0,"shrubs_primary_perc_live":89},"2":{},"3":{},"4":{},"5":{}},"is_active":True,"Total_available_fuel_loading":99.16,"total_fuels":99.16,"contributed_fuels":11.51,"basal_accum_loading":0,"cover_type":118,"duff_lower_depth":0,"duff_lower_loading":0,"duff_upper_depth":0,"duff_upper_loading":0,"ecoregion":240,"efg_activity":1,"efg_natural":8,"filename":"FB_0000_FCCS.xml","fuelbed_name":"","fuelbed_row":1,"ladderfuels_loading":0,"lichen_depth":0,"lichen_loading":0,"litter_depth":0,"litter_loading":0,"midstory_loading":0,"moss_depth":0,"moss_loading":0,"overstory_loading":0,"pile_clean_loading":99.16,"pile_dirty_loading":0,"pile_vdirty_loading":0,"shrubs_needledrape_loading":0,"snags_c1_foliage_loading":0,"snags_c1_wood_loading":0,"snags_c1wo_foliage_loading":0,"snags_c2_loading":0,"snags_c3_loading":0,"squirrel_midden_loading":0,"understory_loading":0,"w_rotten_3_9_loading":0,"w_rotten_9_20_loading":0,"w_rotten_gt20_loading":0,"w_sound_0_quarter_loading":0,"w_sound_1_3_loading":0,"w_sound_3_9_loading":0,"w_sound_9_20_loading":0,"w_sound_gt20_loading":0,"w_sound_quarter_1_loading":0,"w_stump_lightered_loading":0,"w_stump_rotten_loading":0,"w_stump_sound_loading":0,"fuel_lengthOfIgnition":120,"fuel_3MonthHarvest":True,"_id":"","nw_primary_loading":0,"shrubs_secondary_loading":0,"shrubs_secondary_perc_live":0,"nw_primary_perc_live":0,"nw_secondary_perc_live":0,"shrubs_primary_loading":0,"fuelbed_number":0,"nw_secondary_loading":0,"shrubs_primary_perc_live":0}
-}}}    
+}}}
 
 
 # fb 52 with clean 10, dirty 20, vdirty 30 added
 CONFIG_FOR_FB_WITH_PILE_TESTS = {"consumption":{"fuel_loadings":{"foo":{"bar":"baz"},
 "52":{"expertFuelbeds":{"1":{"is_active":True,"Total_available_fuel_loading":93.87,"total_fuels":93.87,"contributed_fuels":11.51,"percent_of_fire":100,"basal_accum_loading":0,"cover_type":118,"duff_lower_depth":0,"duff_lower_loading":0,"duff_upper_depth":1.1,"duff_upper_loading":7.48,"ecoregion":240,"efg_activity":1,"efg_natural":8,"filename":"","fuelbed_name":"","fuelbed_row":1,"fuel_consumptionEquation":"natural","fccs_number":52000000,"ladderfuels_loading":3,"lichen_depth":0.1,"lichen_loading":0.01,"litter_depth":0.7,"litter_loading":1.88,"midstory_loading":2.84,"moss_depth":0.2,"moss_loading":0.04,"overstory_loading":7.52,"pile_clean_loading":10,"pile_dirty_loading":20,"pile_vdirty_loading":30,"shrubs_needledrape_loading":0,"shrubs_herbs_primary_loading":0.59,"shrubs_herbs_primary_perc_live":79.5,"shrubs_herbs_secondary_loading":0.12,"shrubs_herbs_secondary_perc_live":87.5,"snags_c1_foliage_loading":0.26,"snags_c1_wood_loading":0.94,"snags_c1wo_foliage_loading":0,"snags_c2_loading":0.57,"snags_c3_loading":2.15,"squirrel_midden_loading":0,"understory_loading":0.56,"w_rotten_3_9_loading":0.4,"w_rotten_9_20_loading":2.4,"w_rotten_gt20_loading":0,"w_sound_0_quarter_loading":0.4,"w_sound_1_3_loading":0.4,"w_sound_3_9_loading":0.4,"w_sound_9_20_loading":1.1,"w_sound_gt20_loading":0.6,"w_sound_quarter_1_loading":0.9,"w_stump_lightered_loading":0,"w_stump_rotten_loading":0.25,"w_stump_sound_loading":0.22,"fuel_lengthOfIgnition":120,"fuel_3MonthHarvest":True,"_id":"","nw_primary_loading":0.2,"shrubs_secondary_loading":0.11,"shrubs_secondary_perc_live":95,"nw_primary_perc_live":70,"nw_secondary_perc_live":80,"shrubs_primary_loading":0.39,"fuelbed_number":52,"nw_secondary_loading":0.01,"shrubs_primary_perc_live":89},"2":{},"3":{},"4":{},"5":{}},"is_active":True,"Total_available_fuel_loading":93.87,"total_fuels":33.87,"contributed_fuels":11.51,"basal_accum_loading":0,"cover_type":118,"duff_lower_depth":0,"duff_lower_loading":0,"duff_upper_depth":1.1,"duff_upper_loading":7.48,"ecoregion":240,"efg_activity":1,"efg_natural":8,"filename":"FB_0052_FCCS.xml","fuelbed_name":"","fuelbed_row":1,"ladderfuels_loading":3,"lichen_depth":0.1,"lichen_loading":0.01,"litter_depth":0.7,"litter_loading":1.88,"midstory_loading":2.84,"moss_depth":0.2,"moss_loading":0.04,"overstory_loading":7.52,"pile_clean_loading":10,"pile_dirty_loading":20,"pile_vdirty_loading":30,"shrubs_needledrape_loading":0,"snags_c1_foliage_loading":0.26,"snags_c1_wood_loading":0.94,"snags_c1wo_foliage_loading":0,"snags_c2_loading":0.57,"snags_c3_loading":2.15,"squirrel_midden_loading":0,"understory_loading":0.56,"w_rotten_3_9_loading":0.4,"w_rotten_9_20_loading":2.4,"w_rotten_gt20_loading":0,"w_sound_0_quarter_loading":0.4,"w_sound_1_3_loading":0.4,"w_sound_3_9_loading":0.4,"w_sound_9_20_loading":1.1,"w_sound_gt20_loading":0.6,"w_sound_quarter_1_loading":0.9,"w_stump_lightered_loading":0,"w_stump_rotten_loading":0.25,"w_stump_sound_loading":0.22,"fuel_lengthOfIgnition":120,"fuel_3MonthHarvest":True,"_id":"","nw_primary_loading":0.295,"shrubs_secondary_loading":0.06,"shrubs_secondary_perc_live":43.75,"nw_primary_perc_live":39.75,"nw_secondary_perc_live":43.75,"shrubs_primary_loading":0.295,"fuelbed_number":52,"nw_secondary_loading":0.06,"shrubs_primary_perc_live":39.75}
-}}}   
+}}}
 
 
 class fire_failure_manager():
@@ -719,89 +719,89 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
 
     EXPECTED_FIRE52_PILE_ONLY_EMISSIONS = {
         'flaming': {
-            'CO': [3289.7123279999996],
+            'CO': [3289.7123279999996/2000.0],
             'SO2': [0.0],
             'NOx': [0.0],
             'NH3': [0.0],
-            'CH4': [204.90422399999997],
-            'PM2.5': [843.3558],
-            'PM10': [968.2973999999999],
-            'CO2': [214227.366192]
+            'CH4': [204.90422399999997/2000.0],
+            'PM2.5': [843.3558/2000.0],
+            'PM10': [968.2973999999999/2000.0],
+            'CO2': [214227.366192/2000.0]
         },
         'smoldering': {
-            'CO': [1745.211042],
+            'CO': [1745.211042/2000.0],
             'SO2': [0.0],
             'NOx': [0.0],
             'NH3': [0.0],
-            'CH4': [147.65419799999998],
-            'PM2.5': [180.7191],
-            'PM10': [207.49229999999997],
-            'CO2': [41362.987608]
+            'CH4': [147.65419799999998/2000.0],
+            'PM2.5': [180.7191/2000.0],
+            'PM10': [207.49229999999997/2000.0],
+            'CO2': [41362.987608/2000.0]
         },
         'residual': {
-            'CO': [1745.211042],
+            'CO': [1745.211042/2000.0],
             'SO2': [0.0],
             'NOx': [0.0],
             'NH3': [0.0],
-            'CH4': [147.65419799999998],
-            'PM2.5': [180.7191],
-            'PM10': [207.49229999999997],
-            'CO2': [41362.987608]
+            'CH4': [147.65419799999998/2000.0],
+            'PM2.5': [180.7191/2000.0],
+            'PM10': [207.49229999999997/2000.0],
+            'CO2': [41362.987608/2000.0]
         },
         'total': {
-            'CO': [6780.134411999999],
+            'CO': [6780.134411999999/2000.0],
             'SO2': [0.0],
             'NOx': [0.0],
             'NH3': [0.0],
-            'CH4': [500.2126199999999],
-            'PM2.5': [1204.794],
-            'PM10': [1383.282],
-            'CO2': [296953.341408]
+            'CH4': [500.2126199999999/2000.0],
+            'PM2.5': [1204.794/2000.0],
+            'PM10': [1383.282/2000.0],
+            'CO2': [296953.341408/2000.0]
         }
     }
 
     EXPECTED_FIRE_WITH_PILE_EMISSIONS = {
         'flaming': {
-            'CO': [2017.5766060231028],
+            'CO': [28.02388002310301],
             'SO2': [0.39522236726530535],
             'NOx': [0.5140925],
             'NH3': [0.32721800000000006],
-            'CH4': [125.21894334488888],
-            'PM2.5': [749.2525206441915],
-            'PM10': [885.073146],
-            'CO2': [130119.88782852919]
+            'CH4': [1.296935344888901],
+            'PM2.5': [4.3351656441915525],
+            'PM10': [6.662571000000001],
+            'CO2': [559.4284645291991]
         },
         'smoldering': {
-            'CO': [1182.7471603486872],
+            'CO': [127.2781588486871],
             'SO2': [1.5593568283333363],
             'NOx': [0.97118925],
             'NH3': [1.6569200000000002],
-            'CH4': [96.19028430348753],
-            'PM2.5': [177.455671735337],
-            'PM10': [206.992365],
-            'CO2': [26454.32683559619]
+            'CH4': [6.891955803487535],
+            'PM2.5': [17.830524235337002],
+            'PM10': [18.761527500000003],
+            'CO2': [1438.8128495961935]
         },
         'residual': {
-            'CO': [1055.997],
+            'CO': [0.5279985],
             'SO2': [0.0],
             'NOx': [0.0],
             'NH3': [0.0],
-            'CH4': [89.34299999999999],
-            'PM2.5': [159.705],
-            'PM10': [188.325],
-            'CO2': [25028.028]
+            'CH4': [0.044671499999999996],
+            'PM2.5': [0.0798525],
+            'PM10': [0.0941625],
+            'CO2': [12.514014]
         },
         'total': {
-            'CO': [4256.32076637179],
+            'CO': [155.83003737179013],
             'SO2': [1.9545791955986418],
             'NOx': [1.4852817500000002],
             'NH3': [1.9841380000000002],
-            'CH4': [310.7522276483764],
-            'PM2.5': [1086.4131923795287],
-            'PM10': [1280.390511],
-            'CO2': [181602.24266412537]
+            'CH4': [8.233562648376434],
+            'PM2.5': [22.245542379528555],
+            'PM10': [25.518261000000003],
+            'CO2': [2010.7553281253925]
         }
-    }   
+    }
 
     SPECIES = ['CH4','CO','CO2','NH3','NOx','PM10','PM2.5','SO2','VOC']
 
@@ -844,19 +844,19 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         assert 'emissions_details' in self.fires_with_piles_only[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         assert 'emissions_details' in self.fires_with_piles_only[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
 
-        # first fire 
+        # first fire
         ed1 = self.fires_with_piles_only[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions_details']
         em1 = self.fires_with_piles_only[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions']
         # second fire
         ed2 = self.fires_with_piles_only[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions_details']
         em2 = self.fires_with_piles_only[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions']
 
-        ## check first fire... 
+        ## check first fire...
         assert ed1['summary']['total']['flaming']['PM2.5'][0] == em1['flaming']['PM2.5'][0]
         assert ed1['summary']['total']['smoldering']['PM2.5'][0] == em1['smoldering']['PM2.5'][0]
         assert ed1['summary']['total']['residual']['PM2.5'][0] == em1['residual']['PM2.5'][0]
         assert ed1['summary']['total']['total']['PM2.5'][0] == em1['total']['PM2.5'][0]
-        
+
         # since the only loadings are piles, the woody fuels and piles emissions should match total emissions
         assert ed1['summary']['woody fuels']['flaming']['PM2.5'][0] == em1['flaming']['PM2.5'][0]
         assert ed1['summary']['woody fuels']['smoldering']['PM2.5'][0] == em1['smoldering']['PM2.5'][0]
@@ -871,12 +871,12 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         assert ed2['summary']['total']['smoldering']['PM2.5'][0] == em2['smoldering']['PM2.5'][0]
         assert ed2['summary']['total']['residual']['PM2.5'][0] == em2['residual']['PM2.5'][0]
         assert ed2['summary']['total']['total']['PM2.5'][0] == em2['total']['PM2.5'][0]
-        
+
         # since the only loadings are piles, the woody fuels and piles emissions should match total emissions
         assert ed2['summary']['woody fuels']['flaming']['PM2.5'][0] == em2['flaming']['PM2.5'][0]
         assert ed2['summary']['woody fuels']['smoldering']['PM2.5'][0] == em2['smoldering']['PM2.5'][0]
         assert ed2['summary']['woody fuels']['residual']['PM2.5'][0] == em2['residual']['PM2.5'][0]
-        
+
         assert ed2['woody fuels']['piles']['flaming']['PM2.5'][0] == em2['flaming']['PM2.5'][0]
         assert ed2['woody fuels']['piles']['smoldering']['PM2.5'][0] == em2['smoldering']['PM2.5'][0]
         assert ed2['woody fuels']['piles']['residual']['PM2.5'][0] == em2['residual']['PM2.5'][0]
@@ -884,9 +884,9 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         # 0 = fb 52 with piles, all other loadings zero
         # 1 = fb 53 with piles, all other loadings zero
         # 2 = fb 0 with piles, all other loadings zero
-        # expect (pile) emissions for all to be the same... regardless of fuelbed number 
+        # expect (pile) emissions for all to be the same... regardless of fuelbed number
         # because the calculation is done using consume.Emissions which has pile EF (which apply to all fuelbeds)
-        # if the piles are calculated in EmissionsCalculator, then the emissions would be different 
+        # if the piles are calculated in EmissionsCalculator, then the emissions would be different
         self._check_emissions(self.EXPECTED_FIRE52_PILE_ONLY_EMISSIONS,
             self.fires_with_piles_only[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
         self._check_emissions(self.EXPECTED_FIRE52_PILE_ONLY_EMISSIONS,
@@ -906,14 +906,14 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         ed = self.fires_with_piles[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions_details']
         em = self.fires_with_piles[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions']
 
-        # check that the emissions details match the emissions 
+        # check that the emissions details match the emissions
         assert ed['summary']['total']['flaming']['PM10'][0] == em['flaming']['PM10'][0]
         assert ed['summary']['total']['flaming']['CO2'][0] == em['flaming']['CO2'][0]
         assert ed['summary']['total']['flaming']['SO2'][0] == em['flaming']['SO2'][0]
         assert ed['summary']['total']['flaming']['NH3'][0] == em['flaming']['NH3'][0]
         assert ed['summary']['total']['flaming']['NOx'][0] == em['flaming']['NOx'][0]
         assert ed['summary']['total']['flaming']['CO'][0] == em['flaming']['CO'][0]
-        assert ed['summary']['total']['flaming']['CH4'][0] == em['flaming']['CH4'][0]        
+        assert ed['summary']['total']['flaming']['CH4'][0] == em['flaming']['CH4'][0]
         assert ed['summary']['total']['flaming']['PM2.5'][0] == em['flaming']['PM2.5'][0]
 
         assert ed['summary']['total']['smoldering']['PM2.5'][0] == em['smoldering']['PM2.5'][0]
@@ -923,7 +923,7 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         # 0 = fb 52 with piles
         self._check_emissions(self.EXPECTED_FIRE_WITH_PILE_EMISSIONS,
             self.fires_with_piles[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
- 
+
 class TestConsumeEmissions(BaseEmissionsTest):
 
     EXPECTED_FIRE1_EMISSIONS = {

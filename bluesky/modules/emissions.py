@@ -296,7 +296,6 @@ class PrichardOneill(EmissionsBase):
                                 config_fuel_loadings = Config().get('consumption','fuel_loadings')[fb['fccs_id']]
                                 fb['emissions_fuel_loadings'] = config_fuel_loadings
                                 e = consume.Emissions(fuel_consumption_object=fc)
-                                e.output_units = 'tons'
 
                                 pile_black_pct = (fc._settings.get('pile_black_pct') * 0.01)
                                 config_fuel_loadings_df = pd.DataFrame([config_fuel_loadings])
@@ -306,14 +305,15 @@ class PrichardOneill(EmissionsBase):
                                 (pile_co, pile_co2, pile_ch4, pile_nmhc, pile_nmoc, pile_nh3, pile_no, pile_no2, pile_nox, pile_so2) = \
                                     e._emissions_calc_pollutants_piles(pile_loadings, pile_black_pct)
 
-                                self.add_pile_emissions(fb, 'PM2.5', pile_pm25)
-                                self.add_pile_emissions(fb, 'PM10', pile_pm10)
-                                self.add_pile_emissions(fb, 'CO', pile_co)
-                                self.add_pile_emissions(fb, 'CO2', pile_co2)
-                                self.add_pile_emissions(fb, 'CH4', pile_ch4)
-                                self.add_pile_emissions(fb, 'NH3', pile_nh3)
-                                self.add_pile_emissions(fb, 'NOx', pile_nox)
-                                self.add_pile_emissions(fb, 'SO2', pile_so2)
+                                # EF are lbs/ton consumed (example: pm2.5 is 13.5lbs/ton), so we need to divide by 2000.0 to get tons
+                                self.add_pile_emissions(fb, 'PM2.5', pile_pm25/2000.0)
+                                self.add_pile_emissions(fb, 'PM10', pile_pm10/2000.0)
+                                self.add_pile_emissions(fb, 'CO', pile_co/2000.0)
+                                self.add_pile_emissions(fb, 'CO2', pile_co2/2000.0)
+                                self.add_pile_emissions(fb, 'CH4', pile_ch4/2000.0)
+                                self.add_pile_emissions(fb, 'NH3', pile_nh3/2000.0)
+                                self.add_pile_emissions(fb, 'NOx', pile_nox/2000.0)
+                                self.add_pile_emissions(fb, 'SO2', pile_so2/2000.0)
 
 
     def add_pile_emissions(self, fb, pollutant, pile_fsrt_emissions):
