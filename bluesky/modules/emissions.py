@@ -306,14 +306,15 @@ class PrichardOneill(EmissionsBase):
                                     e._emissions_calc_pollutants_piles(pile_loadings, pile_black_pct)
 
                                 # EF are lbs/ton consumed (example: pm2.5 is 13.5lbs/ton), so we need to divide by 2000.0 to get tons
-                                self.add_pile_emissions(fb, 'PM2.5', pile_pm25/2000.0)
-                                self.add_pile_emissions(fb, 'PM10', pile_pm10/2000.0)
-                                self.add_pile_emissions(fb, 'CO', pile_co/2000.0)
-                                self.add_pile_emissions(fb, 'CO2', pile_co2/2000.0)
-                                self.add_pile_emissions(fb, 'CH4', pile_ch4/2000.0)
-                                self.add_pile_emissions(fb, 'NH3', pile_nh3/2000.0)
-                                self.add_pile_emissions(fb, 'NOx', pile_nox/2000.0)
-                                self.add_pile_emissions(fb, 'SO2', pile_so2/2000.0)
+                                # (lbs/acre)(tons/2000lbs)(acres) = tons
+                                self.add_pile_emissions(fb, 'PM2.5', (pile_pm25/2000.0)*area)
+                                self.add_pile_emissions(fb, 'PM10', (pile_pm10/2000.0)*area)
+                                self.add_pile_emissions(fb, 'CO', (pile_co/2000.0)*area)
+                                self.add_pile_emissions(fb, 'CO2', (pile_co2/2000.0)*area)
+                                self.add_pile_emissions(fb, 'CH4', (pile_ch4/2000.0)*area)
+                                self.add_pile_emissions(fb, 'NH3', (pile_nh3/2000.0)*area)
+                                self.add_pile_emissions(fb, 'NOx', (pile_nox/2000.0)*area)
+                                self.add_pile_emissions(fb, 'SO2', (pile_so2/2000.0)*area)
 
 
     def add_pile_emissions(self, fb, pollutant, pile_fsrt_emissions):
