@@ -709,3 +709,6 @@
 
 ## 4.6.8
  - Fix units bug in piles emissions
+
+## 4.6.9
+ - Fix piles emissions calculation
