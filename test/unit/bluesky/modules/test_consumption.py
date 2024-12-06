@@ -230,7 +230,7 @@ class TestConsumptionRunFire():
         fm = fires.FiresManager()
         fm.add_fires(FIRES_WITH_PILES_ONLY)
         consumption.run(fm)
-        assert len(fm.fires) == 2
+        assert len(fm.fires) == 1
         # check total fuel loading values
         assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['fuel_loadings']['total_available_fuel_loading'] == 100
         assert fm.fires[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][1]['fuel_loadings']['total_available_fuel_loading'] == 10
