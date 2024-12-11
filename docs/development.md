@@ -74,11 +74,8 @@ profile a run by using `bsp`'s `--profile-output-file` option.
 
 ## How to debug tests in VSCode
 
-cd repos/uw/bluesky  
-bluesky % docker build  -t bluesky .   
-
-In VSCode, open the bluesky folder, click on Debug icon (left side), add "python debugger, remote attach"  
-Will generate launch.json that looks similar to this... add port and justMyCode settings.   
+In VSCode, open the bluesky folder, click on the Debug icon (left side), and
+add "python debugger, remote attach". This will generate a launch.json that looks similar to the following after adding `port` and `justMyCode` settings.
 
     {
         // Use IntelliSense to learn about possible attributes.
@@ -105,18 +102,18 @@ Will generate launch.json that looks similar to this... add port and justMyCode 
         ]
     }
 
-Add breakpoints to unit tests or other code in VSCode.  
-Use this command to start docker with port 5678 expoed, and pause until the debugger is connected.  
-note: I had to change py.test to "pytest".  
-change "$HOME/repos/uw/bluesky/" to match where your source code is located on local machine
+Add breakpoints to the unit tests or other code in VSCode. Use this command to
+run docker with port 5678 exposed, and pause until the debugger is connected.
+Change "$HOME/code/pnwairfire-bluesky/" to match where your source code is
+located on your local machine
 
     docker run --rm -ti --user bluesky \
-        -v $HOME/repos/uw/bluesky/:/bluesky/ \
+        -v $HOME/code/pnwairfire-bluesky/:/bluesky/ \
         -p 5678:5678 \
         -e PYTHONPATH=/bluesky/ \
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         bluesky python3 -m debugpy --wait-for-client --listen 0.0.0.0:5678 -m pytest --disable-pytest-warnings
 
-In VSCode, click the debug icon, then click the green triangle to "run and debug". The tests will start running and the output will be displayed in the debug console of VSCode. The breakpoints should work.  
-
-
+In VSCode, click the debug icon, then click the green triangle to "run and debug".
+The tests will start running and the output will be displayed in the debug console of
+VSCode. The breakpoints should work.
