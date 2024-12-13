@@ -58,6 +58,44 @@ fire = Fire({
     ]
 })
 
+fire_w_hand_piles = Fire({
+    'type': "rx",
+    "activity":  [
+        {
+            "active_areas": [
+                {
+                    "start": "2018-06-27T00:00:00",
+                    "end": "2018-06-28T00:00:00",
+                    "utc_offset": "-07:00",
+                    "ecoregion": "western",
+                    "specified_points": [
+                        {
+                            'area': 50.4,
+                            'lat': 45.632,
+                            'lng': -120.362,
+                            "piles": {
+                                "pile_type": "Hand",
+                                "number_of_piles": 10,
+                                "shape": "HalfSphere",
+                                "h1": 1,
+                                "percent_consumed":90,
+                                "pile_composition": "Conifer"
+                            },
+                            "fuelbeds": [
+                                {
+                                    "fccs_id": "52",
+                                    "pct": 100.0
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+})
+
+
 def check_consumption(actual, expected):
     assert set(expected.keys()) == set(actual.keys())
     for c in expected:
@@ -151,3 +189,22 @@ class TestConsumptionRunFire():
         }
 
         check_consumption(fb['consumption'], expected_consumption)
+
+    def test_fire_with_hand_piles(self):
+        set_old_consume_defaults()
+
+        fuel_loadings_manager = FuelLoadingsManager()
+        consumption._run_fire(fire_w_hand_piles, fuel_loadings_manager)
+
+        fb = fire_w_hand_piles['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
+
+        expectedConsumedMass = 0.1018872143886993
+        assert_approx_equal(fb['consumption']['summary']['total']['total'][0], expectedConsumedMass)
+        assert_approx_equal(fb['consumption']['summary']['woody fuels']['total'][0], expectedConsumedMass)
+        assert_approx_equal(fb['consumption']['woody fuels']['piles']['total'][0], expectedConsumedMass)
+
+        for k in fb['fuel_loadings']:
+            if k != 'pile_clean_loading':
+                assert fb['fuel_loadings'][k] == 0
+            else:
+                assert_approx_equal(fb['fuel_loadings'][k], expectedConsumedMass)
