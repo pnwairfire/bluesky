@@ -197,7 +197,10 @@ def get_piles_fuel_loadings_manager(loc):
     try:
         consumed_per_acre = {k: 0 for k in FuelLoadingsManager.FUEL_LOADINGS_KEY_MAPPINGS.values()}
 
-        for p in loc['piles']:
+        # support either array of piles or single piles dict
+        piles = loc['piles'] if hasattr(loc['piles'], 'append') else [loc['piles']]
+
+        for p in piles:
             if p.get('unit_system') and p['unit_system'] != 'English':
                 raise ValueError('Only English unit supported for piles')
             p['unit_system'] = 'English'
