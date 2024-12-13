@@ -72,10 +72,11 @@ profile a run by using `bsp`'s `--profile-output-file` option.
         -e PATH=/bluesky/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         bluesky bsp --profile-output-file ...
 
+
 ## How to debug tests in VSCode
 
 In VSCode, open the bluesky folder, click on the Debug icon (left side), and
-add "python debugger, remote attach". This will generate a launch.json that looks similar to the following after adding `port` and `justMyCode` settings.
+add "python debugger, remote attach". This will generate a `launch.json` that looks similar to the following after adding `port` and `justMyCode` settings.
 
     {
         // Use IntelliSense to learn about possible attributes.

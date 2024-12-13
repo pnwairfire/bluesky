@@ -3,10 +3,11 @@
 __author__ = "Joel Dubowy"
 
 import itertools
+import io
+import json
 import logging
 import re
-import io
-
+import subprocess
 from contextlib import redirect_stdout
 
 import consume
@@ -84,9 +85,17 @@ def _run_fire(fire, fuel_loadings_manager):
 
             season = datetimeutils.season_from_date(aa.get('start'))
             for loc in aa.locations:
+                # If this location has piles, we'll get a piles specific fuel
+                # loadings manager to pass into consume. These fuel loadings will
+                # be the same for each fuelbed, so create them once and then
+                # create a
+                _fuel_loadings_manager = (get_piles_fuel_loadings_manager(loc)
+                    if loc.get('piles') else fuel_loadings_manager)
+
                 for fb in loc['fuelbeds']:
-                    _run_fuelbed(fb, loc, fuel_loadings_manager, season,
+                    _run_fuelbed(fb, loc, _fuel_loadings_manager, season,
                         burn_type, fire_type)
+
                 # scale with estimated consumption or fuel load, if specified
                 # and if configured to do so
                 (_scale_with_estimated_consumption(loc)
@@ -161,6 +170,56 @@ def _scale_with_estimated_fuelload(loc):
     loc['input_est_fuelload_scale_factor'] = scale_factor
 
     return True
+
+def get_piles_fuel_loadings_manager(loc):
+    """For piles, we call the pile calculator to get mass consumed.  We then
+    pass this value into CONSUME to break it out into phase specific values.
+    The actual mechanism for passing this value into consume is via custom
+    per-acre fuel loadings.
+
+    Note that we could alternatively create the fuel loadings based on the pile
+    mass (as opposed to mass consumed), and set pile_blackened_pct to
+    """
+
+    consumed_per_acre = {k: 0 for k in FuelLoadingsManager.FUEL_LOADINGS_KEY_MAPPINGS.values()}
+
+    for p in loc['piles']:
+        if p.get('unit_system') and p['unit_system'] != 'English':
+            raise ValueError('Only English unit supported for piles')
+        p['unit_system'] = 'English'
+
+        pile_type = p.pop('pile_type', None)
+        if pile_type not in ('Hand', 'Machine'):
+            raise ValueError("Pile type ('Hand' or 'Machine') must be specified")
+
+        args = ['piles-calc', pile_type] + list(itertools.chain.from_iterable(
+            [['--'+ k.replace('_','-'), str(p[k])] for k in p]))
+        try:
+            output_json = subprocess.check_output(args,
+                stderr=subprocess.STDOUT, universal_newlines=True)
+        except Exception as e:
+            logging.error(f'Failed to calculate pile mass: {e}')
+            # TODO: ignore if configured to do so ?
+            raise e
+
+        output = json.loads(output_json)
+
+        # The piles loadings keys are 'pile_clean_loading',
+        #  'pile_dirty_loading', and 'pile_vdirty_loading'
+        quality = p.get('pile_quality', 'Clean').lower().replace('verydirty', 'vdirty')
+        key = f"pile_{quality}_loading"
+        consumed_per_acre[key] += output['consumedMass'] / loc['area']
+
+    # the piles calculator already takes into account percent consumed,
+    # so we can just set pile_blackened_pct to 100
+    # TODO: should we instead set `percentConsumed` to 100 in the call
+    #   to `piles-calc` and then set `pile_blackened_pct` to `percentConsumed` ?
+    loc['pile_blackened_pct'] = 100
+
+    return FuelLoadingsManager(all_fuel_loadings={
+        fb['fccs_id']: consumed_per_acre for fb in loc['fuelbeds']
+    })
+
 
 def _run_fuelbed(fb, location, fuel_loadings_manager, season,
         burn_type, fire_type):

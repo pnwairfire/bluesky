@@ -88,6 +88,40 @@ objects, or directly under the parent 'active_areas' object
  - ***['fires'] > 'type'*** -- *optional* -- fire type ('rx' vs. 'wildfire'); default: 'wildfire'
  - ***['fires'] > 'fuel_type'*** -- *optional* -- fuel type ('natural', 'activity', or 'piles'); default: 'natural'
 
+
+Piles:
+
+There can be multiple sets of piles specified for each specified point or perimeter.
+Each set is defined by the following parameters.
+See https://research.fs.usda.gov/pnw/products/dataandtools/tools/piled-fuels-biomass-and-emissions-calculator
+for more information about input parameters for pile mass calculations.
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'number_of_piles'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'shape'*** -- *required* -- options: 'HalfSphere', 'Paraboloid', 'HalfCylinder', 'HalfFrustumOfCone', 'HalfFrustumOfConeWithRoundedEnds', 'HalfEllipsoidIrregularSolid', or 'Irregular'
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'h1'*** -- *required for some shapes* -- height 1
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'h2'*** -- *required for some shapes* -- height 2
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'w1'*** -- *required for some shapes* -- width 1
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'w2'*** -- *required for some shapes* -- width 2
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'l1'*** -- *required for some shapes* -- length 1
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'l2'*** -- *required for some shapes* -- length 2
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'percent_consumed'*** -- *required* -- percent of pile that's expected to be consumed
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'pile_type'*** -- *required* -- Options: 'Hand' or 'Machine'
+
+Hand piles only:
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'pile_composition'*** -- *required* -- Options: Conifer' or 'ShrubHardwood'
+
+Machine piles only:
+
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'soil_percent'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'packing_ratio_percent'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'primary_species_density'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'primary_species_percent'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'secondary_species_density'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'secondary_species_percent'*** -- *required* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['piles'] > 'pile_quality'*** -- *required* -- Options: 'Clean', 'Dirty', or 'VeryDirty'
+
+
 ###### if an 'rx' burn:
 
 The following can be defined either under 'specified_points' or 'perimeter'
@@ -199,7 +233,7 @@ other fields
  - ***['fires'] > 'type'*** -- *optional* --
  - ***['fires'] > 'event_of' > 'name'*** -- *optional* --
  - ***['fires'] > 'event_of' > 'id'*** -- *optional* --
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['fuelbeds'[] > 'emissions'*** -- *optional* --
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['fuelbeds'] > 'emissions'*** -- *optional* --
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['fuelbeds'] > 'fccs_id'*** -- *optional* --
  - ***['fires'] > ['activity'] > ['active_areas'] > 'start'*** -- *required* --
  - ***'run_id'*** -- *optional* -- guid or other identifer to be used as output directory name; if not defined, generates new guid

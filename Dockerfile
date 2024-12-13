@@ -112,6 +112,9 @@ RUN pip3 install --break-system-packages -c constraints.txt -r requirements-dev.
 COPY requirements.txt /tmp/bluesky/requirements.txt
 RUN pip3 install --break-system-packages -c constraints.txt --no-binary gdal -r requirements.txt
 
+RUN apt-get update && apt install -y nodejs npm
+RUN npm install -g @pnwairfire/piles-calculator@1.0.1
+
 # Install binary dependencies - for localmet, plumerise,
 # dipersion, and visualization
 COPY bin/feps_emissions /usr/local/bin/feps_emissions
