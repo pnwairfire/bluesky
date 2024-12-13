@@ -89,10 +89,15 @@ objects, or directly under the parent 'active_areas' object
  - ***['fires'] > 'fuel_type'*** -- *optional* -- fuel type ('natural', 'activity', or 'piles'); default: 'natural'
 
 
-Piles:
+###### Piles:
 
-There can be multiple sets of piles specified for each specified point or perimeter.
-Each set is defined by the following parameters.
+There can be multiple sets of piles defined for each specified point or
+perimeter.  Any given specified point or perimeter must be all piles
+or all natural vegetation.  So, if the actual location has both, it must be
+specified in the bluesky input as two separate locations (specified points
+or perimeters).
+
+Each set of piles is defined by the following parameters.
 See https://research.fs.usda.gov/pnw/products/dataandtools/tools/piled-fuels-biomass-and-emissions-calculator
 for more information about input parameters for pile mass calculations.
 

@@ -165,6 +165,7 @@ The following settings apply to filtering on any field (other than 'area') in th
  - ***'config' > 'consumption' > 'scale_with_estimated_fuelload'*** -- *optional* -- If set to true and if the estimated fuel load per acre is defined for the location (field `input_est_fuelload_tpa` in specified point or perimeter), then the modeled fuel load and consumption values are all scaled by `input_est_fuelload_tpa \ <modeled fuel load per acre for that location>`
  - ***'config' > 'consumption' > 'scale_with_estimated_consumption'*** -- *optional* -- If set to true and if the estimated consumption per acre is defined for the location (field `input_est_consumption_tpa` in specified point or perimeter), then the modeled consumption values are all scaled by `input_est_consumption_tpa \ <modeled consumption per acre for that location>`
  - ***'config' > 'consumption' > 'summarize_fuel_loadings'*** -- *optional* -- default false; whether or not to summarize/aggregate fuel loadings across fuelbeds, locations, etc.
+ - ***'config' > 'consumption' > ' use_default_loadings_on_failure'*** -- *optional* -- when piles calculator fails, ignore piles parameters specified under a location's `"piles"` key and use default fuel loadings
 
 The following consume_settings fields define what defaults to use when the
 field isn't defined in a fire's activity object (or in its localmet data, if
