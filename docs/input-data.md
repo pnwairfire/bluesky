@@ -58,7 +58,7 @@ Other fields
 
 ##### consumption
 
- - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuelbeds'*** -- *required* -- array of fuelbeds objects, each containing 'fccs_id' and 'pct'
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'fuelbeds'*** -- *required* -- array of fuelbeds objects, each containing 'fccs_id' (string) and 'pct'
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'area'*** -- *required* -- fire's total area
  - ***['fires'] > ['activity'] > ['active_areas'] > 'ignition_start'*** -- *required* --
  - ***['fires'] > ['activity'] > ['active_areas'] > 'ignition_end'*** -- *required* --
@@ -85,6 +85,7 @@ objects, or directly under the parent 'active_areas' object
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'sound_cwd_pct_available'*** -- *optional* -- default: 100
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'rotten_cwd_pct_available'*** -- *optional* -- default: 100
  - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > 'output_units'*** -- *optional* -- default: "tons_ac"
+ - ***['fires'] > ['activity'] > ['active_areas'] > ['specified_points'] | 'perimeter' > ['fuelbeds'] > 'fuel_loadings*** -- *optional* -- fuel loadings, in tons, for one specific fuelbed object (not necessary for other fuelbed objects with the same `fccs_id`)
  - ***['fires'] > 'type'*** -- *optional* -- fire type ('rx' vs. 'wildfire'); default: 'wildfire'
  - ***['fires'] > 'fuel_type'*** -- *optional* -- fuel type ('natural', 'activity', or 'piles'); default: 'natural'
 

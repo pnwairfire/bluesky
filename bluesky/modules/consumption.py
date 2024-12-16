@@ -89,12 +89,17 @@ def _run_fire(fire, fuel_loadings_manager):
                 # loadings manager to pass into consume. These fuel loadings will
                 # be the same for each fuelbed, so create them once and then
                 # create a
-                _fuel_loadings_manager = (
+                loc_fuel_loadings_manager = (
                     get_piles_fuel_loadings_manager(loc) or fuel_loadings_manager
                 )
 
                 for fb in loc['fuelbeds']:
-                    _run_fuelbed(fb, loc, _fuel_loadings_manager, season,
+                    fb_area = loc['area'] * (fb['pct'] / 100)
+                    fb_fuel_loadings_manager = FuelLoadingsManager(all_fuel_loadings={
+                        fb['fccs_id']: { k: v / fb_area for k, v in fb['fuel_loadings'].items() }
+                    }) if fb.get('fuel_loadings') else loc_fuel_loadings_manager
+
+                    _run_fuelbed(fb, loc, fb_fuel_loadings_manager, season,
                         burn_type, fire_type)
 
                 # scale with estimated consumption or fuel load, if specified
