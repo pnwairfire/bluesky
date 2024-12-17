@@ -67,9 +67,11 @@ def run(fires_manager):
 def _run_fire(fire, fuel_loadings_manager):
     logging.debug("Consume consumption - fire {}".format(fire.id))
 
+    # Piles can now be specified at location scope (per specified point
+    # or perimeter), but top level 'fuel_type', can't be 'piles'
     # TODO: set burn type to 'activity' if fire.fuel_type == 'piles' ?
     if fire.fuel_type == 'piles':
-        raise ValueError("Consume can't be used for fuel type 'piles'")
+        raise ValueError("Fuel type 'piles' not supported. Specify piles per specified point or perimeter")
     burn_type = fire.fuel_type
     fire_type = fire.type
 

@@ -247,7 +247,7 @@ class PrichardOneill(EmissionsBase):
                             "Missing FCCS Id required for computing emissions")
                     lookup = self._get_lookup_object(fire, fb)
 
-                    # use EmissionsCalculator (emitCalc) for non-pile emissions
+                    # use EmissionsCalculator (emitcalc) for non-pile emissions
                     # if a fb has piles, remove them, so EmissionsCalculator
                     #  doesn't calculate them.
                     if 'woody fuels' in fb["consumption"]:
