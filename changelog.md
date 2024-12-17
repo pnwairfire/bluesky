@@ -712,3 +712,8 @@
 
 ## 4.6.9
  - Fix piles emissions calculation
+
+## 4.6.10
+ - Update consumption module to support piles
+ - Support specifying fuel loadings (in tons) per fuelbed object
+ - Make sure fccs_id's are strings in fuelbed objects
