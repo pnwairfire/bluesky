@@ -181,17 +181,15 @@ def get_piles_fuel_loadings_manager(loc):
     """If piles related fields are defined for this location, this method
     returns fuel loadings specific for the described piles.
 
-    For piles, we call the pile calculator to get mass consumed.  We then
-    pass this value into CONSUME to break it out into phase specific values.
-    The actual mechanism for passing this value into consume is via custom
-    per-acre fuel loadings.
+    For piles, we call the pile calculator to get pile mass and mass consumed.
+    We compute mass per acre and pass it into consume via custom fuel loadings.
+    We use the total mass consumed and pile mass values to compute
+    `pile_blackened_pct`, which is also passed into CONSUME.  The reason for
+    using CONSUME, rather than just directly using the consumption value
+    returned by the piles calculator, is to get phase specific values.
 
-    Note that we could alternatively create the fuel loadings based on the pile
-    mass (as opposed to mass consumed), and set pile_blackened_pct to
-    loc['piles']['percent_consumed'].
-
-    Also note that, if loc['piles'] is defined, the location is assumed to
-    have *only* piles.  If the actual location has both piles and natural
+    Note that, if loc['piles'] is defined, the location is assumed to have
+    *only* piles.  If the actual physical location has both piles and natural
     fuels, they need to be specified as two different locations (specified
     points or perimeters) in the bluesky input data.
     """
@@ -200,7 +198,8 @@ def get_piles_fuel_loadings_manager(loc):
         return None
 
     try:
-        consumed_per_acre = {k: 0 for k in FuelLoadingsManager.FUEL_LOADINGS_KEY_MAPPINGS.values()}
+        totals = { 'mass': 0, 'consumed': 0 } # to compute overall pct consumed
+        mass_per_acre = {k: 0 for k in FuelLoadingsManager.FUEL_LOADINGS_KEY_MAPPINGS.values()}
 
         # support either array of piles or single piles dict
         piles = loc['piles'] if hasattr(loc['piles'], 'append') else [loc['piles']]
@@ -224,17 +223,20 @@ def get_piles_fuel_loadings_manager(loc):
             #  'pile_dirty_loading', and 'pile_vdirty_loading'
             quality = p.get('pile_quality', 'Clean').lower().replace('verydirty', 'vdirty')
             key = f"pile_{quality}_loading"
-            consumed_per_acre[key] += output['consumedMass'] / loc['area']
+            mass_per_acre[key] += output['pileMass'] / loc['area']
+            totals['mass'] += output['pileMass']
+            totals['consumed'] += output['consumedMass']
 
         # the piles calculator already takes into account percent consumed,
         # so we can just set pile_blackened_pct to 100
         # TODO: should we instead set `percentConsumed` to 100 in the call
         #   to `piles-calc` and then set `pile_blackened_pct` to `percentConsumed` ?
-        loc['pile_blackened_pct'] = 100
+        loc['pile_blackened_pct'] = 100 * (totals['consumed'] / totals['mass'])
 
         return FuelLoadingsManager(all_fuel_loadings={
-            fb['fccs_id']: consumed_per_acre for fb in loc['fuelbeds']
+            fb['fccs_id']: mass_per_acre for fb in loc['fuelbeds']
         })
+
     except Exception as e:
         logging.error(f'Failed to calculate pile mass: {e}')
         if not Config().get('consumption', 'piles', 'use_default_loadings_on_failure'):

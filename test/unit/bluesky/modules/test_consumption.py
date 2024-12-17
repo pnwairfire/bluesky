@@ -190,6 +190,7 @@ class TestConsumptionRunFire():
 
         check_consumption(fb['consumption'], expected_consumption)
 
+
     def test_fire_with_hand_piles(self):
         set_old_consume_defaults()
 
@@ -203,8 +204,9 @@ class TestConsumptionRunFire():
         assert_approx_equal(fb['consumption']['summary']['woody fuels']['total'][0], expectedConsumedMass)
         assert_approx_equal(fb['consumption']['woody fuels']['piles']['total'][0], expectedConsumedMass)
 
+        expectedMass = 0.11320801598744366
         for k in fb['fuel_loadings']:
             if k != 'pile_clean_loading':
                 assert fb['fuel_loadings'][k] == 0
             else:
-                assert_approx_equal(fb['fuel_loadings'][k], expectedConsumedMass)
+                assert_approx_equal(fb['fuel_loadings'][k], expectedMass)
