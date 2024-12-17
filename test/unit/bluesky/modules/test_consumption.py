@@ -95,6 +95,60 @@ fire_w_hand_piles = Fire({
     ]
 })
 
+fire_w_multiple_piles = Fire({
+    'type': "rx",
+    "activity":  [
+        {
+            "active_areas": [
+                {
+                    "start": "2018-06-27T00:00:00",
+                    "end": "2018-06-28T00:00:00",
+                    "utc_offset": "-07:00",
+                    "ecoregion": "western",
+                    "specified_points": [
+                        {
+                            'area': 50.4,
+                            'lat': 45.632,
+                            'lng': -120.362,
+                            "piles": [
+                                {
+                                    "pile_type": "Hand",
+                                    "number_of_piles": 10,
+                                    "shape": "HalfSphere",
+                                    "h1": 5,
+                                    "percent_consumed":90,
+                                    "pile_composition": "Conifer"
+                                },
+                                {
+                                    "pile_type": "Machine",
+                                    "number_of_piles": 15,
+                                    "shape": "Paraboloid",
+                                    "h1": 4,
+                                    "w1": 5,
+                                    "percent_consumed":85,
+                                    "soil_percent": 10,
+                                    "packing_ratio_percent": 90,
+                                    "primary_species_density": 20,
+                                    "primary_species_percent": 90,
+                                    "secondary_species_density": 3,
+                                    "secondary_species_percent": 10,
+                                    "pile_quality": "Dirty"
+                                }
+                            ],
+                            "fuelbeds": [
+                                {
+                                    "fccs_id": "52",
+                                    "pct": 100.0
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+})
+
 
 def check_consumption(actual, expected):
     assert set(expected.keys()) == set(actual.keys())
@@ -210,3 +264,26 @@ class TestConsumptionRunFire():
                 assert fb['fuel_loadings'][k] == 0
             else:
                 assert_approx_equal(fb['fuel_loadings'][k], expectedMass)
+
+
+    def test_fire_with_multiple_piles(self):
+        set_old_consume_defaults()
+
+        fuel_loadings_manager = FuelLoadingsManager()
+        consumption._run_fire(fire_w_multiple_piles, fuel_loadings_manager)
+
+        fb = fire_w_multiple_piles['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
+
+        # clear + dirty
+        expectedConsumedMass =  3.39037447412042 + 3.7108737861128693
+        assert_approx_equal(fb['consumption']['summary']['total']['total'][0], expectedConsumedMass)
+        assert_approx_equal(fb['consumption']['summary']['woody fuels']['total'][0], expectedConsumedMass)
+        assert_approx_equal(fb['consumption']['woody fuels']['piles']['total'][0], expectedConsumedMass)
+
+        for k in fb['fuel_loadings']:
+            if k == 'pile_clean_loading':
+                assert_approx_equal(fb['fuel_loadings'][k], 3.7670827490226886)
+            elif k == 'pile_dirty_loading':
+                assert_approx_equal(fb['fuel_loadings'][k], 4.365733866015141)
+            else:
+                assert fb['fuel_loadings'][k] == 0
