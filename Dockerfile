@@ -69,6 +69,9 @@ RUN apt-get update \
         openmpi-bin \
         openmpi-common
 
+RUN apt remove -y python3-pyparsing python3-blinker
+
+
 # Without the following, GDAL gets installed without `_gdal_array`, possibly
 # being build with an older version of numpy (?), which breaks blueskykml.
 # See: https://stackoverflow.com/questions/75372275/importerror-cannot-import-name-gdal-array-from-osgeo
@@ -81,6 +84,9 @@ RUN pip3 install --break-system-packages --no-cache-dir --force-reinstall 'GDAL[
 RUN mkdir /tmp/bluesky/
 WORKDIR /tmp/bluesky/
 COPY constraints.txt /tmp/bluesky/constraints.txt
+#    && pip3 install --break-system-packages \
+#        --extra-index https://pypi.airfire.org/simple/ \
+#        -r constraints.txt
 
 # blueskykml, consume, and fiona are relatively static these days; so, install
 # them here in order to avoid reinstalling them and their large dependencies
@@ -96,11 +102,10 @@ COPY constraints.txt /tmp/bluesky/constraints.txt
 # Another Note: without --break-system-packages, pip install fails with
 #   a message about using virtual environments.  This docker image
 #   is soley for bluesky, so we're installing system wide.
-RUN pip3 install --break-system-packages numpy==2.1.1 \
-    && pip3 install --break-system-packages matplotlib==3.9.2 \
-    && pip3 install --break-system-packages fiona==1.10.1 \
-    && pip3 install --break-system-packages \
-        -c constraints.txt --index-url https://pypi.airfire.org/simple \
+RUN pip3 install --break-system-packages -c constraints.txt matplotlib==3.9.2 \
+    && pip3 install --break-system-packages -c constraints.txt fiona==1.10.1 \
+    && pip3 install --break-system-packages -c constraints.txt \
+        --index-url https://pypi.airfire.org/simple \
         apps-consume==5.3.1 \
         blueskykml==6.0.2
 
