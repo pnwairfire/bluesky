@@ -32,6 +32,9 @@ RUN apt-get update \
 
 # Install numpy==2.1.1. Otherwise, something in the next apt-get install call
 # installs numpy==1.26.4
+# Note: without --break-system-packages, pip install fails with
+#   a message about using virtual environments.  This docker image
+#   is soley for bluesky, so we're installing system wide.
 RUN pip3 install --break-system-packages numpy==2.1.1
 
 # Install
@@ -84,30 +87,12 @@ RUN pip3 install --break-system-packages --no-cache-dir --force-reinstall 'GDAL[
 RUN mkdir /tmp/bluesky/
 WORKDIR /tmp/bluesky/
 COPY constraints.txt /tmp/bluesky/constraints.txt
-#    && pip3 install --break-system-packages \
-#        --extra-index https://pypi.airfire.org/simple/ \
-#        -r constraints.txt
 
-# blueskykml, consume, and fiona are relatively static these days; so, install
-# them here in order to avoid reinstalling them and their large dependencies
-# each time other dependencies in requirements.txt change.
-# Notable sub-dependencies:
-#  - blueskykml:  Pillow==10.4.0, ~9.0MB, and matplotlib==3.9.2, ~50.4MB
-#  - consume:  pandas, etc.
-#  - fiona:  39.7MB for fiona itself
-# Note: this RUN command will need to be updated if fiona,
-#   consume, or blueskykml are ever updated in setup.py
-# Another Note: matplotlib must be explicitly installed to make
-#   sure the correct version is installed
-# Another Note: without --break-system-packages, pip install fails with
-#   a message about using virtual environments.  This docker image
-#   is soley for bluesky, so we're installing system wide.
-RUN pip3 install --break-system-packages -c constraints.txt matplotlib==3.9.2 \
-    && pip3 install --break-system-packages -c constraints.txt fiona==1.10.1 \
-    && pip3 install --break-system-packages -c constraints.txt \
-        --index-url https://pypi.airfire.org/simple \
-        apps-consume==5.3.1 \
-        blueskykml==6.0.2
+# TODO: install dependencies using constraints.txt directly
+#     rather than referencing each of the requirements*.txt files?
+#  RUN pip3 install --break-system-packages \
+#      --extra-index https://pypi.airfire.org/simple/ \
+#      -r constraints.txt
 
 # Install python dependencies
 COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
