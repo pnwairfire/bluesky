@@ -102,7 +102,7 @@ RUN pip3 install --break-system-packages numpy==2.1.1 \
     && pip3 install --break-system-packages \
         -c constraints.txt --index-url https://pypi.airfire.org/simple \
         apps-consume==5.3.1 \
-        blueskykml==6.0.1
+        blueskykml==6.0.2
 
 # Install python dependencies
 COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
