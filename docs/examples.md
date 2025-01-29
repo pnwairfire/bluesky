@@ -2,19 +2,18 @@
 
 ### Through Emissions
 
-Assume you have the following input data:
+Assume that you have the following input data in ./tmp/fires.json
 
     {
         "fires": [
             {
                 "id": "SF11C14225236095807750",
                 "event_of" :{
-                    "name": "Natural Fire near Snoqualmie Pass, WA",
-                    "id": "SF11E826544"
+                    "name": "WF near Lake Chelan",
+                    "id": "ABC123"
                 },
                 "activity": [
                     {
-                        "name": "First day",
                         "active_areas": [
                             {
                                 "start": "2015-08-04T17:00:00",
@@ -26,13 +25,13 @@ Assume you have the following input data:
                                 "specified_points": [
                                     {
                                         "name": "HMW-32434",
-                                        "lat": 47.41,
-                                        "lng": -121.41,
+                                        "lat": 48.06,
+                                        "lng": -120.22,
                                         "area": 120
                                     },
                                     {
-                                        "lat": 47.42,
-                                        "lng": -121.43,
+                                        "lat": 48.07,
+                                        "lng": -120.223,
                                         "area": 103,
                                         "ecoregion": "western"
                                     }
@@ -42,11 +41,11 @@ Assume you have the following input data:
                                         "type": "Polygon",
                                         "coordinates": [
                                             [
-                                                [-121.45, 47.43],
-                                                [-121.39, 47.43],
-                                                [-121.39, 47.4],
-                                                [-121.45, 47.4],
-                                                [-121.45, 47.43]
+                                                [-120.22, 48.06],
+                                                [-120.23, 48.06],
+                                                [-120.23, 48.08],
+                                                [-120.22, 48.08],
+                                                [-120.22, 48.06]
                                             ]
                                         ]
                                     }
@@ -61,17 +60,20 @@ Assume you have the following input data:
 
 (Note that ecoregion and other location input fields can be defined either per location or in the parent active area object)
 
-Lets say that's in a file called fires.json. piping that into bsp
-and running it through fuelbeds
+You can run bluesky through fuelbeds on that input data by either piping it or
+by specifying the input file with the '-i' option.
 
     cat ./tmp/fires.json | bsp --indent 4 fuelbeds
+    bsp -i ./tmp/fires.json --indent 4 fuelbeds
 
-would give you:
+Either way would give you the following:
 
     {
-        "bluesky_version": "4.1.2",
+        "bluesky_version": "4.6.11",
         "counts": {
-            "fires": 1
+            "failed_fires": 0,
+            "fires": 1,
+            "locations": 2
         },
         "fires": [
             {
@@ -84,44 +86,42 @@ would give you:
                                 "end": "2015-08-05T17:00:00",
                                 "perimeter": {
                                     "geometry": {
-                                        "type": "Polygon",
                                         "coordinates": [
                                             [
-                                                [-121.45, 47.43],
-                                                [-121.39, 47.43],
-                                                [-121.39, 47.4],
-                                                [-121.45, 47.4],
-                                                [-121.45, 47.43]
+                                                [-120.22,48.06],
+                                                [-120.23,48.06],
+                                                [-120.23,48.08],
+                                                [-120.22,48.08],
+                                                [-120.22,48.06]
                                             ]
-                                        ]
+                                        ],
+                                        "type": "Polygon"
                                     }
                                 },
                                 "specified_points": [
                                     {
-                                        "area": 120.0,
+                                        "area": 120,
                                         "fuelbeds": [
                                             {
-                                                "fccs_id": "9",
+                                                "fccs_id": "52",
                                                 "pct": 100.0
                                             }
                                         ],
-                                        "fuelbeds_total_accounted_for_pct": 100.0,
-                                        "lat": 47.41,
-                                        "lng": -121.41,
+                                        "lat": 48.06,
+                                        "lng": -120.22,
                                         "name": "HMW-32434"
                                     },
                                     {
-                                        "area": 103.0,
+                                        "area": 103,
                                         "ecoregion": "western",
                                         "fuelbeds": [
                                             {
-                                                "fccs_id": "9",
+                                                "fccs_id": "52",
                                                 "pct": 100.0
                                             }
                                         ],
-                                        "fuelbeds_total_accounted_for_pct": 100.0,
-                                        "lat": 47.42,
-                                        "lng": -121.43
+                                        "lat": 48.07,
+                                        "lng": -120.223
                                     }
                                 ],
                                 "start": "2015-08-04T17:00:00",
@@ -143,7 +143,7 @@ would give you:
         ],
         "processing": [
             {
-                "fccsmap_version": "2.1.0",
+                "fccsmap_version": "5.0.2",
                 "module": "bluesky.modules.fuelbeds",
                 "module_name": "fuelbeds",
                 "version": "0.1.0"
@@ -153,43 +153,53 @@ would give you:
             /* The configuration used for the run would be listed
                here.  It's cut here, for brevity */
         },
-        "run_id": "154eb63c-adc5-4d4a-8a44-a806869dd672",
+        "run_id": "c41164bc-7267-4760-975b-93e53c514b8f",
         "runtime": {
-            "end": "2019-05-28T17:32:28.760890Z",
+            "end": "2025-01-29T17:21:15.720657Z",
             "modules": [
                 {
-                    "end": "2019-05-28T17:32:28.760839Z",
+                    "end": "2025-01-29T17:21:15.720340Z",
                     "module_name": "fuelbeds",
-                    "start": "2019-05-28T17:32:28.755644Z",
-                    "total": "0h 0m 0.005195s"
+                    "start": "2025-01-29T17:21:15.542702Z",
+                    "total": "0h 0m 0.177638s"
                 }
             ],
-            "start": "2019-05-28T17:32:28.755635Z",
-            "total": "0h 0m 0.005255s"
+            "start": "2025-01-29T17:21:15.542697Z",
+            "total": "0h 0m 0.17796s"
         },
         "summary": {
             "fuelbeds": [
                 {
-                    "fccs_id": "9",
+                    "fccs_id": "52",
                     "pct": 100.0
                 }
             ]
         },
-        "today": "2019-05-28"
+        "today": "2025-01-29T00:00:00"
     }
 
-Piping that through consumption
 
-    cat ./tmp/fires.json | bsp fuelbeds ecoregion consumption
-    # or
-    cat ./tmp/fires.json | bsp fuelbeds |bsp consumption
+Running through consumption with the following command
 
-would give you give you the
+    bsp -i ./tmp/fires.json --indent 4 fuelbeds consumption
+
+or
+
+    cat ./tmp/fires.json |bsp --indent 4 fuelbeds consumption
+
+or
+
+    cat ./tmp/fires.json |bsp fuelbeds | bsp consumption --indent 4
+
+
+would give you give you the following
 
     {
-        "bluesky_version": "4.1.2",
+        "bluesky_version": "4.6.11",
         "counts": {
-            "fires": 1
+            "failed_fires": 0,
+            "fires": 1,
+            "locations": 2
         },
         "fires": [
             {
@@ -199,10 +209,10 @@ would give you give you the
                             {
                                 "consumption": {
                                     "summary": {
-                                        "flaming": 2436.660009706181,
-                                        "residual": 2693.4613796987646,
-                                        "smoldering": 2354.6406474615565,
-                                        "total": 7484.7620368665
+                                        "flaming": 773.0540904948921,
+                                        "residual": 163.29028860443086,
+                                        "smoldering": 210.9871561676324,
+                                        "total": 1147.3315352669554
                                     }
                                 },
                                 "country": "USA",
@@ -210,35 +220,35 @@ would give you give you the
                                 "end": "2015-08-05T17:00:00",
                                 "heat": {
                                     "summary": {
-                                        "flaming": 38986560155.29889,
-                                        "residual": 43095382075.18023,
-                                        "smoldering": 37674250359.3849,
-                                        "total": 119756192589.86403
+                                        "flaming": 12368865447.918274,
+                                        "residual": 2612644617.6708937,
+                                        "smoldering": 3375794498.6821184,
+                                        "total": 18357304564.271286
                                     }
                                 },
                                 "perimeter": {
                                     "geometry": {
-                                        "type": "Polygon",
                                         "coordinates": [
                                             [
-                                                [-121.45, 47.43],
-                                                [-121.39, 47.43],
-                                                [-121.39, 47.4],
-                                                [-121.45, 47.4],
-                                                [-121.45, 47.43]
+                                                [-120.22,48.06],
+                                                [-120.23,48.06],
+                                                [-120.23,48.08],
+                                                [-120.22,48.08],
+                                                [-120.22,48.06]
                                             ]
-                                        ]
+                                        ],
+                                        "type": "Polygon"
                                     }
                                 },
                                 "specified_points": [
                                     {
-                                        "area": 120.0,
+                                        "area": 120,
                                         "consumption": {
                                             "summary": {
-                                                "flaming": 1311.2071801109494,
-                                                "residual": 1449.3962581338644,
-                                                "smoldering": 1267.0712004277434,
-                                                "total": 4027.6746386725563
+                                                "flaming": 415.9932325533051,
+                                                "residual": 87.86921359879688,
+                                                "smoldering": 113.53568941756004,
+                                                "total": 617.3981355696623
                                             }
                                         },
                                         "fuelbeds": [
@@ -263,7 +273,7 @@ would give you give you the
                                                             "smoldering": [0.0],
                                                             "total": [0.0]
                                                         },
-                                                        /* More canopy sub categories
+                                                         /* More canopy sub categories
                                                            would be listed here.*/
                                                     },
                                                     "ground fuels": {
@@ -279,56 +289,50 @@ would give you give you the
                                                         /* ... */
                                                     },
                                                     "summary": {
-                                                        "canopy": {
-                                                            "flaming": [0.0],
-                                                            "residual": [0.0],
-                                                            "smoldering": [0.0],
-                                                            "total": [0.0]
-                                                        },
                                                         /* ... */
                                                     },
                                                     "woody fuels": {
                                                         /* ... */
                                                     }
                                                 },
-                                                "fccs_id": "9",
+                                                "fccs_id": "52",
                                                 "fuel_loadings": {
-                                                    "basal_accum_loading": 0.0,
-                                                    "cover_type": 135,
+                                                    "FCCSID": "52",
+                                                    "basal_accum_loading": 0.030600000000000002,
+                                                    "cover_type": 118.0,
                                                     "duff_lower_depth": 0.0,
                                                     "duff_lower_loading": 0.0,
                                                     /* ... */
                                                 },
                                                 "heat": {
-                                                    "flaming": [20979314881.77519],
-                                                    "residual": [23190340130.141827],
-                                                    "smoldering": [20273139206.843895],
-                                                    "total": [64442794218.7609]
+                                                    "flaming": [6655891720.852882],
+                                                    "residual": [1405907417.58075],
+                                                    "smoldering": [1816571030.6809607],
+                                                    "total": [9878370169.114592]
                                                 },
                                                 "pct": 100.0
                                             }
                                         ],
-                                        "fuelbeds_total_accounted_for_pct": 100.0,
                                         "heat": {
                                             "summary": {
-                                                "flaming": 20979314881.77519,
-                                                "residual": 23190340130.141827,
-                                                "smoldering": 20273139206.843895,
-                                                "total": 64442794218.76091
+                                                "flaming": 6655891720.852882,
+                                                "residual": 1405907417.58075,
+                                                "smoldering": 1816571030.6809607,
+                                                "total": 9878370169.114594
                                             }
                                         },
-                                        "lat": 47.41,
-                                        "lng": -121.41,
+                                        "lat": 48.06,
+                                        "lng": -120.22,
                                         "name": "HMW-32434"
                                     },
                                     {
-                                        "area": 103.0,
+                                        "area": 103,
                                         "consumption": {
                                             "summary": {
-                                                "flaming": 1125.4528295952316,
-                                                "residual": 1244.0651215649002,
-                                                "smoldering": 1087.569447033813,
-                                                "total": 3457.087398193945
+                                                "flaming": 357.06085794158685,
+                                                "residual": 75.42107500563398,
+                                                "smoldering": 97.45146675007234,
+                                                "total": 529.9333996972933
                                             }
                                         },
                                         "ecoregion": "western",
@@ -357,34 +361,35 @@ would give you give you the
                                                         /* ... */
                                                     }
                                                 },
-                                                "fccs_id": "9",
+                                                "fccs_id": "52",
                                                 "fuel_loadings": {
-                                                    "basal_accum_loading": 0.0,
-                                                    "cover_type": 135,
+                                                    "FCCSID": "52",
+                                                    "basal_accum_loading": 0.026265000000000004,
+                                                    "cover_type": 118.0,
                                                     "duff_lower_depth": 0.0,
                                                     "duff_lower_loading": 0.0,
+                                                    "duff_upper_depth": 1.1,
                                                     /* ... */
                                                 },
                                                 "heat": {
-                                                    "flaming": [18007245273.523705],
-                                                    "residual": [19905041945.038403],
-                                                    "smoldering": [17401111152.541008],
-                                                    "total": [55313398371.1031]
+                                                    "flaming": [5712973727.065391],
+                                                    "residual": [1206737200.0901437],
+                                                    "smoldering": [1559223468.001158],
+                                                    "total": [8478934395.156691]
                                                 },
                                                 "pct": 100.0
                                             }
                                         ],
-                                        "fuelbeds_total_accounted_for_pct": 100.0,
                                         "heat": {
                                             "summary": {
-                                                "flaming": 18007245273.523705,
-                                                "residual": 19905041945.038403,
-                                                "smoldering": 17401111152.541008,
-                                                "total": 55313398371.10312
+                                                "flaming": 5712973727.065391,
+                                                "residual": 1206737200.0901437,
+                                                "smoldering": 1559223468.001158,
+                                                "total": 8478934395.1566925
                                             }
                                         },
-                                        "lat": 47.42,
-                                        "lng": -121.43
+                                        "lat": 48.07,
+                                        "lng": -120.223
                                     }
                                 ],
                                 "start": "2015-08-04T17:00:00",
@@ -394,18 +399,18 @@ would give you give you the
                         ],
                         "consumption": {
                             "summary": {
-                                "flaming": 2436.660009706181,
-                                "residual": 2693.4613796987646,
-                                "smoldering": 2354.6406474615565,
-                                "total": 7484.7620368665
+                                "flaming": 773.0540904948921,
+                                "residual": 163.29028860443086,
+                                "smoldering": 210.9871561676324,
+                                "total": 1147.3315352669554
                             }
                         },
                         "heat": {
                             "summary": {
-                                "flaming": 38986560155.29889,
-                                "residual": 43095382075.18023,
-                                "smoldering": 37674250359.3849,
-                                "total": 119756192589.86403
+                                "flaming": 12368865447.918274,
+                                "residual": 2612644617.6708937,
+                                "smoldering": 3375794498.6821184,
+                                "total": 18357304564.271286
                             }
                         },
                         "name": "First day"
@@ -413,10 +418,10 @@ would give you give you the
                 ],
                 "consumption": {
                     "summary": {
-                        "flaming": 2436.660009706181,
-                        "residual": 2693.4613796987646,
-                        "smoldering": 2354.6406474615565,
-                        "total": 7484.7620368665
+                        "flaming": 773.0540904948921,
+                        "residual": 163.29028860443086,
+                        "smoldering": 210.9871561676324,
+                        "total": 1147.3315352669554
                     }
                 },
                 "event_of": {
@@ -426,10 +431,10 @@ would give you give you the
                 "fuel_type": "natural",
                 "heat": {
                     "summary": {
-                        "flaming": 38986560155.29889,
-                        "residual": 43095382075.18023,
-                        "smoldering": 37674250359.3849,
-                        "total": 119756192589.86403
+                        "flaming": 12368865447.918274,
+                        "residual": 2612644617.6708937,
+                        "smoldering": 3375794498.6821184,
+                        "total": 18357304564.271286
                     }
                 },
                 "id": "SF11C14225236095807750",
@@ -438,13 +443,18 @@ would give you give you the
         ],
         "processing": [
             {
-                "fccsmap_version": "2.1.0",
+                "fccsmap_version": "5.0.2",
                 "module": "bluesky.modules.fuelbeds",
                 "module_name": "fuelbeds",
                 "version": "0.1.0"
             },
             {
-                "consume_version": "5.0.2",
+                "module": "bluesky.modules.ecoregion",
+                "module_name": "ecoregion",
+                "version": "0.1.0"
+            },
+            {
+                "consume_version": "5.3.1",
                 "module": "bluesky.modules.consumption",
                 "module_name": "consumption",
                 "version": "0.1.0"
@@ -454,25 +464,31 @@ would give you give you the
             /* The configuration used for the run would be listed
                here.  It's cut here, for brevity */
         },
-        "run_id": "ff9a9d80-e572-40d0-8ae4-22fb389b7b31",
+        "run_id": "6f7ac90f-89a1-44d7-87b9-be9def906aa9",
         "runtime": {
-            "end": "2019-05-28T17:37:49.009256Z",
+            "end": "2025-01-29T17:24:50.986237Z",
             "modules": [
                 {
-                    "end": "2019-05-28T17:37:48.965167Z",
+                    "end": "2025-01-29T17:24:50.791119Z",
                     "module_name": "fuelbeds",
-                    "start": "2019-05-28T17:37:48.959961Z",
-                    "total": "0h 0m 0.005206s"
+                    "start": "2025-01-29T17:24:50.617809Z",
+                    "total": "0h 0m 0.17331s"
                 },
                 {
-                    "end": "2019-05-28T17:37:49.009213Z",
+                    "end": "2025-01-29T17:24:50.791517Z",
+                    "module_name": "ecoregion",
+                    "start": "2025-01-29T17:24:50.791453Z",
+                    "total": "0h 0m 6.4e-05s"
+                },
+                {
+                    "end": "2025-01-29T17:24:50.986199Z",
                     "module_name": "consumption",
-                    "start": "2019-05-28T17:37:48.965215Z",
-                    "total": "0h 0m 0.043998s"
+                    "start": "2025-01-29T17:24:50.791537Z",
+                    "total": "0h 0m 0.194662s"
                 }
             ],
-            "start": "2019-05-28T17:37:48.959952Z",
-            "total": "0h 0m 0.049304s"
+            "start": "2025-01-29T17:24:50.617803Z",
+            "total": "0h 0m 0.368434s"
         },
         "summary": {
             "consumption": {
@@ -528,29 +544,33 @@ would give you give you the
             },
             "fuelbeds": [
                 {
-                    "fccs_id": "9",
+                    "fccs_id": "52",
                     "pct": 100.0
                 }
             ],
             "heat": {
-                "flaming": [38986560155.29889],
-                "residual": [43095382075.18023],
-                "smoldering": [37674250359.3849],
+                "flaming": [
+                    12368865447.918274
+                ],
+                "residual": [
+                    2612644617.6708937
+                ],
+                "smoldering": [
+                    3375794498.6821184
+                ],
                 "summary": {
-                    "flaming": 38986560155.29889,
-                    "residual": 43095382075.18023,
-                    "smoldering": 37674250359.3849,
-                    "total": 119756192589.86403
+                    "flaming": 12368865447.918274,
+                    "residual": 2612644617.6708937,
+                    "smoldering": 3375794498.6821184,
+                    "total": 18357304564.271286
                 }
             }
         },
-        "today": "2019-05-28"
+        "today": "2025-01-29T00:00:00"
     }
 
-Finally, piping that through emissions
+Finally, running through emissions
 
-    cat ./tmp/fires.json fuelbeds ecoregion consumption emissions
-    # or
-    cat ./tmp/fires.json | bsp fuelbeds |bsp consumption | bsp emissions
+    bsp -i ./tmp/fires.json --indent 4 fuelbeds consumption emissions
 
-would give you the above output, but with added emissions output - PM2.5, CO2, etc.
+would give you the above output, but with added emissions data - PM2.5, CO2, etc.
