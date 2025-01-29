@@ -443,7 +443,12 @@ async def setup(args):
 
     # Note: Calling code handles exception
     if not args.no_input:
-        await load_input_files(args, fires_manager)
+        if args.input_files:
+            await load_input_files(args, fires_manager)
+        else:
+            fires_manager.loads(input_stream=fires_manager._stream(None, 'r'),
+                append_fires=True)
+
 
     set_modules(args, fires_manager)
 
