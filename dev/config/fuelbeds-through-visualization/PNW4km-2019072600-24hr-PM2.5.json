@@ -12,6 +12,12 @@
                 "working_dir": "/bluesky/output/plumerise/{run_id}/"
             }
         },
+        "trajectories": {
+            "model": "hysplit",
+            "start": "2019-07-26T00:00:00",
+            "output_dir": "/bluesky/output/trajectories-output/{run_id}/",
+            "working_dir": "/bluesky/output/trajectories-working/{run_id}/"
+        },
         "dispersion": {
             "start": "2019-07-26T00:00:00",
             "num_hours": 24,
