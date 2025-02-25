@@ -723,3 +723,6 @@
 
 ## 4.6.12
  - Add back support for piping input into bsp
+
+## 4.6.13
+ - Upgrade to blueskykml==6.0.3
