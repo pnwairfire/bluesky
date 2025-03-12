@@ -729,3 +729,6 @@
 
 ## 4.6.14
  - Upgrade to blueskykml==6.0.4
+
+## 4.6.15
+ - Upgrade to blueskykml==6.0.5
