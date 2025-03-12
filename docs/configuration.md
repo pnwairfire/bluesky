@@ -303,21 +303,16 @@ parameters would be used.
 ### plumerise
 
  - ***'config' > 'plumerise' > 'model'*** -- *optional* -- plumerise model; defaults to "feps"
-
-#### If running feps model:
-
- - ***'config' > 'plumerise' > 'feps' > 'working_dir'*** -- *optional* -- default: None
- - ***'config' > 'plumerise' > 'feps' > 'delete_working_dir_if_no_error'*** -- *optional* -- default: True
- - ***'config' > 'plumerise' > 'feps' > 'load_heat'*** -- *optional* -- default: False
+ - ***'config' > 'plumerise' > 'working_dir'*** -- *optional* -- where to write intermediate files; defaults to writing to tmp dir
+ - ***'config' > 'plumerise' > 'delete_working_dir_if_no_error'*** -- *optional* -- default: True
 
 
 #### if feps:
 
+ - ***'config' > 'plumerise' > 'feps' > 'load_heat'*** -- *optional* -- default: False
  - ***'config' > 'plumerise' > 'feps' > 'feps_weather_binary'*** -- *optional* -- defaults to "feps_weather"
  - ***'config' > 'plumerise' > 'feps' > 'feps_plumerise_binary'*** -- *optional* -- defaults to "feps_plumerise"
  - ***'config' > 'plumerise' > 'feps' > 'plume_top_behavior'*** -- *optional* -- how to model plume top; options: 'Briggs', 'FEPS', 'auto'; defaults to 'auto'
- - ***'config' > 'plumerise' > 'feps' > 'working_dir'*** -- *optional* -- where to write intermediate files; defaults to writing to tmp dir
- - ***'config' > 'plumerise' > 'feps' > 'delete_working_dir_if_no_error'*** -- *optional* -- default true
 
 #### if sev:
 
