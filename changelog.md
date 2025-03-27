@@ -732,3 +732,6 @@
 
 ## 4.6.15
  - Upgrade to blueskykml==6.0.5
+
+## 4.6.16
+ - updated feps_plumerise to check area within 10% instead of 1% of total
