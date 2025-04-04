@@ -293,14 +293,17 @@ class PrichardOneill(EmissionsBase):
                                 fccs_file=fuel_loadings_csv_filename)
 
                                 # custom fuel loadings for this fuelbed
-                                config_fuel_loadings = Config().get('consumption','fuel_loadings')[fb['fccs_id']]
-                                fb['emissions_fuel_loadings'] = config_fuel_loadings
+                                custom_fuel_loadings = (
+                                    fb.get('fuel_loadings')
+                                        or Config().get('consumption','fuel_loadings').get(fb['fccs_id'])
+                                )
+                                fb['emissions_fuel_loadings'] = custom_fuel_loadings
                                 e = consume.Emissions(fuel_consumption_object=fc)
 
                                 pile_black_pct = (fc._settings.get('pile_black_pct') * 0.01)
-                                config_fuel_loadings_df = pd.DataFrame([config_fuel_loadings])
-                                pile_loadings = pd.Series([config_fuel_loadings['pile_clean_loading'] + config_fuel_loadings['pile_dirty_loading'] + config_fuel_loadings['pile_vdirty_loading']])
-                                (pile_pm, pile_pm10, pile_pm25) = e._emissions_calc_pm_piles(config_fuel_loadings_df, pile_loadings, pile_black_pct)
+                                custom_fuel_loadings_df = pd.DataFrame([custom_fuel_loadings])
+                                pile_loadings = pd.Series([custom_fuel_loadings['pile_clean_loading'] + custom_fuel_loadings['pile_dirty_loading'] + custom_fuel_loadings['pile_vdirty_loading']])
+                                (pile_pm, pile_pm10, pile_pm25) = e._emissions_calc_pm_piles(custom_fuel_loadings_df, pile_loadings, pile_black_pct)
 
                                 (pile_co, pile_co2, pile_ch4, pile_nmhc, pile_nmoc, pile_nh3, pile_no, pile_no2, pile_nox, pile_so2) = \
                                     e._emissions_calc_pollutants_piles(pile_loadings, pile_black_pct)
