@@ -735,3 +735,6 @@
 
 ## 4.6.16
  - updated feps_plumerise to check area within 10% instead of 1% of total
+
+## 4.6.17
+ - Update Prichard O'Neill emissions to check both the fuelbed object as well as the config for custom fuel loadings for piles
