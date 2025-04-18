@@ -738,3 +738,6 @@
 
 ## 4.6.17
  - Update Prichard O'Neill emissions to check both the fuelbed object as well as the config for custom fuel loadings for piles
+
+## 4.6.18
+ - Upgrade to blueskykml==6.0.6
