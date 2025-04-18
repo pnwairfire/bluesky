@@ -94,6 +94,20 @@ COPY constraints.txt /tmp/bluesky/constraints.txt
 #      --extra-index https://pypi.airfire.org/simple/ \
 #      -r constraints.txt
 
+# Install consume tarball dirrectly because we get the following error
+# when installing from AirFire's pypi server (which we don't get with
+# other AirFire packages):
+#  ERROR: THESE PACKAGES DO NOT MATCH THE HASHES FROM THE REQUIREMENTS FILE. If you have updated the package versions, please update the hashes. Otherwise, examine the package contents carefully; someone may have tampered with them.
+#      fera-apps-consume==5.3.2 from https://pypi.airfire.org/packages/simple/fera-apps-consume/fera-apps-consume-5.3.2.tar.gz#sha256=4bdfa4bbf1604873bb2a424190d9eb5812a79a934499afdd240130431b6b3150:
+#          Expected sha256 4bdfa4bbf1604873bb2a424190d9eb5812a79a934499afdd240130431b6b3150
+#               Got        71de5472888d7b129c9ec35c6d621670ad8b7b78e0f6a869eb2976e706281578
+
+RUN wget https://pypi.airfire.org/packages/simple/apps-consume/apps-consume-5.3.1.tar.gz \
+    && pip3 install --break-system-packages \
+        --extra-index https://pypi.airfire.org/simple/ \
+        -f https://pypi.airfire.org/simple/ \
+        apps-consume-5.3.1.tar.gz
+
 # Install python dependencies
 COPY requirements-test.txt /tmp/bluesky/requirements-test.txt
 RUN pip3 install --break-system-packages -c constraints.txt -r requirements-test.txt
