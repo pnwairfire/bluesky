@@ -638,6 +638,14 @@ class BaseEmissionsTest():
         self.fires_with_piles_only =copy.deepcopy(FIRES_WITH_PILES_ONLY)
         self.fires_with_piles_only_2acres =copy.deepcopy(FIRES_WITH_PILES_ONLY_2ACRES)
 
+    def _run_fires(self, emissions_obj, fires):
+        for fire in fires:
+            with fire_failure_manager(fire):
+                for aa in fire.active_areas:
+                    for loc in aa.locations:
+                        emissions_obj.run_on_location(fire, aa, loc)
+
+
     def _check_emissions(self, expected, actual):
         assert set(expected.keys()) == set(actual.keys())
         for p in expected:
@@ -717,7 +725,7 @@ class TestFepsEmissions(BaseEmissionsTest):
         Config().set("feps", 'emissions', "model")
         Config().set(False, 'emissions', "include_emissions_details")
 
-        emissions.Feps(fire_failure_manager).run(self.fires)
+        self._run_fires(emissions.Feps(), self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -729,7 +737,7 @@ class TestFepsEmissions(BaseEmissionsTest):
     def test_with_details(self, reset_config):
         Config().set("feps", 'emissions', "model")
         Config().set(True, 'emissions', "include_emissions_details")
-        emissions.Feps(fire_failure_manager).run(self.fires)
+        self._run_fires(emissions.Feps(), self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -742,7 +750,7 @@ class TestFepsEmissions(BaseEmissionsTest):
         Config().set("feps", 'emissions', "model")
         Config().set(False, 'emissions', "include_emissions_details")
         Config().set(['PM2.5', 'PM10'], 'emissions', "species")
-        emissions.Feps(fire_failure_manager).run(self.fires)
+        self._run_fires(emissions.Feps(), self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -755,7 +763,7 @@ class TestFepsEmissions(BaseEmissionsTest):
         Config().set("feps", 'emissions', "model")
         Config().set(True, 'emissions', "include_emissions_details")
         Config().set(['PM2.5', 'PM10'], 'emissions', "species")
-        emissions.Feps(fire_failure_manager).run(self.fires)
+        self._run_fires(emissions.Feps(), self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -904,7 +912,7 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         Config().set("prichard-oneill", 'emissions', "model")
         Config().set(False, 'emissions', "include_emissions_details")
         Config().set(self.SPECIES, 'emissions', "species")
-        emissions.PrichardOneill(fire_failure_manager).run(self.fires)
+        self._run_fires(emissions.PrichardOneill(), self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -917,7 +925,7 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         Config().set("prichard-oneill", 'emissions', "model")
         Config().set(True, 'emissions', "include_emissions_details")
         Config().set(self.SPECIES, 'emissions', "species")
-        emissions.PrichardOneill(fire_failure_manager).run(self.fires)
+        self._run_fires(emissions.PrichardOneill(), self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -931,7 +939,7 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         Config().set(True, 'emissions', "include_emissions_details")
         Config().set(self.SPECIES, 'emissions', "species")
         Config().merge(CONFIG_FOR_PILE_ONLY_TESTS_2ACRES)
-        emissions.PrichardOneill(fire_failure_manager).run(self.fires_with_piles_only_2acres)
+        self._run_fires(emissions.PrichardOneill(), self.fires_with_piles_only_2acres)
 
         ed1 = self.fires_with_piles_only_2acres[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions_details']
         em1 = self.fires_with_piles_only_2acres[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions']
@@ -943,13 +951,12 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         assert em1['total']['PM2.5'][0] == 0.6415739460000001
 
 
-
     def test_pile_only(self, reset_config):
         Config().set("prichard-oneill", 'emissions', "model")
         Config().set(True, 'emissions', "include_emissions_details")
         Config().set(self.SPECIES, 'emissions', "species")
         Config().merge(CONFIG_FOR_PILE_ONLY_TESTS)
-        emissions.PrichardOneill(fire_failure_manager).run(self.fires_with_piles_only)
+        self._run_fires(emissions.PrichardOneill(), self.fires_with_piles_only)
 
         assert 'emissions_details' in self.fires_with_piles_only[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         assert 'emissions_details' in self.fires_with_piles_only[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
@@ -1008,7 +1015,7 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         # double the area of the first fire... see if emissions double... this may not be valid test...
         self.fires_with_piles_only[0]['activity'][0]['active_areas'][0]['specified_points'][0]['area'] *= 2
 #        self.fires_with_piles_only[0]['activity'][0]['active_areas'][0]['locations'][0]['area'] *= 2   # ?this is the important area
-        emissions.PrichardOneill(fire_failure_manager).run(self.fires_with_piles_only)
+        self._run_fires(emissions.PrichardOneill(), self.fires_with_piles_only)
         ed1 = self.fires_with_piles_only[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions_details']
         em1 = self.fires_with_piles_only[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions']
 
@@ -1016,14 +1023,12 @@ class TestPrichardOneillEmissions(BaseEmissionsTest):
         assert em1['flaming']['PM2.5'][0] == 2 * self.EXPECTED_FIRE52_PILE_ONLY_EMISSIONS['flaming']['PM2.5'][0]
 
 
-
-
     def test_fb_with_pile_loadings(self, reset_config):
         Config().set("prichard-oneill", 'emissions', "model")
         Config().set(True, 'emissions', "include_emissions_details")
         Config().set(self.SPECIES, 'emissions', "species")
         Config().merge(CONFIG_FOR_FB_WITH_PILE_TESTS)
-        emissions.PrichardOneill(fire_failure_manager).run(self.fires_with_piles)
+        self._run_fires(emissions.PrichardOneill(), self.fires_with_piles)
 
         assert 'emissions_details' in self.fires_with_piles[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         ed = self.fires_with_piles[0]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions_details']
@@ -1136,7 +1141,7 @@ class TestConsumeEmissions(BaseEmissionsTest):
         Config().set(False, 'emissions', "include_emissions_details")
         set_old_consume_defaults()
 
-        emissions.Consume(fire_failure_manager).run(self.fires)
+        self._run_fires(emissions.Consume(), self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -1150,7 +1155,7 @@ class TestConsumeEmissions(BaseEmissionsTest):
         Config().set(True, 'emissions', "include_emissions_details")
         set_old_consume_defaults()
 
-        emissions.Consume(fire_failure_manager).run(self.fires)
+        self._run_fires(emissions.Consume(), self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -1165,7 +1170,7 @@ class TestConsumeEmissions(BaseEmissionsTest):
         Config().set(['PM2.5', 'PM10'], 'emissions', "species")
         set_old_consume_defaults()
 
-        emissions.Consume(fire_failure_manager).run(self.fires)
+        self._run_fires(emissions.Consume(), self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
@@ -1180,7 +1185,7 @@ class TestConsumeEmissions(BaseEmissionsTest):
         Config().set(['PM2.5', 'PM10'], 'emissions', "species")
         set_old_consume_defaults()
 
-        emissions.Consume(fire_failure_manager).run(self.fires)
+        self._run_fires(emissions.Consume(), self.fires)
 
         assert self.fires[0]['error'] == (
             'Missing fuelbed data required for computing emissions')
