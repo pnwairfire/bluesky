@@ -3,6 +3,7 @@
 __author__ = "Joel Dubowy"
 
 import copy
+import logging
 import os
 from functools import reduce
 
@@ -72,6 +73,13 @@ def _run_fire(hourly_fractions, fire):
             hr = profiler.start_hour + (i * profiler.ONE_HOUR)
             a['timeprofile'][hr.isoformat()] = {
                 p: profiler.hourly_fractions[p][i] for p in fields }
+            logging.debug('[timeprofile] hr %d - %s - %s',
+                i, hr.isoformat(), a['timeprofile'][hr.isoformat()])
+
+        logging.debug('[timeprofile] summed area_fraction in profiler.hourly_fractions: %s',
+            sum(profiler.hourly_fractions['area_fraction']))
+        logging.debug('[timeprofile] summed area_fraction in a["timeprofile"]: %s',
+            sum([e['area_fraction'] for e in a['timeprofile'].values()]))
 
 def _get_profiler(hourly_fractions, fire, active_area):
     tw = parse_datetimes(active_area, 'start', 'end')
