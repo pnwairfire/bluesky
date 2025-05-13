@@ -103,7 +103,7 @@ def get_emissions_object(fires_manager, model):
     try:
         klass_name = ''.join([e.capitalize() for e in model.split('-')])
         klass = getattr(sys.modules[__name__], klass_name)
-        return klass(fires_manager.fire_failure_handler)
+        return klass()
     except AttributeError:
         msg = "Invalid emissions model: '{}'.".format(model)
         if model == 'urbanski':
@@ -129,8 +129,7 @@ def _fix_keys(emissions):
 
 class EmissionsBase(object, metaclass=abc.ABCMeta):
 
-    def __init__(self, fire_failure_handler):
-        self.fire_failure_handler = fire_failure_handler
+    def __init__(self):
         self.include_emissions_details = Config().get(
             'emissions', 'include_emissions_details')
         self.include_emissions_factors = Config().get(
@@ -147,8 +146,8 @@ class EmissionsBase(object, metaclass=abc.ABCMeta):
 class UbcBsfFeps(EmissionsBase):
     # TODO: Add "Included Emissions Details" functionality
 
-    def __init__(self, fire_failure_handler):
-        super(UbcBsfFeps, self).__init__(fire_failure_handler)
+    def __init__(self):
+        super(UbcBsfFeps, self).__init__()
         model = Config().get('emissions', 'model').lower()
         config = Config().get('emissions', model)
         self.emitter = UbcBsfFEPSEmissions(**config)
@@ -188,8 +187,8 @@ class UbcBsfFeps(EmissionsBase):
 
 class Feps(EmissionsBase):
 
-    def __init__(self, fire_failure_handler):
-        super(Feps, self).__init__(fire_failure_handler)
+    def __init__(self):
+        super(Feps, self).__init__()
 
         # The same lookup object is used for both Rx and WF
         self.calculator = EmissionsCalculator(FepsEFLookup(),
@@ -222,8 +221,8 @@ class Feps(EmissionsBase):
 
 class PrichardOneill(EmissionsBase):
 
-    def __init__(self, fire_failure_handler):
-        super(PrichardOneill, self).__init__(fire_failure_handler)
+    def __init__(self):
+        super(PrichardOneill, self).__init__()
 
         all_fuel_loadings = (Config().get('emissions','fuel_loadings')
             or Config().get('consumption','fuel_loadings'))
@@ -363,8 +362,8 @@ class Urbanski(PrichardOneill):
 
 class Consume(EmissionsBase):
 
-    def __init__(self, fire_failure_handler):
-        super(Consume, self).__init__(fire_failure_handler)
+    def __init__(self):
+        super(Consume, self).__init__()
 
         self.species = self.species and [e.upper() for e in self.species]
 
@@ -514,8 +513,8 @@ PILES_EFS = {
 
 class Piles(EmissionsBase):
 
-    def __init__(self, fire_failure_handler):
-        super(Piles, self).__init__(fire_failure_handler)
+    def __init__(self):
+        super(Piles, self).__init__()
 
     def run_on_location(self, fire, aa, loc):
         for fb in loc['fuelbeds']:
