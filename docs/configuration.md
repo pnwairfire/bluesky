@@ -226,6 +226,7 @@ They also define what synonyms to recognize, if any, for each field.
 ### emissions
 
  - ***'config' > 'emissions' > 'model'*** -- *optional* -- emissions model; 'prichard-oneill' (which replaced 'urbanski'), 'feps', or 'consume'; default 'prichard-oneill'
+ - ***'config' > 'emissions' > 'piles_model'*** -- *optional* -- emissions model to use for piles; 'prichard-oneill' (which replaced 'urbanski'), 'feps', 'consume', or 'piles'; defaults to what 'model' is set to
  - ***'config' > 'emissions' > 'species'*** -- *optional* -- list of species to compute emissions levels for
  - ***'config' > 'emissions' > 'include_emissions_details'*** -- *optional* -- whether or not to include emissions levels by fuel category; default: false
  - ***'config' > 'emissions' > 'include_emissions_factors'*** -- *optional* -- whether or not to include the emissions factors used for computing emissions in the output data; default: false

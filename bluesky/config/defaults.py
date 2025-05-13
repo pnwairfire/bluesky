@@ -270,6 +270,7 @@ _DEFAULTS = {
     "emissions": {
         # Note that 'efs' is deprecated, and so is not listed here
         "model": "prichard-oneill",
+        "piles_model": None,
         "include_emissions_details": False,
         "include_emissions_factors": False,
         "species": [],
