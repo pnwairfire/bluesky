@@ -741,3 +741,6 @@
 
 ## 4.6.18
  - Upgrade to blueskykml==6.0.6
+
+## 4.6.19
+ - Add 'piles' emissions model
