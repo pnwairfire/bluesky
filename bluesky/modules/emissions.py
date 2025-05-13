@@ -272,6 +272,7 @@ class PrichardOneill(EmissionsBase):
             if self.include_emissions_details:
                 datautils.multiply_nested_data(fb['emissions_details'], self.CONVERSION_FACTOR)
 
+            # TODO: use the Piles class, below, instad of the following ?
             # calculate pile emissions by using consume.Emissions class
             if 'woody fuels' in fb["consumption"]:
                 if 'piles' in fb["consumption"]['woody fuels']:
