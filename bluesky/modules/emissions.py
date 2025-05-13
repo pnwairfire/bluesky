@@ -466,20 +466,40 @@ class Consume(EmissionsBase):
 ## Piles
 ##
 
+# For information regarding piles consumption and emissions calculations, see
+#
+#  - https://depts.washington.edu/nwfire/piles/support/pile_documentation.php
+#
+# as well as the following papers
+#
+#  - Hardy, C.C. 1996. Guidelines for estimating volume, biomass and smoke
+#    production for piled slash. Gen. Tech. Rep. PNW-GTR-364. Portland, OR:
+#    U.S. Department of Agriculture, Forest Service, Pacific Northwest
+#    Research Station. 17 p.
+#  - Wright, C.S.; Balog, C.S.; Kelly, J.W. 2010. Estimating volume, biomass,
+#    and potential emissions of hand-piled fuels. Gen. Tech. Rep. PNW-GTR-805.
+#    Portland, OR: U.S. Department of Agriculture, Forest Service, Pacific
+#    Northwest Research Station. 23 p.
+#    https://research.fs.usda.gov/treesearch/34607
+
+
+# Piles emissions factors are specified in lbs emissions / tons fuels consumed,
+# but we want tons of emissions. So, we divide each EF by 2000.0
+
 # PM EFs are the same for all three phases
-EFS_PM = {"c": 21.9, "d": 27.0, "v": 36.0}
-EFS_PM10 = {"c": 15.5, "d": 20.0, "v": 28.0}
-EFS_PM25 = {"c": 13.5, "d": 17.0, "v": 23.6}
+EFS_PM = {"c": 21.9 / 2000.0, "d": 27.0 / 2000.0, "v": 36.0 / 2000.0}
+EFS_PM10 = {"c": 15.5 / 2000.0, "d": 20.0 / 2000.0, "v": 28.0 / 2000.0}
+EFS_PM25 = {"c": 13.5 / 2000.0, "d": 17.0 / 2000.0, "v": 23.6 / 2000.0}
 
 # Other EFs are the same for clean vs. dirty vs. very dirty
-EF_CO_FLAMING = 52.66
-EF_CO_SMOL_RES = 130.37
-EF_CO2_FLAMING = 3429.22
-EF_CO2_SMOL_RES = 3089.86
-EF_CH4_FLAMING = 3.28
-EF_CH4_SMOL_RES = 11.03
-EF_NMHC_FLAMING = 3.56
-EF_NMHC_SMOL_RES = 6.78
+EF_CO_FLAMING = 52.66  / 2000.0
+EF_CO_SMOL_RES = 130.37  / 2000.0
+EF_CO2_FLAMING = 3429.22  / 2000.0
+EF_CO2_SMOL_RES = 3089.86  / 2000.0
+EF_CH4_FLAMING = 3.28  / 2000.0
+EF_CH4_SMOL_RES = 11.03  / 2000.0
+EF_NMHC_FLAMING = 3.56  / 2000.0
+EF_NMHC_SMOL_RES = 6.78  / 2000.0
 
 PILES_EFS = {
     "flaming": {
@@ -538,8 +558,9 @@ class Piles(EmissionsBase):
             for phase in PILES_EFS:
                 for species in PILES_EFS[phase]:
                     fb['emissions'][phase][species] = sum([
-                        fractions[k] * PILES_EFS[phase][species][k]
-                            for k in fractions
+                        (fractions[k] * PILES_EFS[phase][species][k]
+                            * fb["consumption"]["woody fuels"]["piles"][phase][0])
+                        for k in fractions
                     ])
             for species in PILES_EFS['flaming']:
                 fb['emissions']['total'][species] = sum([
