@@ -483,8 +483,8 @@ class Consume(EmissionsBase):
 #    https://research.fs.usda.gov/treesearch/34607
 
 
-# Piles emissions factors are specified in lbs emissions / tons fuels consumed,
-# but we want tons of emissions. So, we divide each EF by 2000.0
+# Piles emissions factors are specified in lbs emissions / tons fuels
+# consumed, but we want tons of emissions. So, each EF is divided by 2000.0.
 
 # PM EFs are the same for all three phases
 EFS_PM = {"c": 21.9 / 2000.0, "d": 27.0 / 2000.0, "v": 36.0 / 2000.0}

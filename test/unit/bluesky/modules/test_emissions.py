@@ -1192,3 +1192,106 @@ class TestConsumeEmissions(BaseEmissionsTest):
         assert 'emissions_details' in self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]
         self._check_emissions(self.EXPECTED_FIRE1_EMISSIONS_PM_ONLY,
             self.fires[1]['activity'][0]['active_areas'][0]['specified_points'][0]['fuelbeds'][0]['emissions'])
+
+
+class TestPilesEmissions(BaseEmissionsTest):
+
+    def test_wo_details(self, reset_config):
+        Config().set("pile", 'emissions', "model")
+        Config().set(False, 'emissions', "include_emissions_details")
+
+        # expected_online_calc = {
+        #     "PM": 0.1813,
+        #     "PM10": 0.1283,
+        #     "PM2.5": 0.1118,
+        #     "CO": 0.6290,
+        #     "CO2": 27.5499,
+        #     "CH4": 0.0464,
+        #     "NMHC": 0.0375
+        # }
+        expected = {
+            "flaming": {
+                "CH4": 0.01901011643887843,
+                "CO": 0.3052051011193104,
+                "CO2": 19.874960821503258,
+                "NMHC": 0.020632931256831466,
+                "PM": 0.12692730183275536,
+                "PM10": 0.08983439170811452,
+                "PM2.5": 0.07824285729416426
+            },
+            "residual": {
+                "CH4": 0.013698709777057649,
+                "CO": 0.16191303659428882,
+                "CO2": 3.837451984745181,
+                "NMHC": 0.008420421784991012,
+                "PM": 0.027198707535590436,
+                "PM10": 0.01925022679459597,
+                "PM2.5": 0.0167663265630352
+            },
+            "smoldering": {
+                "CH4": 0.013698709777057649,
+                "CO": 0.16191303659428882,
+                "CO2": 3.837451984745181,
+                "NMHC": 0.008420421784991012,
+                "PM": 0.027198707535590436,
+                "PM10": 0.01925022679459597,
+                "PM2.5": 0.0167663265630352
+            },
+            "total": {
+                "CH4": 0.04640753599299373,
+                "CO": 0.629031174307888,
+                "CO2": 27.549864790993617,
+                "NMHC": 0.037473774826813494,
+                "PM": 0.18132471690393626,
+                "PM10": 0.12833484529730646,
+                "PM2.5": 0.11177551042023466
+            }
+        }
+
+        # Note that the location's "piles" section is used in consumption
+        # but not emissions.  It's included here for reference - to know
+        # what was used to get the fuel loadings and consumption values.
+        loc = {
+            "area": 12,
+            "lat": 46.0,
+            "lng": -121.0,
+            "fuelbeds": [
+                {
+                    "fuel_loadings": {
+                        "pile_clean_loading": 20.699168596339753,
+                        "pile_dirty_loading": 0.0,
+                        "pile_vdirty_loading": 0.0
+                    },
+                    "consumption": {
+                        "woody fuels": {
+                            "piles": {
+                                "flaming": [11.591534413950262],
+                                "residual": [2.4839002315607703],
+                                "smoldering": [2.4839002315607703],
+                                "total": [16.559334877071805]
+                            }
+                        }
+                    }
+                }
+            ],
+            "piles": [
+                {
+                    "pile_type": "Machine",
+                    "number_of_piles": 20,
+                    "shape": "HalfSphere",
+                    "h1": 5,
+                    "soil_percent": 10,
+                    "packing_ratio_percent": 25,
+                    "primary_species_density": 37.0,
+                    "primary_species_percent": 70,
+                    "secondary_species_density": 30.8,
+                    "secondary_species_percent": 30,
+                    "pile_quality": "Clean",
+                    "percent_consumed": 80
+                }
+            ]
+        }
+        emissions.Piles().run_on_location(None, None, loc)
+        for p in expected:
+            for s in expected[p]:
+                assert_approx_equal(loc['fuelbeds'][0]['emissions'][p][s.replace('PM2.5', 'PM25')], expected[p][s])
