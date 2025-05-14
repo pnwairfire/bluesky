@@ -558,16 +558,18 @@ class Piles(EmissionsBase):
             fb['emissions'] = {phase: {} for phase in list(PILES_EFS) + ['total']}
             for phase in PILES_EFS:
                 for species in PILES_EFS[phase]:
-                    fb['emissions'][phase][species] = sum([
+                    # emissions are nested in an array to match the output
+                    # of the other models
+                    fb['emissions'][phase][species] = [sum([
                         (fractions[k] * PILES_EFS[phase][species][k]
                             * fb["consumption"]["woody fuels"]["piles"][phase][0])
                         for k in fractions
-                    ])
+                    ])]
             for species in PILES_EFS['flaming']:
-                fb['emissions']['total'][species] = sum([
-                    fb['emissions'][phase][species]
+                fb['emissions']['total'][species] = [sum([
+                    fb['emissions'][phase][species][0]
                         for phase in PILES_EFS
-                ])
+                ])]
 
 
 ##
