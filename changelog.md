@@ -744,3 +744,6 @@
 
 ## 4.6.19
  - Add 'piles' emissions model
+
+## 4.6.20
+ - Fixed structure of 'piles' emissions output
