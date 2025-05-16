@@ -747,3 +747,6 @@
 
 ## 4.6.20
  - Fixed structure of 'piles' emissions output
+
+## 4.6.21
+ - Fixed piles specific logic in Prichard-O'Neill emissions
