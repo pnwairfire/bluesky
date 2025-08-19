@@ -56,6 +56,8 @@ See above.
 Note that the build args are so that files saved in mounted host volumes
 are saved as your user.
 
+If using a Mac with an Apple silicon chips, you may need to add
+`--platform linux/amd64` to the build command.
 
 
 
