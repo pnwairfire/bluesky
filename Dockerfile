@@ -158,10 +158,10 @@ ARG GID=1000
 # We used to always add a new group, even if the GID was already used:
 #    RUN groupadd -g $GID -o $UNAME
 # Now we rename the group if GID already exists
-RUN if id -ng $GID; \
+RUN if getent group $GID; \
     then \
-        echo "Group $GID ($(id -ng $GID)) exists. Renaming as $UNAME"; \
-        groupmod -n $UNAME "$(id -ng $GID)"; \
+        echo "Group $GID ($(getent group $GID | cut -d: -f1)) exists. Renaming as $UNAME"; \
+        groupmod -n $UNAME "$(getent group $GID | cut -d: -f1)"; \
     else \
         groupadd -g $GID $UNAME; fi
 
