@@ -16,7 +16,10 @@
             "model": "hysplit",
             "start": "2025-08-19T00:00:00",
             "output_dir": "/bluesky/output/trajectories-output/{run_id}/",
-            "working_dir": "/bluesky/output/trajectories-working/{run_id}/"
+            "working_dir": "/bluesky/output/trajectories-working/{run_id}/",
+            "hysplit": {
+                "json_indent": 4
+            }
         },
         "dispersion": {
             "start": "2025-08-19T00:00:00",
