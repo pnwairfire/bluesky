@@ -754,3 +754,6 @@
 ## 4.6.22
  - New process for transforming trajectories json into kml
  - Dockerfile fixes
+
+## 4.6.23
+ - Run trajectories json-to-kml transformation in process
