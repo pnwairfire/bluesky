@@ -11,8 +11,8 @@ __version__ = "0.1.0"
 import logging
 import os
 
-from bluesky import io
 from bluesky.config import Config
+from .hysplit_json_to_kml import transform_json_to_kml
 
 class HysplitTrajectoriesVisualizer():
     """Generates KML from trajectores JSON output file
@@ -43,12 +43,7 @@ class HysplitTrajectoriesVisualizer():
     def run(self):
         r = {"output": {}}
         if self._kml_file_name:
-            args = [
-                'trajectories_json_to_kml.py',
-                self._json_file_name,
-                self._kml_file_name
-            ]
-            io.SubprocessExecutor().execute(*args)
+            transform_json_to_kml(self._json_file_name,self._kml_file_name)
 
             r["output"] = {
                 'kml_file_name': os.path.basename(self._kml_file_name),

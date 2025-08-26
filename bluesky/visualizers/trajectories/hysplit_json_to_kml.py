@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
 import argparse
 import json
+import logging
 import sys
 from xml.etree.ElementTree import Element, SubElement, tostring
 from datetime import datetime
@@ -363,25 +363,17 @@ def json_to_kml(data):
     
     return '\n'.join(kml_parts)
 
-def main():
-    parser = argparse.ArgumentParser(description="Convert HYSPLIT JSON to KML.")
-    parser.add_argument("json_file", help="Path to the JSON file")
-    parser.add_argument("output_file", help="Path to output KML file")
-    args = parser.parse_args()
+def transform_json_to_kml(json_file_name,output_file_name):
     
     try:
-        with open(args.json_file, "r", encoding="utf-8") as f:
+        with open(json_file_name, "r", encoding="utf-8") as f:
             data = json.load(f)
         
         kml_str = json_to_kml(data)
         
-        with open(args.output_file, "w", encoding="utf-8") as f:
+        with open(output_file_name, "w", encoding="utf-8") as f:
             f.write(kml_str)
         
-        print(f"KML file written to {args.output_file}")
+        logging.info(f"KML file written to {output_file_name}")
     except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
-
-if __name__ == "__main__":
-    main()
+        logging.error(f"Error: {e}", file=sys.stderr)

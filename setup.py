@@ -20,8 +20,7 @@ setup(
         'bin/bsp',
         'bin/bsp-run-info',
         'bin/bsp-output-visualizer',
-        'bin/ecoregion-lookup',
-        'bin/trajectories_json_to_kml.py'
+        'bin/ecoregion-lookup'
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
