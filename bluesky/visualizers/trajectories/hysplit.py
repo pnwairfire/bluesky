@@ -32,9 +32,9 @@ class HysplitTrajectoriesVisualizer():
         self._kml_file_name = None
         if self._fires_manager.trajectories:
             o = self._fires_manager.trajectories.get('output')
-            if o and o.get('geojson_file_name') and o.get('directory'):
-                self._geojson_file_name = os.path.join(o['directory'],
-                    o['geojson_file_name'])
+            if o and o.get('json_file_name') and o.get('directory'):
+                self._json_file_name = os.path.join(o['directory'],
+                    o['json_file_name'])
                 self._kml_file_name = os.path.join(o['directory'],
                     Config().get('visualization', 'trajectories', 'hysplit',
                         'kml_file_name')
@@ -50,9 +50,9 @@ class HysplitTrajectoriesVisualizer():
         r = {"output": {}}
         if self._kml_file_name:
             args = [
-                'ogr2ogr', '-f', 'kml',
-                self._kml_file_name,
-                self._geojson_file_name
+                'trajectories_json_to_kml.py',
+                self._json_file_name,
+                self._kml_file_name
             ]
             io.SubprocessExecutor().execute(*args)
 
