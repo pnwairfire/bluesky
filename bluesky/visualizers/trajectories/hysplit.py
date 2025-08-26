@@ -15,13 +15,7 @@ from bluesky import io
 from bluesky.config import Config
 
 class HysplitTrajectoriesVisualizer():
-    """Generates KML from trajectores GeoJSON output file
-
-    TODO: generate KML from scratch in order to:
-      - use custom fire icons for location point features,
-      - color coding trajectory lines by start height
-      - group trajectories by start hours, and then by fire
-      - customize popups
+    """Generates KML from trajectores JSON output file
     """
 
     def __init__(self, fires_manager):
