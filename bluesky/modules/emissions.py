@@ -90,11 +90,11 @@ def run(fires_manager):
 
 def should_use_piles_model(loc):
     total_consumption = [
-        fb['consumption']['summary']['total']['total']
+        fb.get('consumption', {}).get('summary', {}).get('total', {}).get('total', 0.0)
         for fb in loc.get('fuelbeds', [])
     ]
     total_piles_consumption = [
-        fb['consumption']['woody fuels']['piles']['total']
+        fb.get('consumption', {}).get('woody fuels', {}).get('piles', {}).get('total', 0.0)
         for fb in loc.get('fuelbeds', [])
     ]
     return total_consumption == total_piles_consumption
