@@ -757,3 +757,6 @@
 
 ## 4.6.23
  - Run trajectories json-to-kml transformation in process
+
+## 4.6.24
+ - Add data checks in piles emissions logic
