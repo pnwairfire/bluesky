@@ -760,3 +760,7 @@
 
 ## 4.6.24
  - Add data checks in piles emissions logic
+
+## 4.6.25
+ - Try decompressing with zcat if gzip.decompress fails when loading input
+ - Create kmz instead of kml for hysplit trajectories
