@@ -165,6 +165,7 @@ RUN if getent group $GID; \
     else \
         groupadd -g $GID $UNAME; fi
 
+# TODO: set home directory to /home/bluesky/
 # Similarly, we used to always add a new user, even if the UID was already used:
 #    RUN useradd -m -u $UID -g $GID -s /bin/bash -o $UNAME
 # Now we rename the user if UID already exists
