@@ -8,6 +8,7 @@ import itertools
 import io
 import json
 import logging
+import subprocess
 import sys
 import traceback
 import urllib.request
@@ -692,12 +693,35 @@ class FiresManager():
 
         try:
             input_stream = gzip.decompress(input_stream)
-            logging.info("Decompressed input")
+            logging.info("Decompressed input with gzip.compress")
         except Exception as e:
-            logging.debug("Failed to gzip.decompress %s: %s", input_file or '', e)
-            logging.info("input %s not gzip'd", input_file or '')
+            try:
+                logging.info("Failed to gzip.decompress %s: %s", input_file or '', e)
+                logging.info("Trying zcat (forked process)")
+                # call `subprocess.run` without `check=True` because there
+                # are cases where `zcat` returns error 1 with message
+                # 'unexpected end of file', but actually successfully
+                # decompresses and returns (to stdout) the complete output data.
+                result = subprocess.run(['zcat', input_file],
+                    capture_output=True, text=True)
 
-        input_stream = input_stream.decode()
+                # We can't rely on `result.returncode` (see comment above).
+                # So, check for data written to stdout. (If the input data
+                # is uncompressed, `result.stdout` will be an empty string.
+                if result.stdout:
+                    logging.info("Decompressed input with zcat")
+                    input_stream = result.stdout
+                else:
+                    logging.info("Failed to zcat %s", input_file or '')
+                    logging.info("Input %s does not appear to be gzip'd", input_file or '')
+            except Exception as eZcat:
+                logging.info("Failed to zcat %s: %s", input_file or '', eZcat)
+                logging.info("Input %s does not appear to be gzip'd", input_file or '')
+
+        # If the input was decompressed with zcat, then it will already
+        # be raw text, and thus not have the 'decode' method.
+        if hasattr(input_stream, 'decode'):
+            input_stream = input_stream.decode()
 
         try:
             data = json.loads(input_stream)
