@@ -23,15 +23,15 @@ class HysplitTrajectoriesVisualizer():
         self._set_output_info()
 
     def _set_output_info(self):
-        self._kml_file_name = None
+        self._kmz_file_name = None
         if self._fires_manager.trajectories:
             o = self._fires_manager.trajectories.get('output')
             if o and o.get('json_file_name') and o.get('directory'):
                 self._json_file_name = os.path.join(o['directory'],
                     o['json_file_name'])
-                self._kml_file_name = os.path.join(o['directory'],
+                self._kmz_file_name = os.path.join(o['directory'],
                     Config().get('visualization', 'trajectories', 'hysplit',
-                        'kml_file_name')
+                        'kmz_file_name')
                 )
 
             else:
@@ -42,12 +42,12 @@ class HysplitTrajectoriesVisualizer():
 
     def run(self):
         r = {"output": {}}
-        if self._kml_file_name:
-            transform_json_to_kml(self._json_file_name,self._kml_file_name)
+        if self._kmz_file_name:
+            transform_json_to_kml(self._json_file_name,self._kmz_file_name)
 
             r["output"] = {
-                'kml_file_name': os.path.basename(self._kml_file_name),
-                'directory': os.path.dirname(self._kml_file_name),
+                'kmz_file_name': os.path.basename(self._kmz_file_name),
+                'directory': os.path.dirname(self._kmz_file_name),
             }
 
         return r

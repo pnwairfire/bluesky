@@ -586,7 +586,7 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
 
 #### if visualizing hysplit trajectories:
 
- - ***'config' > 'visualization' > 'trajectories' > 'hysplit' > 'kml_file_name'*** -- *optional* -- defaults to 'hysplit-trajectories.kml'
+ - ***'config' > 'visualization' > 'trajectories' > 'hysplit' > 'kmz_file_name'*** -- *optional* -- defaults to 'hysplit-trajectories.kmz'
 
 ### export
 

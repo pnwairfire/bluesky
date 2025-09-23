@@ -862,7 +862,7 @@ _DEFAULTS = {
         "targets": [],
         "trajectories": {
             "hysplit": {
-                "kml_file_name": "hysplit-trajectories.kml"
+                "kmz_file_name": "hysplit-trajectories.kmz"
             }
         },
         "dispersion": {

@@ -2,6 +2,8 @@ import argparse
 import json
 import logging
 import sys
+import zipfile
+
 from xml.etree.ElementTree import Element, SubElement, tostring
 from datetime import datetime
 
@@ -371,8 +373,8 @@ def transform_json_to_kml(json_file_name,output_file_name):
         
         kml_str = json_to_kml(data)
         
-        with open(output_file_name, "w", encoding="utf-8") as f:
-            f.write(kml_str)
+        with zipfile.ZipFile(output_file_name, 'w', zipfile.ZIP_DEFLATED) as kmz:
+            kmz.writestr('doc.kml', kml_str)
         
         logging.info(f"KML file written to {output_file_name}")
     except Exception as e:
