@@ -218,6 +218,17 @@ class Fire(dict):
             super(Fire, self).__setattr__(attr, val)
 
 
+FLOAT_PREC = Config().get('floating_point_precision')
+
+def round_floats(obj):
+    if isinstance(obj, float):
+        return round(obj, FLOAT_PREC)
+    elif isinstance(obj, dict):
+        return {k: round_floats(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)) or hasattr(obj, 'tolist'):
+        return [round_floats(item) for item in obj]
+    return obj
+
 class FireEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, 'tolist'):
@@ -761,7 +772,9 @@ class FiresManager():
         if not output_stream:
             flag = 'wb' if compress else 'w'
             output_stream = self._stream(output_file, flag, compress=compress)
-        fire_json = json.dumps(self.dump(), sort_keys=True, cls=FireEncoder,
+        # TODO: py 3.13+ supposedly supports kwarg `round_floats`.
+        #   If so, use it once bluesky is upgraded to 26.06
+        fire_json = json.dumps(round_floats(self.dump()), sort_keys=True, cls=FireEncoder,
             indent=indent)
         if compress:
             fire_json = gzip.compress(fire_json.encode())

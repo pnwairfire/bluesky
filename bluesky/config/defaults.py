@@ -19,6 +19,7 @@ _VSMOKE_IMAGES_PATH = os.path.join(_REPO_ROOT_DIR,
 _DEFAULTS = {
     "skip_failed_fires": True,
     "skip_failed_sources": False,
+    "floating_point_precision": 6,
     "statuslogging": {
         "enabled": False,
         "api_endpoint": None,

@@ -46,6 +46,7 @@ configuration json data are case-insensitive.***
 
  - ***'config' > 'skip_failed_fires'*** -- *optional* -- exclude failed fire rather than abort entire run; default false; applies to various modules
  - ***'config' > 'skip_failed_sources'*** -- *optional* -- exclude failed sources rather than abort entire run; default false;  *Note: this may alternatively be defined under 'load'*
+ - ***'config' > 'floating_point_precision'*** -- *optional* -- default `6`
 
 ### input
 
