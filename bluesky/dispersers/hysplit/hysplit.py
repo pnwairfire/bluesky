@@ -241,6 +241,9 @@ class HYSPLITDispersion(DispersionBase):
         return hours
 
     def _set_met_info(self, met_info):
+        if not met_info:
+            raise ValueError("Met info is undefined")
+
         # TODO: move validation code into common module met.arl.validation ?
         self._met_info = {}
 
