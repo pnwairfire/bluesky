@@ -50,16 +50,19 @@ def run(fires_manager):
 
     met_finder = _get_met_finder(fires_manager)
     time_windows = _get_time_windows(fires_manager)
-
     wait_config = Config().get('findmetdata','wait')
     @io.wait_for_availability(wait_config)
     def _find():
         files = []
         for time_window in time_windows:
-            logging.debug("Findmetdata time window: %s to %s",
-                time_window['start'], time_window['end'])
-            files.extend(met_finder.find(
-                time_window['start'], time_window['end']).get('files', []))
+            try:
+                logging.debug("Findmetdata time window: %s to %s",
+                    time_window['start'], time_window['end'])
+                files.extend(met_finder.find(
+                    time_window['start'], time_window['end']).get('files', []))
+            except Exception as e:
+                logging.debug("Failed to find met data for time window: %s to %s - %s",
+                    time_window['start'], time_window['end'], e)
 
         if not files:
             raise BlueSkyUnavailableResourceError("No met files found")
