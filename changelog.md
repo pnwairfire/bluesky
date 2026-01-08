@@ -764,3 +764,7 @@
 ## 4.6.25
  - Try decompressing with zcat if gzip.decompress fails when loading input
  - Create kmz instead of kml for hysplit trajectories
+
+## 4.6.26
+ - Round floating point values in bluesky output JSON data
+ - Update findmetdata to only fail if all of the time windows have no corresponding met files
