@@ -516,7 +516,7 @@ _DEFAULTS = {
             "ASCDATA_FILE": os.path.join(_HYSPLIT_DISP_BDYFILES_PATH, 'ASCDATA.CFG'),
             "LANDUSE_FILE": os.path.join(_HYSPLIT_DISP_BDYFILES_PATH, 'LANDUSE.ASC'),
             "ROUGLEN_FILE": os.path.join(_HYSPLIT_DISP_BDYFILES_PATH, 'ROUGLEN.ASC'),
-
+            "TERRAIN_FILE": os.path.join(_HYSPLIT_DISP_BDYFILES_PATH, 'TERRAIN.ASC'),
 
             ## Other
 

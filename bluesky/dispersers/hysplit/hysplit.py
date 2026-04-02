@@ -584,7 +584,8 @@ class HYSPLITDispersion(DispersionBase):
             os.path.join(working_dir, 'LANDUSE.ASC'))
         io.create_sym_link(self.config("ROUGLEN_FILE"),
             os.path.join(working_dir, 'ROUGLEN.ASC'))
-
+        io.create_sym_link(self.config("TERRAIN_FILE"),
+            os.path.join(working_dir, 'TERRAIN.ASC'))
 
     def _write_emissions(self, fires, emissions_file):
         # A value slightly above ground level at which to inject smoldering
