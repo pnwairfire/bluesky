@@ -617,6 +617,22 @@ _DEFAULTS = {
             # written after NDUMP
             "NCYCL": 0, # TODO: should this be 24 ?
 
+            # Particle thinning applied to PARINIT before HYSPLIT reads it.
+            # See bluesky.dispersers.hysplit.parthin.
+            # 'min_mass_grams' and 'thin_bins' are mutually exclusive.
+            "parthin": {
+                "enabled": False,
+                # Drop particles with total mass below this value (grams).
+                "min_mass_grams": None,
+                # List of [upper_mass_grams, thin_rate] pairs, ascending and
+                # non-overlapping. Particles in range [prev_upper, upper) are
+                # removed at the thin_rate. Particles above the
+                # highest upper bound are always kept.
+                "thin_bins": None,
+                # Archive the thinned PARINIT to the run output directory.
+                "keep_parinit": False,
+            },
+
             ## ADVANCED Setup variable options
 
             # Minimum size in grid units of the meteorological sub-grid

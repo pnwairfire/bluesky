@@ -64,6 +64,7 @@ from .. import DispersionBase
 from . import hysplit_utils
 from .emissions_file_utils import get_emissions_rows_data
 from .emissionssplit import EmissionsSplitter
+from .parthin import Parthinner
 
 __all__ = [
     'HYSPLITDispersion'
@@ -434,6 +435,10 @@ class HYSPLITDispersion(DispersionBase):
         #      particles
         ninit_val = int(self.config("NINIT") or 0)
 
+        # If parthin replaces the input PARINIT with a thinned version staged
+        # in working_dir, this holds the path written to the setup file.
+        parinit_override = None
+
         # need an input file if ninit_val > 0
         if ninit_val > 0:
             # name of pardump input file, parinit (check for strftime strings)
@@ -470,6 +475,13 @@ class HYSPLITDispersion(DispersionBase):
                 else:
                     logging.info("Using particle initialization file %s" % f)
                     self._has_parinit.append(True)
+
+            # If all input files were present and parthin is enabled, thin
+            # them into working_dir. On any failure the override stays None
+            # and HYSPLIT reads the original PARINIT unchanged.
+            if ninit_val > 0:
+                parinit_override = self._thin_parinit_files(
+                    parinitFiles, working_dir, tranche_num)
 
         # Prepare for run ... get pardump name just in case needed
         pardump = self.config("PARDUMP")
@@ -511,7 +523,8 @@ class HYSPLITDispersion(DispersionBase):
 
         self._write_emissions(fires, emissions_file)
         self._write_control_file(fires, control_file, output_conc_file)
-        self._write_setup_file(fires, emissions_file, setup_file, ninit_val, NCPUS, tranche_num)
+        self._write_setup_file(fires, emissions_file, setup_file, ninit_val,
+            NCPUS, tranche_num, parinit_override=parinit_override)
 
         try:
             # Run HYSPLIT
@@ -565,6 +578,54 @@ class HYSPLITDispersion(DispersionBase):
         # Only archive tranched files if configured to do so
         elif self.config('archive_tranche_files'):
             super()._archive_file(filename, suffix=tranche_num)
+
+    def _thin_parinit_files(self, src_files, working_dir, tranche_num):
+        """Thin each source PARINIT into working_dir and return the relative
+        PINPF base path to write into the setup file.
+
+        Returns None (no override) if parthin is disabled or if thinning fails
+        on any file -- HYSPLIT will then read the original PARINIT.
+        Config errors in the parthin block are raised; per-file runtime errors
+        are logged and trigger the fallback.
+        """
+        parthinner = Parthinner(self.config)
+        if not parthinner.enabled:
+            return None
+
+        thinned_base = os.path.join(working_dir, "PARINIT.thinned")
+        thinned_files = []
+
+        for src in src_files:
+            if len(src_files) == 1:
+                dest = thinned_base
+            else:
+                # Preserve the MPI .NNN suffix from the source filename
+                dest = "%s.%s" % (thinned_base, src.rsplit('.', 1)[-1])
+            try:
+                kept, total = parthinner.thin(src, dest)
+                logging.info("Thinned PARINIT %s: %d -> %d particles",
+                    os.path.basename(src), total, kept)
+                thinned_files.append(dest)
+            except Exception as e:
+                logging.warning("Failed to thin PARINIT %s (%s); using the "
+                    "original PARINIT for this run", src, e)
+                for f in thinned_files:
+                    if os.path.exists(f):
+                        try:
+                            os.remove(f)
+                        except OSError:
+                            pass
+                return None
+
+        if self.config("parthin", "keep_parinit"):
+            for f in thinned_files:
+                try:
+                    self._archive_file(f, tranche_num=tranche_num)
+                except Exception as e:
+                    logging.warning("Failed to archive thinned PARINIT %s: %s",
+                        f, e)
+
+        return "PARINIT.thinned"
 
     def _create_sym_links_for_process(self, working_dir):
         for f in self._met_info['files']:
@@ -883,7 +944,8 @@ class HYSPLITDispersion(DispersionBase):
             # non-zero requires the definition of a deposition grid
             f.write("0.0\n")
 
-    def _write_setup_file(self, fires, emissions_file, setup_file, ninit_val, ncpus, tranche_num):
+    def _write_setup_file(self, fires, emissions_file, setup_file, ninit_val,
+            ncpus, tranche_num, parinit_override=None):
         # Advanced setup options
         # adapted from Robert's HysplitGFS Perl script
 
@@ -920,12 +982,18 @@ class HYSPLITDispersion(DispersionBase):
         if maxpar_val == 0:
             max_particles = (num_sources * 1000) / ncpus
 
-        # name of the particle input file (check for strftime strings)
-        parinit = self.config("PARINIT")
-        if "%" in parinit:
-            parinit = self._model_start.strftime(parinit)
-        if tranche_num is not None:
-            parinit = parinit + '-' + str(tranche_num).zfill(2)
+        # name of the particle input file (check for strftime strings). If
+        # parthin staged a thinned copy in the working dir, use that path
+        # instead -- HYSPLIT runs with cwd=working_dir so a relative path
+        # works and sidesteps the 80-char PINPF limit.
+        if parinit_override is not None:
+            parinit = parinit_override
+        else:
+            parinit = self.config("PARINIT")
+            if "%" in parinit:
+                parinit = self._model_start.strftime(parinit)
+            if tranche_num is not None:
+                parinit = parinit + '-' + str(tranche_num).zfill(2)
 
 
         # name of the particle output file (check for strftime strings)
