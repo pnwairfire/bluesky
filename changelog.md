@@ -768,3 +768,6 @@
 ## 4.6.26
  - Round floating point values in bluesky output JSON data
  - Update findmetdata to only fail if all of the time windows have no corresponding met files
+
+## 4.6.27
+ - Add higher resolution, 0.5 and 0.1 degree, dispersion and trajectory boundary files
