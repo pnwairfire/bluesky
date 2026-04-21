@@ -771,3 +771,8 @@
 
 ## 4.6.27
  - Add higher resolution, 0.5 and 0.1 degree, dispersion and trajectory boundary files
+
+## 4.6.28
+ - add support for parthinning (dropping or sub-sampling particles at different mass thresholds)
+ - add support for initializing particles from sources other than pardump files (e.g. netcdf)
+ - add support for adaptive NUMPAR (scaling NUMPAR such that any given particle represents a fixed amount of mass)
