@@ -45,7 +45,8 @@ class Location(dict):
                 "coordinates": polygon_coordinates
             }
 
-        if self.get('shapefile'):
+        # Only load shapefile if it wasn't already loaded by previous run
+        if self.get('shapefile') and not self.get('geometry'):
             logging.debug("Loading polygon from shapefile")
             if self.get('geometry'):
                 logging.warning("Overwriting perimeter geometry with contents in shapefile")
