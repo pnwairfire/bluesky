@@ -118,3 +118,19 @@ located on your local machine
 In VSCode, click the debug icon, then click the green triangle to "run and debug".
 The tests will start running and the output will be displayed in the debug console of
 VSCode. The breakpoints should work.
+
+
+## Using pdb
+
+One thing to note about using pdb is that, while you can normally break
+into the code with this:
+
+    import pdb; pdb.set_trace()
+
+it doesn't work when using the `contextlib.redirect_stdout` context
+handler. The code hangs and you get no prompt.  To get it to work, you
+need to do the following:
+
+    with redirect_stdout(stdout_target):
+        import pdb; import sys;
+        pdb.Pdb(stdout=sys.__stdout__).set_trace()
