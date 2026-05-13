@@ -776,3 +776,7 @@
  - add support for parthinning (dropping or sub-sampling particles at different mass thresholds)
  - add support for initializing particles from sources other than pardump files (e.g. netcdf)
  - add support for adaptive NUMPAR (scaling NUMPAR such that any given particle represents a fixed amount of mass)
+
+## 4.6.29
+ - don't load a location's shapefile if 'geometry' is already specified
+ - add support for generating geotiffs from hysplit output and optionally uploading them to s3
