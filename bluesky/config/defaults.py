@@ -894,6 +894,7 @@ _DEFAULTS = {
                 "images_dir": None,
                 "data_dir": "",
                 "create_summary_json": False,
+                "skip_blueskykml": False,
                 "blueskykml_config": {
                     'SmokeDispersionKMLInput': {
                         # Use google's fire icon instead of BlueSkyKml's built-in icon

@@ -220,6 +220,9 @@ class HysplitDispersionVisualizer():
     ##
 
     def _run_blueskykml(self, output_directory, files):
+        if vis_hysplit_config('skip_blueskykml'):
+            return
+
         config_options = self._get_config_options(output_directory)
 
         layers = vis_hysplit_config('layers')

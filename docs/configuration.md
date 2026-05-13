@@ -582,6 +582,7 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
  - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'images_dir' -- *optional* -- sub-directory to contain images (relative to output direcotry); default is 'graphics/''
  - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'data_dir' -- *optional* -- sub-directory to contain data files (relative to output direcotry); default is output directory root
  - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'create_summary_json'*** -- *optional* -- default False
+ - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'skip_blueskykml'*** -- *optional* -- default False
 
  - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'blueskykml_config'*** -- *optional* -- contains configuration to pass directly into blueskykml; expected to be nested with top level section keys and second level option keys; see https://github.com/pnwairfire/blueskykml/ for configuration options
 
