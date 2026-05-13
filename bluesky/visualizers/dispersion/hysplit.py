@@ -29,7 +29,7 @@ from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.extrafilewriters.firescsvs import FiresCsvsWriter
 from bluesky.dispersers.hysplit import hysplit_utils
 
-from .hsyplit_geotiffs import create_hysplit_geotiffs
+from .hysplit_geotiffs import create_hysplit_geotiffs
 
 ##
 ## Config getter helpers

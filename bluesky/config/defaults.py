@@ -917,7 +917,7 @@ _DEFAULTS = {
                     # Split the file pathname into output_dir and filename_template
                     # anyway you want.  If uploading to s3, the full s3 key will
                     # reflect filename_template.
-                    "output_dir": "{vis_dir}/geotiffs"
+                    "output_dir": "{vis_dir}/geotiffs",
                     "filename_template": "pm2.5-{hour:03d}.tif",
                     "s3": {
                         "bucket": None,
