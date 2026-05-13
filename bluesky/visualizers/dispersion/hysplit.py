@@ -329,7 +329,7 @@ class HysplitDispersionVisualizer():
         }
 
         s3_info = vis_hysplit_config('geotiffs', 's3')
-        if s3_info['bucket'] and s3_info['path_prefix']:
+        if s3_info['bucket'] and s3_info['key_prefix']:
             # TODO: upload to s3 and add s3 info to 'info''
             pass
 

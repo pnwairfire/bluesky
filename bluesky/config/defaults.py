@@ -922,7 +922,7 @@ _DEFAULTS = {
                     "filename_template": "pm2.5-{hour:03d}.tif",
                     "s3": {
                         "bucket": None,
-                        "path_prefix": None
+                        "key_prefix": None
                     }
                 }
             }

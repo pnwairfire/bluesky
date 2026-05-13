@@ -586,10 +586,11 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
 
  - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'blueskykml_config'*** -- *optional* -- contains configuration to pass directly into blueskykml; expected to be nested with top level section keys and second level option keys; see https://github.com/pnwairfire/blueskykml/ for configuration options
 
- - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 'enabled'***
- - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 'filename_template'***
- - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 's3' > 'bucket'***
- - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 's3' > 'path_prefix'***
+ - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 'enabled'*** -- *optional* -- enable generation of hourly PM2.5 geotiffs, in EPSG:4326
+ - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 'output_dir'*** -- *optional* -- directory to store the geotiffs. Use `{vis_dir}` as a placeholder for the visualization output dir. Defaults to `"{vis_dir}/geotiffs"`.
+ - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 'filename_template'*** -- *optional* -- file name containing hour format directive (e.g. `{hour}`). Can contain subdirectories to be created under `output_dir` - e.g. `"hour-{hour:03d}/pm2.5.tif"`.  Defaults to `"pm2.5-{hour:03d}.tif"`.
+ - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 's3' > 'bucket'*** -- *optional* -- s3 bucket to upload geotiffs to
+ - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 's3' > 'key_prefix'*** -- *optional* -- key prefix to use when uploading geotiffs to s3.  The full key will be key_prefix + filename_template
 
 #### if visualizing hysplit trajectories:
 
