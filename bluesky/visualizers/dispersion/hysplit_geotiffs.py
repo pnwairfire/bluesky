@@ -1,6 +1,10 @@
 import logging
 import os
+
+import boto3
+from botocore.exceptions import NoCredentialsError
 from osgeo import gdal
+
 
 __all__ = [
     'create_hysplit_geotiffs'
@@ -74,4 +78,27 @@ def create_hysplit_geotiffs(hysplit_output_nc_file, output_dir, filename_templat
         if (hour+1) % 10 == 0:
             logging.debug(f"Finished generating {hour+1} hours of geotiffs")
 
-    print(f"Export complete. Files saved in: {output_dir}")
+    logging.debug(f"Done creating geotiffs. Files saved in: {output_dir}")
+    return tsteps
+
+
+def upload_to_s3(s3_info, num_hours, output_dir, filename_template):
+    """
+    Uploads a file to an S3 bucket.
+    """
+    s3 = boto3.client('s3')
+
+    try:
+        for hour in range(0, num_hours):
+            try:
+                f = filename_template.format(hour=hour)
+                local_file = os.path.join(output_dir, f)
+                s3_key = os.path.join(s3_info['key_prefix'], f)
+                s3.upload_file(local_file, s3_info['bucket'], s3_key)
+                logging.debug(f"Successfully uploaded {s3_key}")
+
+            except FileNotFoundError as e:
+                logging.debug(f"Failed to find geotiff file {local_file} to upload to s3")
+
+    except NoCredentialsError as e:
+        logging.debug("AWS credentials not available. Check your ~/.aws/credentials file.")

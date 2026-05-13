@@ -29,7 +29,7 @@ from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.extrafilewriters.firescsvs import FiresCsvsWriter
 from bluesky.dispersers.hysplit import hysplit_utils
 
-from .hysplit_geotiffs import create_hysplit_geotiffs
+from .hysplit_geotiffs import create_hysplit_geotiffs, upload_to_s3
 
 ##
 ## Config getter helpers
@@ -321,17 +321,18 @@ class HysplitDispersionVisualizer():
             vis_hysplit_config('geotiffs', 'filename_template')
         )
 
-        create_hysplit_geotiffs(hysplit_output_file, output_dir, filename_template)
+        num_hours = create_hysplit_geotiffs(hysplit_output_file, output_dir, filename_template)
 
         info = {
             "output_dir": output_dir,
-            "filename_template": filename_template
+            "filename_template": filename_template,
+            "num_hours": num_hours,
         }
 
         s3_info = vis_hysplit_config('geotiffs', 's3')
         if s3_info['bucket'] and s3_info['key_prefix']:
-            # TODO: upload to s3 and add s3 info to 'info''
-            pass
+            upload_to_s3(s3_info, num_hours, output_dir, filename_template)
+            info['s3'] = s3_info
 
         return info
 
