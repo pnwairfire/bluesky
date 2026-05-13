@@ -13,18 +13,15 @@ def create_hysplit_geotiffs(hysplit_output_nc_file, output_dir, filename_templat
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    # Open the specific PM25 subdataset
-    # Format: NETCDF:"filename":variable
+    # Open the specific PM25 subdataset (format: NETCDF:"filename":variable)
     sd_path = f'NETCDF:"{hysplit_output_nc_file}":PM25'
     ds = gdal.Open(sd_path)
 
     if not ds:
-        logging.error("Could not open subdataset. Check filename and variable name.")
+        logging.error(f"Could not read PM2.5 data from hysplit output {hysplit_output_nc_file}.")
         return
 
-
     # TODO: make sure this always extracts surface layer
-
 
     # In GDAL, the bands represent the product of Time x Layers
     total_bands = ds.RasterCount
@@ -35,8 +32,6 @@ def create_hysplit_geotiffs(hysplit_output_nc_file, output_dir, filename_templat
     tsteps = total_bands // nlays
 
     logging.debug(f"Detected Dimensions: {tsteps} hours, {nlays} layer(s).")
-    logging.debug(f"Exporting surface layer (Layer 1) for all {tsteps} hours...")
-
 
     # Extract spatial parameters from metadata
     # Note: Metadata values are returned as strings, so we cast them to float/int
@@ -51,21 +46,18 @@ def create_hysplit_geotiffs(hysplit_output_nc_file, output_dir, filename_templat
     right = left + (ncols * x_cell)
     top = bottom + (nrows * y_cell)
 
-    # Define the output bounds for GDAL
-    # format: [min_x, max_y, max_x, min_y]
+    # Define the output bounds for GDAL (format: [min_x, max_y, max_x, min_y])
     calc_bounds = [left, top, right, bottom]
 
-
-
     # Loop through each hour (surface layer is always the first set of bands)
-    for hour in range(1, tsteps + 1):
+    for hour in range(0, tsteps):
         output_name = os.path.join(output_dir, filename_template.format(hour=hour))
 
         # 1. Translate: Extract specific band and assign spatial bounds
         # Note: In GDAL, Band 1 = Hour 1/Layer 1, Band 2 = Hour 2/Layer 1...
         tmp_ds = gdal.Translate(
             '', ds, format='VRT',
-            bandList=[hour],
+            bandList=[hour + 1], # 1-based indexing
             outputSRS='EPSG:4326',
             outputBounds=calc_bounds,
             noData=0
@@ -79,7 +71,7 @@ def create_hysplit_geotiffs(hysplit_output_nc_file, output_dir, filename_templat
             creationOptions=['COMPRESS=DEFLATE', 'TILED=YES']
         )
 
-        if hour % 10 == 0:
-            logging.debug(f"Finished hour {hour}...")
+        if (hour+1) % 10 == 0:
+            logging.debug(f"Finished generating {hour+1} hours of geotiffs")
 
     print(f"Export complete. Files saved in: {output_dir}")
