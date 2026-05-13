@@ -29,6 +29,8 @@ from bluesky.exceptions import BlueSkyConfigurationError
 from bluesky.extrafilewriters.firescsvs import FiresCsvsWriter
 from bluesky.dispersers.hysplit import hysplit_utils
 
+from .hsyplit_geotiffs import create_hysplit_geotiffs
+
 ##
 ## Config getter helpers
 ##
@@ -128,35 +130,9 @@ class HysplitDispersionVisualizer():
 
         self._generate_summary_json(output_directory)
 
-        config_options = self._get_config_options(output_directory)
+        self._run_blueskykml(output_directory, files)
 
-        layers = vis_hysplit_config('layers')
-        args = BlueskyKmlArgs(
-            output_directory=str(output_directory),
-            configfile=None, # TODO: allow this to be configurable?
-            prettykml=vis_hysplit_config('prettykml'),
-            # in blueskykml, if verbose is True, then logging level will be set
-            # DEBUG; otherwise, logging level is left as is.  bsp already takes
-            # care of setting log level, so setting verbose to False will let
-            # blueskykml inherit logging level
-            verbose=False,
-            config_options=config_options,
-            inputfile=str(self._hysplit_output_file),
-            fire_locations_csv=str(files['fire_locations_csv']['pathname']),
-            fire_events_csv=str(files['fire_events_csv']['pathname']),
-            smoke_dispersion_kmz_file=str(files['smoke_dispersion_kmz']['pathname']),
-            fire_kmz_file=str(files['fire_kmz']['pathname']),
-            # blueskykml now supports layers specified as list of ints
-            layers=layers
-        )
-
-        try:
-            # Note: using create_working_dir effectively marks any
-            #  intermediate outputs for cleanup
-            with osutils.create_working_dir() as wdir:
-                makedispersionkml.main(args)
-        except blueskykml_configuration.ConfigurationError as e:
-            raise BlueSkyConfigurationError(".....")
+        geotiffs_info = self._create_geotiffs(self._hysplit_output_file, output_directory)
 
         return {
             'blueskykml_version': blueskykml_version,
@@ -166,7 +142,8 @@ class HysplitDispersionVisualizer():
                 "smoke_dispersion_kmz_filename": files['smoke_dispersion_kmz']['name'],
                 "fire_kmz_filename": files['fire_kmz']['name'],
                 "fire_locations_csv_filename": files['fire_locations_csv']['name'],
-                "fire_events_csv_filename": files['fire_events_csv']['name']
+                "fire_events_csv_filename": files['fire_events_csv']['name'],
+                "geotiffs": geotiffs_info
                 # TODO: add location of image files, etc.
             }
         }
@@ -236,6 +213,45 @@ class HysplitDispersionVisualizer():
             with open(os.path.join(output_directory, 'summary.json'), 'w') as f:
                 f.write(contents_json)
 
+
+
+    ##
+    ## BlueskyKml
+    ##
+
+    def _run_blueskykml(self, output_directory, files):
+        config_options = self._get_config_options(output_directory)
+
+        layers = vis_hysplit_config('layers')
+        args = BlueskyKmlArgs(
+            output_directory=str(output_directory),
+            configfile=None, # TODO: allow this to be configurable?
+            prettykml=vis_hysplit_config('prettykml'),
+            # in blueskykml, if verbose is True, then logging level will be set
+            # DEBUG; otherwise, logging level is left as is.  bsp already takes
+            # care of setting log level, so setting verbose to False will let
+            # blueskykml inherit logging level
+            verbose=False,
+            config_options=config_options,
+            inputfile=str(self._hysplit_output_file),
+            fire_locations_csv=str(files['fire_locations_csv']['pathname']),
+            fire_events_csv=str(files['fire_events_csv']['pathname']),
+            smoke_dispersion_kmz_file=str(files['smoke_dispersion_kmz']['pathname']),
+            fire_kmz_file=str(files['fire_kmz']['pathname']),
+            # blueskykml now supports layers specified as list of ints
+            layers=layers
+        )
+
+        try:
+            # Note: using create_working_dir effectively marks any
+            #  intermediate outputs for cleanup
+            with osutils.create_working_dir() as wdir:
+                makedispersionkml.main(args)
+        except blueskykml_configuration.ConfigurationError as e:
+            raise BlueSkyConfigurationError(".....")
+
+
+
     def _get_config_options(self, output_directory):
         """Creates config options dict to be pass into BlueSkyKml
 
@@ -282,3 +298,37 @@ class HysplitDispersionVisualizer():
                 'DispersionGridOutput', 'OUTPUT_DIR')
 
         return config_options
+
+
+    ##
+    ## Geotiffs
+    ##
+
+    def _create_geotiffs(self, hysplit_output_file, vis_output_directory):
+        if not vis_hysplit_config('geotiffs', 'enabled'):
+            return
+
+        def _replace_vis_dir(p):
+            return p.replace('{vis_dir}', vis_output_directory)
+
+        output_dir = _replace_vis_dir(
+            vis_hysplit_config('geotiffs', 'output_dir')
+        )
+        filename_template = _replace_vis_dir(
+            vis_hysplit_config('geotiffs', 'filename_template')
+        )
+
+        create_hysplit_geotiffs(hysplit_output_file, output_dir, filename_template)
+
+        info = {
+            "output_dir": output_dir,
+            "filename_template": filename_template
+        }
+
+        s3_info = vis_hysplit_config('geotiffs', 's3')
+        if s3_info['bucket'] and s3_info['path_prefix']:
+            # TODO: upload to s3 and add s3 info to 'info''
+            pass
+
+        return info
+

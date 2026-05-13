@@ -910,7 +910,20 @@ _DEFAULTS = {
 
                 # The following default is defined in the blueskykml package,
                 # but we need to define it here so that the code doesn't fail
-                "layers": [0]
+                "layers": [0],
+
+                "geotiffs": {
+                    "enabled": False,
+                    # Split the file pathname into output_dir and filename_template
+                    # anyway you want.  If uploading to s3, the full s3 key will
+                    # reflect filename_template.
+                    "output_dir": "{vis_dir}/geotiffs"
+                    "filename_template": "pm2.5-{hour:03d}.tif",
+                    "s3": {
+                        "bucket": None,
+                        "path_prefix": None
+                    }
+                }
             }
         }
     },

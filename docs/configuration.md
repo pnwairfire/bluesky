@@ -585,6 +585,11 @@ defined, it will look for 'boundary', 'spacing', and 'projection' in the top lev
 
  - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'blueskykml_config'*** -- *optional* -- contains configuration to pass directly into blueskykml; expected to be nested with top level section keys and second level option keys; see https://github.com/pnwairfire/blueskykml/ for configuration options
 
+ - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 'enabled'***
+ - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 'filename_template'***
+ - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 's3' > 'bucket'***
+ - ***'config' > 'visualization' > 'dispersion' > 'hysplit' > 'geotiffs' > 's3' > 'path_prefix'***
+
 #### if visualizing hysplit trajectories:
 
  - ***'config' > 'visualization' > 'trajectories' > 'hysplit' > 'kmz_file_name'*** -- *optional* -- defaults to 'hysplit-trajectories.kmz'
