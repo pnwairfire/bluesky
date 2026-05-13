@@ -56,6 +56,9 @@ def create_hysplit_geotiffs(hysplit_output_nc_file, output_dir, filename_templat
     # Loop through each hour (surface layer is always the first set of bands)
     for hour in range(0, tsteps):
         output_name = os.path.join(output_dir, filename_template.format(hour=hour))
+        full_dir = os.path.dirname(output_name)
+        if not os.path.exists(full_dir):
+            os.makedirs(full_dir)
 
         # 1. Translate: Extract specific band and assign spatial bounds
         # Note: In GDAL, Band 1 = Hour 1/Layer 1, Band 2 = Hour 2/Layer 1...
