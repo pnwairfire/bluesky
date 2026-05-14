@@ -10,7 +10,38 @@ __all__ = [
     'create_hysplit_geotiffs'
 ]
 
-def create_hysplit_geotiffs(hysplit_output_nc_file, output_dir, filename_template):
+
+def create_hysplit_geotiffs(geotiffs_config, hysplit_output_file, vis_output_directory):
+    if not geotiffs_config.get('enabled'):
+        return
+
+    def _replace_vis_dir(p):
+        return p.replace('{vis_dir}', vis_output_directory)
+
+    output_dir = _replace_vis_dir(
+        geotiffs_config.get('output_dir')
+    )
+    filename_template = _replace_vis_dir(
+        geotiffs_config.get('filename_template')
+    )
+
+    num_hours = _create_geotiffs(hysplit_output_file, output_dir, filename_template)
+
+    info = {
+        "output_dir": output_dir,
+        "filename_template": filename_template,
+        "num_hours": num_hours,
+    }
+
+    s3_info = geotiffs_config.get('s3')
+    if s3_info['bucket'] and s3_info['key_prefix']:
+        upload_to_s3(s3_info, num_hours, output_dir, filename_template)
+        info['s3'] = s3_info
+
+    return info
+
+
+def _create_geotiffs(hysplit_output_nc_file, output_dir, filename_template):
     """Parses HYSPLIT NetCDF to extract time/layer info and
     exports each hour of the surface layer as a reprojected geotiff.
     """

@@ -132,7 +132,8 @@ class HysplitDispersionVisualizer():
 
         self._run_blueskykml(output_directory, files)
 
-        geotiffs_info = self._create_geotiffs(self._hysplit_output_file, output_directory)
+        geotiffs_info = create_hysplit_geotiffs(vis_hysplit_config('geotiffs'),
+            self._hysplit_output_file, output_directory)
 
         return {
             'blueskykml_version': blueskykml_version,
@@ -301,38 +302,4 @@ class HysplitDispersionVisualizer():
                 'DispersionGridOutput', 'OUTPUT_DIR')
 
         return config_options
-
-
-    ##
-    ## Geotiffs
-    ##
-
-    def _create_geotiffs(self, hysplit_output_file, vis_output_directory):
-        if not vis_hysplit_config('geotiffs', 'enabled'):
-            return
-
-        def _replace_vis_dir(p):
-            return p.replace('{vis_dir}', vis_output_directory)
-
-        output_dir = _replace_vis_dir(
-            vis_hysplit_config('geotiffs', 'output_dir')
-        )
-        filename_template = _replace_vis_dir(
-            vis_hysplit_config('geotiffs', 'filename_template')
-        )
-
-        num_hours = create_hysplit_geotiffs(hysplit_output_file, output_dir, filename_template)
-
-        info = {
-            "output_dir": output_dir,
-            "filename_template": filename_template,
-            "num_hours": num_hours,
-        }
-
-        s3_info = vis_hysplit_config('geotiffs', 's3')
-        if s3_info['bucket'] and s3_info['key_prefix']:
-            upload_to_s3(s3_info, num_hours, output_dir, filename_template)
-            info['s3'] = s3_info
-
-        return info
 
