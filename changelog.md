@@ -780,3 +780,6 @@
 ## 4.6.29
  - don't load a location's shapefile if 'geometry' is already specified
  - add support for generating geotiffs from hysplit output and optionally uploading them to s3
+
+## 4.6.30
+ - add support for generating 3hr, daily avg, and daily max geotiffs from hysplit output
