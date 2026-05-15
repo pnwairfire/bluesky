@@ -919,7 +919,13 @@ _DEFAULTS = {
                     # anyway you want.  If uploading to s3, the full s3 key will
                     # reflect filename_template.
                     "output_dir": "{vis_dir}/geotiffs",
-                    "filename_template": "pm2.5-{hour:03d}.tif",
+                    "filename_templates": {
+                        "hourly": "pm2.5-{hour:03d}.tif",
+                        "3hr": "pm2.5-3hr-{hour:03d}.tif",
+                        "daily_avg": "pm2.5-daily-avg-{day:%Y-%m-%d%z}.tif",
+                        "daily_max": "pm2.5-daily-max-{day:%Y-%m-%d%z}.tif",
+                    },
+                    "daily_utc_offsets": [-11,-10,-9,-8,-7,-6,-5,-4,0],
                     "s3": {
                         "bucket": None,
                         "key_prefix": None

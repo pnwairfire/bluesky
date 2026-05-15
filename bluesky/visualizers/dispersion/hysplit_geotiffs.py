@@ -21,27 +21,28 @@ def create_hysplit_geotiffs(geotiffs_config, hysplit_output_file, vis_output_dir
     output_dir = _replace_vis_dir(
         geotiffs_config.get('output_dir')
     )
-    filename_template = _replace_vis_dir(
-        geotiffs_config.get('filename_template')
+    hourly_filename_template = _replace_vis_dir(
+        geotiffs_config['filename_templates']['hourly']
     )
 
-    num_hours = _create_geotiffs(hysplit_output_file, output_dir, filename_template)
+    num_hours = _create_geotiffs(hysplit_output_file, output_dir,
+        hourly_filename_template)
 
     info = {
         "output_dir": output_dir,
-        "filename_template": filename_template,
+        "filename_templates": filename_templates,
         "num_hours": num_hours,
     }
 
     s3_info = geotiffs_config.get('s3')
     if s3_info['bucket'] and s3_info['key_prefix']:
-        upload_to_s3(s3_info, num_hours, output_dir, filename_template)
+        upload_to_s3(s3_info, num_hours, output_dir, hourly_filename_template)
         info['s3'] = s3_info
 
     return info
 
 
-def _create_geotiffs(hysplit_output_nc_file, output_dir, filename_template):
+def _create_geotiffs(hysplit_output_nc_file, output_dir, hourly_filename_template):
     """Parses HYSPLIT NetCDF to extract time/layer info and
     exports each hour of the surface layer as a reprojected geotiff.
     """
@@ -86,7 +87,7 @@ def _create_geotiffs(hysplit_output_nc_file, output_dir, filename_template):
 
     # Loop through each hour (surface layer is always the first set of bands)
     for hour in range(0, tsteps):
-        output_name = os.path.join(output_dir, filename_template.format(hour=hour))
+        output_name = os.path.join(output_dir, hourly_filename_template.format(hour=hour))
         full_dir = os.path.dirname(output_name)
         if not os.path.exists(full_dir):
             os.makedirs(full_dir)
@@ -116,7 +117,7 @@ def _create_geotiffs(hysplit_output_nc_file, output_dir, filename_template):
     return tsteps
 
 
-def upload_to_s3(s3_info, num_hours, output_dir, filename_template):
+def upload_to_s3(s3_info, num_hours, output_dir, hourly_filename_template):
     """
     Uploads a file to an S3 bucket.
     """
@@ -125,7 +126,7 @@ def upload_to_s3(s3_info, num_hours, output_dir, filename_template):
     try:
         for hour in range(0, num_hours):
             try:
-                f = filename_template.format(hour=hour)
+                f = hourly_filename_template.format(hour=hour)
                 local_file = os.path.join(output_dir, f)
                 s3_key = os.path.join(s3_info['key_prefix'], f)
                 s3.upload_file(local_file, s3_info['bucket'], s3_key)
