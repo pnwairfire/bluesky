@@ -46,7 +46,7 @@ def create_hysplit_geotiffs(geotiffs_config, hysplit_output_file, vis_output_dir
 
     s3_info = geotiffs_config.get('s3')
     if s3_info and s3_info.get('bucket') and s3_info.get('key_prefix'):
-        upload_to_s3(
+        _upload_to_s3(
             s3_info, result['tsteps'], result['start_dt'],
             daily_utc_offsets, output_dir, filename_templates
         )
@@ -177,7 +177,7 @@ def _create_geotiffs(hysplit_output_nc_file, output_dir, filename_templates, dai
             filename_template_daily_avg, filename_template_daily_max,
             tsteps, start_dt, daily_utc_offsets)
 
-    logging.debug(f"All geotiffs saved in: {output_dir}")
+    logging.info(f"All geotiffs saved in: {output_dir}")
     return {'tsteps': tsteps, 'start_dt': start_dt, "bounds": bounds}
 
 def _get_metadata(ds):
@@ -192,7 +192,7 @@ def _get_metadata(ds):
     logging.debug(f"Detected Dimensions: {tsteps} hours, {nlays} layer(s).")
 
     # Extract spatial parameters from metadata
-    # Note: Metadata values are returned as strings, so we cast them to float/int
+    # Note: metadata values are returned as strings
     left = float(metadata.get('NC_GLOBAL#XORIG'))
     bottom = float(metadata.get('NC_GLOBAL#YORIG'))
     x_cell = float(metadata.get('NC_GLOBAL#XCELL'))
@@ -200,7 +200,7 @@ def _get_metadata(ds):
     ncols = int(metadata.get('NC_GLOBAL#NCOLS'))
     nrows = int(metadata.get('NC_GLOBAL#NROWS'))
 
-    # Calculate the Right and Top boundaries
+    # Calculate the right and top boundaries
     right = left + (ncols * x_cell)
     top = bottom + (nrows * y_cell)
 
@@ -240,11 +240,10 @@ def _create_hourly_geotiffs(ds, bounds, output_dir, filename_template_hourly, ts
             if (hour + 1) % 10 == 0:
                 logging.debug(f"Finished generating {hour + 1} hours of geotiffs")
 
-        logging.debug("Done creating hourly geotiffs.")
+        logging.info("Done creating hourly geotiffs.")
 
 
 def _create_3hr_geotiffs(band_arrays, ref_vrt, output_dir, filename_template_3hr, tsteps):
-    # --- 3-hour average geotiffs (centered rolling window, clipped at boundaries) ---
     if filename_template_3hr and band_arrays is not None:
         for hour in range(tsteps):
             window_start = max(0, hour - 1)
@@ -253,11 +252,10 @@ def _create_3hr_geotiffs(band_arrays, ref_vrt, output_dir, filename_template_3hr
             output_name = os.path.join(output_dir, filename_template_3hr.format(hour=hour))
             _write_array_as_geotiff(avg_arr, output_name, ref_vrt)
 
-        logging.debug("Done creating 3hr average geotiffs.")
+        logging.info("Done creating 3hr average geotiffs.")
 
 def _create_daily_geotiffs(band_arrays, ref_vrt, output_dir, filename_template_daily_avg,
         filename_template_daily_max, tsteps, start_dt, daily_utc_offsets):
-    # --- Daily average and maximum geotiffs ---
     if (filename_template_daily_avg or filename_template_daily_max) and band_arrays is not None:
         for utc_offset in daily_utc_offsets:
             day_groups = _group_hours_by_day(tsteps, start_dt, utc_offset)
@@ -272,10 +270,12 @@ def _create_daily_geotiffs(band_arrays, ref_vrt, output_dir, filename_template_d
                     output_name = os.path.join(output_dir, filename_template_daily_max.format(day=local_day))
                     _write_array_as_geotiff(max_arr, output_name, ref_vrt)
 
-        logging.debug("Done creating daily average and maximum geotiffs.")
+        logging.info("Done creating daily average and maximum geotiffs.")
 
-def upload_to_s3(s3_info, tsteps, start_dt, daily_utc_offsets, output_dir, filename_templates):
-    """Upload all generated geotiff files to an S3 bucket."""
+def _upload_to_s3(s3_info, tsteps, start_dt, daily_utc_offsets, output_dir, filename_templates):
+    """Upload all generated geotiff files to s3
+    """
+    logging.info("Uploading geotiffs to s3")
     s3 = boto3.client('s3')
 
     files_to_upload = []
@@ -306,7 +306,9 @@ def upload_to_s3(s3_info, tsteps, start_dt, daily_utc_offsets, output_dir, filen
                 logging.debug(f"Successfully uploaded {s3_key}")
 
             except FileNotFoundError:
-                logging.debug(f"Failed to find geotiff file {local_file} to upload to s3")
+                logging.error(f"Failed to find geotiff file {local_file} to upload to s3")
 
     except NoCredentialsError:
-        logging.debug("AWS credentials not available. Check your ~/.aws/credentials file.")
+        logging.error("AWS credentials not available. Check your ~/.aws/credentials file.")
+
+    logging.info("Done uploading geotiffs to s3")
