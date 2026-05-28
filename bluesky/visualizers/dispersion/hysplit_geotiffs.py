@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from collections import defaultdict
@@ -139,7 +140,7 @@ def _create_geotiffs(hysplit_output_nc_file, output_dir, filename_templates, dai
 
     # TODO: make sure this always extracts surface layer
 
-    bounds, start_dt, tsteps = _get_metadata(ds)
+    bounds, start_dt, tsteps, ncols, nrows = _get_metadata(ds)
 
     filename_template_hourly = filename_templates.get('hourly')
     filename_template_3hr = filename_templates.get('3hr')
@@ -177,6 +178,8 @@ def _create_geotiffs(hysplit_output_nc_file, output_dir, filename_templates, dai
             filename_template_daily_avg, filename_template_daily_max,
             tsteps, start_dt, daily_utc_offsets)
 
+    _write_metadata_json(output_dir, start_dt, tsteps, bounds, ncols, nrows)
+
     logging.info(f"All geotiffs saved in: {output_dir}")
     return {'tsteps': tsteps, 'start_dt': start_dt, "bounds": bounds}
 
@@ -209,7 +212,32 @@ def _get_metadata(ds):
 
     start_dt = _get_start_datetime(metadata)
 
-    return bounds, start_dt, tsteps
+    return bounds, start_dt, tsteps, ncols, nrows
+
+def _write_metadata_json(output_dir, start_dt, tsteps, bounds, ncols, nrows):
+    """Write metadata.json describing the geotiff outputs to output_dir.
+
+    bounds is in GDAL format [left, top, right, bottom]; metadata.json uses
+    [west, south, east, north].
+    """
+    metadata = {
+        "init_time": start_dt.strftime('%Y%m%d%H') if start_dt else None,
+        "forecast_hours": list(range(tsteps)),
+        "variables": {
+            "pm25": {
+                "bounds": [bounds[0], bounds[3], bounds[2], bounds[1]],
+                "width": ncols,
+                "height": nrows,
+                "unit": "µg/m³",
+                "fileTypes": ["geotiff"]
+            }
+        }
+    }
+    metadata_path = os.path.join(output_dir, 'metadata.json')
+    with open(metadata_path, 'w') as f:
+        json.dump(metadata, f, indent=2)
+    logging.info(f"Metadata written to {metadata_path}")
+
 
 def _create_hourly_geotiffs(ds, bounds, output_dir, filename_template_hourly, tsteps):
     if filename_template_hourly:
@@ -278,7 +306,7 @@ def _upload_to_s3(s3_info, tsteps, start_dt, daily_utc_offsets, output_dir, file
     logging.info("Uploading geotiffs to s3")
     s3 = boto3.client('s3')
 
-    files_to_upload = []
+    files_to_upload = ['metadata.json']
 
     if 'hourly' in filename_templates:
         for hour in range(tsteps):
