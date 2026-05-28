@@ -783,3 +783,6 @@
 
 ## 4.6.30
  - add support for generating 3hr, daily avg, and daily max geotiffs from hysplit output
+
+## 4.6.31
+ - create and upload metadata.json to go along with hysplit geotiffs
