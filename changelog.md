@@ -786,3 +786,6 @@
 
 ## 4.6.31
  - create and upload metadata.json to go along with hysplit geotiffs
+
+## 4.6.32
+ - Add more geotiff info to visualization section of output
