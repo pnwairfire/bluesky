@@ -31,27 +31,26 @@ def create_hysplit_geotiffs(geotiffs_config, hysplit_output_file, vis_output_dir
 
     daily_utc_offsets = geotiffs_config.get('daily_utc_offsets', [])
 
-    result = _create_geotiffs(
+    info, start_dt = _create_geotiffs(
         hysplit_output_file, output_dir,
         filename_templates, daily_utc_offsets
     )
 
-    if not result:
+    if not info:
         return
 
-    info = {
-        "output_dir": output_dir,
-        "filename_templates": filename_templates,
-        "num_hours": result['tsteps'],
-    }
+    info["daily_utc_offsets"] = daily_utc_offsets
+    info["output_dir"] = output_dir
+    info["filename_templates"] = filename_templates
 
     s3_info = geotiffs_config.get('s3')
     if s3_info and s3_info.get('bucket') and s3_info.get('key_prefix'):
-        _upload_to_s3(
-            s3_info, result['tsteps'], result['start_dt'],
+        region = _upload_to_s3(
+            s3_info, info['num_hours'], start_dt,
             daily_utc_offsets, output_dir, filename_templates
         )
         info['s3'] = s3_info
+        info['s3']['region'] = region
 
     return info
 
@@ -178,10 +177,11 @@ def _create_geotiffs(hysplit_output_nc_file, output_dir, filename_templates, dai
             filename_template_daily_avg, filename_template_daily_max,
             tsteps, start_dt, daily_utc_offsets)
 
-    _write_metadata_json(output_dir, start_dt, tsteps, bounds, ncols, nrows)
+    structured_metadata = _write_metadata_json(output_dir, start_dt, tsteps, bounds, ncols, nrows)
 
     logging.info(f"All geotiffs saved in: {output_dir}")
-    return {'tsteps': tsteps, 'start_dt': start_dt, "bounds": bounds}
+
+    return structured_metadata, start_dt
 
 def _get_metadata(ds):
     # In GDAL, the bands represent the product of Time x Layers
@@ -222,14 +222,15 @@ def _write_metadata_json(output_dir, start_dt, tsteps, bounds, ncols, nrows):
     """
     metadata = {
         "init_time": start_dt.strftime('%Y%m%d%H') if start_dt else None,
-        "forecast_hours": list(range(tsteps)),
+        "num_hours": tsteps,
         "variables": {
             "pm25": {
                 "bounds": [bounds[0], bounds[3], bounds[2], bounds[1]],
                 "width": ncols,
                 "height": nrows,
                 "unit": "µg/m³",
-                "fileTypes": ["geotiff"]
+                "fileTypes": ["geotiff"],
+                "type": "scalar",
             }
         }
     }
@@ -237,6 +238,8 @@ def _write_metadata_json(output_dir, start_dt, tsteps, bounds, ncols, nrows):
     with open(metadata_path, 'w') as f:
         json.dump(metadata, f, indent=2)
     logging.info(f"Metadata written to {metadata_path}")
+
+    return metadata
 
 
 def _create_hourly_geotiffs(ds, bounds, output_dir, filename_template_hourly, tsteps):
@@ -340,3 +343,4 @@ def _upload_to_s3(s3_info, tsteps, start_dt, daily_utc_offsets, output_dir, file
         logging.error("AWS credentials not available. Check your ~/.aws/credentials file.")
 
     logging.info("Done uploading geotiffs to s3")
+    return s3.meta.region_name
