@@ -43,6 +43,7 @@ setup(
             'trajectories/hysplit/bdyfiles/*',
             'dispersers/vsmoke/images/*',
             'ecoregion/data/*',
+            'countries/data/*',
             'fips/*'
         ]
     },
