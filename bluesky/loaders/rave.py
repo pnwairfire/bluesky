@@ -22,7 +22,7 @@ import glob
 import os
 
 from bluesky.loaders import BaseLoader, BaseCsvFileLoader
-from bluesky.exceptions import BlueSkyConfigurationError
+from bluesky.exceptions import BlueSkyConfigurationError, BlueSkyGeographyValueError
 
 __all__ = ["NetcdfFileLoader", "CsvFileLoader"]
 
@@ -70,20 +70,23 @@ def np_time_to_iso(np_dt):
 class _RaveMarshalMixin:
     """Turns flat cell-hour records into one Fire per grid cell."""
 
-    def _load_country_grid(self, config):
-        path = config.get("country_lookup")
-        if not path:
+    def _setup_country_lookup(self, config):
+        if not config.get("assign_country", True):
             return None
-        import numpy
-        return numpy.load(path, mmap_mode="r")  # near-zero resident; O(1) lookups
+        from bluesky.countries.lookup import CountryLookup, get_default_lookup
+        shapefile = config.get("country_shapefile")
+        return CountryLookup(shapefile) if shapefile else get_default_lookup()
 
-    def _lookup_country(self, row, col):
-        grid = getattr(self, "_country_grid", None)
-        if grid is None:
+    def _lookup_country(self, lat, lng):
+        lookup = getattr(self, "_country_lookup", None)
+        if lookup is None:
             return None
-        if 0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]:
-            return str(grid[row, col]) or None
-        return None
+        try:
+            return lookup.lookup(lat, lng)
+        except BlueSkyGeographyValueError:
+            # a single out-of-range point must not fail the whole load;
+            # systematic failures (e.g. a missing shapefile) surface instead.
+            return None
 
     def _marshal(self, records):
         groups = {}
@@ -153,7 +156,7 @@ class _RaveMarshalMixin:
             "timeprofile": timeprofile,
             "specified_points": [point],
         }
-        country = self._lookup_country(row, col)
+        country = self._lookup_country(lat, lng)
         if country:
             active_area["country"] = country
         return {
@@ -174,7 +177,7 @@ class NetcdfFileLoader(_RaveMarshalMixin, BaseLoader):
         super().__init__(**config)
         self._filenames = self._resolve_files(config)
         self._min_qa = config.get("min_qa", 1)
-        self._country_grid = self._load_country_grid(config)
+        self._country_lookup = self._setup_country_lookup(config)
 
     def _resolve_files(self, config):
         if config.get("files"):
@@ -243,7 +246,7 @@ class CsvFileLoader(_RaveMarshalMixin, BaseCsvFileLoader):
     def __init__(self, **config):
         super().__init__(**config)
         self._min_qa = config.get("min_qa", 1)
-        self._country_grid = self._load_country_grid(config)
+        self._country_lookup = self._setup_country_lookup(config)
 
     def _load(self):
         rows = super()._load()  # pyairfire CSV2JSON -> list of row dicts
