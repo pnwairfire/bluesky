@@ -444,12 +444,15 @@ _DEFAULTS = {
         # the logic in the code. So, leave fields commented out
         "plume_merge": {
             # "grid": {
+            #     # spacing is assumed to be in degrees if 'projection' is
+            #     # set to 'LatLng'. Otherwise, it's assumed to be in km.
             #     "spacing": None,
             #     # the region within which to merge plumes
             #     "boundary": {
             #         "sw": { "lat":None, "lng": None},
             #         "ne": { "lat":None, "lng": None}
-            #     }
+            #     },
+            #     "projection": None, # "'LatLng' or 'LCC'"
             # }
         },
         "hysplit": {
@@ -492,12 +495,15 @@ _DEFAULTS = {
             # of a grid definition (nonempty vs. empty grid dict) is used in
             # the logic in the code. So, leave grid fields commented out
             "grid": {
+                # spacing is assumed to be in degrees if 'projection' is
+                # set to 'LatLng'. Otherwise, it's assumed to be in km.
                 # "spacing": None,
                 # "domain": None,
                 # "boundary": {
                 #   "sw": { "lat":None, "lng": None},
                 #   "ne": { "lat":None, "lng": None}
-                # }
+                # },
+                # "projection": None, # "'LatLng' or 'LCC'"
             },
 
             # computing grid around fire

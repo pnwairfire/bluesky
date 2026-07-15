@@ -13,6 +13,6 @@ profile.txt
 /input/
 /working/
 dev-private/
-.private/
+.private
 /export/
 fabfile.py
