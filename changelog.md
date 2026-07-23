@@ -789,3 +789,9 @@
 
 ## 4.6.32
  - Add more geotiff info to visualization section of output
+
+## 4.6.32
+ - Add more geotiff info to visualization section of output
+
+## 4.6.33
+ - Add RAVE emissions loader with country assignment
