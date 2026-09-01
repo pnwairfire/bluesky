@@ -1148,3 +1148,162 @@ class TestPersistenceWfWtihDailyPercentages():
         assert fm.fires[0]['activity'][1] == expected[0]['activity'][1]
         assert fm.fires[0]['activity'][2] == expected[0]['activity'][2]
         assert fm.fires == expected
+
+
+##
+## Regression: a timeprofile must be shifted exactly once, whichever level owns it
+##
+## Both placements are real and source-dependent, so _persist has to handle each:
+##   - POINT level: FireSpider GOES-16. Its marshaller seeds and fills
+##     specified_points[0]['timeprofile'] (firespider/marshal/goes16.py:112-128), and
+##     the shape reaches the grower intact because bluesky's v3 load path is
+##     pass-through (bluesky/loaders/firespider.py:91-93).
+##   - ACTIVE AREA level: the RAVE loader (bluesky/loaders/rave.py:248), bsf
+##     (bluesky/loaders/bsf.py:321), and the timeprofile module, which assigns
+##     a['timeprofile'] on the active area (bluesky/modules/timeprofile.py:70).
+##   - FIS supplies neither -- its marshaller returns only lat/lng/source/frp/area
+##     (firespider/marshal/fireinfosystem.py:278-287) -- which is why FIS runs never
+##     tripped this bug and why no fixture here was exercising the active-area path.
+##
+
+ONE_DAY = datetime.timedelta(days=1)
+
+# timeprofile on the ACTIVE AREA, deliberately NOT on the point
+AA_TIMEPROFILE_FIRE = {
+    "id": "aa-tp-1",
+    "type": "wildfire",
+    "activity": [
+        {
+            "active_areas": [
+                {
+                    "specified_points": [
+                        {'lat': 40, 'lng': -116, 'area': 40, "utc_offset": "-05:00"}
+                    ],
+                    "start": datetime.datetime(2016,8,2,0,0,0),
+                    "end": datetime.datetime(2016,8,3,0,0,0),
+                    "timeprofile": {
+                        datetime.datetime(2016,8,2,1,0,0): {"area_fraction": 0.5},
+                        datetime.datetime(2016,8,2,13,0,0): {"area_fraction": 0.5}
+                    }
+                }
+            ]
+        }
+    ]
+}
+
+# timeprofile on the POINT (current FireSpider GOES-16 v3 shape); must keep shifting
+# correctly, so the fix cannot simply drop the location-level shift
+POINT_TIMEPROFILE_FIRE = {
+    "id": "pt-tp-1",
+    "type": "wildfire",
+    "activity": [
+        {
+            "active_areas": [
+                {
+                    "specified_points": [
+                        {
+                            'lat': 40, 'lng': -116, 'area': 40, "utc_offset": "-05:00",
+                            "timeprofile": {
+                                datetime.datetime(2016,8,2,1,0,0): {"area_fraction": 1.0}
+                            },
+                            "hourly_frp": {
+                                datetime.datetime(2016,8,2,1,0,0): 55.23
+                            }
+                        }
+                    ],
+                    "start": datetime.datetime(2016,8,2,0,0,0),
+                    "end": datetime.datetime(2016,8,3,0,0,0)
+                }
+            ]
+        }
+    ]
+}
+
+
+class TestPersistenceWfActiveAreaTimeprofile():
+
+    def set_config(self, days_to_persist):
+        Config().set({
+            "date_to_persist": datetime.date(2016,8,2),
+            "days_to_persist": days_to_persist,
+        }, "growth", "persistence")
+
+    def test_aa_timeprofile_stays_aligned_with_start(self, reset_config):
+        """Each persisted day's active-area timeprofile lands on its own start date.
+
+        Pre-fix this drifts by +N days on forecast day N: start 8-3 / profile 8-4,
+        start 8-4 / profile 8-6, start 8-5 / profile 8-8.
+        """
+        self.set_config(3)
+
+        fm = MockFiresManager([copy.deepcopy(AA_TIMEPROFILE_FIRE)])
+        persistence.Grower(fm).grow()
+
+        activity = fm.fires[0]['activity']
+        assert len(activity) == 4  # the original day plus 3 persisted
+
+        for i, a in enumerate(activity):
+            aa = a['active_areas'][0]
+            assert aa['start'] == datetime.datetime(2016,8,2,0,0,0) + i * ONE_DAY
+            assert aa['end'] == datetime.datetime(2016,8,3,0,0,0) + i * ONE_DAY
+            assert set(aa['timeprofile']) == {
+                datetime.datetime(2016,8,2,1,0,0) + i * ONE_DAY,
+                datetime.datetime(2016,8,2,13,0,0) + i * ONE_DAY
+            }, "timeprofile drifted from start on activity {}".format(i)
+            # the point must never acquire a timeprofile of its own
+            assert not dict.__contains__(aa['specified_points'][0], 'timeprofile')
+
+    def test_aa_timeprofile_shift_independent_of_point_count(self, reset_config):
+        """The shared profile is shifted once, not once per location.
+
+        Pre-fix the shift is 1 + len(aa.locations) days, so this fails at every count.
+        """
+        self.set_config(1)
+
+        for num_points in (1, 2, 5):
+            fire = copy.deepcopy(AA_TIMEPROFILE_FIRE)
+            fire['activity'][0]['active_areas'][0]['specified_points'] = [
+                {'lat': 40 + n, 'lng': -116, 'area': 40, "utc_offset": "-05:00"}
+                for n in range(num_points)
+            ]
+            fm = MockFiresManager([fire])
+            persistence.Grower(fm).grow()
+
+            aa = fm.fires[0]['activity'][-1]['active_areas'][0]
+            assert aa['start'] == datetime.datetime(2016,8,3,0,0,0)
+            assert set(aa['timeprofile']) == {
+                datetime.datetime(2016,8,3,1,0,0),
+                datetime.datetime(2016,8,3,13,0,0)
+            }, "profile drifted with {} point(s)".format(num_points)
+
+
+class TestPersistenceWfPointTimeprofileStillShifts():
+    """The fix must not regress the shape the other fixtures use."""
+
+    def set_config(self, days_to_persist):
+        Config().set({
+            "date_to_persist": datetime.date(2016,8,2),
+            "days_to_persist": days_to_persist,
+        }, "growth", "persistence")
+
+    def test_point_timeprofile_still_shifted_once(self, reset_config):
+        self.set_config(2)
+
+        fm = MockFiresManager([copy.deepcopy(POINT_TIMEPROFILE_FIRE)])
+        persistence.Grower(fm).grow()
+
+        activity = fm.fires[0]['activity']
+        assert len(activity) == 3
+
+        for i, a in enumerate(activity):
+            aa = a['active_areas'][0]
+            pt = aa['specified_points'][0]
+            assert aa['start'] == datetime.datetime(2016,8,2,0,0,0) + i * ONE_DAY
+            assert set(pt['timeprofile']) == {
+                datetime.datetime(2016,8,2,1,0,0) + i * ONE_DAY
+            }, "point timeprofile wrong on activity {}".format(i)
+            assert set(pt['hourly_frp']) == {
+                datetime.datetime(2016,8,2,1,0,0) + i * ONE_DAY
+            }
+            # the active area never acquires one via the shift
+            assert not dict.__contains__(aa, 'timeprofile')
