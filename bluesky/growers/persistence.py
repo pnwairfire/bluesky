@@ -199,7 +199,17 @@ class Grower(GrowerBase):
                     self._add_time_diff_to_keys(aa, t_diff, ('timeprofile',))
                     for l in aa.locations:
                         self._add_time_diff_to_keys(l, t_diff, ('plumerise',))
-                        self._add_time_diff_to_keys(l, t_diff, ('timeprofile',))
+                        # Only shift a timeprofile the location actually OWNS.
+                        # 'timeprofile' is not in Location.LOCATION_ONLY_FIELDS, so a
+                        # location without its own falls through to its active area's
+                        # (models/activity.py:78-84) and returns that very same dict --
+                        # which the line above already shifted. Use dict.__contains__ to
+                        # bypass Location.__contains__ (activity.py:86-89), which ORs in
+                        # that same fallback and so is True either way; a plain
+                        # "'timeprofile' in l" would re-shift the active area's profile
+                        # once per location, drifting it +N days on forecast day N.
+                        if dict.__contains__(l, 'timeprofile'):
+                            self._add_time_diff_to_keys(l, t_diff, ('timeprofile',))
                         self._add_time_diff_to_keys(l, t_diff, ('hourly_frp',))
 
                 if self._daily_percentages[i] < 100:
