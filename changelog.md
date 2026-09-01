@@ -792,3 +792,7 @@
 
 ## 4.6.33
  - Add RAVE emissions loader with country assignment
+
+## 4.6.34
+ - bug fix in persistence growth module
+ - RAVE follow-ups
