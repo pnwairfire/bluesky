@@ -28,9 +28,18 @@ or, on the command line:
         "saved_copy_file": "/path/to/log/dir/fire-spider-goes16-fires-{today:%Y-%m-%d}.json"
     }]' load -o out.json
 
-Currently supported sources:  FireSpider
-Currently supported types: file, API
-Currently supported formats: JSON, CSV
+'name' selects the module under bluesky.loaders, and 'format' + 'type' select the
+loader class within it ('<Format><Type>Loader'), so only these combinations exist:
+
+    name          format    type    loader class
+    ------------  --------  ------  -------------------
+    firespider    JSON      API     JsonApiLoader
+    firespider    JSON      file    JsonFileLoader
+    bsf           CSV       file    CsvFileLoader
+    rave          netcdf    file    NetcdfFileLoader
+    rave          CSV       file    CsvFileLoader
+
+See docs/configuration.md for the options each source accepts.
 """
 
 import importlib

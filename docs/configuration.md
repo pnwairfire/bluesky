@@ -83,6 +83,34 @@ configuration json data are case-insensitive.***
  - ***'config' > 'load' > 'sources' > 'area_units'*** -- *optional* -- default 'acres'; supported: 'acrea', 'hectares'
  - ***'config' > 'load' > 'sources' > 'consumption_units'*** -- *optional* -- default 'tons/acre'; supported 'tons/acre', 'kg/m^2'
 
+#### if source 'rave'
+
+RAVE (Regional ABI-VIIRS Emissions) is a gridded satellite product; each fire is one ~3km grid cell for one day, with emissions and FRP read straight from the source, so the 'fuelbeds' > 'consumption' > 'emissions' modules are typically skipped. Use `format` 'netcdf' to read RAVE '.nc' files directly, or 'csv' for pre-extracted records; both use `type` 'file'.
+
+ - ***'config' > 'load' > 'sources' > 'group_by'*** -- *optional* -- default 'local'; how cell-hours are grouped into one fire. 'local' = one fire per grid cell per LOCAL day, using an approximate solar offset derived from longitude, so days line up with FireSpider/FIS's local-day buckets; 'utc' = one fire per grid cell per UTC calendar day. Note that a local day straddles two UTC days, so 'local' requires the neighbouring UTC day(s) to be loaded as well -- loading a single UTC day's files in 'local' mode drops nearly every day as incomplete (see 'max_missing_hours')
+ - ***'config' > 'load' > 'sources' > 'max_missing_hours'*** -- *optional* -- default 5; only used when 'group_by' is 'local' -- drop a local day that is missing more than this many of its 24 hours. Coverage is counted against the UTC hours actually loaded, not against hours that happen to contain fire, so an hour whose file was loaded but held no fire in a cell still counts as covered. Days kept with tolerated gaps are reported in a warning
+ - ***'config' > 'load' > 'sources' > 'trim_to_date'*** -- *optional* -- default none; keep only the fires falling on this one day and discard the rest, given as 'YYYYMMDD' or 'YYYY-MM-DD' (a '{today}' wildcard works, and resolves before the loader sees it). The day compared is the one the fire is grouped into: the LOCAL day under 'group_by' 'local', the UTC day under 'utc'. This matters for local grouping, because the neighbouring UTC day(s) that have to be loaded to complete the target local day also carry enough hours to complete a neighbouring LOCAL day -- the day before for western cells, the day after for eastern ones -- so without this a D-1..D+1 load emits two days per grid cell. Trimming is applied before the completeness check, so a neighbouring day is never built into a fire and never counted in the 'max_missing_hours' warning. When 'trim_to_date' is not set and a local-grouped load emits more than one local day, the loader logs a warning naming the days and their fire counts, since that is correct for a deliberate multi-day load but a silent doubling for a single-day one
+ - ***'config' > 'load' > 'sources' > 'min_qa'*** -- *optional* -- default 1; drop cells whose QA flag is below this value
+ - ***'config' > 'load' > 'sources' > 'scaled'*** -- *optional* -- default false; netcdf only -- read the 'PM25_scaled'/'CO_scaled' variables instead of 'PM25'/'CO'. Note that RAVE only scales particulates, so this raises PM2.5 while leaving CO unchanged
+ - ***'config' > 'load' > 'sources' > 'assign_country'*** -- *optional* -- default true; assign each cell a country by point-in-polygon against the bundled countries shapefile
+ - ***'config' > 'load' > 'sources' > 'country_shapefile'*** -- *optional* -- path to an alternate countries shapefile, used when 'assign_country' is true
+ - ***'config' > 'load' > 'sources' > 'files'*** -- *optional* -- netcdf only -- explicit list of files to load
+ - ***'config' > 'load' > 'sources' > 'dir'*** -- *optional* -- netcdf only -- directory to load files from, globbed with 'pattern'
+ - ***'config' > 'load' > 'sources' > 'pattern'*** -- *optional* -- default '*.nc'; netcdf only -- glob pattern used with 'dir'. May be a single string or a list of them, and may contain directory components, so one load can reach into sibling directories without pulling in everything under them. Note that '**' does NOT recurse. A pattern that matches nothing is not an error, but a 'dir' whose pattern(s) match nothing at all is
+
+Combined with datetime substitution (see 'Datetime Substitutions' in the docs), a list of patterns lets a single static config select a date window from a date-partitioned archive. RAVE is typically archived as '<root>/<YYYY>/<MM>/', and 'group_by' 'local' needs the neighbouring UTC day(s), so:
+
+    "dir": "/data/.../RAVE-HrlyEmiss-3km",
+    "pattern": [
+        "{today-1:%Y}/{today-1:%m}/*_s{today-1:%Y%m%d}*.nc",
+        "{today:%Y}/{today:%m}/*_s{today:%Y%m%d}*.nc",
+        "{today+1:%Y}/{today+1:%m}/*_s{today+1:%Y%m%d}*.nc"
+    ]
+
+Each entry resolves its own year and month, so the same config keeps working across month, year, and leap-day boundaries with no special casing, and loads ~72 hourly files rather than a whole month's ~744.
+
+The netcdf loader requires at least one of 'files', 'dir', or 'file' (see 'if type file', below), and raises a configuration error if none is given; if more than one is set they are checked in that order and the first match wins. Note that 'files' entries are used verbatim and are NOT globbed. The csv loader takes the single 'file' from that same section.
+
 #### if type 'file':
 
  - ***'config' > 'load' > 'sources' > 'file'*** -- *required* for each file type source-- file containing fire data; e.g. '/path/to/fires.csv'; may contain format codes that conform to the C standard (e.g. '%Y' for four digit year, '%m' for zero-padded month, etc.); note that csv files can be loaded over http(s)
